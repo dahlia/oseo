@@ -111,10 +111,34 @@ Avoid constructs that require TypeScript-specific runtime emission, including
 enums, namespaces, parameter properties, and legacy decorators. Prefer explicit
 data structures, tagged unions, and `import type` for type-only dependencies.
 
+Prefer immutable data unless mutation is part of the implementation contract.
+Mark object fields `readonly` by default, including fields on internal and test
+types. Spell immutable array types as `readonly T[]`; use mutable `T[]` only
+when the code deliberately changes that array, such as a local accumulator.
+Use `interface` for named object shapes. Reserve `type` for unions,
+intersections, primitive aliases, tuples, and other declarations that an
+interface cannot express clearly.
+
+Document exported APIs with JSDoc. Important internal declarations also need
+JSDoc when they define a package boundary, ownership rule, invariant, or
+non-obvious representation. Describe the contract and the reason it exists;
+do not add comments that merely repeat the declaration's name or TypeScript
+syntax.
+
 Source type annotations and JSDoc types are optimization hints. The compiler
 must not depend on `tsc` or the TypeScript type checker to extract them. A
 bootstrap parser's AST must be converted at the frontend boundary rather than
 leaking into intermediate representations or backend code.
+
+
+Line length
+-----------
+
+Keep every manually maintained source, configuration, and documentation line
+at or below 80 columns. Wrap prose and code instead of relying on an editor's
+soft wrapping. Markdown table rows and link destinations are exempt. A URL may
+also exceed the limit wherever it appears, including in a source-code comment.
+Generated lockfiles are exempt and must not be hand-edited.
 
 
 C and native toolchain policy

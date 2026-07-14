@@ -1,0 +1,8 @@
+node_modules/
+
+# Probe outputs are reproducible and are written outside the source tree.
+experiments/.tmp/
+*.o
+*.a
+*.s
+*.out

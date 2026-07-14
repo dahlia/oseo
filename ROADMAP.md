@@ -4,7 +4,9 @@ Oseo roadmap
 Status
 ------
 
-Oseo is in milestone M0, design and project foundations. This roadmap uses
+Oseo is in milestone M0, design and project foundations. M0-A, architecture
+decisions and executable probes, is complete. M0-B, the publishable workspace
+and native fixture harness, is the next implementation plan. This roadmap uses
 capability gates rather than calendar dates. A milestone is complete only when
 its exit criteria are repeatable in continuous integration.
 
@@ -80,6 +82,13 @@ smallest workflow needed to test native output.
     compare it with a reference runtime.
  -  Stable commands reserved for `--dump-mir` and `--emit-c`, even if their
     first output is minimal.
+
+M0-A accepted Node.js and Deno host pins, Babel behind an owned-syntax boundary,
+the C11 and Zig responsibility split, an x86-64 NaN-boxed generic value, a
+two-word generic call result, and linked explicit root frames. The checked-in
+probes remain regression tests through `mise run check:probes`. M0-B now owns
+the package workspace and fixture harness described in
+[*PLAN-M0-B.md*](./PLAN-M0-B.md).
 
 ### Exit criteria
 
@@ -408,19 +417,17 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The first implementation plan should split M0 and the start of M1 into the
-following work items:
+The first two items and the architecture probes are complete in M0-A. M0-B and
+M1 retain the following implementation queue:
 
-1.  Write the initial language profile and unsupported-feature policy.
-2.  Add architecture decision records and a decision-record template.
-3.  Scaffold the restricted TypeScript compiler core and Node.js/Deno hosts.
-4.  Define the Oseo-owned syntax tree and bootstrap-parser adapter.
-5.  Define high-level IR and a textual printer.
-6.  Define control-flow MIR and a textual printer.
-7.  Prototype tagged-value layouts and record generated guard sequences.
-8.  Implement the minimal C11 runtime and native build driver.
-9.  Lower the first generic fixture from MIR to C.
-10. Add differential, structural, and native-executable test harnesses.
+1.  Scaffold the restricted TypeScript compiler core and Node.js/Deno hosts.
+2.  Implement the accepted Oseo-owned syntax contract and Babel adapter.
+3.  Define high-level IR and a textual printer.
+4.  Define control-flow MIR and a textual printer.
+5.  Implement the accepted opaque value, call, and root interfaces.
+6.  Implement the minimal C11 runtime and native build driver.
+7.  Lower the first generic fixture from MIR to C.
+8.  Add differential, structural, and native-executable test harnesses.
 
 Work on guarded specialization begins only after the generic fixture and its
 reference-runtime comparison pass. That boundary keeps M2 a test of Oseo's

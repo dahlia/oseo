@@ -7,8 +7,8 @@ Status
 This is a living design document. It records the constraints that should remain
 true as Oseo grows, the boundaries between its major components, and the
 decisions that later implementation work must preserve.
-The [white paper](./WHITEPAPER.md) explains why Oseo should exist;
-this document describes how it is intended to work.
+The [*WHITEPAPER.md*](./WHITEPAPER.md) white paper explains why Oseo should
+exist; this document describes how it is intended to work.
 
 The design may change at any point during development. Experiments, conformance
 tests, implementation experience, and compatibility work will expose mistakes
@@ -85,15 +85,16 @@ that may change after the first vertical slice.
 | Bootstrap hosts        | Node.js and Deno                                              | Decided              |
 | Type information       | Syntax-level hints, without TypeScript type checking          | Decided              |
 | Optimization model     | Guarded specialized paths beside a generic path               | Decided              |
-| Initial target         | Linux on x86-64                                               | Provisional          |
-| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Provisional          |
+| Initial target         | `x86_64-linux-gnu`                                            | Accepted for M1      |
+| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Accepted for M1      |
 | Generic value          | One 64-bit tagged word                                        | Decided in principle |
-| Initial value layout   | NaN-boxing with an immediate small-integer form               | Provisional          |
-| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Provisional          |
+| Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for x86-64  |
+| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Accepted for M1      |
 
-Provisional choices require an architecture decision record. A decision record
-must include the alternatives considered, the experiment used to choose among
-them, and the conditions that would justify revisiting the choice.
+The accepted M0 choices and their replacement triggers are recorded under
+[*docs/adr/*](./docs/adr/). Choices that remain provisional require an
+architecture decision record with alternatives, probe evidence, and the
+conditions that would justify revisiting the choice.
 
 
 Compiler architecture
@@ -141,9 +142,12 @@ an explicit TypeScript annotation, a JSDoc annotation, and a fact proven from
 syntax or control flow. Proven facts may remove a guard; user annotations may
 select a specialization but do not remove the guard that makes it safe.
 
-Parser dependencies belong behind the frontend boundary. Code in the compiler
-core must not import them or rely on their object layout, traversal helpers, or
-host-specific module behavior.
+The bootstrap adapter uses `@babel/parser` with TypeScript syntax, comments,
+tokens, and recoverable errors enabled. Parser dependencies belong behind the
+frontend boundary. Code in the compiler core must not import them or rely on
+their object layout, traversal helpers, or host-specific module behavior. Fatal
+and recoverable parser failures become Oseo-owned diagnostics before leaving
+the adapter.
 
 
 Intermediate representations
@@ -218,12 +222,12 @@ this document. It must represent at least numbers, strings, booleans, `null`,
 `undefined`, symbols, big integers, and heap object references as those values
 enter the supported language profile.
 
-The initial experiment should compare a NaN-boxed layout with a conventional
-low-bit tagged layout. NaN-boxing is the current candidate because JavaScript
-numbers are IEEE 754 doubles and should not all require heap allocation. The
-experiment must cover pointer-width assumptions, NaN canonicalization, integer
-range, generated guard sequences, garbage-collector recognition, and both
-x86-64 and likely AArch64 constraints.
+The initial x86-64 runtime uses a NaN-boxed layout. It canonicalizes numeric NaN
+to `0x7ff8000000000000`, stores signed 48-bit small integers immediately, and
+uses a distinct tag for heap references below the checked 48-bit user-address
+limit. The tag masks are private runtime ABI. AArch64 execution requires a new
+address-space validation because 52-bit virtual addresses and pointer metadata
+can violate this layout.
 
 Specialized blocks may hold raw integers, doubles, or pointers in native
 registers. A value must be converted back to `OseoValue` before it crosses a
@@ -260,11 +264,11 @@ and property model but may have distinct layouts.
 Memory management
 -----------------
 
-The initial collector should favor an inspectable rooting protocol over an
-advanced collection strategy. Generated code records live generic values in an
-explicit root stack around allocation points and runtime calls that may collect.
-A non-moving mark-and-sweep collector then avoids relocation barriers while the
-object representation and compiler ABI are still changing.
+The initial collector uses an inspectable rooting protocol. Generated code
+records live generic values in linked root frames around allocation points and
+runtime calls that may collect. Each frame points to a contiguous slot array and
+the previous frame. A non-moving mark-and-sweep collector avoids relocation
+barriers while the object representation and compiler ABI are still changing.
 
 MIR must identify allocation and collection safepoints. Specialized raw values
 that denote heap objects must either be described to the collector or be boxed
@@ -285,10 +289,11 @@ stable across independently compiled units. Specialized entries are private to
 the linked program and may change between builds.
 
 Exceptions, `return`, `break`, and `continue` are represented explicitly before
-backend lowering. The first C backend needs a documented abrupt-completion ABI;
-whether it uses explicit result values, exception continuations, or another
-mechanism remains an initial architecture decision. The choice must preserve
-garbage-collector roots and allow non-throwing specialized blocks to stay small.
+backend lowering. A generic call returns a two-word `OseoResult` containing an
+`OseoStatus` and an `OseoValue`. Normal and thrown values use the same value
+field. `return`, `break`, and `continue` are resolved within a compiled
+function; only thrown completion crosses an ordinary call boundary. Private
+helpers that are proven not to throw may return a value directly.
 
 
 Modules and whole-program compilation
@@ -330,8 +335,8 @@ documented scheduling model.
 Native backend
 --------------
 
-The initial backend emits C11 for the selected target. A separate native
-toolchain adapter invokes `zig cc` by default. This keeps the first
+The initial backend emits C11 for `x86_64-linux-gnu`. A separate native
+toolchain adapter invokes pinned `zig cc` by default. This keeps the first
 implementation in TypeScript, produces native functions, and makes generated
 control flow easy to inspect. The compiler should support `--emit-c` and
 `--dump-mir` from the first executable milestone.
@@ -426,16 +431,14 @@ failed compilation. IR and C dumps should retain enough source information to
 trace a native block back to the originating expression.
 
 
-Open architecture decisions
----------------------------
+Remaining architecture decisions
+--------------------------------
 
-The following questions must be settled by decision records before the affected
-implementation becomes a dependency of later milestones:
+M0 accepted the bootstrap parser, initial C boundary, x86-64 value layout,
+generic call result, and explicit root protocol. The following questions still
+need decision records before the affected implementation becomes a dependency
+of later milestones:
 
- -  the exact tagged-value layout and supported address-space assumptions;
- -  the bootstrap parser and the plan for replacing or absorbing it;
- -  the initial C ABI for calls and abrupt completion;
- -  the garbage-collector root format and safepoint protocol;
  -  the object shape and dictionary layouts;
  -  the long-term native code-generation backend;
  -  the native event-loop and system-library boundary;

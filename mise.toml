@@ -5,15 +5,46 @@ experimental = true
 
 [tools]
 "aqua:dahlia/hongdown" = "0.5.1"
+aube = "1.26.0"
+deno = "2.9.2"
+node = "24.18.0"
+zig = "0.16.0"
 
 [tasks.check]
 depends = ["check:*"]
+
+[tasks."check:probes"]
+depends = [
+  "probe:abi-roots",
+  "probe:host-parser",
+  "probe:native-boundary",
+  "probe:value-layouts",
+]
 
 [tasks."check:fmt:md"]
 run = "hongdown --check"
 
 [tasks."check:fmt:mise"]
 run = "mise fmt --check"
+
+[tasks."check:fmt:ts"]
+run = """
+deno fmt --check \
+  experiments/host/probe.ts \
+  experiments/measure-assembly.ts \
+  experiments/parser/*.ts
+"""
+
+[tasks."check:types"]
+depends = ["probe:deps"]
+run = """
+deno --version
+deno check --node-modules-dir=manual \
+  experiments/host/probe.ts \
+  experiments/parser/probe.ts \
+  experiments/parser/check.ts \
+  experiments/measure-assembly.ts
+"""
 
 [tasks.fmt]
 depends = ["fmt:*"]
@@ -23,3 +54,28 @@ run = "hongdown --write"
 
 [tasks."fmt:mise"]
 run = "mise fmt"
+
+[tasks."fmt:ts"]
+run = """
+deno fmt \
+  experiments/host/probe.ts \
+  experiments/measure-assembly.ts \
+  experiments/parser/*.ts
+"""
+
+[tasks."probe:deps"]
+hide = true
+run = "aube install --frozen-lockfile"
+
+[tasks."probe:host-parser"]
+depends = ["probe:deps"]
+run = "node experiments/parser/check.ts"
+
+[tasks."probe:native-boundary"]
+run = "bash experiments/native/run.sh"
+
+[tasks."probe:value-layouts"]
+run = "bash experiments/value/run.sh"
+
+[tasks."probe:abi-roots"]
+run = "bash experiments/abi-roots/run.sh"

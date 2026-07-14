@@ -1,0 +1,14 @@
+{
+  "name": "oseo-m0-probes",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.18.0"
+  },
+  "devDependencies": {
+    "@babel/parser": "8.0.4",
+    "@types/node": "24.13.3",
+    "acorn": "8.17.0",
+    "acorn-typescript": "1.4.13"
+  }
+}
