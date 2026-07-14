@@ -1,12 +1,26 @@
 {
-  "name": "oseo-m0-probes",
+  "name": "oseo-workspace",
   "private": true,
+  "license": "GPL-3.0-only",
+  "author": {
+    "name": "Hong Minhee",
+    "email": "hong@minhee.org",
+    "url": "https://hongminhee.org/"
+  },
+  "funding": "https://github.com/sponsors/dahlia",
+  "workspaces": [
+    "packages/*"
+  ],
   "type": "module",
   "devDependencies": {
+    "@arethetypeswrong/core": "0.18.5",
     "@babel/parser": "8.0.4",
     "@types/node": "24.13.3",
     "acorn": "8.17.0",
-    "acorn-typescript": "1.4.13"
+    "acorn-typescript": "1.4.13",
+    "publint": "0.3.21",
+    "tsdown": "0.22.7",
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": "24.18.0"

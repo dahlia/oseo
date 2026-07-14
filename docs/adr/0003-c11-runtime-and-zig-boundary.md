@@ -80,8 +80,8 @@ Consequences
 Another C compiler replaces only the toolchain adapter and target mapping.
 Another runtime implementation supplies the same private runtime ABI. Another
 native backend consumes the backend-neutral input without changing source
-semantics. M0-B may model these inputs as opaque data, but it must not merge
-their ownership.
+semantics. M0 models these inputs as opaque data without merging their
+ownership.
 
 
 Failure modes and replacement triggers

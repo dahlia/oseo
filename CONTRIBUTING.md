@@ -1,9 +1,10 @@
 Contributing to Oseo
 ====================
 
-Thank you for helping build Oseo. The project is currently in M0, so interfaces,
-package boundaries, and tooling will change as experiments replace assumptions
-with evidence. Small, testable changes are especially valuable at this stage.
+Thank you for helping build Oseo. The project is currently entering M1, so
+interfaces and implementation details will change as the first generic native
+slice replaces assumptions with evidence. Small, testable changes are
+especially valuable at this stage.
 
 
 Before you start
@@ -37,11 +38,15 @@ tools and repository tasks. Start with:
 mise install
 mise tasks
 mise run check
+mise run test
 ~~~~
 
+`mise install` also installs a local pre-commit hook that runs
+`mise run check`. Repeating the install refreshes the generated hook.
+
 `mise tasks` is the source of truth for commands available in the current
-checkout. M0 tooling is still being added, so a command described in a design or
-plan document may not exist yet. Do not add instructions that present planned
+checkout. A command described in a design or plan document may not exist until
+its implementation lands. Do not add instructions that present planned
 commands as already available.
 
 The mise aube dependency provider checks *package.json* and *aube-lock.yaml*
@@ -50,7 +55,7 @@ changed or *node\_modules/* is missing. Run `mise deps` to synchronize
 dependencies without starting a repository task. Do not add task-level install
 dependencies that duplicate this provider.
 
-As the workspace is scaffolded, the intended toolchain is:
+The workspace uses this toolchain:
 
  -  [aube] for JavaScript package installation and
     workspace management;
@@ -206,15 +211,28 @@ crosses a boundary. Depending on the work, this may include:
     contract;
  -  applicable ECMA-262, test262, or WinterTC conformance tests.
 
+Tests shared by Node.js and Deno must import `test` from `node:test` and
+`assert` from `node:assert/strict` directly. Register tests in files that both
+hosts execute unchanged. Do not add host-specific registration wrappers or
+repository-local assertion helpers for APIs provided by these modules.
+
+Place tests owned by one package under *packages/<package>/tests/* and name
+executable test files *.test.ts* so Node.js and Deno discover them. Reserve the
+repository-level *tests/* directory for cross-package integration, native
+fixtures, built-artifact validation, and workspace tooling. A package test may
+import only its public source entry point or an explicitly tested internal
+module from the same package.
+
 Before submitting a change, run:
 
 ~~~~ sh
 mise run check
+mise run test
 ~~~~
 
-Also run any focused test or native fixture task shown by `mise tasks` for the
-packages you changed. Do not commit generated binaries, temporary C output, or
-debug dumps unless they are reviewed fixtures with a documented purpose.
+Also run any focused test task shown by `mise tasks` for the packages you
+changed. Do not commit generated binaries, temporary C output, or debug dumps
+unless they are reviewed fixtures with a documented purpose.
 
 
 Package manifests and versions
@@ -225,17 +243,27 @@ package independently. npm and JSR manifests for the same package must report
 the same version, and internal package dependencies should use the workspace
 protocol rather than hard-coded local versions.
 
+The root *VERSION* file is the single source of truth for the lockstep version.
+`mise run check:versions` verifies its strict SemVer value against every
+published npm and JSR package manifest. The check also validates manifest
+pairs, package names, and `workspace:*` internal dependency ranges. Do not edit
+*VERSION* or one package manifest independently.
+
 Version changes are maintainer-driven and should not be included in unrelated
-contributions. The planned stable task interface is `mise run check:versions`
-for validation and `mise run bump-versions <version>` for an atomic lockstep
-bump. Use those commands only after they appear in `mise tasks`; until then,
-leave package versions unchanged unless the work explicitly establishes the
-versioning workflow.
+contributions. Use `mise run bump-versions <version>` to update *VERSION* and
+every package manifest atomically. The command restores the previous contents
+if it cannot complete the full update.
 
 npm artifacts should be ESM packages built with tsdown and include declaration
 files and source maps. JSR packages should publish TypeScript source. Package
 manifests are public API: keep exports explicit, do not expose private build
 paths, and do not bundle other `@oseo/*` packages into an npm artifact.
+
+`mise run check:packages` stages npm artifacts without changing their source
+manifests. The staging step rewrites internal `workspace:*` dependencies to the
+exact lockstep release version, then inspects the packed manifest. Every package
+root must also contain a *LICENSE* file identical to the repository license so
+that both npm and JSR artifacts distribute the GPL text.
 
 
 Documentation and design changes

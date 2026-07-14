@@ -1,0 +1,35 @@
+{
+  "name": "@oseo/compiler",
+  "version": "0.1.0",
+  "description": "Host-neutral contracts for the Oseo compiler.",
+  "bugs": "https://github.com/dahlia/oseo/issues",
+  "license": "GPL-3.0-only",
+  "author": {
+    "name": "Hong Minhee",
+    "email": "hong@minhee.org",
+    "url": "https://hongminhee.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dahlia/oseo.git",
+    "directory": "packages/compiler"
+  },
+  "funding": "https://github.com/sponsors/dahlia",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "deno": ">=2.9",
+    "node": ">=24"
+  }
+}

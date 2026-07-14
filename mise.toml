@@ -3,12 +3,14 @@ min_version = "2026.6.1"
 [settings]
 experimental = true
 
+[hooks]
+postinstall = "mise generate git-pre-commit --write --task=check"
+
 [tools]
 "aqua:dahlia/hongdown" = "0.5.1"
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
-"npm:typescript" = "7.0.2"
 oxfmt = "0.59.0"
 oxlint = "1.74.0"
 zig = "0.16.0"
@@ -17,16 +19,34 @@ zig = "0.16.0"
 auto = true
 run = "aube install --frozen-lockfile"
 
-[tasks.check]
-depends = ["check:*"]
+[tasks.build]
+description = "Build every npm package as validated ESM"
+run = "aube exec -- tsdown --workspace"
 
-[tasks."check:probes"]
+[tasks.bump-versions]
+description = "Atomically set the lockstep package version"
+usage = 'arg "<version>" help="Strict SemVer for every @oseo package"'
+run = '''
+node tools/versions.ts set "${usage_version?}"
+mise run check:versions
+'''
+
+[tasks.check]
 depends = [
-  "probe:abi-roots",
-  "probe:host-parser",
-  "probe:native-boundary",
-  "probe:value-layouts",
+  "check:boundaries",
+  "check:fmt",
+  "check:lines",
+  "check:lint",
+  "check:packages",
+  "check:types",
+  "check:versions",
 ]
+
+[tasks."check:boundaries"]
+run = "node tools/check-boundaries.ts"
+
+[tasks."check:fmt"]
+depends = ["check:fmt:md", "check:fmt:mise", "check:fmt:oxfmt"]
 
 [tasks."check:fmt:md"]
 run = "hongdown --check"
@@ -37,17 +57,38 @@ run = "mise fmt --check"
 [tasks."check:fmt:oxfmt"]
 run = "oxfmt --check ."
 
+[tasks."check:lines"]
+run = "node tools/check-lines.ts"
+
 [tasks."check:lint"]
 run = "oxlint --deny-warnings ."
 
+[tasks."check:packages"]
+depends = ["build"]
+run = '''
+node tools/check-packages.ts
+deno publish --dry-run --allow-dirty
+'''
+
 [tasks."check:types"]
-run = """
-tsc --version
-tsc --project tsconfig.json
-"""
+depends = ["build"]
+run = '''
+aube exec -- tsc --version
+aube exec -- tsc --project tsconfig.json
+'''
+
+[tasks."check:versions"]
+run = '''
+node tools/versions.ts check
+deno run --allow-read tools/versions.ts check
+'''
+
+[tasks.clean]
+description = "Remove generated package and native-test artifacts"
+run = "rm -rf packages/*/dist artifacts"
 
 [tasks.fmt]
-depends = ["fmt:*"]
+depends = ["fmt:md", "fmt:mise", "fmt:oxfmt"]
 
 [tasks."fmt:md"]
 run = "hongdown --write"
@@ -58,6 +99,9 @@ run = "mise fmt"
 [tasks."fmt:oxfmt"]
 run = "oxfmt ."
 
+[tasks."probe:abi-roots"]
+run = "bash experiments/abi-roots/run.sh"
+
 [tasks."probe:host-parser"]
 run = "node experiments/parser/check.ts"
 
@@ -67,5 +111,27 @@ run = "bash experiments/native/run.sh"
 [tasks."probe:value-layouts"]
 run = "bash experiments/value/run.sh"
 
-[tasks."probe:abi-roots"]
-run = "bash experiments/abi-roots/run.sh"
+[tasks.test]
+depends = ["test:deno", "test:native", "test:node", "test:probes"]
+
+[tasks."test:deno"]
+description = "Run package source tests under Deno"
+run = "deno test -A packages"
+
+[tasks."test:native"]
+description = "Build, run, compare, and cross-link the native fixture"
+run = "node tests/native.ts"
+
+[tasks."test:node"]
+description = "Run source, version, and built ESM tests under Node.js"
+depends = ["build"]
+run = "node --test"
+
+[tasks."test:probes"]
+description = "Run the architecture decision probes as regression tests"
+run = '''
+mise run probe:abi-roots
+mise run probe:host-parser
+mise run probe:native-boundary
+mise run probe:value-layouts
+'''

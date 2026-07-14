@@ -1,0 +1,9 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { cRuntimeProvider } from "../src/index.ts";
+
+test("provides the reviewed C runtime inputs", () => {
+  const runtime = cRuntimeProvider.getRuntimeInput();
+  assert.equal(runtime.assets.length, 2);
+});

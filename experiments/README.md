@@ -12,7 +12,7 @@ From a clean checkout, run:
 
 ~~~~ sh
 mise install
-mise run check:probes
+mise run test:probes
 ~~~~
 
 The aggregate installs the locked JavaScript dependencies through aube, runs
@@ -21,7 +21,8 @@ candidates under both hosts, builds the native C boundary for x86-64 and
 AArch64, checks two value layouts, and exercises the call and root protocols.
 Each task prints its pinned tools and target.
 
-`mise run check` also type-checks every TypeScript probe with pinned Deno.
+`mise run check` also type-checks every TypeScript probe with the pinned
+TypeScript compiler.
 
 
 Expected observations

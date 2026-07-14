@@ -1,0 +1,51 @@
+name: main
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - run: mise run check
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        runtime:
+          - node
+          - deno
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - run: mise run test:${{ matrix.runtime }}
+
+  test-native:
+    name: Test native and architecture contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - run: mise run test:native
+      - run: mise run test:probes
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-fixture-diagnostics
+          path: /tmp/oseo-native-*
+          if-no-files-found: ignore

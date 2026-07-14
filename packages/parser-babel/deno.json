@@ -1,0 +1,9 @@
+{
+  "name": "@oseo/parser-babel",
+  "version": "0.1.0",
+  "license": "GPL-3.0-only",
+  "exports": "./src/index.ts",
+  "publish": {
+    "exclude": ["dist/", "tests/"]
+  }
+}

@@ -18,8 +18,8 @@ on an unrecorded system compiler or package manager.
 Required contract
 -----------------
 
-M0-B needs exact host and toolchain versions, an initial executable target, and
-a second target that detects accidental host ABI dependencies.
+The M0 workspace needs exact host and toolchain versions, an initial executable
+target, and a second target that detects accidental host ABI dependencies.
 
 
 Alternatives considered
@@ -72,8 +72,8 @@ Consequences
 
 Probe tasks may use only tools provisioned through mise. Native target
 selection is explicit even when it matches the host. The AArch64 target is a
-portability check, not a supported execution target. M0-B must carry these pins
-until another accepted record updates them.
+portability check, not a supported execution target. The workspace carries
+these pins until another accepted record updates them.
 
 
 Failure modes and replacement triggers
@@ -88,6 +88,7 @@ target-specific assumptions that are absent from the target description.
 Links
 -----
 
-[*PLAN-M0-A.md*](../../PLAN-M0-A.md) defines the probe requirements.
+[*experiments/README.md*](../../experiments/README.md) defines the probe
+commands.
 [*0003-c11-runtime-and-zig-boundary.md*](./0003-c11-runtime-and-zig-boundary.md)
 defines how the native tools are used.

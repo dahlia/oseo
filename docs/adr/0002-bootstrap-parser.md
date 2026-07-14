@@ -79,7 +79,7 @@ Consequences
 ------------
 
 Only the Babel adapter imports `@babel/parser`. The compiler package owns every
-type returned by the adapter. M0-B may expose comment and token information only
+type returned by the adapter. M0 exposes comment and token information only
 through deliberately small Oseo types. Startup time is not optimized before a
 real compiler workload exists.
 

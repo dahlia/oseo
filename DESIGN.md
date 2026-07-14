@@ -122,6 +122,18 @@ Oseo-owned data structures immediately. This boundary lets Oseo use a mature
 parser during bootstrap and replace it later without rewriting optimization or
 code generation.
 
+M0 established this architecture as eight publishable packages under
+*packages/*. `@oseo/compiler` owns the interfaces, and concrete parser, backend,
+runtime, toolchain, and host packages depend inward on those contracts. The CLI
+is the composition root. `@oseo/testkit` consumes injected public interfaces
+rather than package-private source. Automated checks reject dependency cycles,
+private cross-package imports, and concrete dependencies from compiler core.
+
+The M0 backend input is a synthetic test module used only to prove native
+composition. It is not an Oseo syntax tree or a supported JavaScript profile.
+M1 replaces it with owned syntax, HIR, MIR, and generic lowering as specified in
+[*PLAN-M1.md*](./PLAN-M1.md).
+
 
 Source frontend
 ---------------

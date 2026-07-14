@@ -1,0 +1,39 @@
+{
+  "name": "@oseo/parser-babel",
+  "version": "0.1.0",
+  "description": "Babel source frontend adapter for Oseo.",
+  "bugs": "https://github.com/dahlia/oseo/issues",
+  "license": "GPL-3.0-only",
+  "author": {
+    "name": "Hong Minhee",
+    "email": "hong@minhee.org",
+    "url": "https://hongminhee.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dahlia/oseo.git",
+    "directory": "packages/parser-babel"
+  },
+  "funding": "https://github.com/sponsors/dahlia",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@babel/parser": "8.0.4",
+    "@oseo/compiler": "workspace:*"
+  },
+  "engines": {
+    "deno": ">=2.9",
+    "node": ">=24"
+  }
+}

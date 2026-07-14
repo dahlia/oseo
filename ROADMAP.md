@@ -4,11 +4,11 @@ Oseo roadmap
 Status
 ------
 
-Oseo is in milestone M0, design and project foundations. M0-A, architecture
-decisions and executable probes, is complete. M0-B, the publishable workspace
-and native fixture harness, is the next implementation plan. This roadmap uses
-capability gates rather than calendar dates. A milestone is complete only when
-its exit criteria are repeatable in continuous integration.
+Oseo has completed milestone M0, design and project foundations. The current
+implementation plan is the M1 generic native vertical slice in
+[*PLAN-M1.md*](./PLAN-M1.md). This roadmap uses capability gates rather than
+calendar dates. A milestone is complete only when its exit criteria are
+repeatable in continuous integration.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -38,7 +38,8 @@ Milestone work follows these rules:
  -  Correctness tests are written with or before the implementation they cover.
  -  Every specialized operation has specialization-invariance tests and
     deliberate guard failures.
- -  `mise run check` is the local and continuous-integration gate.
+ -  `mise run check` and `mise run test` are the local and
+    continuous-integration gates.
  -  Performance measurements record generated code and allocation behavior
     before broad benchmark scores.
  -  Compatibility findings are classified as language, runtime API, module
@@ -83,16 +84,17 @@ smallest workflow needed to test native output.
  -  Stable commands reserved for `--dump-mir` and `--emit-c`, even if their
     first output is minimal.
 
-M0-A accepted Node.js and Deno host pins, Babel behind an owned-syntax boundary,
+M0 accepted Node.js and Deno host pins, Babel behind an owned-syntax boundary,
 the C11 and Zig responsibility split, an x86-64 NaN-boxed generic value, a
-two-word generic call result, and linked explicit root frames. The checked-in
-probes remain regression tests through `mise run check:probes`. M0-B now owns
-the package workspace and fixture harness described in
-[*PLAN-M0-B.md*](./PLAN-M0-B.md).
+two-word generic call result, and linked explicit root frames. It also created
+the eight-package npm and JSR workspace, lockstep versioning, dual-host tests,
+package validation, and the native differential fixture harness. The checked-in
+probes remain regression tests through `mise run test:probes`.
 
 ### Exit criteria
 
- -  `mise run check` passes from a clean checkout on the initial supported host.
+ -  `mise run check` and `mise run test` pass from a clean checkout on the
+    initial supported host.
  -  The same compiler-core unit tests pass under Node.js and Deno.
  -  The repository documents every external tool needed to build a native
     fixture.
@@ -119,9 +121,9 @@ source-to-executable path and establish the generic semantic boundary.
  -  string concatenation for the values admitted by the profile;
  -  a minimal `console.log` host intrinsic for observable fixtures.
 
-The exact list is frozen in an M1 plan before implementation. Features may be
-removed to finish the vertical slice, but accepted features may not have
-placeholder semantics.
+The exact list and its required fixtures are frozen in
+[*PLAN-M1.md*](./PLAN-M1.md). Features may be removed by updating the plan and
+language profile, but accepted features may not have placeholder semantics.
 
 ### Deliverables
 
@@ -417,17 +419,17 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The first two items and the architecture probes are complete in M0-A. M0-B and
-M1 retain the following implementation queue:
+The package scaffold, architecture probes, version tooling, host adapters, and
+synthetic native harness are complete in M0. M1 retains this implementation
+queue:
 
-1.  Scaffold the restricted TypeScript compiler core and Node.js/Deno hosts.
-2.  Implement the accepted Oseo-owned syntax contract and Babel adapter.
-3.  Define high-level IR and a textual printer.
-4.  Define control-flow MIR and a textual printer.
-5.  Implement the accepted opaque value, call, and root interfaces.
-6.  Implement the minimal C11 runtime and native build driver.
-7.  Lower the first generic fixture from MIR to C.
-8.  Add differential, structural, and native-executable test harnesses.
+1.  Replace the M0 parser smoke result with production owned syntax and hints.
+2.  Define high-level IR, lexical resolution, and a textual printer.
+3.  Define generic control-flow MIR, roots, safepoints, and a textual printer.
+4.  Implement M1 primitive values and semantics in the C11 runtime.
+5.  Lower the first generic source fixture from MIR to deterministic C11.
+6.  Connect the real compiler path to `--dump-mir` and `--emit-c`.
+7.  Expand differential, structural, and native-executable fixture coverage.
 
 Work on guarded specialization begins only after the generic fixture and its
 reference-runtime comparison pass. That boundary keeps M2 a test of Oseo's

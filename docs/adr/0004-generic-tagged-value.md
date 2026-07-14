@@ -92,8 +92,8 @@ Consequences
 Most doubles cross the generic ABI without allocation. M1 runtime helpers must
 use `memcpy` for bit conversion and unsigned operations for tag arithmetic so C
 undefined behavior cannot enter the representation. The masks remain private
-to the C runtime and backend lowering. M0-B exposes only an opaque `OseoValue`
-contract.
+to the C runtime and backend lowering. M0 public packages expose only an opaque
+`OseoValue` contract.
 
 
 Failure modes and replacement triggers

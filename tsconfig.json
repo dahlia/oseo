@@ -3,6 +3,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "declaration": true,
+    "declarationMap": true,
     "erasableSyntaxOnly": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,5 +18,11 @@
     "types": ["node"],
     "verbatimModuleSyntax": true
   },
-  "include": ["experiments/**/*.ts"]
+  "include": [
+    "experiments/**/*.ts",
+    "packages/**/*.ts",
+    "tests/**/*.ts",
+    "tools/**/*.ts",
+    "tsdown.config.ts"
+  ]
 }
