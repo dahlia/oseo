@@ -8,6 +8,7 @@ experimental = true
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
+"npm:typescript" = "7.0.2"
 oxfmt = "0.59.0"
 oxlint = "1.74.0"
 zig = "0.16.0"
@@ -41,12 +42,8 @@ run = "oxlint --deny-warnings ."
 
 [tasks."check:types"]
 run = """
-deno --version
-deno check --node-modules-dir=manual \
-  experiments/host/probe.ts \
-  experiments/parser/probe.ts \
-  experiments/parser/check.ts \
-  experiments/measure-assembly.ts
+tsc --version
+tsc --project tsconfig.json
 """
 
 [tasks.fmt]

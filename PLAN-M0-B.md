@@ -252,7 +252,7 @@ Work sequence
 8.  Complete the task graph and continuous integration.
 
     `mise run check` is the only required aggregate gate. It covers formatting,
-    linting, Node.js and Deno type checks, dual-host tests, version checks,
+    linting, a TypeScript project check, dual-host tests, version checks,
     dependency-boundary checks, npm builds, npm and JSR package validation, and
     native fixture tests. Focused tasks remain available for debugging:
 

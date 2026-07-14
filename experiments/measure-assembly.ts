@@ -16,7 +16,8 @@ for (const name of functions) {
   if (start < 0) throw new Error(`${name} not found in ${path}`);
   const body: string[] = [];
   for (let index = start + 1; index < lines.length; index++) {
-    const line = lines[index].trim();
+    const line = lines[index]?.trim();
+    if (line == null) break;
     if (line.startsWith(`.size\t${name},`) || line.startsWith(`.size ${name},`))
       break;
     if (line === "" || line.startsWith(".") || line.endsWith(":")) continue;
@@ -24,7 +25,8 @@ for (const name of functions) {
       .replace(/[#;].*$/u, "")
       .replace(/\/\/.*$/u, "")
       .trim();
-    if (instruction !== "") body.push(instruction.split(/\s+/u)[0]);
+    const opcode = instruction.split(/\s+/u)[0];
+    if (opcode != null && opcode !== "") body.push(opcode);
   }
   console.log(
     `${architecture} ${name}: ${body.length} instructions [${body.join(", ")}]`,

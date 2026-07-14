@@ -91,6 +91,16 @@ interface ThrownParserError {
   readonly raisedAt?: number;
 }
 
+/** Minimal Deno surface read by this cross-host command-line probe. */
+interface DenoHost {
+  readonly args: readonly string[];
+}
+
+/** Runtime globals shared by the Node.js and Deno probe entry point. */
+interface CrossHostGlobal {
+  readonly Deno?: DenoHost;
+}
+
 /** Parser implementations compared by the M0 probe. */
 type ParserCandidate = "babel" | "acorn";
 
@@ -327,8 +337,9 @@ function normalizeFile(
   };
 }
 
+const hostGlobal = globalThis as typeof globalThis & CrossHostGlobal;
 const requestedCandidate =
-  globalThis.process?.argv[2] ?? globalThis.Deno?.args[0] ?? "babel";
+  hostGlobal.process?.argv[2] ?? hostGlobal.Deno?.args[0] ?? "babel";
 if (requestedCandidate !== "babel" && requestedCandidate !== "acorn") {
   throw new Error(`unknown parser candidate: ${requestedCandidate}`);
 }

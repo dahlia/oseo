@@ -56,6 +56,7 @@ As the workspace is scaffolded, the intended toolchain is:
     workspace management;
  -  [Oxfmt] for JavaScript, TypeScript, and data-file formatting;
  -  [Oxlint] for JavaScript and TypeScript linting;
+ -  [TypeScript] for static checking of repository source;
  -  [tsdown] for npm package builds;
  -  Node.js and Deno as bootstrap compiler hosts;
  -  Zig's C toolchain, invoked through `zig cc`, as the default way to compile
@@ -79,6 +80,7 @@ lockfiles.
 [aube]: https://aube.jdx.dev/
 [Oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 [Oxlint]: https://oxc.rs/docs/guide/usage/linter
+[TypeScript]: https://www.typescriptlang.org/
 [tsdown]: https://tsdown.dev/
 
 
@@ -141,10 +143,12 @@ non-obvious representation. Describe the contract and the reason it exists;
 do not add comments that merely repeat the declaration's name or TypeScript
 syntax.
 
-Source type annotations and JSDoc types are optimization hints. The compiler
-must not depend on `tsc` or the TypeScript type checker to extract them. A
-bootstrap parser's AST must be converted at the frontend boundary rather than
-leaking into intermediate representations or backend code.
+Repository checks use `tsc --noEmit` to validate Oseo's own TypeScript source.
+Source type annotations and JSDoc types in programs compiled by Oseo remain
+optimization hints. The Oseo compiler must not depend on `tsc` or the
+TypeScript type checker to extract them. A bootstrap parser's AST must be
+converted at the frontend boundary rather than leaking into intermediate
+representations or backend code.
 
 
 Line length
