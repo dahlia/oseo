@@ -1,0 +1,25 @@
+min_version = "2026.6.1"
+
+[settings]
+experimental = true
+
+[tools]
+"aqua:dahlia/hongdown" = "0.5.1"
+
+[tasks.check]
+depends = ["check:*"]
+
+[tasks."check:fmt:md"]
+run = "hongdown --check"
+
+[tasks."check:fmt:mise"]
+run = "mise fmt --check"
+
+[tasks.fmt]
+depends = ["fmt:*"]
+
+[tasks."fmt:md"]
+run = "hongdown --write"
+
+[tasks."fmt:mise"]
+run = "mise fmt"
