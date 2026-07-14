@@ -48,14 +48,22 @@ As the workspace is scaffolded, the intended toolchain is:
 
  -  [aube] for JavaScript package installation and
     workspace management;
+ -  [Oxfmt] for JavaScript, TypeScript, and data-file formatting;
+ -  [Oxlint] for JavaScript and TypeScript linting;
  -  [tsdown] for npm package builds;
  -  Node.js and Deno as bootstrap compiler hosts;
  -  Zig's C toolchain, invoked through `zig cc`, as the default way to compile
     generated C11 and the initial runtime.
 
-These tools should be pinned through mise and exposed through mise tasks. Using
-Zig as a C toolchain does not make Zig the runtime implementation language. The
-C runtime and the native backend remain replaceable architectural components.
+Repository-wide tools must be pinned through mise and exposed through mise
+tasks. Package build and test dependencies belong in aube workspace manifests.
+Oxfmt owns JavaScript, TypeScript, and supported data files. Hongdown owns
+Markdown, and `mise fmt` owns *mise.toml*. Generated lockfiles are never
+formatter inputs.
+
+Using Zig as a C toolchain does not make Zig the runtime implementation
+language. The C runtime and the native backend remain replaceable architectural
+components.
 
 When aube workspace files exist, do not introduce npm or pnpm lockfiles or use a
 different package manager to modify dependency state. Do not hand-edit generated
@@ -63,6 +71,8 @@ lockfiles.
 
 [mise]: https://mise.jdx.dev/
 [aube]: https://aube.jdx.dev/
+[Oxfmt]: https://oxc.rs/docs/guide/usage/formatter
+[Oxlint]: https://oxc.rs/docs/guide/usage/linter
 [tsdown]: https://tsdown.dev/
 
 
@@ -254,7 +264,7 @@ All Markdown documents in the repository follow these rules:
  -  Avoid em dashes. Rewrite the sentence or use a comma, colon, or semicolon.
  -  Use italics sparingly for ordinary emphasis. Reserve bold text for warnings
     and user-interface labels.
- -  Let hongdown manage line wrapping and list layout. Do not align Markdown
+ -  Let Hongdown manage line wrapping and list layout. Do not align Markdown
     manually with padding or repeated spaces.
 
 When a link names a repository file, italicize the visible filename, as in

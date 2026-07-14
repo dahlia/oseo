@@ -131,7 +131,7 @@ proposed.
 1.  Establish the reproducible probe environment.
 
     Pin an active Node.js LTS release, a stable Deno release, a stable Zig
-    release, and aube in *mise.toml*. Keep hongdown and the existing formatting
+    release, and aube in *mise.toml*. Keep Hongdown and the existing formatting
     tasks. Do not use `latest`, a moving Zig nightly, a globally installed
     package manager, or an unrecorded system C compiler.
 

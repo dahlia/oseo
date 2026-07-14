@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 
-const arguments_: readonly string[] = process.argv.slice(2);
-const path = arguments_[0];
-const architecture = arguments_[1];
-const functions: readonly string[] = arguments_.slice(2);
+const args: readonly string[] = process.argv.slice(2);
+const path = args[0];
+const architecture = args[1];
+const functions: readonly string[] = args.slice(2);
 if (path == null || architecture == null || functions.length === 0) {
   throw new Error(
     "usage: measure-assembly.ts <path> <architecture> <function>...",
@@ -17,11 +17,12 @@ for (const name of functions) {
   const body: string[] = [];
   for (let index = start + 1; index < lines.length; index++) {
     const line = lines[index].trim();
-    if (
-      line.startsWith(`.size\t${name},`) || line.startsWith(`.size ${name},`)
-    ) break;
+    if (line.startsWith(`.size\t${name},`) || line.startsWith(`.size ${name},`))
+      break;
     if (line === "" || line.startsWith(".") || line.endsWith(":")) continue;
-    const instruction = line.replace(/[#;].*$/u, "").replace(/\/\/.*$/u, "")
+    const instruction = line
+      .replace(/[#;].*$/u, "")
+      .replace(/\/\/.*$/u, "")
       .trim();
     if (instruction !== "") body.push(instruction.split(/\s+/u)[0]);
   }

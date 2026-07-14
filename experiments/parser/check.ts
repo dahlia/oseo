@@ -72,18 +72,15 @@ function run(command: string, args: readonly string[]): Observation {
   const milliseconds = performance.now() - started;
   if (result.status !== 0) {
     throw new Error(
-      `${command} ${
-        args.join(" ")
-      } failed (${result.status}):\n${result.stderr}`,
+      `${command} ${args.join(
+        " ",
+      )} failed (${result.status}):\n${result.stderr}`,
     );
   }
   return { output: result.stdout, milliseconds };
 }
 
-function compareHosts(
-  script: string,
-  args: readonly string[],
-): HostComparison {
+function compareHosts(script: string, args: readonly string[]): HostComparison {
   const node = run(process.execPath, [script, ...args]);
   const deno = run("deno", [
     "run",
@@ -129,15 +126,13 @@ function inspectCapabilities(): CapabilityObservation {
       readFileSync(acornFile, "utf8"),
     ) as readonly ParsedFile[];
     const invalid = babel.find((file) => file.sourceId === "invalid.ts");
-    const unsupported = babel.find((file) =>
-      file.sourceId === "unsupported.ts"
+    const unsupported = babel.find(
+      (file) => file.sourceId === "unsupported.ts",
     );
     if (!invalid?.diagnostics.some((entry) => entry.code === "OSEO0001")) {
       throw new Error("invalid source did not produce OSEO0001");
     }
-    if (
-      !unsupported?.diagnostics.some((entry) => entry.code === "OSEO1001")
-    ) {
+    if (!unsupported?.diagnostics.some((entry) => entry.code === "OSEO1001")) {
       throw new Error("unsupported source did not produce OSEO1001");
     }
     const babelJsdoc = babel.find((file) => file.sourceId === "jsdoc.js");
@@ -148,16 +143,17 @@ function inspectCapabilities(): CapabilityObservation {
       ?.statements[0]?.parameters?.[0];
     return {
       babelJsdocAttached: true,
-      acornJsdocAttached: acorn.find((file) =>
-        file.sourceId === "jsdoc.js"
-      )?.statements[0]?.jsdoc != null,
-      babelRecoverableStatements: babel.find((file) =>
-        file.sourceId === "recoverable.ts"
-      )?.statements.length ?? 0,
-      acornRecoverableStatements: acorn.find((file) =>
-        file.sourceId === "recoverable.ts"
-      )?.statements.length ?? 0,
-      acornJsdocParameterRangeValid: acornParameter != null &&
+      acornJsdocAttached:
+        acorn.find((file) => file.sourceId === "jsdoc.js")?.statements[0]
+          ?.jsdoc != null,
+      babelRecoverableStatements:
+        babel.find((file) => file.sourceId === "recoverable.ts")?.statements
+          .length ?? 0,
+      acornRecoverableStatements:
+        acorn.find((file) => file.sourceId === "recoverable.ts")?.statements
+          .length ?? 0,
+      acornJsdocParameterRangeValid:
+        acornParameter != null &&
         acornParameter.range.end.byte >= acornParameter.range.start.byte,
     };
   } finally {
@@ -179,12 +175,12 @@ console.log(
 );
 console.log(`candidate capabilities: ${capabilitySummary}`);
 console.log(
-  `startup observations (single cold process, ms): ${
-    JSON.stringify(observations)
-  }`,
+  `startup observations (single cold process, ms): ${JSON.stringify(
+    observations,
+  )}`,
 );
 console.log(
-  `host startup observations (ms): node=${
-    hostNode.milliseconds.toFixed(2)
-  } deno=${hostDeno.milliseconds.toFixed(2)}`,
+  `host startup observations (ms): node=${hostNode.milliseconds.toFixed(
+    2,
+  )} deno=${hostDeno.milliseconds.toFixed(2)}`,
 );

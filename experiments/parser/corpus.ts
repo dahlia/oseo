@@ -8,7 +8,8 @@ export interface CorpusCase {
 export const corpus: readonly CorpusCase[] = [
   {
     id: "valid-m1.ts",
-    source: "function add(left: number, right: number) {\n" +
+    source:
+      "function add(left: number, right: number) {\n" +
       "  const sum = left + right;\n" +
       "  return sum;\n" +
       "}\n" +
@@ -16,7 +17,8 @@ export const corpus: readonly CorpusCase[] = [
   },
   {
     id: "jsdoc.js",
-    source: "/** @param {number} value @returns {number} */\n" +
+    source:
+      "/** @param {number} value @returns {number} */\n" +
       "function identity(value) {\n" +
       "  return value;\n" +
       "}\n",
@@ -39,7 +41,8 @@ export const corpus: readonly CorpusCase[] = [
   },
   {
     id: "comments.ts",
-    source: "/* before */ function choose(flag: boolean) {\n" +
+    source:
+      "/* before */ function choose(flag: boolean) {\n" +
       "  return /* result */ flag ? 1 : 0;\n" +
       "}\n",
   },

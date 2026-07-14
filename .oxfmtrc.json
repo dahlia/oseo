@@ -1,0 +1,5 @@
+{
+  "$schema": "https://unpkg.com/oxfmt@0.59.0/configuration_schema.json",
+  "ignorePatterns": ["**/*.md", "aube-lock.yaml", "mise.toml"],
+  "printWidth": 80
+}

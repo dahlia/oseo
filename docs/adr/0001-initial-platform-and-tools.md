@@ -54,7 +54,7 @@ and parser probes. Zig 0.16.0 compiled, linked, and ran the strict C11 fixture
 for `x86_64-linux-gnu` with undefined-behavior sanitization. It also built and
 linked a static `aarch64-linux-musl` executable without using host headers or
 libraries. aube 1.26.0 installed the exact parser dependency graph from
-*aube-lock.yaml*. hongdown 0.5.1 checked the repository Markdown.
+*aube-lock.yaml*. Hongdown 0.5.1 checked the repository Markdown.
 
 
 Decision

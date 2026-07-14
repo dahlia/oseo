@@ -8,6 +8,8 @@ experimental = true
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
+oxfmt = "0.59.0"
+oxlint = "1.74.0"
 zig = "0.16.0"
 
 [tasks.check]
@@ -27,13 +29,11 @@ run = "hongdown --check"
 [tasks."check:fmt:mise"]
 run = "mise fmt --check"
 
-[tasks."check:fmt:ts"]
-run = """
-deno fmt --check \
-  experiments/host/probe.ts \
-  experiments/measure-assembly.ts \
-  experiments/parser/*.ts
-"""
+[tasks."check:fmt:oxfmt"]
+run = "oxfmt --check ."
+
+[tasks."check:lint"]
+run = "oxlint --deny-warnings ."
 
 [tasks."check:types"]
 depends = ["probe:deps"]
@@ -55,13 +55,8 @@ run = "hongdown --write"
 [tasks."fmt:mise"]
 run = "mise fmt"
 
-[tasks."fmt:ts"]
-run = """
-deno fmt \
-  experiments/host/probe.ts \
-  experiments/measure-assembly.ts \
-  experiments/parser/*.ts
-"""
+[tasks."fmt:oxfmt"]
+run = "oxfmt ."
 
 [tasks."probe:deps"]
 hide = true

@@ -128,19 +128,20 @@ function ownedStatement(
 ): OwnedStatement | undefined {
   if (node.type === "FunctionDeclaration") {
     const block = node.body as AnyNodeBody;
-    const jsdoc = node.leadingComments?.find((comment) =>
-      comment.type.includes("Block") &&
-      comment.value.trimStart().startsWith("*")
+    const jsdoc = node.leadingComments?.find(
+      (comment) =>
+        comment.type.includes("Block") &&
+        comment.value.trimStart().startsWith("*"),
     );
     return {
       kind: "function-declaration",
       name: node.id?.name ?? "<anonymous>",
       range: rangeOf(source, node),
       parameters: (node.params ?? []).map((parameter) =>
-        normalizeParameter(source, parameter)
+        normalizeParameter(source, parameter),
       ),
       bodyKinds: (block.body ?? []).map((statement) =>
-        syntaxKind(statement.type)
+        syntaxKind(statement.type),
       ),
       ...(jsdoc == null ? {} : { jsdoc: normalizeText(jsdoc.value) }),
     };
@@ -152,8 +153,8 @@ function ownedStatement(
     return {
       kind: "variable-declaration",
       declarationKind: node.kind,
-      names: (node.declarations ?? []).map((entry) =>
-        entry.id?.name ?? "<unsupported>"
+      names: (node.declarations ?? []).map(
+        (entry) => entry.id?.name ?? "<unsupported>",
       ),
       range: rangeOf(source, node),
     };
@@ -184,9 +185,10 @@ function normalizeTokens(
   tokens: readonly AnyToken[],
 ): readonly OwnedToken[] {
   return tokens.map((token) => {
-    const raw = typeof token.type === "string"
-      ? token.type
-      : token.type.label ?? "unknown";
+    const raw =
+      typeof token.type === "string"
+        ? token.type
+        : (token.type.label ?? "unknown");
     return { kind: tokenKind(raw), range: rangeOf(source, token) };
   });
 }
@@ -259,9 +261,8 @@ function normalizeFile(
 ): OwnedFile {
   let parsed: Parsed;
   try {
-    parsed = candidate === "babel"
-      ? parseWithBabel(source)
-      : parseWithAcorn(source);
+    parsed =
+      candidate === "babel" ? parseWithBabel(source) : parseWithAcorn(source);
   } catch (error) {
     const value = error as ThrownParserError;
     return {
@@ -296,7 +297,7 @@ function normalizeFile(
       "OSEO0001",
       error.pos ?? error.position ?? 0,
       "Source could not be parsed.",
-    )
+    ),
   );
   for (const node of parsed.body) {
     if (node.type === "VariableDeclaration") {
@@ -326,15 +327,14 @@ function normalizeFile(
   };
 }
 
-const requestedCandidate = globalThis.process?.argv[2] ??
-  globalThis.Deno?.args[0] ??
-  "babel";
+const requestedCandidate =
+  globalThis.process?.argv[2] ?? globalThis.Deno?.args[0] ?? "babel";
 if (requestedCandidate !== "babel" && requestedCandidate !== "acorn") {
   throw new Error(`unknown parser candidate: ${requestedCandidate}`);
 }
 const candidate: ParserCandidate = requestedCandidate;
 
 const result: readonly OwnedFile[] = corpus.map((entry) =>
-  normalizeFile(candidate, entry.id, entry.source)
+  normalizeFile(candidate, entry.id, entry.source),
 );
 console.log(JSON.stringify(result, null, 2));

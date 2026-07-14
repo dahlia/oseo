@@ -83,17 +83,19 @@ Workspace contract
 
 The root workspace contains these files:
 
-| Path                           | Purpose                                                                                       |
-| ------------------------------ | --------------------------------------------------------------------------------------------- |
-| *VERSION*                      | Single source of truth for the lockstep `@oseo/*` version                                     |
-| *package.json*                 | Private npm workspace root and development dependencies                                       |
-| *deno.json*                    | Deno workspace, formatting, linting, checking, and manual use of aube's *node\_modules/* tree |
-| *aube-workspace.yaml*          | aube workspace membership and package-manager policy                                          |
-| *aube-lock.yaml*               | Sole lockfile for npm dependency installation                                                 |
-| *tsconfig.json*                | Shared erasable TypeScript and declaration settings                                           |
-| *tsdown.config.ts*             | Shared npm build policy for all publishable packages                                          |
-| *tools/versions.ts*            | Cross-host version validation and lockstep mutation                                           |
-| *.github/workflows/check.yaml* | Clean Linux x86-64 continuous-integration gate                                                |
+| Path                           | Purpose                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| *VERSION*                      | Single source of truth for the lockstep `@oseo/*` version                |
+| *package.json*                 | Private npm workspace root and development dependencies                  |
+| *deno.json*                    | Deno workspace, checking, and manual use of aube's *node\_modules/* tree |
+| *aube-workspace.yaml*          | aube workspace membership and package-manager policy                     |
+| *aube-lock.yaml*               | Sole lockfile for npm dependency installation                            |
+| *.oxfmtrc.json*                | Oxfmt scope and formatting policy                                        |
+| *.oxlintrc.json*               | Oxlint categories and rule policy                                        |
+| *tsconfig.json*                | Shared erasable TypeScript and declaration settings                      |
+| *tsdown.config.ts*             | Shared npm build policy for all publishable packages                     |
+| *tools/versions.ts*            | Cross-host version validation and lockstep mutation                      |
+| *.github/workflows/check.yaml* | Clean Linux x86-64 continuous-integration gate                           |
 
 Use _packages/\*_ as the workspace pattern in aube and Deno. Configure Deno to
 use *node\_modules/* in manual mode so aube remains the package manager. Do not
@@ -101,11 +103,11 @@ let a second tool rewrite dependency state. If a Deno-only dependency later
 requires *deno.lock*, introduce it through a separate documented decision rather
 than allowing it to appear incidentally.
 
-Pin Node.js, Deno, Zig, and aube to exact versions in *mise.toml*. Keep tsdown,
-TypeScript, publint, and `@arethetypeswrong/core` as root development
-dependencies installed by aube. Repository tasks invoke local JavaScript tools
-through `aube exec`; contributors do not need npm, pnpm, or a global tsdown
-installation.
+Pin Node.js, Deno, Zig, aube, Oxfmt, and Oxlint to exact versions in
+*mise.toml*. Keep tsdown, TypeScript, publint, and `@arethetypeswrong/core` as
+exact workspace development dependencies installed by aube. Repository tasks
+invoke those package-scoped JavaScript tools through `aube exec`; contributors
+do not need npm, pnpm, or global tool installations.
 
 
 Work sequence
@@ -251,7 +253,8 @@ Work sequence
 
     | Task                      | Responsibility                                              |
     | ------------------------- | ----------------------------------------------------------- |
-    | `mise run fmt`            | Format supported repository files                           |
+    | `mise run fmt`            | Format files through Oxfmt, Hongdown, and mise              |
+    | `mise run check:lint`     | Lint JavaScript and TypeScript with Oxlint                  |
     | `mise run build`          | Build all npm artifacts with tsdown                         |
     | `mise run test:node`      | Run direct core tests and built-package tests under Node.js |
     | `mise run test:deno`      | Run source tests under Deno                                 |
