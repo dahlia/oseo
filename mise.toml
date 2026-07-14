@@ -12,6 +12,10 @@ oxfmt = "0.59.0"
 oxlint = "1.74.0"
 zig = "0.16.0"
 
+[deps.aube]
+auto = true
+run = "aube install --frozen-lockfile"
+
 [tasks.check]
 depends = ["check:*"]
 
@@ -36,7 +40,6 @@ run = "oxfmt --check ."
 run = "oxlint --deny-warnings ."
 
 [tasks."check:types"]
-depends = ["probe:deps"]
 run = """
 deno --version
 deno check --node-modules-dir=manual \
@@ -58,12 +61,7 @@ run = "mise fmt"
 [tasks."fmt:oxfmt"]
 run = "oxfmt ."
 
-[tasks."probe:deps"]
-hide = true
-run = "aube install --frozen-lockfile"
-
 [tasks."probe:host-parser"]
-depends = ["probe:deps"]
 run = "node experiments/parser/check.ts"
 
 [tasks."probe:native-boundary"]

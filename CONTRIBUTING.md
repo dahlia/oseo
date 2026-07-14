@@ -44,6 +44,12 @@ checkout. M0 tooling is still being added, so a command described in a design or
 plan document may not exist yet. Do not add instructions that present planned
 commands as already available.
 
+The mise aube dependency provider checks *package.json* and *aube-lock.yaml*
+before every `mise run`. It performs a frozen install only when the inputs have
+changed or *node\_modules/* is missing. Run `mise deps` to synchronize
+dependencies without starting a repository task. Do not add task-level install
+dependencies that duplicate this provider.
+
 As the workspace is scaffolded, the intended toolchain is:
 
  -  [aube] for JavaScript package installation and

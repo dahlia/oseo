@@ -109,6 +109,11 @@ exact workspace development dependencies installed by aube. Repository tasks
 invoke those package-scoped JavaScript tools through `aube exec`; contributors
 do not need npm, pnpm, or global tool installations.
 
+Configure mise's aube dependency provider with `auto = true` and a frozen
+install command. It owns dependency freshness before `mise run`, so individual
+tasks must not depend on a separate installation task. `mise deps` remains the
+explicit dependency-synchronization command.
+
 
 Work sequence
 -------------
@@ -265,8 +270,9 @@ Work sequence
 
 
     The CI workflow runs on Linux x86-64 from a clean checkout, provisions tools
-    through mise, performs a frozen aube install, and runs `mise run check`.
-    Print pinned tool versions at the start of the job. Preserve native fixture
+    through mise, and runs `mise run check`. The auto-enabled aube dependency
+    provider performs the frozen install before the task graph starts. Print
+    pinned tool versions at the start of the job. Preserve native fixture
     diagnostics as failure artifacts. The workflow does not publish packages.
 
 
@@ -336,6 +342,8 @@ The tooling assumptions in this plan were checked on July 14, 2026:
     *aube-lock.yaml* and frozen installation.
  -  [mise Zig support] documents Zig as a
     mise core tool.
+ -  [mise deps] documents dependency freshness
+    and automatic installation before `mise run`.
  -  [mise task arguments] documents
     the `usage` field used by the version-bump task.
  -  [tsdown declaration output],
@@ -352,6 +360,7 @@ The tooling assumptions in this plan were checked on July 14, 2026:
 [aube workspaces]: https://aube.jdx.dev/package-manager/workspaces
 [aube lockfiles]: https://aube.jdx.dev/package-manager/lockfiles
 [mise Zig support]: https://mise.jdx.dev/lang/zig.html
+[mise deps]: https://mise.jdx.dev/dev-tools/deps.html
 [mise task arguments]: https://mise.jdx.dev/tasks/task-arguments
 [tsdown declaration output]: https://tsdown.dev/options/dts
 [dependency handling]: https://tsdown.dev/options/dependencies
