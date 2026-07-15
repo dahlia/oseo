@@ -1489,6 +1489,7 @@ export type MirTerminator =
   | {
       readonly completionSlot: number;
       readonly kind: "resume-completion";
+      readonly outerAbrupt?: number;
       readonly outerFinalizer?: number;
     }
   | {
@@ -2339,6 +2340,7 @@ function lowerTryStatement(
       builder.current.terminator = {
         completionSlot: finallyBlock.id,
         kind: "resume-completion",
+        ...(outerAbrupt == null ? {} : { outerAbrupt }),
         ...(outerFinalizer == null ? {} : { outerFinalizer }),
       };
     }
@@ -2921,9 +2923,17 @@ function printTerminator(terminator: MirTerminator): string {
   }
   if (terminator.kind === "resume-completion") {
     const completion = `resume-completion bb${terminator.completionSlot}`;
-    return terminator.outerFinalizer == null
+    const destinations = [
+      terminator.outerAbrupt == null
+        ? undefined
+        : `throw bb${terminator.outerAbrupt}`,
+      terminator.outerFinalizer == null
+        ? undefined
+        : `finally bb${terminator.outerFinalizer}`,
+    ].filter((destination) => destination != null);
+    return destinations.length === 0
       ? completion
-      : `${completion} via bb${terminator.outerFinalizer}`;
+      : `${completion} via ${destinations.join(", ")}`;
   }
   return "unreachable";
 }

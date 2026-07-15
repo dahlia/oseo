@@ -643,6 +643,22 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   }
 }
 
+function emitCompletionCopy(
+  state: EmitState,
+  source: number,
+  target: number,
+): void {
+  line(state, `    completion_kind[${target}u] = completion_kind[${source}u];`);
+  line(
+    state,
+    `    completion_value[${target}u] = completion_value[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_target[${target}u] = completion_target[${source}u];`,
+  );
+}
+
 function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   if (terminator.kind === "return") {
     line(
@@ -675,23 +691,15 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
     const slot = terminator.completionSlot;
+    if (terminator.outerAbrupt != null) {
+      line(state, `if (completion_kind[${slot}u] == 2) {`);
+      emitCompletionCopy(state, slot, terminator.outerAbrupt);
+      line(state, `    goto bb${terminator.outerAbrupt};`);
+      line(state, "}");
+    }
     if (terminator.outerFinalizer != null) {
       line(state, `if (completion_kind[${slot}u] != 0) {`);
-      line(
-        state,
-        `    completion_kind[${terminator.outerFinalizer}u] = ` +
-          `completion_kind[${slot}u];`,
-      );
-      line(
-        state,
-        `    completion_value[${terminator.outerFinalizer}u] = ` +
-          `completion_value[${slot}u];`,
-      );
-      line(
-        state,
-        `    completion_target[${terminator.outerFinalizer}u] = ` +
-          `completion_target[${slot}u];`,
-      );
+      emitCompletionCopy(state, slot, terminator.outerFinalizer);
       line(state, `    goto bb${terminator.outerFinalizer};`);
       line(state, "}");
     }
@@ -816,9 +824,15 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
     } else if (
       block.terminator.kind === "resume-completion" &&
-      block.terminator.outerFinalizer != null
+      (block.terminator.outerAbrupt != null ||
+        block.terminator.outerFinalizer != null)
     ) {
-      pending.push(block.terminator.outerFinalizer);
+      if (block.terminator.outerAbrupt != null) {
+        pending.push(block.terminator.outerAbrupt);
+      }
+      if (block.terminator.outerFinalizer != null) {
+        pending.push(block.terminator.outerFinalizer);
+      }
     }
     for (const operation of block.operations) {
       if (operation.abruptTarget != null) pending.push(operation.abruptTarget);

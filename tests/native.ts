@@ -157,6 +157,18 @@ function nestedThrow() {
   }
 }
 try { nestedThrow(); } catch (error) { console.log(error); }
+try {
+  try { throw "caught after finally"; } finally {}
+} catch (error) {
+  console.log(error);
+}
+try {
+  try { throw "caught before outer finally"; } finally {}
+} catch (error) {
+  console.log(error);
+} finally {
+  console.log("outer finally after catch");
+}
 let nestedIndex = 0;
 while (nestedIndex < 2) {
   nestedIndex = nestedIndex + 1;
