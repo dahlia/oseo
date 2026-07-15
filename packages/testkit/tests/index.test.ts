@@ -242,3 +242,37 @@ test("requires the declared phase for negative test262 cases", () => {
   );
   assert.equal(result.classification, "semantic-failure");
 });
+
+test("requires the declared error type for negative test262 cases", () => {
+  const testCase = {
+    expectedErrorType: "TypeError",
+    expectedFailurePhase: "runtime",
+    features: [],
+    includes: [],
+    path: "language/expressions/property/runtime.js",
+    strictness: ["non-strict"],
+    suiteRevision: "test-revision",
+  } as const;
+  const mismatch = classifyTest262(
+    testCase,
+    {
+      errorType: "RangeError",
+      failedPhase: "runtime",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  const match = classifyTest262(
+    testCase,
+    {
+      errorType: "TypeError",
+      failedPhase: "runtime",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  assert.equal(mismatch.classification, "semantic-failure");
+  assert.equal(match.classification, "pass");
+});
