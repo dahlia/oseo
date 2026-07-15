@@ -997,13 +997,21 @@ export const cBackend: NativeBackend = {
     if (scriptRootCount == null) {
       throw new Error("MIR script has no root frame layout.");
     }
-    const allBindingIds = functions.flatMap((functionValue) => [
-      ...(functionValue.localBindingIds ?? []),
-      ...functionValue.parameters.map((parameter) => parameter.bindingId),
-    ]);
-    allBindingIds.push(...input.globalBindings.map((binding) => binding.id));
-    const totalBindingCount =
-      allBindingIds.length === 0 ? 0 : Math.max(...allBindingIds) + 1;
+    let totalBindingCount = 0;
+    for (const functionValue of functions) {
+      for (const bindingId of functionValue.localBindingIds ?? []) {
+        totalBindingCount = Math.max(totalBindingCount, bindingId + 1);
+      }
+      for (const parameter of functionValue.parameters) {
+        totalBindingCount = Math.max(
+          totalBindingCount,
+          parameter.bindingId + 1,
+        );
+      }
+    }
+    for (const binding of input.globalBindings) {
+      totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
+    }
     const declarations = functions.map(prototype).join("\n");
     const functionReferences = declaredFunctions
       .map((functionValue) => `    (void)oseo_function_${functionValue.id};`)
