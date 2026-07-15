@@ -75,6 +75,7 @@ typedef struct {
     OseoValue environment;
     OseoValue prototype_object;
     size_t code_id;
+    bool prototype_writable;
 } OseoFunction;
 
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
@@ -183,6 +184,8 @@ static bool is_array(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_ARRAY;
 }
+
+static OseoResult to_number(OseoContext *context, OseoValue value);
 
 static int64_t smi_value(OseoValue value) {
     uint64_t payload = value & OSEO_PAYLOAD_MASK;
@@ -727,6 +730,7 @@ OseoResult oseo_function_create(
     function->environment = frame.slots[0];
     function->prototype_object = frame.slots[1];
     function->code_id = code_id;
+    function->prototype_writable = true;
     result = publish_heap(
         context,
         &function->ordinary.header,
@@ -864,19 +868,26 @@ static bool remove_property(OseoOrdinaryObject *object, size_t index) {
 static OseoResult set_array_length(
     OseoContext *context,
     OseoOrdinaryObject *array,
-    OseoValue value
+    OseoValue value,
+    bool strict,
+    bool *valid_length
 ) {
-    if (!is_number(value)) {
-        return language_failure();
-    }
-    double number = number_value(value);
+    if (valid_length != NULL) *valid_length = false;
+    OseoResult converted = to_number(context, value);
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    double number = number_value(converted.value);
     if (!isfinite(number) || number < 0.0 ||
         number > 4294967295.0 || floor(number) != number) {
         return language_failure();
     }
-    if (!array->length_writable) return normal(value);
     uint32_t requested = (uint32_t)number;
+    if (valid_length != NULL) *valid_length = true;
+    if (!array->length_writable) {
+        if (requested == array->array_length) return normal(value);
+        return strict ? language_failure() : normal(value);
+    }
     if (requested < array->array_length) {
+        bool removed = false;
         while (true) {
             size_t selected = SIZE_MAX;
             uint32_t selected_index = 0u;
@@ -904,8 +915,14 @@ static OseoResult set_array_length(
                 ) ||
                 !remove_property(array, selected)) {
                 array->array_length = selected_index + 1u;
+                if (removed) {
+                    array->dictionary = true;
+                    array->shape_id = context->next_shape_id;
+                    context->next_shape_id += 1u;
+                }
                 return language_failure();
             }
+            removed = true;
         }
     }
     array->array_length = requested;
@@ -1130,18 +1147,24 @@ OseoResult oseo_object_set(
         return normal(value);
     }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
-        function_object(object_value)->prototype_object = value;
+        OseoFunction *function = function_object(object_value);
+        if (!function->prototype_writable) {
+            return strict ? language_failure() : normal(value);
+        }
+        function->prototype_object = value;
         return normal(value);
     }
     OseoOrdinaryObject *receiver = ordinary_object(object_value);
     if (is_array(object_value) && string_is_ascii(key, "length")) {
-        return set_array_length(context, receiver, value);
+        return set_array_length(context, receiver, value, strict, NULL);
     }
     uint32_t receiver_index = 0u;
     bool extends_array = is_array(object_value) &&
         array_index(key, &receiver_index) &&
         receiver_index >= receiver->array_length;
-    if (extends_array && !receiver->length_writable) return normal(value);
+    if (extends_array && !receiver->length_writable) {
+        return strict ? language_failure() : normal(value);
+    }
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *owner = ordinary_object(current);
@@ -1188,7 +1211,14 @@ OseoResult oseo_object_define(
         if (attributes.configurable || attributes.enumerable) {
             return language_failure();
         }
-        function_object(object_value)->prototype_object = value;
+        OseoFunction *function = function_object(object_value);
+        if (!function->prototype_writable &&
+            (attributes.writable ||
+             !same_property_value(function->prototype_object, value))) {
+            return language_failure();
+        }
+        function->prototype_object = value;
+        function->prototype_writable = attributes.writable;
         return normal(object_value);
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
@@ -1199,8 +1229,20 @@ OseoResult oseo_object_define(
         if (!object->length_writable && attributes.writable) {
             return language_failure();
         }
-        OseoResult changed = set_array_length(context, object, value);
-        if (changed.status != OSEO_STATUS_NORMAL) return changed;
+        bool valid_length = false;
+        OseoResult changed = set_array_length(
+            context,
+            object,
+            value,
+            true,
+            &valid_length
+        );
+        if (changed.status != OSEO_STATUS_NORMAL) {
+            if (valid_length && !attributes.writable) {
+                object->length_writable = false;
+            }
+            return changed;
+        }
         object->length_writable = attributes.writable;
         return normal(object_value);
     }
@@ -1491,7 +1533,11 @@ static bool own_descriptor(
 ) {
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         *value = function_object(object_value)->prototype_object;
-        *attributes = (OseoPropertyAttributes){false, false, true};
+        *attributes = (OseoPropertyAttributes){
+            false,
+            false,
+            function_object(object_value)->prototype_writable,
+        };
         return true;
     }
     if (is_array(object_value) && string_is_ascii(key, "length")) {

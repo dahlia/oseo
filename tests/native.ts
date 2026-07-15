@@ -300,6 +300,7 @@ console.log(detached.missing);
   },
   {
     name: "descriptor-redefinition",
+    nonStrictScript: true,
     source: `
 const value = { item: 7 };
 Object.defineProperty(value, "item", { writable: false });
@@ -320,13 +321,40 @@ Object.defineProperty(values, "2", {
   configurable: true,
 });
 try {
-  Object.defineProperty(values, "length", { value: 1 });
+  Object.defineProperty(values, "length", { value: 1, writable: false });
 } catch (error) {
   console.log("length rejected");
 }
 console.log(values.length, values[2], values[4]);
-Object.defineProperty(values, "length", { writable: false });
-console.log(values.length);
+values[5] = 5;
+const lengthDescriptor = Object.getOwnPropertyDescriptor(values, "length");
+console.log(values.length, values[5], lengthDescriptor.writable);
+let coerced = [1, 2, 3];
+coerced.length = "1";
+console.log(coerced.length, coerced[1]);
+coerced = [1, 2];
+coerced.length = false;
+console.log(coerced.length, coerced[0]);
+coerced = [1, 2];
+coerced.length = null;
+console.log(coerced.length, coerced[0]);
+function DescriptorFunction() {}
+const originalPrototype = DescriptorFunction.prototype;
+Object.defineProperty(DescriptorFunction, "prototype", { writable: false });
+const functionDescriptor = Object.getOwnPropertyDescriptor(
+  DescriptorFunction,
+  "prototype",
+);
+DescriptorFunction.prototype = { replaced: true };
+console.log(
+  functionDescriptor.writable,
+  DescriptorFunction.prototype === originalPrototype,
+);
+try {
+  Object.defineProperty(DescriptorFunction, "prototype", { value: {} });
+} catch (error) {
+  console.log("function prototype rejected");
+}
 `,
   },
   {
