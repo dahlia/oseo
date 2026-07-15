@@ -496,7 +496,10 @@ function expression(
         key = expression(context, keyNode);
       } else {
         const name = identifierName(keyNode);
-        if (name === "__proto__") {
+        if (
+          name === "__proto__" ||
+          (keyNode.type === "StringLiteral" && keyNode.value === "__proto__")
+        ) {
           return unsupported(
             context,
             property,

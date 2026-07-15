@@ -1268,6 +1268,24 @@ static size_t own_ascii_property_index(
     return SIZE_MAX;
 }
 
+static bool descriptor_field(
+    OseoValue descriptor_value,
+    const char *name,
+    OseoValue *value
+) {
+    OseoValue current = descriptor_value;
+    while (is_object(current)) {
+        OseoOrdinaryObject *descriptor = ordinary_object(current);
+        size_t index = own_ascii_property_index(descriptor, name);
+        if (index != SIZE_MAX) {
+            *value = descriptor->properties[index].value;
+            return true;
+        }
+        current = descriptor->prototype;
+    }
+    return false;
+}
+
 static bool own_descriptor(
     OseoValue object_value,
     OseoValue key,
@@ -1333,9 +1351,9 @@ OseoResult oseo_object_builtin_define_property(
         oseo_roots_release(context, &frame);
         return result;
     }
-    OseoOrdinaryObject *descriptor = ordinary_object(descriptor_value);
-    if (own_ascii_property_index(descriptor, "get") != SIZE_MAX ||
-        own_ascii_property_index(descriptor, "set") != SIZE_MAX) {
+    OseoValue ignored = oseo_undefined();
+    if (descriptor_field(descriptor_value, "get", &ignored) ||
+        descriptor_field(descriptor_value, "set", &ignored)) {
         oseo_roots_release(context, &frame);
         return failure(
             context,
@@ -1343,12 +1361,30 @@ OseoResult oseo_object_builtin_define_property(
             "Accessor property descriptors are unsupported."
         );
     }
-    size_t value_index = own_ascii_property_index(descriptor, "value");
-    size_t writable_index = own_ascii_property_index(descriptor, "writable");
-    size_t enumerable_index =
-        own_ascii_property_index(descriptor, "enumerable");
-    size_t configurable_index =
-        own_ascii_property_index(descriptor, "configurable");
+    OseoValue descriptor_value_field = oseo_undefined();
+    OseoValue writable = oseo_undefined();
+    OseoValue enumerable = oseo_undefined();
+    OseoValue configurable = oseo_undefined();
+    bool has_value = descriptor_field(
+        descriptor_value,
+        "value",
+        &descriptor_value_field
+    );
+    bool has_writable = descriptor_field(
+        descriptor_value,
+        "writable",
+        &writable
+    );
+    bool has_enumerable = descriptor_field(
+        descriptor_value,
+        "enumerable",
+        &enumerable
+    );
+    bool has_configurable = descriptor_field(
+        descriptor_value,
+        "configurable",
+        &configurable
+    );
     OseoValue current_value = oseo_undefined();
     OseoPropertyAttributes current_attributes = {false, false, false};
     bool exists = own_descriptor(
@@ -1357,21 +1393,17 @@ OseoResult oseo_object_builtin_define_property(
         &current_value,
         &current_attributes
     );
-    OseoValue value = value_index == SIZE_MAX
-        ? current_value
-        : descriptor->properties[value_index].value;
+    OseoValue value = has_value ? descriptor_value_field : current_value;
     OseoPropertyAttributes attributes = {
-        configurable_index == SIZE_MAX
+        !has_configurable
             ? exists && current_attributes.configurable
-            : oseo_to_boolean(
-                  descriptor->properties[configurable_index].value
-              ),
-        enumerable_index == SIZE_MAX
+            : oseo_to_boolean(configurable),
+        !has_enumerable
             ? exists && current_attributes.enumerable
-            : oseo_to_boolean(descriptor->properties[enumerable_index].value),
-        writable_index == SIZE_MAX
+            : oseo_to_boolean(enumerable),
+        !has_writable
             ? exists && current_attributes.writable
-            : oseo_to_boolean(descriptor->properties[writable_index].value),
+            : oseo_to_boolean(writable),
     };
     result = oseo_object_define(
         context,

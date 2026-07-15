@@ -270,6 +270,19 @@ console.log(
   descriptor.enumerable,
   descriptor.configurable,
 );
+const inheritedValue = { item: 8 };
+const inheritedDescriptor = Object.create({ writable: false });
+Object.defineProperty(inheritedValue, "item", inheritedDescriptor);
+const inheritedResult = Object.getOwnPropertyDescriptor(
+  inheritedValue,
+  "item",
+);
+console.log(
+  inheritedResult.value,
+  inheritedResult.writable,
+  inheritedResult.enumerable,
+  inheritedResult.configurable,
+);
 console.log(Object.getOwnPropertyDescriptor(value, "missing"));
 const keys = Object.keys(value);
 console.log(keys[0], keys[1], keys[2], keys[3], keys.length);
@@ -898,6 +911,25 @@ assert.equal(accessorDescriptor.exitStatus, 1);
 assert.equal(accessorDescriptor.stdout, "");
 assert.match(
   accessorDescriptor.stderr,
+  /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
+);
+
+const inheritedAccessorDescriptor = await runNativeCli(
+  {
+    args: ["inherited-accessor-descriptor.ts"],
+    source:
+      "const descriptor = Object.create({ " +
+      "get: function () { return 42; } }); " +
+      'Object.defineProperty({}, "item", descriptor);',
+    sourceId: "inherited-accessor-descriptor.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(inheritedAccessorDescriptor.exitStatus, 1);
+assert.equal(inheritedAccessorDescriptor.stdout, "");
+assert.match(
+  inheritedAccessorDescriptor.stderr,
   /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
 );
 

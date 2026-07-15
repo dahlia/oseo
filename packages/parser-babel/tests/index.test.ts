@@ -192,6 +192,13 @@ test("rejects only noncomputed __proto__ literals", () => {
   assert.equal(rejected.diagnostics[0]?.code, "OSEO1001");
   assert.match(rejected.diagnostics[0]?.message ?? "", /__proto__/u);
 
+  const quoted = compileSource(babelFrontend, {
+    source: 'const value = { "__proto__": null };',
+    sourceId: "quoted-proto.ts",
+  });
+  assert.equal(quoted.diagnostics[0]?.code, "OSEO1001");
+  assert.match(quoted.diagnostics[0]?.message ?? "", /__proto__/u);
+
   const accepted = compileSource(babelFrontend, {
     source: 'const value = { ["__proto__"]: null };',
     sourceId: "computed-proto.ts",
