@@ -258,6 +258,7 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
     );
     context->error_code = NULL;
     context->error_message = NULL;
+    context->has_diagnostic = false;
     assert(
         require_normal(oseo_object_get(context, roots[0], roots[3])) ==
         oseo_number(5.0)
@@ -316,6 +317,7 @@ static void test_cell_initialization(
     );
     context->error_code = NULL;
     context->error_message = NULL;
+    context->has_diagnostic = false;
     (void)require_normal(
         oseo_cell_initialize(context, roots[0], oseo_number(2.0))
     );

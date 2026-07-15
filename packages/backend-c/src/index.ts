@@ -585,6 +585,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     } else {
       state.usesCompletion = true;
       line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
+      line(state, "    if (context->has_diagnostic) goto abrupt;");
       line(state, "    completion_kind = 2;");
       line(state, "    completion_value = result.value;");
       line(state, `    goto bb${operation.abruptTarget};`);
@@ -624,6 +625,11 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, `goto bb${terminator.whenFalse};`);
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
+    if (terminator.outerFinalizer != null) {
+      line(state, "if (completion_kind != 0) {");
+      line(state, `    goto bb${terminator.outerFinalizer};`);
+      line(state, "}");
+    }
     line(state, "if (completion_kind == 1) {");
     line(
       state,
@@ -741,6 +747,11 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
       pending.push(block.terminator.target);
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
+    } else if (
+      block.terminator.kind === "resume-completion" &&
+      block.terminator.outerFinalizer != null
+    ) {
+      pending.push(block.terminator.outerFinalizer);
     }
     for (const operation of block.operations) {
       if (operation.abruptTarget != null) pending.push(operation.abruptTarget);

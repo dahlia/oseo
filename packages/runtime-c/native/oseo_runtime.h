@@ -44,6 +44,7 @@ typedef struct {
     size_t source_id_length;
     const char *error_code;
     const char *error_message;
+    bool has_diagnostic;
     size_t active_frame_slots;
     size_t call_depth;
     size_t line;

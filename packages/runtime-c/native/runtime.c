@@ -126,6 +126,12 @@ static OseoResult failure(
 ) {
     context->error_code = code;
     context->error_message = message;
+    context->has_diagnostic = true;
+    OseoResult result = {OSEO_STATUS_THROW, oseo_undefined()};
+    return result;
+}
+
+static OseoResult language_failure(void) {
     OseoResult result = {OSEO_STATUS_THROW, oseo_undefined()};
     return result;
 }
@@ -279,6 +285,7 @@ void oseo_context_init(
     context->source_id_length = source_id_length;
     context->error_code = "OSEO2001";
     context->error_message = "Unsupported runtime behavior.";
+    context->has_diagnostic = false;
     context->active_frame_slots = 0u;
     context->call_depth = 0u;
     context->line = 1u;
@@ -851,12 +858,12 @@ static OseoResult set_array_length(
     OseoValue value
 ) {
     if (!is_number(value)) {
-        return failure(context, "OSEO2001", "Invalid array length.");
+        return language_failure();
     }
     double number = number_value(value);
     if (!isfinite(number) || number < 0.0 ||
         number > 4294967295.0 || floor(number) != number) {
-        return failure(context, "OSEO2001", "Invalid array length.");
+        return language_failure();
     }
     if (!array->length_writable) return normal(value);
     uint32_t requested = (uint32_t)number;
@@ -888,11 +895,7 @@ static OseoResult set_array_length(
                 ) ||
                 !remove_property(array, selected)) {
                 array->array_length = selected_index + 1u;
-                return failure(
-                    context,
-                    "OSEO2001",
-                    "Array length truncation was rejected."
-                );
+                return language_failure();
             }
         }
     }
@@ -1133,11 +1136,7 @@ OseoResult oseo_object_define(
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Function prototype attributes are incompatible."
-            );
+            return language_failure();
         }
         function_object(object_value)->prototype_object = value;
         return normal(object_value);
@@ -1145,18 +1144,10 @@ OseoResult oseo_object_define(
     OseoOrdinaryObject *object = ordinary_object(object_value);
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         if (attributes.configurable || attributes.enumerable) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Array length attributes are incompatible."
-            );
+            return language_failure();
         }
         if (!object->length_writable && attributes.writable) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Array length is not writable."
-            );
+            return language_failure();
         }
         OseoResult changed = set_array_length(context, object, value);
         if (changed.status != OSEO_STATUS_NORMAL) return changed;
@@ -1168,7 +1159,7 @@ OseoResult oseo_object_define(
         array_index(key, &defined_index) &&
         defined_index >= object->array_length;
     if (extends_array && !object->length_writable) {
-        return failure(context, "OSEO2001", "Array length is not writable.");
+        return language_failure();
     }
     size_t index = own_property_index(object, key);
     if (index != SIZE_MAX) {
@@ -1179,11 +1170,7 @@ OseoResult oseo_object_define(
              (!property->attributes.writable && attributes.writable) ||
              (!property->attributes.writable &&
               !same_property_value(property->value, value)))) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Property redefinition is incompatible."
-            );
+            return language_failure();
         }
         property->attributes = attributes;
         property->value = value;

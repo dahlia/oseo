@@ -86,6 +86,12 @@ function Replace() { return { value: 9 }; }
 console.log(new Replace().value);
 function KeepReceiver() { this.value = 3; return 1; }
 console.log(new KeepReceiver().value);
+function ChangedPrototype() {}
+function changePrototype() {
+  ChangedPrototype.prototype = { changed: true };
+  return 0;
+}
+console.log(new ChangedPrototype(changePrototype()).changed);
 `,
   },
   {
@@ -122,6 +128,39 @@ while (index < 3) {
   }
 }
 console.log(index);
+function nestedReturn() {
+  try {
+    try { return "nested return"; }
+    finally { console.log("inner return finally"); }
+  } finally {
+    console.log("outer return finally");
+  }
+}
+console.log(nestedReturn());
+function nestedThrow() {
+  try {
+    try { throw "nested throw"; }
+    finally { console.log("inner throw finally"); }
+  } finally {
+    console.log("outer throw finally");
+  }
+}
+try { nestedThrow(); } catch (error) { console.log(error); }
+let nestedIndex = 0;
+while (nestedIndex < 2) {
+  nestedIndex = nestedIndex + 1;
+  try {
+    try {
+      if (nestedIndex === 1) continue;
+      break;
+    } finally {
+      console.log("inner loop finally", nestedIndex);
+    }
+  } finally {
+    console.log("outer loop finally", nestedIndex);
+  }
+}
+console.log(nestedIndex);
 `,
   },
   {
@@ -859,6 +898,21 @@ const recursion = await runNativeCli(
 assert.equal(recursion.exitStatus, 1);
 assert.equal(recursion.stdout, "");
 assert.match(recursion.stderr, /error\[OSEO2001\].*call depth/u);
+
+const caughtRecursion = await runNativeCli(
+  {
+    args: ["caught-recursion-runtime.ts"],
+    source:
+      "function recurse() { return recurse(); } " +
+      'try { recurse(); } catch (error) { console.log("caught"); }',
+    sourceId: "caught-recursion-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(caughtRecursion.exitStatus, 1);
+assert.equal(caughtRecursion.stdout, "");
+assert.match(caughtRecursion.stderr, /error\[OSEO2001\].*call depth/u);
 
 const wideBindings = Array.from(
   { length: 3_000 },

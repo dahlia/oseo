@@ -1484,6 +1484,7 @@ export type MirTerminator =
     }
   | {
       readonly kind: "resume-completion";
+      readonly outerFinalizer?: number;
     }
   | {
       readonly kind: "unreachable";
@@ -1978,6 +1979,9 @@ function lowerExpression(
   }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
+    const argumentIds = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
     appendMirMetadata(
       builder,
       "safepoint",
@@ -2002,9 +2006,6 @@ function lowerExpression(
       expression.range,
     );
     recordRoot(builder, receiver, expression.range);
-    const argumentIds = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
-    );
     const argumentsValue = [callee, receiver, ...argumentIds];
     appendMirMetadata(
       builder,
@@ -2256,7 +2257,11 @@ function lowerTryStatement(
       builder,
     );
     if (!finallyTerminated) {
-      builder.current.terminator = { kind: "resume-completion" };
+      const outerFinalizer = builder.finalizers.at(-1);
+      builder.current.terminator = {
+        kind: "resume-completion",
+        ...(outerFinalizer == null ? {} : { outerFinalizer }),
+      };
     }
   }
   builder.current = afterBlock;
@@ -2833,7 +2838,11 @@ function printTerminator(terminator: MirTerminator): string {
       `bb${terminator.whenFalse}`
     );
   }
-  if (terminator.kind === "resume-completion") return "resume-completion";
+  if (terminator.kind === "resume-completion") {
+    return terminator.outerFinalizer == null
+      ? "resume-completion"
+      : `resume-completion via bb${terminator.outerFinalizer}`;
+  }
   return "unreachable";
 }
 
