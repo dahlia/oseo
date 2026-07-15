@@ -1463,6 +1463,7 @@ export interface MirOperation {
   readonly checkedResult?: number;
   readonly abruptTarget?: number;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
+  readonly completionSlot?: number;
   readonly completionTarget?: number;
   readonly functionId?: number;
   readonly hint?: MirHint;
@@ -1489,6 +1490,7 @@ export type MirTerminator =
       readonly value: number;
     }
   | {
+      readonly completionSlot: number;
       readonly kind: "resume-completion";
       readonly outerFinalizer?: number;
     }
@@ -2200,6 +2202,7 @@ function lowerStatementBody(
 function setCompletion(
   builder: MirBuilder,
   kind: NonNullable<MirOperation["completionKind"]>,
+  slot: number,
   range: SourceRange,
   value?: number,
   target?: number,
@@ -2212,6 +2215,7 @@ function setCompletion(
     range,
     {
       completionKind: kind,
+      completionSlot: slot,
       ...(target == null ? {} : { completionTarget: target }),
     },
   );
@@ -2226,7 +2230,7 @@ function enterFinalizer(
 ): boolean {
   const finalizer = builder.finalizers.at(-1);
   if (finalizer == null) return false;
-  setCompletion(builder, kind, range, value, target);
+  setCompletion(builder, kind, finalizer, range, value, target);
   builder.current.terminator = { kind: "jump", target: finalizer };
   return true;
 }
@@ -2254,6 +2258,7 @@ function lowerTryStatement(
       setCompletion(
         builder,
         "normal",
+        finallyBlock.id,
         statement.range,
         undefined,
         afterBlock.id,
@@ -2280,6 +2285,7 @@ function lowerTryStatement(
       detail: statement.handler.name,
       id: caught,
       kind: "caught",
+      completionSlot: catchBlock.id,
       range: statement.handler.range,
     });
     recordRoot(builder, caught, statement.handler.range);
@@ -2307,6 +2313,7 @@ function lowerTryStatement(
         setCompletion(
           builder,
           "normal",
+          finallyBlock.id,
           statement.range,
           undefined,
           afterBlock.id,
@@ -2325,6 +2332,7 @@ function lowerTryStatement(
     if (!finallyTerminated) {
       const outerFinalizer = builder.finalizers.at(-1);
       builder.current.terminator = {
+        completionSlot: finallyBlock.id,
         kind: "resume-completion",
         ...(outerFinalizer == null ? {} : { outerFinalizer }),
       };
@@ -2385,11 +2393,11 @@ function lowerStatements(
       return true;
     } else if (statement.kind === "throw") {
       const value = lowerExpression(statement.expression, builder);
-      setCompletion(builder, "throw", statement.range, value);
       const target = builder.abruptTargets.at(-1);
+      setCompletion(builder, "throw", target ?? 0, statement.range, value);
       builder.current.terminator =
         target == null
-          ? { kind: "resume-completion" }
+          ? { completionSlot: 0, kind: "resume-completion" }
           : { kind: "jump", target };
       return true;
     } else if (statement.kind === "try") {
@@ -2907,9 +2915,10 @@ function printTerminator(terminator: MirTerminator): string {
     );
   }
   if (terminator.kind === "resume-completion") {
+    const completion = `resume-completion bb${terminator.completionSlot}`;
     return terminator.outerFinalizer == null
-      ? "resume-completion"
-      : `resume-completion via bb${terminator.outerFinalizer}`;
+      ? completion
+      : `${completion} via bb${terminator.outerFinalizer}`;
   }
   return "unreachable";
 }

@@ -137,6 +137,14 @@ function nestedReturn() {
   }
 }
 console.log(nestedReturn());
+function nestedFinallyDuringReturn() {
+  try {
+    return "preserved return";
+  } finally {
+    try {} finally {}
+  }
+}
+console.log(nestedFinallyDuringReturn());
 function nestedThrow() {
   try {
     try { throw "nested throw"; }

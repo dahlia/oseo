@@ -550,8 +550,16 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     line(state, `roots[${operation.id}] = receiver;`);
   } else if (operation.kind === "caught") {
     state.usesCompletion = true;
-    line(state, `roots[${operation.id}] = completion_value;`);
-    line(state, "result = (OseoResult){OSEO_STATUS_NORMAL, completion_value};");
+    const slot = operation.completionSlot;
+    if (slot == null) {
+      throw new Error(`MIR caught %${operation.id} has no completion slot.`);
+    }
+    line(state, `roots[${operation.id}] = completion_value[${slot}u];`);
+    line(
+      state,
+      `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
+        `completion_value[${slot}u]};`,
+    );
   } else if (operation.kind === "completion-set") {
     state.usesCompletion = true;
     const kinds = { jump: 3, normal: 0, return: 1, throw: 2 } as const;
@@ -559,12 +567,24 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (kind == null) {
       throw new Error(`MIR completion-set %${operation.id} has no kind.`);
     }
-    line(state, `completion_kind = ${kinds[kind]};`);
+    const slot = operation.completionSlot;
+    if (slot == null) {
+      throw new Error(
+        `MIR completion-set %${operation.id} has no completion slot.`,
+      );
+    }
+    line(state, `completion_kind[${slot}u] = ${kinds[kind]};`);
     if (operation.arguments[0] != null) {
-      line(state, `completion_value = roots[${operation.arguments[0]}];`);
+      line(
+        state,
+        `completion_value[${slot}u] = roots[${operation.arguments[0]}];`,
+      );
     }
     if (operation.completionTarget != null) {
-      line(state, `completion_target = ${operation.completionTarget}u;`);
+      line(
+        state,
+        `completion_target[${slot}u] = ${operation.completionTarget}u;`,
+      );
     }
   } else if (operation.kind === "unary") {
     emitUnary(state, operation);
@@ -609,8 +629,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state.usesCompletion = true;
       line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
       line(state, "    if (context->has_diagnostic) goto abrupt;");
-      line(state, "    completion_kind = 2;");
-      line(state, "    completion_value = result.value;");
+      line(state, `    completion_kind[${operation.abruptTarget}u] = 2;`);
+      line(
+        state,
+        `    completion_value[${operation.abruptTarget}u] = result.value;`,
+      );
       line(state, `    goto bb${operation.abruptTarget};`);
       line(state, "}");
     }
@@ -648,27 +671,45 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, `goto bb${terminator.whenFalse};`);
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
+    const slot = terminator.completionSlot;
     if (terminator.outerFinalizer != null) {
-      line(state, "if (completion_kind != 0) {");
+      line(state, `if (completion_kind[${slot}u] != 0) {`);
+      line(
+        state,
+        `    completion_kind[${terminator.outerFinalizer}u] = ` +
+          `completion_kind[${slot}u];`,
+      );
+      line(
+        state,
+        `    completion_value[${terminator.outerFinalizer}u] = ` +
+          `completion_value[${slot}u];`,
+      );
+      line(
+        state,
+        `    completion_target[${terminator.outerFinalizer}u] = ` +
+          `completion_target[${slot}u];`,
+      );
       line(state, `    goto bb${terminator.outerFinalizer};`);
       line(state, "}");
     }
-    line(state, "if (completion_kind == 1) {");
+    line(state, `if (completion_kind[${slot}u] == 1) {`);
     line(
       state,
-      "    result = (OseoResult){OSEO_STATUS_NORMAL, completion_value};",
+      `    result = (OseoResult){OSEO_STATUS_NORMAL, ` +
+        `completion_value[${slot}u]};`,
     );
     line(state, "    oseo_roots_release(context, &frame);");
     line(state, "    return result;");
     line(state, "}");
-    line(state, "if (completion_kind == 2) {");
+    line(state, `if (completion_kind[${slot}u] == 2) {`);
     line(
       state,
-      "    result = (OseoResult){OSEO_STATUS_THROW, completion_value};",
+      `    result = (OseoResult){OSEO_STATUS_THROW, ` +
+        `completion_value[${slot}u]};`,
     );
     line(state, "    goto abrupt;");
     line(state, "}");
-    line(state, "switch (completion_target) {");
+    line(state, `switch (completion_target[${slot}u]) {`);
     for (const target of state.blockParameters.keys()) {
       if (target === 0) continue;
       line(state, `case ${target}u: goto bb${target};`);
@@ -833,6 +874,10 @@ function emitFunction(
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
   }
   const blocks = reachableBlocks(functionValue);
+  let completionSlotCount = 1;
+  for (const block of blocks) {
+    completionSlotCount = Math.max(completionSlotCount, block.id + 1);
+  }
   const valueSlotCount = maximumValueId(blocks) + 1;
   const parameters = functionValue.parameters;
   const bindingIdValues =
@@ -952,9 +997,9 @@ function emitFunction(
     "    OseoValue *roots;\n" +
     "    OseoResult result;\n" +
     (state.usesCompletion
-      ? "    int completion_kind = 0;\n" +
-        "    size_t completion_target = 0u;\n" +
-        "    OseoValue completion_value = oseo_undefined();\n" +
+      ? `    int completion_kind[${completionSlotCount}u] = {0};\n` +
+        `    size_t completion_target[${completionSlotCount}u] = {0};\n` +
+        `    OseoValue completion_value[${completionSlotCount}u] = {0};\n` +
         "    (void)completion_kind;\n" +
         "    (void)completion_target;\n" +
         "    (void)completion_value;\n"
