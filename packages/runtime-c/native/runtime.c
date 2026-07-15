@@ -22,6 +22,7 @@
 typedef enum {
     OSEO_HEAP_STRING = 1,
     OSEO_HEAP_ENVIRONMENT = 2,
+    OSEO_HEAP_OBJECT = 3,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -42,6 +43,22 @@ typedef struct {
     size_t slot_count;
     OseoValue slots[];
 } OseoEnvironment;
+
+typedef struct {
+    OseoPropertyAttributes attributes;
+    OseoValue key;
+    OseoValue value;
+} OseoProperty;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue prototype;
+    OseoProperty *properties;
+    size_t property_capacity;
+    size_t property_count;
+    size_t shape_id;
+    bool dictionary;
+} OseoOrdinaryObject;
 
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
@@ -66,6 +83,10 @@ static OseoString *string_object(OseoValue value) {
 
 static OseoEnvironment *environment_object(OseoValue value) {
     return (OseoEnvironment *)heap_object(value);
+}
+
+static OseoOrdinaryObject *ordinary_object(OseoValue value) {
+    return (OseoOrdinaryObject *)heap_object(value);
 }
 
 static OseoResult normal(OseoValue value) {
@@ -110,6 +131,11 @@ static bool is_environment(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_ENVIRONMENT;
 }
 
+static bool is_object(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT;
+}
+
 static int64_t smi_value(OseoValue value) {
     uint64_t payload = value & OSEO_PAYLOAD_MASK;
     if ((payload & UINT64_C(0x0000800000000000)) != 0u) {
@@ -130,11 +156,27 @@ static void mark_value(OseoValue value) {
 }
 
 static void trace_object(OseoHeapObject *object) {
-    if (object->kind != OSEO_HEAP_ENVIRONMENT) return;
-    OseoEnvironment *environment = (OseoEnvironment *)object;
-    for (size_t index = 0u; index < environment->slot_count; index += 1u) {
-        mark_value(environment->slots[index]);
+    if (object->kind == OSEO_HEAP_ENVIRONMENT) {
+        OseoEnvironment *environment = (OseoEnvironment *)object;
+        for (size_t index = 0u; index < environment->slot_count; index += 1u) {
+            mark_value(environment->slots[index]);
+        }
+    } else if (object->kind == OSEO_HEAP_OBJECT) {
+        OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
+        mark_value(ordinary->prototype);
+        for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
+            mark_value(ordinary->properties[index].key);
+            mark_value(ordinary->properties[index].value);
+        }
     }
+}
+
+static void destroy_heap_object(OseoHeapObject *object) {
+    if (object->kind == OSEO_HEAP_OBJECT) {
+        OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
+        free(ordinary->properties);
+    }
+    free(object);
 }
 
 void oseo_collect(OseoContext *context) {
@@ -168,7 +210,7 @@ void oseo_collect(OseoContext *context) {
             link = &object->next;
         } else {
             *link = object->next;
-            free(object);
+            destroy_heap_object(object);
         }
     }
 }
@@ -192,6 +234,7 @@ void oseo_context_init(
     context->guard_misses = 0u;
     context->overflow_misses = 0u;
     context->generic_addition_calls = 0u;
+    context->next_shape_id = 1u;
     context->allocations = 0u;
     context->allocation_attempts = 0u;
     context->collections = 0u;
@@ -502,6 +545,271 @@ OseoResult oseo_environment_set(
     }
     environment->slots[index] = value;
     return normal(value);
+}
+
+static bool string_equal(OseoValue left, OseoValue right) {
+    if (!is_string(left) || !is_string(right)) return false;
+    OseoString *left_string = string_object(left);
+    OseoString *right_string = string_object(right);
+    return left_string->length == right_string->length &&
+        memcmp(
+            left_string->units,
+            right_string->units,
+            left_string->length * sizeof(uint16_t)
+        ) == 0;
+}
+
+static bool same_property_value(OseoValue left, OseoValue right) {
+    if (is_number(left) && is_number(right)) {
+        double left_number = number_value(left);
+        double right_number = number_value(right);
+        if (isnan(left_number) && isnan(right_number)) return true;
+        if (left_number == 0.0 && right_number == 0.0) {
+            return signbit(left_number) == signbit(right_number);
+        }
+        return left_number == right_number;
+    }
+    if (is_string(left) && is_string(right)) return string_equal(left, right);
+    return left == right;
+}
+
+static size_t own_property_index(
+    const OseoOrdinaryObject *object,
+    OseoValue key
+) {
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        if (string_equal(object->properties[index].key, key)) return index;
+    }
+    return SIZE_MAX;
+}
+
+static OseoResult require_object_and_key(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+) {
+    if (!is_object(object)) {
+        return failure(context, "OSEO2001", "Value is not an ordinary object.");
+    }
+    if (!is_string(key)) {
+        return failure(context, "OSEO2001", "Property key is not a string.");
+    }
+    return normal(object);
+}
+
+OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
+    if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
+        return failure(context, "OSEO2001", "Prototype is not object or null.");
+    }
+    OseoOrdinaryObject *object = allocate_heap_bytes(context, sizeof(*object));
+    if (object == NULL) {
+        return failure(context, "OSEO2001", "Object allocation failed.");
+    }
+    object->prototype = prototype;
+    object->properties = NULL;
+    object->property_capacity = 0u;
+    object->property_count = 0u;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    object->dictionary = false;
+    return publish_heap(context, &object->header, OSEO_HEAP_OBJECT);
+}
+
+static OseoResult grow_properties(
+    OseoContext *context,
+    OseoValue object_value
+) {
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (object->property_count < object->property_capacity) {
+        return normal(object_value);
+    }
+    size_t capacity = object->property_capacity == 0u
+        ? 4u
+        : object->property_capacity * 2u;
+    if (capacity < object->property_capacity ||
+        capacity > SIZE_MAX / sizeof(OseoProperty)) {
+        return failure(context, "OSEO2001", "Property storage is too large.");
+    }
+    if (context->collect_every_safepoint) oseo_collect(context);
+    object = ordinary_object(object_value);
+    context->allocation_attempts += 1u;
+    if (context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at) {
+        return failure(context, "OSEO2001", "Property allocation failed.");
+    }
+    OseoProperty *properties = malloc(capacity * sizeof(*properties));
+    if (properties == NULL) {
+        return failure(context, "OSEO2001", "Property allocation failed.");
+    }
+    if (object->property_count > 0u) {
+        memcpy(
+            properties,
+            object->properties,
+            object->property_count * sizeof(*properties)
+        );
+    }
+    free(object->properties);
+    object->properties = properties;
+    object->property_capacity = capacity;
+    return normal(object_value);
+}
+
+OseoResult oseo_object_get(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoResult valid = require_object_and_key(context, object_value, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoValue current = object_value;
+    while (is_object(current)) {
+        OseoOrdinaryObject *object = ordinary_object(current);
+        size_t index = own_property_index(object, key);
+        if (index != SIZE_MAX) return normal(object->properties[index].value);
+        current = object->prototype;
+    }
+    return normal(oseo_undefined());
+}
+
+OseoResult oseo_object_has_own(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoResult valid = require_object_and_key(context, object_value, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    return normal(oseo_boolean(own_property_index(object, key) != SIZE_MAX));
+}
+
+OseoResult oseo_object_set(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value
+) {
+    OseoResult valid = require_object_and_key(context, object_value, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoValue current = object_value;
+    while (is_object(current)) {
+        OseoOrdinaryObject *owner = ordinary_object(current);
+        size_t index = own_property_index(owner, key);
+        if (index != SIZE_MAX) {
+            OseoProperty *property = &owner->properties[index];
+            if (!property->attributes.writable) {
+                return normal(value);
+            }
+            if (current == object_value) {
+                property->value = value;
+                return normal(value);
+            }
+            break;
+        }
+        current = owner->prototype;
+    }
+    OseoResult grown = grow_properties(context, object_value);
+    if (grown.status != OSEO_STATUS_NORMAL) return grown;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    OseoProperty *property = &object->properties[object->property_count];
+    property->attributes = (OseoPropertyAttributes){true, true, true};
+    property->key = key;
+    property->value = value;
+    object->property_count += 1u;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(value);
+}
+
+OseoResult oseo_object_define(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    OseoResult valid = require_object_and_key(context, object_value, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    size_t index = own_property_index(object, key);
+    if (index != SIZE_MAX) {
+        OseoProperty *property = &object->properties[index];
+        if (!property->attributes.configurable &&
+            (attributes.configurable ||
+             attributes.enumerable != property->attributes.enumerable ||
+             (!property->attributes.writable && attributes.writable) ||
+             (!property->attributes.writable &&
+              !same_property_value(property->value, value)))) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Property redefinition is incompatible."
+            );
+        }
+        property->attributes = attributes;
+        property->value = value;
+        object->dictionary = true;
+        object->shape_id = context->next_shape_id;
+        context->next_shape_id += 1u;
+        return normal(object_value);
+    }
+    OseoResult grown = grow_properties(context, object_value);
+    if (grown.status != OSEO_STATUS_NORMAL) return grown;
+    object = ordinary_object(object_value);
+    OseoProperty *property = &object->properties[object->property_count];
+    property->attributes = attributes;
+    property->key = key;
+    property->value = value;
+    object->property_count += 1u;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(object_value);
+}
+
+OseoResult oseo_object_delete(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoResult valid = require_object_and_key(context, object_value, key);
+    if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    size_t index = own_property_index(object, key);
+    if (index == SIZE_MAX) return normal(oseo_boolean(true));
+    if (!object->properties[index].attributes.configurable) {
+        return normal(oseo_boolean(false));
+    }
+    for (size_t next = index + 1u; next < object->property_count; next += 1u) {
+        object->properties[next - 1u] = object->properties[next];
+    }
+    object->property_count -= 1u;
+    object->dictionary = true;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(oseo_boolean(true));
+}
+
+OseoResult oseo_object_set_prototype(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue prototype
+) {
+    if (!is_object(object_value) ||
+        (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype))) {
+        return failure(context, "OSEO2001", "Invalid prototype mutation.");
+    }
+    OseoValue current = prototype;
+    while (is_object(current)) {
+        if (current == object_value) {
+            return failure(context, "OSEO2001", "Prototype cycle rejected.");
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    object->prototype = prototype;
+    object->dictionary = true;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(object_value);
 }
 
 static bool numeric_whitespace(uint16_t unit) {

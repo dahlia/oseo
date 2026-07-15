@@ -20,6 +20,12 @@ typedef struct {
 typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
 
+typedef struct {
+    bool configurable;
+    bool enumerable;
+    bool writable;
+} OseoPropertyAttributes;
+
 struct OseoRootFrame {
     OseoRootFrame *previous;
     OseoValue *slots;
@@ -41,6 +47,7 @@ typedef struct {
     size_t guard_misses;
     size_t overflow_misses;
     size_t generic_addition_calls;
+    size_t next_shape_id;
     size_t allocations;
     size_t allocation_attempts;
     size_t collections;
@@ -143,6 +150,40 @@ OseoResult oseo_environment_set(
     OseoValue environment,
     size_t index,
     OseoValue value
+);
+OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
+OseoResult oseo_object_define(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+);
+OseoResult oseo_object_delete(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+OseoResult oseo_object_get(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+OseoResult oseo_object_has_own(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+OseoResult oseo_object_set(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value
+);
+OseoResult oseo_object_set_prototype(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue prototype
 );
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_add(

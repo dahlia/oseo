@@ -77,14 +77,94 @@ static void test_allocation_failure(
     oseo_context_fail_allocation_at(context, 0u);
 }
 
+static OseoValue make_key(
+    OseoContext *context,
+    uint16_t unit
+) {
+    return require_normal(oseo_string_from_units(context, &unit, 1u));
+}
+
+static void test_ordinary_properties(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_object_create(context, oseo_null()));
+    roots[1] = require_normal(oseo_object_create(context, roots[0]));
+    roots[2] = make_key(context, UINT16_C(0x0078));
+    roots[3] = make_key(context, UINT16_C(0x0066));
+    roots[4] = make_key(context, UINT16_C(0x0075));
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[2], oseo_number(1.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[1], roots[2])) ==
+        oseo_number(1.0)
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[1], roots[2], oseo_number(2.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[1], roots[2])) ==
+        oseo_number(2.0)
+    );
+    OseoPropertyAttributes fixed = {false, false, false};
+    (void)require_normal(
+        oseo_object_define(
+            context,
+            roots[1],
+            roots[3],
+            oseo_number(3.0),
+            fixed
+        )
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[1], roots[3], oseo_number(4.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[1], roots[3])) ==
+        oseo_number(3.0)
+    );
+    assert(
+        require_normal(oseo_object_delete(context, roots[1], roots[3])) ==
+        oseo_boolean(false)
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[1], roots[4], oseo_undefined())
+    );
+    assert(
+        require_normal(oseo_object_has_own(context, roots[1], roots[4])) ==
+        oseo_boolean(true)
+    );
+    assert(
+        require_normal(oseo_object_delete(context, roots[1], roots[2])) ==
+        oseo_boolean(true)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[1], roots[2])) ==
+        oseo_number(1.0)
+    );
+    assert(
+        oseo_object_set_prototype(context, roots[0], roots[1]).status ==
+        OSEO_STATUS_THROW
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[1], roots[2], roots[1])
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_object_get(context, roots[1], roots[2])) == roots[1]
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
     oseo_context_init(&context, "runtime-heap.c", 14u);
-    (void)require_normal(oseo_roots_allocate(&context, &frame, 4u));
+    (void)require_normal(oseo_roots_allocate(&context, &frame, 8u));
     test_deep_graph(&context, frame.slots);
     test_cycle_and_sharing(&context, frame.slots);
     test_allocation_failure(&context, frame.slots);
+    test_ordinary_properties(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;
