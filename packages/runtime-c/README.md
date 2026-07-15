@@ -1,11 +1,14 @@
 @oseo/runtime-c
 ===============
 
-This package provides versioned, reviewed C11 runtime source inputs. The M2
-runtime owns opaque NaN-boxed values, UTF-16 strings, primitive semantics,
-two-word call results, explicit root frames, mark-and-sweep collection, and the
-deterministic `console.log` intrinsic. Native assets remain separate files and
-are included in npm and JSR packages.
+This package provides versioned, reviewed C11 runtime source inputs. The runtime
+owns opaque NaN-boxed values, UTF-16 strings, primitive semantics, two-word call
+results, explicit root frames, mark-and-sweep collection, ordinary objects,
+arrays, environments, binding cells, function objects, and the deterministic
+`console.log` intrinsic. Native assets remain separate files and are included
+in npm and JSR packages.
+M3 property operations implement descriptors, prototypes, array holes and
+length, ordered own-key enumeration, and private monomorphic read caches.
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.

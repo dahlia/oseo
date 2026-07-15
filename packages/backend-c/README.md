@@ -2,12 +2,12 @@
 ===============
 
 This package emits deterministic C11 source from backend-neutral MIR. It
-preserves direct generic calls, guarded small-integer control flow,
-abrupt-result checks, root frames, and safepoint locations. It does not execute
-a compiler or choose runtime sources. MIR blocks and terminators are its only
-semantic input; it never replays HIR.
-Script-owned lexical bindings use shared storage while their values remain
-rooted in the active script frame across declared-function calls.
+preserves generic and dynamic calls, receivers, constructors, explicit abrupt
+completion, guarded operations, root frames, and safepoint locations. It does
+not execute a compiler or choose runtime sources. MIR blocks and terminators are
+its only semantic input; it never replays HIR.
+Lexical bindings use traced environments and shared cells while their values
+remain rooted across calls and collection.
 Only functions reachable from the script and blocks reachable from function
 entry are emitted. Self-recursive calls use a standard C volatile function
 pointer so strict warning settings do not reject valid recursion.

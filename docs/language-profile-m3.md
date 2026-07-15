@@ -4,10 +4,9 @@ M3 dynamic language profile
 Status
 ------
 
-This document freezes the source profile implemented by M3. It extends, and
-does not weaken, [*language-profile-m1.md*](./language-profile-m1.md). M2
-specialization remains removable as described by
-[*specialization-m2.md*](./specialization-m2.md).
+This document freezes the source profile implemented by M3. It extends
+[*language-profile-m1.md*](./language-profile-m1.md). M2 specialization remains
+removable as described by [*specialization-m2.md*](./specialization-m2.md).
 
 
 Program and value model
@@ -27,18 +26,18 @@ Objects and properties
 M3 accepts object literals containing data properties with identifier, string,
 number, or computed primitive keys. It accepts computed and named property
 reads, simple property assignment, `delete`, and these static `Object` methods:
-`create`, `defineProperty`, `getOwnPropertyDescriptor`, and `setPrototypeOf`.
-Descriptor objects may specify `value`, `writable`, `enumerable`, and
+`create`, `defineProperty`, `getOwnPropertyDescriptor`, `setPrototypeOf`, and
+`keys`. Descriptor objects may specify `value`, `writable`, `enumerable`, and
 `configurable`. Accessor descriptors, methods, shorthand properties, spread,
 and `__proto__` literal syntax remain unsupported.
 
 Property keys use ECMAScript `ToPropertyKey` for admitted primitive values.
 Object-valued keys remain unsupported because M3 does not admit user-observable
 object-to-primitive conversion. Lookup distinguishes absence from stored
-`undefined`, walks ordinary prototypes, and preserves receiver identity.
-Prototype mutation rejects cycles. Definition and deletion honor attributes.
-Incompatible redefinition fails through the language completion selected by the
-accepted `Object.defineProperty` contract.
+`undefined` and walks ordinary prototypes. Prototype mutation rejects cycles.
+Definition and deletion honor attributes. Incompatible redefinition produces
+an abrupt completion that can be observed through the admitted exception
+syntax.
 
 
 Arrays
@@ -53,10 +52,10 @@ cannot be deleted. The `length` property is non-enumerable and
 non-configurable, and its writability can be removed through
 `Object.defineProperty`.
 
-M3 admits `Object.keys` as the enumeration oracle. It reports canonical indices
-in ascending order followed by enumerable string keys in insertion order.
-Array methods, iterators, destructuring, rest and spread, and array prototype
-built-ins remain unsupported.
+`Object.keys` is the enumeration oracle. It reports canonical indices in
+ascending order followed by enumerable string keys in insertion order. Array
+methods, iterators, destructuring, rest, spread, and array prototype built-ins
+remain unsupported.
 
 
 Functions, bindings, and calls
@@ -86,37 +85,35 @@ are ordinary admitted values. A catch binding is lexical and mutable. A
 continue completion according to ECMAScript ordering.
 
 Runtime resource limits and unsupported host capabilities remain `OSEO2001` and
-`OSEO3001` diagnostics. They are not catchable JavaScript values. Type failures
-from the M3 property, call, constructor, and descriptor operations are
-language-visible thrown values with deterministic M3 messages.
+`OSEO3001` diagnostics. They are not catchable JavaScript values.
 
 
 Specialization
 --------------
 
-M3 may specialize a repeated named read of a stable own data property. The hit
-path checks object kind, shape identity, and the applicable prototype epoch,
-then reads one fixed slot without allocation or generic lookup. Shape,
-dictionary, deletion, prototype, accessor, and non-object misses enter one
-compiled generic property block without repeating key or receiver evaluation.
-Disabling specialization preserves every JavaScript-visible observation.
+M3 specializes named property reads with a private monomorphic call-site cache.
+The hit path checks object kind, dictionary state, layout identity, slot bounds,
+and key equality before reading a fixed slot without allocation or generic
+lookup. Any miss performs one generic lookup. Deletion, descriptor change,
+prototype mutation, another layout, or a non-object receiver cannot reuse the
+cached slot. Disabling specialization preserves observable behavior.
 
 
 Test262 evidence
 ----------------
 
-The repository adapter records the test262 revision, path, frontmatter feature
-names, strictness modes, includes, expected failure phase, and actual
-observation. Results are reported separately as pass, semantic failure,
-unsupported profile feature, expected parse failure, or harness failure.
-Unsupported and harness cases never increase the pass count.
+The repository adapter records suite revision, path, frontmatter features,
+strictness modes, harness includes, expected phase, and actual observation.
+Results are classified as pass, semantic failure, unsupported profile feature,
+expected parse failure, or harness failure. Unsupported and harness cases never
+increase the pass count.
 
 
 Negative profile boundaries
 ---------------------------
 
-Each withheld syntax family has a source-located `OSEO1001` fixture. The
-negative corpus includes modules, promises, `async` and `await`, generators,
+Each withheld syntax family receives a source-located `OSEO1001` diagnostic.
+The negative corpus includes modules, promises, `async` and `await`, generators,
 classes, accessors, proxies, symbols, big integers, regular expressions, typed
 arrays, destructuring, spread, arrows, optional chaining, and dynamic import.
 No withheld form receives approximate semantics.
