@@ -526,7 +526,7 @@ function emitConstructReceiver(
   state.usesAbrupt = true;
   line(state, `result = oseo_function_prototype(context, roots[${callee}]);`);
   line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-  line(state, "    result = oseo_object_create(context, result.value);");
+  line(state, "    result = oseo_constructor_receiver(context, result.value);");
   line(state, "}");
   line(state, `roots[${operation.id}] = result.value;`);
 }

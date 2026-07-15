@@ -198,6 +198,10 @@ OseoResult oseo_constructor_result(
     OseoValue returned,
     OseoValue receiver
 );
+OseoResult oseo_constructor_receiver(
+    OseoContext *context,
+    OseoValue prototype
+);
 OseoResult oseo_array_create(OseoContext *context, size_t length);
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);

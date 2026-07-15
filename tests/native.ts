@@ -92,6 +92,9 @@ function changePrototype() {
   return 0;
 }
 console.log(new ChangedPrototype(changePrototype()).changed);
+function PrimitivePrototype(value) { this.value = value; }
+PrimitivePrototype.prototype = 1;
+console.log(new PrimitivePrototype(12).value);
 `,
   },
   {
@@ -304,6 +307,32 @@ try {
 }
 const detached = Object.create(null);
 console.log(detached.missing);
+function FunctionPrototypeOwner() {}
+const functionPrototypeChild = Object.create(FunctionPrototypeOwner);
+console.log(
+  functionPrototypeChild.prototype === FunctionPrototypeOwner.prototype,
+);
+Object.defineProperty(FunctionPrototypeOwner, "prototype", {
+  writable: false,
+});
+function strictSyntheticSet() {
+  "use strict";
+  try { functionPrototypeChild.prototype = {}; } catch (error) {
+    console.log("inherited function prototype rejected");
+  }
+}
+strictSyntheticSet();
+const arrayPrototype = [];
+const arrayPrototypeChild = Object.create(arrayPrototype);
+console.log(arrayPrototypeChild.length);
+Object.defineProperty(arrayPrototype, "length", { writable: false });
+function strictInheritedLengthSet() {
+  "use strict";
+  try { arrayPrototypeChild.length = 0; } catch (error) {
+    console.log("inherited array length rejected");
+  }
+}
+strictInheritedLengthSet();
 `,
   },
   {
@@ -363,6 +392,15 @@ try {
 } catch (error) {
   console.log("function prototype rejected");
 }
+const frozenLength = [1];
+Object.defineProperty(frozenLength, "length", { writable: false });
+function strictSameLengthSet() {
+  "use strict";
+  try { frozenLength.length = frozenLength.length; } catch (error) {
+    console.log("same frozen length rejected");
+  }
+}
+strictSameLengthSet();
 `,
   },
   {

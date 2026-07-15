@@ -794,6 +794,16 @@ OseoResult oseo_function_prototype(
     return normal(function_object(function_value)->prototype_object);
 }
 
+OseoResult oseo_constructor_receiver(
+    OseoContext *context,
+    OseoValue prototype
+) {
+    return oseo_object_create(
+        context,
+        is_object(prototype) ? prototype : oseo_null()
+    );
+}
+
 OseoResult oseo_constructor_result(
     OseoContext *context,
     OseoValue returned,
@@ -883,6 +893,7 @@ static OseoResult set_array_length(
     OseoOrdinaryObject *array,
     OseoValue value,
     bool strict,
+    bool allow_same_value,
     bool *valid_length
 ) {
     if (valid_length != NULL) *valid_length = false;
@@ -896,7 +907,9 @@ static OseoResult set_array_length(
     uint32_t requested = (uint32_t)number;
     if (valid_length != NULL) *valid_length = true;
     if (!array->length_writable) {
-        if (requested == array->array_length) return normal(value);
+        if (allow_same_value && requested == array->array_length) {
+            return normal(value);
+        }
         return strict ? language_failure() : normal(value);
     }
     if (requested < array->array_length) {
@@ -1053,6 +1066,13 @@ static OseoResult grow_properties(
     return normal(object_value);
 }
 
+static bool own_descriptor(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+);
+
 OseoResult oseo_object_get(
     OseoContext *context,
     OseoValue object_value,
@@ -1072,17 +1092,14 @@ OseoResult oseo_object_get(
         }
         return normal(oseo_undefined());
     }
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
-        return normal(function_object(object_value)->prototype_object);
-    }
-    if (is_array(object_value) && string_is_ascii(key, "length")) {
-        return normal(oseo_number(ordinary_object(object_value)->array_length));
-    }
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *object = ordinary_object(current);
-        size_t index = own_property_index(object, key);
-        if (index != SIZE_MAX) return normal(object->properties[index].value);
+        OseoValue value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false};
+        if (own_descriptor(current, key, &value, &attributes)) {
+            return normal(value);
+        }
         current = object->prototype;
     }
     return normal(oseo_undefined());
@@ -1169,7 +1186,14 @@ OseoResult oseo_object_set(
     }
     OseoOrdinaryObject *receiver = ordinary_object(object_value);
     if (is_array(object_value) && string_is_ascii(key, "length")) {
-        return set_array_length(context, receiver, value, strict, NULL);
+        return set_array_length(
+            context,
+            receiver,
+            value,
+            strict,
+            false,
+            NULL
+        );
     }
     uint32_t receiver_index = 0u;
     bool extends_array = is_array(object_value) &&
@@ -1181,12 +1205,15 @@ OseoResult oseo_object_set(
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *owner = ordinary_object(current);
-        size_t index = own_property_index(owner, key);
-        if (index != SIZE_MAX) {
-            OseoProperty *property = &owner->properties[index];
-            if (!property->attributes.writable) {
+        OseoValue own_value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false};
+        if (own_descriptor(current, key, &own_value, &attributes)) {
+            if (!attributes.writable) {
                 return strict ? language_failure() : normal(value);
             }
+            size_t index = own_property_index(owner, key);
+            if (index == SIZE_MAX) break;
+            OseoProperty *property = &owner->properties[index];
             if (current == object_value) {
                 property->value = value;
                 if (extends_array) receiver->array_length = receiver_index + 1u;
@@ -1247,6 +1274,7 @@ OseoResult oseo_object_define(
             context,
             object,
             value,
+            true,
             true,
             &valid_length
         );
@@ -1400,13 +1428,6 @@ static bool descriptor_field(
     }
     return false;
 }
-
-static bool own_descriptor(
-    OseoValue object_value,
-    OseoValue key,
-    OseoValue *value,
-    OseoPropertyAttributes *attributes
-);
 
 static OseoResult ascii_string(OseoContext *context, const char *text) {
     uint16_t units[32];
