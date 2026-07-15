@@ -179,6 +179,13 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
   if (operation.mutable === false) {
+    if (operation.functionNameBinding === true && !state.strict) {
+      line(
+        state,
+        `result = (OseoResult){OSEO_STATUS_NORMAL, roots[${value}]};`,
+      );
+      return;
+    }
     line(state, "result = oseo_write_immutable_binding(context);");
     return;
   }

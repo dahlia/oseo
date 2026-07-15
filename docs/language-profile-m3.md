@@ -76,6 +76,8 @@ Function bodies may read `this`. `new` accepts an admitted function value,
 creates a receiver whose prototype comes from the function's `prototype`
 property, and returns the explicit object result or otherwise the receiver.
 `new.target`, `super`, bound functions, and reflection APIs remain unsupported.
+Assignment to a named function expression's inner name is ignored in a
+non-strict function body and throws in a strict function body.
 
 
 Control flow and abrupt completion

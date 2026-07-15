@@ -96,6 +96,24 @@ callConsole(localConsole);
 `,
   },
   {
+    name: "function-name-assignment",
+    nonStrictScript: true,
+    source: `
+const sloppyNamed = function self() {
+  self = 1;
+  return self === sloppyNamed;
+};
+console.log(sloppyNamed());
+const strictNamed = function self() {
+  "use strict";
+  try { self = 1; }
+  catch (error) { return "strict function name"; }
+  return "missed strict function name";
+};
+console.log(strictNamed());
+`,
+  },
+  {
     name: "constructors",
     source: `
 function Box(value) { this.value = value; }

@@ -73,6 +73,21 @@ test("retains script and function strictness in owned IR", () => {
   assert.equal(functionOnly.mir?.functions[0]?.strict, true);
 });
 
+test("rejects top-level this until script receivers exist", () => {
+  const script = compileSource(babelFrontend, {
+    source: "console.log(this);",
+    sourceId: "script-this.ts",
+  });
+  assert.equal(script.diagnostics[0]?.code, "OSEO1001");
+  assert.match(script.diagnostics[0]?.message ?? "", /function bodies/u);
+
+  const functionBody = compileSource(babelFrontend, {
+    source: "function receiver() { return this; }",
+    sourceId: "function-this.ts",
+  });
+  assert.deepEqual(functionBody.diagnostics, []);
+});
+
 test("ignores tag-shaped text outside JSDoc comments", () => {
   const result = babelFrontend.parse({
     source:

@@ -311,6 +311,7 @@ export type HirCallTarget =
 export type HirExpression =
   | (LocatedSyntax & {
       readonly bindingId: number;
+      readonly functionNameBinding?: boolean;
       readonly kind: "binding-set";
       readonly mutable: boolean;
       readonly name: string;
@@ -501,6 +502,7 @@ export interface HirResult {
 
 interface Binding {
   readonly functionId?: number;
+  readonly functionNameBinding?: boolean;
   readonly id: number;
   readonly mutable: boolean;
   readonly name: string;
@@ -583,6 +585,9 @@ function resolveExpression(
       : {
           ...expression,
           bindingId: binding.id,
+          ...(binding.functionNameBinding === true
+            ? { functionNameBinding: true }
+            : {}),
           mutable: binding.mutable,
           value,
         };
@@ -977,6 +982,7 @@ function resolveFunctionExpression(
     functionValue.name == null
       ? undefined
       : {
+          functionNameBinding: true,
           id: state.nextBindingId,
           mutable: false,
           name: functionValue.name,
@@ -1494,6 +1500,7 @@ export interface MirOperation {
   readonly completionSlot?: number;
   readonly completionTarget?: number;
   readonly functionId?: number;
+  readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
   readonly operator?: BinaryOperator | "!" | "-";
   readonly range: SourceRange;
@@ -1665,6 +1672,9 @@ function lowerExpression(
       arguments: [value],
       bindingId: expression.bindingId,
       detail: `%b${expression.bindingId} ${expression.name}`,
+      ...(expression.functionNameBinding === true
+        ? { functionNameBinding: true }
+        : {}),
       id,
       kind: "write",
       mutable: expression.mutable,

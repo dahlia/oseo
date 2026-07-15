@@ -40,6 +40,7 @@ interface BabelNode {
 
 interface ConvertContext {
   readonly diagnostics: Diagnostic[];
+  readonly functionStack: boolean[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;
   readonly strictStack: boolean[];
@@ -451,7 +452,15 @@ function expression(
     return { ...located, kind: "boolean", value: value.value };
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
-  if (value.type === "ThisExpression") return { ...located, kind: "this" };
+  if (value.type === "ThisExpression") {
+    return context.functionStack.length === 0
+      ? unsupported(
+          context,
+          value,
+          "The M3 profile admits this only in function bodies.",
+        )
+      : { ...located, kind: "this" };
+  }
   if (value.type === "Identifier") {
     const name = identifierName(value);
     if (name != null) return { ...located, kind: "identifier", name };
@@ -880,17 +889,20 @@ function functionDeclaration(
     context.strictStack.at(-1) === true || hasUseStrictDirective(bodyNode);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
+  context.functionStack.push(true);
   for (const child of nodes(bodyNode.body)) {
     const converted =
       child.type === "FunctionDeclaration"
         ? functionDeclaration(context, child, true)
         : statement(context, child, true);
     if (converted == null) {
+      context.functionStack.pop();
       context.strictStack.pop();
       return undefined;
     }
     body.push(converted);
   }
+  context.functionStack.pop();
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
   return {
@@ -961,6 +973,7 @@ export const babelFrontend: SourceFrontend = {
       }
       const context: ConvertContext = {
         diagnostics: [],
+        functionStack: [],
         input,
         locations,
         strictStack: [],
