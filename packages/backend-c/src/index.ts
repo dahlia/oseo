@@ -187,6 +187,29 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
     state,
     `result = oseo_cell_set(context, result.value, roots[${value}]);`,
   );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+}
+
+function emitInitialize(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(`MIR initialize %${operation.id} has no binding identity.`);
+  }
+  const value = operationArgument(operation, 0);
+  line(state, `roots[${operation.id}] = roots[${value}];`);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(
+    state,
+    `result = oseo_cell_initialize(context, result.value, roots[${value}]);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
 }
 
 function emitUnary(state: EmitState, operation: MirOperation): void {
@@ -494,6 +517,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitRead(state, operation);
   } else if (operation.kind === "write") {
     emitWrite(state, operation);
+  } else if (operation.kind === "initialize") {
+    emitInitialize(state, operation);
   } else if (operation.kind === "function-create") {
     emitFunctionCreate(state, operation);
   } else if (operation.kind === "construct-receiver") {
@@ -838,9 +863,13 @@ function emitFunction(
         `${functionValue.selfBindingId}u);`,
     );
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-    line(state, "result = oseo_cell_set(context, result.value, callee);");
+    line(
+      state,
+      "result = oseo_cell_initialize(context, result.value, callee);",
+    );
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
   }
+  const initializedParameters = new Set<number>();
   for (let index = 0; index < parameters.length; index += 1) {
     const parameter = parameters[index];
     if (parameter == null) continue;
@@ -850,13 +879,17 @@ function emitFunction(
         `${parameter.bindingId}u);`,
     );
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    const setter = initializedParameters.has(parameter.bindingId)
+      ? "oseo_cell_set"
+      : "oseo_cell_initialize";
     line(
       state,
-      `result = oseo_cell_set(context, result.value, ` +
+      `result = ${setter}(context, result.value, ` +
         `(argument_count > ${index}u ? arguments[${index}] : ` +
         "oseo_undefined()));",
     );
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    initializedParameters.add(parameter.bindingId);
   }
   for (const block of blocks) {
     if (block.id !== 0) line(state, `bb${block.id}:;`);

@@ -751,6 +751,38 @@ assert.equal(tdz.stdout, "");
 assert.match(tdz.stderr, /error\[OSEO2001\].*before initialization/u);
 assert.equal(tdzCleanupCount, 1);
 
+const assignmentTdz = await runNativeCli(
+  {
+    args: ["assignment-tdz.ts"],
+    source: "value = 1; let value = 2;",
+    sourceId: "assignment-tdz.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(assignmentTdz.exitStatus, 1);
+assert.equal(assignmentTdz.stdout, "");
+assert.match(
+  assignmentTdz.stderr,
+  /error\[OSEO2001\].*assigned before initialization/u,
+);
+
+const objectCoercion = await runNativeCli(
+  {
+    args: ["object-coercion.ts"],
+    source: "console.log([2] * 3);",
+    sourceId: "object-coercion.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(objectCoercion.exitStatus, 1);
+assert.equal(objectCoercion.stdout, "");
+assert.match(
+  objectCoercion.stderr,
+  /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
+);
+
 const nulSourceId = "source\0identifier.ts";
 const nulSourceDiagnostic = await runNativeCli(
   {

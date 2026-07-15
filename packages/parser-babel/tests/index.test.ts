@@ -172,6 +172,33 @@ test("preserves array elements and holes in owned syntax", () => {
   assert.match(printMir(result.mir), /array-create array length 3/u);
 });
 
+test("accepts uninitialized let as undefined", () => {
+  const result = compileSource(babelFrontend, {
+    source: "let value; console.log(value);",
+    sourceId: "uninitialized-let.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.match(
+    result.hir == null ? "" : printHir(result.hir),
+    /let .*undefined/u,
+  );
+});
+
+test("rejects only noncomputed __proto__ literals", () => {
+  const rejected = compileSource(babelFrontend, {
+    source: "const value = { __proto__: null };",
+    sourceId: "proto-literal.ts",
+  });
+  assert.equal(rejected.diagnostics[0]?.code, "OSEO1001");
+  assert.match(rejected.diagnostics[0]?.message ?? "", /__proto__/u);
+
+  const accepted = compileSource(babelFrontend, {
+    source: 'const value = { ["__proto__"]: null };',
+    sourceId: "computed-proto.ts",
+  });
+  assert.deepEqual(accepted.diagnostics, []);
+});
+
 test("rejects the smallest syntax form outside the M3 profile", () => {
   const result = babelFrontend.parse({
     source: "const value = () => 1;",

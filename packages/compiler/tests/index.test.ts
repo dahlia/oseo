@@ -409,7 +409,7 @@ test("prints distinct non-finite MIR constants", () => {
   assert.doesNotMatch(text, /constant null/u);
 });
 
-test("records const binding writes in MIR", () => {
+test("distinguishes binding initialization in MIR", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -434,12 +434,14 @@ test("records const binding writes in MIR", () => {
   const operations = buildMir(hir).script.blocks.flatMap(
     (block) => block.operations,
   );
-  const write = operations.find((operation) => operation.kind === "write");
+  const initialize = operations.find(
+    (operation) => operation.kind === "initialize",
+  );
   const read = operations.find((operation) => operation.kind === "read");
-  assert.ok(write != null);
+  assert.ok(initialize != null);
   assert.ok(read != null);
-  assert.equal(write.bindingId, read.bindingId);
-  assert.equal(write.arguments.length, 1);
+  assert.equal(initialize.bindingId, read.bindingId);
+  assert.equal(initialize.arguments.length, 1);
 });
 
 test("marks generic addition as an allocation safepoint", () => {

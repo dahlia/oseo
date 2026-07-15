@@ -263,6 +263,25 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
     );
 }
 
+static void test_cell_initialization(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_cell_create(context, oseo_uninitialized()));
+    assert(
+        oseo_cell_set(context, roots[0], oseo_number(1.0)).status ==
+        OSEO_STATUS_THROW
+    );
+    context->error_code = NULL;
+    context->error_message = NULL;
+    (void)require_normal(
+        oseo_cell_initialize(context, roots[0], oseo_number(2.0))
+    );
+    assert(
+        require_normal(oseo_cell_get(context, roots[0])) == oseo_number(2.0)
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -274,6 +293,7 @@ int main(void) {
     test_ordinary_properties(&context, frame.slots);
     test_arrays(&context, frame.slots);
     test_function_cells(&context, frame.slots);
+    test_cell_initialization(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

@@ -496,6 +496,13 @@ function expression(
         key = expression(context, keyNode);
       } else {
         const name = identifierName(keyNode);
+        if (name === "__proto__") {
+          return unsupported(
+            context,
+            property,
+            "Noncomputed __proto__ literals are unsupported.",
+          );
+        }
         if (name != null) {
           key = { ...location(context, keyNode), kind: "string", value: name };
         } else if (keyNode.type === "NumericLiteral") {
@@ -661,14 +668,21 @@ function statement(
     const identifier = node(declaration.id);
     const initializerNode = node(declaration.init);
     const name = identifier == null ? undefined : identifierName(identifier);
-    if (identifier == null || name == null || initializerNode == null) {
+    if (
+      identifier == null ||
+      name == null ||
+      (value.kind === "const" && initializerNode == null)
+    ) {
       return unsupported(
         context,
         declaration,
         "A const binding needs one identifier and an initializer.",
       );
     }
-    const initializer = expression(context, initializerNode);
+    const initializer =
+      initializerNode == null
+        ? { ...location(context, declaration), kind: "undefined" as const }
+        : expression(context, initializerNode);
     if (initializer == null) return undefined;
     const hint = typeHint(context, identifier.typeAnnotation);
     if (context.diagnostics.length > 0) return undefined;

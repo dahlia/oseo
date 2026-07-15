@@ -650,6 +650,28 @@ OseoResult oseo_cell_set(
     if (!is_cell(cell_value)) {
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
+    if (tag_of(cell_object(cell_value)->value) == OSEO_TAG_UNINITIALIZED) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Binding was assigned before initialization."
+        );
+    }
+    cell_object(cell_value)->value = value;
+    return normal(value);
+}
+
+OseoResult oseo_cell_initialize(
+    OseoContext *context,
+    OseoValue cell_value,
+    OseoValue value
+) {
+    if (!is_cell(cell_value)) {
+        return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    if (tag_of(cell_object(cell_value)->value) != OSEO_TAG_UNINITIALIZED) {
+        return failure(context, "OSEO2001", "Binding is already initialized.");
+    }
     cell_object(cell_value)->value = value;
     return normal(value);
 }
@@ -1701,7 +1723,11 @@ static OseoResult to_number(OseoContext *context, OseoValue value) {
     if (is_string(value)) {
         return string_number(context, string_object(value));
     }
-    return normal(oseo_number(NAN));
+    return failure(
+        context,
+        "OSEO2001",
+        "Object-to-primitive conversion is unsupported."
+    );
 }
 
 static void append_character(

@@ -162,6 +162,11 @@ OseoResult oseo_environment_set(
 );
 OseoResult oseo_cell_create(OseoContext *context, OseoValue value);
 OseoResult oseo_cell_get(OseoContext *context, OseoValue cell);
+OseoResult oseo_cell_initialize(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
 OseoResult oseo_cell_set(
     OseoContext *context,
     OseoValue cell,

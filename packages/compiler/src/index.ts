@@ -1439,6 +1439,7 @@ export interface MirOperation {
     | "count-overflow-miss"
     | "function-create"
     | "guard-smi"
+    | "initialize"
     | "join"
     | "object-create"
     | "property-key"
@@ -2216,7 +2217,7 @@ function lowerTryStatement(
       bindingId: statement.handler.bindingId,
       detail: statement.handler.name,
       id: written,
-      kind: "write",
+      kind: "initialize",
       range: statement.handler.range,
     });
     recordRoot(builder, written, statement.handler.range);
@@ -2275,7 +2276,7 @@ function lowerStatements(
         bindingId: statement.bindingId,
         detail: `%b${statement.bindingId} ${statement.name}`,
         id,
-        kind: "write",
+        kind: "initialize",
         range: statement.range,
       });
       recordRoot(builder, id, statement.range);
@@ -2296,7 +2297,7 @@ function lowerStatements(
         bindingId: statement.bindingId,
         detail: `%b${statement.bindingId} ${statement.name}`,
         id,
-        kind: "write",
+        kind: "initialize",
         range: statement.range,
       });
       recordRoot(builder, id, statement.range);
