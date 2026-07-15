@@ -23,6 +23,7 @@ typedef enum {
     OSEO_HEAP_STRING = 1,
     OSEO_HEAP_ENVIRONMENT = 2,
     OSEO_HEAP_OBJECT = 3,
+    OSEO_HEAP_ARRAY = 4,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -57,7 +58,9 @@ typedef struct {
     size_t property_capacity;
     size_t property_count;
     size_t shape_id;
+    uint32_t array_length;
     bool dictionary;
+    bool length_writable;
 } OseoOrdinaryObject;
 
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
@@ -132,8 +135,14 @@ static bool is_environment(OseoValue value) {
 }
 
 static bool is_object(OseoValue value) {
+    if (tag_of(value) != OSEO_TAG_HEAP) return false;
+    OseoHeapKind kind = heap_object(value)->kind;
+    return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY;
+}
+
+static bool is_array(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
-        heap_object(value)->kind == OSEO_HEAP_OBJECT;
+        heap_object(value)->kind == OSEO_HEAP_ARRAY;
 }
 
 static int64_t smi_value(OseoValue value) {
@@ -161,7 +170,8 @@ static void trace_object(OseoHeapObject *object) {
         for (size_t index = 0u; index < environment->slot_count; index += 1u) {
             mark_value(environment->slots[index]);
         }
-    } else if (object->kind == OSEO_HEAP_OBJECT) {
+    } else if (object->kind == OSEO_HEAP_OBJECT ||
+               object->kind == OSEO_HEAP_ARRAY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype);
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
@@ -172,7 +182,8 @@ static void trace_object(OseoHeapObject *object) {
 }
 
 static void destroy_heap_object(OseoHeapObject *object) {
-    if (object->kind == OSEO_HEAP_OBJECT) {
+    if (object->kind == OSEO_HEAP_OBJECT ||
+        object->kind == OSEO_HEAP_ARRAY) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
     }
@@ -583,6 +594,84 @@ static size_t own_property_index(
     return SIZE_MAX;
 }
 
+static bool string_is_ascii(OseoValue value, const char *text) {
+    if (!is_string(value)) return false;
+    OseoString *string = string_object(value);
+    size_t length = strlen(text);
+    if (string->length != length) return false;
+    for (size_t index = 0u; index < length; index += 1u) {
+        if (string->units[index] !=
+            (uint16_t)(unsigned char)text[index]) return false;
+    }
+    return true;
+}
+
+static bool array_index(OseoValue key, uint32_t *result) {
+    if (!is_string(key)) return false;
+    OseoString *string = string_object(key);
+    if (string->length == 0u || string->length > 10u) return false;
+    if (string->length > 1u && string->units[0] == UINT16_C(0x30)) {
+        return false;
+    }
+    uint64_t value = 0u;
+    for (size_t index = 0u; index < string->length; index += 1u) {
+        uint16_t unit = string->units[index];
+        if (unit < UINT16_C(0x30) || unit > UINT16_C(0x39)) return false;
+        value = value * UINT64_C(10) + (uint64_t)(unit - UINT16_C(0x30));
+        if (value > UINT64_C(4294967294)) return false;
+    }
+    *result = (uint32_t)value;
+    return true;
+}
+
+static bool remove_property(OseoOrdinaryObject *object, size_t index) {
+    if (!object->properties[index].attributes.configurable) return false;
+    for (size_t next = index + 1u; next < object->property_count; next += 1u) {
+        object->properties[next - 1u] = object->properties[next];
+    }
+    object->property_count -= 1u;
+    return true;
+}
+
+static OseoResult set_array_length(
+    OseoContext *context,
+    OseoOrdinaryObject *array,
+    OseoValue value
+) {
+    if (!is_number(value)) {
+        return failure(context, "OSEO2001", "Invalid array length.");
+    }
+    double number = number_value(value);
+    if (!isfinite(number) || number < 0.0 ||
+        number > 4294967295.0 || floor(number) != number) {
+        return failure(context, "OSEO2001", "Invalid array length.");
+    }
+    if (!array->length_writable) return normal(value);
+    uint32_t requested = (uint32_t)number;
+    if (requested < array->array_length) {
+        size_t index = array->property_count;
+        while (index > 0u) {
+            index -= 1u;
+            uint32_t property_index;
+            if (array_index(array->properties[index].key, &property_index) &&
+                property_index >= requested &&
+                !remove_property(array, index)) {
+                array->array_length = property_index + 1u;
+                return failure(
+                    context,
+                    "OSEO2001",
+                    "Array length truncation was rejected."
+                );
+            }
+        }
+    }
+    array->array_length = requested;
+    array->dictionary = true;
+    array->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(value);
+}
+
 static OseoResult require_object_and_key(
     OseoContext *context,
     OseoValue object,
@@ -611,8 +700,30 @@ OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
     object->property_count = 0u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
+    object->array_length = 0u;
     object->dictionary = false;
+    object->length_writable = false;
     return publish_heap(context, &object->header, OSEO_HEAP_OBJECT);
+}
+
+OseoResult oseo_array_create(OseoContext *context, size_t length) {
+    if (length > UINT32_MAX) {
+        return failure(context, "OSEO2001", "Array length is too large.");
+    }
+    OseoOrdinaryObject *array = allocate_heap_bytes(context, sizeof(*array));
+    if (array == NULL) {
+        return failure(context, "OSEO2001", "Array allocation failed.");
+    }
+    array->prototype = oseo_null();
+    array->properties = NULL;
+    array->property_capacity = 0u;
+    array->property_count = 0u;
+    array->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    array->array_length = (uint32_t)length;
+    array->dictionary = false;
+    array->length_writable = true;
+    return publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
 static OseoResult grow_properties(
@@ -661,6 +772,9 @@ OseoResult oseo_object_get(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        return normal(oseo_number(ordinary_object(object_value)->array_length));
+    }
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *object = ordinary_object(current);
@@ -678,6 +792,9 @@ OseoResult oseo_object_has_own(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        return normal(oseo_boolean(true));
+    }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     return normal(oseo_boolean(own_property_index(object, key) != SIZE_MAX));
 }
@@ -690,6 +807,15 @@ OseoResult oseo_object_set(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    OseoOrdinaryObject *receiver = ordinary_object(object_value);
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        return set_array_length(context, receiver, value);
+    }
+    uint32_t receiver_index = 0u;
+    bool extends_array = is_array(object_value) &&
+        array_index(key, &receiver_index) &&
+        receiver_index >= receiver->array_length;
+    if (extends_array && !receiver->length_writable) return normal(value);
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *owner = ordinary_object(current);
@@ -701,6 +827,7 @@ OseoResult oseo_object_set(
             }
             if (current == object_value) {
                 property->value = value;
+                if (extends_array) receiver->array_length = receiver_index + 1u;
                 return normal(value);
             }
             break;
@@ -717,6 +844,7 @@ OseoResult oseo_object_set(
     object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
+    if (extends_array) object->array_length = receiver_index + 1u;
     return normal(value);
 }
 
@@ -730,6 +858,33 @@ OseoResult oseo_object_define(
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        if (attributes.configurable || attributes.enumerable) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Array length attributes are incompatible."
+            );
+        }
+        if (!object->length_writable && attributes.writable) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Array length is not writable."
+            );
+        }
+        OseoResult changed = set_array_length(context, object, value);
+        if (changed.status != OSEO_STATUS_NORMAL) return changed;
+        object->length_writable = attributes.writable;
+        return normal(object_value);
+    }
+    uint32_t defined_index = 0u;
+    bool extends_array = is_array(object_value) &&
+        array_index(key, &defined_index) &&
+        defined_index >= object->array_length;
+    if (extends_array && !object->length_writable) {
+        return failure(context, "OSEO2001", "Array length is not writable.");
+    }
     size_t index = own_property_index(object, key);
     if (index != SIZE_MAX) {
         OseoProperty *property = &object->properties[index];
@@ -750,6 +905,7 @@ OseoResult oseo_object_define(
         object->dictionary = true;
         object->shape_id = context->next_shape_id;
         context->next_shape_id += 1u;
+        if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
     OseoResult grown = grow_properties(context, object_value);
@@ -762,6 +918,7 @@ OseoResult oseo_object_define(
     object->property_count += 1u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
+    if (extends_array) object->array_length = defined_index + 1u;
     return normal(object_value);
 }
 
@@ -772,16 +929,16 @@ OseoResult oseo_object_delete(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        return normal(oseo_boolean(false));
+    }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     size_t index = own_property_index(object, key);
     if (index == SIZE_MAX) return normal(oseo_boolean(true));
     if (!object->properties[index].attributes.configurable) {
         return normal(oseo_boolean(false));
     }
-    for (size_t next = index + 1u; next < object->property_count; next += 1u) {
-        object->properties[next - 1u] = object->properties[next];
-    }
-    object->property_count -= 1u;
+    (void)remove_property(object, index);
     object->dictionary = true;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;

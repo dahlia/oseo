@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 static OseoValue require_normal(OseoResult result) {
     assert(result.status == OSEO_STATUS_NORMAL);
@@ -84,6 +85,16 @@ static OseoValue make_key(
     return require_normal(oseo_string_from_units(context, &unit, 1u));
 }
 
+static OseoValue make_text(OseoContext *context, const char *text) {
+    size_t length = strlen(text);
+    assert(length <= 16u);
+    uint16_t units[16];
+    for (size_t index = 0u; index < length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)text[index];
+    }
+    return require_normal(oseo_string_from_units(context, units, length));
+}
+
 static void test_ordinary_properties(
     OseoContext *context,
     OseoValue *roots
@@ -156,6 +167,65 @@ static void test_ordinary_properties(
     );
 }
 
+static void test_arrays(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_array_create(context, 3u));
+    roots[1] = make_text(context, "0");
+    roots[2] = make_text(context, "2");
+    roots[3] = make_text(context, "5");
+    roots[4] = make_text(context, "length");
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[1], oseo_number(1.0))
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[2], oseo_number(3.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[4])) ==
+        oseo_number(3.0)
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[3], oseo_number(6.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[4])) ==
+        oseo_number(6.0)
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[4], oseo_number(1.0))
+    );
+    assert(
+        require_normal(oseo_object_has_own(context, roots[0], roots[2])) ==
+        oseo_boolean(false)
+    );
+    OseoPropertyAttributes fixed = {false, true, true};
+    (void)require_normal(
+        oseo_object_define(
+            context,
+            roots[0],
+            roots[2],
+            oseo_number(3.0),
+            fixed
+        )
+    );
+    assert(
+        oseo_object_set(
+            context,
+            roots[0],
+            roots[4],
+            oseo_number(1.0)
+        ).status == OSEO_STATUS_THROW
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[4])) ==
+        oseo_number(3.0)
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[1])) ==
+        oseo_number(1.0)
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -165,6 +235,7 @@ int main(void) {
     test_cycle_and_sharing(&context, frame.slots);
     test_allocation_failure(&context, frame.slots);
     test_ordinary_properties(&context, frame.slots);
+    test_arrays(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

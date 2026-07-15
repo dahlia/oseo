@@ -86,6 +86,10 @@ export type BinaryOperator =
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
+      readonly elements: readonly (SyntaxExpression | undefined)[];
+      readonly kind: "array";
+    })
+  | (LocatedSyntax & {
       readonly kind: "binary";
       readonly left: SyntaxExpression;
       readonly operator: BinaryOperator;
@@ -222,6 +226,10 @@ export type HirCallTarget =
 
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
+  | (LocatedSyntax & {
+      readonly elements: readonly (HirExpression | undefined)[];
+      readonly kind: "array";
+    })
   | (LocatedSyntax & {
       readonly kind: "binary";
       readonly left: HirExpression;
@@ -385,6 +393,19 @@ function resolveExpression(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | undefined {
+  if (expression.kind === "array") {
+    const elements: (HirExpression | undefined)[] = [];
+    for (const element of expression.elements) {
+      if (element == null) {
+        elements.push(undefined);
+        continue;
+      }
+      const resolved = resolveExpression(element, scopes, state);
+      if (resolved == null) return undefined;
+      elements.push(resolved);
+    }
+    return { ...expression, elements };
+  }
   if (
     expression.kind === "boolean" ||
     expression.kind === "null" ||
@@ -737,6 +758,17 @@ function numberText(value: number): string {
 }
 
 function printHirExpression(expression: HirExpression): string {
+  if (expression.kind === "array") {
+    return (
+      "[" +
+      expression.elements
+        .map((element) =>
+          element == null ? "<hole>" : printHirExpression(element),
+        )
+        .join(", ") +
+      "]"
+    );
+  }
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
   }
@@ -906,12 +938,14 @@ export interface MirGlobalBinding {
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
   readonly arguments: readonly number[];
+  readonly arrayLength?: number;
   readonly bindingId?: number;
   readonly constant?: MirConstant;
   readonly detail: string;
   readonly id: number;
   readonly kind:
     | "add-smi-checked"
+    | "array-create"
     | "binary"
     | "box-smi"
     | "branch"
@@ -1076,6 +1110,69 @@ function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
 ): number {
+  if (expression.kind === "array") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "array allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      arrayLength: expression.elements.length,
+      detail: `array length ${expression.elements.length}`,
+      id,
+      kind: "array-create",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    recordRoot(builder, id, expression.range);
+    for (let index = 0; index < expression.elements.length; index += 1) {
+      const element = expression.elements[index];
+      if (element == null) continue;
+      const keyExpression: HirExpression = {
+        kind: "string",
+        range: element.range,
+        value: String(index),
+      };
+      const key = lowerPropertyKey(keyExpression, builder);
+      const value = lowerExpression(element, builder);
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "array property storage growth",
+        [id, key, value],
+        expression.range,
+      );
+      const result = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [id, key, value],
+        detail: `array element ${index}`,
+        id: result,
+        kind: "property-set",
+        range: element.range,
+      });
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [result],
+        element.range,
+      );
+      recordRoot(builder, result, element.range);
+    }
+    return id;
+  }
   if (expression.kind === "binding") {
     const id = builder.nextValue;
     builder.nextValue += 1;

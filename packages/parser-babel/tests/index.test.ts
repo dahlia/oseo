@@ -129,23 +129,34 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.match(printMir(result.mir), /property-(?:get|set|delete)/u);
 });
 
-test("rejects the smallest syntax form outside the M1 profile", () => {
+test("preserves array elements and holes in owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source: "const values = [1, , 3]; console.log(values.length);",
+    sourceId: "arrays.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /\[1, <hole>, 3\]/u);
+  assert.match(printMir(result.mir), /array-create array length 3/u);
+});
+
+test("rejects the smallest syntax form outside the M3 profile", () => {
   const result = babelFrontend.parse({
-    source: "const values = [1, 2];",
-    sourceId: "array.ts",
+    source: "const value = () => 1;",
+    sourceId: "arrow.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.deepEqual(result.diagnostics[0]?.range.start, {
-    column: 16,
+    column: 15,
     line: 1,
   });
 });
 
 const unsupportedForms = [
   ["assignment", "let value = 1;"],
-  ["array", "console.log([]);"],
   ["loop", "while (true) {}"],
   ["nested function", "function outer() { function inner() {} }"],
   ["function value", "function value() {} const copy = value;"],

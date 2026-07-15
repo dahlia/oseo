@@ -331,7 +331,15 @@ function emitCall(state: EmitState, operation: MirOperation): void {
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
-  if (operation.kind === "object-create") {
+  if (operation.kind === "array-create") {
+    if (operation.arrayLength == null) {
+      throw new Error(`MIR array-create %${operation.id} has no length.`);
+    }
+    line(
+      state,
+      `result = oseo_array_create(context, ${operation.arrayLength}u);`,
+    );
+  } else if (operation.kind === "object-create") {
     line(state, "result = oseo_object_create(context, oseo_null());");
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
@@ -400,6 +408,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "call") {
     emitCall(state, operation);
   } else if (
+    operation.kind === "array-create" ||
     operation.kind === "object-create" ||
     operation.kind === "property-key" ||
     operation.kind === "property-delete" ||

@@ -401,6 +401,24 @@ function expression(
   value: BabelNode,
 ): SyntaxExpression | undefined {
   const located = location(context, value);
+  if (value.type === "ArrayExpression") {
+    const rawElements = Array.isArray(value.elements) ? value.elements : [];
+    const elements: (SyntaxExpression | undefined)[] = [];
+    for (const rawElement of rawElements) {
+      if (rawElement == null) {
+        elements.push(undefined);
+        continue;
+      }
+      const elementNode = node(rawElement);
+      if (elementNode == null || elementNode.type === "SpreadElement") {
+        return unsupported(context, value, "Array spread is unsupported.");
+      }
+      const converted = expression(context, elementNode);
+      if (converted == null) return undefined;
+      elements.push(converted);
+    }
+    return { ...located, elements, kind: "array" };
+  }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
   }

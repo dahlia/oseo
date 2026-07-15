@@ -49,6 +49,18 @@ interface Fixture {
 
 const fixtures: readonly Fixture[] = [
   {
+    name: "arrays",
+    source: `
+const values = [1, , 3];
+console.log(values.length, values[0], values[1], values[2]);
+values[5] = 6;
+console.log(values.length, values[4], values[5]);
+console.log(delete values[5], values.length, values[5]);
+values.length = 1;
+console.log(values.length, values[0], values[2]);
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
