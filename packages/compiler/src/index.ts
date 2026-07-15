@@ -1098,6 +1098,7 @@ export interface MirOperation {
     | "property-key"
     | "property-delete"
     | "property-get"
+    | "property-get-cached"
     | "property-set"
     | "read"
     | "root-store"
@@ -1187,6 +1188,7 @@ interface MirBuilder {
   }[];
   current: MutableMirBlock;
   nextValue: number;
+  readonly specialization: SpecializationMode;
 }
 
 function appendMirMetadata(
@@ -1524,7 +1526,12 @@ function lowerExpression(
       arguments: [object, key],
       detail: expression.kind,
       id,
-      kind: expression.kind,
+      kind:
+        expression.kind === "property-get" &&
+        expression.key.kind === "string" &&
+        builder.specialization === "enabled"
+          ? "property-get-cached"
+          : expression.kind,
       range: expression.range,
     });
     appendMirMetadata(
@@ -1780,6 +1787,7 @@ function buildMirFunction(
   body: readonly HirStatement[],
   parameters: readonly HirParameter[],
   range: SourceRange,
+  specialization: SpecializationMode,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -1791,6 +1799,7 @@ function buildMirFunction(
     current: entry,
     loops: [],
     nextValue: 0,
+    specialization,
   };
   const returned = lowerStatements(body, builder);
   if (!returned) {
@@ -2104,6 +2113,7 @@ export function buildMir(
         functionValue.body,
         functionValue.parameters,
         functionValue.range,
+        specialization,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)
@@ -2116,7 +2126,14 @@ export function buildMir(
     ),
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
-    script: buildMirFunction(-1, "<script>", program.body, [], program.range),
+    script: buildMirFunction(
+      -1,
+      "<script>",
+      program.body,
+      [],
+      program.range,
+      specialization,
+    ),
     sourceId: program.sourceId,
     specialization,
   };

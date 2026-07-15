@@ -49,6 +49,25 @@ interface Fixture {
 
 const fixtures: readonly Fixture[] = [
   {
+    name: "property-specialization",
+    source: `
+const value = { item: 1 };
+let reads = 0;
+while (reads < 3) {
+  console.log(value.item);
+  reads = reads + 1;
+}
+console.log(delete value.item, value.item);
+`,
+    specialization: {
+      genericCallsDisabled: 3,
+      genericCallsEnabled: 3,
+      hits: 2,
+      misses: 2,
+      overflowMisses: 0,
+    },
+  },
+  {
     name: "loops",
     source: `
 let value = 0;

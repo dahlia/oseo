@@ -26,6 +26,11 @@ typedef struct {
     bool writable;
 } OseoPropertyAttributes;
 
+typedef struct {
+    size_t shape_id;
+    size_t slot;
+} OseoPropertyCache;
+
 struct OseoRootFrame {
     OseoRootFrame *previous;
     OseoValue *slots;
@@ -170,6 +175,12 @@ OseoResult oseo_object_get(
     OseoContext *context,
     OseoValue object,
     OseoValue key
+);
+OseoResult oseo_object_get_cached(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoPropertyCache *cache
 );
 OseoResult oseo_object_has_own(
     OseoContext *context,

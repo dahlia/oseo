@@ -30,12 +30,11 @@ backend or collector must be able to replace the C representation.
 Alternatives considered
 -----------------------
 
-A dictionary for every object is simple, but provides no stable layout to guard
-and repeats metadata in every instance. Object-owned mutable descriptors make
-transitions cheap to implement, but couple values to metadata and invalidate
-fixed slots unpredictably. Tracing shapes as ordinary JavaScript heap values
-would reuse collector machinery, but exposes metadata that has no language
-identity and complicates weak transition ownership before it is needed.
+A shared immutable shape arena can amortize metadata across similarly
+constructed objects, but needs transition ownership, key lifetime management,
+and prototype invalidation before the first monomorphic read proves that cost
+useful. Tracing shapes as ordinary JavaScript heap values would reuse collector
+machinery, but exposes metadata that has no language identity.
 
 
 Decision
@@ -47,32 +46,30 @@ strings, ordinary objects, arrays, functions, environments, and binding cells.
 The dispatch traces only `OseoValue` fields. It uses an explicit work list so a
 deep or cyclic graph cannot exhaust the native stack.
 
-An ordinary shape is immutable. It owns ordered property metadata containing an
-owned UTF-16 key copy, attributes, and a fixed slot index. Shapes and their key
-copies live in a context-owned lifetime arena. They are not tagged values, do
-not outlive the context, and never contain `OseoValue` fields. An ordinary
-object owns its shape pointer, value slots, and a rooted prototype value. A
-compatible addition creates a successor shape and preserves existing slots.
+The first guarded layout uses an object-owned ordered property vector. Each
+entry contains a rooted UTF-16 key value, attributes, and a rooted property
+value. The object also owns a rooted prototype and a monotonic layout identity.
+Adding or removing a property, changing a descriptor, or changing the prototype
+assigns a fresh identity. Replacing the value of an existing writable property
+preserves the identity and slot.
 
-Deletion, incompatible redefinition, or layout pressure converts an object to
-an insertion-ordered dictionary. Dictionary entries own the same key,
-descriptor, and value information. Conversion preserves order and attributes.
-No generic operation may distinguish the shape-backed and dictionary-backed
-representations.
+Deletion, descriptor redefinition, and prototype mutation mark the object as a
+dictionary layout. Dictionary objects retain the same insertion-ordered vector
+for the first implementation, but are never eligible for a fixed-slot cache.
+This deliberate mechanism keeps the generic representation authoritative while
+leaving a replacement boundary for hash indexing and shared immutable shapes.
 
-Arrays use a distinct heap kind. Dense storage uses an occupancy bitmap so a
-hole differs from stored `undefined`. Sparse indexed entries preserve numeric
-order separately from ordinary named properties. The array owns its `length`
-descriptor and an ordinary-object property record for named keys and its
-prototype. Canonical indices range from zero through 2^32 - 2; the string
-`"4294967295"` is an ordinary key.
+Arrays use a distinct heap kind and the same ordered property vector. Absence
+from that vector distinguishes a hole from stored `undefined`. The array owns
+its `length` value and writability bit. Canonical indices range from zero
+through 2^32 - 2; the string `"4294967295"` is an ordinary key.
 
-Prototype values live on each object rather than in a shape. The context owns a
-monotonic prototype epoch. Prototype mutation advances the epoch and rejects a
-cycle before publishing the new link. A shape-specialized read checks the
-receiver kind, shape identity, and the epoch required by its selection. Shapes,
-slot arrays, dictionaries, and element buffers never cross public TypeScript
-interfaces.
+Prototype mutation assigns a fresh layout identity and rejects a cycle before
+publishing the new link. A specialized named read owns a private monomorphic
+cache containing the last layout identity and fixed slot. It checks object kind,
+dictionary state, identity, slot bounds, and key equality. A miss performs one
+generic lookup and may relearn a stable own slot. No private object or cache
+layout crosses a public TypeScript interface.
 
 Allocation and resizing collect before publication. Generated code roots all
 live generic values across those safepoints. Tests may force every safepoint or
@@ -83,10 +80,10 @@ pointers cannot survive a safepoint in generated code.
 Consequences
 ------------
 
-Shape identity supports a monomorphic fixed-slot read, while dictionary
-conversion and prototype mutation have explicit miss conditions. The initial
-arena can retain unreachable shapes until context destruction. That bounded
-metadata retention is accepted for M3 and is not a JavaScript-visible leak.
+Layout identity supports a monomorphic fixed-slot read, while dictionary
+conversion and prototype mutation have explicit miss conditions. A future
+shared shape arena can replace object-owned metadata without changing the
+runtime API or guarded MIR contract.
 Object values and all references among objects, arrays, functions,
 environments, cells, prototypes, and thrown values remain collector-managed.
 
@@ -94,11 +91,12 @@ environments, cells, prototypes, and thrown values remain collector-managed.
 Failure modes and replacement triggers
 --------------------------------------
 
-Reopen this decision if shape retention dominates representative heaps, if
-descriptor churn makes arena allocation unbounded, if array workloads require a
-different elements strategy, or if a moving collector cannot retain an opaque
-stable shape identity. A later collector may trace or compact metadata provided
-that the public semantics and guard-miss contract remain unchanged.
+Reopen this decision when representative allocation data justifies shared
+shapes, if linear lookup dominates generic property time, if array workloads
+require a dedicated elements strategy, or if a moving collector cannot retain
+an opaque stable layout identity. A later collector may trace or compact
+metadata provided that the public semantics and guard-miss contract remain
+unchanged.
 
 
 Links

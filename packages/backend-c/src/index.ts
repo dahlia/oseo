@@ -347,7 +347,18 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   } else {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
-    if (operation.kind === "property-get") {
+    if (operation.kind === "property-get-cached") {
+      line(
+        state,
+        `static OseoPropertyCache property_cache_${operation.id} = ` +
+          "{0u, 0u};",
+      );
+      line(
+        state,
+        `result = oseo_object_get_cached(context, roots[${object}], ` +
+          `roots[${key}], &property_cache_${operation.id});`,
+      );
+    } else if (operation.kind === "property-get") {
       line(
         state,
         `result = oseo_object_get(context, roots[${object}], ` +
@@ -413,6 +424,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "property-key" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||
+    operation.kind === "property-get-cached" ||
     operation.kind === "property-set"
   ) {
     emitObjectOperation(state, operation);

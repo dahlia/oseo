@@ -127,6 +127,17 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.match(printHir(result.hir), /object\{/u);
   assert.match(printMir(result.mir), /object-create/u);
   assert.match(printMir(result.mir), /property-(?:get|set|delete)/u);
+  assert.match(printMir(result.mir), /property-get-cached/u);
+  const generic = compileSource(
+    babelFrontend,
+    {
+      source: "const value = { item: 1 }; console.log(value.item);",
+      sourceId: "generic-object.ts",
+    },
+    { specialization: "disabled" },
+  );
+  assert.ok(generic.mir != null);
+  assert.doesNotMatch(printMir(generic.mir), /property-get-cached/u);
 });
 
 test("preserves array elements and holes in owned syntax", () => {

@@ -785,6 +785,39 @@ OseoResult oseo_object_get(
     return normal(oseo_undefined());
 }
 
+OseoResult oseo_object_get_cached(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoPropertyCache *cache
+) {
+    if (is_object(object_value)) {
+        OseoOrdinaryObject *object = ordinary_object(object_value);
+        if (!object->dictionary && cache->shape_id != 0u &&
+            cache->shape_id == object->shape_id &&
+            cache->slot < object->property_count &&
+            string_equal(object->properties[cache->slot].key, key)) {
+            if (context->observe_specialization) context->guard_hits += 1u;
+            return normal(object->properties[cache->slot].value);
+        }
+    }
+    if (context->observe_specialization) context->guard_misses += 1u;
+    OseoResult result = oseo_object_get(context, object_value, key);
+    if (result.status != OSEO_STATUS_NORMAL || !is_object(object_value)) {
+        return result;
+    }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    size_t slot = own_property_index(object, key);
+    if (!object->dictionary && slot != SIZE_MAX) {
+        cache->shape_id = object->shape_id;
+        cache->slot = slot;
+    } else {
+        cache->shape_id = 0u;
+        cache->slot = 0u;
+    }
+    return result;
+}
+
 OseoResult oseo_object_has_own(
     OseoContext *context,
     OseoValue object_value,
