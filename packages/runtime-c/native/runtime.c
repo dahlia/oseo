@@ -24,6 +24,8 @@ typedef enum {
     OSEO_HEAP_ENVIRONMENT = 2,
     OSEO_HEAP_OBJECT = 3,
     OSEO_HEAP_ARRAY = 4,
+    OSEO_HEAP_CELL = 5,
+    OSEO_HEAP_FUNCTION = 6,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -46,6 +48,11 @@ typedef struct {
 } OseoEnvironment;
 
 typedef struct {
+    OseoHeapObject header;
+    OseoValue value;
+} OseoCell;
+
+typedef struct {
     OseoPropertyAttributes attributes;
     OseoValue key;
     OseoValue value;
@@ -62,6 +69,12 @@ typedef struct {
     bool dictionary;
     bool length_writable;
 } OseoOrdinaryObject;
+
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue environment;
+    size_t code_id;
+} OseoFunction;
 
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
@@ -90,6 +103,14 @@ static OseoEnvironment *environment_object(OseoValue value) {
 
 static OseoOrdinaryObject *ordinary_object(OseoValue value) {
     return (OseoOrdinaryObject *)heap_object(value);
+}
+
+static OseoCell *cell_object(OseoValue value) {
+    return (OseoCell *)heap_object(value);
+}
+
+static OseoFunction *function_object(OseoValue value) {
+    return (OseoFunction *)heap_object(value);
 }
 
 static OseoResult normal(OseoValue value) {
@@ -134,10 +155,21 @@ static bool is_environment(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_ENVIRONMENT;
 }
 
+static bool is_cell(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_CELL;
+}
+
+static bool is_function(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_FUNCTION;
+}
+
 static bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
-    return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY;
+    return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
+        kind == OSEO_HEAP_FUNCTION;
 }
 
 static bool is_array(OseoValue value) {
@@ -170,20 +202,27 @@ static void trace_object(OseoHeapObject *object) {
         for (size_t index = 0u; index < environment->slot_count; index += 1u) {
             mark_value(environment->slots[index]);
         }
+    } else if (object->kind == OSEO_HEAP_CELL) {
+        mark_value(((OseoCell *)object)->value);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
-               object->kind == OSEO_HEAP_ARRAY) {
+               object->kind == OSEO_HEAP_ARRAY ||
+               object->kind == OSEO_HEAP_FUNCTION) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype);
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
             mark_value(ordinary->properties[index].key);
             mark_value(ordinary->properties[index].value);
         }
+        if (object->kind == OSEO_HEAP_FUNCTION) {
+            mark_value(((OseoFunction *)object)->environment);
+        }
     }
 }
 
 static void destroy_heap_object(OseoHeapObject *object) {
     if (object->kind == OSEO_HEAP_OBJECT ||
-        object->kind == OSEO_HEAP_ARRAY) {
+        object->kind == OSEO_HEAP_ARRAY ||
+        object->kind == OSEO_HEAP_FUNCTION) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
     }
@@ -556,6 +595,108 @@ OseoResult oseo_environment_set(
     }
     environment->slots[index] = value;
     return normal(value);
+}
+
+OseoResult oseo_environment_clone(
+    OseoContext *context,
+    OseoValue environment_value
+) {
+    if (!is_environment(environment_value)) {
+        return failure(context, "OSEO2001", "Value is not an environment.");
+    }
+    size_t slot_count = environment_object(environment_value)->slot_count;
+    OseoResult created = oseo_environment_create(context, slot_count);
+    if (created.status != OSEO_STATUS_NORMAL) return created;
+    OseoEnvironment *source = environment_object(environment_value);
+    OseoEnvironment *target = environment_object(created.value);
+    if (slot_count > 0u) {
+        memcpy(
+            target->slots,
+            source->slots,
+            slot_count * sizeof(*target->slots)
+        );
+    }
+    return created;
+}
+
+OseoResult oseo_cell_create(OseoContext *context, OseoValue value) {
+    OseoCell *cell = allocate_heap_bytes(context, sizeof(*cell));
+    if (cell == NULL) {
+        return failure(context, "OSEO2001", "Binding cell allocation failed.");
+    }
+    cell->value = value;
+    return publish_heap(context, &cell->header, OSEO_HEAP_CELL);
+}
+
+OseoResult oseo_cell_get(OseoContext *context, OseoValue cell_value) {
+    if (!is_cell(cell_value)) {
+        return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    return oseo_read_binding(context, cell_object(cell_value)->value);
+}
+
+OseoResult oseo_cell_set(
+    OseoContext *context,
+    OseoValue cell_value,
+    OseoValue value
+) {
+    if (!is_cell(cell_value)) {
+        return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    cell_object(cell_value)->value = value;
+    return normal(value);
+}
+
+OseoResult oseo_function_create(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue environment
+) {
+    if (!is_environment(environment)) {
+        return failure(context, "OSEO2001", "Invalid function environment.");
+    }
+    OseoFunction *function = allocate_heap_bytes(context, sizeof(*function));
+    if (function == NULL) {
+        return failure(context, "OSEO2001", "Function allocation failed.");
+    }
+    function->ordinary.prototype = oseo_null();
+    function->ordinary.properties = NULL;
+    function->ordinary.property_capacity = 0u;
+    function->ordinary.property_count = 0u;
+    function->ordinary.shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    function->ordinary.array_length = 0u;
+    function->ordinary.dictionary = false;
+    function->ordinary.length_writable = false;
+    function->environment = environment;
+    function->code_id = code_id;
+    return publish_heap(
+        context,
+        &function->ordinary.header,
+        OSEO_HEAP_FUNCTION
+    );
+}
+
+OseoResult oseo_function_environment(
+    OseoContext *context,
+    OseoValue function_value
+) {
+    if (!is_function(function_value)) {
+        return failure(context, "OSEO2001", "Value is not callable.");
+    }
+    return normal(function_object(function_value)->environment);
+}
+
+OseoResult oseo_function_code_id(
+    OseoContext *context,
+    OseoValue function_value,
+    size_t *code_id
+) {
+    if (!is_function(function_value)) {
+        return failure(context, "OSEO2001", "Value is not callable.");
+    }
+    *code_id = function_object(function_value)->code_id;
+    return normal(function_value);
 }
 
 static bool string_equal(OseoValue left, OseoValue right) {

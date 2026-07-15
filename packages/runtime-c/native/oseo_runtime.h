@@ -145,6 +145,10 @@ OseoResult oseo_string_from_units(
     size_t length
 );
 OseoResult oseo_environment_create(OseoContext *context, size_t slot_count);
+OseoResult oseo_environment_clone(
+    OseoContext *context,
+    OseoValue environment
+);
 OseoResult oseo_environment_get(
     OseoContext *context,
     OseoValue environment,
@@ -155,6 +159,27 @@ OseoResult oseo_environment_set(
     OseoValue environment,
     size_t index,
     OseoValue value
+);
+OseoResult oseo_cell_create(OseoContext *context, OseoValue value);
+OseoResult oseo_cell_get(OseoContext *context, OseoValue cell);
+OseoResult oseo_cell_set(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
+OseoResult oseo_function_create(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue environment
+);
+OseoResult oseo_function_environment(
+    OseoContext *context,
+    OseoValue function
+);
+OseoResult oseo_function_code_id(
+    OseoContext *context,
+    OseoValue function,
+    size_t *code_id
 );
 OseoResult oseo_array_create(OseoContext *context, size_t length);
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);

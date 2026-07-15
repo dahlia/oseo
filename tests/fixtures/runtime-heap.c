@@ -226,6 +226,43 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
     );
 }
 
+static void test_function_cells(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_environment_create(context, 2u));
+    roots[1] = require_normal(
+        oseo_cell_create(context, oseo_number(1.0))
+    );
+    (void)require_normal(
+        oseo_environment_set(context, roots[0], 0u, roots[1])
+    );
+    roots[2] = require_normal(oseo_function_create(context, 7u, roots[0]));
+    roots[3] = require_normal(oseo_environment_clone(context, roots[0]));
+    roots[4] = require_normal(oseo_environment_get(context, roots[3], 0u));
+    assert(roots[4] == roots[1]);
+    (void)require_normal(oseo_cell_set(context, roots[4], oseo_number(2.0)));
+    assert(
+        require_normal(oseo_cell_get(context, roots[1])) == oseo_number(2.0)
+    );
+    context->collect_every_safepoint = true;
+    oseo_collect(context);
+    roots[5] = require_normal(
+        oseo_function_environment(context, roots[2])
+    );
+    roots[6] = require_normal(oseo_environment_get(context, roots[5], 0u));
+    assert(
+        require_normal(oseo_cell_get(context, roots[6])) == oseo_number(2.0)
+    );
+    size_t code_id = 0u;
+    (void)require_normal(
+        oseo_function_code_id(context, roots[2], &code_id)
+    );
+    assert(code_id == 7u);
+    context->collect_every_safepoint = false;
+    assert(
+        oseo_function_environment(context, oseo_number(1.0)).status ==
+        OSEO_STATUS_THROW
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -236,6 +273,7 @@ int main(void) {
     test_allocation_failure(&context, frame.slots);
     test_ordinary_properties(&context, frame.slots);
     test_arrays(&context, frame.slots);
+    test_function_cells(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;
