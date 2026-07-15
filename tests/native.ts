@@ -206,6 +206,36 @@ console.log(value, value = 4, value);
 `,
   },
   {
+    name: "fresh-block-bindings",
+    source: `
+let first;
+let second;
+let index = 0;
+while (index < 2) {
+  const captured = index;
+  const read = function () { return captured; };
+  if (index === 0) first = read;
+  else second = read;
+  index = index + 1;
+}
+console.log(first(), second());
+let firstError;
+let secondError;
+index = 0;
+while (index < 2) {
+  try {
+    throw index;
+  } catch (error) {
+    const readError = function () { return error; };
+    if (index === 0) firstError = readError;
+    else secondError = readError;
+  }
+  index = index + 1;
+}
+console.log(firstError(), secondError());
+`,
+  },
+  {
     name: "arrays",
     source: `
 const values = [1, , 3];

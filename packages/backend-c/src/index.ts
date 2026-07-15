@@ -212,6 +212,25 @@ function emitInitialize(state: EmitState, operation: MirOperation): void {
   line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
 }
 
+function emitBindingReset(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(`MIR binding-reset %${operation.id} has no identity.`);
+  }
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, "result = oseo_cell_create(context, oseo_uninitialized());");
+  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+  line(
+    state,
+    `    result = oseo_environment_set(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u, ` +
+      `roots[${operation.id}]);`,
+  );
+  line(state, "}");
+}
+
 function emitUnary(state: EmitState, operation: MirOperation): void {
   const argument = operationArgument(operation, 0);
   if (operation.operator === "!") {
@@ -519,6 +538,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitWrite(state, operation);
   } else if (operation.kind === "initialize") {
     emitInitialize(state, operation);
+  } else if (operation.kind === "binding-reset") {
+    emitBindingReset(state, operation);
   } else if (operation.kind === "function-create") {
     emitFunctionCreate(state, operation);
   } else if (operation.kind === "construct-receiver") {

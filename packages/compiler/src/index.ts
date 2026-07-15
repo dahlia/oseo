@@ -1425,6 +1425,7 @@ export interface MirOperation {
     | "add-smi-checked"
     | "array-create"
     | "binary"
+    | "binding-reset"
     | "box-smi"
     | "branch"
     | "call"
@@ -2128,6 +2129,68 @@ function statementBody(statement: HirStatement): readonly HirStatement[] {
   return statement.kind === "block" ? statement.body : [statement];
 }
 
+function resetBinding(
+  bindingId: number,
+  name: string,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    `fresh lexical cell for ${name}`,
+    [],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    bindingId,
+    detail: `${name} cell`,
+    id,
+    kind: "binding-reset",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  recordRoot(builder, id, range);
+}
+
+function resetBlockBindings(
+  statements: readonly HirStatement[],
+  builder: MirBuilder,
+): void {
+  for (const statement of statements) {
+    if (
+      statement.kind === "const" ||
+      statement.kind === "let" ||
+      statement.kind === "function-init"
+    ) {
+      resetBinding(
+        statement.bindingId,
+        statement.name,
+        statement.range,
+        builder,
+      );
+    }
+  }
+}
+
+function lowerStatementBody(
+  statement: HirStatement,
+  builder: MirBuilder,
+): boolean {
+  const body = statementBody(statement);
+  if (statement.kind === "block") resetBlockBindings(body, builder);
+  return lowerStatements(body, builder);
+}
+
 function setCompletion(
   builder: MirBuilder,
   kind: NonNullable<MirOperation["completionKind"]>,
@@ -2175,10 +2238,7 @@ function lowerTryStatement(
   const tryAbrupt = catchBlock?.id ?? finallyBlock?.id ?? outerAbrupt;
   if (tryAbrupt != null) builder.abruptTargets.push(tryAbrupt);
   if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
-  const tryTerminated = lowerStatements(
-    statementBody(statement.block),
-    builder,
-  );
+  const tryTerminated = lowerStatementBody(statement.block, builder);
   if (finallyBlock != null) builder.finalizers.pop();
   if (tryAbrupt != null) builder.abruptTargets.pop();
   if (!tryTerminated) {
@@ -2201,6 +2261,12 @@ function lowerTryStatement(
 
   if (catchBlock != null && statement.handler != null) {
     builder.current = catchBlock;
+    resetBinding(
+      statement.handler.bindingId,
+      statement.handler.name,
+      statement.handler.range,
+      builder,
+    );
     const caught = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -2225,10 +2291,7 @@ function lowerTryStatement(
     const catchAbrupt = finallyBlock?.id ?? outerAbrupt;
     if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
     if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
-    const catchTerminated = lowerStatements(
-      statementBody(statement.handler.body),
-      builder,
-    );
+    const catchTerminated = lowerStatementBody(statement.handler.body, builder);
     if (finallyBlock != null) builder.finalizers.pop();
     if (catchAbrupt != null) builder.abruptTargets.pop();
     if (!catchTerminated) {
@@ -2252,10 +2315,7 @@ function lowerTryStatement(
 
   if (finallyBlock != null && statement.finalizer != null) {
     builder.current = finallyBlock;
-    const finallyTerminated = lowerStatements(
-      statementBody(statement.finalizer),
-      builder,
-    );
+    const finallyTerminated = lowerStatementBody(statement.finalizer, builder);
     if (!finallyTerminated) {
       const outerFinalizer = builder.finalizers.at(-1);
       builder.current.terminator = {
@@ -2329,6 +2389,7 @@ function lowerStatements(
     } else if (statement.kind === "try") {
       lowerTryStatement(statement, builder);
     } else if (statement.kind === "block") {
+      resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;
     } else if (statement.kind === "break" || statement.kind === "continue") {
       const loop = builder.loops.at(-1);
@@ -2362,10 +2423,7 @@ function lowerStatements(
         continueTarget: conditionBlock.id,
       });
       builder.current = bodyBlock;
-      const terminated = lowerStatements(
-        statementBody(statement.body),
-        builder,
-      );
+      const terminated = lowerStatementBody(statement.body, builder);
       builder.loops.pop();
       if (!terminated) {
         builder.current.terminator = {
@@ -2405,8 +2463,8 @@ function lowerStatements(
       };
 
       builder.current = consequentBlock;
-      const consequentReturns = lowerStatements(
-        statementBody(statement.consequent),
+      const consequentReturns = lowerStatementBody(
+        statement.consequent,
         builder,
       );
       if (!consequentReturns) {
@@ -2417,7 +2475,7 @@ function lowerStatements(
       const alternateReturns =
         statement.alternate == null
           ? false
-          : lowerStatements(statementBody(statement.alternate), builder);
+          : lowerStatementBody(statement.alternate, builder);
       if (!alternateReturns) {
         builder.current.terminator = { kind: "jump", target: joinBlock.id };
       }

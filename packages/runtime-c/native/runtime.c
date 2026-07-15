@@ -692,10 +692,16 @@ OseoResult oseo_function_create(
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_object_create(context, oseo_null());
+    result = oseo_environment_clone(context, environment);
     frame.slots[0] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = oseo_object_create(context, oseo_null());
+    frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL &&
         context->observe_specialization && context->allocations > 0u) {
         context->allocations -= 1u;
@@ -718,15 +724,15 @@ OseoResult oseo_function_create(
     function->ordinary.array_length = 0u;
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
-    function->environment = environment;
-    function->prototype_object = frame.slots[0];
+    function->environment = frame.slots[0];
+    function->prototype_object = frame.slots[1];
     function->code_id = code_id;
     result = publish_heap(
         context,
         &function->ordinary.header,
         OSEO_HEAP_FUNCTION
     );
-    frame.slots[1] = result.value;
+    frame.slots[2] = result.value;
     oseo_roots_release(context, &frame);
     return result;
 }
