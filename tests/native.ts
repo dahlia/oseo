@@ -345,6 +345,38 @@ function strictInheritedLengthSet() {
   }
 }
 strictInheritedLengthSet();
+const stringKeys = Object.keys("ab");
+console.log(stringKeys[0], stringKeys[1], stringKeys.length);
+console.log(Object.keys(1).length, Object.keys(true).length);
+const stringIndexDescriptor = Object.getOwnPropertyDescriptor("ab", "0");
+console.log(
+  stringIndexDescriptor.value,
+  stringIndexDescriptor.writable,
+  stringIndexDescriptor.enumerable,
+  stringIndexDescriptor.configurable,
+);
+const stringLengthDescriptor = Object.getOwnPropertyDescriptor(
+  "ab",
+  "length",
+);
+console.log(
+  stringLengthDescriptor.value,
+  stringLengthDescriptor.writable,
+  stringLengthDescriptor.enumerable,
+  stringLengthDescriptor.configurable,
+);
+console.log(Object.getOwnPropertyDescriptor(1, "missing"));
+console.log(Object.setPrototypeOf(1, null));
+try { Object.keys(null); } catch (error) { console.log("null keys"); }
+try { Object.getOwnPropertyDescriptor(null, "item"); } catch (error) {
+  console.log("null descriptor");
+}
+try { Object.setPrototypeOf(null, null); } catch (error) {
+  console.log("null set prototype");
+}
+try { Object.setPrototypeOf(1, 1); } catch (error) {
+  console.log("invalid primitive prototype");
+}
 `,
   },
   {
@@ -413,6 +445,18 @@ function strictSameLengthSet() {
   }
 }
 strictSameLengthSet();
+const assignedLength = [];
+Object.defineProperty(assignedLength, "4", {
+  value: 4,
+  configurable: false,
+});
+try {
+  assignedLength.length = 1;
+  console.log("non-strict length assignment completed");
+} catch (error) {
+  console.log("non-strict length assignment threw");
+}
+console.log(assignedLength.length, assignedLength[4]);
 `,
   },
   {
@@ -676,6 +720,16 @@ console.log(conflicting("value", 1));
     },
   },
 ];
+
+const descriptorMapCompilation = compileSource(babelFrontend, {
+  source: "Object.create(null, { item: { value: 3 } });",
+  sourceId: "object-create-descriptor-map.ts",
+});
+assert.equal(descriptorMapCompilation.mir, undefined);
+assert.match(
+  descriptorMapCompilation.diagnostics[0]?.message ?? "",
+  /descriptor maps are unsupported/u,
+);
 
 async function requireSuccess(
   command: string,

@@ -228,13 +228,13 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
         )
     );
     assert(
-        oseo_object_set(
+        require_normal(oseo_object_set(
             context,
             roots[0],
             roots[4],
             oseo_number(1.0),
             false
-        ).status == OSEO_STATUS_THROW
+        )) == oseo_number(1.0)
     );
     assert(
         require_normal(oseo_object_get(context, roots[0], roots[4])) ==
@@ -270,17 +270,14 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
         )
     );
     assert(
-        oseo_object_set(
+        require_normal(oseo_object_set(
             context,
             roots[0],
             roots[3],
             oseo_number(1.0),
             false
-        ).status == OSEO_STATUS_THROW
+        )) == oseo_number(1.0)
     );
-    context->error_code = NULL;
-    context->error_message = NULL;
-    context->has_diagnostic = false;
     assert(
         require_normal(oseo_object_get(context, roots[0], roots[3])) ==
         oseo_number(5.0)

@@ -717,6 +717,23 @@ function resolveExpression(
       );
       return undefined;
     }
+    if (
+      expression.target.method === "create" &&
+      expression.arguments.length > 1
+    ) {
+      const descriptorMap = expression.arguments[1];
+      if (descriptorMap == null) {
+        throw new Error("Object.create has no second argument.");
+      }
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          descriptorMap,
+          "Object.create descriptor maps are unsupported in M3.",
+        ),
+      );
+      return undefined;
+    }
     target = {
       kind: "object-intrinsic",
       method: expression.target.method,

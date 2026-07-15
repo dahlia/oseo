@@ -31,7 +31,8 @@ reads, simple property assignment, `delete`, and these static `Object` methods:
 `create`, `defineProperty`, `getOwnPropertyDescriptor`, `setPrototypeOf`, and
 `keys`. Descriptor objects may specify `value`, `writable`, `enumerable`, and
 `configurable`. Accessor descriptors, methods, shorthand properties, spread,
-and `__proto__` literal syntax remain unsupported.
+`Object.create` descriptor maps, and `__proto__` literal syntax remain
+unsupported. `Object.create` therefore accepts only its prototype argument.
 
 Property keys use ECMAScript `ToPropertyKey` for admitted primitive values.
 Object-valued keys remain unsupported because M3 does not admit user-observable

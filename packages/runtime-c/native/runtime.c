@@ -946,7 +946,7 @@ static OseoResult set_array_length(
                     array->shape_id = context->next_shape_id;
                     context->next_shape_id += 1u;
                 }
-                return language_failure();
+                return strict ? language_failure() : normal(value);
             }
             removed = true;
         }
@@ -1598,11 +1598,9 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
     const OseoValue *arguments
 ) {
     OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
-    if (!is_object(object_value)) {
-        return failure(context, "OSEO2001", "Value is not an ordinary object.");
-    }
+    if (is_nullish(object_value)) return language_failure();
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_property_key(
         context,
@@ -1611,13 +1609,33 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
     frame.slots[1] = result.value;
     OseoValue value = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false};
-    if (result.status == OSEO_STATUS_NORMAL &&
-        !own_descriptor(
+    bool exists = false;
+    if (result.status == OSEO_STATUS_NORMAL && is_object(object_value)) {
+        exists = own_descriptor(
             object_value,
             frame.slots[1],
             &value,
             &attributes
-        )) {
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL &&
+               is_string(object_value)) {
+        if (string_is_ascii(frame.slots[1], "length")) {
+            value = oseo_number(string_object(object_value)->length);
+            exists = true;
+        } else {
+            uint32_t index = 0u;
+            if (array_index(frame.slots[1], &index) &&
+                index < string_object(object_value)->length) {
+                uint16_t unit = string_object(object_value)->units[index];
+                result = allocate_string(context, &unit, 1u);
+                value = result.value;
+                attributes.enumerable = true;
+                exists = result.status == OSEO_STATUS_NORMAL;
+            }
+        }
+    }
+    frame.slots[2] = value;
+    if (result.status == OSEO_STATUS_NORMAL && !exists) {
         oseo_roots_release(context, &frame);
         return normal(oseo_undefined());
     }
@@ -1626,7 +1644,12 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = define_ascii_value(context, &frame, "value", value);
+        result = define_ascii_value(
+            context,
+            &frame,
+            "value",
+            frame.slots[2]
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = define_ascii_value(
@@ -1684,13 +1707,17 @@ OseoResult oseo_object_builtin_keys(
     const OseoValue *arguments
 ) {
     OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
-    if (!is_object(object_value)) {
-        return failure(context, "OSEO2001", "Value is not an ordinary object.");
-    }
-    OseoOrdinaryObject *object = ordinary_object(object_value);
-    size_t count = 0u;
-    for (size_t index = 0u; index < object->property_count; index += 1u) {
-        if (object->properties[index].attributes.enumerable) count += 1u;
+    if (is_nullish(object_value)) return language_failure();
+    OseoOrdinaryObject *object = is_object(object_value)
+        ? ordinary_object(object_value)
+        : NULL;
+    size_t count = is_string(object_value)
+        ? string_object(object_value)->length
+        : 0u;
+    if (object != NULL) {
+        for (size_t index = 0u; index < object->property_count; index += 1u) {
+            if (object->properties[index].attributes.enumerable) count += 1u;
+        }
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
@@ -1698,8 +1725,27 @@ OseoResult oseo_object_builtin_keys(
     result = oseo_array_create(context, count);
     frame.slots[0] = result.value;
     size_t output_index = 0u;
+    if (is_string(object_value)) {
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < count;
+             index += 1u) {
+            char key_text[24];
+            (void)snprintf(key_text, sizeof(key_text), "%zu", index);
+            result = ascii_string(context, key_text);
+            frame.slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = append_key(
+                    context,
+                    &frame,
+                    output_index,
+                    frame.slots[2]
+                );
+            }
+            output_index += 1u;
+        }
+    }
     uint64_t previous = UINT64_MAX;
-    while (result.status == OSEO_STATUS_NORMAL) {
+    while (result.status == OSEO_STATUS_NORMAL && object != NULL) {
         size_t selected = SIZE_MAX;
         uint32_t selected_number = 0u;
         for (size_t index = 0u; index < object->property_count; index += 1u) {
@@ -1724,7 +1770,8 @@ OseoResult oseo_object_builtin_keys(
         previous = selected_number;
     }
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < object->property_count;
+         result.status == OSEO_STATUS_NORMAL && object != NULL &&
+         index < object->property_count;
          index += 1u) {
         OseoProperty *property = &object->properties[index];
         uint32_t ignored = 0u;
@@ -1748,10 +1795,21 @@ OseoResult oseo_object_builtin_set_prototype_of(
     size_t argument_count,
     const OseoValue *arguments
 ) {
+    OseoValue object_value = builtin_argument(
+        argument_count,
+        arguments,
+        0u
+    );
+    OseoValue prototype = builtin_argument(argument_count, arguments, 1u);
+    if (is_nullish(object_value) ||
+        (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype))) {
+        return language_failure();
+    }
+    if (!is_object(object_value)) return normal(object_value);
     return oseo_object_set_prototype(
         context,
-        builtin_argument(argument_count, arguments, 0u),
-        builtin_argument(argument_count, arguments, 1u)
+        object_value,
+        prototype
     );
 }
 
