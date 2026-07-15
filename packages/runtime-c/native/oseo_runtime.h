@@ -181,6 +181,16 @@ OseoResult oseo_function_code_id(
     OseoValue function,
     size_t *code_id
 );
+OseoResult oseo_unknown_function(OseoContext *context, size_t code_id);
+OseoResult oseo_function_prototype(
+    OseoContext *context,
+    OseoValue function
+);
+OseoResult oseo_constructor_result(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue receiver
+);
 OseoResult oseo_array_create(OseoContext *context, size_t length);
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);

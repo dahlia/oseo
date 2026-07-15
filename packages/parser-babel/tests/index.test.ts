@@ -168,11 +168,8 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
 
 const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
-  ["nested function", "function outer() { function inner() {} }"],
-  ["function value", "function value() {} const copy = value;"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
-  ["throw", "function fail() { throw 1; }"],
   ["async", "async function work() {}"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],

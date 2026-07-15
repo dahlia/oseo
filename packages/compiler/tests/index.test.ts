@@ -212,7 +212,7 @@ test("uses the last repeated top-level function declaration", () => {
   assert.doesNotMatch(printHir(result.program), /return 1/u);
 });
 
-test("resolves direct call targets through lexical scopes", () => {
+test("resolves dynamic call targets through lexical scopes", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -248,8 +248,15 @@ test("resolves direct call targets through lexical scopes", () => {
     sourceId: "shadowed-call.ts",
   };
   const result = buildHir(syntax);
-  assert.equal(result.program, undefined);
-  assert.match(result.diagnostics[0]?.message ?? "", /resolves to a binding/u);
+  assert.deepEqual(result.diagnostics, []);
+  const statement = result.program?.functions[1]?.body[0];
+  assert.equal(statement?.kind, "expression");
+  if (statement?.kind !== "expression") return;
+  assert.equal(statement.expression.kind, "call");
+  if (statement.expression.kind !== "call") return;
+  assert.equal(statement.expression.target.kind, "dynamic");
+  if (statement.expression.target.kind !== "dynamic") return;
+  assert.equal(statement.expression.target.callee.kind, "binding");
 });
 
 test("resolves script bindings from declared functions", () => {
@@ -284,7 +291,9 @@ test("resolves script bindings from declared functions", () => {
   const result = buildHir(syntax);
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.program != null);
-  const declaration = result.program.body[0];
+  const declaration = result.program.body.find(
+    (statement) => statement.kind === "const",
+  );
   const expression = result.program.functions[0]?.body[0];
   assert.equal(declaration?.kind, "const");
   assert.equal(expression?.kind, "expression");
@@ -295,9 +304,12 @@ test("resolves script bindings from declared functions", () => {
   if (expression.expression.kind !== "binding") return;
   assert.equal(expression.expression.bindingId, declaration.bindingId);
   const mir = buildMir(result.program);
-  assert.deepEqual(mir.globalBindings, [
-    { id: declaration.bindingId, name: "value" },
-  ]);
+  assert.ok(
+    mir.globalBindings.some(
+      (binding) =>
+        binding.id === declaration.bindingId && binding.name === "value",
+    ),
+  );
 });
 
 test("shadows intrinsic globals with script bindings inside functions", () => {
@@ -339,7 +351,7 @@ test("shadows intrinsic globals with script bindings inside functions", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /console.*binding/u);
 });
 
-test("resolves declared functions before primitive globals", () => {
+test("resolves declared functions as primitive-global bindings", () => {
   for (const name of ["undefined", "NaN", "Infinity"]) {
     const syntax: SyntaxProgram = {
       body: [
@@ -367,8 +379,13 @@ test("resolves declared functions before primitive globals", () => {
       sourceId: "shadowed-primitive-global.ts",
     };
     const result = buildHir(syntax);
-    assert.equal(result.program, undefined);
-    assert.match(result.diagnostics[0]?.message ?? "", /Function values/u);
+    assert.deepEqual(result.diagnostics, []);
+    const statement = result.program?.body[1];
+    assert.equal(statement?.kind, "expression");
+    if (statement?.kind !== "expression") continue;
+    assert.equal(statement.expression.kind, "call");
+    if (statement.expression.kind !== "call") continue;
+    assert.equal(statement.expression.arguments[0]?.kind, "binding");
   }
 });
 

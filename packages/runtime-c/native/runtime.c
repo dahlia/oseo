@@ -73,6 +73,7 @@ typedef struct {
 typedef struct {
     OseoOrdinaryObject ordinary;
     OseoValue environment;
+    OseoValue prototype_object;
     size_t code_id;
 } OseoFunction;
 
@@ -214,7 +215,9 @@ static void trace_object(OseoHeapObject *object) {
             mark_value(ordinary->properties[index].value);
         }
         if (object->kind == OSEO_HEAP_FUNCTION) {
-            mark_value(((OseoFunction *)object)->environment);
+            OseoFunction *function = (OseoFunction *)object;
+            mark_value(function->environment);
+            mark_value(function->prototype_object);
         }
     }
 }
@@ -509,7 +512,11 @@ static OseoResult publish_heap(
     object->marked = false;
     object->traced = false;
     context->objects = object;
-    if (context->observe_specialization) context->allocations += 1u;
+    if (context->observe_specialization &&
+        kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&
+        kind != OSEO_HEAP_FUNCTION) {
+        context->allocations += 1u;
+    }
     return normal(tagged(OSEO_TAG_HEAP, (uint64_t)address));
 }
 
@@ -655,8 +662,22 @@ OseoResult oseo_function_create(
     if (!is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_object_create(context, oseo_null());
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        context->observe_specialization && context->allocations > 0u) {
+        context->allocations -= 1u;
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     OseoFunction *function = allocate_heap_bytes(context, sizeof(*function));
     if (function == NULL) {
+        oseo_roots_release(context, &frame);
         return failure(context, "OSEO2001", "Function allocation failed.");
     }
     function->ordinary.prototype = oseo_null();
@@ -669,12 +690,16 @@ OseoResult oseo_function_create(
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
     function->environment = environment;
+    function->prototype_object = frame.slots[0];
     function->code_id = code_id;
-    return publish_heap(
+    result = publish_heap(
         context,
         &function->ordinary.header,
         OSEO_HEAP_FUNCTION
     );
+    frame.slots[1] = result.value;
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 OseoResult oseo_function_environment(
@@ -697,6 +722,30 @@ OseoResult oseo_function_code_id(
     }
     *code_id = function_object(function_value)->code_id;
     return normal(function_value);
+}
+
+OseoResult oseo_unknown_function(OseoContext *context, size_t code_id) {
+    (void)code_id;
+    return failure(context, "OSEO2001", "Function code identity is invalid.");
+}
+
+OseoResult oseo_function_prototype(
+    OseoContext *context,
+    OseoValue function_value
+) {
+    if (!is_function(function_value)) {
+        return failure(context, "OSEO2001", "Value is not a constructor.");
+    }
+    return normal(function_object(function_value)->prototype_object);
+}
+
+OseoResult oseo_constructor_result(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue receiver
+) {
+    (void)context;
+    return normal(is_object(returned) ? returned : receiver);
 }
 
 static bool string_equal(OseoValue left, OseoValue right) {
@@ -913,6 +962,9 @@ OseoResult oseo_object_get(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        return normal(function_object(object_value)->prototype_object);
+    }
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         return normal(oseo_number(ordinary_object(object_value)->array_length));
     }
@@ -966,6 +1018,9 @@ OseoResult oseo_object_has_own(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        return normal(oseo_boolean(true));
+    }
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         return normal(oseo_boolean(true));
     }
@@ -981,6 +1036,10 @@ OseoResult oseo_object_set(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        function_object(object_value)->prototype_object = value;
+        return normal(value);
+    }
     OseoOrdinaryObject *receiver = ordinary_object(object_value);
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         return set_array_length(context, receiver, value);
@@ -1031,6 +1090,17 @@ OseoResult oseo_object_define(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        if (attributes.configurable || attributes.enumerable) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Function prototype attributes are incompatible."
+            );
+        }
+        function_object(object_value)->prototype_object = value;
+        return normal(object_value);
+    }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         if (attributes.configurable || attributes.enumerable) {
@@ -1103,6 +1173,9 @@ OseoResult oseo_object_delete(
 ) {
     OseoResult valid = require_object_and_key(context, object_value, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        return normal(oseo_boolean(false));
+    }
     if (is_array(object_value) && string_is_ascii(key, "length")) {
         return normal(oseo_boolean(false));
     }

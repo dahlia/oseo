@@ -49,6 +49,82 @@ interface Fixture {
 
 const fixtures: readonly Fixture[] = [
   {
+    name: "closures-and-methods",
+    source: `
+function makeCounter(start) {
+  let value = start;
+  function increment() { value = value + 1; return value; }
+  function read() { return value; }
+  return { increment: increment, read: read };
+}
+const first = makeCounter(1);
+const second = makeCounter(10);
+console.log(first.read(), first.increment(), first.read());
+console.log(second.increment(), second.read(), first.read());
+const identity = function (value) { return value; };
+console.log(identity("function expression"));
+const factorial = function recur(value) {
+  if (value === 0) return 1;
+  return value * recur(value - 1);
+};
+console.log(factorial(5));
+const receiver = {
+  value: 42,
+  read: function () { return this.value; },
+};
+console.log(receiver.read());
+`,
+  },
+  {
+    name: "constructors",
+    source: `
+function Box(value) { this.value = value; }
+Box.prototype.read = function () { return this.value; };
+const box = new Box(7);
+console.log(box.value, box.read());
+function Replace() { return { value: 9 }; }
+console.log(new Replace().value);
+function KeepReceiver() { this.value = 3; return 1; }
+console.log(new KeepReceiver().value);
+`,
+  },
+  {
+    name: "abrupt-completion",
+    source: `
+function complete(kind) {
+  try {
+    if (kind === 0) return "try return";
+    if (kind === 1) throw "first";
+    return "ordinary";
+  } catch (error) {
+    if (kind === 1) return "caught " + error;
+    throw error;
+  } finally {
+    console.log("finally", kind);
+    if (kind === 2) return "finally return";
+  }
+}
+console.log(complete(0));
+console.log(complete(1));
+console.log(complete(2));
+function replaceThrow() {
+  try { throw "old"; } finally { throw "new"; }
+}
+try { replaceThrow(); } catch (error) { console.log(error); }
+let index = 0;
+while (index < 3) {
+  index = index + 1;
+  try {
+    if (index === 1) continue;
+    if (index === 2) break;
+  } finally {
+    console.log("loop finally", index);
+  }
+}
+console.log(index);
+`,
+  },
+  {
     name: "property-specialization",
     source: `
 const value = { item: 1 };
@@ -464,7 +540,7 @@ for (const fixture of fixtures) {
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {
-            assert.doesNotMatch(native.emittedC, /oseo_function_0/u);
+            assert.match(native.emittedC, /oseo_function_0/u);
           }
           if (fixture.name === "returning-branches") {
             assert.doesNotMatch(native.emittedC, /bb3:/u);
@@ -585,10 +661,8 @@ await withNativeFixture(
     toolchain: zigToolchain,
   },
   (cross) => {
-    assert.match(
-      cross.emittedC,
-      /OseoFunctionEntry volatile recursive_target_0/u,
-    );
+    assert.match(cross.emittedC, /switch \(dynamic_code_id_\d+\)/u);
+    assert.match(cross.emittedC, /oseo_function_0\(context/u);
   },
 );
 

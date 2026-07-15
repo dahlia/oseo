@@ -340,7 +340,7 @@ function callTarget(
   }
   const name = identifierName(value);
   if (name != null) return { ...location(context, value), kind: "name", name };
-  if (value.type !== "MemberExpression" || value.computed === true) {
+  if (value.type !== "MemberExpression") {
     return unsupported(
       context,
       value,
@@ -349,19 +349,18 @@ function callTarget(
   }
   const object = node(value.object);
   const property = node(value.property);
+  if (object == null || property == null) return unsupported(context, value);
   if (
-    object != null &&
-    property != null &&
+    value.computed !== true &&
     identifierName(object) === "console" &&
     identifierName(property) === "log"
   ) {
     return { ...location(context, value), kind: "console-log" };
   }
-  return unsupported(
-    context,
-    value,
-    "Property access is outside the M1 profile.",
-  );
+  const parts = memberParts(context, value);
+  return parts == null
+    ? undefined
+    : { ...location(context, value), ...parts, kind: "property" };
 }
 
 function memberParts(
@@ -429,6 +428,7 @@ function expression(
     return { ...located, kind: "boolean", value: value.value };
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
+  if (value.type === "ThisExpression") return { ...located, kind: "this" };
   if (value.type === "Identifier") {
     const name = identifierName(value);
     if (name != null) return { ...located, kind: "identifier", name };
@@ -497,6 +497,12 @@ function expression(
       properties.push({ key, value: propertyValue });
     }
     return { ...located, kind: "object", properties };
+  }
+  if (value.type === "FunctionExpression") {
+    const functionValue = functionDeclaration(context, value, false);
+    return functionValue == null
+      ? undefined
+      : { ...located, functionValue, kind: "function" };
   }
   if (value.type === "MemberExpression") {
     const member = memberParts(context, value);
@@ -583,6 +589,23 @@ function expression(
     return target == null
       ? undefined
       : { ...located, arguments: argumentValues, kind: "call", target };
+  }
+  if (value.type === "NewExpression") {
+    const calleeNode = node(value.callee);
+    if (calleeNode == null) return unsupported(context, value);
+    const callee = expression(context, calleeNode);
+    const argumentValues: SyntaxExpression[] = [];
+    for (const argumentValue of nodes(value.arguments)) {
+      if (argumentValue.type === "SpreadElement") {
+        return unsupported(context, argumentValue);
+      }
+      const converted = expression(context, argumentValue);
+      if (converted == null) return undefined;
+      argumentValues.push(converted);
+    }
+    return callee == null
+      ? undefined
+      : { ...located, arguments: argumentValues, callee, kind: "new" };
   }
   return unsupported(context, value);
 }
@@ -673,10 +696,62 @@ function statement(
     if (argument != null && converted == null) return undefined;
     return { ...located, expression: converted, kind: "return" };
   }
+  if (value.type === "ThrowStatement") {
+    const argument = node(value.argument);
+    if (argument == null) return unsupported(context, value);
+    const converted = expression(context, argument);
+    return converted == null
+      ? undefined
+      : { ...located, expression: converted, kind: "throw" };
+  }
+  if (value.type === "TryStatement") {
+    const blockNode = node(value.block);
+    const handlerNode = node(value.handler);
+    const finalizerNode = node(value.finalizer);
+    if (blockNode == null) return unsupported(context, value);
+    const block = statement(context, blockNode, functionBody);
+    let handler:
+      | {
+          readonly body: SyntaxStatement;
+          readonly name: string;
+          readonly range: SourceRange;
+        }
+      | undefined;
+    if (handlerNode != null) {
+      const parameter = node(handlerNode.param);
+      const bodyNode = node(handlerNode.body);
+      const name = parameter == null ? undefined : identifierName(parameter);
+      if (parameter == null || name == null || bodyNode == null) {
+        return unsupported(
+          context,
+          handlerNode,
+          "A catch clause requires one identifier binding.",
+        );
+      }
+      const body = statement(context, bodyNode, functionBody);
+      if (body == null) return undefined;
+      handler = {
+        body,
+        name,
+        range: sourceRange(context.locations, parameter),
+      };
+    }
+    const finalizer =
+      finalizerNode == null
+        ? undefined
+        : statement(context, finalizerNode, functionBody);
+    if (block == null || (finalizerNode != null && finalizer == null)) {
+      return undefined;
+    }
+    return { ...located, block, finalizer, handler, kind: "try" };
+  }
   if (value.type === "BlockStatement") {
-    const body: SyntaxStatement[] = [];
+    const body: (SyntaxFunction | SyntaxStatement)[] = [];
     for (const child of nodes(value.body)) {
-      const converted = statement(context, child, functionBody);
+      const converted =
+        child.type === "FunctionDeclaration"
+          ? functionDeclaration(context, child, true)
+          : statement(context, child, functionBody);
       if (converted == null) return undefined;
       body.push(converted);
     }
@@ -705,6 +780,7 @@ function statement(
 function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
+  requireName = true,
 ): SyntaxFunction | undefined {
   if (value.async === true || value.generator === true) {
     return unsupported(
@@ -723,7 +799,7 @@ function functionDeclaration(
   const identifier = node(value.id);
   const name = identifier == null ? undefined : identifierName(identifier);
   const bodyNode = node(value.body);
-  if (name == null || bodyNode?.type !== "BlockStatement") {
+  if ((requireName && name == null) || bodyNode?.type !== "BlockStatement") {
     return unsupported(
       context,
       value,
@@ -760,9 +836,12 @@ function functionDeclaration(
   const returnHint = typeHint(context, value.returnType);
   if (returnHint != null) returnHints.push(returnHint);
   returnHints.push(...jsdoc.returns);
-  const body: SyntaxStatement[] = [];
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
   for (const child of nodes(bodyNode.body)) {
-    const converted = statement(context, child, true);
+    const converted =
+      child.type === "FunctionDeclaration"
+        ? functionDeclaration(context, child, true)
+        : statement(context, child, true);
     if (converted == null) return undefined;
     body.push(converted);
   }

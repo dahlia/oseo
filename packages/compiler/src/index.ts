@@ -68,6 +68,11 @@ export type SyntaxCallTarget =
   | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property";
+      readonly object: SyntaxExpression;
     });
 
 /** Binary operations selected before native backend lowering. */
@@ -110,11 +115,20 @@ export type SyntaxExpression =
       readonly target: SyntaxCallTarget;
     })
   | (LocatedSyntax & {
+      readonly functionValue: SyntaxFunction;
+      readonly kind: "function";
+    })
+  | (LocatedSyntax & {
       readonly kind: "identifier";
       readonly name: string;
     })
   | (LocatedSyntax & {
       readonly kind: "null";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly SyntaxExpression[];
+      readonly callee: SyntaxExpression;
+      readonly kind: "new";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -148,6 +162,9 @@ export type SyntaxExpression =
       readonly value: string;
     })
   | (LocatedSyntax & {
+      readonly kind: "this";
+    })
+  | (LocatedSyntax & {
       readonly argument: SyntaxExpression;
       readonly kind: "unary";
       readonly operator: "!" | "-";
@@ -165,7 +182,7 @@ export interface SyntaxParameter extends LocatedSyntax {
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =
   | (LocatedSyntax & {
-      readonly body: readonly SyntaxStatement[];
+      readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
       readonly kind: "block";
     })
   | (LocatedSyntax & {
@@ -201,6 +218,22 @@ export type SyntaxStatement =
       readonly kind: "return";
     })
   | (LocatedSyntax & {
+      readonly expression: SyntaxExpression;
+      readonly kind: "throw";
+    })
+  | (LocatedSyntax & {
+      readonly block: SyntaxStatement;
+      readonly handler:
+        | {
+            readonly body: SyntaxStatement;
+            readonly name: string;
+            readonly range: SourceRange;
+          }
+        | undefined;
+      readonly finalizer: SyntaxStatement | undefined;
+      readonly kind: "try";
+    })
+  | (LocatedSyntax & {
       readonly body: SyntaxStatement;
       readonly kind: "while";
       readonly test: SyntaxExpression;
@@ -208,9 +241,9 @@ export type SyntaxStatement =
 
 /** A top-level function declaration in owned syntax. */
 export interface SyntaxFunction extends LocatedSyntax {
-  readonly body: readonly SyntaxStatement[];
+  readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
   readonly kind: "function";
-  readonly name: string;
+  readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];
   readonly returnHints: readonly Hint[];
 }
@@ -241,9 +274,13 @@ export type HirCallTarget =
       readonly kind: "console-log";
     }
   | {
-      readonly functionId: number;
-      readonly kind: "function";
-      readonly name: string;
+      readonly callee: HirExpression;
+      readonly kind: "dynamic";
+    }
+  | {
+      readonly key: HirExpression;
+      readonly kind: "method";
+      readonly object: HirExpression;
     };
 
 /** A resolved, normalized HIR expression. */
@@ -274,12 +311,22 @@ export type HirExpression =
       readonly target: HirCallTarget;
     })
   | (LocatedSyntax & {
+      readonly functionId: number;
+      readonly kind: "function";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
       readonly bindingId: number;
       readonly kind: "binding";
       readonly name: string;
     })
   | (LocatedSyntax & {
       readonly kind: "null";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly HirExpression[];
+      readonly callee: HirExpression;
+      readonly kind: "new";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -311,6 +358,9 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly kind: "string";
       readonly value: string;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "this";
     })
   | (LocatedSyntax & {
       readonly argument: HirExpression;
@@ -352,6 +402,12 @@ export type HirStatement =
       readonly kind: "expression";
     })
   | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly functionId: number;
+      readonly kind: "function-init";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
       readonly alternate: HirStatement | undefined;
       readonly consequent: HirStatement;
       readonly kind: "if";
@@ -360,6 +416,23 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly expression: HirExpression | undefined;
       readonly kind: "return";
+    })
+  | (LocatedSyntax & {
+      readonly expression: HirExpression;
+      readonly kind: "throw";
+    })
+  | (LocatedSyntax & {
+      readonly block: HirStatement;
+      readonly handler:
+        | {
+            readonly bindingId: number;
+            readonly body: HirStatement;
+            readonly name: string;
+            readonly range: SourceRange;
+          }
+        | undefined;
+      readonly finalizer: HirStatement | undefined;
+      readonly kind: "try";
     })
   | (LocatedSyntax & {
       readonly body: HirStatement;
@@ -377,9 +450,11 @@ export interface HirFunction extends LocatedSyntax {
   readonly body: readonly HirStatement[];
   readonly id: number;
   readonly kind: "hir-function";
+  readonly localBindingIds: readonly number[];
   readonly name: string;
   readonly parameters: readonly HirParameter[];
   readonly returnHints: readonly Hint[];
+  readonly selfBindingId?: number;
 }
 
 /** A normalized script and its statically callable functions. */
@@ -398,6 +473,7 @@ export interface HirResult {
 }
 
 interface Binding {
+  readonly functionId?: number;
   readonly id: number;
   readonly mutable: boolean;
   readonly name: string;
@@ -406,7 +482,12 @@ interface Binding {
 interface ResolveState {
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
-  readonly functions: ReadonlyMap<string, number>;
+  readonly functionInfo: Map<
+    SyntaxFunction,
+    { readonly bindingId?: number; readonly id: number }
+  >;
+  readonly hirFunctions: HirFunction[];
+  nextFunctionId: number;
   readonly sourceId: string;
 }
 
@@ -485,23 +566,22 @@ function resolveExpression(
     expression.kind === "null" ||
     expression.kind === "number" ||
     expression.kind === "string" ||
+    expression.kind === "this" ||
     expression.kind === "undefined"
   ) {
     return expression;
   }
+  if (expression.kind === "function") {
+    return resolveFunctionExpression(
+      expression.functionValue,
+      scopes,
+      state,
+      expression,
+    );
+  }
   if (expression.kind === "identifier") {
     const binding = findBinding(scopes, expression.name);
     if (binding == null) {
-      if (state.functions.has(expression.name)) {
-        state.diagnostics.push(
-          sourceDiagnostic(
-            state.sourceId,
-            expression,
-            "Function values are outside the M1 profile.",
-          ),
-        );
-        return undefined;
-      }
       if (expression.name === "undefined") {
         return { kind: "undefined", range: expression.range };
       }
@@ -574,6 +654,18 @@ function resolveExpression(
       ? undefined
       : { ...expression, key, object, value };
   }
+  if (expression.kind === "new") {
+    const callee = resolveExpression(expression.callee, scopes, state);
+    const argumentsValue: HirExpression[] = [];
+    for (const argument of expression.arguments) {
+      const resolved = resolveExpression(argument, scopes, state);
+      if (resolved == null) return undefined;
+      argumentsValue.push(resolved);
+    }
+    return callee == null
+      ? undefined
+      : { ...expression, arguments: argumentsValue, callee };
+  }
   const argumentValues: HirExpression[] = [];
   for (const argument of expression.arguments) {
     const resolved = resolveExpression(argument, scopes, state);
@@ -594,79 +686,90 @@ function resolveExpression(
       );
       return undefined;
     }
-    if (state.functions.has("console")) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          "The console.log target resolves through a declared function; " +
-            "property calls are outside the M1 profile.",
-        ),
-      );
-      return undefined;
-    }
     target = { kind: "console-log" };
+  } else if (expression.target.kind === "name") {
+    const callee = resolveExpression(
+      {
+        kind: "identifier",
+        name: expression.target.name,
+        range: expression.target.range,
+      },
+      scopes,
+      state,
+    );
+    if (callee == null) return undefined;
+    target = { callee, kind: "dynamic" };
   } else {
-    const binding = findBinding(scopes, expression.target.name);
-    if (binding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          `Call target '${expression.target.name}' resolves to a binding; ` +
-            "function-valued bindings are outside the M1 profile.",
-        ),
-      );
-      return undefined;
-    }
-    const functionId = state.functions.get(expression.target.name);
-    if (functionId == null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          `Call target '${expression.target.name}' is not a declared function.`,
-        ),
-      );
-      return undefined;
-    }
-    target = {
-      functionId,
-      kind: "function",
-      name: expression.target.name,
-    };
+    const object = resolveExpression(expression.target.object, scopes, state);
+    const key = resolveExpression(expression.target.key, scopes, state);
+    if (object == null || key == null) return undefined;
+    target = { key, kind: "method", object };
   }
   return { ...expression, arguments: argumentValues, target };
 }
 
+type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
+
 function predeclareBindings(
-  statements: readonly SyntaxStatement[],
+  statements: readonly SyntaxStatementItem[],
   scope: Map<string, Binding>,
   state: ResolveState,
 ): void {
   for (const statement of statements) {
-    if (statement.kind !== "const" && statement.kind !== "let") continue;
-    if (scope.has(statement.name)) {
+    if (
+      statement.kind !== "const" &&
+      statement.kind !== "let" &&
+      statement.kind !== "function"
+    ) {
+      continue;
+    }
+    const name = statement.name;
+    if (name == null) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
           statement,
-          `Duplicate declaration '${statement.name}'.`,
+          "A function declaration requires a name.",
         ),
       );
       continue;
     }
-    scope.set(statement.name, {
-      id: state.nextBindingId,
-      mutable: statement.kind === "let",
-      name: statement.name,
-    });
-    state.nextBindingId += 1;
+    const previous = scope.get(name);
+    if (previous != null && statement.kind !== "function") {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `Duplicate declaration '${name}'.`,
+        ),
+      );
+      continue;
+    }
+    if (statement.kind === "function") {
+      const functionId = state.nextFunctionId;
+      state.nextFunctionId += 1;
+      const bindingId = previous?.id ?? state.nextBindingId;
+      if (previous == null) state.nextBindingId += 1;
+      scope.set(name, {
+        functionId,
+        id: bindingId,
+        mutable: true,
+        name,
+      });
+      state.functionInfo.set(statement, { bindingId, id: functionId });
+    } else {
+      scope.set(name, {
+        id: state.nextBindingId,
+        mutable: statement.kind === "let",
+        name,
+      });
+      state.nextBindingId += 1;
+    }
   }
 }
 
 function resolveStatementList(
-  statements: readonly SyntaxStatement[],
+  statements: readonly SyntaxStatementItem[],
   parentScopes: readonly Map<string, Binding>[],
   state: ResolveState,
   functionBody: boolean,
@@ -678,6 +781,21 @@ function resolveStatementList(
   const scopes = [...parentScopes, local];
   const result: HirStatement[] = [];
   for (const statement of statements) {
+    if (statement.kind !== "function" || statement.name == null) continue;
+    const info = state.functionInfo.get(statement);
+    if (info == null) continue;
+    if (local.get(statement.name)?.functionId !== info.id) continue;
+    resolveFunction(statement, scopes, state, info.id);
+    result.push({
+      bindingId: info.bindingId ?? -1,
+      functionId: info.id,
+      kind: "function-init",
+      name: statement.name,
+      range: statement.range,
+    });
+  }
+  for (const statement of statements) {
+    if (statement.kind === "function") continue;
     const resolved = resolveStatement(
       statement,
       scopes,
@@ -688,6 +806,130 @@ function resolveStatementList(
     if (resolved != null) result.push(resolved);
   }
   return result;
+}
+
+function resolveFunction(
+  functionValue: SyntaxFunction,
+  outerScopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  id: number,
+  selfBinding?: Binding,
+): HirFunction {
+  const parameterScope = new Map<string, Binding>();
+  const parameters: HirParameter[] = [];
+  for (const parameter of functionValue.parameters) {
+    let binding = parameterScope.get(parameter.name);
+    if (binding == null) {
+      binding = {
+        id: state.nextBindingId,
+        mutable: true,
+        name: parameter.name,
+      };
+      state.nextBindingId += 1;
+      parameterScope.set(parameter.name, binding);
+    }
+    parameters.push({ ...parameter, bindingId: binding.id });
+  }
+  const bodyScope = new Map<string, Binding>();
+  predeclareBindings(functionValue.body, bodyScope, state);
+  const body = resolveStatementList(
+    functionValue.body,
+    [
+      ...outerScopes,
+      ...(selfBinding == null
+        ? []
+        : [new Map([[selfBinding.name, selfBinding]])]),
+      parameterScope,
+    ],
+    state,
+    true,
+    bodyScope,
+  );
+  const resolved: HirFunction = {
+    ...functionValue,
+    body,
+    id,
+    kind: "hir-function",
+    localBindingIds: [
+      ...new Set([
+        ...Array.from(parameterScope.values(), (binding) => binding.id),
+        ...(selfBinding == null ? [] : [selfBinding.id]),
+        ...declaredHirBindingIds(body),
+      ]),
+    ],
+    name: functionValue.name ?? `<anonymous-${id}>`,
+    parameters,
+    ...(selfBinding == null ? {} : { selfBindingId: selfBinding.id }),
+  };
+  state.hirFunctions.push(resolved);
+  return resolved;
+}
+
+function declaredHirBindingIds(
+  statements: readonly HirStatement[],
+): readonly number[] {
+  const result: number[] = [];
+  for (const statement of statements) {
+    if (
+      statement.kind === "const" ||
+      statement.kind === "let" ||
+      statement.kind === "function-init"
+    ) {
+      result.push(statement.bindingId);
+    } else if (statement.kind === "block") {
+      result.push(...declaredHirBindingIds(statement.body));
+    } else if (statement.kind === "if") {
+      result.push(...declaredHirBindingIds([statement.consequent]));
+      if (statement.alternate != null) {
+        result.push(...declaredHirBindingIds([statement.alternate]));
+      }
+    } else if (statement.kind === "while") {
+      result.push(...declaredHirBindingIds([statement.body]));
+    } else if (statement.kind === "try") {
+      result.push(...declaredHirBindingIds([statement.block]));
+      if (statement.handler != null) {
+        result.push(statement.handler.bindingId);
+        result.push(...declaredHirBindingIds([statement.handler.body]));
+      }
+      if (statement.finalizer != null) {
+        result.push(...declaredHirBindingIds([statement.finalizer]));
+      }
+    }
+  }
+  return result;
+}
+
+function resolveFunctionExpression(
+  functionValue: SyntaxFunction,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  expression: LocatedSyntax,
+): HirExpression {
+  const id = state.nextFunctionId;
+  state.nextFunctionId += 1;
+  state.functionInfo.set(functionValue, { id });
+  const selfBinding =
+    functionValue.name == null
+      ? undefined
+      : {
+          id: state.nextBindingId,
+          mutable: false,
+          name: functionValue.name,
+        };
+  if (selfBinding != null) state.nextBindingId += 1;
+  const resolved = resolveFunction(
+    functionValue,
+    scopes,
+    state,
+    id,
+    selfBinding,
+  );
+  return {
+    functionId: id,
+    kind: "function",
+    name: resolved.name,
+    range: expression.range,
+  };
 }
 
 function resolveStatement(
@@ -724,6 +966,64 @@ function resolveStatement(
         : resolveExpression(statement.expression, scopes, state);
     if (statement.expression != null && expression == null) return undefined;
     return { ...statement, expression };
+  }
+  if (statement.kind === "throw") {
+    const expression = resolveExpression(statement.expression, scopes, state);
+    return expression == null ? undefined : { ...statement, expression };
+  }
+  if (statement.kind === "try") {
+    const block = resolveStatement(
+      statement.block,
+      scopes,
+      state,
+      functionBody,
+      loopDepth,
+    );
+    let handler:
+      | {
+          readonly bindingId: number;
+          readonly body: HirStatement;
+          readonly name: string;
+          readonly range: SourceRange;
+        }
+      | undefined;
+    if (statement.handler != null) {
+      const binding: Binding = {
+        id: state.nextBindingId,
+        mutable: true,
+        name: statement.handler.name,
+      };
+      state.nextBindingId += 1;
+      const catchScope = new Map([[statement.handler.name, binding]]);
+      const body = resolveStatement(
+        statement.handler.body,
+        [...scopes, catchScope],
+        state,
+        functionBody,
+        loopDepth,
+      );
+      if (body == null) return undefined;
+      handler = {
+        bindingId: binding.id,
+        body,
+        name: statement.handler.name,
+        range: statement.handler.range,
+      };
+    }
+    const finalizer =
+      statement.finalizer == null
+        ? undefined
+        : resolveStatement(
+            statement.finalizer,
+            scopes,
+            state,
+            functionBody,
+            loopDepth,
+          );
+    if (block == null || (statement.finalizer != null && finalizer == null)) {
+      return undefined;
+    }
+    return { ...statement, block, finalizer, handler };
   }
   if (statement.kind === "break" || statement.kind === "continue") {
     if (loopDepth === 0) {
@@ -790,60 +1090,18 @@ function resolveStatement(
 /** Validate owned syntax and resolve all lexical and function identities. */
 export function buildHir(program: SyntaxProgram): HirResult {
   const diagnostics: Diagnostic[] = [];
-  const functionIds = new Map<string, number>();
-  const functionDeclarations = new Map<string, SyntaxFunction>();
-  for (const item of program.body) {
-    if (item.kind !== "function") continue;
-    if (!functionIds.has(item.name)) {
-      functionIds.set(item.name, functionIds.size);
-    }
-    functionDeclarations.set(item.name, item);
-  }
   const state: ResolveState = {
     diagnostics,
-    functions: functionIds,
+    functionInfo: new Map(),
+    hirFunctions: [],
     nextBindingId: 0,
+    nextFunctionId: 0,
     sourceId: program.sourceId,
   };
-  const scriptStatements = program.body.filter(
-    (item): item is SyntaxStatement => item.kind !== "function",
-  );
   const scriptScope = new Map<string, Binding>();
-  predeclareBindings(scriptStatements, scriptScope, state);
-  const functions: HirFunction[] = [];
-  for (const item of functionDeclarations.values()) {
-    const parameterScope = new Map<string, Binding>();
-    const parameters: HirParameter[] = [];
-    for (const parameter of item.parameters) {
-      let binding = parameterScope.get(parameter.name);
-      if (binding == null) {
-        binding = {
-          id: state.nextBindingId,
-          mutable: true,
-          name: parameter.name,
-        };
-        state.nextBindingId += 1;
-        parameterScope.set(parameter.name, binding);
-      }
-      parameters.push({ ...parameter, bindingId: binding.id });
-    }
-    const id = functionIds.get(item.name);
-    if (id == null) continue;
-    functions.push({
-      ...item,
-      body: resolveStatementList(
-        item.body,
-        [scriptScope, parameterScope],
-        state,
-        true,
-      ),
-      id,
-      kind: "hir-function",
-      parameters,
-    });
-  }
+  predeclareBindings(program.body, scriptScope, state);
   const body = resolveStatementList(
-    scriptStatements,
+    program.body,
     [],
     state,
     false,
@@ -854,7 +1112,7 @@ export function buildHir(program: SyntaxProgram): HirResult {
     diagnostics,
     program: {
       body,
-      functions,
+      functions: state.hirFunctions,
       kind: "hir-program",
       range: program.range,
       sourceId: program.sourceId,
@@ -902,6 +1160,10 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
   }
+  if (expression.kind === "function") {
+    return `function @f${expression.functionId} ${expression.name}`;
+  }
+  if (expression.kind === "this") return "this";
   if (expression.kind === "undefined" || expression.kind === "null") {
     return expression.kind;
   }
@@ -947,10 +1209,20 @@ function printHirExpression(expression: HirExpression): string {
       printHirExpression(expression.value)
     );
   }
+  if (expression.kind === "new") {
+    return (
+      `new ${printHirExpression(expression.callee)}(` +
+      expression.arguments.map(printHirExpression).join(", ") +
+      ")"
+    );
+  }
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"
-      : `function @f${expression.target.functionId}`;
+      : expression.target.kind === "dynamic"
+        ? printHirExpression(expression.target.callee)
+        : `${printHirExpression(expression.target.object)}[` +
+          `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirExpression).join(", ") +
@@ -974,12 +1246,35 @@ function appendHirStatement(
     lines.push(
       `${indent}${printHirExpression(statement.expression)}${location}`,
     );
+  } else if (statement.kind === "function-init") {
+    lines.push(
+      `${indent}function-init %b${statement.bindingId} ${statement.name} ` +
+        `= @f${statement.functionId}${location}`,
+    );
   } else if (statement.kind === "return") {
     const value =
       statement.expression == null
         ? "undefined"
         : printHirExpression(statement.expression);
     lines.push(`${indent}return ${value}${location}`);
+  } else if (statement.kind === "throw") {
+    lines.push(
+      `${indent}throw ${printHirExpression(statement.expression)}${location}`,
+    );
+  } else if (statement.kind === "try") {
+    lines.push(`${indent}try${location}`);
+    appendHirStatement(lines, statement.block, `${indent}  `);
+    if (statement.handler != null) {
+      lines.push(
+        `${indent}catch %b${statement.handler.bindingId} ` +
+          `${statement.handler.name}`,
+      );
+      appendHirStatement(lines, statement.handler.body, `${indent}  `);
+    }
+    if (statement.finalizer != null) {
+      lines.push(`${indent}finally`);
+      appendHirStatement(lines, statement.finalizer, `${indent}  `);
+    }
   } else if (statement.kind === "block") {
     lines.push(`${indent}block${location}`);
     for (const child of statement.body) {
@@ -1040,6 +1335,7 @@ export type MirConstant =
 /** A direct call target independent of HIR and source syntax. */
 export type MirCallTarget =
   | { readonly kind: "console-log" }
+  | { readonly kind: "dynamic" }
   | { readonly functionId: number; readonly kind: "function" };
 
 /** Hint data copied into MIR without retaining a HIR or syntax object. */
@@ -1089,9 +1385,14 @@ export interface MirOperation {
     | "call"
     | "check-status"
     | "constant"
+    | "caught"
+    | "completion-set"
+    | "construct"
+    | "construct-receiver"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
+    | "function-create"
     | "guard-smi"
     | "join"
     | "object-create"
@@ -1101,12 +1402,17 @@ export interface MirOperation {
     | "property-get-cached"
     | "property-set"
     | "read"
+    | "receiver"
     | "root-store"
     | "safepoint"
     | "unbox-smi"
     | "unary"
     | "write";
   readonly checkedResult?: number;
+  readonly abruptTarget?: number;
+  readonly completionKind?: "jump" | "normal" | "return" | "throw";
+  readonly completionTarget?: number;
+  readonly functionId?: number;
   readonly hint?: MirHint;
   readonly operator?: BinaryOperator | "!" | "-";
   readonly range: SourceRange;
@@ -1129,6 +1435,9 @@ export type MirTerminator =
   | {
       readonly kind: "return";
       readonly value: number;
+    }
+  | {
+      readonly kind: "resume-completion";
     }
   | {
       readonly kind: "unreachable";
@@ -1156,10 +1465,12 @@ export interface MirFunction extends LocatedSyntax {
   readonly blocks: readonly MirBlock[];
   readonly id: number;
   readonly kind: "mir-function";
+  readonly localBindingIds?: readonly number[];
   readonly name: string;
   readonly parameterCount: number;
   readonly parameters: readonly MirParameter[];
   readonly rootSlotCount: number;
+  readonly selfBindingId?: number;
   readonly specialization?: MirSpecialization;
 }
 
@@ -1181,11 +1492,13 @@ interface MutableMirBlock {
 }
 
 interface MirBuilder {
+  readonly abruptTargets: number[];
   readonly blocks: MutableMirBlock[];
   readonly loops: {
     readonly breakTarget: number;
     readonly continueTarget: number;
   }[];
+  readonly finalizers: number[];
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;
@@ -1197,15 +1510,21 @@ function appendMirMetadata(
   detail: string,
   argumentsValue: readonly number[],
   range: SourceRange,
+  extra: Partial<MirOperation> = {},
 ): void {
   const id = builder.nextValue;
   builder.nextValue += 1;
+  const abruptTarget = builder.abruptTargets.at(-1);
   builder.current.operations.push({
     arguments: argumentsValue,
     detail,
     id,
     kind,
     range,
+    ...(kind === "check-status" && abruptTarget != null
+      ? { abruptTarget }
+      : {}),
+    ...extra,
   });
 }
 
@@ -1263,6 +1582,45 @@ function lowerExpression(
       detail: `%b${expression.bindingId} ${expression.name}`,
       id,
       kind: "write",
+      range: expression.range,
+    });
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "function") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "function allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `function @f${expression.functionId}`,
+      functionId: expression.functionId,
+      id,
+      kind: "function-create",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "this") {
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "this",
+      id,
+      kind: "receiver",
       range: expression.range,
     });
     return recordRoot(builder, id, expression.range);
@@ -1572,17 +1930,109 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
-  const argumentIds = expression.arguments.map((argument) =>
-    lowerExpression(argument, builder),
-  );
+  if (expression.kind === "new") {
+    const callee = lowerExpression(expression.callee, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "constructor receiver allocation",
+      [callee],
+      expression.range,
+    );
+    const receiver = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [callee],
+      detail: "constructor receiver",
+      id: receiver,
+      kind: "construct-receiver",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [receiver],
+      expression.range,
+    );
+    recordRoot(builder, receiver, expression.range);
+    const argumentIds = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    const argumentsValue = [callee, receiver, ...argumentIds];
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "constructor call",
+      argumentsValue,
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: argumentsValue,
+      detail: "dynamic constructor",
+      id,
+      kind: "construct",
+      range: expression.range,
+      target: { kind: "dynamic" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  let callArguments: number[];
+  let callTarget: MirCallTarget;
+  let detail: string;
+  if (expression.target.kind === "console-log") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = { kind: "console-log" };
+    detail = "console_log";
+  } else {
+    let callee: number;
+    let receiver: number;
+    if (expression.target.kind === "dynamic") {
+      callee = lowerExpression(expression.target.callee, builder);
+      receiver = lowerSyntheticUndefined(expression.range, builder);
+    } else {
+      receiver = lowerExpression(expression.target.object, builder);
+      const key = lowerPropertyKey(expression.target.key, builder);
+      callee = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [receiver, key],
+        detail: "method lookup",
+        id: callee,
+        kind: "property-get",
+        range: expression.range,
+      });
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [callee],
+        expression.range,
+      );
+      recordRoot(builder, callee, expression.range);
+    }
+    const argumentsValue = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callArguments = [callee, receiver, ...argumentsValue];
+    callTarget = { kind: "dynamic" };
+    detail = "dynamic function value";
+  }
   const safepointId = builder.nextValue;
   builder.nextValue += 1;
-  const detail =
-    expression.target.kind === "console-log"
-      ? "console_log"
-      : `function @f${expression.target.functionId}`;
   builder.current.operations.push({
-    arguments: argumentIds,
+    arguments: callArguments,
     detail,
     id: safepointId,
     kind: "safepoint",
@@ -1591,18 +2041,12 @@ function lowerExpression(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: argumentIds,
+    arguments: callArguments,
     detail,
     id,
     kind: "call",
     range: expression.range,
-    target:
-      expression.target.kind === "console-log"
-        ? { kind: "console-log" }
-        : {
-            functionId: expression.target.functionId,
-            kind: "function",
-          },
+    target: callTarget,
   });
   appendMirMetadata(
     builder,
@@ -1628,6 +2072,141 @@ function statementBody(statement: HirStatement): readonly HirStatement[] {
   return statement.kind === "block" ? statement.body : [statement];
 }
 
+function setCompletion(
+  builder: MirBuilder,
+  kind: NonNullable<MirOperation["completionKind"]>,
+  range: SourceRange,
+  value?: number,
+  target?: number,
+): void {
+  appendMirMetadata(
+    builder,
+    "completion-set",
+    kind,
+    value == null ? [] : [value],
+    range,
+    {
+      completionKind: kind,
+      ...(target == null ? {} : { completionTarget: target }),
+    },
+  );
+}
+
+function enterFinalizer(
+  builder: MirBuilder,
+  kind: NonNullable<MirOperation["completionKind"]>,
+  range: SourceRange,
+  value?: number,
+  target?: number,
+): boolean {
+  const finalizer = builder.finalizers.at(-1);
+  if (finalizer == null) return false;
+  setCompletion(builder, kind, range, value, target);
+  builder.current.terminator = { kind: "jump", target: finalizer };
+  return true;
+}
+
+function lowerTryStatement(
+  statement: HirStatement & { readonly kind: "try" },
+  builder: MirBuilder,
+): void {
+  const catchBlock =
+    statement.handler == null ? undefined : createMirBlock(builder);
+  const finallyBlock =
+    statement.finalizer == null ? undefined : createMirBlock(builder);
+  const afterBlock = createMirBlock(builder);
+  const outerAbrupt = builder.abruptTargets.at(-1);
+  const tryAbrupt = catchBlock?.id ?? finallyBlock?.id ?? outerAbrupt;
+  if (tryAbrupt != null) builder.abruptTargets.push(tryAbrupt);
+  if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
+  const tryTerminated = lowerStatements(
+    statementBody(statement.block),
+    builder,
+  );
+  if (finallyBlock != null) builder.finalizers.pop();
+  if (tryAbrupt != null) builder.abruptTargets.pop();
+  if (!tryTerminated) {
+    if (finallyBlock == null) {
+      builder.current.terminator = { kind: "jump", target: afterBlock.id };
+    } else {
+      setCompletion(
+        builder,
+        "normal",
+        statement.range,
+        undefined,
+        afterBlock.id,
+      );
+      builder.current.terminator = {
+        kind: "jump",
+        target: finallyBlock.id,
+      };
+    }
+  }
+
+  if (catchBlock != null && statement.handler != null) {
+    builder.current = catchBlock;
+    const caught = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: statement.handler.name,
+      id: caught,
+      kind: "caught",
+      range: statement.handler.range,
+    });
+    recordRoot(builder, caught, statement.handler.range);
+    const written = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [caught],
+      bindingId: statement.handler.bindingId,
+      detail: statement.handler.name,
+      id: written,
+      kind: "write",
+      range: statement.handler.range,
+    });
+    recordRoot(builder, written, statement.handler.range);
+    const catchAbrupt = finallyBlock?.id ?? outerAbrupt;
+    if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
+    if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
+    const catchTerminated = lowerStatements(
+      statementBody(statement.handler.body),
+      builder,
+    );
+    if (finallyBlock != null) builder.finalizers.pop();
+    if (catchAbrupt != null) builder.abruptTargets.pop();
+    if (!catchTerminated) {
+      if (finallyBlock == null) {
+        builder.current.terminator = { kind: "jump", target: afterBlock.id };
+      } else {
+        setCompletion(
+          builder,
+          "normal",
+          statement.range,
+          undefined,
+          afterBlock.id,
+        );
+        builder.current.terminator = {
+          kind: "jump",
+          target: finallyBlock.id,
+        };
+      }
+    }
+  }
+
+  if (finallyBlock != null && statement.finalizer != null) {
+    builder.current = finallyBlock;
+    const finallyTerminated = lowerStatements(
+      statementBody(statement.finalizer),
+      builder,
+    );
+    if (!finallyTerminated) {
+      builder.current.terminator = { kind: "resume-completion" };
+    }
+  }
+  builder.current = afterBlock;
+}
+
 function lowerStatements(
   statements: readonly HirStatement[],
   builder: MirBuilder,
@@ -1646,6 +2225,27 @@ function lowerStatements(
         range: statement.range,
       });
       recordRoot(builder, id, statement.range);
+    } else if (statement.kind === "function-init") {
+      const value = lowerExpression(
+        {
+          functionId: statement.functionId,
+          kind: "function",
+          name: statement.name,
+          range: statement.range,
+        },
+        builder,
+      );
+      const id = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [value],
+        bindingId: statement.bindingId,
+        detail: `%b${statement.bindingId} ${statement.name}`,
+        id,
+        kind: "write",
+        range: statement.range,
+      });
+      recordRoot(builder, id, statement.range);
     } else if (statement.kind === "expression") {
       lowerExpression(statement.expression, builder);
     } else if (statement.kind === "return") {
@@ -1653,18 +2253,33 @@ function lowerStatements(
         statement.expression == null
           ? lowerSyntheticUndefined(statement.range, builder)
           : lowerExpression(statement.expression, builder);
-      builder.current.terminator = { kind: "return", value };
+      if (!enterFinalizer(builder, "return", statement.range, value)) {
+        builder.current.terminator = { kind: "return", value };
+      }
       return true;
+    } else if (statement.kind === "throw") {
+      const value = lowerExpression(statement.expression, builder);
+      setCompletion(builder, "throw", statement.range, value);
+      const target = builder.abruptTargets.at(-1);
+      builder.current.terminator =
+        target == null
+          ? { kind: "resume-completion" }
+          : { kind: "jump", target };
+      return true;
+    } else if (statement.kind === "try") {
+      lowerTryStatement(statement, builder);
     } else if (statement.kind === "block") {
       if (lowerStatements(statement.body, builder)) return true;
     } else if (statement.kind === "break" || statement.kind === "continue") {
       const loop = builder.loops.at(-1);
       if (loop == null) throw new Error(`${statement.kind} has no MIR loop.`);
-      builder.current.terminator = {
-        kind: "jump",
-        target:
-          statement.kind === "break" ? loop.breakTarget : loop.continueTarget,
-      };
+      const target =
+        statement.kind === "break" ? loop.breakTarget : loop.continueTarget;
+      if (
+        !enterFinalizer(builder, "jump", statement.range, undefined, target)
+      ) {
+        builder.current.terminator = { kind: "jump", target };
+      }
       return true;
     } else if (statement.kind === "while") {
       const conditionBlock = createMirBlock(builder);
@@ -1786,6 +2401,8 @@ function buildMirFunction(
   name: string,
   body: readonly HirStatement[],
   parameters: readonly HirParameter[],
+  localBindingIds: readonly number[],
+  selfBindingId: number | undefined,
   range: SourceRange,
   specialization: SpecializationMode,
 ): MirFunction {
@@ -1795,9 +2412,11 @@ function buildMirFunction(
     terminator: undefined,
   };
   const builder: MirBuilder = {
+    abruptTargets: [],
     blocks: [entry],
     current: entry,
     loops: [],
+    finalizers: [],
     nextValue: 0,
     specialization,
   };
@@ -1832,11 +2451,13 @@ function buildMirFunction(
     })),
     id,
     kind: "mir-function",
+    localBindingIds: [...localBindingIds],
     name,
     parameterCount: parameters.length,
     parameters: mirParameters,
     range,
     rootSlotCount: builder.nextValue + parameters.length + 1,
+    ...(selfBindingId == null ? {} : { selfBindingId }),
   };
 }
 
@@ -2112,6 +2733,8 @@ export function buildMir(
         functionValue.name,
         functionValue.body,
         functionValue.parameters,
+        functionValue.localBindingIds,
+        functionValue.selfBindingId,
         functionValue.range,
         specialization,
       );
@@ -2120,7 +2743,9 @@ export function buildMir(
         : generic;
     }),
     globalBindings: program.body.flatMap((statement) =>
-      statement.kind === "const" || statement.kind === "let"
+      statement.kind === "const" ||
+      statement.kind === "let" ||
+      statement.kind === "function-init"
         ? [{ id: statement.bindingId, name: statement.name }]
         : [],
     ),
@@ -2131,6 +2756,8 @@ export function buildMir(
       "<script>",
       program.body,
       [],
+      declaredHirBindingIds(program.body),
+      undefined,
       program.range,
       specialization,
     ),
@@ -2151,6 +2778,7 @@ function printTerminator(terminator: MirTerminator): string {
       `bb${terminator.whenFalse}`
     );
   }
+  if (terminator.kind === "resume-completion") return "resume-completion";
   return "unreachable";
 }
 
