@@ -118,6 +118,17 @@ console.log(strictNamed());
     source: `
 function Box(value) { this.value = value; }
 Box.prototype.read = function () { return this.value; };
+console.log(Box.prototype.constructor === Box);
+const constructorDescriptor = Object.getOwnPropertyDescriptor(
+  Box.prototype,
+  "constructor",
+);
+console.log(
+  constructorDescriptor.value === Box,
+  constructorDescriptor.writable,
+  constructorDescriptor.enumerable,
+  constructorDescriptor.configurable,
+);
 const box = new Box(7);
 console.log(box.value, box.read());
 function Replace() { return { value: 9 }; }

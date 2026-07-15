@@ -299,6 +299,7 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
     roots[2] = require_normal(oseo_function_create(context, 7u, roots[0]));
     roots[3] = require_normal(oseo_environment_clone(context, roots[0]));
     roots[4] = require_normal(oseo_environment_get(context, roots[3], 0u));
+    roots[7] = make_text(context, "constructor");
     assert(roots[4] == roots[1]);
     (void)require_normal(oseo_cell_set(context, roots[4], oseo_number(2.0)));
     assert(
@@ -312,6 +313,13 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
     roots[6] = require_normal(oseo_environment_get(context, roots[5], 0u));
     assert(
         require_normal(oseo_cell_get(context, roots[6])) == oseo_number(2.0)
+    );
+    OseoValue prototype = require_normal(
+        oseo_function_prototype(context, roots[2])
+    );
+    assert(
+        require_normal(oseo_object_get(context, prototype, roots[7])) ==
+        roots[2]
     );
     size_t code_id = 0u;
     (void)require_normal(

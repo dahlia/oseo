@@ -708,7 +708,7 @@ OseoResult oseo_function_create(
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_environment_clone(context, environment);
     frame.slots[0] = result.value;
@@ -750,6 +750,34 @@ OseoResult oseo_function_create(
         OSEO_HEAP_FUNCTION
     );
     frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        static const uint16_t constructor_name[] = {
+            'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
+        };
+        result = allocate_string(
+            context,
+            constructor_name,
+            sizeof(constructor_name) / sizeof(*constructor_name)
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPropertyAttributes attributes = {true, false, true};
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[3],
+            frame.slots[2],
+            attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result.value = frame.slots[2];
+    }
     oseo_roots_release(context, &frame);
     return result;
 }
