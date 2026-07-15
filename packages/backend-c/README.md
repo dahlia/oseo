@@ -29,3 +29,7 @@ M2 guard failures and checked-addition overflow branch to the same emitted
 generic addition block. The hit path uses private inline runtime primitives and
 does not call generic addition or allocate. Block parameters carry the selected
 result into one ordinary continuation.
+M3 named property reads likewise preserve MIR-owned object and shape guards, a
+fixed-slot hit, one generic fallback, and a block-parameter join. The runtime
+exposes only private cache tests, fixed-slot loads, and cache updates to the C
+backend.

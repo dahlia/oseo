@@ -96,12 +96,14 @@ Runtime resource limits and unsupported host capabilities remain `OSEO2001` and
 Specialization
 --------------
 
-M3 specializes named property reads with a private monomorphic call-site cache.
-The hit path checks object kind, dictionary state, layout identity, slot bounds,
-and key equality before reading a fixed slot without allocation or generic
-lookup. Any miss performs one generic lookup. Deletion, descriptor change,
-prototype mutation, another layout, or a non-object receiver cannot reuse the
-cached slot. Disabling specialization preserves observable behavior.
+M3 specializes named property reads with an explicit backend-neutral MIR graph.
+The graph checks object kind, then checks a private monomorphic call-site cache
+for dictionary state, layout identity, slot bounds, and key equality. A cache
+hit reads a fixed slot without allocation or generic lookup. Any miss enters one
+generic lookup block, may relearn a stable own slot, and joins the hit result at
+one continuation. Deletion, descriptor change, prototype mutation, another
+layout, or a non-object receiver cannot reuse the cached slot. Disabling
+specialization removes this graph while preserving observable behavior.
 
 
 Test262 evidence

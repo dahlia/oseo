@@ -8,7 +8,8 @@ arrays, environments, binding cells, function objects, and the deterministic
 `console.log` intrinsic. Native assets remain separate files and are included
 in npm and JSR packages.
 M3 property operations implement descriptors, prototypes, array holes and
-length, ordered own-key enumeration, and private monomorphic read caches.
+length, ordered own-key enumeration, and private cache primitives for explicit
+MIR property-read guards.
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.

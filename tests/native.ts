@@ -10,6 +10,7 @@ import { runNativeCli } from "../packages/cli/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printMir,
 } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import { babelFrontend } from "../packages/parser-babel/src/index.ts";
@@ -850,6 +851,17 @@ for (const fixture of fixtures) {
   const enabledMir = enabledCompilation.mir;
   assert(disabledMir != null, `${fixture.name}: disabled MIR`);
   assert(enabledMir != null, `${fixture.name}: enabled MIR`);
+
+  if (fixture.name === "property-specialization") {
+    const enabledText = printMir(enabledMir);
+    assert.match(enabledText, /guard-object/u);
+    assert.match(enabledText, /guard-shape/u);
+    assert.match(enabledText, /load-fixed-slot/u);
+    assert.match(enabledText, /property-get generic/u);
+    assert.match(enabledText, /join property read/u);
+    assert.doesNotMatch(enabledText, /property-get-cached/u);
+    assert.doesNotMatch(printMir(disabledMir), /guard-(?:object|shape)/u);
+  }
 
   if (
     fixture.name === "generic-addition" ||

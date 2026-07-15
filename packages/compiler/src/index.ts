@@ -1456,6 +1456,7 @@ export interface MirOperation {
   readonly arguments: readonly number[];
   readonly arrayLength?: number;
   readonly bindingId?: number;
+  readonly cacheId?: number;
   readonly constant?: MirConstant;
   readonly detail: string;
   readonly id: number;
@@ -1477,14 +1478,16 @@ export interface MirOperation {
     | "count-guard-miss"
     | "count-overflow-miss"
     | "function-create"
+    | "guard-object"
+    | "guard-shape"
     | "guard-smi"
     | "initialize"
     | "join"
+    | "load-fixed-slot"
     | "object-create"
     | "property-key"
     | "property-delete"
     | "property-get"
-    | "property-get-cached"
     | "property-set"
     | "read"
     | "receiver"
@@ -1492,6 +1495,7 @@ export interface MirOperation {
     | "safepoint"
     | "unbox-smi"
     | "unary"
+    | "update-property-cache"
     | "write";
   readonly mutable?: boolean;
   readonly checkedResult?: number;
@@ -1580,6 +1584,7 @@ export interface MirProgram {
 interface MutableMirBlock {
   readonly id: number;
   readonly operations: MirOperation[];
+  parameters?: number[];
   terminator: MirTerminator | undefined;
 }
 
@@ -1658,6 +1663,126 @@ function lowerPropertyKey(
     expression.range,
   );
   return recordRoot(builder, id, expression.range);
+}
+
+function lowerSpecializedPropertyGet(
+  object: number,
+  key: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const shapeBlock = createMirBlock(builder);
+  const hitBlock = createMirBlock(builder);
+  const genericBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+
+  const objectGuard = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object],
+    detail: `object -> bb${shapeBlock.id}, miss -> bb${genericBlock.id}`,
+    id: objectGuard,
+    kind: "guard-object",
+    range,
+  });
+  builder.current.terminator = {
+    kind: "branch",
+    test: objectGuard,
+    whenFalse: genericBlock.id,
+    whenTrue: shapeBlock.id,
+  };
+
+  builder.current = shapeBlock;
+  const shapeGuard = builder.nextValue;
+  builder.nextValue += 1;
+  shapeBlock.operations.push({
+    arguments: [object, key],
+    cacheId: shapeGuard,
+    detail: `cached slot -> bb${hitBlock.id}, miss -> bb${genericBlock.id}`,
+    id: shapeGuard,
+    kind: "guard-shape",
+    range,
+  });
+  shapeBlock.terminator = {
+    kind: "branch",
+    test: shapeGuard,
+    whenFalse: genericBlock.id,
+    whenTrue: hitBlock.id,
+  };
+
+  builder.current = hitBlock;
+  appendMirMetadata(builder, "count-guard-hit", "property read", [], range);
+  const hitValue = builder.nextValue;
+  builder.nextValue += 1;
+  hitBlock.operations.push({
+    arguments: [object],
+    cacheId: shapeGuard,
+    detail: "cached own-property slot",
+    id: hitValue,
+    kind: "load-fixed-slot",
+    range,
+  });
+  recordRoot(builder, hitValue, range);
+  hitBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [hitValue],
+  };
+
+  builder.current = genericBlock;
+  appendMirMetadata(builder, "count-guard-miss", "property read", [], range);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "generic property lookup",
+    [object, key],
+    range,
+  );
+  const genericValue = builder.nextValue;
+  builder.nextValue += 1;
+  genericBlock.operations.push({
+    arguments: [object, key],
+    detail: "generic",
+    id: genericValue,
+    kind: "property-get",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [genericValue],
+    range,
+  );
+  recordRoot(builder, genericValue, range);
+  appendMirMetadata(
+    builder,
+    "update-property-cache",
+    "relearn stable own slot",
+    [object, key],
+    range,
+    { cacheId: shapeGuard },
+  );
+  genericBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [genericValue],
+  };
+
+  builder.current = joinBlock;
+  const joinValue = builder.nextValue;
+  builder.nextValue += 1;
+  const joinMarker = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.operations.push({
+    arguments: [hitValue, genericValue],
+    detail: `property read bb${hitBlock.id} + bb${genericBlock.id}`,
+    id: joinMarker,
+    kind: "join",
+    range,
+  });
+  joinBlock.parameters = [joinValue];
+  return joinValue;
 }
 
 function lowerExpression(
@@ -1981,18 +2106,34 @@ function lowerExpression(
   ) {
     const object = lowerExpression(expression.object, builder);
     const key = lowerPropertyKey(expression.key, builder);
+    if (
+      expression.kind === "property-get" &&
+      expression.key.kind === "string" &&
+      builder.specialization === "enabled"
+    ) {
+      return lowerSpecializedPropertyGet(
+        object,
+        key,
+        expression.range,
+        builder,
+      );
+    }
+    if (expression.kind === "property-get") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "generic property lookup",
+        [object, key],
+        expression.range,
+      );
+    }
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
       arguments: [object, key],
       detail: expression.kind,
       id,
-      kind:
-        expression.kind === "property-get" &&
-        expression.key.kind === "string" &&
-        builder.specialization === "enabled"
-          ? "property-get-cached"
-          : expression.kind,
+      kind: expression.kind,
       range: expression.range,
     });
     appendMirMetadata(
@@ -2628,6 +2769,7 @@ function buildMirFunction(
     blocks: builder.blocks.map((block) => ({
       id: block.id,
       operations: block.operations,
+      ...(block.parameters == null ? {} : { parameters: block.parameters }),
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
     id,
@@ -3012,11 +3154,13 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
         operation.hint == null
           ? ""
           : ` hint=${operation.hint.provenance}:${operation.hint.name}`;
+      const cacheText =
+        operation.cacheId == null ? "" : ` cache=%${operation.cacheId}`;
       lines.push(
         `    ${resultText} = ${operation.kind} ` +
           `${operation.detail}` +
           `${argumentText === "" ? "" : ` ${argumentText}`} ` +
-          `@${rangeText(operation.range)}${hintTextValue}`,
+          `@${rangeText(operation.range)}${hintTextValue}${cacheText}`,
       );
     }
     lines.push(`    ${printTerminator(block.terminator)}`);

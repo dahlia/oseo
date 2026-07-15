@@ -474,18 +474,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   } else {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
-    if (operation.kind === "property-get-cached") {
-      line(
-        state,
-        `static OseoPropertyCache property_cache_${operation.id} = ` +
-          "{0u, 0u};",
-      );
-      line(
-        state,
-        `result = oseo_object_get_cached(context, roots[${object}], ` +
-          `roots[${key}], &property_cache_${operation.id});`,
-      );
-    } else if (operation.kind === "property-get") {
+    if (operation.kind === "property-get") {
       line(
         state,
         `result = oseo_object_get(context, roots[${object}], ` +
@@ -508,6 +497,59 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     }
   }
   line(state, `roots[${operation.id}] = result.value;`);
+}
+
+function propertyCacheName(operation: MirOperation): string {
+  if (operation.cacheId == null) {
+    throw new Error(`MIR ${operation.kind} %${operation.id} has no cache.`);
+  }
+  return `property_cache_${operation.cacheId}`;
+}
+
+function emitGuardObject(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  state.scalarKinds.set(operation.id, "boolean");
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_value_is_object(roots[${object}]);`,
+  );
+}
+
+function emitGuardShape(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const key = operationArgument(operation, 1);
+  const cache = propertyCacheName(operation);
+  state.scalarKinds.set(operation.id, "boolean");
+  line(state, `static OseoPropertyCache ${cache} = {0u, 0u};`);
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_property_cache_matches(` +
+      `roots[${object}], roots[${key}], &${cache});`,
+  );
+}
+
+function emitLoadFixedSlot(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const cache = propertyCacheName(operation);
+  line(
+    state,
+    `roots[${operation.id}] = ` +
+      `oseo_property_cache_load(roots[${object}], &${cache});`,
+  );
+}
+
+function emitUpdatePropertyCache(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const object = operationArgument(operation, 0);
+  const key = operationArgument(operation, 1);
+  const cache = propertyCacheName(operation);
+  line(
+    state,
+    `oseo_property_cache_update(roots[${object}], roots[${key}], ` +
+      `&${cache});`,
+  );
 }
 
 function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
@@ -600,6 +642,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitUnary(state, operation);
   } else if (operation.kind === "binary") {
     emitBinary(state, operation);
+  } else if (operation.kind === "guard-object") {
+    emitGuardObject(state, operation);
+  } else if (operation.kind === "guard-shape") {
+    emitGuardShape(state, operation);
   } else if (operation.kind === "guard-smi") {
     emitGuardSmi(state, operation);
   } else if (operation.kind === "unbox-smi") {
@@ -608,6 +654,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitCheckedAdd(state, operation);
   } else if (operation.kind === "box-smi") {
     emitBoxSmi(state, operation);
+  } else if (operation.kind === "load-fixed-slot") {
+    emitLoadFixedSlot(state, operation);
+  } else if (operation.kind === "update-property-cache") {
+    emitUpdatePropertyCache(state, operation);
   } else if (operation.kind === "count-guard-hit") {
     if (state.observeSpecialization) {
       line(state, "context->guard_hits += 1u;");
@@ -628,7 +678,6 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "property-key" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||
-    operation.kind === "property-get-cached" ||
     operation.kind === "property-set"
   ) {
     emitObjectOperation(state, operation);

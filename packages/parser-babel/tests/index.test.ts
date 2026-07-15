@@ -183,7 +183,13 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.match(printHir(result.hir), /object\{/u);
   assert.match(printMir(result.mir), /object-create/u);
   assert.match(printMir(result.mir), /property-(?:get|set|delete)/u);
-  assert.match(printMir(result.mir), /property-get-cached/u);
+  const specializedText = printMir(result.mir);
+  assert.match(specializedText, /guard-object/u);
+  assert.match(specializedText, /guard-shape/u);
+  assert.match(specializedText, /load-fixed-slot/u);
+  assert.match(specializedText, /property-get generic/u);
+  assert.match(specializedText, /join property read/u);
+  assert.doesNotMatch(specializedText, /property-get-cached/u);
   const generic = compileSource(
     babelFrontend,
     {
@@ -193,7 +199,9 @@ test("converts ordinary object operations to owned syntax", () => {
     { specialization: "disabled" },
   );
   assert.ok(generic.mir != null);
-  assert.doesNotMatch(printMir(generic.mir), /property-get-cached/u);
+  const genericText = printMir(generic.mir);
+  assert.match(genericText, /property-get property-get/u);
+  assert.doesNotMatch(genericText, /guard-(?:object|shape)/u);
 });
 
 test("lowers the admitted Object reflection intrinsics", () => {

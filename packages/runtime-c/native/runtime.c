@@ -1133,26 +1133,42 @@ OseoResult oseo_object_get(
     return normal(oseo_undefined());
 }
 
-OseoResult oseo_object_get_cached(
-    OseoContext *context,
+bool oseo_value_is_object(OseoValue value) {
+    return is_object(value);
+}
+
+bool oseo_property_cache_matches(
+    OseoValue object_value,
+    OseoValue key,
+    const OseoPropertyCache *cache
+) {
+    if (!is_object(object_value)) return false;
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    return !object->dictionary && cache->shape_id != 0u &&
+        cache->shape_id == object->shape_id &&
+        cache->slot < object->property_count &&
+        string_equal(object->properties[cache->slot].key, key);
+}
+
+OseoValue oseo_property_cache_load(
+    OseoValue object_value,
+    const OseoPropertyCache *cache
+) {
+    if (!is_object(object_value)) return oseo_undefined();
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (cache->slot >= object->property_count) return oseo_undefined();
+    return object->properties[cache->slot].value;
+}
+
+void oseo_property_cache_update(
     OseoValue object_value,
     OseoValue key,
     OseoPropertyCache *cache
 ) {
-    if (is_object(object_value)) {
-        OseoOrdinaryObject *object = ordinary_object(object_value);
-        if (!object->dictionary && cache->shape_id != 0u &&
-            cache->shape_id == object->shape_id &&
-            cache->slot < object->property_count &&
-            string_equal(object->properties[cache->slot].key, key)) {
-            if (context->observe_specialization) context->guard_hits += 1u;
-            return normal(object->properties[cache->slot].value);
-        }
-    }
-    if (context->observe_specialization) context->guard_misses += 1u;
-    OseoResult result = oseo_object_get(context, object_value, key);
-    if (result.status != OSEO_STATUS_NORMAL || !is_object(object_value)) {
-        return result;
+    if (!is_object(object_value)) {
+        cache->shape_id = 0u;
+        cache->slot = 0u;
+        return;
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     size_t slot = own_property_index(object, key);
@@ -1163,7 +1179,6 @@ OseoResult oseo_object_get_cached(
         cache->shape_id = 0u;
         cache->slot = 0u;
     }
-    return result;
 }
 
 OseoResult oseo_object_has_own(

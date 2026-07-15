@@ -223,8 +223,17 @@ OseoResult oseo_object_get(
     OseoValue object,
     OseoValue key
 );
-OseoResult oseo_object_get_cached(
-    OseoContext *context,
+bool oseo_value_is_object(OseoValue value);
+bool oseo_property_cache_matches(
+    OseoValue object,
+    OseoValue key,
+    const OseoPropertyCache *cache
+);
+OseoValue oseo_property_cache_load(
+    OseoValue object,
+    const OseoPropertyCache *cache
+);
+void oseo_property_cache_update(
     OseoValue object,
     OseoValue key,
     OseoPropertyCache *cache
