@@ -86,6 +86,11 @@ export type BinaryOperator =
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
+      readonly kind: "binding-set";
+      readonly name: string;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
       readonly elements: readonly (SyntaxExpression | undefined)[];
       readonly kind: "array";
     })
@@ -170,6 +175,12 @@ export type SyntaxStatement =
       readonly name: string;
     })
   | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
+      readonly kind: "let";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
       readonly expression: SyntaxExpression;
       readonly kind: "expression";
     })
@@ -226,6 +237,12 @@ export type HirCallTarget =
 
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
+  | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly kind: "binding-set";
+      readonly name: string;
+      readonly value: HirExpression;
+    })
   | (LocatedSyntax & {
       readonly elements: readonly (HirExpression | undefined)[];
       readonly kind: "array";
@@ -307,6 +324,13 @@ export type HirStatement =
       readonly name: string;
     })
   | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly hint: Hint | undefined;
+      readonly initializer: HirExpression;
+      readonly kind: "let";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
       readonly expression: HirExpression;
       readonly kind: "expression";
     })
@@ -353,6 +377,7 @@ export interface HirResult {
 
 interface Binding {
   readonly id: number;
+  readonly mutable: boolean;
   readonly name: string;
 }
 
@@ -393,6 +418,33 @@ function resolveExpression(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | undefined {
+  if (expression.kind === "binding-set") {
+    const binding = findBinding(scopes, expression.name);
+    const value = resolveExpression(expression.value, scopes, state);
+    if (binding == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          `Unknown binding '${expression.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    if (!binding.mutable) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          `Cannot assign to const binding '${expression.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    return value == null
+      ? undefined
+      : { ...expression, bindingId: binding.id, value };
+  }
   if (expression.kind === "array") {
     const elements: (HirExpression | undefined)[] = [];
     for (const element of expression.elements) {
@@ -571,7 +623,7 @@ function predeclareBindings(
   state: ResolveState,
 ): void {
   for (const statement of statements) {
-    if (statement.kind !== "const") continue;
+    if (statement.kind !== "const" && statement.kind !== "let") continue;
     if (scope.has(statement.name)) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -584,6 +636,7 @@ function predeclareBindings(
     }
     scope.set(statement.name, {
       id: state.nextBindingId,
+      mutable: statement.kind === "let",
       name: statement.name,
     });
     state.nextBindingId += 1;
@@ -614,7 +667,7 @@ function resolveStatement(
   state: ResolveState,
   functionBody: boolean,
 ): HirStatement | undefined {
-  if (statement.kind === "const") {
+  if (statement.kind === "const" || statement.kind === "let") {
     const initializer = resolveExpression(statement.initializer, scopes, state);
     const binding = scopes.at(-1)?.get(statement.name);
     if (binding == null || initializer == null) return undefined;
@@ -696,6 +749,7 @@ export function buildHir(program: SyntaxProgram): HirResult {
       if (binding == null) {
         binding = {
           id: state.nextBindingId,
+          mutable: true,
           name: parameter.name,
         };
         state.nextBindingId += 1;
@@ -758,6 +812,12 @@ function numberText(value: number): string {
 }
 
 function printHirExpression(expression: HirExpression): string {
+  if (expression.kind === "binding-set") {
+    return (
+      `%b${expression.bindingId} ${expression.name} = ` +
+      printHirExpression(expression.value)
+    );
+  }
   if (expression.kind === "array") {
     return (
       "[" +
@@ -834,9 +894,9 @@ function appendHirStatement(
   indent: string,
 ): void {
   const location = ` @${rangeText(statement.range)}`;
-  if (statement.kind === "const") {
+  if (statement.kind === "const" || statement.kind === "let") {
     lines.push(
-      `${indent}%b${statement.bindingId} ${statement.name}` +
+      `${indent}${statement.kind} %b${statement.bindingId} ${statement.name}` +
         `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
         `${printHirExpression(statement.initializer)}${location}`,
     );
@@ -1110,6 +1170,20 @@ function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
 ): number {
+  if (expression.kind === "binding-set") {
+    const value = lowerExpression(expression.value, builder);
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [value],
+      bindingId: expression.bindingId,
+      detail: `%b${expression.bindingId} ${expression.name}`,
+      id,
+      kind: "write",
+      range: expression.range,
+    });
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "array") {
     appendMirMetadata(
       builder,
@@ -1471,7 +1545,7 @@ function lowerStatements(
   builder: MirBuilder,
 ): boolean {
   for (const statement of statements) {
-    if (statement.kind === "const") {
+    if (statement.kind === "const" || statement.kind === "let") {
       const value = lowerExpression(statement.initializer, builder);
       const id = builder.nextValue;
       builder.nextValue += 1;
@@ -1905,7 +1979,7 @@ export function buildMir(
         : generic;
     }),
     globalBindings: program.body.flatMap((statement) =>
-      statement.kind === "const"
+      statement.kind === "const" || statement.kind === "let"
         ? [{ id: statement.bindingId, name: statement.name }]
         : [],
     ),

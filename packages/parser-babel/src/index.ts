@@ -511,6 +511,13 @@ function expression(
     const left = node(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
+    const name = identifierName(left);
+    if (name != null) {
+      const assigned = expression(context, right);
+      return assigned == null
+        ? undefined
+        : { ...located, kind: "binding-set", name, value: assigned };
+    }
     const member = memberParts(context, left);
     const assigned = expression(context, right);
     return member == null || assigned == null
@@ -595,11 +602,11 @@ function statement(
       : { ...located, expression: converted, kind: "expression" };
   }
   if (value.type === "VariableDeclaration") {
-    if (value.kind !== "const") {
+    if (value.kind !== "const" && value.kind !== "let") {
       return unsupported(
         context,
         value,
-        "Only const declarations are supported.",
+        "Only const and let declarations are supported.",
       );
     }
     const declarations = nodes(value.declarations);
@@ -626,7 +633,7 @@ function statement(
     if (initializer == null) return undefined;
     const hint = typeHint(context, identifier.typeAnnotation);
     if (context.diagnostics.length > 0) return undefined;
-    return { ...located, hint, initializer, kind: "const", name };
+    return { ...located, hint, initializer, kind: value.kind, name };
   }
   if (value.type === "ReturnStatement") {
     if (!functionBody) {

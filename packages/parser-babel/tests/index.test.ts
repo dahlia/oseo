@@ -156,7 +156,7 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
 });
 
 const unsupportedForms = [
-  ["assignment", "let value = 1;"],
+  ["compound assignment", "let value = 1; value += 1;"],
   ["loop", "while (true) {}"],
   ["nested function", "function outer() { function inner() {} }"],
   ["function value", "function value() {} const copy = value;"],

@@ -49,6 +49,15 @@ interface Fixture {
 
 const fixtures: readonly Fixture[] = [
   {
+    name: "mutable-bindings",
+    source: `
+let value = 1;
+console.log(value);
+value = value + 2;
+console.log(value, value = 4, value);
+`,
+  },
+  {
     name: "arrays",
     source: `
 const values = [1, , 3];
