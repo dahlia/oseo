@@ -1182,6 +1182,10 @@ static OseoResult value_string(OseoContext *context, OseoValue value) {
     return allocate_string(context, units, length);
 }
 
+OseoResult oseo_property_key(OseoContext *context, OseoValue value) {
+    return value_string(context, value);
+}
+
 OseoResult oseo_negate(OseoContext *context, OseoValue value) {
     OseoResult number = to_number(context, value);
     if (number.status != OSEO_STATUS_NORMAL) return number;

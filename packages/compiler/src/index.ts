@@ -924,6 +924,7 @@ export interface MirOperation {
     | "guard-smi"
     | "join"
     | "object-create"
+    | "property-key"
     | "property-delete"
     | "property-get"
     | "property-set"
@@ -1038,6 +1039,37 @@ function recordRoot(
 ): number {
   appendMirMetadata(builder, "root-store", `slot %${value}`, [value], range);
   return value;
+}
+
+function lowerPropertyKey(
+  expression: HirExpression,
+  builder: MirBuilder,
+): number {
+  const input = lowerExpression(expression, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "primitive property-key conversion",
+    [input],
+    expression.range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "ToPropertyKey for admitted primitives",
+    id,
+    kind: "property-key",
+    range: expression.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    expression.range,
+  );
+  return recordRoot(builder, id, expression.range);
 }
 
 function lowerExpression(
@@ -1199,7 +1231,7 @@ function lowerExpression(
     );
     recordRoot(builder, id, expression.range);
     for (const property of expression.properties) {
-      const key = lowerExpression(property.key, builder);
+      const key = lowerPropertyKey(property.key, builder);
       const value = lowerExpression(property.value, builder);
       appendMirMetadata(
         builder,
@@ -1233,7 +1265,7 @@ function lowerExpression(
     expression.kind === "property-delete"
   ) {
     const object = lowerExpression(expression.object, builder);
-    const key = lowerExpression(expression.key, builder);
+    const key = lowerPropertyKey(expression.key, builder);
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -1254,7 +1286,7 @@ function lowerExpression(
   }
   if (expression.kind === "property-set") {
     const object = lowerExpression(expression.object, builder);
-    const key = lowerExpression(expression.key, builder);
+    const key = lowerPropertyKey(expression.key, builder);
     const value = lowerExpression(expression.value, builder);
     appendMirMetadata(
       builder,

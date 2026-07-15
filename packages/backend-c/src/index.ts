@@ -333,6 +333,9 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   if (operation.kind === "object-create") {
     line(state, "result = oseo_object_create(context, oseo_null());");
+  } else if (operation.kind === "property-key") {
+    const input = operationArgument(operation, 0);
+    line(state, `result = oseo_property_key(context, roots[${input}]);`);
   } else {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
@@ -398,6 +401,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitCall(state, operation);
   } else if (
     operation.kind === "object-create" ||
+    operation.kind === "property-key" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||
     operation.kind === "property-set"

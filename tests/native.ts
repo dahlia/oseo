@@ -60,6 +60,11 @@ console.log(value.self === value);
 console.log(value.missing);
 console.log(delete value.first);
 console.log(value.first);
+value[1] = "number";
+value[true] = "boolean";
+value[null] = "null";
+value[undefined] = "undefined";
+console.log(value["1"], value.true, value.null, value.undefined);
 `,
   },
   {

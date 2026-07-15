@@ -152,6 +152,7 @@ OseoResult oseo_environment_set(
     OseoValue value
 );
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
+OseoResult oseo_property_key(OseoContext *context, OseoValue value);
 OseoResult oseo_object_define(
     OseoContext *context,
     OseoValue object,
