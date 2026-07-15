@@ -4,11 +4,11 @@ Oseo roadmap
 Status
 ------
 
-Oseo has completed milestone M2, guarded native specialization with a compiled
-generic fallback. The current implementation plan is the dynamic language core
-in [*PLAN-M3.md*](./PLAN-M3.md). This roadmap uses capability gates rather than
-calendar dates. A milestone is complete only when its exit criteria are
-repeatable in continuous integration.
+Oseo has completed M3: traced ordinary objects and arrays, closures and dynamic
+calls, constructors, explicit abrupt completion, and guarded property reads
+with a compiled generic fallback. The current implementation plan is
+[*PLAN-M4.md*](./PLAN-M4.md). This roadmap uses capability gates rather than
+calendar dates.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -247,6 +247,15 @@ prerequisites listed. They need not all block the first useful M3 release.
  -  Memory-safety tooling reports no known errors in the runtime and generated C
     fixtures.
 
+M3 completion is recorded in
+[*docs/language-profile-m3.md*](./docs/language-profile-m3.md) and
+[*ADR 0008*](./docs/adr/0008-object-layout-and-shapes.md). The generic runtime
+owns descriptors, prototypes, arrays, closures, function objects, constructors,
+and completion propagation. Differential fixtures match Node.js and Deno in
+specialization-disabled and specialization-enabled native modes. The same
+corpus cross-links for AArch64, and the test262 adapter keeps semantic,
+unsupported, expected-negative, and harness results distinct.
+
 
 M4: Modules and asynchronous execution
 --------------------------------------
@@ -435,21 +444,19 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The package scaffold, architecture probes, generic compiler pipeline, native
-runtime, and guarded specialization proof are complete through M2. M3 follows
-the semantic order and acceptance criteria in [*PLAN-M3.md*](./PLAN-M3.md):
+The package scaffold, compiler pipeline, native runtime, arithmetic
+specialization, managed object graph, array semantics, and first property cache
+are complete through M3. M4 follows [*PLAN-M4.md*](./PLAN-M4.md):
 
-1.  Freeze an M3 language profile, object-layout decision, and test262 harness.
-2.  Generalize heap ownership and collector tracing for object graphs.
-3.  Implement complete generic ordinary-object and prototype semantics.
-4.  Add arrays, lexical environments, closures, and function values in
-    prerequisite order.
-5.  Add language-visible exceptions and abrupt control flow.
-6.  Add shape-guarded property access only after generic mutation evidence.
+1.  Freeze the M4 source profile and the module, job, continuation, and event
+    loop records.
+2.  Implement module loading, linking, instantiation, live bindings, and cycles.
+3.  Add namespaces and deterministic whole-graph native linking.
+4.  Implement promises and the native job queue.
+5.  Add asynchronous functions, top-level await, timers, and shutdown rules.
 
-M3 preserves M2 as a permanent invariance gate. Property specialization cannot
-replace unfinished generic object semantics or weaken the checked-addition
-fallback.
+M4 preserves M2 and M3 as permanent invariance gates. New module and async work
+cannot weaken generic primitive, object, array, or property behavior.
 
 
 Risks that affect ordering
