@@ -385,6 +385,14 @@ try { const value = 1; value(); } catch (error) {
 try { null.item; } catch (error) { console.log("null receiver"); }
 try { Object.create(1); } catch (error) { console.log("invalid prototype"); }
 console.log((1).missing, true.missing, "abc".length, "abc"[1]);
+try { tdzRead; } catch (error) { console.log("tdz read"); }
+let tdzRead;
+try { tdzWrite = 1; } catch (error) { console.log("tdz write"); }
+let tdzWrite;
+const immutable = 1;
+try { immutable = 2; } catch (error) { console.log("const write"); }
+if (false) immutable = 3;
+console.log(immutable);
 `,
   },
   {

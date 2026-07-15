@@ -135,6 +135,7 @@ void oseo_collect(OseoContext *context);
 OseoValue oseo_undefined(void);
 OseoValue oseo_uninitialized(void);
 OseoResult oseo_read_binding(OseoContext *context, OseoValue value);
+OseoResult oseo_write_immutable_binding(OseoContext *context);
 OseoValue oseo_null(void);
 OseoValue oseo_boolean(bool value);
 OseoValue oseo_number(double value);

@@ -308,6 +308,7 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly kind: "binding-set";
+      readonly mutable: boolean;
       readonly name: string;
       readonly value: HirExpression;
     })
@@ -556,19 +557,14 @@ function resolveExpression(
       );
       return undefined;
     }
-    if (!binding.mutable) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression,
-          `Cannot assign to const binding '${expression.name}'.`,
-        ),
-      );
-      return undefined;
-    }
     return value == null
       ? undefined
-      : { ...expression, bindingId: binding.id, value };
+      : {
+          ...expression,
+          bindingId: binding.id,
+          mutable: binding.mutable,
+          value,
+        };
   }
   if (expression.kind === "array") {
     const elements: (HirExpression | undefined)[] = [];
@@ -1460,6 +1456,7 @@ export interface MirOperation {
     | "unbox-smi"
     | "unary"
     | "write";
+  readonly mutable?: boolean;
   readonly checkedResult?: number;
   readonly abruptTarget?: number;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
@@ -1638,8 +1635,16 @@ function lowerExpression(
       detail: `%b${expression.bindingId} ${expression.name}`,
       id,
       kind: "write",
+      mutable: expression.mutable,
       range: expression.range,
     });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "function") {

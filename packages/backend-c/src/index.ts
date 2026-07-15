@@ -178,6 +178,10 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = roots[${value}];`);
   location(state, operation.range);
   state.usesAbrupt = true;
+  if (operation.mutable === false) {
+    line(state, "result = oseo_write_immutable_binding(context);");
+    return;
+  }
   line(
     state,
     `result = oseo_environment_get(context, ` +
@@ -188,7 +192,6 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
     state,
     `result = oseo_cell_set(context, result.value, roots[${value}]);`,
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
 }
 
 function emitInitialize(state: EmitState, operation: MirOperation): void {

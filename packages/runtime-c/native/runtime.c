@@ -137,6 +137,14 @@ static OseoResult language_failure(void) {
     return result;
 }
 
+static OseoResult language_failure_message(
+    OseoContext *context,
+    const char *message
+) {
+    context->error_message = message;
+    return language_failure();
+}
+
 static uint64_t double_bits(double value) {
     uint64_t bits;
     memcpy(&bits, &value, sizeof(bits));
@@ -453,13 +461,19 @@ OseoValue oseo_uninitialized(void) {
 
 OseoResult oseo_read_binding(OseoContext *context, OseoValue value) {
     if (tag_of(value) == OSEO_TAG_UNINITIALIZED) {
-        return failure(
+        return language_failure_message(
             context,
-            "OSEO2001",
             "Binding is read before initialization."
         );
     }
     return normal(value);
+}
+
+OseoResult oseo_write_immutable_binding(OseoContext *context) {
+    return language_failure_message(
+        context,
+        "Cannot assign to an immutable binding."
+    );
 }
 
 OseoValue oseo_null(void) {
@@ -661,9 +675,8 @@ OseoResult oseo_cell_set(
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
     if (tag_of(cell_object(cell_value)->value) == OSEO_TAG_UNINITIALIZED) {
-        return failure(
+        return language_failure_message(
             context,
-            "OSEO2001",
             "Binding was assigned before initialization."
         );
     }
