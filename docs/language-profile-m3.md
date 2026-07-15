@@ -4,9 +4,11 @@ M3 dynamic language profile
 Status
 ------
 
-This document freezes the source profile implemented by M3. It extends
+This document freezes the source profile implemented for M3. It extends
 [*language-profile-m1.md*](./language-profile-m1.md). M2 specialization remains
-removable as described by [*specialization-m2.md*](./specialization-m2.md).
+removable as described by [*specialization-m2.md*](./specialization-m2.md). The
+profile implementation is not a milestone-completion claim: executable
+test262 subset evidence remains outstanding in [*PLAN-M3.md*](../PLAN-M3.md).
 
 
 Program and value model
@@ -102,11 +104,12 @@ cached slot. Disabling specialization preserves observable behavior.
 Test262 evidence
 ----------------
 
-The repository adapter records suite revision, path, frontmatter features,
-strictness modes, harness includes, expected phase, and actual observation.
-Results are classified as pass, semantic failure, unsupported profile feature,
-expected parse failure, or harness failure. Unsupported and harness cases never
-increase the pass count.
+The repository classification model records suite revision, path, frontmatter
+features, strictness modes, harness includes, expected phase, and actual
+observation. Results are classified as pass, semantic failure, unsupported
+profile feature, expected parse failure, or harness failure. Unsupported and
+harness cases never increase the pass count. An executable runner, pinned suite
+revision, reviewed subset, and checked-in result manifest are still required.
 
 
 Negative profile boundaries

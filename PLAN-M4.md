@@ -4,9 +4,11 @@ M4 plan for modules and asynchronous execution
 Status
 ------
 
-Implementation status: ready, not started. M3 established traced objects,
+Implementation status: draft, not started. M3 has implemented traced objects,
 arrays, function values, closures, dynamic calls, constructors, explicit
-abrupt completion, and removable guarded specialization.
+abrupt completion, and removable guarded specialization, but its executable
+test262 evidence gate remains open. This plan becomes active only after
+[*PLAN-M3.md*](./PLAN-M3.md) reaches every exit criterion.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md), the frozen language
