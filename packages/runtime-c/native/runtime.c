@@ -21,15 +21,27 @@
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
+    OSEO_HEAP_ENVIRONMENT = 2,
 } OseoHeapKind;
 
 struct OseoHeapObject {
     OseoHeapObject *next;
-    size_t length;
     OseoHeapKind kind;
     bool marked;
-    uint16_t units[];
+    bool traced;
 };
+
+typedef struct {
+    OseoHeapObject header;
+    size_t length;
+    uint16_t units[];
+} OseoString;
+
+typedef struct {
+    OseoHeapObject header;
+    size_t slot_count;
+    OseoValue slots[];
+} OseoEnvironment;
 
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
@@ -46,6 +58,14 @@ static uint64_t tag_of(OseoValue value) {
 static OseoHeapObject *heap_object(OseoValue value) {
     uintptr_t address = (uintptr_t)(value & OSEO_PAYLOAD_MASK);
     return (OseoHeapObject *)address;
+}
+
+static OseoString *string_object(OseoValue value) {
+    return (OseoString *)heap_object(value);
+}
+
+static OseoEnvironment *environment_object(OseoValue value) {
+    return (OseoEnvironment *)heap_object(value);
 }
 
 static OseoResult normal(OseoValue value) {
@@ -85,6 +105,11 @@ static bool is_string(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_STRING;
 }
 
+static bool is_environment(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_ENVIRONMENT;
+}
+
 static int64_t smi_value(OseoValue value) {
     uint64_t payload = value & OSEO_PAYLOAD_MASK;
     if ((payload & UINT64_C(0x0000800000000000)) != 0u) {
@@ -104,6 +129,14 @@ static void mark_value(OseoValue value) {
     object->marked = true;
 }
 
+static void trace_object(OseoHeapObject *object) {
+    if (object->kind != OSEO_HEAP_ENVIRONMENT) return;
+    OseoEnvironment *environment = (OseoEnvironment *)object;
+    for (size_t index = 0u; index < environment->slot_count; index += 1u) {
+        mark_value(environment->slots[index]);
+    }
+}
+
 void oseo_collect(OseoContext *context) {
     if (context->observe_specialization) context->collections += 1u;
     for (OseoRootFrame *frame = context->roots;
@@ -113,11 +146,25 @@ void oseo_collect(OseoContext *context) {
             mark_value(frame->slots[index]);
         }
     }
+    bool traced_object;
+    do {
+        traced_object = false;
+        for (OseoHeapObject *object = context->objects;
+             object != NULL;
+             object = object->next) {
+            if (object->marked && !object->traced) {
+                object->traced = true;
+                trace_object(object);
+                traced_object = true;
+            }
+        }
+    } while (traced_object);
     OseoHeapObject **link = &context->objects;
     while (*link != NULL) {
         OseoHeapObject *object = *link;
         if (object->marked) {
             object->marked = false;
+            object->traced = false;
             link = &object->next;
         } else {
             *link = object->next;
@@ -146,10 +193,17 @@ void oseo_context_init(
     context->overflow_misses = 0u;
     context->generic_addition_calls = 0u;
     context->allocations = 0u;
+    context->allocation_attempts = 0u;
     context->collections = 0u;
+    context->fail_allocation_at = 0u;
     context->observe_specialization = false;
     context->collect_every_safepoint =
         getenv("OSEO_GC_EVERY_SAFEPOINT") != NULL;
+}
+
+void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt) {
+    context->allocation_attempts = 0u;
+    context->fail_allocation_at = attempt;
 }
 
 void oseo_context_destroy(OseoContext *context) {
@@ -329,24 +383,25 @@ bool oseo_to_boolean(OseoValue value) {
         double number = number_value(value);
         return number != 0.0 && !isnan(number);
     }
-    if (is_string(value)) return heap_object(value)->length != 0u;
-    return false;
+    if (is_string(value)) return string_object(value)->length != 0u;
+    return tag == OSEO_TAG_HEAP;
 }
 
-static OseoResult allocate_string(
-    OseoContext *context,
-    const uint16_t *units,
-    size_t length
-) {
+static void *allocate_heap_bytes(OseoContext *context, size_t size) {
     if (context->collect_every_safepoint) oseo_collect(context);
-    if (length > (SIZE_MAX - sizeof(OseoHeapObject)) / sizeof(uint16_t)) {
-        return failure(context, "OSEO2001", "String allocation is too large.");
+    context->allocation_attempts += 1u;
+    if (context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at) {
+        return NULL;
     }
-    size_t size = sizeof(OseoHeapObject) + length * sizeof(uint16_t);
-    OseoHeapObject *object = malloc(size);
-    if (object == NULL) {
-        return failure(context, "OSEO2001", "String allocation failed.");
-    }
+    return malloc(size);
+}
+
+static OseoResult publish_heap(
+    OseoContext *context,
+    OseoHeapObject *object,
+    OseoHeapKind kind
+) {
     uintptr_t address = (uintptr_t)object;
     if (address == 0u || address > OSEO_PAYLOAD_MASK) {
         free(object);
@@ -357,13 +412,30 @@ static OseoResult allocate_string(
         );
     }
     object->next = context->objects;
-    object->length = length;
-    object->kind = OSEO_HEAP_STRING;
+    object->kind = kind;
     object->marked = false;
-    if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
+    object->traced = false;
     context->objects = object;
     if (context->observe_specialization) context->allocations += 1u;
     return normal(tagged(OSEO_TAG_HEAP, (uint64_t)address));
+}
+
+static OseoResult allocate_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+) {
+    if (length > (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t)) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
+    size_t size = sizeof(OseoString) + length * sizeof(uint16_t);
+    OseoString *object = allocate_heap_bytes(context, size);
+    if (object == NULL) {
+        return failure(context, "OSEO2001", "String allocation failed.");
+    }
+    object->length = length;
+    if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
+    return publish_heap(context, &object->header, OSEO_HEAP_STRING);
 }
 
 OseoResult oseo_string_from_units(
@@ -372,6 +444,64 @@ OseoResult oseo_string_from_units(
     size_t length
 ) {
     return allocate_string(context, units, length);
+}
+
+OseoResult oseo_environment_create(OseoContext *context, size_t slot_count) {
+    if (slot_count >
+        (SIZE_MAX - sizeof(OseoEnvironment)) / sizeof(OseoValue)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Environment allocation is too large."
+        );
+    }
+    size_t size = sizeof(OseoEnvironment) +
+        slot_count * sizeof(OseoValue);
+    OseoEnvironment *environment = allocate_heap_bytes(context, size);
+    if (environment == NULL) {
+        return failure(context, "OSEO2001", "Environment allocation failed.");
+    }
+    environment->slot_count = slot_count;
+    for (size_t index = 0u; index < slot_count; index += 1u) {
+        environment->slots[index] = oseo_undefined();
+    }
+    return publish_heap(
+        context,
+        &environment->header,
+        OSEO_HEAP_ENVIRONMENT
+    );
+}
+
+OseoResult oseo_environment_get(
+    OseoContext *context,
+    OseoValue environment_value,
+    size_t index
+) {
+    if (!is_environment(environment_value)) {
+        return failure(context, "OSEO2001", "Value is not an environment.");
+    }
+    OseoEnvironment *environment = environment_object(environment_value);
+    if (index >= environment->slot_count) {
+        return failure(context, "OSEO2001", "Environment index is invalid.");
+    }
+    return normal(environment->slots[index]);
+}
+
+OseoResult oseo_environment_set(
+    OseoContext *context,
+    OseoValue environment_value,
+    size_t index,
+    OseoValue value
+) {
+    if (!is_environment(environment_value)) {
+        return failure(context, "OSEO2001", "Value is not an environment.");
+    }
+    OseoEnvironment *environment = environment_object(environment_value);
+    if (index >= environment->slot_count) {
+        return failure(context, "OSEO2001", "Environment index is invalid.");
+    }
+    environment->slots[index] = value;
+    return normal(value);
 }
 
 static bool numeric_whitespace(uint16_t unit) {
@@ -460,7 +590,7 @@ static double prefixed_integer(
 
 static OseoResult string_number(
     OseoContext *context,
-    const OseoHeapObject *string
+    const OseoString *string
 ) {
     size_t start = 0u;
     size_t end_index = string->length;
@@ -557,7 +687,7 @@ static OseoResult to_number(OseoContext *context, OseoValue value) {
         return normal(oseo_number(number));
     }
     if (is_string(value)) {
-        return string_number(context, heap_object(value));
+        return string_number(context, string_object(value));
     }
     return normal(oseo_number(NAN));
 }
@@ -796,10 +926,10 @@ OseoResult oseo_add(
         return right_string;
     }
     slots[1] = right_string.value;
-    OseoHeapObject *left_object = heap_object(slots[0]);
-    OseoHeapObject *right_object = heap_object(slots[1]);
+    OseoString *left_object = string_object(slots[0]);
+    OseoString *right_object = string_object(slots[1]);
     size_t maximum_length =
-        (SIZE_MAX - sizeof(OseoHeapObject)) / sizeof(uint16_t);
+        (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t);
     if (left_object->length > maximum_length ||
         right_object->length > maximum_length - left_object->length) {
         oseo_roots_pop(context, &frame);
@@ -875,8 +1005,8 @@ static bool strict_equal_value(OseoValue left, OseoValue right) {
     }
     if (left_tag == OSEO_TAG_BOOLEAN) return (left & 1u) == (right & 1u);
     if (is_string(left) && is_string(right)) {
-        OseoHeapObject *left_string = heap_object(left);
-        OseoHeapObject *right_string = heap_object(right);
+        OseoString *left_string = string_object(left);
+        OseoString *right_string = string_object(right);
         return left_string->length == right_string->length &&
             memcmp(
                 left_string->units,
@@ -906,8 +1036,8 @@ OseoResult oseo_not_strict_equal(
 }
 
 static int compare_strings(
-    const OseoHeapObject *left,
-    const OseoHeapObject *right
+    const OseoString *left,
+    const OseoString *right
 ) {
     size_t length = left->length < right->length
         ? left->length
@@ -928,7 +1058,7 @@ static OseoResult relational(
     char operator
 ) {
     if (is_string(left) && is_string(right)) {
-        int order = compare_strings(heap_object(left), heap_object(right));
+        int order = compare_strings(string_object(left), string_object(right));
         bool result;
         if (operator == '<') result = order < 0;
         else if (operator == 'l') result = order <= 0;
@@ -1010,7 +1140,7 @@ static int write_code_point(uint32_t point) {
 }
 
 static int write_string(OseoValue value) {
-    OseoHeapObject *string = heap_object(value);
+    OseoString *string = string_object(value);
     for (size_t index = 0u; index < string->length; index += 1u) {
         uint32_t point = string->units[index];
         if (point >= UINT32_C(0xd800) && point <= UINT32_C(0xdbff) &&

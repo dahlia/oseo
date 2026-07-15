@@ -42,7 +42,9 @@ typedef struct {
     size_t overflow_misses;
     size_t generic_addition_calls;
     size_t allocations;
+    size_t allocation_attempts;
     size_t collections;
+    size_t fail_allocation_at;
     bool observe_specialization;
     bool collect_every_safepoint;
 } OseoContext;
@@ -93,6 +95,7 @@ void oseo_context_init(
     size_t source_id_length
 );
 void oseo_context_destroy(OseoContext *context);
+void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt);
 void oseo_context_location(
     OseoContext *context,
     size_t line,
@@ -128,6 +131,18 @@ OseoResult oseo_string_from_units(
     OseoContext *context,
     const uint16_t *units,
     size_t length
+);
+OseoResult oseo_environment_create(OseoContext *context, size_t slot_count);
+OseoResult oseo_environment_get(
+    OseoContext *context,
+    OseoValue environment,
+    size_t index
+);
+OseoResult oseo_environment_set(
+    OseoContext *context,
+    OseoValue environment,
+    size_t index,
+    OseoValue value
 );
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_add(

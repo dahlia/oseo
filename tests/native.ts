@@ -655,8 +655,8 @@ const concatenationOverflowHost = {
       return source;
     }
     const injected = source.replace(
-      "OseoHeapObject *right_object = heap_object(slots[1]);",
-      "OseoHeapObject *right_object = heap_object(slots[1]);\n" +
+      "OseoString *right_object = string_object(slots[1]);",
+      "OseoString *right_object = string_object(slots[1]);\n" +
         "    right_object->length = SIZE_MAX;",
     );
     assert.notEqual(injected, source, "concatenation overflow injected");
