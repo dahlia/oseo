@@ -157,7 +157,6 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
 
 const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
-  ["loop", "while (true) {}"],
   ["nested function", "function outer() { function inner() {} }"],
   ["function value", "function value() {} const copy = value;"],
   ["property", "console.error(1);"],
@@ -180,8 +179,6 @@ const unsupportedForms = [
     "function identity(value: number) { return value; } identity<number>(1);",
   ],
   ["console.log type arguments", 'console.log<string>("value");'],
-  ["top-level block", "{ console.log(1); }"],
-  ["top-level if", "if (true) console.log(1);"],
 ] as const;
 
 for (const [name, source] of unsupportedForms) {

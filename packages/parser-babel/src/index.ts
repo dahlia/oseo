@@ -635,6 +635,30 @@ function statement(
     if (context.diagnostics.length > 0) return undefined;
     return { ...located, hint, initializer, kind: value.kind, name };
   }
+  if (value.type === "BreakStatement" || value.type === "ContinueStatement") {
+    if (value.label != null) {
+      return unsupported(
+        context,
+        value,
+        "Labeled control flow is unsupported.",
+      );
+    }
+    return {
+      ...located,
+      kind: value.type === "BreakStatement" ? "break" : "continue",
+    };
+  }
+  if (value.type === "WhileStatement") {
+    const testNode = node(value.test);
+    const bodyNode = node(value.body);
+    if (testNode == null || bodyNode == null)
+      return unsupported(context, value);
+    const test = expression(context, testNode);
+    const body = statement(context, bodyNode, functionBody);
+    return test == null || body == null
+      ? undefined
+      : { ...located, body, kind: "while", test };
+  }
   if (value.type === "ReturnStatement") {
     if (!functionBody) {
       return unsupported(
@@ -650,13 +674,6 @@ function statement(
     return { ...located, expression: converted, kind: "return" };
   }
   if (value.type === "BlockStatement") {
-    if (!functionBody) {
-      return unsupported(
-        context,
-        value,
-        "Top-level blocks are outside the M1 profile.",
-      );
-    }
     const body: SyntaxStatement[] = [];
     for (const child of nodes(value.body)) {
       const converted = statement(context, child, functionBody);
@@ -666,13 +683,6 @@ function statement(
     return { ...located, body, kind: "block" };
   }
   if (value.type === "IfStatement") {
-    if (!functionBody) {
-      return unsupported(
-        context,
-        value,
-        "Top-level if statements are outside the M1 profile.",
-      );
-    }
     const testNode = node(value.test);
     const consequentNode = node(value.consequent);
     const alternateNode = node(value.alternate);

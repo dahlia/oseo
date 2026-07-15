@@ -169,6 +169,12 @@ export type SyntaxStatement =
       readonly kind: "block";
     })
   | (LocatedSyntax & {
+      readonly kind: "break";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "continue";
+    })
+  | (LocatedSyntax & {
       readonly hint: Hint | undefined;
       readonly initializer: SyntaxExpression;
       readonly kind: "const";
@@ -193,6 +199,11 @@ export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly expression: SyntaxExpression | undefined;
       readonly kind: "return";
+    })
+  | (LocatedSyntax & {
+      readonly body: SyntaxStatement;
+      readonly kind: "while";
+      readonly test: SyntaxExpression;
     });
 
 /** A top-level function declaration in owned syntax. */
@@ -317,6 +328,12 @@ export type HirStatement =
       readonly kind: "block";
     })
   | (LocatedSyntax & {
+      readonly kind: "break";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "continue";
+    })
+  | (LocatedSyntax & {
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
@@ -343,6 +360,11 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly expression: HirExpression | undefined;
       readonly kind: "return";
+    })
+  | (LocatedSyntax & {
+      readonly body: HirStatement;
+      readonly kind: "while";
+      readonly test: HirExpression;
     });
 
 /** A resolved function parameter. */
@@ -649,13 +671,20 @@ function resolveStatementList(
   state: ResolveState,
   functionBody: boolean,
   existingLocal?: Map<string, Binding>,
+  loopDepth = 0,
 ): readonly HirStatement[] {
   const local = existingLocal ?? new Map<string, Binding>();
   if (existingLocal == null) predeclareBindings(statements, local, state);
   const scopes = [...parentScopes, local];
   const result: HirStatement[] = [];
   for (const statement of statements) {
-    const resolved = resolveStatement(statement, scopes, state, functionBody);
+    const resolved = resolveStatement(
+      statement,
+      scopes,
+      state,
+      functionBody,
+      loopDepth,
+    );
     if (resolved != null) result.push(resolved);
   }
   return result;
@@ -666,6 +695,7 @@ function resolveStatement(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
   functionBody: boolean,
+  loopDepth = 0,
 ): HirStatement | undefined {
   if (statement.kind === "const" || statement.kind === "let") {
     const initializer = resolveExpression(statement.initializer, scopes, state);
@@ -695,11 +725,44 @@ function resolveStatement(
     if (statement.expression != null && expression == null) return undefined;
     return { ...statement, expression };
   }
+  if (statement.kind === "break" || statement.kind === "continue") {
+    if (loopDepth === 0) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `A ${statement.kind} statement requires an enclosing loop.`,
+        ),
+      );
+      return undefined;
+    }
+    return statement;
+  }
   if (statement.kind === "block") {
     return {
       ...statement,
-      body: resolveStatementList(statement.body, scopes, state, functionBody),
+      body: resolveStatementList(
+        statement.body,
+        scopes,
+        state,
+        functionBody,
+        undefined,
+        loopDepth,
+      ),
     };
+  }
+  if (statement.kind === "while") {
+    const test = resolveExpression(statement.test, scopes, state);
+    const body = resolveStatement(
+      statement.body,
+      scopes,
+      state,
+      functionBody,
+      loopDepth + 1,
+    );
+    return test == null || body == null
+      ? undefined
+      : { ...statement, body, test };
   }
   const test = resolveExpression(statement.test, scopes, state);
   const consequent = resolveStatement(
@@ -707,11 +770,18 @@ function resolveStatement(
     scopes,
     state,
     functionBody,
+    loopDepth,
   );
   const alternate =
     statement.alternate == null
       ? undefined
-      : resolveStatement(statement.alternate, scopes, state, functionBody);
+      : resolveStatement(
+          statement.alternate,
+          scopes,
+          state,
+          functionBody,
+          loopDepth,
+        );
   if (test == null || consequent == null) return undefined;
   if (statement.alternate != null && alternate == null) return undefined;
   return { ...statement, alternate, consequent, test };
@@ -915,6 +985,13 @@ function appendHirStatement(
     for (const child of statement.body) {
       appendHirStatement(lines, child, `${indent}  `);
     }
+  } else if (statement.kind === "break" || statement.kind === "continue") {
+    lines.push(`${indent}${statement.kind}${location}`);
+  } else if (statement.kind === "while") {
+    lines.push(
+      `${indent}while ${printHirExpression(statement.test)}${location}`,
+    );
+    appendHirStatement(lines, statement.body, `${indent}  `);
   } else {
     lines.push(`${indent}if ${printHirExpression(statement.test)}${location}`);
     appendHirStatement(lines, statement.consequent, `${indent}  `);
@@ -1104,6 +1181,10 @@ interface MutableMirBlock {
 
 interface MirBuilder {
   readonly blocks: MutableMirBlock[];
+  readonly loops: {
+    readonly breakTarget: number;
+    readonly continueTarget: number;
+  }[];
   current: MutableMirBlock;
   nextValue: number;
 }
@@ -1569,6 +1650,55 @@ function lowerStatements(
       return true;
     } else if (statement.kind === "block") {
       if (lowerStatements(statement.body, builder)) return true;
+    } else if (statement.kind === "break" || statement.kind === "continue") {
+      const loop = builder.loops.at(-1);
+      if (loop == null) throw new Error(`${statement.kind} has no MIR loop.`);
+      builder.current.terminator = {
+        kind: "jump",
+        target:
+          statement.kind === "break" ? loop.breakTarget : loop.continueTarget,
+      };
+      return true;
+    } else if (statement.kind === "while") {
+      const conditionBlock = createMirBlock(builder);
+      const bodyBlock = createMirBlock(builder);
+      const exitBlock = createMirBlock(builder);
+      builder.current.terminator = {
+        kind: "jump",
+        target: conditionBlock.id,
+      };
+      builder.current = conditionBlock;
+      const test = lowerExpression(statement.test, builder);
+      builder.current.terminator = {
+        kind: "branch",
+        test,
+        whenFalse: exitBlock.id,
+        whenTrue: bodyBlock.id,
+      };
+      builder.loops.push({
+        breakTarget: exitBlock.id,
+        continueTarget: conditionBlock.id,
+      });
+      builder.current = bodyBlock;
+      const terminated = lowerStatements(
+        statementBody(statement.body),
+        builder,
+      );
+      builder.loops.pop();
+      if (!terminated) {
+        builder.current.terminator = {
+          kind: "jump",
+          target: conditionBlock.id,
+        };
+      }
+      builder.current = exitBlock;
+      appendMirMetadata(
+        builder,
+        "join",
+        `while bb${conditionBlock.id}`,
+        [],
+        statement.range,
+      );
     } else {
       const test = lowerExpression(statement.test, builder);
       const consequentBlock = createMirBlock(builder);
@@ -1659,6 +1789,7 @@ function buildMirFunction(
   const builder: MirBuilder = {
     blocks: [entry],
     current: entry,
+    loops: [],
     nextValue: 0,
   };
   const returned = lowerStatements(body, builder);

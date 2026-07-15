@@ -49,6 +49,20 @@ interface Fixture {
 
 const fixtures: readonly Fixture[] = [
   {
+    name: "loops",
+    source: `
+let value = 0;
+let total = 0;
+while (value < 6) {
+  value = value + 1;
+  if (value === 2) continue;
+  if (value === 5) break;
+  total = total + value;
+}
+console.log(value, total);
+`,
+  },
+  {
     name: "mutable-bindings",
     source: `
 let value = 1;
