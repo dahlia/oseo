@@ -79,6 +79,10 @@ export type SyntaxCallTarget =
       readonly name: string;
     })
   | (LocatedSyntax & {
+      readonly callee: SyntaxExpression;
+      readonly kind: "dynamic";
+    })
+  | (LocatedSyntax & {
       readonly key: SyntaxExpression;
       readonly kind: "property";
       readonly object: SyntaxExpression;
@@ -539,6 +543,23 @@ function findBinding(
   return undefined;
 }
 
+function shadowedMethodTarget(
+  binding: Binding,
+  key: string,
+  range: SourceRange,
+): HirCallTarget {
+  return {
+    key: { kind: "string", range, value: key },
+    kind: "method",
+    object: {
+      bindingId: binding.id,
+      kind: "binding",
+      name: binding.name,
+      range,
+    },
+  };
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -693,31 +714,19 @@ function resolveExpression(
   let target: HirCallTarget;
   if (expression.target.kind === "console-log") {
     const binding = findBinding(scopes, "console");
-    if (binding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          "The console.log target resolves through the 'console' binding; " +
-            "property calls are outside the M1 profile.",
-        ),
-      );
-      return undefined;
-    }
-    target = { kind: "console-log" };
+    target =
+      binding == null
+        ? { kind: "console-log" }
+        : shadowedMethodTarget(binding, "log", expression.target.range);
   } else if (expression.target.kind === "object-intrinsic") {
     const binding = findBinding(scopes, "Object");
     if (binding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression.target,
-          "The Object intrinsic is shadowed by a lexical binding.",
-        ),
+      target = shadowedMethodTarget(
+        binding,
+        expression.target.method,
+        expression.target.range,
       );
-      return undefined;
-    }
-    if (
+    } else if (
       expression.target.method === "create" &&
       expression.arguments.length > 1
     ) {
@@ -733,11 +742,12 @@ function resolveExpression(
         ),
       );
       return undefined;
+    } else {
+      target = {
+        kind: "object-intrinsic",
+        method: expression.target.method,
+      };
     }
-    target = {
-      kind: "object-intrinsic",
-      method: expression.target.method,
-    };
   } else if (expression.target.kind === "name") {
     const callee = resolveExpression(
       {
@@ -748,6 +758,10 @@ function resolveExpression(
       scopes,
       state,
     );
+    if (callee == null) return undefined;
+    target = { callee, kind: "dynamic" };
+  } else if (expression.target.kind === "dynamic") {
+    const callee = resolveExpression(expression.target.callee, scopes, state);
     if (callee == null) return undefined;
     target = { callee, kind: "dynamic" };
   } else {

@@ -113,16 +113,37 @@ test("preserves shadowable primitive global names as identifiers", () => {
 
 test("resolves console.log through lexical scope", () => {
   for (const source of [
-    'function write(console) { console.log("x"); } write(null);',
-    'const console = null; console.log("x");',
+    "function write(console) { console.log('x'); } " +
+      "write({ log: function () {} });",
+    "const console = { log: function () {} }; console.log('x');",
   ]) {
     const result = compileSource(babelFrontend, {
       source,
       sourceId: "shadowed-console.ts",
     });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", /property/u);
+    assert.deepEqual(result.diagnostics, []);
   }
+});
+
+test("resolves shadowed Object methods through lexical scope", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function make(Object) { return Object.create(1, 2); } " +
+      "make({ create: function (left, right) { return left + right; } });",
+    sourceId: "shadowed-object.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("accepts expression-valued dynamic call targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "(function () { return 42; })(); " +
+      "function factory() { return function () { return 43; }; } " +
+      "factory()();",
+    sourceId: "dynamic-calls.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
 });
 
 test("accepts parenthesized direct call targets", () => {

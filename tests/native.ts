@@ -63,6 +63,11 @@ console.log(first.read(), first.increment(), first.read());
 console.log(second.increment(), second.read(), first.read());
 const identity = function (value) { return value; };
 console.log(identity("function expression"));
+console.log((function () { return 42; })());
+function makeFunction() {
+  return function () { return "nested call"; };
+}
+console.log(makeFunction()());
 const factorial = function recur(value) {
   if (value === 0) return 1;
   return value * recur(value - 1);
@@ -73,6 +78,21 @@ const receiver = {
   read: function () { return this.value; },
 };
 console.log(receiver.read());
+const localObject = {
+  marker: "shadowed Object",
+  keys: function () { return [this.marker]; },
+  create: function (left, right) { return left + right; },
+};
+function callObject(Object) {
+  console.log(Object.keys({})[0], Object.create(1, 2));
+}
+callObject(localObject);
+const localConsole = {
+  prefix: "shadowed console",
+  log: function (value) { console.log(this.prefix, value); },
+};
+function callConsole(console) { console.log("message"); }
+callConsole(localConsole);
 `,
   },
   {

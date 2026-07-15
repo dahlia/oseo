@@ -349,11 +349,10 @@ function callTarget(
   const name = identifierName(value);
   if (name != null) return { ...location(context, value), kind: "name", name };
   if (value.type !== "MemberExpression") {
-    return unsupported(
-      context,
-      value,
-      "Only direct function calls and console.log are supported.",
-    );
+    const callee = expression(context, value);
+    return callee == null
+      ? undefined
+      : { ...location(context, value), callee, kind: "dynamic" };
   }
   const object = node(value.object);
   const property = node(value.property);

@@ -312,7 +312,7 @@ test("resolves script bindings from declared functions", () => {
   );
 });
 
-test("shadows intrinsic globals with script bindings inside functions", () => {
+test("lowers shadowed intrinsic globals as methods", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -347,8 +347,20 @@ test("shadows intrinsic globals with script bindings inside functions", () => {
     sourceId: "script-console.ts",
   };
   const result = buildHir(syntax);
-  assert.equal(result.program, undefined);
-  assert.match(result.diagnostics[0]?.message ?? "", /console.*binding/u);
+  assert.deepEqual(result.diagnostics, []);
+  const statement = result.program?.functions[0]?.body[0];
+  assert.equal(statement?.kind, "expression");
+  if (statement?.kind !== "expression") return;
+  assert.equal(statement.expression.kind, "call");
+  if (statement.expression.kind !== "call") return;
+  assert.equal(statement.expression.target.kind, "method");
+  if (statement.expression.target.kind !== "method") return;
+  assert.equal(statement.expression.target.object.kind, "binding");
+  assert.deepEqual(statement.expression.target.key, {
+    kind: "string",
+    range,
+    value: "log",
+  });
 });
 
 test("resolves declared functions as primitive-global bindings", () => {
