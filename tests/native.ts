@@ -217,6 +217,37 @@ console.log(detached.missing);
 `,
   },
   {
+    name: "descriptor-redefinition",
+    source: `
+const value = { item: 7 };
+Object.defineProperty(value, "item", { writable: false });
+const descriptor = Object.getOwnPropertyDescriptor(value, "item");
+console.log(
+  descriptor.value,
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+);
+const values = [];
+Object.defineProperty(values, "4", {
+  value: 4,
+  configurable: false,
+});
+Object.defineProperty(values, "2", {
+  value: 2,
+  configurable: true,
+});
+try {
+  Object.defineProperty(values, "length", { value: 1 });
+} catch (error) {
+  console.log("length rejected");
+}
+console.log(values.length, values[2], values[4]);
+Object.defineProperty(values, "length", { writable: false });
+console.log(values.length);
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
@@ -781,6 +812,24 @@ assert.equal(objectCoercion.stdout, "");
 assert.match(
   objectCoercion.stderr,
   /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
+);
+
+const accessorDescriptor = await runNativeCli(
+  {
+    args: ["accessor-descriptor.ts"],
+    source:
+      'Object.defineProperty({}, "item", {' +
+      " get: function () { return 42; } });",
+    sourceId: "accessor-descriptor.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(accessorDescriptor.exitStatus, 1);
+assert.equal(accessorDescriptor.stdout, "");
+assert.match(
+  accessorDescriptor.stderr,
+  /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
 );
 
 const nulSourceId = "source\0identifier.ts";

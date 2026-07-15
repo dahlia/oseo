@@ -224,6 +224,48 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
         require_normal(oseo_object_get(context, roots[0], roots[1])) ==
         oseo_number(1.0)
     );
+    roots[0] = require_normal(oseo_array_create(context, 0u));
+    roots[1] = make_text(context, "4");
+    roots[2] = make_text(context, "2");
+    roots[3] = make_text(context, "length");
+    OseoPropertyAttributes retained = {false, true, true};
+    OseoPropertyAttributes removable = {true, true, true};
+    (void)require_normal(
+        oseo_object_define(
+            context,
+            roots[0],
+            roots[1],
+            oseo_number(4.0),
+            retained
+        )
+    );
+    (void)require_normal(
+        oseo_object_define(
+            context,
+            roots[0],
+            roots[2],
+            oseo_number(2.0),
+            removable
+        )
+    );
+    assert(
+        oseo_object_set(
+            context,
+            roots[0],
+            roots[3],
+            oseo_number(1.0)
+        ).status == OSEO_STATUS_THROW
+    );
+    context->error_code = NULL;
+    context->error_message = NULL;
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[3])) ==
+        oseo_number(5.0)
+    );
+    assert(
+        require_normal(oseo_object_has_own(context, roots[0], roots[2])) ==
+        oseo_boolean(true)
+    );
 }
 
 static void test_function_cells(OseoContext *context, OseoValue *roots) {

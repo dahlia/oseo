@@ -861,14 +861,33 @@ static OseoResult set_array_length(
     if (!array->length_writable) return normal(value);
     uint32_t requested = (uint32_t)number;
     if (requested < array->array_length) {
-        size_t index = array->property_count;
-        while (index > 0u) {
-            index -= 1u;
+        while (true) {
+            size_t selected = SIZE_MAX;
+            uint32_t selected_index = 0u;
+            for (
+                size_t index = 0u;
+                index < array->property_count;
+                index += 1u
+            ) {
+                uint32_t property_index;
+                if (array_index(
+                        array->properties[index].key,
+                        &property_index
+                    ) &&
+                    property_index >= requested &&
+                    (selected == SIZE_MAX || property_index > selected_index)) {
+                    selected = index;
+                    selected_index = property_index;
+                }
+            }
+            if (selected == SIZE_MAX) break;
             uint32_t property_index;
-            if (array_index(array->properties[index].key, &property_index) &&
-                property_index >= requested &&
-                !remove_property(array, index)) {
-                array->array_length = property_index + 1u;
+            if (!array_index(
+                    array->properties[selected].key,
+                    &property_index
+                ) ||
+                !remove_property(array, selected)) {
+                array->array_length = selected_index + 1u;
                 return failure(
                     context,
                     "OSEO2001",
@@ -1256,6 +1275,13 @@ static size_t own_ascii_property_index(
     return SIZE_MAX;
 }
 
+static bool own_descriptor(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+);
+
 static OseoResult ascii_string(OseoContext *context, const char *text) {
     uint16_t units[32];
     size_t length = strlen(text);
@@ -1315,25 +1341,44 @@ OseoResult oseo_object_builtin_define_property(
         return result;
     }
     OseoOrdinaryObject *descriptor = ordinary_object(descriptor_value);
+    if (own_ascii_property_index(descriptor, "get") != SIZE_MAX ||
+        own_ascii_property_index(descriptor, "set") != SIZE_MAX) {
+        oseo_roots_release(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "Accessor property descriptors are unsupported."
+        );
+    }
     size_t value_index = own_ascii_property_index(descriptor, "value");
     size_t writable_index = own_ascii_property_index(descriptor, "writable");
     size_t enumerable_index =
         own_ascii_property_index(descriptor, "enumerable");
     size_t configurable_index =
         own_ascii_property_index(descriptor, "configurable");
+    OseoValue current_value = oseo_undefined();
+    OseoPropertyAttributes current_attributes = {false, false, false};
+    bool exists = own_descriptor(
+        object_value,
+        frame.slots[0],
+        &current_value,
+        &current_attributes
+    );
     OseoValue value = value_index == SIZE_MAX
-        ? oseo_undefined()
+        ? current_value
         : descriptor->properties[value_index].value;
     OseoPropertyAttributes attributes = {
-        configurable_index != SIZE_MAX && oseo_to_boolean(
-            descriptor->properties[configurable_index].value
-        ),
-        enumerable_index != SIZE_MAX && oseo_to_boolean(
-            descriptor->properties[enumerable_index].value
-        ),
-        writable_index != SIZE_MAX && oseo_to_boolean(
-            descriptor->properties[writable_index].value
-        ),
+        configurable_index == SIZE_MAX
+            ? exists && current_attributes.configurable
+            : oseo_to_boolean(
+                  descriptor->properties[configurable_index].value
+              ),
+        enumerable_index == SIZE_MAX
+            ? exists && current_attributes.enumerable
+            : oseo_to_boolean(descriptor->properties[enumerable_index].value),
+        writable_index == SIZE_MAX
+            ? exists && current_attributes.writable
+            : oseo_to_boolean(descriptor->properties[writable_index].value),
     };
     result = oseo_object_define(
         context,
