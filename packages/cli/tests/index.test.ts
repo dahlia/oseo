@@ -9,6 +9,7 @@ test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
   assert.ok(help.stdout.includes("--emit-c"));
   assert.ok(help.stdout.includes("--dump-mir"));
+  assert.ok(help.stdout.includes("--no-specialization"));
   const mir = runCli({
     args: ["--dump-mir", "fixture.ts"],
     source: "console.log(42);",
@@ -25,6 +26,25 @@ test("prints deterministic MIR and C for accepted source", () => {
   });
   assert.equal(emitted.exitStatus, 0);
   assert.match(emitted.stdout, /oseo_console_log/u);
+});
+
+test("passes an explicit generic-only policy through CLI orchestration", () => {
+  const source =
+    "function add(left: number, right: number) { " +
+    "return left + right; } add(1, 2);";
+  const enabled = runCli({
+    args: ["--dump-mir", "fixture.ts"],
+    source,
+    version: "0.0.0",
+  });
+  const disabled = runCli({
+    args: ["--no-specialization", "--dump-mir", "fixture.ts"],
+    source,
+    version: "0.0.0",
+  });
+  assert.match(enabled.stdout, /guard-smi/u);
+  assert.doesNotMatch(disabled.stdout, /guard-smi/u);
+  assert.match(disabled.stdout, /specialization disabled/u);
 });
 
 test("rejects invalid command-line shapes before compilation", () => {

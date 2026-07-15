@@ -112,6 +112,12 @@ ordinary line or block comments is ignored. M1 records these hints but does not
 specialize from them. Adding, removing, or falsifying a hint cannot change
 whether the program is accepted or how it behaves.
 
+M1 established the generic behavior without using hints. M2 may select the
+checked small-integer addition described in
+[*specialization-m2.md*](./specialization-m2.md). The generic profile remains
+the semantic authority: adding, removing, replacing, conflicting, or falsifying
+a hint cannot change source acceptance or observable behavior.
+
 Type aliases, interfaces, generic parameters, call type arguments, unions,
 intersections, assertions, `satisfies`, enums, namespaces, parameter
 properties, and legacy decorators are outside the profile. Oseo does not invoke

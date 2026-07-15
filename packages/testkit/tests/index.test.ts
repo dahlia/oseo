@@ -64,6 +64,7 @@ function fixtureOptions(
       functions: [],
       globalBindings: [],
       kind: "mir-program",
+      observeSpecialization: false,
       script: {
         blocks: [],
         id: -1,
@@ -78,6 +79,7 @@ function fixtureOptions(
         rootSlotCount: 1,
       },
       sourceId: "fixture.ts",
+      specialization: "disabled",
     },
     runtime: {
       getRuntimeInput() {
@@ -158,5 +160,32 @@ test("records complete failed build observations", async () => {
     exitStatus: 1,
     stderr: "compiler error",
     stdout: "compiler output",
+  });
+});
+
+test("separates private runtime counters from fixture stderr", async () => {
+  const state = memoryHost([
+    { exitStatus: 0, stderr: "", stdout: "compiler output" },
+    {
+      exitStatus: 0,
+      stderr:
+        "OSEO_OBSERVATIONS " +
+        '{"guardHits":1,"guardMisses":2,"overflowMisses":3,' +
+        '"genericAdditionCalls":4,"allocations":5,"collections":6}\n',
+      stdout: "native output",
+    },
+  ]);
+  const options = fixtureOptions(state.host, ["compile"]);
+  const input = { ...options.input, observeSpecialization: true };
+  await withNativeFixture({ ...options, input }, (native) => {
+    assert.equal(native.stderr, "");
+    assert.deepEqual(native.counters, {
+      allocations: 5,
+      collections: 6,
+      genericAdditionCalls: 4,
+      guardHits: 1,
+      guardMisses: 2,
+      overflowMisses: 3,
+    });
   });
 });

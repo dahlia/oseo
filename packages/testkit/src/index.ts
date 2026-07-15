@@ -12,11 +12,22 @@ import type {
 /** Complete observation retained for one native fixture build and run. */
 export interface NativeFixtureObservation extends ProcessObservation {
   readonly compilerInvocation: readonly string[];
+  readonly counters?: RuntimeObservationCounters;
   readonly emittedC: string;
   readonly target: TargetDescription;
 }
 
-/** Injected components and options for one generic native fixture. */
+/** Test-only runtime counters kept separate from JavaScript observations. */
+export interface RuntimeObservationCounters {
+  readonly allocations: number;
+  readonly collections: number;
+  readonly genericAdditionCalls: number;
+  readonly guardHits: number;
+  readonly guardMisses: number;
+  readonly overflowMisses: number;
+}
+
+/** Injected components and options for one native fixture. */
 export interface NativeFixtureOptions {
   readonly backend: NativeBackend;
   readonly host: CompilerHost;
@@ -58,6 +69,39 @@ function errorMessage(error: unknown): string {
   return error instanceof Error
     ? `${error.name}: ${error.message}`
     : `${error}`;
+}
+
+function splitCounters(observation: ProcessObservation): {
+  readonly counters?: RuntimeObservationCounters;
+  readonly observation: ProcessObservation;
+} {
+  const prefix = "OSEO_OBSERVATIONS ";
+  const lines = observation.stderr.split(/(?<=\n)/u);
+  const index = lines.findLastIndex((line) => line.startsWith(prefix));
+  if (index < 0) return { observation };
+  const line = lines[index];
+  if (line == null) return { observation };
+  const parsed = JSON.parse(
+    line.slice(prefix.length),
+  ) as Partial<RuntimeObservationCounters>;
+  const keys = [
+    "allocations",
+    "collections",
+    "genericAdditionCalls",
+    "guardHits",
+    "guardMisses",
+    "overflowMisses",
+  ] as const;
+  for (const key of keys) {
+    if (!Number.isSafeInteger(parsed[key]) || (parsed[key] ?? -1) < 0) {
+      throw new Error(`Runtime observation has invalid ${key}.`);
+    }
+  }
+  lines.splice(index, 1);
+  return {
+    counters: parsed as RuntimeObservationCounters,
+    observation: { ...observation, stderr: lines.join("") },
+  };
 }
 
 /**
@@ -133,13 +177,23 @@ export async function withNativeFixture<T>(
           observation.stderr,
       );
     }
-    nativeObservation = {
-      ...observation,
+    const separated = splitCounters(observation);
+    if (
+      options.input.observeSpecialization === true &&
+      options.target.execute &&
+      separated.counters == null
+    ) {
+      throw new Error("Native fixture did not report runtime observations.");
+    }
+    const completeObservation: NativeFixtureObservation = {
+      ...separated.observation,
       compilerInvocation,
+      ...(separated.counters == null ? {} : { counters: separated.counters }),
       emittedC: emitted.source,
       target: options.target,
     };
-    const result = await inspect(nativeObservation);
+    nativeObservation = completeObservation;
+    const result = await inspect(completeObservation);
     succeeded = true;
     return result;
   } catch (error) {

@@ -38,6 +38,13 @@ interface Fixture {
   readonly name: string;
   readonly nonStrictScript?: boolean;
   readonly source: string;
+  readonly specialization?: {
+    readonly genericCallsDisabled: number;
+    readonly genericCallsEnabled: number;
+    readonly hits: number;
+    readonly misses: number;
+    readonly overflowMisses: number;
+  };
 }
 
 const fixtures: readonly Fixture[] = [
@@ -179,6 +186,79 @@ function choose(value) {
 console.log(choose(true), choose(false));
 `,
   },
+  {
+    name: "specialization-hit",
+    source: `
+function add(left: number, right: number) { return left + right; }
+add(20, 22);
+`,
+    specialization: {
+      genericCallsDisabled: 1,
+      genericCallsEnabled: 0,
+      hits: 1,
+      misses: 0,
+      overflowMisses: 0,
+    },
+  },
+  {
+    name: "guarded-addition",
+    source: `
+function add(left: number, right: number) { return left + right; }
+/** @param {number} left @param {number} right */
+function addJs(left, right) { return left + right; }
+function sum(value) {
+  if (value === 0) return add(0, 0);
+  return add(value, sum(value - 1));
+}
+function first() { console.log("left argument"); return 1; }
+function second() { console.log("right argument"); return 2; }
+console.log(add(1, 2));
+console.log(add(140737488355327, 0));
+console.log(add(-140737488355328, 0));
+console.log(add(140737488355327, 1));
+console.log(add(-140737488355328, -1));
+console.log(add(-0, 0));
+console.log(add(0.5, 1));
+console.log(add(5e-324, 0));
+console.log(add(NaN, 1));
+console.log(add(Infinity, 1));
+console.log(add(-Infinity, 1));
+console.log(add("left", 1));
+console.log(add(1, "right"));
+console.log(add(true, 1));
+console.log(add(null, 1));
+console.log(add(undefined, 1));
+console.log(addJs(20, 22));
+console.log(sum(3));
+console.log(add(first(), second()));
+`,
+    specialization: {
+      genericCallsDisabled: 22,
+      genericCallsEnabled: 13,
+      hits: 9,
+      misses: 11,
+      overflowMisses: 2,
+    },
+  },
+  {
+    name: "ineligible-and-ordered-addition",
+    source: `
+function plain(left, right) { return left + right; }
+/** @param {string} left @param {number} right */
+function conflicting(left: number, right: number) { return left + right; }
+function first() { console.log("left"); return 1; }
+function second() { console.log("right"); return 2; }
+console.log(plain(first(), second()));
+console.log(conflicting("value", 1));
+`,
+    specialization: {
+      genericCallsDisabled: 2,
+      genericCallsEnabled: 2,
+      hits: 0,
+      misses: 0,
+      overflowMisses: 0,
+    },
+  },
 ];
 
 async function requireSuccess(
@@ -229,67 +309,191 @@ async function references(fixture: Fixture): Promise<
 for (const fixture of fixtures) {
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
-  const compilation = compileSource(babelFrontend, {
-    source: fixture.source,
-    sourceId: `${fixture.name}.ts`,
-  });
-  assert.deepEqual(compilation.diagnostics, [], fixture.name);
-  assert(compilation.mir != null, `${fixture.name}: generic MIR`);
+  const disabledCompilation = compileSource(
+    babelFrontend,
+    {
+      source: fixture.source,
+      sourceId: `${fixture.name}.ts`,
+    },
+    { observeSpecialization: true, specialization: "disabled" },
+  );
+  const enabledCompilation = compileSource(
+    babelFrontend,
+    {
+      source: fixture.source,
+      sourceId: `${fixture.name}.ts`,
+    },
+    { observeSpecialization: true, specialization: "enabled" },
+  );
+  assert.deepEqual(disabledCompilation.diagnostics, [], fixture.name);
+  assert.deepEqual(enabledCompilation.diagnostics, [], fixture.name);
+  const disabledMir = disabledCompilation.mir;
+  const enabledMir = enabledCompilation.mir;
+  assert(disabledMir != null, `${fixture.name}: disabled MIR`);
+  assert(enabledMir != null, `${fixture.name}: enabled MIR`);
 
-  if (fixture.name === "generic-addition") {
+  if (
+    fixture.name === "generic-addition" ||
+    fixture.name === "guarded-addition"
+  ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
   try {
-    await withNativeFixture(
-      {
-        backend: cBackend,
-        host,
-        input: compilation.mir,
-        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
-        runtime: cRuntimeProvider,
-        target: describeTarget("x86_64-linux-gnu"),
-        toolchain: zigToolchain,
-      },
-      (native) => {
-        assertMatchingObservations([nodeReference, denoReference, native]);
-        assert(native.emittedC.includes("OseoResult"), "generic call ABI");
-        if (fixture.name === "unused-function") {
-          assert.doesNotMatch(native.emittedC, /oseo_function_0/u);
-        }
-        if (fixture.name === "returning-branches") {
-          assert.doesNotMatch(native.emittedC, /bb3:/u);
-        }
-        assert(
-          native.compilerInvocation
-            .filter((line) => line.startsWith("zig cc "))
-            .every((line) => line.includes("x86_64-linux-gnu")),
-          "native compiler invocation records an explicit target",
-        );
-      },
-    );
+    for (const [mode, compilation] of [
+      ["disabled", disabledMir],
+      ["enabled", enabledMir],
+    ] as const) {
+      await withNativeFixture(
+        {
+          backend: cBackend,
+          host,
+          input: compilation,
+          keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+          runtime: cRuntimeProvider,
+          target: describeTarget("x86_64-linux-gnu"),
+          toolchain: zigToolchain,
+        },
+        (native) => {
+          assertMatchingObservations([nodeReference, denoReference, native]);
+          assert(native.counters != null, `${fixture.name}: counters`);
+          assert(native.emittedC.includes("OseoResult"), "generic call ABI");
+          if (mode === "disabled") {
+            assert.equal(native.counters.guardHits, 0);
+            assert.equal(native.counters.guardMisses, 0);
+            assert.equal(native.counters.overflowMisses, 0);
+          }
+          if (fixture.specialization != null) {
+            const expected = fixture.specialization;
+            assert.equal(
+              native.counters.genericAdditionCalls,
+              mode === "enabled"
+                ? expected.genericCallsEnabled
+                : expected.genericCallsDisabled,
+            );
+            if (mode === "enabled") {
+              assert.equal(native.counters.guardHits, expected.hits);
+              assert.equal(native.counters.guardMisses, expected.misses);
+              assert.equal(
+                native.counters.overflowMisses,
+                expected.overflowMisses,
+              );
+            }
+          }
+          if (fixture.name === "guarded-addition" && mode === "enabled") {
+            assert.match(native.emittedC, /oseo_value_is_smi/u);
+            assert.match(native.emittedC, /oseo_smi_try_add/u);
+            assert.match(native.emittedC, /oseo_value_box_smi/u);
+            assert.ok(native.counters.allocations > 0);
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "specialization-hit" && mode === "enabled") {
+            assert.equal(native.counters.allocations, 0);
+            assert.equal(native.counters.genericAdditionCalls, 0);
+          }
+          if (fixture.name === "unused-function") {
+            assert.doesNotMatch(native.emittedC, /oseo_function_0/u);
+          }
+          if (fixture.name === "returning-branches") {
+            assert.doesNotMatch(native.emittedC, /bb3:/u);
+          }
+          assert(
+            native.compilerInvocation
+              .filter((line) => line.startsWith("zig cc "))
+              .every((line) => line.includes("x86_64-linux-gnu")),
+            "native compiler invocation records an explicit target",
+          );
+        },
+      );
+    }
   } finally {
     delete process.env.OSEO_GC_EVERY_SAFEPOINT;
   }
 
-  await withNativeFixture(
-    {
-      backend: cBackend,
-      host,
-      input: compilation.mir,
-      keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
-      runtime: cRuntimeProvider,
-      target: describeTarget("aarch64-linux-musl"),
-      toolchain: zigToolchain,
-    },
-    (cross) => {
-      assert(
-        cross.compilerInvocation
-          .filter((line) => line.startsWith("zig cc "))
-          .every((line) => line.includes("aarch64-linux-musl")),
-        "cross compiler invocation records an explicit target",
-      );
-    },
-  );
+  const crossCompilations =
+    fixture.specialization == null ? [enabledMir] : [disabledMir, enabledMir];
+  for (const compilation of crossCompilations) {
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compilation,
+        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        runtime: cRuntimeProvider,
+        target: describeTarget("aarch64-linux-musl"),
+        toolchain: zigToolchain,
+      },
+      (cross) => {
+        assert(
+          cross.compilerInvocation
+            .filter((line) => line.startsWith("zig cc "))
+            .every((line) => line.includes("aarch64-linux-musl")),
+          "cross compiler invocation records an explicit target",
+        );
+      },
+    );
+  }
+}
+
+const assemblyCompilation = compileSource(
+  babelFrontend,
+  {
+    source:
+      "function add(left: number, right: number) { " +
+      "return left + right; } console.log(add(1, 2));",
+    sourceId: "assembly-specialization.ts",
+  },
+  { specialization: "enabled" },
+);
+const assemblyMir = assemblyCompilation.mir;
+assert(assemblyMir != null, "assembly specialization MIR");
+const assemblySource = cBackend.emit(assemblyMir).source;
+for (const target of ["x86_64-linux-gnu", "aarch64-linux-musl"] as const) {
+  const directory = await host.makeTemporaryDirectory("oseo-assembly-");
+  try {
+    const generatedPath = `${directory}/generated.c`;
+    const headerPath = `${directory}/oseo_runtime.h`;
+    const assemblyPath = `${directory}/generated.s`;
+    await host.writeTextFile(generatedPath, assemblySource);
+    const runtimeHeader = cRuntimeProvider
+      .getRuntimeInput()
+      .assets.find((asset) => asset.kind === "header");
+    assert(runtimeHeader != null, "runtime header");
+    await host.writeTextFile(
+      headerPath,
+      await host.readTextFile(runtimeHeader.url),
+    );
+    const assembly = await host.run({
+      args: [
+        "cc",
+        "-target",
+        target,
+        "-std=c11",
+        "-O2",
+        "-S",
+        "-I",
+        directory,
+        generatedPath,
+        "-o",
+        assemblyPath,
+      ],
+      command: "zig",
+      cwd: directory,
+    });
+    assert.equal(assembly.exitStatus, 0, assembly.stderr);
+    const text = await host.readTextFile(assemblyPath);
+    assert.match(
+      text,
+      /(?:callq?|bl)\s+oseo_add(?:@PLT)?/u,
+      `${target}: generic fallback retained`,
+    );
+    assert.doesNotMatch(
+      text,
+      /(?:callq?|bl)\s+oseo_(?:value_is_smi|smi_try_add|value_box_smi)/u,
+      `${target}: small-integer primitives inline`,
+    );
+  } finally {
+    await host.remove(directory);
+  }
 }
 
 const recursiveCompilation = compileSource(babelFrontend, {
@@ -509,3 +713,4 @@ console.log(
 console.log(
   `cross fixtures: ${fixtures.length + 1} aarch64-linux-musl builds passed`,
 );
+console.log("assembly fixtures: x86-64 and AArch64 guarded paths inspected");

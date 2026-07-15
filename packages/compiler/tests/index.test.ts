@@ -12,6 +12,7 @@ import {
 import type {
   Diagnostic,
   DiagnosticCode,
+  Hint,
   SourceRange,
   SyntaxProgram,
 } from "../src/index.ts";
@@ -108,7 +109,7 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
   assert.match(firstMir, /jump bb3/u);
   assert.match(firstMir, /join bb1 \+ bb2/u);
   assert.match(firstMir, /return %/u);
-  assert.doesNotMatch(firstMir, /special|guard/u);
+  assert.doesNotMatch(firstMir, /guard-smi|add-smi-checked/u);
 });
 
 test("retains lexical reads for runtime temporal-dead-zone checks", () => {
@@ -492,4 +493,135 @@ test("copies parameters into a MIR-owned representation", () => {
     name: "value",
     range,
   });
+});
+
+function additionProgram(
+  leftHints: readonly Hint[],
+  rightHints: readonly Hint[],
+): SyntaxProgram {
+  return {
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              kind: "binary",
+              left: { kind: "identifier", name: "left", range },
+              operator: "+",
+              range,
+              right: { kind: "identifier", name: "right", range },
+            },
+            kind: "return",
+            range,
+          },
+        ],
+        kind: "function",
+        name: "add",
+        parameters: [
+          { hints: leftHints, name: "left", range },
+          { hints: rightHints, name: "right", range },
+        ],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "specialized-addition.ts",
+  };
+}
+
+const typescriptNumber: Hint = {
+  name: "number",
+  provenance: "typescript",
+  range,
+};
+const jsdocNumber: Hint = {
+  name: "number",
+  provenance: "jsdoc",
+  range,
+};
+
+test("selects checked addition from equivalent number hints", () => {
+  for (const hint of [typescriptNumber, jsdocNumber]) {
+    const hir = buildHir(additionProgram([hint], [hint])).program;
+    assert.ok(hir != null);
+    const mir = buildMir(hir, { specialization: "enabled" });
+    const functionValue = mir.functions[0];
+    assert.equal(mir.specialization, "enabled");
+    assert.equal(functionValue?.specialization?.kind, "smi-add");
+    assert.equal(functionValue?.specialization?.genericBlock, 6);
+    assert.equal(functionValue?.specialization?.joinBlock, 7);
+    const text = printMir(mir);
+    assert.match(text, /specialization enabled/u);
+    assert.equal(text.match(/guard-smi/gu)?.length, 2);
+    assert.match(text, /add-smi-checked/u);
+    assert.match(text, /box-smi/u);
+    assert.match(text, /generic-fallback bb6/u);
+    assert.match(text, /join bb7/u);
+  }
+});
+
+test("keeps disabled and ineligible MIR generic-only", () => {
+  const cases = [
+    {
+      hints: [[typescriptNumber], [typescriptNumber]] as const,
+      specialization: "disabled" as const,
+    },
+    {
+      hints: [[], []] as const,
+      specialization: "enabled" as const,
+    },
+    {
+      hints: [
+        [typescriptNumber, { ...jsdocNumber, name: "string" as const }],
+        [typescriptNumber],
+      ] as const,
+      specialization: "enabled" as const,
+    },
+  ];
+  for (const entry of cases) {
+    const hir = buildHir(
+      additionProgram(entry.hints[0], entry.hints[1]),
+    ).program;
+    assert.ok(hir != null);
+    const mir = buildMir(hir, { specialization: entry.specialization });
+    assert.equal(mir.functions[0]?.specialization, undefined);
+    assert.doesNotMatch(printMir(mir), /guard-smi|add-smi-checked/u);
+  }
+});
+
+test("generated hint mutations change only specialization selection", () => {
+  const mutations: readonly {
+    readonly hints: readonly Hint[];
+    readonly name: string;
+    readonly selected: boolean;
+  }[] = [
+    { hints: [typescriptNumber], name: "add", selected: true },
+    { hints: [], name: "remove", selected: false },
+    {
+      hints: [{ ...typescriptNumber, name: "string" }],
+      name: "replace",
+      selected: false,
+    },
+    {
+      hints: [{ ...typescriptNumber, name: "any" }],
+      name: "falsify",
+      selected: false,
+    },
+  ];
+  for (const mutation of mutations) {
+    const hir = buildHir(
+      additionProgram(mutation.hints, mutation.hints),
+    ).program;
+    assert.ok(hir != null, mutation.name);
+    const mir = buildMir(hir, { specialization: "enabled" });
+    assert.equal(
+      mir.functions[0]?.specialization != null,
+      mutation.selected,
+      mutation.name,
+    );
+    const disabled = buildMir(hir, { specialization: "disabled" });
+    assert.equal(disabled.functions[0]?.specialization, undefined);
+  }
 });

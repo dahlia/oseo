@@ -105,6 +105,7 @@ static void mark_value(OseoValue value) {
 }
 
 void oseo_collect(OseoContext *context) {
+    if (context->observe_specialization) context->collections += 1u;
     for (OseoRootFrame *frame = context->roots;
          frame != NULL;
          frame = frame->previous) {
@@ -140,6 +141,13 @@ void oseo_context_init(
     context->call_depth = 0u;
     context->line = 1u;
     context->column = 1u;
+    context->guard_hits = 0u;
+    context->guard_misses = 0u;
+    context->overflow_misses = 0u;
+    context->generic_addition_calls = 0u;
+    context->allocations = 0u;
+    context->collections = 0u;
+    context->observe_specialization = false;
     context->collect_every_safepoint =
         getenv("OSEO_GC_EVERY_SAFEPOINT") != NULL;
 }
@@ -172,6 +180,22 @@ void oseo_context_print_error(const OseoContext *context) {
         context->column,
         context->error_code,
         context->error_message
+    );
+}
+
+void oseo_context_print_observations(const OseoContext *context) {
+    (void)fprintf(
+        stderr,
+        "OSEO_OBSERVATIONS "
+        "{\"guardHits\":%zu,\"guardMisses\":%zu,"
+        "\"overflowMisses\":%zu,\"genericAdditionCalls\":%zu,"
+        "\"allocations\":%zu,\"collections\":%zu}\n",
+        context->guard_hits,
+        context->guard_misses,
+        context->overflow_misses,
+        context->generic_addition_calls,
+        context->allocations,
+        context->collections
     );
 }
 
@@ -338,6 +362,7 @@ static OseoResult allocate_string(
     object->marked = false;
     if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
     context->objects = object;
+    if (context->observe_specialization) context->allocations += 1u;
     return normal(tagged(OSEO_TAG_HEAP, (uint64_t)address));
 }
 
@@ -750,6 +775,9 @@ OseoResult oseo_add(
     OseoValue left,
     OseoValue right
 ) {
+    if (context->observe_specialization) {
+        context->generic_addition_calls += 1u;
+    }
     if (!is_string(left) && !is_string(right)) {
         return numeric_binary(context, left, right, '+');
     }

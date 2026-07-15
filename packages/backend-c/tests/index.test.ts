@@ -12,6 +12,7 @@ test("emits deterministic generic C without executing a toolchain", () => {
     functions: [],
     globalBindings: [],
     kind: "mir-program",
+    observeSpecialization: false,
     script: {
       blocks: [
         {
@@ -53,6 +54,7 @@ test("emits deterministic generic C without executing a toolchain", () => {
       rootSlotCount: 3,
     },
     sourceId: "fixture.ts",
+    specialization: "disabled",
   });
   assert.ok(emitted.source.includes("oseo_context_init"));
   assert.ok(emitted.source.includes("oseo_console_log"));
@@ -73,6 +75,7 @@ test("scans large MIR argument lists without spreading them", () => {
     functions: [],
     globalBindings: [],
     kind: "mir-program",
+    observeSpecialization: false,
     script: {
       blocks: [
         {
@@ -99,6 +102,7 @@ test("scans large MIR argument lists without spreading them", () => {
       rootSlotCount: argumentsValue.length + 1,
     },
     sourceId: "large-arguments.ts",
+    specialization: "disabled",
   });
   assert.match(emitted.source, /roots\[149999\]/u);
   assert.doesNotMatch(emitted.source, /OseoValue call_arguments/u);
@@ -113,6 +117,7 @@ test("keeps string constant units out of generated stack frames", () => {
     functions: [],
     globalBindings: [],
     kind: "mir-program",
+    observeSpecialization: false,
     script: {
       blocks: [
         {
@@ -146,6 +151,7 @@ test("keeps string constant units out of generated stack frames", () => {
       rootSlotCount: 2,
     },
     sourceId: "string.ts",
+    specialization: "disabled",
   });
   assert.match(emitted.source, /static const uint16_t string_units_0\[\]/u);
   assert.doesNotMatch(emitted.source, /\(const uint16_t\[\]\)/u);

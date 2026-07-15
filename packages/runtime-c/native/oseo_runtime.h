@@ -37,8 +37,55 @@ typedef struct {
     size_t call_depth;
     size_t line;
     size_t column;
+    size_t guard_hits;
+    size_t guard_misses;
+    size_t overflow_misses;
+    size_t generic_addition_calls;
+    size_t allocations;
+    size_t collections;
+    bool observe_specialization;
     bool collect_every_safepoint;
 } OseoContext;
+
+/* Private inline primitives used by generated guarded native paths. */
+static inline bool oseo_value_is_smi(OseoValue value) {
+    return (value & UINT64_C(0x7fff000000000000)) ==
+        UINT64_C(0x7ff9000000000000);
+}
+
+static inline int64_t oseo_value_unbox_smi(OseoValue value) {
+    uint64_t payload = value & UINT64_C(0x0000ffffffffffff);
+    if ((payload & UINT64_C(0x0000800000000000)) == 0u) {
+        return (int64_t)payload;
+    }
+    uint64_t magnitude =
+        ((~payload) & UINT64_C(0x0000ffffffffffff)) + UINT64_C(1);
+    return -(int64_t)magnitude;
+}
+
+static inline bool oseo_smi_try_add(
+    int64_t left,
+    int64_t right,
+    int64_t *result
+) {
+    const int64_t minimum = INT64_C(-140737488355328);
+    const int64_t maximum = INT64_C(140737488355327);
+    if (left < minimum || left > maximum ||
+        right < minimum || right > maximum) {
+        return false;
+    }
+    if ((right > 0 && left > maximum - right) ||
+        (right < 0 && left < minimum - right)) {
+        return false;
+    }
+    *result = left + right;
+    return true;
+}
+
+static inline OseoValue oseo_value_box_smi(int64_t value) {
+    return UINT64_C(0x7ff9000000000000) |
+        ((uint64_t)value & UINT64_C(0x0000ffffffffffff));
+}
 
 void oseo_context_init(
     OseoContext *context,
@@ -52,6 +99,7 @@ void oseo_context_location(
     size_t column
 );
 void oseo_context_print_error(const OseoContext *context);
+void oseo_context_print_observations(const OseoContext *context);
 
 OseoResult oseo_call_enter(OseoContext *context);
 void oseo_call_leave(OseoContext *context);

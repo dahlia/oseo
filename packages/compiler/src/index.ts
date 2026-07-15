@@ -773,6 +773,15 @@ export interface MirHint {
   readonly range: SourceRange;
 }
 
+/** Compiler-owned policy for removable guarded specialization. */
+export type SpecializationMode = "disabled" | "enabled";
+
+/** Explicit compiler orchestration options, independent of process globals. */
+export interface CompilerOptions {
+  readonly observeSpecialization?: boolean;
+  readonly specialization?: SpecializationMode;
+}
+
 /** One MIR-owned function parameter and its specialization hints. */
 export interface MirParameter {
   readonly bindingId: number;
@@ -787,7 +796,7 @@ export interface MirGlobalBinding {
   readonly name: string;
 }
 
-/** One inspectable generic MIR operation. */
+/** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
   readonly arguments: readonly number[];
   readonly bindingId?: number;
@@ -795,17 +804,26 @@ export interface MirOperation {
   readonly detail: string;
   readonly id: number;
   readonly kind:
+    | "add-smi-checked"
     | "binary"
+    | "box-smi"
     | "branch"
     | "call"
     | "check-status"
     | "constant"
+    | "count-guard-hit"
+    | "count-guard-miss"
+    | "count-overflow-miss"
+    | "guard-smi"
     | "join"
     | "read"
     | "root-store"
     | "safepoint"
+    | "unbox-smi"
     | "unary"
     | "write";
+  readonly checkedResult?: number;
+  readonly hint?: MirHint;
   readonly operator?: BinaryOperator | "!" | "-";
   readonly range: SourceRange;
   readonly target?: MirCallTarget;
@@ -822,6 +840,7 @@ export type MirTerminator =
   | {
       readonly kind: "jump";
       readonly target: number;
+      readonly values?: readonly number[];
     }
   | {
       readonly kind: "return";
@@ -835,10 +854,20 @@ export type MirTerminator =
 export interface MirBlock {
   readonly id: number;
   readonly operations: readonly MirOperation[];
+  readonly parameters?: readonly number[];
   readonly terminator: MirTerminator;
 }
 
-/** Generic-only MIR for one declared function or script. */
+/** Inspectable identity and control-flow anchors for one specialization. */
+export interface MirSpecialization {
+  readonly genericBlock: number;
+  readonly hints: readonly MirHint[];
+  readonly joinBlock: number;
+  readonly kind: "smi-add";
+  readonly range: SourceRange;
+}
+
+/** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
   readonly blocks: readonly MirBlock[];
   readonly id: number;
@@ -847,15 +876,18 @@ export interface MirFunction extends LocatedSyntax {
   readonly parameterCount: number;
   readonly parameters: readonly MirParameter[];
   readonly rootSlotCount: number;
+  readonly specialization?: MirSpecialization;
 }
 
-/** Backend-neutral generic MIR for one source script. */
+/** Backend-neutral MIR for one source script. */
 export interface MirProgram {
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
   readonly kind: "mir-program";
   readonly script: MirFunction;
   readonly sourceId: string;
+  readonly specialization: SpecializationMode;
+  readonly observeSpecialization: boolean;
 }
 
 interface MutableMirBlock {
@@ -1246,32 +1278,303 @@ function buildMirFunction(
   };
 }
 
-/** Lower HIR to inspectable generic-only MIR. */
-export function buildMir(program: HirProgram): MirProgram {
+function maximumMirValue(functionValue: MirFunction): number {
+  let maximum = -1;
+  for (const block of functionValue.blocks) {
+    for (const operation of block.operations) {
+      maximum = Math.max(maximum, operation.id);
+      if (operation.checkedResult != null) {
+        maximum = Math.max(maximum, operation.checkedResult);
+      }
+    }
+  }
+  return maximum;
+}
+
+function numberHint(parameter: HirParameter): Hint | undefined {
+  if (parameter.hints.length === 0) return undefined;
+  if (parameter.hints.some((hint) => hint.name !== "number")) {
+    return undefined;
+  }
+  return parameter.hints[0];
+}
+
+function eligibleAddition(functionValue: HirFunction):
+  | {
+      readonly expression: HirExpression & { readonly kind: "binary" };
+      readonly hints: readonly [Hint, Hint];
+    }
+  | undefined {
+  const [leftParameter, rightParameter] = functionValue.parameters;
+  if (
+    functionValue.parameters.length !== 2 ||
+    leftParameter == null ||
+    rightParameter == null ||
+    leftParameter.bindingId === rightParameter.bindingId
+  ) {
+    return undefined;
+  }
+  const leftHint = numberHint(leftParameter);
+  const rightHint = numberHint(rightParameter);
+  if (leftHint == null || rightHint == null) return undefined;
+  const statement = functionValue.body[0];
+  if (
+    functionValue.body.length !== 1 ||
+    statement?.kind !== "return" ||
+    statement.expression?.kind !== "binary" ||
+    statement.expression.operator !== "+" ||
+    statement.expression.left.kind !== "binding" ||
+    statement.expression.right.kind !== "binding" ||
+    statement.expression.left.bindingId !== leftParameter.bindingId ||
+    statement.expression.right.bindingId !== rightParameter.bindingId
+  ) {
+    return undefined;
+  }
   return {
-    functions: program.functions.map((functionValue) =>
-      buildMirFunction(
+    expression: statement.expression,
+    hints: [leftHint, rightHint],
+  };
+}
+
+function copyHint(hint: Hint): MirHint {
+  return {
+    name: hint.name,
+    provenance: hint.provenance,
+    range: {
+      end: { ...hint.range.end },
+      start: { ...hint.range.start },
+    },
+  };
+}
+
+function specializeAddition(
+  generic: MirFunction,
+  hir: HirFunction,
+): MirFunction {
+  const eligible = eligibleAddition(hir);
+  const original = generic.blocks[0];
+  if (
+    eligible == null ||
+    generic.blocks.length !== 1 ||
+    original == null ||
+    original.terminator.kind !== "return"
+  ) {
+    return generic;
+  }
+  const binaryIndex = original.operations.findIndex(
+    (operation) => operation.kind === "binary" && operation.operator === "+",
+  );
+  const binary = original.operations[binaryIndex];
+  const safepoint = original.operations[binaryIndex - 1];
+  if (
+    binaryIndex < 1 ||
+    binary == null ||
+    binary.arguments.length !== 2 ||
+    safepoint?.kind !== "safepoint"
+  ) {
+    return generic;
+  }
+  const leftValue = binary.arguments[0];
+  const rightValue = binary.arguments[1];
+  if (leftValue == null || rightValue == null) return generic;
+
+  let nextValue = maximumMirValue(generic) + 1;
+  const takeValue = (): number => {
+    const value = nextValue;
+    nextValue += 1;
+    return value;
+  };
+  const leftGuard = takeValue();
+  const rightGuard = takeValue();
+  const leftRaw = takeValue();
+  const rightRaw = takeValue();
+  const checked = takeValue();
+  const checkedResult = takeValue();
+  const hitCounter = takeValue();
+  const boxed = takeValue();
+  const missCounter = takeValue();
+  const overflowCounter = takeValue();
+  const joinValue = takeValue();
+  const joinMarker = takeValue();
+  const range = eligible.expression.range;
+  const hints: readonly [MirHint, MirHint] = [
+    copyHint(eligible.hints[0]),
+    copyHint(eligible.hints[1]),
+  ];
+  const operation = (
+    id: number,
+    kind: MirOperation["kind"],
+    detail: string,
+    argumentsValue: readonly number[],
+    extra: Partial<MirOperation> = {},
+  ): MirOperation => ({
+    arguments: argumentsValue,
+    detail,
+    id,
+    kind,
+    range,
+    ...extra,
+  });
+  const prefix = original.operations.slice(0, binaryIndex - 1);
+  const genericOperations = original.operations.slice(binaryIndex - 1);
+  const blocks: readonly MirBlock[] = [
+    {
+      id: 0,
+      operations: [
+        ...prefix,
+        operation(
+          leftGuard,
+          "guard-smi",
+          "left -> bb1, miss -> bb4",
+          [leftValue],
+          { hint: hints[0] },
+        ),
+      ],
+      terminator: {
+        kind: "branch",
+        test: leftGuard,
+        whenFalse: 4,
+        whenTrue: 1,
+      },
+    },
+    {
+      id: 1,
+      operations: [
+        operation(
+          rightGuard,
+          "guard-smi",
+          "right -> bb2, miss -> bb4",
+          [rightValue],
+          { hint: hints[1] },
+        ),
+      ],
+      terminator: {
+        kind: "branch",
+        test: rightGuard,
+        whenFalse: 4,
+        whenTrue: 2,
+      },
+    },
+    {
+      id: 2,
+      operations: [
+        operation(leftRaw, "unbox-smi", "left", [leftValue]),
+        operation(rightRaw, "unbox-smi", "right", [rightValue]),
+        operation(
+          checked,
+          "add-smi-checked",
+          "in-range -> bb3, overflow -> bb5",
+          [leftRaw, rightRaw],
+          { checkedResult },
+        ),
+      ],
+      terminator: {
+        kind: "branch",
+        test: checked,
+        whenFalse: 5,
+        whenTrue: 3,
+      },
+    },
+    {
+      id: 3,
+      operations: [
+        operation(hitCounter, "count-guard-hit", "smi-add", []),
+        operation(boxed, "box-smi", "checked result", [checkedResult]),
+      ],
+      terminator: { kind: "jump", target: 7, values: [boxed] },
+    },
+    {
+      id: 4,
+      operations: [
+        operation(missCounter, "count-guard-miss", "generic-fallback bb6", []),
+      ],
+      terminator: { kind: "jump", target: 6 },
+    },
+    {
+      id: 5,
+      operations: [
+        operation(
+          overflowCounter,
+          "count-overflow-miss",
+          "generic-fallback bb6",
+          [],
+        ),
+      ],
+      terminator: { kind: "jump", target: 6 },
+    },
+    {
+      id: 6,
+      operations: genericOperations,
+      terminator: {
+        kind: "jump",
+        target: 7,
+        values: [original.terminator.value],
+      },
+    },
+    {
+      id: 7,
+      operations: [
+        operation(joinMarker, "join", "specialized bb3 + generic bb6", [
+          boxed,
+          original.terminator.value,
+        ]),
+      ],
+      parameters: [joinValue],
+      terminator: { kind: "return", value: joinValue },
+    },
+  ];
+  return {
+    ...generic,
+    blocks,
+    rootSlotCount: Math.max(generic.rootSlotCount, nextValue + 1),
+    specialization: {
+      genericBlock: 6,
+      hints,
+      joinBlock: 7,
+      kind: "smi-add",
+      range,
+    },
+  };
+}
+
+/** Lower HIR to inspectable MIR under an explicit specialization policy. */
+export function buildMir(
+  program: HirProgram,
+  options: CompilerOptions = {},
+): MirProgram {
+  const specialization = options.specialization ?? "enabled";
+  return {
+    functions: program.functions.map((functionValue) => {
+      const generic = buildMirFunction(
         functionValue.id,
         functionValue.name,
         functionValue.body,
         functionValue.parameters,
         functionValue.range,
-      ),
-    ),
+      );
+      return specialization === "enabled"
+        ? specializeAddition(generic, functionValue)
+        : generic;
+    }),
     globalBindings: program.body.flatMap((statement) =>
       statement.kind === "const"
         ? [{ id: statement.bindingId, name: statement.name }]
         : [],
     ),
     kind: "mir-program",
+    observeSpecialization: options.observeSpecialization ?? false,
     script: buildMirFunction(-1, "<script>", program.body, [], program.range),
     sourceId: program.sourceId,
+    specialization,
   };
 }
 
 function printTerminator(terminator: MirTerminator): string {
   if (terminator.kind === "return") return `return %${terminator.value}`;
-  if (terminator.kind === "jump") return `jump bb${terminator.target}`;
+  if (terminator.kind === "jump") {
+    const values = terminator.values?.map((value) => ` %${value}`).join("");
+    return `jump bb${terminator.target}${values ?? ""}`;
+  }
   if (terminator.kind === "branch") {
     return (
       `branch %${terminator.test} bb${terminator.whenTrue} ` +
@@ -1286,17 +1589,39 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
     `function @f${functionValue.id} ${functionValue.name} roots=` +
       `${functionValue.rootSlotCount} @${rangeText(functionValue.range)}`,
   );
+  if (functionValue.specialization != null) {
+    const specialization = functionValue.specialization;
+    const hints = specialization.hints
+      .map((hint) => `${hint.provenance}:${hint.name}`)
+      .join(", ");
+    lines.push(
+      `  specialize ${specialization.kind} hints=[${hints}] ` +
+        `generic-fallback bb${specialization.genericBlock} ` +
+        `join bb${specialization.joinBlock}`,
+    );
+  }
   for (const block of functionValue.blocks) {
-    lines.push(`  bb${block.id}:`);
+    const parameters = block.parameters?.map((value) => `%${value}`).join(", ");
+    lines.push(
+      `  bb${block.id}${parameters == null ? "" : `(${parameters})`}:`,
+    );
     for (const operation of block.operations) {
       const argumentText = operation.arguments
         .map((argument) => `%${argument}`)
         .join(", ");
+      const resultText =
+        operation.checkedResult == null
+          ? `%${operation.id}`
+          : `%${operation.id}, %${operation.checkedResult}`;
+      const hintTextValue =
+        operation.hint == null
+          ? ""
+          : ` hint=${operation.hint.provenance}:${operation.hint.name}`;
       lines.push(
-        `    %${operation.id} = ${operation.kind} ` +
+        `    ${resultText} = ${operation.kind} ` +
           `${operation.detail}` +
           `${argumentText === "" ? "" : ` ${argumentText}`} ` +
-          `@${rangeText(operation.range)}`,
+          `@${rangeText(operation.range)}${hintTextValue}`,
       );
     }
     lines.push(`    ${printTerminator(block.terminator)}`);
@@ -1305,7 +1630,10 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
 
 /** Print deterministic MIR without host paths or object identities. */
 export function printMir(program: MirProgram): string {
-  const lines = [`mir ${JSON.stringify(program.sourceId)}`];
+  const lines = [
+    `mir ${JSON.stringify(program.sourceId)} ` +
+      `specialization ${program.specialization}`,
+  ];
   for (const binding of program.globalBindings) {
     lines.push(`global %b${binding.id} ${binding.name}`);
   }
@@ -1324,10 +1652,11 @@ export interface CompilationResult {
   readonly syntax?: SyntaxProgram;
 }
 
-/** Compile source through owned syntax, HIR, and generic MIR. */
+/** Compile source through owned syntax, HIR, and policy-selected MIR. */
 export function compileSource(
   frontend: SourceFrontend,
   input: SourceInput,
+  options: CompilerOptions = {},
 ): CompilationResult {
   const frontendResult = frontend.parse(input);
   if (frontendResult.program == null) {
@@ -1343,7 +1672,7 @@ export function compileSource(
   return {
     diagnostics: [],
     hir: hirResult.program,
-    mir: buildMir(hirResult.program),
+    mir: buildMir(hirResult.program, options),
     syntax: frontendResult.program,
   };
 }

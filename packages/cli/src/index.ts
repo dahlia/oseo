@@ -42,11 +42,22 @@ const modeParser = withDefault(
   "execute" as const,
 );
 
+const specializationParser = withDefault(
+  map(
+    flag("--no-specialization", {
+      description: message`Compile only the generic native path.`,
+    }),
+    () => "disabled" as const,
+  ),
+  "enabled" as const,
+);
+
 const cliParser = object({
   mode: modeParser,
   sourceId: argument(stringValue({ metavar: "SOURCE" }), {
     description: message`Source file to compile.`,
   }),
+  specialization: specializationParser,
 });
 
 const cliProgram = defineProgram({
@@ -165,16 +176,21 @@ function compileCliSource(
   mode: CliInvocation["mode"],
   source: string,
   sourceId: string,
+  specialization: CliInvocation["specialization"],
 ): CliResult {
-  const compiled = compileSource(defaultComponents.frontend, {
-    source,
-    sourceId,
-  });
+  const compiled = compileSource(
+    defaultComponents.frontend,
+    {
+      source,
+      sourceId,
+    },
+    { specialization },
+  );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
   if (compiled.mir == null) {
     return diagnosticResult(
-      hostDiagnostic(sourceId, "The compiler did not produce generic MIR."),
+      hostDiagnostic(sourceId, "The compiler did not produce MIR."),
     );
   }
   if (mode === "dump-mir") {
@@ -203,6 +219,7 @@ export function runCli(request: CliRequest): CliResult {
     parsed.value.mode,
     request.source ?? "",
     request.sourceId ?? parsed.value.sourceId,
+    parsed.value.specialization,
   );
 }
 
@@ -308,17 +325,26 @@ export async function runNativeCli(
     );
   }
   if (parsed.value.mode !== "execute") {
-    return compileCliSource(parsed.value.mode, source, sourceId);
+    return compileCliSource(
+      parsed.value.mode,
+      source,
+      sourceId,
+      parsed.value.specialization,
+    );
   }
-  const compiled = compileSource(defaultComponents.frontend, {
-    source,
-    sourceId,
-  });
+  const compiled = compileSource(
+    defaultComponents.frontend,
+    {
+      source,
+      sourceId,
+    },
+    { specialization: parsed.value.specialization },
+  );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
   if (compiled.mir == null) {
     return diagnosticResult(
-      hostDiagnostic(sourceId, "The compiler did not produce generic MIR."),
+      hostDiagnostic(sourceId, "The compiler did not produce MIR."),
     );
   }
   let directory: string;

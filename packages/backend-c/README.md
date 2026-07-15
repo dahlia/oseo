@@ -1,10 +1,11 @@
 @oseo/backend-c
 ===============
 
-This package emits deterministic C11 source from backend-neutral generic MIR.
-It preserves direct generic calls, abrupt-result checks, root frames, and
-safepoint locations. It does not execute a compiler or choose runtime sources.
-MIR blocks and terminators are its only semantic input; it never replays HIR.
+This package emits deterministic C11 source from backend-neutral MIR. It
+preserves direct generic calls, guarded small-integer control flow,
+abrupt-result checks, root frames, and safepoint locations. It does not execute
+a compiler or choose runtime sources. MIR blocks and terminators are its only
+semantic input; it never replays HIR.
 Script-owned lexical bindings use shared storage while their values remain
 rooted in the active script frame across declared-function calls.
 Only functions reachable from the script and blocks reachable from function
@@ -23,3 +24,8 @@ frame.
 Value-slot discovery scans MIR argument IDs iteratively, so source-level call
 size does not become a JavaScript call-stack limit during C emission. Generated
 entry code passes diagnostic source identifiers with their UTF-8 byte lengths.
+
+M2 guard failures and checked-addition overflow branch to the same emitted
+generic addition block. The hit path uses private inline runtime primitives and
+does not call generic addition or allocate. Block parameters carry the selected
+result into one ordinary continuation.

@@ -90,6 +90,7 @@ that may change after the first vertical slice.
 | Generic value          | One 64-bit tagged word                                        | Decided in principle |
 | Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for x86-64  |
 | Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Implemented in M1    |
+| First specialization   | Guarded signed 48-bit addition with one generic fallback      | Implemented in M2    |
 
 The accepted M0 choices and their replacement triggers are recorded under
 [*docs/adr/*](./docs/adr/). Choices that remain provisional require an
@@ -131,7 +132,7 @@ private cross-package imports, and concrete dependencies from compiler core.
 
 M1 removed the synthetic backend input. Production input now traverses owned
 syntax, resolved HIR, generic MIR, deterministic C11 lowering, static runtime
-linking, and native execution. M2 adds guarded specialization to this same
+linking, and native execution. M2 added guarded specialization to this same
 pipeline without creating a second composition path.
 
 
@@ -192,6 +193,12 @@ The names and exact grouping may change. The required property is that a test
 can tell whether a guard exists, where its failure edge goes, and whether a
 specialized block allocates or calls a generic helper.
 
+M2 implements `guard-smi`, `unbox-smi`, checked addition, boxing, explicit
+fallback blocks, and block-parameter result joins. Textual MIR names the
+enabled or disabled policy, selected hint provenance, both guard successors,
+the overflow successor, the one generic block, and the join. Disabled mode
+retains the M1 graph without guarded operations.
+
 MIR is the complete semantic input to native backends. It owns primitive
 constants, binding reads and writes, operators, direct call targets, basic
 blocks, parameters, hint provenance, and terminators. MIR parameters are copied
@@ -223,10 +230,12 @@ The representation is an implementation choice; the following behavior is not:
     still fail, unless the generic continuation is defined to resume after that
     state.
 
-The first specialization should be a checked small-integer addition selected by
-`number` parameter hints. It must cover wrong annotations, integer overflow,
-negative zero, non-integer numbers, strings, and any other value admitted by the
-language profile at that milestone.
+The first specialization is a checked small-integer addition selected by
+consistent `number` parameter hints. M2 restricts selection to an exact
+two-parameter return addition. Wrong annotations, integer overflow, negative
+zero, non-integer numbers, strings, and every other admitted primitive enter
+the same compiled generic addition block. The detailed implemented contract is
+recorded in [*docs/specialization-m2.md*](./docs/specialization-m2.md).
 
 Object specialization follows the same rule. A shape guard can enable fixed-slot
 property access, but a miss must use generic property lookup without
@@ -252,6 +261,11 @@ Specialized blocks may hold raw integers, doubles, or pointers in native
 registers. A value must be converted back to `OseoValue` before it crosses a
 generic ABI boundary, becomes visible to the garbage collector, or is stored in
 a generic heap slot.
+
+The M2 path recognizes and unboxes immediate values through private runtime
+inline primitives. Checked addition validates both operand and result ranges
+before C signed arithmetic. Overflow branches to generic addition before a
+boxed result is committed.
 
 All C operations used by the initial backend must avoid undefined behavior.
 Checked integer arithmetic, shifts, pointer conversion, and floating-point
@@ -453,6 +467,10 @@ compilation. The test strategy has five layers:
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of
 the program-visible runtime API.
+
+M2 observation-enabled builds emit one private counter record. The testkit
+removes it from process stderr before differential comparison. Ordinary CLI
+builds neither update specialized counters nor print an observation record.
 
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to

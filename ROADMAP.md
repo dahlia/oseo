@@ -4,9 +4,9 @@ Oseo roadmap
 Status
 ------
 
-Oseo has completed milestone M1, the generic native vertical slice. The current
-implementation plan is guarded specialization in
-[*PLAN-M2.md*](./PLAN-M2.md). This roadmap uses capability gates rather than
+Oseo has completed milestone M2, guarded native specialization with a compiled
+generic fallback. The current implementation plan is the dynamic language core
+in [*PLAN-M3.md*](./PLAN-M3.md). This roadmap uses capability gates rather than
 calendar dates. A milestone is complete only when its exit criteria are
 repeatable in continuous integration.
 
@@ -200,6 +200,14 @@ strings, and every other input representable by the M2 language profile.
 
 M2 is the first public proof of the architecture described in the white paper.
 Later implementation work should not begin by weakening its invariants.
+
+M2 completion is recorded in
+[*docs/specialization-m2.md*](./docs/specialization-m2.md) and
+[*ADR 0007*](./docs/adr/0007-guarded-small-integer-addition.md). The compiler
+has explicit enabled and disabled policies, inspectable guarded MIR, one shared
+generic addition block, test-only counters, strict native execution, AArch64
+cross-links, and optimized assembly inspection. The M1 and M2 fixture corpus
+matches Node.js and Deno in both native modes.
 
 
 M3: Dynamic language core
@@ -428,19 +436,20 @@ Initial work queue
 ------------------
 
 The package scaffold, architecture probes, generic compiler pipeline, native
-runtime, and differential matrix are complete through M1. M2 follows the work
-sequence and acceptance criteria in [*PLAN-M2.md*](./PLAN-M2.md):
+runtime, and guarded specialization proof are complete through M2. M3 follows
+the semantic order and acceptance criteria in [*PLAN-M3.md*](./PLAN-M3.md):
 
-1.  Freeze specialization-invariance and guard-miss fixtures.
-2.  Add specialization policy and explicit generic-only mode.
-3.  Add small-integer guards, unboxing, checked addition, and boxing to MIR.
-4.  Lower guard success and failure edges to deterministic C11.
-5.  Add test-only counters and structural machine-code inspection.
-6.  Close hint mutation, side-effect ordering, and fallback evidence.
+1.  Freeze an M3 language profile, object-layout decision, and test262 harness.
+2.  Generalize heap ownership and collector tracing for object graphs.
+3.  Implement complete generic ordinary-object and prototype semantics.
+4.  Add arrays, lexical environments, closures, and function values in
+    prerequisite order.
+5.  Add language-visible exceptions and abrupt control flow.
+6.  Add shape-guarded property access only after generic mutation evidence.
 
-M2 changes only after the complete generic path remains available. That
-boundary keeps specialization a test of Oseo's design rather than a replacement
-for unfinished semantics.
+M3 preserves M2 as a permanent invariance gate. Property specialization cannot
+replace unfinished generic object semantics or weaken the checked-addition
+fallback.
 
 
 Risks that affect ordering

@@ -17,6 +17,9 @@ interface EmitState {
   readonly functionRootCounts: ReadonlyMap<number, number>;
   readonly globalBindings: ReadonlyMap<number, number>;
   readonly lines: string[];
+  readonly blockParameters: ReadonlyMap<number, readonly number[]>;
+  readonly scalarKinds: Map<number, "boolean" | "smi">;
+  readonly observeSpecialization: boolean;
   nextRecursiveTarget: number;
   usesAbrupt: boolean;
 }
@@ -226,6 +229,54 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+function emitGuardSmi(state: EmitState, operation: MirOperation): void {
+  const argument = operationArgument(operation, 0);
+  state.scalarKinds.set(operation.id, "boolean");
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_value_is_smi(roots[${argument}]);`,
+  );
+}
+
+function emitUnboxSmi(state: EmitState, operation: MirOperation): void {
+  const argument = operationArgument(operation, 0);
+  state.scalarKinds.set(operation.id, "smi");
+  line(
+    state,
+    `int64_t fast_${operation.id} = ` +
+      `oseo_value_unbox_smi(roots[${argument}]);`,
+  );
+}
+
+function emitCheckedAdd(state: EmitState, operation: MirOperation): void {
+  const left = operationArgument(operation, 0);
+  const right = operationArgument(operation, 1);
+  const result = operation.checkedResult;
+  if (
+    result == null ||
+    state.scalarKinds.get(left) !== "smi" ||
+    state.scalarKinds.get(right) !== "smi"
+  ) {
+    throw new Error(`MIR checked add %${operation.id} has invalid inputs.`);
+  }
+  state.scalarKinds.set(operation.id, "boolean");
+  state.scalarKinds.set(result, "smi");
+  line(state, `int64_t fast_${result};`);
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_smi_try_add(` +
+      `fast_${left}, fast_${right}, &fast_${result});`,
+  );
+}
+
+function emitBoxSmi(state: EmitState, operation: MirOperation): void {
+  const argument = operationArgument(operation, 0);
+  if (state.scalarKinds.get(argument) !== "smi") {
+    throw new Error(`MIR box %${operation.id} has no small integer input.`);
+  }
+  line(state, `roots[${operation.id}] = oseo_value_box_smi(fast_${argument});`);
+}
+
 function emitCall(state: EmitState, operation: MirOperation): void {
   const target = operation.target;
   if (target == null) {
@@ -291,6 +342,26 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitUnary(state, operation);
   } else if (operation.kind === "binary") {
     emitBinary(state, operation);
+  } else if (operation.kind === "guard-smi") {
+    emitGuardSmi(state, operation);
+  } else if (operation.kind === "unbox-smi") {
+    emitUnboxSmi(state, operation);
+  } else if (operation.kind === "add-smi-checked") {
+    emitCheckedAdd(state, operation);
+  } else if (operation.kind === "box-smi") {
+    emitBoxSmi(state, operation);
+  } else if (operation.kind === "count-guard-hit") {
+    if (state.observeSpecialization) {
+      line(state, "context->guard_hits += 1u;");
+    }
+  } else if (operation.kind === "count-guard-miss") {
+    if (state.observeSpecialization) {
+      line(state, "context->guard_misses += 1u;");
+    }
+  } else if (operation.kind === "count-overflow-miss") {
+    if (state.observeSpecialization) {
+      line(state, "context->overflow_misses += 1u;");
+    }
   } else if (operation.kind === "call") {
     emitCall(state, operation);
   } else if (operation.kind === "check-status") {
@@ -308,13 +379,24 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, "oseo_roots_release(context, &frame);");
     line(state, "return result;");
   } else if (terminator.kind === "jump") {
+    const parameters = state.blockParameters.get(terminator.target) ?? [];
+    const values = terminator.values ?? [];
+    if (parameters.length !== values.length) {
+      throw new Error(
+        `MIR jump to bb${terminator.target} has ${values.length} values ` +
+          `for ${parameters.length} parameters.`,
+      );
+    }
+    for (let index = 0; index < parameters.length; index += 1) {
+      line(state, `roots[${parameters[index]}] = roots[${values[index]}];`);
+    }
     line(state, `goto bb${terminator.target};`);
   } else if (terminator.kind === "branch") {
-    line(
-      state,
-      `if (oseo_to_boolean(roots[${terminator.test}])) ` +
-        `goto bb${terminator.whenTrue};`,
-    );
+    const test =
+      state.scalarKinds.get(terminator.test) === "boolean"
+        ? `fast_${terminator.test}`
+        : `oseo_to_boolean(roots[${terminator.test}])`;
+    line(state, `if (${test}) goto bb${terminator.whenTrue};`);
     line(state, `goto bb${terminator.whenFalse};`);
   } else {
     line(state, "abort();");
@@ -324,8 +406,14 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
 function maximumValueId(blocks: readonly MirBlock[]): number {
   let maximum = -1;
   for (const block of blocks) {
+    for (const parameter of block.parameters ?? []) {
+      maximum = Math.max(maximum, parameter);
+    }
     for (const operation of block.operations) {
       maximum = Math.max(maximum, operation.id);
+      if (operation.checkedResult != null) {
+        maximum = Math.max(maximum, operation.checkedResult);
+      }
       for (const argument of operation.arguments) {
         maximum = Math.max(maximum, argument);
       }
@@ -335,6 +423,11 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       maximum = Math.max(maximum, terminator.value);
     if (terminator.kind === "branch")
       maximum = Math.max(maximum, terminator.test);
+    if (terminator.kind === "jump") {
+      for (const value of terminator.values ?? []) {
+        maximum = Math.max(maximum, value);
+      }
+    }
   }
   return maximum;
 }
@@ -452,6 +545,7 @@ function emitFunction(
   functionValue: MirFunction,
   globalBindings: ReadonlyMap<number, number>,
   functionRootCounts: ReadonlyMap<number, number>,
+  observeSpecialization: boolean,
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -479,10 +573,15 @@ function emitFunction(
         valueSlotCount + index,
       ]),
     ),
+    blockParameters: new Map(
+      blocks.map((block) => [block.id, block.parameters ?? []]),
+    ),
     functionRootCounts,
     globalBindings,
     lines: [],
     nextRecursiveTarget: 0,
+    observeSpecialization,
+    scalarKinds: new Map(),
     usesAbrupt: false,
     functionId: functionValue.id,
   };
@@ -554,7 +653,7 @@ function prototype(functionValue: MirFunction): string {
   );
 }
 
-/** Deterministic C11 lowering whose only semantic input is generic MIR. */
+/** Deterministic C11 lowering whose only semantic input is MIR. */
 export const cBackend: NativeBackend = {
   emit(input) {
     const declaredFunctions = reachableFunctions(input);
@@ -586,7 +685,12 @@ export const cBackend: NativeBackend = {
     const declarations = functions.map(prototype).join("\n");
     const definitions = functions
       .map((functionValue) =>
-        emitFunction(functionValue, globalBindings, functionRootCounts),
+        emitFunction(
+          functionValue,
+          globalBindings,
+          functionRootCounts,
+          input.observeSpecialization === true,
+        ),
       )
       .join("\n");
     const sourceId = escapeCString(input.sourceId);
@@ -612,6 +716,9 @@ export const cBackend: NativeBackend = {
         "    OseoResult result;\n" +
         `    oseo_context_init(\n` +
         `        &context, "${sourceId}", ${sourceIdByteLength}u);\n` +
+        (input.observeSpecialization === true
+          ? "    context.observe_specialization = true;\n"
+          : "") +
         `${globalInitialization}${globalInitialization === "" ? "" : "\n"}` +
         `    result = oseo_frame_enter(\n` +
         `        &context, ${scriptRootCount}u);\n` +
@@ -627,6 +734,9 @@ export const cBackend: NativeBackend = {
         "        oseo_context_destroy(&context);\n" +
         "        return 1;\n" +
         "    }\n" +
+        (input.observeSpecialization === true
+          ? "    oseo_context_print_observations(&context);\n"
+          : "") +
         "    oseo_context_destroy(&context);\n" +
         "    return 0;\n" +
         "}\n",
