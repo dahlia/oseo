@@ -18,6 +18,7 @@ interface EmitState {
   readonly environmentSlot: number;
   readonly blockParameters: ReadonlyMap<number, readonly number[]>;
   readonly scalarKinds: Map<number, "boolean" | "smi">;
+  readonly strict: boolean;
   readonly observeSpecialization: boolean;
   nextRecursiveTarget: number;
   usesAbrupt: boolean;
@@ -484,14 +485,15 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       line(
         state,
         `result = oseo_object_delete(context, roots[${object}], ` +
-          `roots[${key}]);`,
+          `roots[${key}], ${state.strict ? "true" : "false"});`,
       );
     } else {
       const value = operationArgument(operation, 2);
       line(
         state,
         `result = oseo_object_set(context, roots[${object}], ` +
-          `roots[${key}], roots[${value}]);`,
+          `roots[${key}], roots[${value}], ` +
+          `${state.strict ? "true" : "false"});`,
       );
     }
   }
@@ -860,6 +862,7 @@ function emitFunction(
     nextRecursiveTarget: 0,
     observeSpecialization,
     scalarKinds: new Map(),
+    strict: functionValue.strict === true,
     usesAbrupt: false,
     usesCompletion: false,
     functionId: functionValue.id,

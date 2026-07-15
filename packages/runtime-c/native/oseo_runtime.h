@@ -210,7 +210,8 @@ OseoResult oseo_object_define(
 OseoResult oseo_object_delete(
     OseoContext *context,
     OseoValue object,
-    OseoValue key
+    OseoValue key,
+    bool strict
 );
 OseoResult oseo_object_get(
     OseoContext *context,
@@ -232,7 +233,8 @@ OseoResult oseo_object_set(
     OseoContext *context,
     OseoValue object,
     OseoValue key,
-    OseoValue value
+    OseoValue value,
+    bool strict
 );
 OseoResult oseo_object_set_prototype(
     OseoContext *context,

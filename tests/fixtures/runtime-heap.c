@@ -105,14 +105,18 @@ static void test_ordinary_properties(
     roots[3] = make_key(context, UINT16_C(0x0066));
     roots[4] = make_key(context, UINT16_C(0x0075));
     (void)require_normal(
-        oseo_object_set(context, roots[0], roots[2], oseo_number(1.0))
+        oseo_object_set(
+            context, roots[0], roots[2], oseo_number(1.0), false
+        )
     );
     assert(
         require_normal(oseo_object_get(context, roots[1], roots[2])) ==
         oseo_number(1.0)
     );
     (void)require_normal(
-        oseo_object_set(context, roots[1], roots[2], oseo_number(2.0))
+        oseo_object_set(
+            context, roots[1], roots[2], oseo_number(2.0), false
+        )
     );
     assert(
         require_normal(oseo_object_get(context, roots[1], roots[2])) ==
@@ -129,25 +133,33 @@ static void test_ordinary_properties(
         )
     );
     (void)require_normal(
-        oseo_object_set(context, roots[1], roots[3], oseo_number(4.0))
+        oseo_object_set(
+            context, roots[1], roots[3], oseo_number(4.0), false
+        )
     );
     assert(
         require_normal(oseo_object_get(context, roots[1], roots[3])) ==
         oseo_number(3.0)
     );
     assert(
-        require_normal(oseo_object_delete(context, roots[1], roots[3])) ==
+        require_normal(
+            oseo_object_delete(context, roots[1], roots[3], false)
+        ) ==
         oseo_boolean(false)
     );
     (void)require_normal(
-        oseo_object_set(context, roots[1], roots[4], oseo_undefined())
+        oseo_object_set(
+            context, roots[1], roots[4], oseo_undefined(), false
+        )
     );
     assert(
         require_normal(oseo_object_has_own(context, roots[1], roots[4])) ==
         oseo_boolean(true)
     );
     assert(
-        require_normal(oseo_object_delete(context, roots[1], roots[2])) ==
+        require_normal(
+            oseo_object_delete(context, roots[1], roots[2], false)
+        ) ==
         oseo_boolean(true)
     );
     assert(
@@ -159,7 +171,7 @@ static void test_ordinary_properties(
         OSEO_STATUS_THROW
     );
     (void)require_normal(
-        oseo_object_set(context, roots[1], roots[2], roots[1])
+        oseo_object_set(context, roots[1], roots[2], roots[1], false)
     );
     oseo_collect(context);
     assert(
@@ -174,24 +186,32 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
     roots[3] = make_text(context, "5");
     roots[4] = make_text(context, "length");
     (void)require_normal(
-        oseo_object_set(context, roots[0], roots[1], oseo_number(1.0))
+        oseo_object_set(
+            context, roots[0], roots[1], oseo_number(1.0), false
+        )
     );
     (void)require_normal(
-        oseo_object_set(context, roots[0], roots[2], oseo_number(3.0))
+        oseo_object_set(
+            context, roots[0], roots[2], oseo_number(3.0), false
+        )
     );
     assert(
         require_normal(oseo_object_get(context, roots[0], roots[4])) ==
         oseo_number(3.0)
     );
     (void)require_normal(
-        oseo_object_set(context, roots[0], roots[3], oseo_number(6.0))
+        oseo_object_set(
+            context, roots[0], roots[3], oseo_number(6.0), false
+        )
     );
     assert(
         require_normal(oseo_object_get(context, roots[0], roots[4])) ==
         oseo_number(6.0)
     );
     (void)require_normal(
-        oseo_object_set(context, roots[0], roots[4], oseo_number(1.0))
+        oseo_object_set(
+            context, roots[0], roots[4], oseo_number(1.0), false
+        )
     );
     assert(
         require_normal(oseo_object_has_own(context, roots[0], roots[2])) ==
@@ -212,7 +232,8 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
             context,
             roots[0],
             roots[4],
-            oseo_number(1.0)
+            oseo_number(1.0),
+            false
         ).status == OSEO_STATUS_THROW
     );
     assert(
@@ -253,7 +274,8 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
             context,
             roots[0],
             roots[3],
-            oseo_number(1.0)
+            oseo_number(1.0),
+            false
         ).status == OSEO_STATUS_THROW
     );
     context->error_code = NULL;

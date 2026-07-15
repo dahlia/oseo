@@ -42,6 +42,7 @@ interface ConvertContext {
   readonly diagnostics: Diagnostic[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;
+  readonly strictStack: boolean[];
 }
 
 interface SourceIndex {
@@ -63,6 +64,13 @@ function nodes(value: unknown): readonly BabelNode[] {
   return value.flatMap((item) => {
     const valueNode = node(item);
     return valueNode == null ? [] : [valueNode];
+  });
+}
+
+function hasUseStrictDirective(value: BabelNode): boolean {
+  return nodes(value.directives).some((directive) => {
+    const literal = node(directive.value);
+    return literal?.value === "use strict";
   });
 }
 
@@ -869,15 +877,22 @@ function functionDeclaration(
   const returnHint = typeHint(context, value.returnType);
   if (returnHint != null) returnHints.push(returnHint);
   returnHints.push(...jsdoc.returns);
+  const strict =
+    context.strictStack.at(-1) === true || hasUseStrictDirective(bodyNode);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  context.strictStack.push(strict);
   for (const child of nodes(bodyNode.body)) {
     const converted =
       child.type === "FunctionDeclaration"
         ? functionDeclaration(context, child, true)
         : statement(context, child, true);
-    if (converted == null) return undefined;
+    if (converted == null) {
+      context.strictStack.pop();
+      return undefined;
+    }
     body.push(converted);
   }
+  context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
   return {
     ...location(context, value),
@@ -886,6 +901,7 @@ function functionDeclaration(
     name,
     parameters,
     returnHints,
+    strict,
   };
 }
 
@@ -894,20 +910,27 @@ function program(
   file: BabelNode,
 ): SyntaxProgram | undefined {
   const programNode = node(file.program) ?? file;
+  const strict = hasUseStrictDirective(programNode);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  context.strictStack.push(strict);
   for (const item of nodes(programNode.body)) {
     const converted =
       item.type === "FunctionDeclaration"
         ? functionDeclaration(context, item)
         : statement(context, item, false);
-    if (converted == null) return undefined;
+    if (converted == null) {
+      context.strictStack.pop();
+      return undefined;
+    }
     body.push(converted);
   }
+  context.strictStack.pop();
   return {
     ...location(context, programNode),
     body,
     kind: "program",
     sourceId: context.input.sourceId,
+    strict,
   };
 }
 
@@ -937,7 +960,12 @@ export const babelFrontend: SourceFrontend = {
           sourceId: input.sourceId,
         };
       }
-      const context: ConvertContext = { diagnostics: [], input, locations };
+      const context: ConvertContext = {
+        diagnostics: [],
+        input,
+        locations,
+        strictStack: [],
+      };
       const converted = program(context, file);
       if (converted == null || context.diagnostics.length > 0) {
         return {

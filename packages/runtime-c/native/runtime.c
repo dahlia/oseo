@@ -742,7 +742,8 @@ OseoResult oseo_function_environment(
     OseoValue function_value
 ) {
     if (!is_function(function_value)) {
-        return failure(context, "OSEO2001", "Value is not callable.");
+        (void)context;
+        return language_failure();
     }
     return normal(function_object(function_value)->environment);
 }
@@ -753,7 +754,8 @@ OseoResult oseo_function_code_id(
     size_t *code_id
 ) {
     if (!is_function(function_value)) {
-        return failure(context, "OSEO2001", "Value is not callable.");
+        (void)context;
+        return language_failure();
     }
     *code_id = function_object(function_value)->code_id;
     return normal(function_value);
@@ -769,7 +771,8 @@ OseoResult oseo_function_prototype(
     OseoValue function_value
 ) {
     if (!is_function(function_value)) {
-        return failure(context, "OSEO2001", "Value is not a constructor.");
+        (void)context;
+        return language_failure();
     }
     return normal(function_object(function_value)->prototype_object);
 }
@@ -912,23 +915,38 @@ static OseoResult set_array_length(
     return normal(value);
 }
 
-static OseoResult require_object_and_key(
+static OseoResult require_property_key(
     OseoContext *context,
-    OseoValue object,
     OseoValue key
 ) {
-    if (!is_object(object)) {
-        return failure(context, "OSEO2001", "Value is not an ordinary object.");
-    }
     if (!is_string(key)) {
         return failure(context, "OSEO2001", "Property key is not a string.");
     }
-    return normal(object);
+    return normal(key);
+}
+
+static bool is_nullish(OseoValue value) {
+    uint64_t tag = tag_of(value);
+    return tag == OSEO_TAG_NULL || tag == OSEO_TAG_UNDEFINED;
+}
+
+static bool string_own_property(
+    OseoValue string_value,
+    OseoValue key,
+    uint32_t *index
+) {
+    if (!is_string(string_value)) return false;
+    if (string_is_ascii(key, "length")) return true;
+    uint32_t candidate = 0u;
+    if (!array_index(key, &candidate) ||
+        candidate >= string_object(string_value)->length) return false;
+    if (index != NULL) *index = candidate;
+    return true;
 }
 
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
     if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
-        return failure(context, "OSEO2001", "Prototype is not object or null.");
+        return language_failure();
     }
     OseoOrdinaryObject *object = allocate_heap_bytes(context, sizeof(*object));
     if (object == NULL) {
@@ -1010,8 +1028,20 @@ OseoResult oseo_object_get(
     OseoValue object_value,
     OseoValue key
 ) {
-    OseoResult valid = require_object_and_key(context, object_value, key);
+    OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(object_value)) {
+        if (is_nullish(object_value)) return language_failure();
+        if (is_string(object_value) && string_is_ascii(key, "length")) {
+            return normal(oseo_number(string_object(object_value)->length));
+        }
+        uint32_t index = 0u;
+        if (string_own_property(object_value, key, &index)) {
+            uint16_t unit = string_object(object_value)->units[index];
+            return allocate_string(context, &unit, 1u);
+        }
+        return normal(oseo_undefined());
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         return normal(function_object(object_value)->prototype_object);
     }
@@ -1066,8 +1096,16 @@ OseoResult oseo_object_has_own(
     OseoValue object_value,
     OseoValue key
 ) {
-    OseoResult valid = require_object_and_key(context, object_value, key);
+    OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(object_value)) {
+        if (is_nullish(object_value)) return language_failure();
+        return normal(oseo_boolean(string_own_property(
+            object_value,
+            key,
+            NULL
+        )));
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         return normal(oseo_boolean(true));
     }
@@ -1082,10 +1120,15 @@ OseoResult oseo_object_set(
     OseoContext *context,
     OseoValue object_value,
     OseoValue key,
-    OseoValue value
+    OseoValue value,
+    bool strict
 ) {
-    OseoResult valid = require_object_and_key(context, object_value, key);
+    OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(object_value)) {
+        if (is_nullish(object_value) || strict) return language_failure();
+        return normal(value);
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         function_object(object_value)->prototype_object = value;
         return normal(value);
@@ -1106,7 +1149,7 @@ OseoResult oseo_object_set(
         if (index != SIZE_MAX) {
             OseoProperty *property = &owner->properties[index];
             if (!property->attributes.writable) {
-                return normal(value);
+                return strict ? language_failure() : normal(value);
             }
             if (current == object_value) {
                 property->value = value;
@@ -1138,8 +1181,9 @@ OseoResult oseo_object_define(
     OseoValue value,
     OseoPropertyAttributes attributes
 ) {
-    OseoResult valid = require_object_and_key(context, object_value, key);
+    OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(object_value)) return language_failure();
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
             return language_failure();
@@ -1203,21 +1247,37 @@ OseoResult oseo_object_define(
 OseoResult oseo_object_delete(
     OseoContext *context,
     OseoValue object_value,
-    OseoValue key
+    OseoValue key,
+    bool strict
 ) {
-    OseoResult valid = require_object_and_key(context, object_value, key);
+    OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (!is_object(object_value)) {
+        if (is_nullish(object_value)) return language_failure();
+        if (string_own_property(object_value, key, NULL)) {
+            return strict
+                ? language_failure()
+                : normal(oseo_boolean(false));
+        }
+        return normal(oseo_boolean(true));
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
-        return normal(oseo_boolean(false));
+        return strict
+            ? language_failure()
+            : normal(oseo_boolean(false));
     }
     if (is_array(object_value) && string_is_ascii(key, "length")) {
-        return normal(oseo_boolean(false));
+        return strict
+            ? language_failure()
+            : normal(oseo_boolean(false));
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     size_t index = own_property_index(object, key);
     if (index == SIZE_MAX) return normal(oseo_boolean(true));
     if (!object->properties[index].attributes.configurable) {
-        return normal(oseo_boolean(false));
+        return strict
+            ? language_failure()
+            : normal(oseo_boolean(false));
     }
     (void)remove_property(object, index);
     object->dictionary = true;
@@ -1233,12 +1293,12 @@ OseoResult oseo_object_set_prototype(
 ) {
     if (!is_object(object_value) ||
         (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype))) {
-        return failure(context, "OSEO2001", "Invalid prototype mutation.");
+        return language_failure();
     }
     OseoValue current = prototype;
     while (is_object(current)) {
         if (current == object_value) {
-            return failure(context, "OSEO2001", "Prototype cycle rejected.");
+            return language_failure();
         }
         current = ordinary_object(current)->prototype;
     }
@@ -1314,7 +1374,13 @@ static OseoResult define_ascii_value(
     OseoResult result = ascii_string(context, name);
     frame->slots[1] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return oseo_object_set(context, frame->slots[0], frame->slots[1], value);
+    return oseo_object_set(
+        context,
+        frame->slots[0],
+        frame->slots[1],
+        value,
+        false
+    );
 }
 
 OseoResult oseo_object_builtin_create(
@@ -1337,7 +1403,7 @@ OseoResult oseo_object_builtin_define_property(
     OseoValue descriptor_value =
         builtin_argument(argument_count, arguments, 2u);
     if (!is_object(object_value) || !is_object(descriptor_value)) {
-        return failure(context, "OSEO2001", "Invalid property descriptor.");
+        return language_failure();
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -1527,7 +1593,8 @@ static OseoResult append_key(
         context,
         frame->slots[0],
         frame->slots[1],
-        frame->slots[2]
+        frame->slots[2],
+        false
     );
 }
 

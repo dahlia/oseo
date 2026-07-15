@@ -255,6 +255,7 @@ export interface SyntaxFunction extends LocatedSyntax {
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];
   readonly returnHints: readonly Hint[];
+  readonly strict?: boolean;
 }
 
 /** One owned M1 script, with no parser-specific values. */
@@ -262,6 +263,7 @@ export interface SyntaxProgram extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
   readonly kind: "program";
   readonly sourceId: string;
+  readonly strict?: boolean;
 }
 
 /** Production frontend output for owned M1 syntax. */
@@ -473,6 +475,7 @@ export interface HirFunction extends LocatedSyntax {
   readonly parameters: readonly HirParameter[];
   readonly returnHints: readonly Hint[];
   readonly selfBindingId?: number;
+  readonly strict?: boolean;
 }
 
 /** A normalized script and its statically callable functions. */
@@ -482,6 +485,7 @@ export interface HirProgram {
   readonly kind: "hir-program";
   readonly range: SourceRange;
   readonly sourceId: string;
+  readonly strict?: boolean;
 }
 
 /** Result of profile validation and HIR name resolution. */
@@ -1150,6 +1154,7 @@ export function buildHir(program: SyntaxProgram): HirResult {
       kind: "hir-program",
       range: program.range,
       sourceId: program.sourceId,
+      strict: program.strict === true,
     },
   };
 }
@@ -1520,6 +1525,7 @@ export interface MirFunction extends LocatedSyntax {
   readonly rootSlotCount: number;
   readonly selfBindingId?: number;
   readonly specialization?: MirSpecialization;
+  readonly strict?: boolean;
 }
 
 /** Backend-neutral MIR for one source script. */
@@ -2523,6 +2529,7 @@ function buildMirFunction(
   selfBindingId: number | undefined,
   range: SourceRange,
   specialization: SpecializationMode,
+  strict: boolean,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -2575,6 +2582,7 @@ function buildMirFunction(
     parameters: mirParameters,
     range,
     rootSlotCount: builder.nextValue + parameters.length + 1,
+    strict,
     ...(selfBindingId == null ? {} : { selfBindingId }),
   };
 }
@@ -2855,6 +2863,7 @@ export function buildMir(
         functionValue.selfBindingId,
         functionValue.range,
         specialization,
+        functionValue.strict === true,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)
@@ -2878,6 +2887,7 @@ export function buildMir(
       undefined,
       program.range,
       specialization,
+      program.strict === true,
     ),
     sourceId: program.sourceId,
     specialization,

@@ -53,6 +53,26 @@ test("preserves non-strict script parameter bindings", () => {
   }
 });
 
+test("retains script and function strictness in owned IR", () => {
+  const script = compileSource(babelFrontend, {
+    source: '"use strict"; function outer() { function inner() {} }',
+    sourceId: "strict-script.ts",
+  });
+  assert.deepEqual(script.diagnostics, []);
+  assert.equal(script.mir?.script.strict, true);
+  assert.ok(
+    script.mir?.functions.every((functionValue) => functionValue.strict),
+  );
+
+  const functionOnly = compileSource(babelFrontend, {
+    source: 'function strictFunction() { "use strict"; }',
+    sourceId: "strict-function.ts",
+  });
+  assert.deepEqual(functionOnly.diagnostics, []);
+  assert.equal(functionOnly.mir?.script.strict, false);
+  assert.equal(functionOnly.mir?.functions[0]?.strict, true);
+});
+
 test("ignores tag-shaped text outside JSDoc comments", () => {
   const result = babelFrontend.parse({
     source:

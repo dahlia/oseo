@@ -330,6 +330,28 @@ console.log(values.length);
 `,
   },
   {
+    name: "catchable-type-errors",
+    source: `
+const fixed = {};
+Object.defineProperty(fixed, "item", {
+  value: 1,
+  writable: false,
+});
+function strictErrors() {
+  "use strict";
+  try { fixed.item = 2; } catch (error) { console.log("strict set"); }
+  try { delete fixed.item; } catch (error) { console.log("strict delete"); }
+}
+strictErrors();
+try { const value = 1; value(); } catch (error) {
+  console.log("not callable");
+}
+try { null.item; } catch (error) { console.log("null receiver"); }
+try { Object.create(1); } catch (error) { console.log("invalid prototype"); }
+console.log((1).missing, true.missing, "abc".length, "abc"[1]);
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
