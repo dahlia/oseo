@@ -1,10 +1,20 @@
 import { parse as parseBabel } from "@babel/parser";
 import type {
+  BinaryOperator,
+  ByteRange,
   Diagnostic,
-  FrontendResult,
+  Hint,
+  HintName,
   Position,
   SourceFrontend,
   SourceInput,
+  SourceRange,
+  SyntaxCallTarget,
+  SyntaxExpression,
+  SyntaxFunction,
+  SyntaxParameter,
+  SyntaxProgram,
+  SyntaxStatement,
 } from "@oseo/compiler";
 
 interface ParserError {
@@ -13,25 +23,84 @@ interface ParserError {
   readonly raisedAt?: number;
 }
 
-interface BabelFile {
-  readonly errors?: readonly ParserError[];
+interface BabelComment {
+  readonly end?: number;
+  readonly start?: number;
+  readonly type?: string;
+  readonly value?: string;
 }
 
-function clampOffset(source: string, offset: number): number {
-  return Math.max(0, Math.min(offset, source.length));
+interface BabelNode {
+  readonly [key: string]: unknown;
+  readonly end?: number;
+  readonly leadingComments?: readonly BabelComment[];
+  readonly start?: number;
+  readonly type?: string;
 }
 
-function positionAt(source: string, rawOffset: number): Position {
-  const offset = clampOffset(source, rawOffset);
+interface ConvertContext {
+  readonly diagnostics: Diagnostic[];
+  readonly input: SourceInput;
+  readonly locations: SourceIndex;
+}
+
+interface SourceIndex {
+  readonly byteOffsets: readonly number[];
+  readonly columns: readonly number[];
+  readonly length: number;
+  readonly lines: readonly number[];
+}
+
+function node(value: unknown): BabelNode | undefined {
+  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+  return value as BabelNode;
+}
+
+function nodes(value: unknown): readonly BabelNode[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    const valueNode = node(item);
+    return valueNode == null ? [] : [valueNode];
+  });
+}
+
+function utf8Width(codePoint: number): number {
+  if (codePoint <= 0x7f) return 1;
+  if (codePoint <= 0x7ff) return 2;
+  if (codePoint <= 0xffff) return 3;
+  return 4;
+}
+
+function createSourceIndex(source: string): SourceIndex {
+  const length = source.length + 1;
+  const byteOffsets = Array.from({ length }, () => 0);
+  const columns = Array.from({ length }, () => 0);
+  const lines = Array.from({ length }, () => 0);
+  let byteCount = 0;
   let line = 1;
   let column = 1;
-  let index = 0;
-  while (index < offset) {
-    const character = source[index];
+  let offset = 0;
+  const record = (): void => {
+    byteOffsets[offset] = byteCount;
+    columns[offset] = column;
+    lines[offset] = line;
+  };
+  record();
+  while (offset < source.length) {
+    const character = source[offset];
     if (character === "\r") {
       line += 1;
       column = 1;
-      index += source[index + 1] === "\n" && index + 1 < offset ? 2 : 1;
+      byteCount += 1;
+      offset += 1;
+      record();
+      if (source[offset] === "\n") {
+        byteCount += 1;
+        offset += 1;
+        record();
+      }
     } else if (
       character === "\n" ||
       character === "\u2028" ||
@@ -39,24 +108,86 @@ function positionAt(source: string, rawOffset: number): Position {
     ) {
       line += 1;
       column = 1;
-      index += 1;
+      byteCount += utf8Width(character.codePointAt(0) ?? 0);
+      offset += 1;
+      record();
     } else {
       column += 1;
-      const codePoint = source.codePointAt(index);
-      index += codePoint !== undefined && codePoint > 0xffff ? 2 : 1;
+      const codePoint = source.codePointAt(offset) ?? 0;
+      if (codePoint > 0xffff) {
+        byteCount += 3;
+        offset += 1;
+        record();
+        byteCount += 1;
+        offset += 1;
+        record();
+      } else {
+        byteCount += utf8Width(codePoint);
+        offset += 1;
+        record();
+      }
     }
   }
-  return { column, line };
+  return { byteOffsets, columns, length: source.length, lines };
 }
 
-function diagnosticAt(input: SourceInput, rawOffset: number): Diagnostic {
-  const offset = clampOffset(input.source, rawOffset);
-  const byteOffset = new TextEncoder().encode(
-    input.source.slice(0, offset),
-  ).length;
-  const position = positionAt(input.source, offset);
+function clampOffset(index: SourceIndex, offset: number): number {
+  return Math.max(0, Math.min(offset, index.length));
+}
+
+function positionAt(index: SourceIndex, rawOffset: number): Position {
+  const offset = clampOffset(index, rawOffset);
   return {
-    byteRange: { end: byteOffset, start: byteOffset },
+    column: index.columns[offset] ?? 1,
+    line: index.lines[offset] ?? 1,
+  };
+}
+
+function byteOffset(index: SourceIndex, rawOffset: number): number {
+  return index.byteOffsets[clampOffset(index, rawOffset)] ?? 0;
+}
+
+function offsets(value: BabelNode): readonly [number, number] {
+  const start = value.start ?? 0;
+  return [start, value.end ?? start];
+}
+
+function sourceRange(index: SourceIndex, value: BabelNode): SourceRange {
+  const [start, end] = offsets(value);
+  return {
+    end: positionAt(index, end),
+    start: positionAt(index, start),
+  };
+}
+
+function bytes(index: SourceIndex, value: BabelNode): ByteRange {
+  const [start, end] = offsets(value);
+  return {
+    end: byteOffset(index, end),
+    start: byteOffset(index, start),
+  };
+}
+
+function location(
+  context: ConvertContext,
+  value: BabelNode,
+): { readonly byteRange: ByteRange; readonly range: SourceRange } {
+  return {
+    byteRange: bytes(context.locations, value),
+    range: sourceRange(context.locations, value),
+  };
+}
+
+function diagnosticAt(
+  input: SourceInput,
+  index: SourceIndex,
+  rawOffset: number,
+): Diagnostic {
+  const offset = clampOffset(index, rawOffset);
+  const position = positionAt(index, offset);
+  const encodedOffset = byteOffset(index, offset);
+  return {
+    byteRange: { end: encodedOffset, start: encodedOffset },
     code: "OSEO0001",
     message: "Source could not be parsed.",
     range: { end: position, start: position },
@@ -64,33 +195,521 @@ function diagnosticAt(input: SourceInput, rawOffset: number): Diagnostic {
   };
 }
 
+function unsupported(
+  context: ConvertContext,
+  value: BabelNode,
+  description?: string,
+): undefined {
+  context.diagnostics.push({
+    ...location(context, value),
+    code: "OSEO1001",
+    message:
+      description ??
+      `${value.type ?? "Unknown syntax"} is outside the M1 profile.`,
+    sourceId: context.input.sourceId,
+  });
+  return undefined;
+}
+
 function errorOffset(error: ParserError): number {
   return error.pos ?? error.position ?? error.raisedAt ?? 0;
 }
 
+const hintNames = new Map<string, HintName>([
+  ["TSAnyKeyword", "any"],
+  ["TSBooleanKeyword", "boolean"],
+  ["TSNullKeyword", "null"],
+  ["TSNumberKeyword", "number"],
+  ["TSStringKeyword", "string"],
+  ["TSUndefinedKeyword", "undefined"],
+  ["TSUnknownKeyword", "unknown"],
+]);
+
+function typeHint(
+  context: ConvertContext,
+  annotationValue: unknown,
+): Hint | undefined {
+  const annotation = node(annotationValue);
+  if (annotation == null) return undefined;
+  const typeNode =
+    annotation.type === "TSTypeAnnotation"
+      ? node(annotation.typeAnnotation)
+      : annotation;
+  if (typeNode == null) return undefined;
+  let name = hintNames.get(typeNode.type ?? "");
+  if (typeNode.type === "TSLiteralType") {
+    const literal = node(typeNode.literal);
+    if (literal?.type === "NullLiteral") name = "null";
+  }
+  if (name == null) {
+    unsupported(context, typeNode, "This TypeScript type is not an M1 hint.");
+    return undefined;
+  }
+  return {
+    name,
+    provenance: "typescript",
+    range: sourceRange(context.locations, typeNode),
+  };
+}
+
+function hintName(value: string): HintName | undefined {
+  if (
+    value === "any" ||
+    value === "boolean" ||
+    value === "null" ||
+    value === "number" ||
+    value === "string" ||
+    value === "undefined" ||
+    value === "unknown"
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
+interface JsdocHints {
+  readonly parameters: ReadonlyMap<string, Hint>;
+  readonly returns: readonly Hint[];
+}
+
+function isJsdocComment(
+  context: ConvertContext,
+  comment: BabelComment,
+): boolean {
+  return (
+    comment.type === "CommentBlock" &&
+    comment.start != null &&
+    context.input.source.startsWith("/**", comment.start)
+  );
+}
+
+function jsdocHints(
+  context: ConvertContext,
+  declaration: BabelNode,
+): JsdocHints {
+  const parameters = new Map<string, Hint>();
+  const returns: Hint[] = [];
+  for (const comment of declaration.leadingComments ?? []) {
+    if (!isJsdocComment(context, comment)) continue;
+    const value = comment.value ?? "";
+    const commentNode: BabelNode = {
+      end: comment.end ?? 0,
+      start: comment.start ?? 0,
+      type: "CommentBlock",
+    };
+    const range = sourceRange(context.locations, commentNode);
+    const parameterPattern =
+      /@param\s+\{(\w+)\}\s+([\p{ID_Start}_$][\p{ID_Continue}$]*)/gu;
+    for (const match of value.matchAll(parameterPattern)) {
+      const name = hintName(match[1] ?? "");
+      const parameter = match[2];
+      if (name != null && parameter != null) {
+        parameters.set(parameter, {
+          name,
+          provenance: "jsdoc",
+          range,
+        });
+      }
+    }
+    const returnPattern = /@returns?\s+\{(\w+)\}/gu;
+    for (const match of value.matchAll(returnPattern)) {
+      const name = hintName(match[1] ?? "");
+      if (name != null) {
+        returns.push({ name, provenance: "jsdoc", range });
+      }
+    }
+  }
+  return { parameters, returns };
+}
+
+function identifierName(value: BabelNode): string | undefined {
+  return value.type === "Identifier" && typeof value.name === "string"
+    ? value.name
+    : undefined;
+}
+
+function callTarget(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxCallTarget | undefined {
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null
+      ? unsupported(context, value)
+      : callTarget(context, inner);
+  }
+  const name = identifierName(value);
+  if (name != null) return { ...location(context, value), kind: "name", name };
+  if (value.type !== "MemberExpression" || value.computed === true) {
+    return unsupported(
+      context,
+      value,
+      "Only direct function calls and console.log are supported.",
+    );
+  }
+  const object = node(value.object);
+  const property = node(value.property);
+  if (
+    object != null &&
+    property != null &&
+    identifierName(object) === "console" &&
+    identifierName(property) === "log"
+  ) {
+    return { ...location(context, value), kind: "console-log" };
+  }
+  return unsupported(
+    context,
+    value,
+    "Property access is outside the M1 profile.",
+  );
+}
+
+function expression(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  const located = location(context, value);
+  if (value.type === "NumericLiteral" && typeof value.value === "number") {
+    return { ...located, kind: "number", value: value.value };
+  }
+  if (value.type === "StringLiteral" && typeof value.value === "string") {
+    return { ...located, kind: "string", value: value.value };
+  }
+  if (value.type === "BooleanLiteral" && typeof value.value === "boolean") {
+    return { ...located, kind: "boolean", value: value.value };
+  }
+  if (value.type === "NullLiteral") return { ...located, kind: "null" };
+  if (value.type === "Identifier") {
+    const name = identifierName(value);
+    if (name != null) return { ...located, kind: "identifier", name };
+  }
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null
+      ? unsupported(context, value)
+      : expression(context, inner);
+  }
+  if (value.type === "UnaryExpression") {
+    if (value.operator !== "-" && value.operator !== "!") {
+      return unsupported(context, value, "This unary operator is unsupported.");
+    }
+    const argumentNode = node(value.argument);
+    if (argumentNode == null) return unsupported(context, value);
+    const argument = expression(context, argumentNode);
+    return argument == null
+      ? undefined
+      : { ...located, argument, kind: "unary", operator: value.operator };
+  }
+  if (value.type === "BinaryExpression") {
+    const operator = value.operator;
+    const accepted = new Set<unknown>([
+      "!==",
+      "*",
+      "+",
+      "-",
+      "/",
+      "<",
+      "<=",
+      "===",
+      ">",
+      ">=",
+    ]);
+    if (!accepted.has(operator)) {
+      return unsupported(
+        context,
+        value,
+        "This binary operator is unsupported.",
+      );
+    }
+    const leftNode = node(value.left);
+    const rightNode = node(value.right);
+    if (leftNode == null || rightNode == null)
+      return unsupported(context, value);
+    const left = expression(context, leftNode);
+    const right = expression(context, rightNode);
+    if (left == null || right == null) return undefined;
+    return {
+      ...located,
+      kind: "binary",
+      left,
+      operator: operator as BinaryOperator,
+      right,
+    };
+  }
+  if (value.type === "CallExpression") {
+    if (value.typeArguments != null || value.typeParameters != null) {
+      return unsupported(
+        context,
+        value,
+        "Call type arguments are outside the M1 profile.",
+      );
+    }
+    const callee = node(value.callee);
+    if (callee == null) return unsupported(context, value);
+    const target = callTarget(context, callee);
+    const argumentValues: SyntaxExpression[] = [];
+    for (const argumentValue of nodes(value.arguments)) {
+      if (argumentValue.type === "SpreadElement") {
+        return unsupported(context, argumentValue);
+      }
+      const converted = expression(context, argumentValue);
+      if (converted == null) return undefined;
+      argumentValues.push(converted);
+    }
+    return target == null
+      ? undefined
+      : { ...located, arguments: argumentValues, kind: "call", target };
+  }
+  return unsupported(context, value);
+}
+
+function statement(
+  context: ConvertContext,
+  value: BabelNode,
+  functionBody: boolean,
+): SyntaxStatement | undefined {
+  const located = location(context, value);
+  if (value.type === "ExpressionStatement") {
+    const expressionNode = node(value.expression);
+    if (expressionNode == null) return unsupported(context, value);
+    const converted = expression(context, expressionNode);
+    return converted == null
+      ? undefined
+      : { ...located, expression: converted, kind: "expression" };
+  }
+  if (value.type === "VariableDeclaration") {
+    if (value.kind !== "const") {
+      return unsupported(
+        context,
+        value,
+        "Only const declarations are supported.",
+      );
+    }
+    const declarations = nodes(value.declarations);
+    if (declarations.length !== 1) {
+      return unsupported(
+        context,
+        value,
+        "An M1 const declaration contains exactly one binding.",
+      );
+    }
+    const declaration = declarations[0];
+    if (declaration == null) return unsupported(context, value);
+    const identifier = node(declaration.id);
+    const initializerNode = node(declaration.init);
+    const name = identifier == null ? undefined : identifierName(identifier);
+    if (identifier == null || name == null || initializerNode == null) {
+      return unsupported(
+        context,
+        declaration,
+        "A const binding needs one identifier and an initializer.",
+      );
+    }
+    const initializer = expression(context, initializerNode);
+    if (initializer == null) return undefined;
+    const hint = typeHint(context, identifier.typeAnnotation);
+    if (context.diagnostics.length > 0) return undefined;
+    return { ...located, hint, initializer, kind: "const", name };
+  }
+  if (value.type === "ReturnStatement") {
+    if (!functionBody) {
+      return unsupported(
+        context,
+        value,
+        "A return statement is only valid inside a function.",
+      );
+    }
+    const argument = node(value.argument);
+    const converted =
+      argument == null ? undefined : expression(context, argument);
+    if (argument != null && converted == null) return undefined;
+    return { ...located, expression: converted, kind: "return" };
+  }
+  if (value.type === "BlockStatement") {
+    if (!functionBody) {
+      return unsupported(
+        context,
+        value,
+        "Top-level blocks are outside the M1 profile.",
+      );
+    }
+    const body: SyntaxStatement[] = [];
+    for (const child of nodes(value.body)) {
+      const converted = statement(context, child, functionBody);
+      if (converted == null) return undefined;
+      body.push(converted);
+    }
+    return { ...located, body, kind: "block" };
+  }
+  if (value.type === "IfStatement") {
+    if (!functionBody) {
+      return unsupported(
+        context,
+        value,
+        "Top-level if statements are outside the M1 profile.",
+      );
+    }
+    const testNode = node(value.test);
+    const consequentNode = node(value.consequent);
+    const alternateNode = node(value.alternate);
+    if (testNode == null || consequentNode == null) {
+      return unsupported(context, value);
+    }
+    const test = expression(context, testNode);
+    const consequent = statement(context, consequentNode, functionBody);
+    const alternate =
+      alternateNode == null
+        ? undefined
+        : statement(context, alternateNode, functionBody);
+    if (test == null || consequent == null) return undefined;
+    if (alternateNode != null && alternate == null) return undefined;
+    return { ...located, alternate, consequent, kind: "if", test };
+  }
+  return unsupported(context, value);
+}
+
+function functionDeclaration(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxFunction | undefined {
+  if (value.async === true || value.generator === true) {
+    return unsupported(
+      context,
+      value,
+      "Async and generator functions are unsupported.",
+    );
+  }
+  if (value.typeParameters != null) {
+    return unsupported(
+      context,
+      value,
+      "Generic function declarations are outside the M1 profile.",
+    );
+  }
+  const identifier = node(value.id);
+  const name = identifier == null ? undefined : identifierName(identifier);
+  const bodyNode = node(value.body);
+  if (name == null || bodyNode?.type !== "BlockStatement") {
+    return unsupported(
+      context,
+      value,
+      "A function needs a name and block body.",
+    );
+  }
+  const jsdoc = jsdocHints(context, value);
+  const parameters: SyntaxParameter[] = [];
+  for (const parameterNode of nodes(value.params)) {
+    const parameterName = identifierName(parameterNode);
+    if (
+      parameterName == null ||
+      parameterName === "this" ||
+      parameterNode.optional === true
+    ) {
+      return unsupported(
+        context,
+        parameterNode,
+        "M1 function parameters must be plain identifiers.",
+      );
+    }
+    const hints: Hint[] = [];
+    const typescriptHint = typeHint(context, parameterNode.typeAnnotation);
+    if (typescriptHint != null) hints.push(typescriptHint);
+    const jsdocHint = jsdoc.parameters.get(parameterName);
+    if (jsdocHint != null) hints.push(jsdocHint);
+    parameters.push({
+      ...location(context, parameterNode),
+      hints,
+      name: parameterName,
+    });
+  }
+  const returnHints: Hint[] = [];
+  const returnHint = typeHint(context, value.returnType);
+  if (returnHint != null) returnHints.push(returnHint);
+  returnHints.push(...jsdoc.returns);
+  const body: SyntaxStatement[] = [];
+  for (const child of nodes(bodyNode.body)) {
+    const converted = statement(context, child, true);
+    if (converted == null) return undefined;
+    body.push(converted);
+  }
+  if (context.diagnostics.length > 0) return undefined;
+  return {
+    ...location(context, value),
+    body,
+    kind: "function",
+    name,
+    parameters,
+    returnHints,
+  };
+}
+
+function program(
+  context: ConvertContext,
+  file: BabelNode,
+): SyntaxProgram | undefined {
+  const programNode = node(file.program) ?? file;
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  for (const item of nodes(programNode.body)) {
+    const converted =
+      item.type === "FunctionDeclaration"
+        ? functionDeclaration(context, item)
+        : statement(context, item, false);
+    if (converted == null) return undefined;
+    body.push(converted);
+  }
+  return {
+    ...location(context, programNode),
+    body,
+    kind: "program",
+    sourceId: context.input.sourceId,
+  };
+}
+
 /** Babel implementation of the owned Oseo source-frontend boundary. */
 export const babelFrontend: SourceFrontend = {
-  parse(input: SourceInput): FrontendResult {
+  parse(input: SourceInput) {
+    const locations = createSourceIndex(input.source);
     try {
       const file = parseBabel(input.source, {
+        allowImportExportEverywhere: true,
         attachComment: true,
+        createParenthesizedExpressions: true,
         errorRecovery: true,
         plugins: ["typescript"],
         sourceType: "script",
         tokens: true,
-      }) as unknown as BabelFile;
-      const diagnostics = (file.errors ?? []).map((error) =>
-        diagnosticAt(input, errorOffset(error)),
-      );
+      }) as unknown as BabelNode;
+      const parserErrors = Array.isArray(file.errors)
+        ? (file.errors as readonly ParserError[])
+        : [];
+      if (parserErrors.length > 0) {
+        return {
+          diagnostics: parserErrors.map((error) =>
+            diagnosticAt(input, locations, errorOffset(error)),
+          ),
+          parsed: false,
+          sourceId: input.sourceId,
+        };
+      }
+      const context: ConvertContext = { diagnostics: [], input, locations };
+      const converted = program(context, file);
+      if (converted == null || context.diagnostics.length > 0) {
+        return {
+          diagnostics: context.diagnostics,
+          parsed: false,
+          sourceId: input.sourceId,
+        };
+      }
       return {
-        diagnostics,
-        parsed: diagnostics.length === 0,
+        diagnostics: [],
+        parsed: true,
+        program: converted,
         sourceId: input.sourceId,
       };
     } catch (error) {
       const value = error as ParserError;
       return {
-        diagnostics: [diagnosticAt(input, errorOffset(value))],
+        diagnostics: [diagnosticAt(input, locations, errorOffset(value))],
         parsed: false,
         sourceId: input.sourceId,
       };

@@ -61,8 +61,23 @@ function fixtureOptions(
     },
     host,
     input: {
-      kind: "m0-synthetic-native-module",
-      outputLine: "native-fixture=42",
+      functions: [],
+      globalBindings: [],
+      kind: "mir-program",
+      script: {
+        blocks: [],
+        id: -1,
+        kind: "mir-function",
+        name: "<script>",
+        parameterCount: 0,
+        parameters: [],
+        range: {
+          end: { column: 1, line: 1 },
+          start: { column: 1, line: 1 },
+        },
+        rootSlotCount: 1,
+      },
+      sourceId: "fixture.ts",
     },
     runtime: {
       getRuntimeInput() {

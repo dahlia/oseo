@@ -12,7 +12,7 @@ const config: UserConfig = defineConfig({
   dts: {
     sourcemap: true,
   },
-  entry: ["src/index.ts"],
+  entry: ["src/*.ts"],
   format: ["esm"],
   minify: false,
   outExtensions(): { readonly js: ".js" } {
@@ -22,6 +22,7 @@ const config: UserConfig = defineConfig({
     level: "error",
   },
   sourcemap: true,
+  unbundle: true,
 });
 
 export default config;

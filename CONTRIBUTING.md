@@ -1,9 +1,9 @@
 Contributing to Oseo
 ====================
 
-Thank you for helping build Oseo. The project is currently entering M1, so
-interfaces and implementation details will change as the first generic native
-slice replaces assumptions with evidence. Small, testable changes are
+Thank you for helping build Oseo. The project is currently entering M2, so
+interfaces and implementation details will change as the first guarded native
+specialization replaces assumptions with evidence. Small, testable changes are
 especially valuable at this stage.
 
 
@@ -110,8 +110,8 @@ The initial package boundaries are expected to cover these roles:
  -  a CLI that composes concrete implementations;
  -  shared conformance and fixture utilities.
 
-Names and exact splits may change in the M0 plans. The dependency direction is
-more important than the initial names: the compiler core defines interfaces,
+Names and exact splits may change in milestone plans. The dependency direction
+is more important than the initial names: the compiler core defines interfaces,
 concrete adapters implement them, and composition happens at an outer entry
 point. The compiler core must not import a concrete parser, backend, runtime, or
 toolchain. The C backend should emit C without owning process execution, and the

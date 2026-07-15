@@ -34,7 +34,6 @@ jobs:
       - run: mise run test:${{ matrix.runtime }}
 
   test-native:
-    name: Test native and architecture contracts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

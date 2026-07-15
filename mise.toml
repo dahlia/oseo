@@ -120,6 +120,7 @@ run = "deno test -A packages"
 
 [tasks."test:native"]
 description = "Build, run, compare, and cross-link the native fixture"
+depends = ["build"]
 run = "node tests/native.ts"
 
 [tasks."test:node"]

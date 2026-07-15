@@ -15,6 +15,9 @@
     "directory": "packages/cli"
   },
   "funding": "https://github.com/sponsors/dahlia",
+  "bin": {
+    "oseo": "./dist/main.js"
+  },
   "files": [
     "dist",
     "README.md"
@@ -29,6 +32,7 @@
     }
   },
   "dependencies": {
+    "@optique/core": "1.1.1",
     "@oseo/backend-c": "workspace:*",
     "@oseo/compiler": "workspace:*",
     "@oseo/host": "workspace:*",

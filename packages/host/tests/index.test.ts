@@ -43,7 +43,7 @@ test("fetches remote text assets in the Deno host", async () => {
       new URL("https://jsr.example/runtime.c"),
     );
     assert.equal(source, "int oseo_runtime(void) { return 0; }\n");
-    assert.equal(localRead, false);
+    assert.ok(!localRead);
   } finally {
     if (fetchDescriptor == null) Reflect.deleteProperty(globalThis, "fetch");
     else Object.defineProperty(globalThis, "fetch", fetchDescriptor);

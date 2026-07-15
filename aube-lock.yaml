@@ -37,28 +37,31 @@ importers:
     dependencies:
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/cli:
     dependencies:
+      '@optique/core':
+        specifier: 1.1.1
+        version: 1.1.1
       '@oseo/backend-c':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
       '@oseo/host':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
       '@oseo/parser-babel':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
       '@oseo/runtime-c':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
       '@oseo/toolchain-zig':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/compiler: {}
 
@@ -66,7 +69,7 @@ importers:
     dependencies:
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/parser-babel:
     dependencies:
@@ -75,25 +78,25 @@ importers:
         version: 8.0.4
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/runtime-c:
     dependencies:
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/testkit:
     dependencies:
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
   packages/toolchain-zig:
     dependencies:
       '@oseo/compiler':
         specifier: workspace:*
-        version: 0.0.0
+        version: 0.1.0
 
 packages:
 
@@ -141,6 +144,10 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@optique/core@1.1.1':
+    resolution: {integrity: sha512-tbZLdH5wEnh8IRG8KTmWPZCKHLmD4bXigoPdzoSUVi+V46qZTNEaTdqtR7EuEwhbPI0KQjLSYRZCxFTdr9OZkA==}
+    engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
 
   '@oxc-project/types@0.139.0':
     resolution: {integrity: sha512-r9gHphtCs+1M7J0pw6Sn/hh/Wpa/iQrOOkrNAlVLF/gHq+/CJmHIWKKUUhdWjcD6CIa8idarspCsASiXCXvFUw==}
@@ -761,6 +768,8 @@ snapshots:
       '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.3
     optional: true
+
+  '@optique/core@1.1.1': {}
 
   '@oxc-project/types@0.139.0': {}
 

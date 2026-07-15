@@ -85,11 +85,11 @@ that may change after the first vertical slice.
 | Bootstrap hosts        | Node.js and Deno                                              | Decided              |
 | Type information       | Syntax-level hints, without TypeScript type checking          | Decided              |
 | Optimization model     | Guarded specialized paths beside a generic path               | Decided              |
-| Initial target         | `x86_64-linux-gnu`                                            | Accepted for M1      |
-| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Accepted for M1      |
+| Initial target         | `x86_64-linux-gnu`                                            | Implemented in M1    |
+| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Implemented in M1    |
 | Generic value          | One 64-bit tagged word                                        | Decided in principle |
 | Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for x86-64  |
-| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Accepted for M1      |
+| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Implemented in M1    |
 
 The accepted M0 choices and their replacement triggers are recorded under
 [*docs/adr/*](./docs/adr/). Choices that remain provisional require an
@@ -129,10 +129,10 @@ is the composition root. `@oseo/testkit` consumes injected public interfaces
 rather than package-private source. Automated checks reject dependency cycles,
 private cross-package imports, and concrete dependencies from compiler core.
 
-The M0 backend input is a synthetic test module used only to prove native
-composition. It is not an Oseo syntax tree or a supported JavaScript profile.
-M1 replaces it with owned syntax, HIR, MIR, and generic lowering as specified in
-[*PLAN-M1.md*](./PLAN-M1.md).
+M1 removed the synthetic backend input. Production input now traverses owned
+syntax, resolved HIR, generic MIR, deterministic C11 lowering, static runtime
+linking, and native execution. M2 adds guarded specialization to this same
+pipeline without creating a second composition path.
 
 
 Source frontend
@@ -191,6 +191,13 @@ throw
 The names and exact grouping may change. The required property is that a test
 can tell whether a guard exists, where its failure edge goes, and whether a
 specialized block allocates or calls a generic helper.
+
+MIR is the complete semantic input to native backends. It owns primitive
+constants, binding reads and writes, operators, direct call targets, basic
+blocks, parameters, hint provenance, and terminators. MIR parameters are copied
+instead of retaining HIR parameter objects. A backend must not replay attached
+HIR or source syntax, because doing so would let optimized MIR and native
+execution diverge.
 
 JavaScript evaluation order must be fixed before specialization. An optimizer
 may not reorder property access, conversion, calls, or exceptions merely because
@@ -281,6 +288,10 @@ records live generic values in linked root frames around allocation points and
 runtime calls that may collect. Each frame points to a contiguous slot array and
 the previous frame. A non-moving mark-and-sweep collector avoids relocation
 barriers while the object representation and compiler ABI are still changing.
+Root slot arrays are allocated independently of generated C stack frames. A
+deterministic aggregate root-slot budget is checked before entering generated C
+so compiler spill space for wide functions cannot bypass the owned runtime
+failure boundary.
 
 MIR must identify allocation and collection safepoints. Specialized raw values
 that denote heap objects must either be described to the collector or be boxed
@@ -350,8 +361,8 @@ Native backend
 The initial backend emits C11 for `x86_64-linux-gnu`. A separate native
 toolchain adapter invokes pinned `zig cc` by default. This keeps the first
 implementation in TypeScript, produces native functions, and makes generated
-control flow easy to inspect. The compiler should support `--emit-c` and
-`--dump-mir` from the first executable milestone.
+control flow easy to inspect. The compiler supports `--emit-c` and `--dump-mir`
+from the first executable milestone.
 
 Zig is a pinned bootstrap tool, not part of the generated program's semantic
 contract. Toolchain selection stays behind an interface so another C compiler
@@ -361,6 +372,11 @@ The C backend is downstream of a backend-neutral interface. Oseo may later emit
 LLVM IR, use another code generator, or write object files directly without
 changing source semantics or specialization decisions. Backend-specific
 optimizations must not become prerequisites for correctness.
+
+The backend lowers MIR blocks, operations, and terminators directly. HIR is not
+retained in `MirFunction`, and changing a MIR operation changes emitted C. This
+keeps `--dump-mir`, specialization passes, and native execution on one semantic
+path.
 
 Runtime code is linked as a static library in the initial design. Generated
 programs may still depend on selected system libraries. Those dependencies must

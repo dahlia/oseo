@@ -2,10 +2,10 @@ import type {
   CompilerHost,
   NativeBackend,
   NativeToolchain,
+  MirProgram,
   ProcessObservation,
   ProcessRequest,
   RuntimeInputProvider,
-  SyntheticNativeModule,
   TargetDescription,
 } from "@oseo/compiler";
 
@@ -16,11 +16,11 @@ export interface NativeFixtureObservation extends ProcessObservation {
   readonly target: TargetDescription;
 }
 
-/** Injected components and options for the synthetic M0 native fixture. */
+/** Injected components and options for one generic native fixture. */
 export interface NativeFixtureOptions {
   readonly backend: NativeBackend;
   readonly host: CompilerHost;
-  readonly input: SyntheticNativeModule;
+  readonly input: MirProgram;
   readonly keepArtifacts?: boolean;
   readonly runtime: RuntimeInputProvider;
   readonly target: TargetDescription;
@@ -61,7 +61,7 @@ function errorMessage(error: unknown): string {
 }
 
 /**
- * Build and inspect one synthetic fixture while its artifacts remain alive.
+ * Build and inspect one source fixture while its artifacts remain alive.
  *
  * Artifacts are removed only after the inspection succeeds. Build, execution,
  * and inspection failures retain the directory and a complete observation.

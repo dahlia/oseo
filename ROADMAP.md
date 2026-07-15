@@ -4,9 +4,9 @@ Oseo roadmap
 Status
 ------
 
-Oseo has completed milestone M0, design and project foundations. The current
-implementation plan is the M1 generic native vertical slice in
-[*PLAN-M1.md*](./PLAN-M1.md). This roadmap uses capability gates rather than
+Oseo has completed milestone M1, the generic native vertical slice. The current
+implementation plan is guarded specialization in
+[*PLAN-M2.md*](./PLAN-M2.md). This roadmap uses capability gates rather than
 calendar dates. A milestone is complete only when its exit criteria are
 repeatable in continuous integration.
 
@@ -122,8 +122,8 @@ source-to-executable path and establish the generic semantic boundary.
  -  a minimal `console.log` host intrinsic for observable fixtures.
 
 The exact list and its required fixtures are frozen in
-[*PLAN-M1.md*](./PLAN-M1.md). Features may be removed by updating the plan and
-language profile, but accepted features may not have placeholder semantics.
+[*docs/language-profile-m1.md*](./docs/language-profile-m1.md). A later plan may
+expand the profile, but accepted features may not have placeholder semantics.
 
 ### Deliverables
 
@@ -148,6 +148,14 @@ language profile, but accepted features may not have placeholder semantics.
  -  Garbage-collector and exception requirements discovered by the slice are
     recorded before M2, even if M1 does not yet allocate general objects or
     throw arbitrary exceptions.
+
+M1 completion is exercised by eight reviewed differential fixture classes.
+Their observations match under Node.js, Deno, and native x86-64 execution, and
+each fixture compile-links for `aarch64-linux-musl`. The matrix covers all M1
+primitive kinds, conversions, operators, lexical control flow, direct calls,
+recursion, argument ordering, hint invariance, numeric edges, strict C11
+warnings, undefined-behavior sanitization, and collection forced at every
+declared string safepoint.
 
 
 M2: Guarded specialization
@@ -396,7 +404,7 @@ Continuous compatibility laboratory
 -----------------------------------
 
 Real-package experiments should not wait until M7. A small compatibility
-laboratory begins after M1 and runs alongside the engine roadmap. Early results
+laboratory runs alongside the engine roadmap. Early results
 are expected to fail. Their purpose is to replace guesses with a ranked blocker
 list.
 
@@ -419,21 +427,20 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The package scaffold, architecture probes, version tooling, host adapters, and
-synthetic native harness are complete in M0. M1 retains this implementation
-queue:
+The package scaffold, architecture probes, generic compiler pipeline, native
+runtime, and differential matrix are complete through M1. M2 follows the work
+sequence and acceptance criteria in [*PLAN-M2.md*](./PLAN-M2.md):
 
-1.  Replace the M0 parser smoke result with production owned syntax and hints.
-2.  Define high-level IR, lexical resolution, and a textual printer.
-3.  Define generic control-flow MIR, roots, safepoints, and a textual printer.
-4.  Implement M1 primitive values and semantics in the C11 runtime.
-5.  Lower the first generic source fixture from MIR to deterministic C11.
-6.  Connect the real compiler path to `--dump-mir` and `--emit-c`.
-7.  Expand differential, structural, and native-executable fixture coverage.
+1.  Freeze specialization-invariance and guard-miss fixtures.
+2.  Add specialization policy and explicit generic-only mode.
+3.  Add small-integer guards, unboxing, checked addition, and boxing to MIR.
+4.  Lower guard success and failure edges to deterministic C11.
+5.  Add test-only counters and structural machine-code inspection.
+6.  Close hint mutation, side-effect ordering, and fallback evidence.
 
-Work on guarded specialization begins only after the generic fixture and its
-reference-runtime comparison pass. That boundary keeps M2 a test of Oseo's
-design rather than a collection of unfinished compiler stages.
+M2 changes only after the complete generic path remains available. That
+boundary keeps specialization a test of Oseo's design rather than a replacement
+for unfinished semantics.
 
 
 Risks that affect ordering

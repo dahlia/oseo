@@ -35,10 +35,149 @@ export interface SourceInput {
   readonly sourceId: string;
 }
 
-/** M0 frontend output, intentionally opaque until M1 owns its syntax tree. */
+/** Provenance retained for an optimization hint. */
+export type HintProvenance = "jsdoc" | "typescript";
+
+/** Primitive hint names accepted during M1. */
+export type HintName =
+  | "any"
+  | "boolean"
+  | "null"
+  | "number"
+  | "string"
+  | "undefined"
+  | "unknown";
+
+/** An owned hint that cannot expose a bootstrap-parser node. */
+export interface Hint {
+  readonly name: HintName;
+  readonly provenance: HintProvenance;
+  readonly range: SourceRange;
+}
+
+interface LocatedSyntax {
+  readonly range: SourceRange;
+  readonly byteRange?: ByteRange;
+}
+
+/** A call target admitted by the M1 language profile. */
+export type SyntaxCallTarget =
+  | (LocatedSyntax & {
+      readonly kind: "console-log";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "name";
+      readonly name: string;
+    });
+
+/** Binary operations selected before native backend lowering. */
+export type BinaryOperator =
+  | "!=="
+  | "*"
+  | "+"
+  | "-"
+  | "/"
+  | "<"
+  | "<="
+  | "==="
+  | ">"
+  | ">=";
+
+/** An expression in the parser-independent M1 syntax tree. */
+export type SyntaxExpression =
+  | (LocatedSyntax & {
+      readonly kind: "binary";
+      readonly left: SyntaxExpression;
+      readonly operator: BinaryOperator;
+      readonly right: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "boolean";
+      readonly value: boolean;
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly SyntaxExpression[];
+      readonly kind: "call";
+      readonly target: SyntaxCallTarget;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "identifier";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "null";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "number";
+      readonly value: number;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "string";
+      readonly value: string;
+    })
+  | (LocatedSyntax & {
+      readonly argument: SyntaxExpression;
+      readonly kind: "unary";
+      readonly operator: "!" | "-";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "undefined";
+    });
+
+/** One plain function parameter and its retained hints. */
+export interface SyntaxParameter extends LocatedSyntax {
+  readonly hints: readonly Hint[];
+  readonly name: string;
+}
+
+/** A statement in the parser-independent M1 syntax tree. */
+export type SyntaxStatement =
+  | (LocatedSyntax & {
+      readonly body: readonly SyntaxStatement[];
+      readonly kind: "block";
+    })
+  | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
+      readonly kind: "const";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly expression: SyntaxExpression;
+      readonly kind: "expression";
+    })
+  | (LocatedSyntax & {
+      readonly alternate: SyntaxStatement | undefined;
+      readonly consequent: SyntaxStatement;
+      readonly kind: "if";
+      readonly test: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly expression: SyntaxExpression | undefined;
+      readonly kind: "return";
+    });
+
+/** A top-level function declaration in owned syntax. */
+export interface SyntaxFunction extends LocatedSyntax {
+  readonly body: readonly SyntaxStatement[];
+  readonly kind: "function";
+  readonly name: string;
+  readonly parameters: readonly SyntaxParameter[];
+  readonly returnHints: readonly Hint[];
+}
+
+/** One owned M1 script, with no parser-specific values. */
+export interface SyntaxProgram extends LocatedSyntax {
+  readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  readonly kind: "program";
+  readonly sourceId: string;
+}
+
+/** Production frontend output for owned M1 syntax. */
 export interface FrontendResult {
   readonly diagnostics: readonly Diagnostic[];
   readonly parsed: boolean;
+  readonly program?: SyntaxProgram;
   readonly sourceId: string;
 }
 
@@ -47,7 +186,1169 @@ export interface SourceFrontend {
   parse(input: SourceInput): FrontendResult;
 }
 
-/** The targets exercised by the M0 native fixture harness. */
+/** A resolved call target in HIR. */
+export type HirCallTarget =
+  | {
+      readonly kind: "console-log";
+    }
+  | {
+      readonly functionId: number;
+      readonly kind: "function";
+      readonly name: string;
+    };
+
+/** A resolved, normalized HIR expression. */
+export type HirExpression =
+  | (LocatedSyntax & {
+      readonly kind: "binary";
+      readonly left: HirExpression;
+      readonly operator: BinaryOperator;
+      readonly right: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "boolean";
+      readonly value: boolean;
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly HirExpression[];
+      readonly kind: "call";
+      readonly target: HirCallTarget;
+    })
+  | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly kind: "binding";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "null";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "number";
+      readonly value: number;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "string";
+      readonly value: string;
+    })
+  | (LocatedSyntax & {
+      readonly argument: HirExpression;
+      readonly kind: "unary";
+      readonly operator: "!" | "-";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "undefined";
+    });
+
+/** A resolved HIR statement with explicit binding identity. */
+export type HirStatement =
+  | (LocatedSyntax & {
+      readonly body: readonly HirStatement[];
+      readonly kind: "block";
+    })
+  | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly hint: Hint | undefined;
+      readonly initializer: HirExpression;
+      readonly kind: "const";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly expression: HirExpression;
+      readonly kind: "expression";
+    })
+  | (LocatedSyntax & {
+      readonly alternate: HirStatement | undefined;
+      readonly consequent: HirStatement;
+      readonly kind: "if";
+      readonly test: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly expression: HirExpression | undefined;
+      readonly kind: "return";
+    });
+
+/** A resolved function parameter. */
+export interface HirParameter extends SyntaxParameter {
+  readonly bindingId: number;
+}
+
+/** One statically resolved HIR function. */
+export interface HirFunction extends LocatedSyntax {
+  readonly body: readonly HirStatement[];
+  readonly id: number;
+  readonly kind: "hir-function";
+  readonly name: string;
+  readonly parameters: readonly HirParameter[];
+  readonly returnHints: readonly Hint[];
+}
+
+/** A normalized script and its statically callable functions. */
+export interface HirProgram {
+  readonly body: readonly HirStatement[];
+  readonly functions: readonly HirFunction[];
+  readonly kind: "hir-program";
+  readonly range: SourceRange;
+  readonly sourceId: string;
+}
+
+/** Result of profile validation and HIR name resolution. */
+export interface HirResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly program?: HirProgram;
+}
+
+interface Binding {
+  readonly id: number;
+  readonly name: string;
+}
+
+interface ResolveState {
+  nextBindingId: number;
+  readonly diagnostics: Diagnostic[];
+  readonly functions: ReadonlyMap<string, number>;
+  readonly sourceId: string;
+}
+
+function sourceDiagnostic(
+  sourceId: string,
+  node: LocatedSyntax,
+  message: string,
+): Diagnostic {
+  return {
+    byteRange: node.byteRange ?? { end: 0, start: 0 },
+    code: "OSEO1001",
+    message,
+    range: node.range,
+    sourceId,
+  };
+}
+
+function findBinding(
+  scopes: readonly Map<string, Binding>[],
+  name: string,
+): Binding | undefined {
+  for (let index = scopes.length - 1; index >= 0; index -= 1) {
+    const binding = scopes[index]?.get(name);
+    if (binding != null) return binding;
+  }
+  return undefined;
+}
+
+function resolveExpression(
+  expression: SyntaxExpression,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirExpression | undefined {
+  if (
+    expression.kind === "boolean" ||
+    expression.kind === "null" ||
+    expression.kind === "number" ||
+    expression.kind === "string" ||
+    expression.kind === "undefined"
+  ) {
+    return expression;
+  }
+  if (expression.kind === "identifier") {
+    const binding = findBinding(scopes, expression.name);
+    if (binding == null) {
+      if (state.functions.has(expression.name)) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            expression,
+            "Function values are outside the M1 profile.",
+          ),
+        );
+        return undefined;
+      }
+      if (expression.name === "undefined") {
+        return { kind: "undefined", range: expression.range };
+      }
+      if (expression.name === "NaN" || expression.name === "Infinity") {
+        return {
+          kind: "number",
+          range: expression.range,
+          value: expression.name === "NaN" ? NaN : Infinity,
+        };
+      }
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          `Unknown binding '${expression.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    return {
+      bindingId: binding.id,
+      kind: "binding",
+      name: expression.name,
+      range: expression.range,
+    };
+  }
+  if (expression.kind === "unary") {
+    const argument = resolveExpression(expression.argument, scopes, state);
+    if (argument == null) return undefined;
+    return { ...expression, argument };
+  }
+  if (expression.kind === "binary") {
+    const left = resolveExpression(expression.left, scopes, state);
+    const right = resolveExpression(expression.right, scopes, state);
+    if (left == null || right == null) return undefined;
+    return {
+      ...expression,
+      left,
+      right,
+    };
+  }
+  const argumentValues: HirExpression[] = [];
+  for (const argument of expression.arguments) {
+    const resolved = resolveExpression(argument, scopes, state);
+    if (resolved == null) return undefined;
+    argumentValues.push(resolved);
+  }
+  let target: HirCallTarget;
+  if (expression.target.kind === "console-log") {
+    const binding = findBinding(scopes, "console");
+    if (binding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression.target,
+          "The console.log target resolves through the 'console' binding; " +
+            "property calls are outside the M1 profile.",
+        ),
+      );
+      return undefined;
+    }
+    if (state.functions.has("console")) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression.target,
+          "The console.log target resolves through a declared function; " +
+            "property calls are outside the M1 profile.",
+        ),
+      );
+      return undefined;
+    }
+    target = { kind: "console-log" };
+  } else {
+    const binding = findBinding(scopes, expression.target.name);
+    if (binding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression.target,
+          `Call target '${expression.target.name}' resolves to a binding; ` +
+            "function-valued bindings are outside the M1 profile.",
+        ),
+      );
+      return undefined;
+    }
+    const functionId = state.functions.get(expression.target.name);
+    if (functionId == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression.target,
+          `Call target '${expression.target.name}' is not a declared function.`,
+        ),
+      );
+      return undefined;
+    }
+    target = {
+      functionId,
+      kind: "function",
+      name: expression.target.name,
+    };
+  }
+  return { ...expression, arguments: argumentValues, target };
+}
+
+function predeclareBindings(
+  statements: readonly SyntaxStatement[],
+  scope: Map<string, Binding>,
+  state: ResolveState,
+): void {
+  for (const statement of statements) {
+    if (statement.kind !== "const") continue;
+    if (scope.has(statement.name)) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `Duplicate declaration '${statement.name}'.`,
+        ),
+      );
+      continue;
+    }
+    scope.set(statement.name, {
+      id: state.nextBindingId,
+      name: statement.name,
+    });
+    state.nextBindingId += 1;
+  }
+}
+
+function resolveStatementList(
+  statements: readonly SyntaxStatement[],
+  parentScopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  functionBody: boolean,
+  existingLocal?: Map<string, Binding>,
+): readonly HirStatement[] {
+  const local = existingLocal ?? new Map<string, Binding>();
+  if (existingLocal == null) predeclareBindings(statements, local, state);
+  const scopes = [...parentScopes, local];
+  const result: HirStatement[] = [];
+  for (const statement of statements) {
+    const resolved = resolveStatement(statement, scopes, state, functionBody);
+    if (resolved != null) result.push(resolved);
+  }
+  return result;
+}
+
+function resolveStatement(
+  statement: SyntaxStatement,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  functionBody: boolean,
+): HirStatement | undefined {
+  if (statement.kind === "const") {
+    const initializer = resolveExpression(statement.initializer, scopes, state);
+    const binding = scopes.at(-1)?.get(statement.name);
+    if (binding == null || initializer == null) return undefined;
+    return { ...statement, bindingId: binding.id, initializer };
+  }
+  if (statement.kind === "expression") {
+    const expression = resolveExpression(statement.expression, scopes, state);
+    return expression == null ? undefined : { ...statement, expression };
+  }
+  if (statement.kind === "return") {
+    if (!functionBody) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          "A return statement is only valid inside a function.",
+        ),
+      );
+      return undefined;
+    }
+    const expression =
+      statement.expression == null
+        ? undefined
+        : resolveExpression(statement.expression, scopes, state);
+    if (statement.expression != null && expression == null) return undefined;
+    return { ...statement, expression };
+  }
+  if (statement.kind === "block") {
+    return {
+      ...statement,
+      body: resolveStatementList(statement.body, scopes, state, functionBody),
+    };
+  }
+  const test = resolveExpression(statement.test, scopes, state);
+  const consequent = resolveStatement(
+    statement.consequent,
+    scopes,
+    state,
+    functionBody,
+  );
+  const alternate =
+    statement.alternate == null
+      ? undefined
+      : resolveStatement(statement.alternate, scopes, state, functionBody);
+  if (test == null || consequent == null) return undefined;
+  if (statement.alternate != null && alternate == null) return undefined;
+  return { ...statement, alternate, consequent, test };
+}
+
+/** Validate owned syntax and resolve all lexical and function identities. */
+export function buildHir(program: SyntaxProgram): HirResult {
+  const diagnostics: Diagnostic[] = [];
+  const functionIds = new Map<string, number>();
+  const functionDeclarations = new Map<string, SyntaxFunction>();
+  for (const item of program.body) {
+    if (item.kind !== "function") continue;
+    if (!functionIds.has(item.name)) {
+      functionIds.set(item.name, functionIds.size);
+    }
+    functionDeclarations.set(item.name, item);
+  }
+  const state: ResolveState = {
+    diagnostics,
+    functions: functionIds,
+    nextBindingId: 0,
+    sourceId: program.sourceId,
+  };
+  const scriptStatements = program.body.filter(
+    (item): item is SyntaxStatement => item.kind !== "function",
+  );
+  const scriptScope = new Map<string, Binding>();
+  predeclareBindings(scriptStatements, scriptScope, state);
+  const functions: HirFunction[] = [];
+  for (const item of functionDeclarations.values()) {
+    const parameterScope = new Map<string, Binding>();
+    const parameters: HirParameter[] = [];
+    for (const parameter of item.parameters) {
+      let binding = parameterScope.get(parameter.name);
+      if (binding == null) {
+        binding = {
+          id: state.nextBindingId,
+          name: parameter.name,
+        };
+        state.nextBindingId += 1;
+        parameterScope.set(parameter.name, binding);
+      }
+      parameters.push({ ...parameter, bindingId: binding.id });
+    }
+    const id = functionIds.get(item.name);
+    if (id == null) continue;
+    functions.push({
+      ...item,
+      body: resolveStatementList(
+        item.body,
+        [scriptScope, parameterScope],
+        state,
+        true,
+      ),
+      id,
+      kind: "hir-function",
+      parameters,
+    });
+  }
+  const body = resolveStatementList(
+    scriptStatements,
+    [],
+    state,
+    false,
+    scriptScope,
+  );
+  if (diagnostics.length > 0) return { diagnostics };
+  return {
+    diagnostics,
+    program: {
+      body,
+      functions,
+      kind: "hir-program",
+      range: program.range,
+      sourceId: program.sourceId,
+    },
+  };
+}
+
+function rangeText(range: SourceRange): string {
+  return (
+    `${range.start.line}:${range.start.column}-` +
+    `${range.end.line}:${range.end.column}`
+  );
+}
+
+function hintText(hints: readonly Hint[]): string {
+  if (hints.length === 0) return "";
+  return ` hints=[${hints
+    .map((hint) => `${hint.provenance}:${hint.name}`)
+    .join(",")}]`;
+}
+
+function numberText(value: number): string {
+  if (Object.is(value, -0)) return "-0";
+  return String(value);
+}
+
+function printHirExpression(expression: HirExpression): string {
+  if (expression.kind === "binding") {
+    return `%b${expression.bindingId}(${expression.name})`;
+  }
+  if (expression.kind === "undefined" || expression.kind === "null") {
+    return expression.kind;
+  }
+  if (expression.kind === "string") return JSON.stringify(expression.value);
+  if (expression.kind === "number") return numberText(expression.value);
+  if (expression.kind === "boolean") return String(expression.value);
+  if (expression.kind === "unary") {
+    return `(${expression.operator}${printHirExpression(expression.argument)})`;
+  }
+  if (expression.kind === "binary") {
+    const left = printHirExpression(expression.left);
+    const operator = String(expression.operator);
+    const right = printHirExpression(expression.right);
+    return `(${left} ${operator} ${right})`;
+  }
+  const target =
+    expression.target.kind === "console-log"
+      ? "intrinsic console.log"
+      : `function @f${expression.target.functionId}`;
+  return (
+    `call ${target}(` +
+    expression.arguments.map(printHirExpression).join(", ") +
+    ")"
+  );
+}
+
+function appendHirStatement(
+  lines: string[],
+  statement: HirStatement,
+  indent: string,
+): void {
+  const location = ` @${rangeText(statement.range)}`;
+  if (statement.kind === "const") {
+    lines.push(
+      `${indent}%b${statement.bindingId} ${statement.name}` +
+        `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
+        `${printHirExpression(statement.initializer)}${location}`,
+    );
+  } else if (statement.kind === "expression") {
+    lines.push(
+      `${indent}${printHirExpression(statement.expression)}${location}`,
+    );
+  } else if (statement.kind === "return") {
+    const value =
+      statement.expression == null
+        ? "undefined"
+        : printHirExpression(statement.expression);
+    lines.push(`${indent}return ${value}${location}`);
+  } else if (statement.kind === "block") {
+    lines.push(`${indent}block${location}`);
+    for (const child of statement.body) {
+      appendHirStatement(lines, child, `${indent}  `);
+    }
+  } else {
+    lines.push(`${indent}if ${printHirExpression(statement.test)}${location}`);
+    appendHirStatement(lines, statement.consequent, `${indent}  `);
+    if (statement.alternate != null) {
+      lines.push(`${indent}else`);
+      appendHirStatement(lines, statement.alternate, `${indent}  `);
+    }
+  }
+}
+
+/** Print deterministic, source-located HIR for review and snapshots. */
+export function printHir(program: HirProgram): string {
+  const lines = [`hir ${JSON.stringify(program.sourceId)}`];
+  for (const functionValue of program.functions) {
+    const parameters = functionValue.parameters
+      .map(
+        (parameter) =>
+          `%b${parameter.bindingId} ${parameter.name}` +
+          hintText(parameter.hints),
+      )
+      .join(", ");
+    lines.push(
+      `function @f${functionValue.id} ${functionValue.name}(${parameters})` +
+        `${hintText(functionValue.returnHints)} ` +
+        `@${rangeText(functionValue.range)}`,
+    );
+    for (const statement of functionValue.body) {
+      appendHirStatement(lines, statement, "  ");
+    }
+  }
+  lines.push(`script @${rangeText(program.range)}`);
+  for (const statement of program.body) {
+    appendHirStatement(lines, statement, "  ");
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+/** A primitive constant retained without lossy textual serialization. */
+export type MirConstant =
+  | { readonly kind: "boolean"; readonly value: boolean }
+  | { readonly kind: "null" }
+  | { readonly kind: "number"; readonly value: number }
+  | { readonly kind: "string"; readonly value: string }
+  | { readonly kind: "undefined" };
+
+/** A direct call target independent of HIR and source syntax. */
+export type MirCallTarget =
+  | { readonly kind: "console-log" }
+  | { readonly functionId: number; readonly kind: "function" };
+
+/** Hint data copied into MIR without retaining a HIR or syntax object. */
+export interface MirHint {
+  readonly name: HintName;
+  readonly provenance: HintProvenance;
+  readonly range: SourceRange;
+}
+
+/** One MIR-owned function parameter and its specialization hints. */
+export interface MirParameter {
+  readonly bindingId: number;
+  readonly hints: readonly MirHint[];
+  readonly name: string;
+  readonly range: SourceRange;
+}
+
+/** One script-owned lexical binding shared by declared functions. */
+export interface MirGlobalBinding {
+  readonly id: number;
+  readonly name: string;
+}
+
+/** One inspectable generic MIR operation. */
+export interface MirOperation {
+  readonly arguments: readonly number[];
+  readonly bindingId?: number;
+  readonly constant?: MirConstant;
+  readonly detail: string;
+  readonly id: number;
+  readonly kind:
+    | "binary"
+    | "branch"
+    | "call"
+    | "check-status"
+    | "constant"
+    | "join"
+    | "read"
+    | "root-store"
+    | "safepoint"
+    | "unary"
+    | "write";
+  readonly operator?: BinaryOperator | "!" | "-";
+  readonly range: SourceRange;
+  readonly target?: MirCallTarget;
+}
+
+/** A MIR block terminator. */
+export type MirTerminator =
+  | {
+      readonly kind: "branch";
+      readonly test: number;
+      readonly whenFalse: number;
+      readonly whenTrue: number;
+    }
+  | {
+      readonly kind: "jump";
+      readonly target: number;
+    }
+  | {
+      readonly kind: "return";
+      readonly value: number;
+    }
+  | {
+      readonly kind: "unreachable";
+    };
+
+/** One deterministic control-flow block. */
+export interface MirBlock {
+  readonly id: number;
+  readonly operations: readonly MirOperation[];
+  readonly terminator: MirTerminator;
+}
+
+/** Generic-only MIR for one declared function or script. */
+export interface MirFunction extends LocatedSyntax {
+  readonly blocks: readonly MirBlock[];
+  readonly id: number;
+  readonly kind: "mir-function";
+  readonly name: string;
+  readonly parameterCount: number;
+  readonly parameters: readonly MirParameter[];
+  readonly rootSlotCount: number;
+}
+
+/** Backend-neutral generic MIR for one source script. */
+export interface MirProgram {
+  readonly functions: readonly MirFunction[];
+  readonly globalBindings: readonly MirGlobalBinding[];
+  readonly kind: "mir-program";
+  readonly script: MirFunction;
+  readonly sourceId: string;
+}
+
+interface MutableMirBlock {
+  readonly id: number;
+  readonly operations: MirOperation[];
+  terminator: MirTerminator | undefined;
+}
+
+interface MirBuilder {
+  readonly blocks: MutableMirBlock[];
+  current: MutableMirBlock;
+  nextValue: number;
+}
+
+function appendMirMetadata(
+  builder: MirBuilder,
+  kind: MirOperation["kind"],
+  detail: string,
+  argumentsValue: readonly number[],
+  range: SourceRange,
+): void {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: argumentsValue,
+    detail,
+    id,
+    kind,
+    range,
+  });
+}
+
+function recordRoot(
+  builder: MirBuilder,
+  value: number,
+  range: SourceRange,
+): number {
+  appendMirMetadata(builder, "root-store", `slot %${value}`, [value], range);
+  return value;
+}
+
+function lowerExpression(
+  expression: HirExpression,
+  builder: MirBuilder,
+): number {
+  if (expression.kind === "binding") {
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      bindingId: expression.bindingId,
+      detail: expression.name,
+      id,
+      kind: "read",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (
+    expression.kind === "undefined" ||
+    expression.kind === "null" ||
+    expression.kind === "boolean" ||
+    expression.kind === "number" ||
+    expression.kind === "string"
+  ) {
+    if (expression.kind === "string") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "string allocation",
+        [],
+        expression.range,
+      );
+    }
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    let constant: MirConstant;
+    if (expression.kind === "undefined") {
+      constant = { kind: "undefined" };
+    } else if (expression.kind === "null") {
+      constant = { kind: "null" };
+    } else if (expression.kind === "boolean") {
+      constant = { kind: "boolean", value: expression.value };
+    } else if (expression.kind === "number") {
+      constant = { kind: "number", value: expression.value };
+    } else {
+      constant = { kind: "string", value: expression.value };
+    }
+    const detail =
+      constant.kind === "undefined" || constant.kind === "null"
+        ? constant.kind
+        : constant.kind === "number"
+          ? numberText(constant.value)
+          : JSON.stringify(constant.value);
+    builder.current.operations.push({
+      arguments: [],
+      constant,
+      detail,
+      id,
+      kind: "constant",
+      range: expression.range,
+    });
+    if (expression.kind === "string") {
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [id],
+        expression.range,
+      );
+    }
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "unary") {
+    const argument = lowerExpression(expression.argument, builder);
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [argument],
+      detail: expression.operator,
+      id,
+      kind: "unary",
+      operator: expression.operator,
+      range: expression.range,
+    });
+    if (expression.operator === "-") {
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [id],
+        expression.range,
+      );
+    }
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "binary") {
+    const left = lowerExpression(expression.left, builder);
+    const right = lowerExpression(expression.right, builder);
+    if (expression.operator === "+") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "string addition fallback",
+        [left, right],
+        expression.range,
+      );
+    }
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [left, right],
+      detail: String(expression.operator),
+      id,
+      kind: "binary",
+      operator: expression.operator,
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  const argumentIds = expression.arguments.map((argument) =>
+    lowerExpression(argument, builder),
+  );
+  const safepointId = builder.nextValue;
+  builder.nextValue += 1;
+  const detail =
+    expression.target.kind === "console-log"
+      ? "console_log"
+      : `function @f${expression.target.functionId}`;
+  builder.current.operations.push({
+    arguments: argumentIds,
+    detail,
+    id: safepointId,
+    kind: "safepoint",
+    range: expression.range,
+  });
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: argumentIds,
+    detail,
+    id,
+    kind: "call",
+    range: expression.range,
+    target:
+      expression.target.kind === "console-log"
+        ? { kind: "console-log" }
+        : {
+            functionId: expression.target.functionId,
+            kind: "function",
+          },
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    expression.range,
+  );
+  return recordRoot(builder, id, expression.range);
+}
+
+function createMirBlock(builder: MirBuilder): MutableMirBlock {
+  const block: MutableMirBlock = {
+    id: builder.blocks.length,
+    operations: [],
+    terminator: undefined,
+  };
+  builder.blocks.push(block);
+  return block;
+}
+
+function statementBody(statement: HirStatement): readonly HirStatement[] {
+  return statement.kind === "block" ? statement.body : [statement];
+}
+
+function lowerStatements(
+  statements: readonly HirStatement[],
+  builder: MirBuilder,
+): boolean {
+  for (const statement of statements) {
+    if (statement.kind === "const") {
+      const value = lowerExpression(statement.initializer, builder);
+      const id = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [value],
+        bindingId: statement.bindingId,
+        detail: `%b${statement.bindingId} ${statement.name}`,
+        id,
+        kind: "write",
+        range: statement.range,
+      });
+      recordRoot(builder, id, statement.range);
+    } else if (statement.kind === "expression") {
+      lowerExpression(statement.expression, builder);
+    } else if (statement.kind === "return") {
+      const value =
+        statement.expression == null
+          ? lowerSyntheticUndefined(statement.range, builder)
+          : lowerExpression(statement.expression, builder);
+      builder.current.terminator = { kind: "return", value };
+      return true;
+    } else if (statement.kind === "block") {
+      if (lowerStatements(statement.body, builder)) return true;
+    } else {
+      const test = lowerExpression(statement.test, builder);
+      const consequentBlock = createMirBlock(builder);
+      const alternateBlock = createMirBlock(builder);
+      const joinBlock = createMirBlock(builder);
+      const branchDetail = [
+        `true -> bb${consequentBlock.id}`,
+        `false -> bb${alternateBlock.id}`,
+      ].join(", ");
+      appendMirMetadata(
+        builder,
+        "branch",
+        branchDetail,
+        [test],
+        statement.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test,
+        whenFalse: alternateBlock.id,
+        whenTrue: consequentBlock.id,
+      };
+
+      builder.current = consequentBlock;
+      const consequentReturns = lowerStatements(
+        statementBody(statement.consequent),
+        builder,
+      );
+      if (!consequentReturns) {
+        builder.current.terminator = { kind: "jump", target: joinBlock.id };
+      }
+
+      builder.current = alternateBlock;
+      const alternateReturns =
+        statement.alternate == null
+          ? false
+          : lowerStatements(statementBody(statement.alternate), builder);
+      if (!alternateReturns) {
+        builder.current.terminator = { kind: "jump", target: joinBlock.id };
+      }
+
+      builder.current = joinBlock;
+      appendMirMetadata(
+        builder,
+        "join",
+        `bb${consequentBlock.id} + bb${alternateBlock.id}`,
+        [],
+        statement.range,
+      );
+      if (consequentReturns && alternateReturns) {
+        joinBlock.terminator = { kind: "unreachable" };
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function lowerSyntheticUndefined(
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    constant: { kind: "undefined" },
+    detail: "undefined",
+    id,
+    kind: "constant",
+    range,
+  });
+  return recordRoot(builder, id, range);
+}
+
+function buildMirFunction(
+  id: number,
+  name: string,
+  body: readonly HirStatement[],
+  parameters: readonly HirParameter[],
+  range: SourceRange,
+): MirFunction {
+  const entry: MutableMirBlock = {
+    id: 0,
+    operations: [],
+    terminator: undefined,
+  };
+  const builder: MirBuilder = {
+    blocks: [entry],
+    current: entry,
+    nextValue: 0,
+  };
+  const returned = lowerStatements(body, builder);
+  if (!returned) {
+    const value = lowerSyntheticUndefined(range, builder);
+    builder.current.terminator = { kind: "return", value };
+  }
+  const mirParameters: readonly MirParameter[] = parameters.map(
+    (parameter) => ({
+      bindingId: parameter.bindingId,
+      hints: parameter.hints.map((hint) => ({
+        name: hint.name,
+        provenance: hint.provenance,
+        range: {
+          end: { ...hint.range.end },
+          start: { ...hint.range.start },
+        },
+      })),
+      name: parameter.name,
+      range: {
+        end: { ...parameter.range.end },
+        start: { ...parameter.range.start },
+      },
+    }),
+  );
+  return {
+    blocks: builder.blocks.map((block) => ({
+      id: block.id,
+      operations: block.operations,
+      terminator: block.terminator ?? { kind: "unreachable" },
+    })),
+    id,
+    kind: "mir-function",
+    name,
+    parameterCount: parameters.length,
+    parameters: mirParameters,
+    range,
+    rootSlotCount: builder.nextValue + parameters.length + 1,
+  };
+}
+
+/** Lower HIR to inspectable generic-only MIR. */
+export function buildMir(program: HirProgram): MirProgram {
+  return {
+    functions: program.functions.map((functionValue) =>
+      buildMirFunction(
+        functionValue.id,
+        functionValue.name,
+        functionValue.body,
+        functionValue.parameters,
+        functionValue.range,
+      ),
+    ),
+    globalBindings: program.body.flatMap((statement) =>
+      statement.kind === "const"
+        ? [{ id: statement.bindingId, name: statement.name }]
+        : [],
+    ),
+    kind: "mir-program",
+    script: buildMirFunction(-1, "<script>", program.body, [], program.range),
+    sourceId: program.sourceId,
+  };
+}
+
+function printTerminator(terminator: MirTerminator): string {
+  if (terminator.kind === "return") return `return %${terminator.value}`;
+  if (terminator.kind === "jump") return `jump bb${terminator.target}`;
+  if (terminator.kind === "branch") {
+    return (
+      `branch %${terminator.test} bb${terminator.whenTrue} ` +
+      `bb${terminator.whenFalse}`
+    );
+  }
+  return "unreachable";
+}
+
+function appendMirFunction(lines: string[], functionValue: MirFunction): void {
+  lines.push(
+    `function @f${functionValue.id} ${functionValue.name} roots=` +
+      `${functionValue.rootSlotCount} @${rangeText(functionValue.range)}`,
+  );
+  for (const block of functionValue.blocks) {
+    lines.push(`  bb${block.id}:`);
+    for (const operation of block.operations) {
+      const argumentText = operation.arguments
+        .map((argument) => `%${argument}`)
+        .join(", ");
+      lines.push(
+        `    %${operation.id} = ${operation.kind} ` +
+          `${operation.detail}` +
+          `${argumentText === "" ? "" : ` ${argumentText}`} ` +
+          `@${rangeText(operation.range)}`,
+      );
+    }
+    lines.push(`    ${printTerminator(block.terminator)}`);
+  }
+}
+
+/** Print deterministic MIR without host paths or object identities. */
+export function printMir(program: MirProgram): string {
+  const lines = [`mir ${JSON.stringify(program.sourceId)}`];
+  for (const binding of program.globalBindings) {
+    lines.push(`global %b${binding.id} ${binding.name}`);
+  }
+  for (const functionValue of program.functions) {
+    appendMirFunction(lines, functionValue);
+  }
+  appendMirFunction(lines, program.script);
+  return `${lines.join("\n")}\n`;
+}
+
+/** Result of the host-neutral compiler pipeline. */
+export interface CompilationResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly hir?: HirProgram;
+  readonly mir?: MirProgram;
+  readonly syntax?: SyntaxProgram;
+}
+
+/** Compile source through owned syntax, HIR, and generic MIR. */
+export function compileSource(
+  frontend: SourceFrontend,
+  input: SourceInput,
+): CompilationResult {
+  const frontendResult = frontend.parse(input);
+  if (frontendResult.program == null) {
+    return { diagnostics: frontendResult.diagnostics };
+  }
+  const hirResult = buildHir(frontendResult.program);
+  if (hirResult.program == null) {
+    return {
+      diagnostics: hirResult.diagnostics,
+      syntax: frontendResult.program,
+    };
+  }
+  return {
+    diagnostics: [],
+    hir: hirResult.program,
+    mir: buildMir(hirResult.program),
+    syntax: frontendResult.program,
+  };
+}
+
+/** The targets exercised by the native fixture harness. */
 export type TargetName = "aarch64-linux-musl" | "x86_64-linux-gnu";
 
 /** Explicit target properties consumed by native toolchain adapters. */
@@ -58,12 +1359,6 @@ export interface TargetDescription {
   readonly sanitizeUndefinedBehavior: boolean;
 }
 
-/** M0-only synthetic backend input used to prove package composition. */
-export interface SyntheticNativeModule {
-  readonly kind: "m0-synthetic-native-module";
-  readonly outputLine: string;
-}
-
 /** Deterministic source emitted by a replaceable native backend. */
 export interface EmittedNativeSource {
   readonly source: string;
@@ -72,7 +1367,7 @@ export interface EmittedNativeSource {
 
 /** Backend boundary that never performs process execution. */
 export interface NativeBackend {
-  emit(input: SyntheticNativeModule): EmittedNativeSource;
+  emit(input: MirProgram): EmittedNativeSource;
 }
 
 /** One reviewed native asset supplied by a runtime package. */
@@ -146,7 +1441,7 @@ export function renderDiagnostic(diagnostic: Diagnostic): string {
   );
 }
 
-/** Return the accepted M0 target description for an explicit target name. */
+/** Return the accepted M1 target description for an explicit target name. */
 export function describeTarget(name: TargetName): TargetDescription {
   if (name === "x86_64-linux-gnu") {
     return {

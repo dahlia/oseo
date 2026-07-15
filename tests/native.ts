@@ -1,11 +1,18 @@
+/* eslint-disable no-await-in-loop -- Native fixture builds are isolated. */
+
 import assert from "node:assert/strict";
 import process from "node:process";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { cBackend } from "../packages/backend-c/src/index.ts";
-import { describeTarget } from "../packages/compiler/src/index.ts";
+import { runNativeCli } from "../packages/cli/src/index.ts";
+import {
+  compileSource,
+  describeTarget,
+} from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
+import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import {
   assertMatchingObservations,
@@ -14,8 +21,165 @@ import {
 import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const fixture = `${root}/tests/fixtures/native-reference.ts`;
 const host = createNodeHost();
+
+const referencePrelude = `
+const oseoReferenceConsole = console;
+Object.defineProperty(globalThis, "console", {
+  value: {
+    log(...values: unknown[]) {
+      oseoReferenceConsole.log(values.map(String).join(" "));
+    },
+  },
+});
+`;
+
+interface Fixture {
+  readonly name: string;
+  readonly nonStrictScript?: boolean;
+  readonly source: string;
+}
+
+const fixtures: readonly Fixture[] = [
+  {
+    name: "values",
+    source: `
+console.log(undefined, null, true, false);
+console.log(-0);
+console.log("" + -0, "" + NaN, "" + Infinity, "" + -Infinity);
+console.log(0.000001, 0.0000123, 1e-7, 1.23e20);
+console.log("" + "");
+console.log("escaped\\ntext", "한글", "😀");
+`,
+  },
+  {
+    name: "truthiness-and-numeric-conversion",
+    source: `
+console.log(!undefined, !null, !false, !0, !NaN, !"", !"value");
+console.log(-true, "" + -null, -"2", -undefined);
+console.log("5" * 2, "9" / 3, false - true);
+console.log("0b10" * 1, "0o10" * 1, "0x10" * 1, "　2　" * 1);
+console.log("nan" * 1, "0x1p2" * 1, "1junk" * 1);
+console.log("Infinity" * 1, "+Infinity" * 1, "-Infinity" * 1);
+console.log("+inf" * 1, "-infinity" - 0, "+nan" * 1);
+console.log("1\\0junk" * 1);
+console.log("0x34964e021e30cde" * 1);
+console.log("0o15113116004170606336" * 1);
+console.log(
+  "0b1101001001011001001110000000100001111000110000110011011110" * 1,
+);
+`,
+  },
+  {
+    name: "generic-addition",
+    source: `
+function show(left, right) { console.log(left + right); }
+show(1, 2);
+show("left", 2);
+show(true, "right");
+show(null, false);
+show(undefined, 1);
+show("", null);
+`,
+  },
+  {
+    name: "comparisons",
+    source: `
+console.log(0 === -0, NaN === NaN, 1 !== "1", null !== undefined);
+console.log("a" < "b", "😀" > "z", "10" < 2, null <= false);
+console.log(Infinity >= 1, -Infinity < 0, NaN >= 0);
+`,
+  },
+  {
+    name: "scope-and-branches",
+    source: `
+const value = "outer";
+const undefined = "undefined binding";
+const NaN = "NaN binding";
+const Infinity = "Infinity binding";
+function scope() {
+  if (false) {
+    console.log(later);
+  }
+  const later = "initialized";
+  if (true) {
+    const value = "inner";
+    console.log(value);
+  } else {
+    console.log("wrong");
+  }
+  console.log(value);
+  console.log(later);
+}
+function globals() {
+  console.log(undefined, NaN, Infinity);
+}
+scope();
+globals();
+`,
+  },
+  {
+    name: "calls-and-order",
+    source: `
+function factorial(value) {
+  if (value === 0) return 1;
+  return value * factorial(value - 1);
+}
+function first(value) { return value; }
+function pair(left, right) { console.log(left, right); }
+console.log(factorial(6));
+console.log(first(console.log("argument"), console.log("extra")));
+pair("missing");
+`,
+  },
+  {
+    name: "duplicate-declarations",
+    nonStrictScript: true,
+    source: `
+function duplicate(value, value) { return value; }
+function repeated() { return "first"; }
+function repeated() { return "last"; }
+console.log(duplicate("first", "last"));
+console.log(duplicate("only"));
+console.log(repeated());
+`,
+  },
+  {
+    name: "hints",
+    source: `
+/** @param {string} left @returns {boolean} */
+function hinted(left: number, right: string): null {
+  return left + right;
+}
+function plain(left, right) { return left + right; }
+console.log(hinted(1, 2), plain(1, 2));
+`,
+  },
+  {
+    name: "number-edges",
+    source: `
+console.log(5e-324, 1e308 * 10, 0 / 0, 1 / 0, 1 / -0);
+console.log(0.1 + 0.2, 140737488355327 + 1);
+`,
+  },
+  {
+    name: "unused-function",
+    source: `
+function unused() { return 1; }
+console.log("unused declaration accepted");
+`,
+  },
+  {
+    name: "returning-branches",
+    source: `
+function choose(value) {
+  if (value) return "yes";
+  else return "no";
+}
+console.log(choose(true), choose(false));
+`,
+  },
+];
 
 async function requireSuccess(
   command: string,
@@ -32,56 +196,316 @@ async function requireSuccess(
   return result;
 }
 
-const nodeReference = await requireSuccess(process.execPath, [fixture]);
-const denoReference = await requireSuccess("deno", ["run", "--quiet", fixture]);
-assertMatchingObservations([nodeReference, denoReference]);
-
-await withNativeFixture(
-  {
-    backend: cBackend,
-    host,
-    input: {
-      kind: "m0-synthetic-native-module",
-      outputLine: "native-fixture=??/42",
+async function references(fixture: Fixture): Promise<
+  readonly [
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
     },
-    keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
-    runtime: cRuntimeProvider,
-    target: describeTarget("x86_64-linux-gnu"),
-    toolchain: zigToolchain,
-  },
-  (native) => {
-    assertMatchingObservations([nodeReference, denoReference, native]);
-    assert(native.emittedC.includes("oseo_runtime_write_line"), "emitted C");
-    assert(
-      native.compilerInvocation
-        .filter((line) => line.startsWith("zig cc "))
-        .every((line) => line.includes("x86_64-linux-gnu")),
-      "native compiler invocation records an explicit target",
+    {
+      readonly exitStatus: number;
+      readonly stderr: string;
+      readonly stdout: string;
+    },
+  ]
+> {
+  const directory = await host.makeTemporaryDirectory("oseo-reference-");
+  const path = `${directory}/${fixture.name}.ts`;
+  try {
+    const source = fixture.nonStrictScript
+      ? `new Function(${JSON.stringify(fixture.source)})();\n`
+      : fixture.source;
+    await host.writeTextFile(path, referencePrelude + source);
+    return [
+      await requireSuccess(process.execPath, [path]),
+      await requireSuccess("deno", ["run", "--quiet", path]),
+    ];
+  } finally {
+    await host.remove(directory);
+  }
+}
+
+for (const fixture of fixtures) {
+  const [nodeReference, denoReference] = await references(fixture);
+  assertMatchingObservations([nodeReference, denoReference]);
+  const compilation = compileSource(babelFrontend, {
+    source: fixture.source,
+    sourceId: `${fixture.name}.ts`,
+  });
+  assert.deepEqual(compilation.diagnostics, [], fixture.name);
+  assert(compilation.mir != null, `${fixture.name}: generic MIR`);
+
+  if (fixture.name === "generic-addition") {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+  }
+  try {
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compilation.mir,
+        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        runtime: cRuntimeProvider,
+        target: describeTarget("x86_64-linux-gnu"),
+        toolchain: zigToolchain,
+      },
+      (native) => {
+        assertMatchingObservations([nodeReference, denoReference, native]);
+        assert(native.emittedC.includes("OseoResult"), "generic call ABI");
+        if (fixture.name === "unused-function") {
+          assert.doesNotMatch(native.emittedC, /oseo_function_0/u);
+        }
+        if (fixture.name === "returning-branches") {
+          assert.doesNotMatch(native.emittedC, /bb3:/u);
+        }
+        assert(
+          native.compilerInvocation
+            .filter((line) => line.startsWith("zig cc "))
+            .every((line) => line.includes("x86_64-linux-gnu")),
+          "native compiler invocation records an explicit target",
+        );
+      },
     );
-  },
-);
+  } finally {
+    delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+  }
 
+  await withNativeFixture(
+    {
+      backend: cBackend,
+      host,
+      input: compilation.mir,
+      keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+      runtime: cRuntimeProvider,
+      target: describeTarget("aarch64-linux-musl"),
+      toolchain: zigToolchain,
+    },
+    (cross) => {
+      assert(
+        cross.compilerInvocation
+          .filter((line) => line.startsWith("zig cc "))
+          .every((line) => line.includes("aarch64-linux-musl")),
+        "cross compiler invocation records an explicit target",
+      );
+    },
+  );
+}
+
+const recursiveCompilation = compileSource(babelFrontend, {
+  source: "function recurse() { return recurse(); } recurse();",
+  sourceId: "recursive-compile-only.ts",
+});
+assert.deepEqual(recursiveCompilation.diagnostics, []);
+assert(recursiveCompilation.mir != null, "recursive compile-only MIR");
 await withNativeFixture(
   {
     backend: cBackend,
     host,
-    input: {
-      kind: "m0-synthetic-native-module",
-      outputLine: "native-fixture=??/42",
-    },
-    keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+    input: recursiveCompilation.mir,
     runtime: cRuntimeProvider,
     target: describeTarget("aarch64-linux-musl"),
     toolchain: zigToolchain,
   },
   (cross) => {
-    assert(
-      cross.compilerInvocation
-        .filter((line) => line.startsWith("zig cc "))
-        .every((line) => line.includes("aarch64-linux-musl")),
-      "cross compiler invocation records an explicit target",
+    assert.match(
+      cross.emittedC,
+      /OseoFunctionEntry volatile recursive_target_0/u,
     );
   },
 );
-console.log("native fixture: Node, Deno, and x86-64 outputs match");
-console.log("cross fixture: aarch64-linux-musl compile and link passed");
+
+const cli = await runNativeCli(
+  {
+    args: ["cli-fixture.ts"],
+    source: 'console.log("cli-native");',
+    sourceId: "cli-fixture.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.deepEqual(cli, {
+  exitStatus: 0,
+  stderr: "",
+  stdout: "cli-native\n",
+});
+
+let tdzDirectory: string | undefined;
+let tdzCleanupCount = 0;
+const tdzHost = {
+  ...host,
+  async makeTemporaryDirectory(prefix: string): Promise<string> {
+    const directory = await host.makeTemporaryDirectory(prefix);
+    tdzDirectory = directory;
+    return directory;
+  },
+  async remove(path: string): Promise<void> {
+    assert.equal(path, tdzDirectory);
+    tdzCleanupCount += 1;
+    await host.remove(path);
+  },
+};
+const tdz = await runNativeCli(
+  {
+    args: ["tdz-runtime.ts"],
+    source:
+      "function read() { console.log(value); }\n" +
+      "read();\n" +
+      "const value = 1;\n",
+    sourceId: "tdz-runtime.ts",
+    version: "0.1.0",
+  },
+  tdzHost,
+);
+assert.equal(tdz.exitStatus, 1);
+assert.equal(tdz.stdout, "");
+assert.match(tdz.stderr, /error\[OSEO2001\].*before initialization/u);
+assert.equal(tdzCleanupCount, 1);
+
+const nulSourceId = "source\0identifier.ts";
+const nulSourceDiagnostic = await runNativeCli(
+  {
+    args: ["nul-source-id.ts"],
+    source: "console.log(value); const value = 1;",
+    sourceId: nulSourceId,
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nulSourceDiagnostic.exitStatus, 1);
+assert.equal(nulSourceDiagnostic.stdout, "");
+assert.ok(nulSourceDiagnostic.stderr.startsWith(`${nulSourceId}:`));
+assert.match(nulSourceDiagnostic.stderr, /error\[OSEO2001\]/u);
+
+const recursion = await runNativeCli(
+  {
+    args: ["recursive-runtime.ts"],
+    source: "function recurse() { return recurse(); } recurse();",
+    sourceId: "recursive-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(recursion.exitStatus, 1);
+assert.equal(recursion.stdout, "");
+assert.match(recursion.stderr, /error\[OSEO2001\].*call depth/u);
+
+const wideBindings = Array.from(
+  { length: 3_000 },
+  (_, index) => `const value${index} = ${index};`,
+).join("\n");
+const wideRecursion = await runNativeCli(
+  {
+    args: ["wide-recursion-runtime.ts"],
+    source:
+      `function recurse(depth) {\n${wideBindings}\n` +
+      "  if (depth === 0) return 0;\n" +
+      "  return recurse(depth - 1);\n" +
+      "}\n" +
+      "console.log(recurse(100));\n",
+    sourceId: "wide-recursion-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(wideRecursion.exitStatus, 1);
+assert.equal(wideRecursion.stdout, "");
+assert.match(wideRecursion.stderr, /error\[OSEO2001\].*frame budget/u);
+
+const rootAllocationFailureHost = {
+  ...host,
+  async readTextFile(path: string | URL): Promise<string> {
+    const source = await host.readTextFile(path);
+    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+      return source;
+    }
+    const injected = source.replace(
+      "slots = calloc(slot_count, sizeof(OseoValue));",
+      "slots = NULL;",
+    );
+    assert.notEqual(injected, source, "root allocation failure injected");
+    return injected;
+  },
+};
+const rootAllocationFailure = await runNativeCli(
+  {
+    args: ["root-allocation-runtime.ts"],
+    source: "console.log(1);",
+    sourceId: "root-allocation-runtime.ts",
+    version: "0.1.0",
+  },
+  rootAllocationFailureHost,
+);
+assert.equal(rootAllocationFailure.exitStatus, 1);
+assert.equal(rootAllocationFailure.stdout, "");
+assert.match(
+  rootAllocationFailure.stderr,
+  /error\[OSEO2001\].*Root frame allocation failed/u,
+);
+
+const concatenationOverflowHost = {
+  ...host,
+  async readTextFile(path: string | URL): Promise<string> {
+    const source = await host.readTextFile(path);
+    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+      return source;
+    }
+    const injected = source.replace(
+      "OseoHeapObject *right_object = heap_object(slots[1]);",
+      "OseoHeapObject *right_object = heap_object(slots[1]);\n" +
+        "    right_object->length = SIZE_MAX;",
+    );
+    assert.notEqual(injected, source, "concatenation overflow injected");
+    return injected;
+  },
+};
+const concatenationOverflow = await runNativeCli(
+  {
+    args: ["concatenation-overflow-runtime.ts"],
+    source: 'console.log("left" + "right");',
+    sourceId: "concatenation-overflow-runtime.ts",
+    version: "0.1.0",
+  },
+  concatenationOverflowHost,
+);
+assert.equal(concatenationOverflow.exitStatus, 1);
+assert.equal(concatenationOverflow.stdout, "");
+assert.match(
+  concatenationOverflow.stderr,
+  /error\[OSEO2001\].*String allocation is too large/u,
+);
+
+const allocationFailureHost = {
+  ...host,
+  async readTextFile(path: string | URL): Promise<string> {
+    const source = await host.readTextFile(path);
+    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+      return source;
+    }
+    const injected = source.replace(
+      "char *text = malloc(length + 1u);",
+      "char *text = NULL;",
+    );
+    assert.notEqual(injected, source, "numeric allocation failure injected");
+    return injected;
+  },
+};
+const allocationFailure = await runNativeCli(
+  {
+    args: ["numeric-conversion-runtime.ts"],
+    source: 'console.log(-"1");',
+    sourceId: "numeric-conversion-runtime.ts",
+    version: "0.1.0",
+  },
+  allocationFailureHost,
+);
+assert.equal(allocationFailure.exitStatus, 1);
+assert.equal(allocationFailure.stdout, "");
+assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+
+console.log(
+  `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
+);
+console.log(
+  `cross fixtures: ${fixtures.length + 1} aarch64-linux-musl builds passed`,
+);

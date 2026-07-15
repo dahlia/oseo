@@ -2,25 +2,66 @@ import { cBackend } from "@oseo/backend-c";
 import type {
   CompilerHost,
   Diagnostic,
+  MirProgram,
   NativeBackend,
   NativeToolchain,
+  ProcessObservation,
+  ProcessRequest,
   RuntimeInputProvider,
   SourceFrontend,
 } from "@oseo/compiler";
-import { renderDiagnostic } from "@oseo/compiler";
+import { compileSource, printMir, renderDiagnostic } from "@oseo/compiler";
 import { createDenoHost, createNodeHost } from "@oseo/host";
 import { babelFrontend } from "@oseo/parser-babel";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 import { zigToolchain } from "@oseo/toolchain-zig";
+import { object, or } from "@optique/core/constructs";
+import { runParser } from "@optique/core/facade";
+import { message } from "@optique/core/message";
+import { map, withDefault } from "@optique/core/modifiers";
+import type { InferValue } from "@optique/core/parser";
+import { argument, flag } from "@optique/core/primitives";
+import { defineProgram } from "@optique/core/program";
+import { string as stringValue } from "@optique/core/valueparser";
 
-const helpText = `Usage: oseo [options] <source>
+const modeParser = withDefault(
+  or(
+    map(
+      flag("--dump-mir", {
+        description: message`Print textual MIR for supported source.`,
+      }),
+      () => "dump-mir" as const,
+    ),
+    map(
+      flag("--emit-c", {
+        description: message`Print generated C11 for supported source.`,
+      }),
+      () => "emit-c" as const,
+    ),
+  ),
+  "execute" as const,
+);
 
-Options:
-  --dump-mir  Print textual MIR for supported source (available in M1)
-  --emit-c    Print generated C11 for supported source (available in M1)
-  --help      Print this help
-  --version   Print the Oseo package version
-`;
+const cliParser = object({
+  mode: modeParser,
+  sourceId: argument(stringValue({ metavar: "SOURCE" }), {
+    description: message`Source file to compile.`,
+  }),
+});
+
+const cliProgram = defineProgram({
+  metadata: {
+    brief: message`Compile JavaScript source to a native executable.`,
+    name: "oseo",
+  },
+  parser: cliParser,
+});
+
+type CliInvocation = InferValue<typeof cliParser>;
+
+type CliParseResult =
+  | { readonly kind: "invoke"; readonly value: CliInvocation }
+  | { readonly kind: "result"; readonly value: CliResult };
 
 /** Concrete adapters selected at the outer Oseo composition root. */
 export interface DefaultComponents {
@@ -32,7 +73,7 @@ export interface DefaultComponents {
   readonly toolchain: NativeToolchain;
 }
 
-/** A host-independent invocation of the M0 command-line contract. */
+/** A host-independent invocation of the Oseo command-line contract. */
 export interface CliRequest {
   readonly args: readonly string[];
   readonly source?: string;
@@ -57,11 +98,14 @@ export const defaultComponents: DefaultComponents = {
   toolchain: zigToolchain,
 };
 
-function unsupportedDiagnostic(sourceId: string): Diagnostic {
+function hostDiagnostic(
+  sourceId: string,
+  diagnosticMessage: string,
+): Diagnostic {
   return {
     byteRange: { end: 0, start: 0 },
-    code: "OSEO1001",
-    message: "Source compilation is not available before milestone M1.",
+    code: "OSEO3001",
+    message: diagnosticMessage,
     range: {
       end: { column: 1, line: 1 },
       start: { column: 1, line: 1 },
@@ -70,27 +114,246 @@ function unsupportedDiagnostic(sourceId: string): Diagnostic {
   };
 }
 
-/** Run the reserved M0 CLI without writing directly to a host stream. */
-export function runCli(request: CliRequest): CliResult {
-  if (request.args.includes("--help")) {
-    return { exitStatus: 0, stderr: "", stdout: helpText };
-  }
-  if (request.args.includes("--version")) {
-    return { exitStatus: 0, stderr: "", stdout: `${request.version}\n` };
-  }
-
-  const sourceId =
-    request.sourceId ??
-    request.args.find((argument) => !argument.startsWith("-")) ??
-    "<stdin>";
-  const parsed = babelFrontend.parse({
-    source: request.source ?? "",
-    sourceId,
-  });
-  const diagnostic = parsed.diagnostics[0] ?? unsupportedDiagnostic(sourceId);
+function diagnosticResult(diagnostic: Diagnostic): CliResult {
   return {
     exitStatus: 1,
     stderr: `${renderDiagnostic(diagnostic)}\n`,
     stdout: "",
   };
+}
+
+function parseCliRequest(request: CliRequest): CliParseResult {
+  let exitStatus = 0;
+  let stderr = "";
+  let stdout = "";
+  const stopped = {};
+  const stop = (status: number): never => {
+    exitStatus = status;
+    throw stopped;
+  };
+  try {
+    return {
+      kind: "invoke",
+      value: runParser(cliProgram, request.args, {
+        colors: false,
+        help: { onShow: stop, option: true },
+        maxWidth: 80,
+        onError: stop,
+        stderr: (text) => {
+          stderr += `${text}\n`;
+        },
+        stdout: (text) => {
+          stdout += `${text}\n`;
+        },
+        version: {
+          onShow: stop,
+          option: true,
+          value: request.version,
+        },
+      }),
+    };
+  } catch (error) {
+    if (error !== stopped) throw error;
+    return {
+      kind: "result",
+      value: { exitStatus, stderr, stdout },
+    };
+  }
+}
+
+function compileCliSource(
+  mode: CliInvocation["mode"],
+  source: string,
+  sourceId: string,
+): CliResult {
+  const compiled = compileSource(defaultComponents.frontend, {
+    source,
+    sourceId,
+  });
+  const diagnostic = compiled.diagnostics[0];
+  if (diagnostic != null) return diagnosticResult(diagnostic);
+  if (compiled.mir == null) {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The compiler did not produce generic MIR."),
+    );
+  }
+  if (mode === "dump-mir") {
+    return { exitStatus: 0, stderr: "", stdout: printMir(compiled.mir) };
+  }
+  if (mode === "emit-c") {
+    return {
+      exitStatus: 0,
+      stderr: "",
+      stdout: defaultComponents.backend.emit(compiled.mir).source,
+    };
+  }
+  return diagnosticResult(
+    hostDiagnostic(
+      sourceId,
+      "Native execution requires the asynchronous CLI host workflow.",
+    ),
+  );
+}
+
+/** Run parsing, dumps, and C emission without touching a host process. */
+export function runCli(request: CliRequest): CliResult {
+  const parsed = parseCliRequest(request);
+  if (parsed.kind === "result") return parsed.value;
+  return compileCliSource(
+    parsed.value.mode,
+    request.source ?? "",
+    request.sourceId ?? parsed.value.sourceId,
+  );
+}
+
+function join(directory: string, name: string): string {
+  return `${directory.replace(/\/$/u, "")}/${name}`;
+}
+
+async function observeProcess(
+  host: CompilerHost,
+  request: ProcessRequest,
+): Promise<ProcessObservation | undefined> {
+  try {
+    return await host.run(request);
+  } catch {
+    return undefined;
+  }
+}
+
+async function executeNativeWorkflow(
+  host: CompilerHost,
+  sourceId: string,
+  directory: string,
+  mir: MirProgram,
+): Promise<CliResult> {
+  const emitted = defaultComponents.backend.emit(mir);
+  const generatedSourcePath = join(directory, emitted.sourceName);
+  await host.writeTextFile(generatedSourcePath, emitted.source);
+  const runtime = defaultComponents.runtime.getRuntimeInput();
+  const copiedAssets = [];
+  for (const asset of runtime.assets) {
+    const destination = join(directory, asset.name);
+    // eslint-disable-next-line no-await-in-loop -- Copies must settle in order.
+    const contents = await host.readTextFile(asset.url);
+    // eslint-disable-next-line no-await-in-loop -- Copies must settle in order.
+    await host.writeTextFile(destination, contents);
+    copiedAssets.push({ asset, destination });
+  }
+  const runtimeSourcePath = copiedAssets.find(
+    (entry) => entry.asset.kind === "source",
+  )?.destination;
+  if (runtimeSourcePath == null) {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The C runtime source is unavailable."),
+    );
+  }
+  const plan = defaultComponents.toolchain.createBuildPlan({
+    generatedSourcePath,
+    runtimeDirectory: directory,
+    runtimeSourcePath,
+    target: {
+      cStandard: "c11",
+      execute: true,
+      name: "x86_64-linux-gnu",
+      sanitizeUndefinedBehavior: true,
+    },
+    workingDirectory: directory,
+  });
+  for (const processRequest of plan.requests) {
+    // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
+    const observation = await observeProcess(host, processRequest);
+    if (observation == null) {
+      return diagnosticResult(
+        hostDiagnostic(sourceId, "The native toolchain could not be started."),
+      );
+    }
+    if (observation.exitStatus !== 0) {
+      return diagnosticResult(
+        hostDiagnostic(sourceId, "The native toolchain failed."),
+      );
+    }
+  }
+  const observation = await observeProcess(host, {
+    args: [],
+    command: plan.executablePath,
+    cwd: directory,
+  });
+  if (observation == null) {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The native executable could not be started."),
+    );
+  }
+  return {
+    exitStatus: observation.exitStatus,
+    stderr: observation.stderr,
+    stdout: observation.stdout,
+  };
+}
+
+/** Compile and execute one source invocation through the native toolchain. */
+export async function runNativeCli(
+  request: CliRequest,
+  host: CompilerHost = defaultComponents.createNodeHost(),
+): Promise<CliResult> {
+  const parsed = parseCliRequest(request);
+  if (parsed.kind === "result") return parsed.value;
+  const sourceId = request.sourceId ?? parsed.value.sourceId;
+  let source: string;
+  try {
+    source = request.source ?? (await host.readTextFile(parsed.value.sourceId));
+  } catch {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The source file could not be read."),
+    );
+  }
+  if (parsed.value.mode !== "execute") {
+    return compileCliSource(parsed.value.mode, source, sourceId);
+  }
+  const compiled = compileSource(defaultComponents.frontend, {
+    source,
+    sourceId,
+  });
+  const diagnostic = compiled.diagnostics[0];
+  if (diagnostic != null) return diagnosticResult(diagnostic);
+  if (compiled.mir == null) {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The compiler did not produce generic MIR."),
+    );
+  }
+  let directory: string;
+  try {
+    directory = await host.makeTemporaryDirectory("oseo-cli-");
+  } catch {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The native temporary directory could not be created.",
+      ),
+    );
+  }
+  let result: CliResult;
+  try {
+    result = await executeNativeWorkflow(
+      host,
+      sourceId,
+      directory,
+      compiled.mir,
+    );
+  } catch {
+    result = diagnosticResult(
+      hostDiagnostic(sourceId, "The native host workflow failed."),
+    );
+  }
+  try {
+    await host.remove(directory);
+  } catch {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The native temporary directory could not be removed.",
+      ),
+    );
+  }
+  return result;
 }
