@@ -296,6 +296,20 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = oseo_console_log(context, ${argumentsValue.count}u, ` +
         `${argumentsValue.name});`,
     );
+  } else if (target.kind === "object-intrinsic") {
+    const names = {
+      create: "oseo_object_builtin_create",
+      defineProperty: "oseo_object_builtin_define_property",
+      getOwnPropertyDescriptor:
+        "oseo_object_builtin_get_own_property_descriptor",
+      keys: "oseo_object_builtin_keys",
+      setPrototypeOf: "oseo_object_builtin_set_prototype_of",
+    } as const;
+    line(
+      state,
+      `result = ${names[target.method]}(context, ` +
+        `${argumentsValue.count}u, ${argumentsValue.name});`,
+    );
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
     const receiver = operationArgument(operation, 1);
@@ -872,7 +886,10 @@ function emitFunction(
     (state.usesCompletion
       ? "    int completion_kind = 0;\n" +
         "    size_t completion_target = 0u;\n" +
-        "    OseoValue completion_value = oseo_undefined();\n"
+        "    OseoValue completion_value = oseo_undefined();\n" +
+        "    (void)completion_kind;\n" +
+        "    (void)completion_target;\n" +
+        "    (void)completion_value;\n"
       : "") +
     "    (void)callee;\n" +
     "    (void)receiver;\n" +

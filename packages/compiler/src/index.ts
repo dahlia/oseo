@@ -66,6 +66,15 @@ export type SyntaxCallTarget =
       readonly kind: "console-log";
     })
   | (LocatedSyntax & {
+      readonly kind: "object-intrinsic";
+      readonly method:
+        | "create"
+        | "defineProperty"
+        | "getOwnPropertyDescriptor"
+        | "keys"
+        | "setPrototypeOf";
+    })
+  | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
     })
@@ -272,6 +281,15 @@ export interface SourceFrontend {
 export type HirCallTarget =
   | {
       readonly kind: "console-log";
+    }
+  | {
+      readonly kind: "object-intrinsic";
+      readonly method:
+        | "create"
+        | "defineProperty"
+        | "getOwnPropertyDescriptor"
+        | "keys"
+        | "setPrototypeOf";
     }
   | {
       readonly callee: HirExpression;
@@ -687,6 +705,22 @@ function resolveExpression(
       return undefined;
     }
     target = { kind: "console-log" };
+  } else if (expression.target.kind === "object-intrinsic") {
+    const binding = findBinding(scopes, "Object");
+    if (binding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression.target,
+          "The Object intrinsic is shadowed by a lexical binding.",
+        ),
+      );
+      return undefined;
+    }
+    target = {
+      kind: "object-intrinsic",
+      method: expression.target.method,
+    };
   } else if (expression.target.kind === "name") {
     const callee = resolveExpression(
       {
@@ -1219,10 +1253,12 @@ function printHirExpression(expression: HirExpression): string {
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"
-      : expression.target.kind === "dynamic"
-        ? printHirExpression(expression.target.callee)
-        : `${printHirExpression(expression.target.object)}[` +
-          `${printHirExpression(expression.target.key)}]`;
+      : expression.target.kind === "object-intrinsic"
+        ? `intrinsic Object.${expression.target.method}`
+        : expression.target.kind === "dynamic"
+          ? printHirExpression(expression.target.callee)
+          : `${printHirExpression(expression.target.object)}[` +
+            `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirExpression).join(", ") +
@@ -1336,6 +1372,15 @@ export type MirConstant =
 export type MirCallTarget =
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
+  | {
+      readonly kind: "object-intrinsic";
+      readonly method:
+        | "create"
+        | "defineProperty"
+        | "getOwnPropertyDescriptor"
+        | "keys"
+        | "setPrototypeOf";
+    }
   | { readonly functionId: number; readonly kind: "function" };
 
 /** Hint data copied into MIR without retaining a HIR or syntax object. */
@@ -1995,6 +2040,15 @@ function lowerExpression(
     );
     callTarget = { kind: "console-log" };
     detail = "console_log";
+  } else if (expression.target.kind === "object-intrinsic") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = {
+      kind: "object-intrinsic",
+      method: expression.target.method,
+    };
+    detail = `Object.${expression.target.method}`;
   } else {
     let callee: number;
     let receiver: number;

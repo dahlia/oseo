@@ -357,6 +357,22 @@ function callTarget(
   ) {
     return { ...location(context, value), kind: "console-log" };
   }
+  if (value.computed !== true && identifierName(object) === "Object") {
+    const method = identifierName(property);
+    if (
+      method === "create" ||
+      method === "defineProperty" ||
+      method === "getOwnPropertyDescriptor" ||
+      method === "keys" ||
+      method === "setPrototypeOf"
+    ) {
+      return {
+        ...location(context, value),
+        kind: "object-intrinsic",
+        method,
+      };
+    }
+  }
   const parts = memberParts(context, value);
   return parts == null
     ? undefined

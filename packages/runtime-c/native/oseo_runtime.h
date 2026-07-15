@@ -233,6 +233,31 @@ OseoResult oseo_object_set_prototype(
     OseoValue object,
     OseoValue prototype
 );
+OseoResult oseo_object_builtin_create(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_define_property(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_get_own_property_descriptor(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_keys(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_set_prototype_of(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
     OseoContext *context,

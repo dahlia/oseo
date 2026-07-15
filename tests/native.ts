@@ -179,6 +179,44 @@ console.log(values.length, values[0], values[2]);
 `,
   },
   {
+    name: "object-reflection",
+    source: `
+const firstPrototype = { inherited: 9 };
+const value = Object.create(firstPrototype);
+console.log(Object.defineProperty(value, "fixed", {
+  value: 1,
+  writable: false,
+  enumerable: true,
+  configurable: false,
+}) === value);
+Object.defineProperty(value, "hidden", { value: 2 });
+value.extra = 3;
+value["10"] = "ten";
+value["2"] = "two";
+console.log(value.fixed, value.inherited);
+const descriptor = Object.getOwnPropertyDescriptor(value, "fixed");
+console.log(
+  descriptor.value,
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+);
+console.log(Object.getOwnPropertyDescriptor(value, "missing"));
+const keys = Object.keys(value);
+console.log(keys[0], keys[1], keys[2], keys[3], keys.length);
+const secondPrototype = { inherited: 11 };
+console.log(Object.setPrototypeOf(value, secondPrototype) === value);
+console.log(value.inherited);
+try {
+  Object.defineProperty(value, "fixed", { value: 4 });
+} catch (error) {
+  console.log("redefinition rejected");
+}
+const detached = Object.create(null);
+console.log(detached.missing);
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };

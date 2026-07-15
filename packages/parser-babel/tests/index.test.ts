@@ -140,6 +140,26 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.doesNotMatch(printMir(generic.mir), /property-get-cached/u);
 });
 
+test("lowers the admitted Object reflection intrinsics", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = Object.create(null);\n" +
+      'Object.defineProperty(value, "key", { value: 1 });\n' +
+      'Object.getOwnPropertyDescriptor(value, "key");\n' +
+      "Object.setPrototypeOf(value, null);\n" +
+      "Object.keys(value);\n",
+    sourceId: "object-reflection.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /intrinsic Object\.create/u);
+  assert.match(printHir(result.hir), /intrinsic Object\.defineProperty/u);
+  assert.match(printMir(result.mir), /Object\.getOwnPropertyDescriptor/u);
+  assert.match(printMir(result.mir), /Object\.setPrototypeOf/u);
+  assert.match(printMir(result.mir), /Object\.keys/u);
+});
+
 test("preserves array elements and holes in owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source: "const values = [1, , 3]; console.log(values.length);",

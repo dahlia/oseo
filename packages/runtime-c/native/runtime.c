@@ -1216,6 +1216,306 @@ OseoResult oseo_object_set_prototype(
     return normal(object_value);
 }
 
+static OseoValue builtin_argument(
+    size_t argument_count,
+    const OseoValue *arguments,
+    size_t index
+) {
+    return index < argument_count ? arguments[index] : oseo_undefined();
+}
+
+static size_t own_ascii_property_index(
+    const OseoOrdinaryObject *object,
+    const char *name
+) {
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        if (string_is_ascii(object->properties[index].key, name)) return index;
+    }
+    return SIZE_MAX;
+}
+
+static OseoResult ascii_string(OseoContext *context, const char *text) {
+    uint16_t units[32];
+    size_t length = strlen(text);
+    if (length > sizeof(units) / sizeof(*units)) {
+        return failure(context, "OSEO2001", "Internal property name is long.");
+    }
+    for (size_t index = 0u; index < length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)text[index];
+    }
+    return allocate_string(context, units, length);
+}
+
+static OseoResult define_ascii_value(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    const char *name,
+    OseoValue value
+) {
+    OseoResult result = ascii_string(context, name);
+    frame->slots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return oseo_object_set(context, frame->slots[0], frame->slots[1], value);
+}
+
+OseoResult oseo_object_builtin_create(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    return oseo_object_create(
+        context,
+        builtin_argument(argument_count, arguments, 0u)
+    );
+}
+
+OseoResult oseo_object_builtin_define_property(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
+    OseoValue descriptor_value =
+        builtin_argument(argument_count, arguments, 2u);
+    if (!is_object(object_value) || !is_object(descriptor_value)) {
+        return failure(context, "OSEO2001", "Invalid property descriptor.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_property_key(
+        context,
+        builtin_argument(argument_count, arguments, 1u)
+    );
+    frame.slots[0] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    OseoOrdinaryObject *descriptor = ordinary_object(descriptor_value);
+    size_t value_index = own_ascii_property_index(descriptor, "value");
+    size_t writable_index = own_ascii_property_index(descriptor, "writable");
+    size_t enumerable_index =
+        own_ascii_property_index(descriptor, "enumerable");
+    size_t configurable_index =
+        own_ascii_property_index(descriptor, "configurable");
+    OseoValue value = value_index == SIZE_MAX
+        ? oseo_undefined()
+        : descriptor->properties[value_index].value;
+    OseoPropertyAttributes attributes = {
+        configurable_index != SIZE_MAX && oseo_to_boolean(
+            descriptor->properties[configurable_index].value
+        ),
+        enumerable_index != SIZE_MAX && oseo_to_boolean(
+            descriptor->properties[enumerable_index].value
+        ),
+        writable_index != SIZE_MAX && oseo_to_boolean(
+            descriptor->properties[writable_index].value
+        ),
+    };
+    result = oseo_object_define(
+        context,
+        object_value,
+        frame.slots[0],
+        value,
+        attributes
+    );
+    if (result.status == OSEO_STATUS_NORMAL) result.value = object_value;
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static bool own_descriptor(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+) {
+    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+        *value = function_object(object_value)->prototype_object;
+        *attributes = (OseoPropertyAttributes){false, false, true};
+        return true;
+    }
+    if (is_array(object_value) && string_is_ascii(key, "length")) {
+        OseoOrdinaryObject *array = ordinary_object(object_value);
+        *value = oseo_number(array->array_length);
+        *attributes = (OseoPropertyAttributes){
+            false,
+            false,
+            array->length_writable,
+        };
+        return true;
+    }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    size_t index = own_property_index(object, key);
+    if (index == SIZE_MAX) return false;
+    *value = object->properties[index].value;
+    *attributes = object->properties[index].attributes;
+    return true;
+}
+
+OseoResult oseo_object_builtin_get_own_property_descriptor(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
+    if (!is_object(object_value)) {
+        return failure(context, "OSEO2001", "Value is not an ordinary object.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_property_key(
+        context,
+        builtin_argument(argument_count, arguments, 1u)
+    );
+    frame.slots[1] = result.value;
+    OseoValue value = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false};
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !own_descriptor(
+            object_value,
+            frame.slots[1],
+            &value,
+            &attributes
+        )) {
+        oseo_roots_release(context, &frame);
+        return normal(oseo_undefined());
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[0] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_value(context, &frame, "value", value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_value(
+            context,
+            &frame,
+            "writable",
+            oseo_boolean(attributes.writable)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_value(
+            context,
+            &frame,
+            "enumerable",
+            oseo_boolean(attributes.enumerable)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_value(
+            context,
+            &frame,
+            "configurable",
+            oseo_boolean(attributes.configurable)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult append_key(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    size_t output_index,
+    OseoValue key
+) {
+    char index_text[24];
+    (void)snprintf(index_text, sizeof(index_text), "%zu", output_index);
+    OseoResult result = ascii_string(context, index_text);
+    frame->slots[1] = result.value;
+    frame->slots[2] = key;
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return oseo_object_set(
+        context,
+        frame->slots[0],
+        frame->slots[1],
+        frame->slots[2]
+    );
+}
+
+OseoResult oseo_object_builtin_keys(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue object_value = builtin_argument(argument_count, arguments, 0u);
+    if (!is_object(object_value)) {
+        return failure(context, "OSEO2001", "Value is not an ordinary object.");
+    }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    size_t count = 0u;
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        if (object->properties[index].attributes.enumerable) count += 1u;
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_array_create(context, count);
+    frame.slots[0] = result.value;
+    size_t output_index = 0u;
+    uint64_t previous = UINT64_MAX;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        size_t selected = SIZE_MAX;
+        uint32_t selected_number = 0u;
+        for (size_t index = 0u; index < object->property_count; index += 1u) {
+            uint32_t number = 0u;
+            OseoProperty *property = &object->properties[index];
+            if (!property->attributes.enumerable ||
+                !array_index(property->key, &number) ||
+                (previous != UINT64_MAX && number <= previous)) continue;
+            if (selected == SIZE_MAX || number < selected_number) {
+                selected = index;
+                selected_number = number;
+            }
+        }
+        if (selected == SIZE_MAX) break;
+        result = append_key(
+            context,
+            &frame,
+            output_index,
+            object->properties[selected].key
+        );
+        output_index += 1u;
+        previous = selected_number;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < object->property_count;
+         index += 1u) {
+        OseoProperty *property = &object->properties[index];
+        uint32_t ignored = 0u;
+        if (!property->attributes.enumerable ||
+            array_index(property->key, &ignored)) continue;
+        result = append_key(
+            context,
+            &frame,
+            output_index,
+            property->key
+        );
+        output_index += 1u;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_object_builtin_set_prototype_of(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    return oseo_object_set_prototype(
+        context,
+        builtin_argument(argument_count, arguments, 0u),
+        builtin_argument(argument_count, arguments, 1u)
+    );
+}
+
 static bool numeric_whitespace(uint16_t unit) {
     return unit == UINT16_C(0x0009) || unit == UINT16_C(0x000a) ||
         unit == UINT16_C(0x000b) || unit == UINT16_C(0x000c) ||
