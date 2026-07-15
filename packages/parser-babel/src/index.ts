@@ -364,6 +364,38 @@ function callTarget(
   );
 }
 
+function memberParts(
+  context: ConvertContext,
+  value: BabelNode,
+):
+  | {
+      readonly key: SyntaxExpression;
+      readonly object: SyntaxExpression;
+    }
+  | undefined {
+  if (value.type !== "MemberExpression" || value.optional === true) {
+    return unsupported(context, value, "This property access is unsupported.");
+  }
+  const objectNode = node(value.object);
+  const propertyNode = node(value.property);
+  if (objectNode == null || propertyNode == null) {
+    return unsupported(context, value);
+  }
+  const objectValue = expression(context, objectNode);
+  let key: SyntaxExpression | undefined;
+  if (value.computed === true) {
+    key = expression(context, propertyNode);
+  } else {
+    const name = identifierName(propertyNode);
+    if (name != null) {
+      key = { ...location(context, propertyNode), kind: "string", value: name };
+    }
+  }
+  return objectValue == null || key == null
+    ? undefined
+    : { key, object: objectValue };
+}
+
 function expression(
   context: ConvertContext,
   value: BabelNode,
@@ -390,6 +422,14 @@ function expression(
       : expression(context, inner);
   }
   if (value.type === "UnaryExpression") {
+    if (value.operator === "delete") {
+      const argumentNode = node(value.argument);
+      if (argumentNode == null) return unsupported(context, value);
+      const member = memberParts(context, argumentNode);
+      return member == null
+        ? undefined
+        : { ...located, ...member, kind: "property-delete" };
+    }
     if (value.operator !== "-" && value.operator !== "!") {
       return unsupported(context, value, "This unary operator is unsupported.");
     }
@@ -399,6 +439,65 @@ function expression(
     return argument == null
       ? undefined
       : { ...located, argument, kind: "unary", operator: value.operator };
+  }
+  if (value.type === "ObjectExpression") {
+    const properties: {
+      readonly key: SyntaxExpression;
+      readonly value: SyntaxExpression;
+    }[] = [];
+    for (const property of nodes(value.properties)) {
+      if (property.type !== "ObjectProperty" || property.shorthand === true) {
+        return unsupported(
+          context,
+          property,
+          "This object property is unsupported.",
+        );
+      }
+      const keyNode = node(property.key);
+      const valueNode = node(property.value);
+      if (keyNode == null || valueNode == null)
+        return unsupported(context, property);
+      let key: SyntaxExpression | undefined;
+      if (property.computed === true) {
+        key = expression(context, keyNode);
+      } else {
+        const name = identifierName(keyNode);
+        if (name != null) {
+          key = { ...location(context, keyNode), kind: "string", value: name };
+        } else if (keyNode.type === "NumericLiteral") {
+          key = {
+            ...location(context, keyNode),
+            kind: "string",
+            value: String(keyNode.value),
+          };
+        } else {
+          key = expression(context, keyNode);
+        }
+      }
+      const propertyValue = expression(context, valueNode);
+      if (key == null || propertyValue == null) return undefined;
+      properties.push({ key, value: propertyValue });
+    }
+    return { ...located, kind: "object", properties };
+  }
+  if (value.type === "MemberExpression") {
+    const member = memberParts(context, value);
+    return member == null
+      ? undefined
+      : { ...located, ...member, kind: "property-get" };
+  }
+  if (value.type === "AssignmentExpression") {
+    if (value.operator !== "=") {
+      return unsupported(context, value, "This assignment is unsupported.");
+    }
+    const left = node(value.left);
+    const right = node(value.right);
+    if (left == null || right == null) return unsupported(context, value);
+    const member = memberParts(context, left);
+    const assigned = expression(context, right);
+    return member == null || assigned == null
+      ? undefined
+      : { ...located, ...member, kind: "property-set", value: assigned };
   }
   if (value.type === "BinaryExpression") {
     const operator = value.operator;

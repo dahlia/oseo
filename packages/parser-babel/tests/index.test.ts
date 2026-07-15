@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource } from "@oseo/compiler";
+import { compileSource, printHir, printMir } from "@oseo/compiler";
 
 import { babelFrontend } from "../src/index.ts";
 
@@ -113,6 +113,22 @@ test("accepts parenthesized direct call targets", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
+test("converts ordinary object operations to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const value = { first: 1, ["second"]: undefined };\n' +
+      "value.first = 2;\n" +
+      'console.log(value.first, value["second"], delete value.first);\n',
+    sourceId: "objects.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /object\{/u);
+  assert.match(printMir(result.mir), /object-create/u);
+  assert.match(printMir(result.mir), /property-(?:get|set|delete)/u);
+});
+
 test("rejects the smallest syntax form outside the M1 profile", () => {
   const result = babelFrontend.parse({
     source: "const values = [1, 2];",
@@ -130,7 +146,6 @@ test("rejects the smallest syntax form outside the M1 profile", () => {
 const unsupportedForms = [
   ["assignment", "let value = 1;"],
   ["array", "console.log([]);"],
-  ["object", "console.log({});"],
   ["loop", "while (true) {}"],
   ["nested function", "function outer() { function inner() {} }"],
   ["function value", "function value() {} const copy = value;"],

@@ -108,6 +108,29 @@ export type SyntaxExpression =
       readonly kind: "null";
     })
   | (LocatedSyntax & {
+      readonly kind: "object";
+      readonly properties: readonly {
+        readonly key: SyntaxExpression;
+        readonly value: SyntaxExpression;
+      }[];
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property-delete";
+      readonly object: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property-get";
+      readonly object: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property-set";
+      readonly object: SyntaxExpression;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
       readonly kind: "number";
       readonly value: number;
     })
@@ -221,6 +244,29 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "null";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "object";
+      readonly properties: readonly {
+        readonly key: HirExpression;
+        readonly value: HirExpression;
+      }[];
+    })
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "property-delete";
+      readonly object: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "property-get";
+      readonly object: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "property-set";
+      readonly object: HirExpression;
+      readonly value: HirExpression;
     })
   | (LocatedSyntax & {
       readonly kind: "number";
@@ -401,6 +447,37 @@ function resolveExpression(
       left,
       right,
     };
+  }
+  if (expression.kind === "object") {
+    const properties: {
+      readonly key: HirExpression;
+      readonly value: HirExpression;
+    }[] = [];
+    for (const property of expression.properties) {
+      const key = resolveExpression(property.key, scopes, state);
+      const value = resolveExpression(property.value, scopes, state);
+      if (key == null || value == null) return undefined;
+      properties.push({ key, value });
+    }
+    return { ...expression, properties };
+  }
+  if (
+    expression.kind === "property-get" ||
+    expression.kind === "property-delete"
+  ) {
+    const object = resolveExpression(expression.object, scopes, state);
+    const key = resolveExpression(expression.key, scopes, state);
+    return object == null || key == null
+      ? undefined
+      : { ...expression, key, object };
+  }
+  if (expression.kind === "property-set") {
+    const object = resolveExpression(expression.object, scopes, state);
+    const key = resolveExpression(expression.key, scopes, state);
+    const value = resolveExpression(expression.value, scopes, state);
+    return object == null || key == null || value == null
+      ? undefined
+      : { ...expression, key, object, value };
   }
   const argumentValues: HirExpression[] = [];
   for (const argument of expression.arguments) {
@@ -678,6 +755,36 @@ function printHirExpression(expression: HirExpression): string {
     const right = printHirExpression(expression.right);
     return `(${left} ${operator} ${right})`;
   }
+  if (expression.kind === "object") {
+    return (
+      "object{" +
+      expression.properties
+        .map(
+          (property) =>
+            `${printHirExpression(property.key)}: ` +
+            printHirExpression(property.value),
+        )
+        .join(", ") +
+      "}"
+    );
+  }
+  if (
+    expression.kind === "property-get" ||
+    expression.kind === "property-delete"
+  ) {
+    const operation = expression.kind === "property-get" ? "get" : "delete";
+    return (
+      `${operation} ${printHirExpression(expression.object)}[` +
+      `${printHirExpression(expression.key)}]`
+    );
+  }
+  if (expression.kind === "property-set") {
+    return (
+      `set ${printHirExpression(expression.object)}[` +
+      `${printHirExpression(expression.key)}] = ` +
+      printHirExpression(expression.value)
+    );
+  }
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"
@@ -816,6 +923,10 @@ export interface MirOperation {
     | "count-overflow-miss"
     | "guard-smi"
     | "join"
+    | "object-create"
+    | "property-delete"
+    | "property-get"
+    | "property-set"
     | "read"
     | "root-store"
     | "safepoint"
@@ -1051,6 +1162,114 @@ function lowerExpression(
       id,
       kind: "binary",
       operator: expression.operator,
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "object") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "object allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "ordinary object with null prototype",
+      id,
+      kind: "object-create",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    recordRoot(builder, id, expression.range);
+    for (const property of expression.properties) {
+      const key = lowerExpression(property.key, builder);
+      const value = lowerExpression(property.value, builder);
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "property storage growth",
+        [id, key, value],
+        expression.range,
+      );
+      const result = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [id, key, value],
+        detail: "create data property",
+        id: result,
+        kind: "property-set",
+        range: expression.range,
+      });
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [result],
+        expression.range,
+      );
+      recordRoot(builder, result, expression.range);
+    }
+    return id;
+  }
+  if (
+    expression.kind === "property-get" ||
+    expression.kind === "property-delete"
+  ) {
+    const object = lowerExpression(expression.object, builder);
+    const key = lowerExpression(expression.key, builder);
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [object, key],
+      detail: expression.kind,
+      id,
+      kind: expression.kind,
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "property-set") {
+    const object = lowerExpression(expression.object, builder);
+    const key = lowerExpression(expression.key, builder);
+    const value = lowerExpression(expression.value, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "property storage growth",
+      [object, key, value],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [object, key, value],
+      detail: "property-set",
+      id,
+      kind: "property-set",
       range: expression.range,
     });
     appendMirMetadata(

@@ -328,6 +328,38 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+function emitObjectOperation(state: EmitState, operation: MirOperation): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  if (operation.kind === "object-create") {
+    line(state, "result = oseo_object_create(context, oseo_null());");
+  } else {
+    const object = operationArgument(operation, 0);
+    const key = operationArgument(operation, 1);
+    if (operation.kind === "property-get") {
+      line(
+        state,
+        `result = oseo_object_get(context, roots[${object}], ` +
+          `roots[${key}]);`,
+      );
+    } else if (operation.kind === "property-delete") {
+      line(
+        state,
+        `result = oseo_object_delete(context, roots[${object}], ` +
+          `roots[${key}]);`,
+      );
+    } else {
+      const value = operationArgument(operation, 2);
+      line(
+        state,
+        `result = oseo_object_set(context, roots[${object}], ` +
+          `roots[${key}], roots[${value}]);`,
+      );
+    }
+  }
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitOperation(state: EmitState, operation: MirOperation): void {
   if (operation.kind === "constant") {
     if (operation.constant == null) {
@@ -364,6 +396,13 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     }
   } else if (operation.kind === "call") {
     emitCall(state, operation);
+  } else if (
+    operation.kind === "object-create" ||
+    operation.kind === "property-delete" ||
+    operation.kind === "property-get" ||
+    operation.kind === "property-set"
+  ) {
+    emitObjectOperation(state, operation);
   } else if (operation.kind === "check-status") {
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
   }

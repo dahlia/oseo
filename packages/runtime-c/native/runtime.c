@@ -1322,6 +1322,7 @@ static bool strict_equal_value(OseoValue left, OseoValue right) {
                 left_string->length * sizeof(uint16_t)
             ) == 0;
     }
+    if (left_tag == OSEO_TAG_HEAP) return left == right;
     return false;
 }
 
