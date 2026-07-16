@@ -87,7 +87,8 @@ M3 accepts `while`, `break`, and `continue` so mutation and completion order can
 be observed. It accepts `throw`, `try`, `catch`, and `finally`. Thrown values
 are ordinary admitted values. A catch binding is lexical and mutable. A
 `finally` completion replaces a pending normal, return, throw, break, or
-continue completion according to ECMAScript ordering.
+continue completion according to ECMAScript ordering. A pending runtime error
+retains its diagnostic location and message while a `finally` body executes.
 
 Runtime-generated binding, callability, receiver, and strict-operation errors
 throw distinct opaque ordinary objects. They are never represented by

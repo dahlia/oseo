@@ -198,6 +198,28 @@ function nestedFinallyDuringReturn() {
   }
 }
 console.log(nestedFinallyDuringReturn());
+function terminatingReturnFinally() {
+  try {} finally { return "return finally"; }
+}
+console.log(terminatingReturnFinally());
+function terminatingThrowFinally() {
+  try {} finally { throw "throw finally"; }
+}
+try { terminatingThrowFinally(); } catch (error) { console.log(error); }
+function terminatingBreakFinally() {
+  while (true) { try {} finally { break; } }
+  return "break finally";
+}
+console.log(terminatingBreakFinally());
+function terminatingContinueFinally() {
+  let count = 0;
+  while (count < 1) {
+    count = count + 1;
+    try {} finally { continue; }
+  }
+  return "continue finally";
+}
+console.log(terminatingContinueFinally());
 function nestedThrow() {
   try {
     try { throw "nested throw"; }
@@ -1114,6 +1136,31 @@ assert.equal(assignmentTdz.stdout, "");
 assert.match(
   assignmentTdz.stderr,
   /error\[OSEO2001\].*assigned before initialization/u,
+);
+
+const finallyTdz = await runNativeCli(
+  {
+    args: ["finally-tdz.ts"],
+    source: `function fail() {
+  try {
+    value;
+  } finally {
+    console.log("cleanup");
+  }
+  let value;
+}
+fail();
+`,
+    sourceId: "finally-tdz.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(finallyTdz.exitStatus, 1);
+assert.equal(finallyTdz.stdout, "cleanup\n");
+assert.match(
+  finallyTdz.stderr,
+  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: Binding is read/u,
 );
 
 const objectCoercion = await runNativeCli(

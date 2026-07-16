@@ -2455,7 +2455,7 @@ function enterFinalizer(
 function lowerTryStatement(
   statement: HirStatement & { readonly kind: "try" },
   builder: MirBuilder,
-): void {
+): boolean {
   const catchBlock =
     statement.handler == null ? undefined : createMirBlock(builder);
   const finallyBlock =
@@ -2555,8 +2555,26 @@ function lowerTryStatement(
         ...(outerFinalizer == null ? {} : { outerFinalizer }),
       };
     }
+    if (finallyTerminated) {
+      for (const block of builder.blocks) {
+        for (let index = 0; index < block.operations.length; index += 1) {
+          const operation = block.operations[index];
+          if (
+            operation?.completionSlot === finallyBlock.id &&
+            operation.completionTarget === afterBlock.id
+          ) {
+            const replacement = { ...operation };
+            delete replacement.completionTarget;
+            block.operations[index] = replacement;
+          }
+        }
+      }
+      builder.current = afterBlock;
+      return true;
+    }
   }
   builder.current = afterBlock;
+  return false;
 }
 
 function lowerStatements(
@@ -2619,7 +2637,7 @@ function lowerStatements(
           : { kind: "jump", target };
       return true;
     } else if (statement.kind === "try") {
-      lowerTryStatement(statement, builder);
+      if (lowerTryStatement(statement, builder)) return true;
     } else if (statement.kind === "block") {
       resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;

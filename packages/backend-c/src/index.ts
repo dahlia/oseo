@@ -631,6 +631,17 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       );
     }
     line(state, `completion_kind[${slot}u] = ${kinds[kind]};`);
+    if (kind === "throw") {
+      location(state, operation.range);
+      line(state, "oseo_context_clear_language_error(context);");
+      line(state, `completion_line[${slot}u] = context->line;`);
+      line(state, `completion_column[${slot}u] = context->column;`);
+      line(state, `completion_error_code[${slot}u] = context->error_code;`);
+      line(
+        state,
+        `completion_error_message[${slot}u] = context->error_message;`,
+      );
+    }
     if (operation.arguments[0] != null) {
       line(
         state,
@@ -700,6 +711,25 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
         `    roots[${state.completionSlotStart + operation.abruptTarget}u] = ` +
           "result.value;",
       );
+      line(
+        state,
+        `    completion_line[${operation.abruptTarget}u] = context->line;`,
+      );
+      line(
+        state,
+        `    completion_column[${operation.abruptTarget}u] = ` +
+          "context->column;",
+      );
+      line(
+        state,
+        `    completion_error_code[${operation.abruptTarget}u] = ` +
+          "context->error_code;",
+      );
+      line(
+        state,
+        `    completion_error_message[${operation.abruptTarget}u] = ` +
+          "context->error_message;",
+      );
       line(state, `    goto bb${operation.abruptTarget};`);
       line(state, "}");
     }
@@ -720,6 +750,21 @@ function emitCompletionCopy(
   line(
     state,
     `    completion_target[${target}u] = completion_target[${source}u];`,
+  );
+  line(state, `    completion_line[${target}u] = completion_line[${source}u];`);
+  line(
+    state,
+    `    completion_column[${target}u] = completion_column[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_error_code[${target}u] = ` +
+      `completion_error_code[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_error_message[${target}u] = ` +
+      `completion_error_message[${source}u];`,
   );
 }
 
@@ -777,6 +822,14 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, "    return result;");
     line(state, "}");
     line(state, `if (completion_kind[${slot}u] == 2) {`);
+    line(state, `    context->line = completion_line[${slot}u];`);
+    line(state, `    context->column = completion_column[${slot}u];`);
+    line(state, `    context->error_code = completion_error_code[${slot}u];`);
+    line(
+      state,
+      `    context->error_message = completion_error_message[${slot}u];`,
+    );
+    line(state, "    context->has_diagnostic = false;");
     line(
       state,
       `    result = (OseoResult){OSEO_STATUS_THROW, ` +
@@ -1098,8 +1151,18 @@ function emitFunction(
     (state.usesCompletion
       ? `    int completion_kind[${completionSlots}u] = {0};\n` +
         `    size_t completion_target[${completionSlots}u] = {0};\n` +
+        `    size_t completion_line[${completionSlots}u] = {0};\n` +
+        `    size_t completion_column[${completionSlots}u] = {0};\n` +
+        `    const char *completion_error_code[${completionSlots}u] = ` +
+        `{NULL};\n` +
+        `    const char *completion_error_message[${completionSlots}u] = ` +
+        `{NULL};\n` +
         "    (void)completion_kind;\n" +
-        "    (void)completion_target;\n"
+        "    (void)completion_target;\n" +
+        "    (void)completion_line;\n" +
+        "    (void)completion_column;\n" +
+        "    (void)completion_error_code;\n" +
+        "    (void)completion_error_message;\n"
       : "") +
     "    (void)callee;\n" +
     "    (void)receiver;\n" +
