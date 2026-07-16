@@ -4375,6 +4375,232 @@ static bool timer_conversion_property_exists(
     return false;
 }
 
+typedef struct TimerArrayAncestor {
+    OseoValue value;
+    const struct TimerArrayAncestor *previous;
+} TimerArrayAncestor;
+
+static OseoResult timer_array_string(
+    OseoContext *context,
+    OseoValue array_value,
+    const TimerArrayAncestor *previous
+);
+
+static OseoResult timer_string_hint_primitive(
+    OseoContext *context,
+    OseoValue value
+) {
+    static const uint16_t to_string_units[] = {
+        't', 'o', 'S', 't', 'r', 'i', 'n', 'g'
+    };
+    static const uint16_t value_of_units[] = {
+        'v', 'a', 'l', 'u', 'e', 'O', 'f'
+    };
+    static const uint16_t default_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'O', 'b', 'j', 'e', 'c', 't', ']'
+    };
+    const uint16_t *names[] = {to_string_units, value_of_units};
+    const size_t lengths[] = {8u, 7u};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    bool converted = false;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = oseo_string_from_units(
+            context,
+            names[index],
+            lengths[index]
+        );
+        frame.slots[1] = result.value;
+        bool property_exists = result.status == OSEO_STATUS_NORMAL &&
+            timer_conversion_property_exists(
+                frame.slots[0],
+                frame.slots[1]
+            );
+        if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
+            if (index == 0u) {
+                result = oseo_string_from_units(
+                    context,
+                    default_units,
+                    15u
+                );
+                converted = result.status == OSEO_STATUS_NORMAL;
+                break;
+            }
+            continue;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            );
+            frame.slots[2] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL ||
+            !is_function(frame.slots[2])) {
+            continue;
+        }
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !is_object(frame.slots[3])) {
+            result.value = frame.slots[3];
+            converted = true;
+            break;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && index == 1u) {
+            result = language_failure(context);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !converted) {
+        result = language_failure(context);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static bool timer_array_is_ancestor(
+    OseoValue value,
+    const TimerArrayAncestor *ancestor
+) {
+    for (const TimerArrayAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
+static OseoResult timer_array_string(
+    OseoContext *context,
+    OseoValue array_value,
+    const TimerArrayAncestor *previous
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = array_value;
+    TimerArrayAncestor current = {frame.slots[0], previous};
+    uint16_t *units = NULL;
+    size_t length = 0u;
+    uint32_t array_length = ordinary_object(frame.slots[0])->array_length;
+    for (uint32_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < array_length;
+        index += 1u) {
+        if (index > 0u) {
+            if (length == SIZE_MAX / sizeof(uint16_t)) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "String allocation is too large."
+                );
+                break;
+            }
+            uint16_t *grown = realloc(
+                units,
+                (length + 1u) * sizeof(uint16_t)
+            );
+            if (grown == NULL) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "String allocation failed."
+                );
+                break;
+            }
+            units = grown;
+            units[length] = ',';
+            length += 1u;
+        }
+        result = oseo_property_key(context, oseo_number((double)index));
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            );
+            frame.slots[2] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (is_nullish(frame.slots[2]) ||
+            timer_array_is_ancestor(frame.slots[2], &current)) {
+            continue;
+        }
+        if (is_array(frame.slots[2])) {
+            result = timer_array_string(
+                context,
+                frame.slots[2],
+                &current
+            );
+        } else if (is_object(frame.slots[2])) {
+            result = timer_string_hint_primitive(
+                context,
+                frame.slots[2]
+            );
+            frame.slots[3] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = value_string(context, frame.slots[3]);
+            }
+        } else {
+            result = value_string(context, frame.slots[2]);
+        }
+        frame.slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoString *element = string_object(frame.slots[3]);
+        if (element->length > SIZE_MAX - length ||
+            length + element->length >
+                SIZE_MAX / sizeof(uint16_t)) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "String allocation is too large."
+            );
+            break;
+        }
+        size_t next_length = length + element->length;
+        uint16_t *grown = realloc(
+            units,
+            next_length * sizeof(uint16_t)
+        );
+        if (grown == NULL && next_length > 0u) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "String allocation failed."
+            );
+            break;
+        }
+        units = grown;
+        if (element->length > 0u) {
+            memcpy(
+                units + length,
+                element->units,
+                element->length * sizeof(uint16_t)
+            );
+        }
+        length = next_length;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_string_from_units(context, units, length);
+    }
+    free(units);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static OseoResult timer_delay_number(
     OseoContext *context,
     OseoValue value
@@ -4408,7 +4634,19 @@ static OseoResult timer_delay_number(
             );
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 1u) {
-                result = normal(oseo_number(NAN));
+                if (is_array(frame.slots[0])) {
+                    result = timer_array_string(
+                        context,
+                        frame.slots[0],
+                        NULL
+                    );
+                    frame.slots[3] = result.value;
+                    if (result.status == OSEO_STATUS_NORMAL) {
+                        result = to_number(context, frame.slots[3]);
+                    }
+                } else {
+                    result = normal(oseo_number(NAN));
+                }
                 oseo_roots_release(context, &frame);
                 return result;
             }

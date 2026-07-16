@@ -1103,6 +1103,7 @@ clearTimeout(canceled);
 setTimeout(task, 100, "late");
 setTimeout(task, 0, "first");
 setTimeout(scheduleNested, 0);
+setTimeout(task, [5], "array delay");
 setTimeout(task, objectDelay, "object delay");
 setTimeout(task, functionDelay, "function delay");
 console.log("scheduled");
@@ -1207,7 +1208,8 @@ for (const fixture of fixtures) {
     fixture.name === "catchable-type-errors" ||
     fixture.name === "async-continuations" ||
     fixture.name === "generic-addition" ||
-    fixture.name === "guarded-addition"
+    fixture.name === "guarded-addition" ||
+    fixture.name === "timer-event-loop"
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
