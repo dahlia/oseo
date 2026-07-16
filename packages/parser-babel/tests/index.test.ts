@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource } from "@oseo/compiler";
+import { compileSource, printHir, printMir } from "@oseo/compiler";
 
 import { babelFrontend } from "../src/index.ts";
 
@@ -53,6 +53,41 @@ test("preserves non-strict script parameter bindings", () => {
   }
 });
 
+test("retains script and function strictness in owned IR", () => {
+  const script = compileSource(babelFrontend, {
+    source: '"use strict"; function outer() { function inner() {} }',
+    sourceId: "strict-script.ts",
+  });
+  assert.deepEqual(script.diagnostics, []);
+  assert.equal(script.mir?.script.strict, true);
+  assert.ok(
+    script.mir?.functions.every((functionValue) => functionValue.strict),
+  );
+
+  const functionOnly = compileSource(babelFrontend, {
+    source: 'function strictFunction() { "use strict"; }',
+    sourceId: "strict-function.ts",
+  });
+  assert.deepEqual(functionOnly.diagnostics, []);
+  assert.equal(functionOnly.mir?.script.strict, false);
+  assert.equal(functionOnly.mir?.functions[0]?.strict, true);
+});
+
+test("rejects top-level this until script receivers exist", () => {
+  const script = compileSource(babelFrontend, {
+    source: "console.log(this);",
+    sourceId: "script-this.ts",
+  });
+  assert.equal(script.diagnostics[0]?.code, "OSEO1001");
+  assert.match(script.diagnostics[0]?.message ?? "", /function bodies/u);
+
+  const functionBody = compileSource(babelFrontend, {
+    source: "function receiver() { return this; }",
+    sourceId: "function-this.ts",
+  });
+  assert.deepEqual(functionBody.diagnostics, []);
+});
+
 test("ignores tag-shaped text outside JSDoc comments", () => {
   const result = babelFrontend.parse({
     source:
@@ -93,16 +128,50 @@ test("preserves shadowable primitive global names as identifiers", () => {
 
 test("resolves console.log through lexical scope", () => {
   for (const source of [
-    'function write(console) { console.log("x"); } write(null);',
-    'const console = null; console.log("x");',
+    "function write(console) { console.log('x'); } " +
+      "write({ log: function () {} });",
+    "const console = { log: function () {} }; console.log('x');",
   ]) {
     const result = compileSource(babelFrontend, {
       source,
       sourceId: "shadowed-console.ts",
     });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", /property/u);
+    assert.deepEqual(result.diagnostics, []);
   }
+});
+
+test("resolves shadowed Object methods through lexical scope", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function make(Object) { return Object.create(1, 2); } " +
+      "make({ create: function (left, right) { return left + right; } });",
+    sourceId: "shadowed-object.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("accepts expression-valued dynamic call targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "(function () { return 42; })(); " +
+      "function factory() { return function () { return 43; }; } " +
+      "factory()();",
+    sourceId: "dynamic-calls.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("marks allocating member lookup as a safepoint", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'try { "a"[0](); } catch (error) {}',
+    sourceId: "member-lookup.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(
+    printMir(result.mir),
+    /safepoint method lookup[^\n]*\n[^\n]*property-get method lookup/u,
+  );
 });
 
 test("accepts parenthesized direct call targets", () => {
@@ -113,30 +182,161 @@ test("accepts parenthesized direct call targets", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
-test("rejects the smallest syntax form outside the M1 profile", () => {
+test("retains function name and length metadata in MIR", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function declared(first, second) {}",
+      "const inferred = function (value) {};",
+    ].join(" "),
+    sourceId: "function-metadata.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const text = printMir(result.mir);
+  assert.match(text, /function @f\d+ name="declared" length=2/u);
+  assert.match(text, /function @f\d+ name="inferred" length=1/u);
+});
+
+test("converts ordinary object operations to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const value = { first: 1, ["second"]: undefined };\n' +
+      "value.first = 2;\n" +
+      'console.log(value.first, value["second"], delete value.first);\n',
+    sourceId: "objects.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /object\{/u);
+  assert.match(printMir(result.mir), /object-create/u);
+  assert.match(printMir(result.mir), /property-(?:get|set|delete)/u);
+  const specializedText = printMir(result.mir);
+  assert.match(specializedText, /guard-object/u);
+  assert.match(specializedText, /guard-shape/u);
+  assert.match(specializedText, /load-fixed-slot/u);
+  assert.match(specializedText, /property-get generic/u);
+  assert.match(specializedText, /join property read/u);
+  assert.doesNotMatch(specializedText, /property-get-cached/u);
+  const namedRead = compileSource(babelFrontend, {
+    source: "function read(value) { return value.item; }",
+    sourceId: "named-read.ts",
+  });
+  assert.ok(namedRead.mir != null);
+  const namedReadText = printMir(namedRead.mir);
+  const shapeGuard = namedReadText.indexOf("guard-shape");
+  const keyConversion = namedReadText.indexOf("property-key");
+  assert.notEqual(shapeGuard, -1);
+  assert.notEqual(keyConversion, -1);
+  assert.ok(shapeGuard < keyConversion);
+  const hitCount = namedReadText.indexOf("count-guard-hit");
+  const fixedLoad = namedReadText.indexOf("load-fixed-slot");
+  const missCount = namedReadText.indexOf("count-guard-miss");
+  assert.ok(shapeGuard < hitCount);
+  assert.ok(hitCount < fixedLoad);
+  assert.ok(fixedLoad < missCount);
+  assert.doesNotMatch(
+    namedReadText.slice(shapeGuard, missCount),
+    /safepoint string allocation|property-key/u,
+  );
+  const generic = compileSource(
+    babelFrontend,
+    {
+      source: "const value = { item: 1 }; console.log(value.item);",
+      sourceId: "generic-object.ts",
+    },
+    { specialization: "disabled" },
+  );
+  assert.ok(generic.mir != null);
+  const genericText = printMir(generic.mir);
+  assert.match(genericText, /property-get property-get/u);
+  assert.doesNotMatch(genericText, /guard-(?:object|shape)/u);
+});
+
+test("lowers the admitted Object reflection intrinsics", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = Object.create(null);\n" +
+      'Object.defineProperty(value, "key", { value: 1 });\n' +
+      'Object.getOwnPropertyDescriptor(value, "key");\n' +
+      "Object.setPrototypeOf(value, null);\n" +
+      "Object.keys(value);\n",
+    sourceId: "object-reflection.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /intrinsic Object\.create/u);
+  assert.match(printHir(result.hir), /intrinsic Object\.defineProperty/u);
+  assert.match(printMir(result.mir), /Object\.getOwnPropertyDescriptor/u);
+  assert.match(printMir(result.mir), /Object\.setPrototypeOf/u);
+  assert.match(printMir(result.mir), /Object\.keys/u);
+});
+
+test("preserves array elements and holes in owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source: "const values = [1, , 3]; console.log(values.length);",
+    sourceId: "arrays.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /\[1, <hole>, 3\]/u);
+  assert.match(printMir(result.mir), /array-create array length 3/u);
+});
+
+test("accepts uninitialized let as undefined", () => {
+  const result = compileSource(babelFrontend, {
+    source: "let value; console.log(value);",
+    sourceId: "uninitialized-let.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.match(
+    result.hir == null ? "" : printHir(result.hir),
+    /let .*undefined/u,
+  );
+});
+
+test("rejects only noncomputed __proto__ literals", () => {
+  const rejected = compileSource(babelFrontend, {
+    source: "const value = { __proto__: null };",
+    sourceId: "proto-literal.ts",
+  });
+  assert.equal(rejected.diagnostics[0]?.code, "OSEO1001");
+  assert.match(rejected.diagnostics[0]?.message ?? "", /__proto__/u);
+
+  const quoted = compileSource(babelFrontend, {
+    source: 'const value = { "__proto__": null };',
+    sourceId: "quoted-proto.ts",
+  });
+  assert.equal(quoted.diagnostics[0]?.code, "OSEO1001");
+  assert.match(quoted.diagnostics[0]?.message ?? "", /__proto__/u);
+
+  const accepted = compileSource(babelFrontend, {
+    source: 'const value = { ["__proto__"]: null };',
+    sourceId: "computed-proto.ts",
+  });
+  assert.deepEqual(accepted.diagnostics, []);
+});
+
+test("rejects the smallest syntax form outside the M3 profile", () => {
   const result = babelFrontend.parse({
-    source: "const values = [1, 2];",
-    sourceId: "array.ts",
+    source: "const value = () => 1;",
+    sourceId: "arrow.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.deepEqual(result.diagnostics[0]?.range.start, {
-    column: 16,
+    column: 15,
     line: 1,
   });
 });
 
 const unsupportedForms = [
-  ["assignment", "let value = 1;"],
-  ["array", "console.log([]);"],
-  ["object", "console.log({});"],
-  ["loop", "while (true) {}"],
-  ["nested function", "function outer() { function inner() {} }"],
-  ["function value", "function value() {} const copy = value;"],
+  ["compound assignment", "let value = 1; value += 1;"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
-  ["throw", "function fail() { throw 1; }"],
   ["async", "async function work() {}"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
@@ -154,8 +354,6 @@ const unsupportedForms = [
     "function identity(value: number) { return value; } identity<number>(1);",
   ],
   ["console.log type arguments", 'console.log<string>("value");'],
-  ["top-level block", "{ console.log(1); }"],
-  ["top-level if", "if (true) console.log(1);"],
 ] as const;
 
 for (const [name, source] of unsupportedForms) {
@@ -167,6 +365,18 @@ for (const [name, source] of unsupportedForms) {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   });
 }
+
+test("rejects constructor type arguments instead of erasing them", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function Box(value: number) { return value; }",
+      "new Box<number>(1);",
+    ].join(" "),
+    sourceId: "constructor-type-arguments.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Constructor type/u);
+});
 
 const lineTerminators = [
   ["LF", "\n"],

@@ -40,8 +40,10 @@ interface BabelNode {
 
 interface ConvertContext {
   readonly diagnostics: Diagnostic[];
+  readonly functionStack: boolean[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;
+  readonly strictStack: boolean[];
 }
 
 interface SourceIndex {
@@ -63,6 +65,13 @@ function nodes(value: unknown): readonly BabelNode[] {
   return value.flatMap((item) => {
     const valueNode = node(item);
     return valueNode == null ? [] : [valueNode];
+  });
+}
+
+function hasUseStrictDirective(value: BabelNode): boolean {
+  return nodes(value.directives).some((directive) => {
+    const literal = node(directive.value);
+    return literal?.value === "use strict";
   });
 }
 
@@ -340,28 +349,74 @@ function callTarget(
   }
   const name = identifierName(value);
   if (name != null) return { ...location(context, value), kind: "name", name };
-  if (value.type !== "MemberExpression" || value.computed === true) {
-    return unsupported(
-      context,
-      value,
-      "Only direct function calls and console.log are supported.",
-    );
+  if (value.type !== "MemberExpression") {
+    const callee = expression(context, value);
+    return callee == null
+      ? undefined
+      : { ...location(context, value), callee, kind: "dynamic" };
   }
   const object = node(value.object);
   const property = node(value.property);
+  if (object == null || property == null) return unsupported(context, value);
   if (
-    object != null &&
-    property != null &&
+    value.computed !== true &&
     identifierName(object) === "console" &&
     identifierName(property) === "log"
   ) {
     return { ...location(context, value), kind: "console-log" };
   }
-  return unsupported(
-    context,
-    value,
-    "Property access is outside the M1 profile.",
-  );
+  if (value.computed !== true && identifierName(object) === "Object") {
+    const method = identifierName(property);
+    if (
+      method === "create" ||
+      method === "defineProperty" ||
+      method === "getOwnPropertyDescriptor" ||
+      method === "keys" ||
+      method === "setPrototypeOf"
+    ) {
+      return {
+        ...location(context, value),
+        kind: "object-intrinsic",
+        method,
+      };
+    }
+  }
+  const parts = memberParts(context, value);
+  return parts == null
+    ? undefined
+    : { ...location(context, value), ...parts, kind: "property" };
+}
+
+function memberParts(
+  context: ConvertContext,
+  value: BabelNode,
+):
+  | {
+      readonly key: SyntaxExpression;
+      readonly object: SyntaxExpression;
+    }
+  | undefined {
+  if (value.type !== "MemberExpression" || value.optional === true) {
+    return unsupported(context, value, "This property access is unsupported.");
+  }
+  const objectNode = node(value.object);
+  const propertyNode = node(value.property);
+  if (objectNode == null || propertyNode == null) {
+    return unsupported(context, value);
+  }
+  const objectValue = expression(context, objectNode);
+  let key: SyntaxExpression | undefined;
+  if (value.computed === true) {
+    key = expression(context, propertyNode);
+  } else {
+    const name = identifierName(propertyNode);
+    if (name != null) {
+      key = { ...location(context, propertyNode), kind: "string", value: name };
+    }
+  }
+  return objectValue == null || key == null
+    ? undefined
+    : { key, object: objectValue };
 }
 
 function expression(
@@ -369,6 +424,24 @@ function expression(
   value: BabelNode,
 ): SyntaxExpression | undefined {
   const located = location(context, value);
+  if (value.type === "ArrayExpression") {
+    const rawElements = Array.isArray(value.elements) ? value.elements : [];
+    const elements: (SyntaxExpression | undefined)[] = [];
+    for (const rawElement of rawElements) {
+      if (rawElement == null) {
+        elements.push(undefined);
+        continue;
+      }
+      const elementNode = node(rawElement);
+      if (elementNode == null || elementNode.type === "SpreadElement") {
+        return unsupported(context, value, "Array spread is unsupported.");
+      }
+      const converted = expression(context, elementNode);
+      if (converted == null) return undefined;
+      elements.push(converted);
+    }
+    return { ...located, elements, kind: "array" };
+  }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
   }
@@ -379,6 +452,15 @@ function expression(
     return { ...located, kind: "boolean", value: value.value };
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
+  if (value.type === "ThisExpression") {
+    return context.functionStack.length === 0
+      ? unsupported(
+          context,
+          value,
+          "The M3 profile admits this only in function bodies.",
+        )
+      : { ...located, kind: "this" };
+  }
   if (value.type === "Identifier") {
     const name = identifierName(value);
     if (name != null) return { ...located, kind: "identifier", name };
@@ -390,6 +472,14 @@ function expression(
       : expression(context, inner);
   }
   if (value.type === "UnaryExpression") {
+    if (value.operator === "delete") {
+      const argumentNode = node(value.argument);
+      if (argumentNode == null) return unsupported(context, value);
+      const member = memberParts(context, argumentNode);
+      return member == null
+        ? undefined
+        : { ...located, ...member, kind: "property-delete" };
+    }
     if (value.operator !== "-" && value.operator !== "!") {
       return unsupported(context, value, "This unary operator is unsupported.");
     }
@@ -399,6 +489,88 @@ function expression(
     return argument == null
       ? undefined
       : { ...located, argument, kind: "unary", operator: value.operator };
+  }
+  if (value.type === "ObjectExpression") {
+    const properties: {
+      readonly key: SyntaxExpression;
+      readonly value: SyntaxExpression;
+    }[] = [];
+    for (const property of nodes(value.properties)) {
+      if (property.type !== "ObjectProperty" || property.shorthand === true) {
+        return unsupported(
+          context,
+          property,
+          "This object property is unsupported.",
+        );
+      }
+      const keyNode = node(property.key);
+      const valueNode = node(property.value);
+      if (keyNode == null || valueNode == null)
+        return unsupported(context, property);
+      let key: SyntaxExpression | undefined;
+      if (property.computed === true) {
+        key = expression(context, keyNode);
+      } else {
+        const name = identifierName(keyNode);
+        if (
+          name === "__proto__" ||
+          (keyNode.type === "StringLiteral" && keyNode.value === "__proto__")
+        ) {
+          return unsupported(
+            context,
+            property,
+            "Noncomputed __proto__ literals are unsupported.",
+          );
+        }
+        if (name != null) {
+          key = { ...location(context, keyNode), kind: "string", value: name };
+        } else if (keyNode.type === "NumericLiteral") {
+          key = {
+            ...location(context, keyNode),
+            kind: "string",
+            value: String(keyNode.value),
+          };
+        } else {
+          key = expression(context, keyNode);
+        }
+      }
+      const propertyValue = expression(context, valueNode);
+      if (key == null || propertyValue == null) return undefined;
+      properties.push({ key, value: propertyValue });
+    }
+    return { ...located, kind: "object", properties };
+  }
+  if (value.type === "FunctionExpression") {
+    const functionValue = functionDeclaration(context, value, false);
+    return functionValue == null
+      ? undefined
+      : { ...located, functionValue, kind: "function" };
+  }
+  if (value.type === "MemberExpression") {
+    const member = memberParts(context, value);
+    return member == null
+      ? undefined
+      : { ...located, ...member, kind: "property-get" };
+  }
+  if (value.type === "AssignmentExpression") {
+    if (value.operator !== "=") {
+      return unsupported(context, value, "This assignment is unsupported.");
+    }
+    const left = node(value.left);
+    const right = node(value.right);
+    if (left == null || right == null) return unsupported(context, value);
+    const name = identifierName(left);
+    if (name != null) {
+      const assigned = expression(context, right);
+      return assigned == null
+        ? undefined
+        : { ...located, kind: "binding-set", name, value: assigned };
+    }
+    const member = memberParts(context, left);
+    const assigned = expression(context, right);
+    return member == null || assigned == null
+      ? undefined
+      : { ...located, ...member, kind: "property-set", value: assigned };
   }
   if (value.type === "BinaryExpression") {
     const operator = value.operator;
@@ -460,6 +632,30 @@ function expression(
       ? undefined
       : { ...located, arguments: argumentValues, kind: "call", target };
   }
+  if (value.type === "NewExpression") {
+    if (value.typeArguments != null || value.typeParameters != null) {
+      return unsupported(
+        context,
+        value,
+        "Constructor type arguments are outside the M3 profile.",
+      );
+    }
+    const calleeNode = node(value.callee);
+    if (calleeNode == null) return unsupported(context, value);
+    const callee = expression(context, calleeNode);
+    const argumentValues: SyntaxExpression[] = [];
+    for (const argumentValue of nodes(value.arguments)) {
+      if (argumentValue.type === "SpreadElement") {
+        return unsupported(context, argumentValue);
+      }
+      const converted = expression(context, argumentValue);
+      if (converted == null) return undefined;
+      argumentValues.push(converted);
+    }
+    return callee == null
+      ? undefined
+      : { ...located, arguments: argumentValues, callee, kind: "new" };
+  }
   return unsupported(context, value);
 }
 
@@ -478,11 +674,11 @@ function statement(
       : { ...located, expression: converted, kind: "expression" };
   }
   if (value.type === "VariableDeclaration") {
-    if (value.kind !== "const") {
+    if (value.kind !== "const" && value.kind !== "let") {
       return unsupported(
         context,
         value,
-        "Only const declarations are supported.",
+        "Only const and let declarations are supported.",
       );
     }
     const declarations = nodes(value.declarations);
@@ -498,18 +694,49 @@ function statement(
     const identifier = node(declaration.id);
     const initializerNode = node(declaration.init);
     const name = identifier == null ? undefined : identifierName(identifier);
-    if (identifier == null || name == null || initializerNode == null) {
+    if (
+      identifier == null ||
+      name == null ||
+      (value.kind === "const" && initializerNode == null)
+    ) {
       return unsupported(
         context,
         declaration,
         "A const binding needs one identifier and an initializer.",
       );
     }
-    const initializer = expression(context, initializerNode);
+    const initializer =
+      initializerNode == null
+        ? { ...location(context, declaration), kind: "undefined" as const }
+        : expression(context, initializerNode);
     if (initializer == null) return undefined;
     const hint = typeHint(context, identifier.typeAnnotation);
     if (context.diagnostics.length > 0) return undefined;
-    return { ...located, hint, initializer, kind: "const", name };
+    return { ...located, hint, initializer, kind: value.kind, name };
+  }
+  if (value.type === "BreakStatement" || value.type === "ContinueStatement") {
+    if (value.label != null) {
+      return unsupported(
+        context,
+        value,
+        "Labeled control flow is unsupported.",
+      );
+    }
+    return {
+      ...located,
+      kind: value.type === "BreakStatement" ? "break" : "continue",
+    };
+  }
+  if (value.type === "WhileStatement") {
+    const testNode = node(value.test);
+    const bodyNode = node(value.body);
+    if (testNode == null || bodyNode == null)
+      return unsupported(context, value);
+    const test = expression(context, testNode);
+    const body = statement(context, bodyNode, functionBody);
+    return test == null || body == null
+      ? undefined
+      : { ...located, body, kind: "while", test };
   }
   if (value.type === "ReturnStatement") {
     if (!functionBody) {
@@ -525,30 +752,68 @@ function statement(
     if (argument != null && converted == null) return undefined;
     return { ...located, expression: converted, kind: "return" };
   }
-  if (value.type === "BlockStatement") {
-    if (!functionBody) {
-      return unsupported(
-        context,
-        value,
-        "Top-level blocks are outside the M1 profile.",
-      );
+  if (value.type === "ThrowStatement") {
+    const argument = node(value.argument);
+    if (argument == null) return unsupported(context, value);
+    const converted = expression(context, argument);
+    return converted == null
+      ? undefined
+      : { ...located, expression: converted, kind: "throw" };
+  }
+  if (value.type === "TryStatement") {
+    const blockNode = node(value.block);
+    const handlerNode = node(value.handler);
+    const finalizerNode = node(value.finalizer);
+    if (blockNode == null) return unsupported(context, value);
+    const block = statement(context, blockNode, functionBody);
+    let handler:
+      | {
+          readonly body: SyntaxStatement;
+          readonly name: string;
+          readonly range: SourceRange;
+        }
+      | undefined;
+    if (handlerNode != null) {
+      const parameter = node(handlerNode.param);
+      const bodyNode = node(handlerNode.body);
+      const name = parameter == null ? undefined : identifierName(parameter);
+      if (parameter == null || name == null || bodyNode == null) {
+        return unsupported(
+          context,
+          handlerNode,
+          "A catch clause requires one identifier binding.",
+        );
+      }
+      const body = statement(context, bodyNode, functionBody);
+      if (body == null) return undefined;
+      handler = {
+        body,
+        name,
+        range: sourceRange(context.locations, parameter),
+      };
     }
-    const body: SyntaxStatement[] = [];
+    const finalizer =
+      finalizerNode == null
+        ? undefined
+        : statement(context, finalizerNode, functionBody);
+    if (block == null || (finalizerNode != null && finalizer == null)) {
+      return undefined;
+    }
+    return { ...located, block, finalizer, handler, kind: "try" };
+  }
+  if (value.type === "BlockStatement") {
+    const body: (SyntaxFunction | SyntaxStatement)[] = [];
     for (const child of nodes(value.body)) {
-      const converted = statement(context, child, functionBody);
+      const converted =
+        child.type === "FunctionDeclaration"
+          ? functionDeclaration(context, child, true)
+          : statement(context, child, functionBody);
       if (converted == null) return undefined;
       body.push(converted);
     }
     return { ...located, body, kind: "block" };
   }
   if (value.type === "IfStatement") {
-    if (!functionBody) {
-      return unsupported(
-        context,
-        value,
-        "Top-level if statements are outside the M1 profile.",
-      );
-    }
     const testNode = node(value.test);
     const consequentNode = node(value.consequent);
     const alternateNode = node(value.alternate);
@@ -571,6 +836,7 @@ function statement(
 function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
+  requireName = true,
 ): SyntaxFunction | undefined {
   if (value.async === true || value.generator === true) {
     return unsupported(
@@ -589,7 +855,7 @@ function functionDeclaration(
   const identifier = node(value.id);
   const name = identifier == null ? undefined : identifierName(identifier);
   const bodyNode = node(value.body);
-  if (name == null || bodyNode?.type !== "BlockStatement") {
+  if ((requireName && name == null) || bodyNode?.type !== "BlockStatement") {
     return unsupported(
       context,
       value,
@@ -626,12 +892,25 @@ function functionDeclaration(
   const returnHint = typeHint(context, value.returnType);
   if (returnHint != null) returnHints.push(returnHint);
   returnHints.push(...jsdoc.returns);
-  const body: SyntaxStatement[] = [];
+  const strict =
+    context.strictStack.at(-1) === true || hasUseStrictDirective(bodyNode);
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  context.strictStack.push(strict);
+  context.functionStack.push(true);
   for (const child of nodes(bodyNode.body)) {
-    const converted = statement(context, child, true);
-    if (converted == null) return undefined;
+    const converted =
+      child.type === "FunctionDeclaration"
+        ? functionDeclaration(context, child, true)
+        : statement(context, child, true);
+    if (converted == null) {
+      context.functionStack.pop();
+      context.strictStack.pop();
+      return undefined;
+    }
     body.push(converted);
   }
+  context.functionStack.pop();
+  context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
   return {
     ...location(context, value),
@@ -640,6 +919,7 @@ function functionDeclaration(
     name,
     parameters,
     returnHints,
+    strict,
   };
 }
 
@@ -648,20 +928,27 @@ function program(
   file: BabelNode,
 ): SyntaxProgram | undefined {
   const programNode = node(file.program) ?? file;
+  const strict = hasUseStrictDirective(programNode);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  context.strictStack.push(strict);
   for (const item of nodes(programNode.body)) {
     const converted =
       item.type === "FunctionDeclaration"
         ? functionDeclaration(context, item)
         : statement(context, item, false);
-    if (converted == null) return undefined;
+    if (converted == null) {
+      context.strictStack.pop();
+      return undefined;
+    }
     body.push(converted);
   }
+  context.strictStack.pop();
   return {
     ...location(context, programNode),
     body,
     kind: "program",
     sourceId: context.input.sourceId,
+    strict,
   };
 }
 
@@ -691,7 +978,13 @@ export const babelFrontend: SourceFrontend = {
           sourceId: input.sourceId,
         };
       }
-      const context: ConvertContext = { diagnostics: [], input, locations };
+      const context: ConvertContext = {
+        diagnostics: [],
+        functionStack: [],
+        input,
+        locations,
+        strictStack: [],
+      };
       const converted = program(context, file);
       if (converted == null || context.diagnostics.length > 0) {
         return {

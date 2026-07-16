@@ -20,6 +20,17 @@ typedef struct {
 typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
 
+typedef struct {
+    bool configurable;
+    bool enumerable;
+    bool writable;
+} OseoPropertyAttributes;
+
+typedef struct {
+    size_t shape_id;
+    size_t slot;
+} OseoPropertyCache;
+
 struct OseoRootFrame {
     OseoRootFrame *previous;
     OseoValue *slots;
@@ -33,6 +44,7 @@ typedef struct {
     size_t source_id_length;
     const char *error_code;
     const char *error_message;
+    bool has_diagnostic;
     size_t active_frame_slots;
     size_t call_depth;
     size_t line;
@@ -41,8 +53,11 @@ typedef struct {
     size_t guard_misses;
     size_t overflow_misses;
     size_t generic_addition_calls;
+    size_t next_shape_id;
     size_t allocations;
+    size_t allocation_attempts;
     size_t collections;
+    size_t fail_allocation_at;
     bool observe_specialization;
     bool collect_every_safepoint;
 } OseoContext;
@@ -93,6 +108,8 @@ void oseo_context_init(
     size_t source_id_length
 );
 void oseo_context_destroy(OseoContext *context);
+void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt);
+void oseo_context_clear_language_error(OseoContext *context);
 void oseo_context_location(
     OseoContext *context,
     size_t line,
@@ -119,6 +136,7 @@ void oseo_collect(OseoContext *context);
 OseoValue oseo_undefined(void);
 OseoValue oseo_uninitialized(void);
 OseoResult oseo_read_binding(OseoContext *context, OseoValue value);
+OseoResult oseo_write_immutable_binding(OseoContext *context);
 OseoValue oseo_null(void);
 OseoValue oseo_boolean(bool value);
 OseoValue oseo_number(double value);
@@ -128,6 +146,143 @@ OseoResult oseo_string_from_units(
     OseoContext *context,
     const uint16_t *units,
     size_t length
+);
+OseoResult oseo_environment_create(OseoContext *context, size_t slot_count);
+OseoResult oseo_environment_clone(
+    OseoContext *context,
+    OseoValue environment
+);
+OseoResult oseo_environment_get(
+    OseoContext *context,
+    OseoValue environment,
+    size_t index
+);
+OseoResult oseo_environment_set(
+    OseoContext *context,
+    OseoValue environment,
+    size_t index,
+    OseoValue value
+);
+OseoResult oseo_cell_create(OseoContext *context, OseoValue value);
+OseoResult oseo_cell_get(OseoContext *context, OseoValue cell);
+OseoResult oseo_cell_initialize(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
+OseoResult oseo_cell_set(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
+OseoResult oseo_function_create(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue environment,
+    const uint16_t *name_units,
+    size_t name_length,
+    size_t parameter_count,
+    OseoValue inferred_name
+);
+OseoResult oseo_function_environment(
+    OseoContext *context,
+    OseoValue function
+);
+OseoResult oseo_function_code_id(
+    OseoContext *context,
+    OseoValue function,
+    size_t *code_id
+);
+OseoResult oseo_unknown_function(OseoContext *context, size_t code_id);
+OseoResult oseo_function_prototype(
+    OseoContext *context,
+    OseoValue function
+);
+OseoResult oseo_constructor_result(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue receiver
+);
+OseoResult oseo_constructor_receiver(
+    OseoContext *context,
+    OseoValue prototype
+);
+OseoResult oseo_array_create(OseoContext *context, size_t length);
+OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
+OseoResult oseo_property_key(OseoContext *context, OseoValue value);
+OseoResult oseo_object_define(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+);
+OseoResult oseo_object_delete(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    bool strict
+);
+OseoResult oseo_object_get(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+bool oseo_value_is_object(OseoValue value);
+bool oseo_property_cache_matches(
+    OseoValue object,
+    const OseoPropertyCache *cache
+);
+OseoValue oseo_property_cache_load(
+    OseoValue object,
+    const OseoPropertyCache *cache
+);
+void oseo_property_cache_update(
+    OseoValue object,
+    OseoValue key,
+    OseoPropertyCache *cache
+);
+OseoResult oseo_object_has_own(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key
+);
+OseoResult oseo_object_set(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue value,
+    bool strict
+);
+OseoResult oseo_object_set_prototype(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue prototype
+);
+OseoResult oseo_object_builtin_create(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_define_property(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_get_own_property_descriptor(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_keys(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_object_builtin_set_prototype_of(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
 );
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_add(

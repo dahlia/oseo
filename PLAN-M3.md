@@ -4,9 +4,11 @@ M3 plan for the dynamic language core
 Status
 ------
 
-Implementation status: ready, not started. M2 established removable guarded
-specialization, one compiled generic fallback, and observation evidence that
-must remain active throughout M3.
+Implementation status: in progress at checkpoint 8. The generic object,
+array, closure, call, completion, and shape-specialization work is implemented
+and covered by differential fixtures. M3 remains open because the repository
+does not yet contain an executable test262 runner, a pinned suite revision, or
+a reviewed result manifest.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
@@ -175,8 +177,9 @@ value calls without exposing a C function pointer in generic values.
 M3 extends the existing generic ABI rather than replacing it. Dynamic calls
 validate callability, preserve left-to-right callee and argument evaluation,
 pass the receiver for methods, and retain `new.target` for constructors.
-Constructors allocate and root the receiver before user code and implement the
-documented return-value rule. Missing and extra arguments keep the M1 behavior.
+Constructors evaluate the callee and arguments before allocating and rooting
+the receiver, then implement the documented return-value rule. Missing and
+extra arguments keep the M1 behavior.
 
 Closure tests cover sibling closures, nested capture, mutation, recursion,
 escaped environments, collection between capture and use, and abrupt completion
@@ -293,9 +296,12 @@ Work sequence
 
 8.  Close M3 evidence.
 
-    Run reviewed test262 subsets, differential generation, forced collection,
-    sanitizers, package checks, and the full M2 invariance corpus. Update
-    design, roadmap, package documentation, decisions, and the next plan.
+    Add an executable test262 runner, pin its suite revision, check in a
+    reviewed subset manifest, and run it without folding unsupported or harness
+    failures into passes. Then run differential generation, forced collection,
+    sanitizers, package checks, and the full M2 invariance corpus. Update the
+    design, roadmap, package documentation, decisions, and the next plan only
+    after that evidence is repeatable.
 
 
 Required fixtures

@@ -15,3 +15,6 @@ counter record from stderr and exposes typed guard, overflow, generic-addition,
 allocation, and collection counts beside the ordinary process observation.
 Reference comparison therefore remains limited to JavaScript-visible output,
 status, and errors.
+
+Test262 observations retain the declared `parse`, `resolution`, or `runtime`
+failure phase. The `parse` phase includes static-semantics early errors.

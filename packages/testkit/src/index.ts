@@ -41,6 +41,61 @@ export interface NativeFixtureOptions {
 /** Observable output used by reference and native fixture comparisons. */
 export interface FixtureObservation extends ProcessObservation {}
 
+/** Classification retained for one reviewed test262 execution. */
+export type Test262Classification =
+  | "expected-parse-failure"
+  | "harness-failure"
+  | "pass"
+  | "semantic-failure"
+  | "unsupported-profile-feature";
+
+/** Strictness variants requested by test262 frontmatter. */
+export type Test262Strictness = "non-strict" | "strict";
+
+/**
+ * Failure phase declared by test262 metadata. Parse includes early errors.
+ */
+export type Test262FailurePhase = "parse" | "resolution" | "runtime";
+
+/** Frontmatter and suite identity needed to reproduce one reviewed case. */
+export interface Test262Case {
+  readonly expectedErrorType?: string;
+  readonly expectedFailurePhase?: Test262FailurePhase;
+  readonly features: readonly string[];
+  readonly includes: readonly string[];
+  readonly path: string;
+  readonly strictness: readonly Test262Strictness[];
+  readonly suiteRevision: string;
+}
+
+/** Host-independent observation produced by the test262 adapter. */
+export interface Test262Observation {
+  readonly detail?: string;
+  readonly errorType?: string;
+  readonly failedPhase?: Test262FailurePhase;
+  readonly harnessFailed: boolean;
+  readonly passed: boolean;
+}
+
+/** Complete reviewed result for one test262 case. */
+export interface Test262Result {
+  readonly case: Test262Case;
+  readonly classification: Test262Classification;
+  readonly observation: Test262Observation;
+  readonly unsupportedFeatures: readonly string[];
+}
+
+/**
+ * Counts that never fold unsupported or infrastructure failures into passes.
+ */
+export interface Test262Summary {
+  readonly expectedParseFailures: number;
+  readonly harnessFailures: number;
+  readonly passes: number;
+  readonly semanticFailures: number;
+  readonly unsupportedProfileFeatures: number;
+}
+
 interface ProcessStepObservation {
   readonly observation: ProcessObservation;
   readonly request: ProcessRequest;
@@ -102,6 +157,69 @@ function splitCounters(observation: ProcessObservation): {
     counters: parsed as RuntimeObservationCounters,
     observation: { ...observation, stderr: lines.join("") },
   };
+}
+
+/** Classify one test262 observation against the named M3 feature profile. */
+export function classifyTest262(
+  testCase: Test262Case,
+  observation: Test262Observation,
+  supportedFeatures: ReadonlySet<string>,
+): Test262Result {
+  const unsupportedFeatures = testCase.features.filter(
+    (feature) => !supportedFeatures.has(feature),
+  );
+  const errorTypeMatches =
+    testCase.expectedErrorType == null ||
+    testCase.expectedErrorType === observation.errorType;
+  const negativeMatches =
+    testCase.expectedFailurePhase != null &&
+    !observation.passed &&
+    observation.failedPhase === testCase.expectedFailurePhase &&
+    errorTypeMatches;
+  let classification: Test262Classification;
+  if (observation.harnessFailed) {
+    classification = "harness-failure";
+  } else if (unsupportedFeatures.length > 0) {
+    classification = "unsupported-profile-feature";
+  } else if (testCase.expectedFailurePhase === "parse" && negativeMatches) {
+    classification = "expected-parse-failure";
+  } else if (negativeMatches) {
+    classification = "pass";
+  } else if (testCase.expectedFailurePhase == null && observation.passed) {
+    classification = "pass";
+  } else {
+    classification = "semantic-failure";
+  }
+  return { case: testCase, classification, observation, unsupportedFeatures };
+}
+
+/**
+ * Summarize reviewed test262 records without changing their classifications.
+ */
+export function summarizeTest262(
+  results: readonly Test262Result[],
+): Test262Summary {
+  const summary = {
+    expectedParseFailures: 0,
+    harnessFailures: 0,
+    passes: 0,
+    semanticFailures: 0,
+    unsupportedProfileFeatures: 0,
+  };
+  for (const result of results) {
+    if (result.classification === "expected-parse-failure") {
+      summary.expectedParseFailures += 1;
+    } else if (result.classification === "harness-failure") {
+      summary.harnessFailures += 1;
+    } else if (result.classification === "pass") {
+      summary.passes += 1;
+    } else if (result.classification === "semantic-failure") {
+      summary.semanticFailures += 1;
+    } else {
+      summary.unsupportedProfileFeatures += 1;
+    }
+  }
+  return summary;
 }
 
 /**

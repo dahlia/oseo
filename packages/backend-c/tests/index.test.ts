@@ -108,6 +108,41 @@ test("scans large MIR argument lists without spreading them", () => {
   assert.doesNotMatch(emitted.source, /OseoValue call_arguments/u);
 });
 
+test("scans large MIR binding sets without spreading them", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: Array.from({ length: 200_000 }, (_, id) => ({
+      id,
+      name: `binding${id}`,
+    })),
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 1,
+    },
+    sourceId: "large-bindings.ts",
+    specialization: "disabled",
+  });
+  assert.match(emitted.source, /oseo_environment_create\(context, 200000u\)/u);
+});
+
 test("keeps string constant units out of generated stack frames", () => {
   const range = {
     end: { column: 1, line: 1 },

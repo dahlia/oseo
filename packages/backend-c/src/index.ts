@@ -12,16 +12,18 @@ import type {
 
 interface EmitState {
   readonly argumentSlotStart: number;
-  readonly bindings: Map<number, number>;
+  readonly completionSlotStart: number;
   readonly functionId: number;
   readonly functionRootCounts: ReadonlyMap<number, number>;
-  readonly globalBindings: ReadonlyMap<number, number>;
   readonly lines: string[];
+  readonly environmentSlot: number;
   readonly blockParameters: ReadonlyMap<number, readonly number[]>;
   readonly scalarKinds: Map<number, "boolean" | "smi">;
+  readonly strict: boolean;
   readonly observeSpecialization: boolean;
   nextRecursiveTarget: number;
   usesAbrupt: boolean;
+  usesCompletion: boolean;
 }
 
 function escapeCString(value: string): string {
@@ -93,15 +95,20 @@ function numberLiteral(value: number): string {
   return text;
 }
 
+function utf16Units(value: string): readonly number[] {
+  const units: number[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    units.push(value.charCodeAt(index));
+  }
+  return units;
+}
+
 function emitStringConstant(
   state: EmitState,
   operation: MirOperation,
   value: string,
 ): void {
-  const units: number[] = [];
-  for (let index = 0; index < value.length; index += 1) {
-    units.push(value.charCodeAt(index));
-  }
+  const units = utf16Units(value);
   let input = "NULL, 0u";
   if (units.length > 0) {
     const name = `string_units_${operation.id}`;
@@ -153,20 +160,18 @@ function emitArguments(
 
 function emitRead(state: EmitState, operation: MirOperation): void {
   const bindingId = operation.bindingId;
-  const globalSlot =
-    bindingId == null ? undefined : state.globalBindings.get(bindingId);
-  const bindingSlot =
-    bindingId == null ? undefined : state.bindings.get(bindingId);
-  if (globalSlot == null && bindingSlot == null) {
+  if (bindingId == null) {
     throw new Error(`MIR read %${operation.id} has no bound value.`);
   }
-  const value =
-    globalSlot == null
-      ? `roots[${String(bindingSlot)}]`
-      : `oseo_global_bindings[${globalSlot}]`;
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, `result = oseo_read_binding(context, ${value});`);
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, "result = oseo_cell_get(context, result.value);");
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
@@ -176,17 +181,71 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
     throw new Error(`MIR write %${operation.id} has no binding identity.`);
   }
   const value = operationArgument(operation, 0);
-  const globalSlot = state.globalBindings.get(bindingId);
-  const bindingSlot = state.bindings.get(bindingId);
-  if (globalSlot == null && bindingSlot == null) {
-    throw new Error(`MIR write %${operation.id} has no binding slot.`);
-  }
   line(state, `roots[${operation.id}] = roots[${value}];`);
-  if (globalSlot == null) {
-    line(state, `roots[${String(bindingSlot)}] = roots[${value}];`);
-  } else {
-    line(state, `oseo_global_bindings[${globalSlot}] = roots[${value}];`);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  if (operation.mutable === false) {
+    if (operation.functionNameBinding === true && !state.strict) {
+      line(
+        state,
+        `result = (OseoResult){OSEO_STATUS_NORMAL, roots[${value}]};`,
+      );
+      return;
+    }
+    line(state, "result = oseo_write_immutable_binding(context);");
+    return;
   }
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(
+    state,
+    `result = oseo_cell_set(context, result.value, roots[${value}]);`,
+  );
+}
+
+function emitInitialize(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(`MIR initialize %${operation.id} has no binding identity.`);
+  }
+  const value = operationArgument(operation, 0);
+  line(state, `roots[${operation.id}] = roots[${value}];`);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(
+    state,
+    `result = oseo_cell_initialize(context, result.value, roots[${value}]);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+}
+
+function emitBindingReset(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(`MIR binding-reset %${operation.id} has no identity.`);
+  }
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, "result = oseo_cell_create(context, oseo_uninitialized());");
+  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+  line(
+    state,
+    `    result = oseo_environment_set(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u, ` +
+      `roots[${operation.id}]);`,
+  );
+  line(state, "}");
 }
 
 function emitUnary(state: EmitState, operation: MirOperation): void {
@@ -282,7 +341,12 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   if (target == null) {
     throw new Error(`MIR call %${operation.id} has no target.`);
   }
-  const argumentsValue = emitArguments(state, operation);
+  const dynamic = target.kind === "dynamic";
+  const constructing = operation.kind === "construct";
+  const callArguments = dynamic
+    ? { ...operation, arguments: operation.arguments.slice(2) }
+    : operation;
+  const argumentsValue = emitArguments(state, callArguments);
   location(state, operation.range);
   state.usesAbrupt = true;
   if (target.kind === "console-log") {
@@ -291,6 +355,75 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = oseo_console_log(context, ${argumentsValue.count}u, ` +
         `${argumentsValue.name});`,
     );
+  } else if (target.kind === "object-intrinsic") {
+    const names = {
+      create: "oseo_object_builtin_create",
+      defineProperty: "oseo_object_builtin_define_property",
+      getOwnPropertyDescriptor:
+        "oseo_object_builtin_get_own_property_descriptor",
+      keys: "oseo_object_builtin_keys",
+      setPrototypeOf: "oseo_object_builtin_set_prototype_of",
+    } as const;
+    line(
+      state,
+      `result = ${names[target.method]}(context, ` +
+        `${argumentsValue.count}u, ${argumentsValue.name});`,
+    );
+  } else if (target.kind === "dynamic") {
+    const callee = operationArgument(operation, 0);
+    const receiver = operationArgument(operation, 1);
+    line(state, `size_t dynamic_code_id_${operation.id} = 0u;`);
+    line(
+      state,
+      `result = oseo_function_code_id(` +
+        `context, roots[${callee}], &dynamic_code_id_${operation.id});`,
+    );
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, "    result = oseo_call_enter(context);");
+    line(state, "}");
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, `    switch (dynamic_code_id_${operation.id}) {`);
+    for (const [functionId, targetRootCount] of state.functionRootCounts) {
+      if (functionId < 0) continue;
+      line(state, `    case ${functionId}u:`);
+      line(
+        state,
+        `        result = oseo_frame_enter(context, ${targetRootCount}u);`,
+      );
+      line(state, "        if (result.status == OSEO_STATUS_NORMAL) {");
+      line(
+        state,
+        `            result = oseo_function_${functionId}(` +
+          `context, roots[${callee}], roots[${receiver}], ` +
+          `${argumentsValue.count}u, ${argumentsValue.name}, ` +
+          (constructing ? `roots[${callee}]);` : "oseo_undefined());"),
+      );
+      line(
+        state,
+        `            oseo_frame_leave(context, ${targetRootCount}u);`,
+      );
+      line(state, "        }");
+      line(state, "        break;");
+    }
+    line(state, "    default:");
+    line(
+      state,
+      `        result = oseo_unknown_function(` +
+        `context, dynamic_code_id_${operation.id});`,
+    );
+    line(state, "        break;");
+    line(state, "    }");
+    line(state, "    oseo_call_leave(context);");
+    line(state, "}");
+    if (constructing) {
+      line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+      line(
+        state,
+        `    result = oseo_constructor_result(` +
+          `context, result.value, roots[${receiver}]);`,
+      );
+      line(state, "}");
+    }
   } else {
     const targetRootCount = state.functionRootCounts.get(target.functionId);
     if (targetRootCount == null) {
@@ -328,6 +461,147 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+function emitObjectOperation(state: EmitState, operation: MirOperation): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  if (operation.kind === "array-create") {
+    if (operation.arrayLength == null) {
+      throw new Error(`MIR array-create %${operation.id} has no length.`);
+    }
+    line(
+      state,
+      `result = oseo_array_create(context, ${operation.arrayLength}u);`,
+    );
+  } else if (operation.kind === "object-create") {
+    line(state, "result = oseo_object_create(context, oseo_null());");
+  } else if (operation.kind === "property-key") {
+    const input = operationArgument(operation, 0);
+    line(state, `result = oseo_property_key(context, roots[${input}]);`);
+  } else {
+    const object = operationArgument(operation, 0);
+    const key = operationArgument(operation, 1);
+    if (operation.kind === "property-get") {
+      line(
+        state,
+        `result = oseo_object_get(context, roots[${object}], ` +
+          `roots[${key}]);`,
+      );
+    } else if (operation.kind === "property-delete") {
+      line(
+        state,
+        `result = oseo_object_delete(context, roots[${object}], ` +
+          `roots[${key}], ${state.strict ? "true" : "false"});`,
+      );
+    } else {
+      const value = operationArgument(operation, 2);
+      line(
+        state,
+        `result = oseo_object_set(context, roots[${object}], ` +
+          `roots[${key}], roots[${value}], ` +
+          `${state.strict ? "true" : "false"});`,
+      );
+    }
+  }
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+function propertyCacheName(operation: MirOperation): string {
+  if (operation.cacheId == null) {
+    throw new Error(`MIR ${operation.kind} %${operation.id} has no cache.`);
+  }
+  return `property_cache_${operation.cacheId}`;
+}
+
+function emitGuardObject(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  state.scalarKinds.set(operation.id, "boolean");
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_value_is_object(roots[${object}]);`,
+  );
+}
+
+function emitGuardShape(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const cache = propertyCacheName(operation);
+  state.scalarKinds.set(operation.id, "boolean");
+  line(state, `static OseoPropertyCache ${cache} = {0u, 0u};`);
+  line(
+    state,
+    `bool fast_${operation.id} = oseo_property_cache_matches(` +
+      `roots[${object}], &${cache});`,
+  );
+}
+
+function emitLoadFixedSlot(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const cache = propertyCacheName(operation);
+  line(
+    state,
+    `roots[${operation.id}] = ` +
+      `oseo_property_cache_load(roots[${object}], &${cache});`,
+  );
+}
+
+function emitUpdatePropertyCache(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const object = operationArgument(operation, 0);
+  const key = operationArgument(operation, 1);
+  const cache = propertyCacheName(operation);
+  line(
+    state,
+    `oseo_property_cache_update(roots[${object}], roots[${key}], ` +
+      `&${cache});`,
+  );
+}
+
+function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
+  if (operation.functionId == null) {
+    throw new Error(`MIR function-create %${operation.id} has no code id.`);
+  }
+  if (operation.functionName == null || operation.functionLength == null) {
+    throw new Error(
+      `MIR function-create %${operation.id} has no function metadata.`,
+    );
+  }
+  const units = utf16Units(operation.functionName);
+  let nameInput = "NULL";
+  if (units.length > 0) {
+    const name = `function_name_units_${operation.id}`;
+    line(state, `static const uint16_t ${name}[] = {${units.join(", ")}};`);
+    nameInput = name;
+  }
+  const inferredName =
+    operation.arguments[0] == null
+      ? "oseo_undefined()"
+      : `roots[${operation.arguments[0]}]`;
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_function_create(context, ${operation.functionId}u, ` +
+      `roots[${state.environmentSlot}], ${nameInput}, ${units.length}u, ` +
+      `${operation.functionLength}u, ${inferredName});`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+function emitConstructReceiver(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const callee = operationArgument(operation, 0);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, `result = oseo_function_prototype(context, roots[${callee}]);`);
+  line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+  line(state, "    result = oseo_constructor_receiver(context, result.value);");
+  line(state, "}");
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitOperation(state: EmitState, operation: MirOperation): void {
   if (operation.kind === "constant") {
     if (operation.constant == null) {
@@ -338,10 +612,78 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitRead(state, operation);
   } else if (operation.kind === "write") {
     emitWrite(state, operation);
+  } else if (operation.kind === "initialize") {
+    emitInitialize(state, operation);
+  } else if (operation.kind === "binding-reset") {
+    emitBindingReset(state, operation);
+  } else if (operation.kind === "function-create") {
+    emitFunctionCreate(state, operation);
+  } else if (operation.kind === "construct-receiver") {
+    emitConstructReceiver(state, operation);
+  } else if (operation.kind === "receiver") {
+    line(state, `roots[${operation.id}] = receiver;`);
+  } else if (operation.kind === "caught") {
+    state.usesCompletion = true;
+    const slot = operation.completionSlot;
+    if (slot == null) {
+      throw new Error(`MIR caught %${operation.id} has no completion slot.`);
+    }
+    line(state, "oseo_context_clear_language_error(context);");
+    line(
+      state,
+      `roots[${operation.id}] = roots[${state.completionSlotStart + slot}u];`,
+    );
+    line(
+      state,
+      `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
+        `roots[${state.completionSlotStart + slot}u]};`,
+    );
+  } else if (operation.kind === "completion-set") {
+    state.usesCompletion = true;
+    const kinds = { jump: 3, normal: 0, return: 1, throw: 2 } as const;
+    const kind = operation.completionKind;
+    if (kind == null) {
+      throw new Error(`MIR completion-set %${operation.id} has no kind.`);
+    }
+    const slot = operation.completionSlot;
+    if (slot == null) {
+      throw new Error(
+        `MIR completion-set %${operation.id} has no completion slot.`,
+      );
+    }
+    line(state, `completion_kind[${slot}u] = ${kinds[kind]};`);
+    if (kind === "throw") {
+      location(state, operation.range);
+      line(state, "oseo_context_clear_language_error(context);");
+      line(state, `completion_line[${slot}u] = context->line;`);
+      line(state, `completion_column[${slot}u] = context->column;`);
+      line(state, `completion_error_code[${slot}u] = context->error_code;`);
+      line(
+        state,
+        `completion_error_message[${slot}u] = context->error_message;`,
+      );
+    }
+    if (operation.arguments[0] != null) {
+      line(
+        state,
+        `roots[${state.completionSlotStart + slot}u] = ` +
+          `roots[${operation.arguments[0]}];`,
+      );
+    }
+    if (operation.completionTarget != null) {
+      line(
+        state,
+        `completion_target[${slot}u] = ${operation.completionTarget}u;`,
+      );
+    }
   } else if (operation.kind === "unary") {
     emitUnary(state, operation);
   } else if (operation.kind === "binary") {
     emitBinary(state, operation);
+  } else if (operation.kind === "guard-object") {
+    emitGuardObject(state, operation);
+  } else if (operation.kind === "guard-shape") {
+    emitGuardShape(state, operation);
   } else if (operation.kind === "guard-smi") {
     emitGuardSmi(state, operation);
   } else if (operation.kind === "unbox-smi") {
@@ -350,6 +692,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitCheckedAdd(state, operation);
   } else if (operation.kind === "box-smi") {
     emitBoxSmi(state, operation);
+  } else if (operation.kind === "load-fixed-slot") {
+    emitLoadFixedSlot(state, operation);
+  } else if (operation.kind === "update-property-cache") {
+    emitUpdatePropertyCache(state, operation);
   } else if (operation.kind === "count-guard-hit") {
     if (state.observeSpecialization) {
       line(state, "context->guard_hits += 1u;");
@@ -362,11 +708,85 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (state.observeSpecialization) {
       line(state, "context->overflow_misses += 1u;");
     }
-  } else if (operation.kind === "call") {
+  } else if (operation.kind === "call" || operation.kind === "construct") {
     emitCall(state, operation);
+  } else if (
+    operation.kind === "array-create" ||
+    operation.kind === "object-create" ||
+    operation.kind === "property-key" ||
+    operation.kind === "property-delete" ||
+    operation.kind === "property-get" ||
+    operation.kind === "property-set"
+  ) {
+    emitObjectOperation(state, operation);
   } else if (operation.kind === "check-status") {
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    if (operation.abruptTarget == null) {
+      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    } else {
+      state.usesCompletion = true;
+      line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
+      line(state, "    if (context->has_diagnostic) goto abrupt;");
+      line(state, `    completion_kind[${operation.abruptTarget}u] = 2;`);
+      line(
+        state,
+        `    roots[${state.completionSlotStart + operation.abruptTarget}u] = ` +
+          "result.value;",
+      );
+      line(
+        state,
+        `    completion_line[${operation.abruptTarget}u] = context->line;`,
+      );
+      line(
+        state,
+        `    completion_column[${operation.abruptTarget}u] = ` +
+          "context->column;",
+      );
+      line(
+        state,
+        `    completion_error_code[${operation.abruptTarget}u] = ` +
+          "context->error_code;",
+      );
+      line(
+        state,
+        `    completion_error_message[${operation.abruptTarget}u] = ` +
+          "context->error_message;",
+      );
+      line(state, `    goto bb${operation.abruptTarget};`);
+      line(state, "}");
+    }
   }
+}
+
+function emitCompletionCopy(
+  state: EmitState,
+  source: number,
+  target: number,
+): void {
+  line(state, `    completion_kind[${target}u] = completion_kind[${source}u];`);
+  line(
+    state,
+    `    roots[${state.completionSlotStart + target}u] = ` +
+      `roots[${state.completionSlotStart + source}u];`,
+  );
+  line(
+    state,
+    `    completion_target[${target}u] = completion_target[${source}u];`,
+  );
+  line(state, `    completion_line[${target}u] = completion_line[${source}u];`);
+  line(
+    state,
+    `    completion_column[${target}u] = completion_column[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_error_code[${target}u] = ` +
+      `completion_error_code[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_error_message[${target}u] = ` +
+      `completion_error_message[${source}u];`,
+  );
 }
 
 function emitTerminator(state: EmitState, terminator: MirTerminator): void {
@@ -398,6 +818,53 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
         : `oseo_to_boolean(roots[${terminator.test}])`;
     line(state, `if (${test}) goto bb${terminator.whenTrue};`);
     line(state, `goto bb${terminator.whenFalse};`);
+  } else if (terminator.kind === "resume-completion") {
+    state.usesCompletion = true;
+    const slot = terminator.completionSlot;
+    if (terminator.outerAbrupt != null) {
+      line(state, `if (completion_kind[${slot}u] == 2) {`);
+      emitCompletionCopy(state, slot, terminator.outerAbrupt);
+      line(state, `    goto bb${terminator.outerAbrupt};`);
+      line(state, "}");
+    }
+    if (terminator.outerFinalizer != null) {
+      line(state, `if (completion_kind[${slot}u] != 0) {`);
+      emitCompletionCopy(state, slot, terminator.outerFinalizer);
+      line(state, `    goto bb${terminator.outerFinalizer};`);
+      line(state, "}");
+    }
+    line(state, `if (completion_kind[${slot}u] == 1) {`);
+    line(
+      state,
+      `    result = (OseoResult){OSEO_STATUS_NORMAL, ` +
+        `roots[${state.completionSlotStart + slot}u]};`,
+    );
+    line(state, "    oseo_roots_release(context, &frame);");
+    line(state, "    return result;");
+    line(state, "}");
+    line(state, `if (completion_kind[${slot}u] == 2) {`);
+    line(state, `    context->line = completion_line[${slot}u];`);
+    line(state, `    context->column = completion_column[${slot}u];`);
+    line(state, `    context->error_code = completion_error_code[${slot}u];`);
+    line(
+      state,
+      `    context->error_message = completion_error_message[${slot}u];`,
+    );
+    line(state, "    context->has_diagnostic = false;");
+    line(
+      state,
+      `    result = (OseoResult){OSEO_STATUS_THROW, ` +
+        `roots[${state.completionSlotStart + slot}u]};`,
+    );
+    line(state, "    goto abrupt;");
+    line(state, "}");
+    line(state, `switch (completion_target[${slot}u]) {`);
+    for (const target of state.blockParameters.keys()) {
+      if (target === 0) continue;
+      line(state, `case ${target}u: goto bb${target};`);
+    }
+    line(state, "default: abort();");
+    line(state, "}");
   } else {
     line(state, "abort();");
   }
@@ -454,7 +921,7 @@ function maximumArgumentCount(blocks: readonly MirBlock[]): number {
   let maximum = 0;
   for (const block of blocks) {
     for (const operation of block.operations) {
-      if (operation.kind === "call") {
+      if (operation.kind === "call" || operation.kind === "construct") {
         maximum = Math.max(maximum, operation.arguments.length);
       }
     }
@@ -462,23 +929,34 @@ function maximumArgumentCount(blocks: readonly MirBlock[]): number {
   return maximum;
 }
 
-function rootCount(
-  functionValue: MirFunction,
-  globalBindings: ReadonlyMap<number, number>,
-): number {
+function completionSlotCount(blocks: readonly MirBlock[]): number {
+  const usesCompletion = blocks.some(
+    (block) =>
+      block.terminator.kind === "resume-completion" ||
+      block.operations.some(
+        (operation) =>
+          operation.kind === "caught" ||
+          operation.kind === "completion-set" ||
+          (operation.kind === "check-status" && operation.abruptTarget != null),
+      ),
+  );
+  if (!usesCompletion) return 0;
+  let count = 1;
+  for (const block of blocks) count = Math.max(count, block.id + 1);
+  return count;
+}
+
+function rootCount(functionValue: MirFunction): number {
   const blocks = reachableBlocks(functionValue);
   const valueSlotCount = maximumValueId(blocks) + 1;
-  const localBindingCount = bindingIds(
-    functionValue,
-    blocks,
-    globalBindings,
-  ).length;
   const baseRootCount = Math.max(
     functionValue.rootSlotCount,
-    valueSlotCount + localBindingCount,
+    valueSlotCount + 2,
     32,
   );
-  return baseRootCount + maximumArgumentCount(blocks);
+  return (
+    baseRootCount + maximumArgumentCount(blocks) + completionSlotCount(blocks)
+  );
 }
 
 function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
@@ -501,6 +979,23 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
       pending.push(block.terminator.target);
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
+    } else if (
+      block.terminator.kind === "resume-completion" &&
+      (block.terminator.outerAbrupt != null ||
+        block.terminator.outerFinalizer != null)
+    ) {
+      if (block.terminator.outerAbrupt != null) {
+        pending.push(block.terminator.outerAbrupt);
+      }
+      if (block.terminator.outerFinalizer != null) {
+        pending.push(block.terminator.outerFinalizer);
+      }
+    }
+    for (const operation of block.operations) {
+      if (operation.abruptTarget != null) pending.push(operation.abruptTarget);
+      if (operation.completionTarget != null) {
+        pending.push(operation.completionTarget);
+      }
     }
   }
   return functionValue.blocks.filter((block) => reachable.has(block.id));
@@ -509,9 +1004,11 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
 function calledFunctionIds(functionValue: MirFunction): readonly number[] {
   return reachableBlocks(functionValue).flatMap((block) =>
     block.operations.flatMap((operation) =>
-      operation.kind === "call" && operation.target?.kind === "function"
-        ? [operation.target.functionId]
-        : [],
+      operation.kind === "function-create" && operation.functionId != null
+        ? [operation.functionId]
+        : operation.kind === "call" && operation.target?.kind === "function"
+          ? [operation.target.functionId]
+          : [],
     ),
   );
 }
@@ -543,22 +1040,28 @@ function hasSelfCall(functionValue: MirFunction): boolean {
 
 function emitFunction(
   functionValue: MirFunction,
-  globalBindings: ReadonlyMap<number, number>,
   functionRootCounts: ReadonlyMap<number, number>,
+  totalBindingCount: number,
   observeSpecialization: boolean,
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
   }
   const blocks = reachableBlocks(functionValue);
+  const completionSlots = completionSlotCount(blocks);
   const valueSlotCount = maximumValueId(blocks) + 1;
   const parameters = functionValue.parameters;
-  const bindingIdValues = bindingIds(functionValue, blocks, globalBindings);
+  const bindingIdValues =
+    functionValue.localBindingIds ??
+    bindingIds(functionValue, blocks, new Map<number, number>());
+  const environmentSlot = valueSlotCount;
+  const temporarySlot = valueSlotCount + 1;
   const baseRootCount = Math.max(
     functionValue.rootSlotCount,
-    valueSlotCount + bindingIdValues.length,
+    valueSlotCount + 2,
     32,
   );
+  const argumentSlots = maximumArgumentCount(blocks);
   const functionRootCount = functionRootCounts.get(functionValue.id);
   if (functionRootCount == null) {
     throw new Error(
@@ -567,43 +1070,79 @@ function emitFunction(
   }
   const state: EmitState = {
     argumentSlotStart: baseRootCount,
-    bindings: new Map(
-      bindingIdValues.map((bindingId, index) => [
-        bindingId,
-        valueSlotCount + index,
-      ]),
-    ),
     blockParameters: new Map(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
+    completionSlotStart: baseRootCount + argumentSlots,
     functionRootCounts,
-    globalBindings,
     lines: [],
+    environmentSlot,
     nextRecursiveTarget: 0,
     observeSpecialization,
     scalarKinds: new Map(),
+    strict: functionValue.strict === true,
     usesAbrupt: false,
+    usesCompletion: false,
     functionId: functionValue.id,
   };
-  const parameterBindingIds = new Set(
-    parameters.map((parameter) => parameter.bindingId),
-  );
-  for (const bindingId of bindingIdValues) {
-    if (parameterBindingIds.has(bindingId)) continue;
-    const bindingSlot = state.bindings.get(bindingId);
-    if (bindingSlot == null) continue;
-    line(state, `roots[${bindingSlot}] = oseo_uninitialized();`);
+  state.usesAbrupt = true;
+  if (functionValue.id < 0) {
+    line(
+      state,
+      `result = oseo_environment_create(context, ${totalBindingCount}u);`,
+    );
+  } else {
+    line(state, "result = oseo_function_environment(context, callee);");
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, "result = oseo_environment_clone(context, result.value);");
   }
+  line(state, `roots[${environmentSlot}] = result.value;`);
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  for (const bindingId of bindingIdValues) {
+    line(state, "result = oseo_cell_create(context, oseo_uninitialized());");
+    line(state, `roots[${temporarySlot}] = result.value;`);
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(
+      state,
+      `result = oseo_environment_set(context, roots[${environmentSlot}], ` +
+        `${bindingId}u, roots[${temporarySlot}]);`,
+    );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  }
+  if (functionValue.selfBindingId != null) {
+    line(
+      state,
+      `result = oseo_environment_get(context, roots[${environmentSlot}], ` +
+        `${functionValue.selfBindingId}u);`,
+    );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(
+      state,
+      "result = oseo_cell_initialize(context, result.value, callee);",
+    );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  }
+  const initializedParameters = new Set<number>();
   for (let index = 0; index < parameters.length; index += 1) {
     const parameter = parameters[index];
     if (parameter == null) continue;
-    const parameterSlot = state.bindings.get(parameter.bindingId);
-    if (parameterSlot == null) continue;
     line(
       state,
-      `roots[${parameterSlot}] = argument_count > ${index}u ` +
-        `? arguments[${index}] : oseo_undefined();`,
+      `result = oseo_environment_get(context, roots[${environmentSlot}], ` +
+        `${parameter.bindingId}u);`,
     );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    const setter = initializedParameters.has(parameter.bindingId)
+      ? "oseo_cell_set"
+      : "oseo_cell_initialize";
+    line(
+      state,
+      `result = ${setter}(context, result.value, ` +
+        `(argument_count > ${index}u ? arguments[${index}] : ` +
+        "oseo_undefined()));",
+    );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    initializedParameters.add(parameter.bindingId);
   }
   for (const block of blocks) {
     if (block.id !== 0) line(state, `bb${block.id}:;`);
@@ -630,6 +1169,22 @@ function emitFunction(
     "    OseoRootFrame frame = {NULL, NULL, 0u};\n" +
     "    OseoValue *roots;\n" +
     "    OseoResult result;\n" +
+    (state.usesCompletion
+      ? `    int completion_kind[${completionSlots}u] = {0};\n` +
+        `    size_t completion_target[${completionSlots}u] = {0};\n` +
+        `    size_t completion_line[${completionSlots}u] = {0};\n` +
+        `    size_t completion_column[${completionSlots}u] = {0};\n` +
+        `    const char *completion_error_code[${completionSlots}u] = ` +
+        `{NULL};\n` +
+        `    const char *completion_error_message[${completionSlots}u] = ` +
+        `{NULL};\n` +
+        "    (void)completion_kind;\n" +
+        "    (void)completion_target;\n" +
+        "    (void)completion_line;\n" +
+        "    (void)completion_column;\n" +
+        "    (void)completion_error_code;\n" +
+        "    (void)completion_error_message;\n"
+      : "") +
     "    (void)callee;\n" +
     "    (void)receiver;\n" +
     "    (void)argument_count;\n" +
@@ -658,37 +1213,41 @@ export const cBackend: NativeBackend = {
   emit(input) {
     const declaredFunctions = reachableFunctions(input);
     const functions = [...declaredFunctions, input.script];
-    const globalBindings = new Map(
-      input.globalBindings.map((binding, index) => [binding.id, index]),
-    );
     const functionRootCounts = new Map(
       functions.map((functionValue) => [
         functionValue.id,
-        rootCount(functionValue, globalBindings),
+        rootCount(functionValue),
       ]),
     );
     const scriptRootCount = functionRootCounts.get(input.script.id);
     if (scriptRootCount == null) {
       throw new Error("MIR script has no root frame layout.");
     }
-    const globalDeclaration =
-      input.globalBindings.length === 0
-        ? ""
-        : `static OseoValue ` +
-          `oseo_global_bindings[${input.globalBindings.length}];\n\n`;
-    const globalInitialization = input.globalBindings
-      .map(
-        (_, index) =>
-          `    oseo_global_bindings[${index}] = oseo_uninitialized();`,
-      )
-      .join("\n");
+    let totalBindingCount = 0;
+    for (const functionValue of functions) {
+      for (const bindingId of functionValue.localBindingIds ?? []) {
+        totalBindingCount = Math.max(totalBindingCount, bindingId + 1);
+      }
+      for (const parameter of functionValue.parameters) {
+        totalBindingCount = Math.max(
+          totalBindingCount,
+          parameter.bindingId + 1,
+        );
+      }
+    }
+    for (const binding of input.globalBindings) {
+      totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
+    }
     const declarations = functions.map(prototype).join("\n");
+    const functionReferences = declaredFunctions
+      .map((functionValue) => `    (void)oseo_function_${functionValue.id};`)
+      .join("\n");
     const definitions = functions
       .map((functionValue) =>
         emitFunction(
           functionValue,
-          globalBindings,
           functionRootCounts,
+          totalBindingCount,
           input.observeSpecialization === true,
         ),
       )
@@ -708,18 +1267,17 @@ export const cBackend: NativeBackend = {
         "#include <stdint.h>\n" +
         "#include <stdlib.h>\n\n" +
         functionEntryType +
-        globalDeclaration +
         `${declarations}\n\n` +
         `${definitions}\n` +
         "int main(void) {\n" +
         "    OseoContext context;\n" +
         "    OseoResult result;\n" +
+        `${functionReferences}${functionReferences === "" ? "" : "\n"}` +
         `    oseo_context_init(\n` +
         `        &context, "${sourceId}", ${sourceIdByteLength}u);\n` +
         (input.observeSpecialization === true
           ? "    context.observe_specialization = true;\n"
           : "") +
-        `${globalInitialization}${globalInitialization === "" ? "" : "\n"}` +
         `    result = oseo_frame_enter(\n` +
         `        &context, ${scriptRootCount}u);\n` +
         "    if (result.status == OSEO_STATUS_NORMAL) {\n" +

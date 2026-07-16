@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { assertMatchingObservations, withNativeFixture } from "../src/index.ts";
+import {
+  assertMatchingObservations,
+  classifyTest262,
+  summarizeTest262,
+  withNativeFixture,
+} from "../src/index.ts";
 import type { NativeFixtureOptions } from "../src/index.ts";
 
 type Host = NativeFixtureOptions["host"];
@@ -188,4 +193,126 @@ test("separates private runtime counters from fixture stderr", async () => {
       overflowMisses: 3,
     });
   });
+});
+
+test("classifies test262 results without inflating passes", () => {
+  const base = {
+    features: ["object-spread"],
+    includes: ["assert.js"],
+    path: "language/expressions/object/basic.js",
+    strictness: ["non-strict", "strict"],
+    suiteRevision: "test-revision",
+  } as const;
+  const unsupported = classifyTest262(
+    base,
+    { harnessFailed: false, passed: true },
+    new Set<string>(),
+  );
+  const harness = classifyTest262(
+    { ...base, features: [] },
+    { detail: "include missing", harnessFailed: true, passed: false },
+    new Set<string>(),
+  );
+  const expectedParse = classifyTest262(
+    { ...base, expectedFailurePhase: "parse", features: [] },
+    { failedPhase: "parse", harnessFailed: false, passed: false },
+    new Set<string>(),
+  );
+  assert.deepEqual(summarizeTest262([unsupported, harness, expectedParse]), {
+    expectedParseFailures: 1,
+    harnessFailures: 1,
+    passes: 0,
+    semanticFailures: 0,
+    unsupportedProfileFeatures: 1,
+  });
+});
+
+test("requires the declared phase for negative test262 cases", () => {
+  const result = classifyTest262(
+    {
+      expectedFailurePhase: "runtime",
+      features: [],
+      includes: [],
+      path: "language/statements/throw/runtime.js",
+      strictness: ["non-strict"],
+      suiteRevision: "test-revision",
+    },
+    { failedPhase: "parse", harnessFailed: false, passed: false },
+    new Set<string>(),
+  );
+  assert.equal(result.classification, "semantic-failure");
+});
+
+test("classifies early errors and resolution failures", () => {
+  const base = {
+    expectedErrorType: "SyntaxError",
+    features: [],
+    includes: [],
+    strictness: ["non-strict"],
+    suiteRevision: "test-revision",
+  } as const;
+  const earlyError = classifyTest262(
+    {
+      ...base,
+      expectedFailurePhase: "parse",
+      path: "language/expressions/let/dstr/dup-lexical.js",
+    },
+    {
+      errorType: "SyntaxError",
+      failedPhase: "parse",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  const resolution = classifyTest262(
+    {
+      ...base,
+      expectedFailurePhase: "resolution",
+      path: "language/module-code/instn-resolve.js",
+    },
+    {
+      errorType: "SyntaxError",
+      failedPhase: "resolution",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  assert.equal(earlyError.classification, "expected-parse-failure");
+  assert.equal(resolution.classification, "pass");
+});
+
+test("requires the declared error type for negative test262 cases", () => {
+  const testCase = {
+    expectedErrorType: "TypeError",
+    expectedFailurePhase: "runtime",
+    features: [],
+    includes: [],
+    path: "language/expressions/property/runtime.js",
+    strictness: ["non-strict"],
+    suiteRevision: "test-revision",
+  } as const;
+  const mismatch = classifyTest262(
+    testCase,
+    {
+      errorType: "RangeError",
+      failedPhase: "runtime",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  const match = classifyTest262(
+    testCase,
+    {
+      errorType: "TypeError",
+      failedPhase: "runtime",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  assert.equal(mismatch.classification, "semantic-failure");
+  assert.equal(match.classification, "pass");
 });

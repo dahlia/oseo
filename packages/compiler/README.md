@@ -8,13 +8,16 @@ contracts without becoming compiler-core dependencies.
 
 MIR is self-contained: constants, lexical binding reads and writes, MIR-owned
 parameters and hints, operators, call targets, control-flow blocks, and
-terminators do not retain HIR nodes. MIR identifies script-owned bindings that
-declared functions share without treating them as function-local slots.
-Binding reads retain runtime temporal-dead-zone checks, and generic addition is
-marked as a possible string-allocation safepoint.
+terminators do not retain HIR nodes. M3 bindings use shared mutable cells in
+traced environments, so escaped closures retain binding identity. MIR also owns
+dynamic calls, receiver and constructor operations, ordinary properties,
+arrays, and explicit completion state for `catch` and `finally`.
+Binding reads retain runtime temporal-dead-zone checks, and every collecting
+operation has an explicit safepoint.
 Non-strict duplicate parameters share one binding while retaining every
-argument position. Repeated top-level function declarations resolve to one
-function identity whose body comes from the last declaration.
+argument position. Repeated declarations resolve to one function binding whose
+body comes from the last declaration. Named function expressions retain a
+private self binding.
 
 `compileSource` and `buildMir` accept an explicit enabled or disabled
 specialization policy. Enabled mode selects the M2 checked small-integer path

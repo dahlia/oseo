@@ -104,7 +104,7 @@ test("separates the source path from its diagnostic identifier", async () => {
     },
     readTextFile(path) {
       readPath = path;
-      return Promise.resolve("console.log([]);");
+      return Promise.resolve("console.log(() => 1);");
     },
     remove() {
       return Promise.reject(new Error("unexpected cleanup"));
