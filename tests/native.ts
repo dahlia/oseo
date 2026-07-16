@@ -1061,11 +1061,24 @@ function scheduleNested() {
   setTimeout(task, 0, "nested");
   Promise.resolve("second").then(microtask);
 }
+const objectDelay = {
+  valueOf: function objectDelayValue() {
+    console.log("coerce object delay");
+    return 30;
+  },
+};
+function functionDelay() {}
+functionDelay.valueOf = function functionDelayValue() {
+  console.log("coerce function delay");
+  return 40;
+};
 const canceled = setTimeout(task, 0, "canceled");
 clearTimeout(canceled);
 setTimeout(task, 100, "late");
 setTimeout(task, 0, "first");
 setTimeout(scheduleNested, 0);
+setTimeout(task, objectDelay, "object delay");
+setTimeout(task, functionDelay, "function delay");
 console.log("scheduled");
 `,
   },

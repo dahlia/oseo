@@ -4339,8 +4339,64 @@ static OseoResult timer_delay_number(
     OseoContext *context,
     OseoValue value
 ) {
-    if (is_object(value)) return normal(oseo_number(NAN));
-    return to_number(context, value);
+    if (!is_object(value)) return to_number(context, value);
+    static const uint16_t value_of_units[] = {
+        'v', 'a', 'l', 'u', 'e', 'O', 'f'
+    };
+    static const uint16_t to_string_units[] = {
+        't', 'o', 'S', 't', 'r', 'i', 'n', 'g'
+    };
+    const uint16_t *names[] = {value_of_units, to_string_units};
+    const size_t lengths[] = {7u, 8u};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = oseo_string_from_units(
+            context,
+            names[index],
+            lengths[index]
+        );
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            );
+            frame.slots[2] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL ||
+            !is_function(frame.slots[2])) {
+            continue;
+        }
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !is_object(frame.slots[3])) {
+            result = to_number(context, frame.slots[3]);
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && index == 1u) {
+            result = language_failure(context);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_number(NAN));
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 OseoResult oseo_set_timeout(
