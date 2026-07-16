@@ -14,6 +14,11 @@ length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
 Function creation installs the standard configurable, non-enumerable `name` and
 `length` properties through the ordinary descriptor representation.
+The `m4-1` ABI adds traced promises, reactions, and jobs. Promise executors run
+synchronously through a generated-function dispatcher, while reactions and
+thenable assimilation enter a runtime-owned FIFO microtask queue. The context
+retains queued work as collector roots and records unhandled rejections only at
+an explicit microtask checkpoint.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary
@@ -34,11 +39,11 @@ Root slot arrays are allocated independently of the process stack. Allocation
 failure propagates as `OSEO2001`. The script and active declared functions also
 have a deterministic aggregate limit of 32,768 root slots. Exceeding this
 native-frame budget fails with `OSEO2001` before generated C is entered.
-The `m2-1` context ABI adds private inline small-integer recognition, unboxing,
+The context ABI includes private inline small-integer recognition, unboxing,
 checked addition, and boxing primitives. Checked addition validates the signed
 48-bit range before using C signed arithmetic. Test builds can separately
 report guard, generic-addition, allocation, and collection counters; ordinary
-program output cannot observe them. The context ABI also carries diagnostic
-source identifiers with explicit byte lengths, heap-backed root-frame
-ownership, and active frame-budget accounting. Embedded null bytes are
-preserved during native error output.
+program output cannot observe them. The context also carries diagnostic source
+identifiers with explicit byte lengths, heap-backed root-frame ownership, and
+active frame-budget accounting. Embedded null bytes are preserved during native
+error output.

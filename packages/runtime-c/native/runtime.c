@@ -19,6 +19,8 @@
 #define OSEO_SMI_MIN INT64_C(-140737488355328)
 #define OSEO_SMI_MAX INT64_C(140737488355327)
 #define OSEO_UNHANDLED_THROW_MESSAGE "Unhandled JavaScript throw."
+#define OSEO_PROMISE_RESOLVE_CODE_ID SIZE_MAX
+#define OSEO_PROMISE_REJECT_CODE_ID (SIZE_MAX - 1u)
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -27,6 +29,9 @@ typedef enum {
     OSEO_HEAP_ARRAY = 4,
     OSEO_HEAP_CELL = 5,
     OSEO_HEAP_FUNCTION = 6,
+    OSEO_HEAP_PROMISE = 7,
+    OSEO_HEAP_PROMISE_REACTION = 8,
+    OSEO_HEAP_JOB = 9,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -80,6 +85,41 @@ typedef struct {
     bool prototype_writable;
 } OseoFunction;
 
+typedef struct {
+    OseoHeapObject header;
+    OseoValue result;
+    OseoValue reaction_head;
+    OseoValue reaction_tail;
+    OseoValue unhandled_next;
+    OseoPromiseState state;
+    bool handled;
+    bool pending_report;
+    bool reported;
+} OseoPromise;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue on_fulfilled;
+    OseoValue on_rejected;
+    OseoValue capability;
+} OseoPromiseReaction;
+
+typedef enum {
+    OSEO_JOB_REACTION = 1,
+    OSEO_JOB_THENABLE = 2,
+} OseoJobKind;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue primary;
+    OseoValue secondary;
+    OseoValue argument;
+    OseoJobKind kind;
+    bool fulfilled;
+} OseoJob;
+
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
         (payload & OSEO_PAYLOAD_MASK);
@@ -115,6 +155,18 @@ static OseoCell *cell_object(OseoValue value) {
 
 static OseoFunction *function_object(OseoValue value) {
     return (OseoFunction *)heap_object(value);
+}
+
+static OseoPromise *promise_object(OseoValue value) {
+    return (OseoPromise *)heap_object(value);
+}
+
+static OseoPromiseReaction *reaction_object(OseoValue value) {
+    return (OseoPromiseReaction *)heap_object(value);
+}
+
+static OseoJob *job_object(OseoValue value) {
+    return (OseoJob *)heap_object(value);
 }
 
 static OseoResult normal(OseoValue value) {
@@ -191,6 +243,11 @@ static bool is_function(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
 }
 
+static bool is_promise(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_PROMISE;
+}
+
 static bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
@@ -255,6 +312,24 @@ static void trace_object(
             mark_value(function->environment, worklist);
             mark_value(function->prototype_object, worklist);
         }
+    } else if (object->kind == OSEO_HEAP_PROMISE) {
+        OseoPromise *promise = (OseoPromise *)object;
+        mark_value(promise->result, worklist);
+        mark_value(promise->reaction_head, worklist);
+        mark_value(promise->reaction_tail, worklist);
+        mark_value(promise->unhandled_next, worklist);
+    } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
+        OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
+        mark_value(reaction->next, worklist);
+        mark_value(reaction->on_fulfilled, worklist);
+        mark_value(reaction->on_rejected, worklist);
+        mark_value(reaction->capability, worklist);
+    } else if (object->kind == OSEO_HEAP_JOB) {
+        OseoJob *job = (OseoJob *)object;
+        mark_value(job->next, worklist);
+        mark_value(job->primary, worklist);
+        mark_value(job->secondary, worklist);
+        mark_value(job->argument, worklist);
     }
 }
 
@@ -278,6 +353,10 @@ void oseo_collect(OseoContext *context) {
             mark_value(frame->slots[index], &worklist);
         }
     }
+    mark_value(context->microtask_head, &worklist);
+    mark_value(context->microtask_tail, &worklist);
+    mark_value(context->pending_rejections, &worklist);
+    mark_value(context->pending_rejection_tail, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;
         worklist = object->trace_next;
@@ -304,6 +383,11 @@ void oseo_context_init(
 ) {
     context->roots = NULL;
     context->objects = NULL;
+    context->function_dispatcher = NULL;
+    context->microtask_head = oseo_undefined();
+    context->microtask_tail = oseo_undefined();
+    context->pending_rejections = oseo_undefined();
+    context->pending_rejection_tail = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -319,10 +403,19 @@ void oseo_context_init(
     context->allocations = 0u;
     context->allocation_attempts = 0u;
     context->collections = 0u;
+    context->rejection_handled_count = 0u;
+    context->unhandled_rejection_count = 0u;
     context->fail_allocation_at = 0u;
     context->observe_specialization = false;
     context->collect_every_safepoint =
         getenv("OSEO_GC_EVERY_SAFEPOINT") != NULL;
+}
+
+void oseo_context_set_function_dispatcher(
+    OseoContext *context,
+    OseoFunctionDispatcher dispatcher
+) {
+    context->function_dispatcher = dispatcher;
 }
 
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt) {
@@ -338,6 +431,10 @@ void oseo_context_clear_language_error(OseoContext *context) {
 
 void oseo_context_destroy(OseoContext *context) {
     context->roots = NULL;
+    context->microtask_head = oseo_undefined();
+    context->microtask_tail = oseo_undefined();
+    context->pending_rejections = oseo_undefined();
+    context->pending_rejection_tail = oseo_undefined();
     oseo_collect(context);
 }
 
@@ -2692,4 +2789,665 @@ OseoResult oseo_console_log(
         return failure(context, "OSEO3001", "Standard output failed.");
     }
     return normal(oseo_undefined());
+}
+
+static OseoResult promise_create(OseoContext *context) {
+    OseoPromise *promise = allocate_heap_bytes(context, sizeof(*promise));
+    if (promise == NULL) {
+        return failure(context, "OSEO2001", "Promise allocation failed.");
+    }
+    promise->result = oseo_undefined();
+    promise->reaction_head = oseo_undefined();
+    promise->reaction_tail = oseo_undefined();
+    promise->unhandled_next = oseo_undefined();
+    promise->state = OSEO_PROMISE_PENDING;
+    promise->handled = false;
+    promise->pending_report = false;
+    promise->reported = false;
+    return publish_heap(context, &promise->header, OSEO_HEAP_PROMISE);
+}
+
+static OseoResult reaction_create(
+    OseoContext *context,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected,
+    OseoValue capability
+) {
+    OseoPromiseReaction *reaction =
+        allocate_heap_bytes(context, sizeof(*reaction));
+    if (reaction == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Promise reaction allocation failed."
+        );
+    }
+    reaction->next = oseo_undefined();
+    reaction->on_fulfilled = on_fulfilled;
+    reaction->on_rejected = on_rejected;
+    reaction->capability = capability;
+    return publish_heap(
+        context,
+        &reaction->header,
+        OSEO_HEAP_PROMISE_REACTION
+    );
+}
+
+static OseoResult enqueue_job(
+    OseoContext *context,
+    OseoJobKind kind,
+    OseoValue primary,
+    OseoValue secondary,
+    OseoValue argument,
+    bool fulfilled
+) {
+    OseoJob *job = allocate_heap_bytes(context, sizeof(*job));
+    if (job == NULL) {
+        return failure(context, "OSEO2001", "Promise job allocation failed.");
+    }
+    job->next = oseo_undefined();
+    job->primary = primary;
+    job->secondary = secondary;
+    job->argument = argument;
+    job->kind = kind;
+    job->fulfilled = fulfilled;
+    OseoResult published = publish_heap(context, &job->header, OSEO_HEAP_JOB);
+    if (published.status != OSEO_STATUS_NORMAL) return published;
+    if (tag_of(context->microtask_tail) == OSEO_TAG_UNDEFINED) {
+        context->microtask_head = published.value;
+    } else {
+        job_object(context->microtask_tail)->next = published.value;
+    }
+    context->microtask_tail = published.value;
+    return normal(oseo_undefined());
+}
+
+static OseoResult enqueue_reactions(
+    OseoContext *context,
+    OseoValue promise_value
+) {
+    OseoPromise *promise = promise_object(promise_value);
+    OseoValue current = promise->reaction_head;
+    while (tag_of(current) != OSEO_TAG_UNDEFINED) {
+        OseoPromiseReaction *reaction = reaction_object(current);
+        OseoValue next = reaction->next;
+        OseoResult queued = enqueue_job(
+            context,
+            OSEO_JOB_REACTION,
+            current,
+            oseo_undefined(),
+            promise_object(promise_value)->result,
+            promise_object(promise_value)->state == OSEO_PROMISE_FULFILLED
+        );
+        if (queued.status != OSEO_STATUS_NORMAL) return queued;
+        current = next;
+    }
+    promise = promise_object(promise_value);
+    promise->reaction_head = oseo_undefined();
+    promise->reaction_tail = oseo_undefined();
+    return normal(oseo_undefined());
+}
+
+static OseoResult promise_fulfill(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue value
+) {
+    if (!is_promise(promise_value)) return language_failure(context);
+    OseoPromise *promise = promise_object(promise_value);
+    if (promise->state != OSEO_PROMISE_PENDING) {
+        return normal(oseo_undefined());
+    }
+    promise->state = OSEO_PROMISE_FULFILLED;
+    promise->result = value;
+    return enqueue_reactions(context, promise_value);
+}
+
+OseoResult oseo_promise_reject_into(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue reason
+) {
+    if (!is_promise(promise_value)) return language_failure(context);
+    OseoPromise *promise = promise_object(promise_value);
+    if (promise->state != OSEO_PROMISE_PENDING) {
+        return normal(oseo_undefined());
+    }
+    promise->state = OSEO_PROMISE_REJECTED;
+    promise->result = reason;
+    if (!promise->handled) {
+        promise->pending_report = true;
+        if (tag_of(context->pending_rejection_tail) == OSEO_TAG_UNDEFINED) {
+            context->pending_rejections = promise_value;
+        } else {
+            promise_object(context->pending_rejection_tail)->unhandled_next =
+                promise_value;
+        }
+        context->pending_rejection_tail = promise_value;
+    }
+    return enqueue_reactions(context, promise_value);
+}
+
+static OseoResult resolving_function_create(
+    OseoContext *context,
+    OseoValue promise,
+    size_t code_id
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise;
+    result = oseo_environment_create(context, 1u);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            0u,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            frame.slots[1],
+            NULL,
+            0u,
+            1u,
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult promise_adopt(
+    OseoContext *context,
+    OseoValue source,
+    OseoValue target
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = source;
+    frame.slots[1] = target;
+    result = reaction_create(
+        context,
+        oseo_undefined(),
+        oseo_undefined(),
+        frame.slots[1]
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPromise *promise = promise_object(frame.slots[0]);
+        if (promise->reported && !promise->handled) {
+            context->rejection_handled_count += 1u;
+        }
+        promise->handled = true;
+        promise->pending_report = false;
+        if (promise->state == OSEO_PROMISE_PENDING) {
+            if (tag_of(promise->reaction_tail) == OSEO_TAG_UNDEFINED) {
+                promise->reaction_head = frame.slots[2];
+            } else {
+                reaction_object(promise->reaction_tail)->next = frame.slots[2];
+            }
+            promise->reaction_tail = frame.slots[2];
+        } else {
+            result = enqueue_job(
+                context,
+                OSEO_JOB_REACTION,
+                frame.slots[2],
+                oseo_undefined(),
+                promise->result,
+                promise->state == OSEO_PROMISE_FULFILLED
+            );
+        }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_promise_resolve_into(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue value
+) {
+    if (!is_promise(promise_value)) return language_failure(context);
+    if (promise_object(promise_value)->state != OSEO_PROMISE_PENDING) {
+        return normal(oseo_undefined());
+    }
+    if (promise_value == value) {
+        OseoResult error = language_failure_message(
+            context,
+            "A promise cannot resolve to itself."
+        );
+        if (error.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+            return error;
+        }
+        oseo_context_clear_language_error(context);
+        return oseo_promise_reject_into(context, promise_value, error.value);
+    }
+    if (is_promise(value)) {
+        return promise_adopt(context, value, promise_value);
+    }
+    if (!is_object(value)) {
+        return promise_fulfill(context, promise_value, value);
+    }
+
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = value;
+    static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
+    result = oseo_string_from_units(
+        context,
+        then_units,
+        sizeof(then_units) / sizeof(*then_units)
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[1], frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+        oseo_context_clear_language_error(context);
+        result = oseo_promise_reject_into(
+            context,
+            frame.slots[0],
+            result.value
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL &&
+               is_function(frame.slots[2])) {
+        result = enqueue_job(
+            context,
+            OSEO_JOB_THENABLE,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[1],
+            true
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = promise_fulfill(context, frame.slots[0], frame.slots[1]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_promise_resolve(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_promise(value)) return normal(value);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    result = promise_create(context);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_promise_resolve_into(
+            context,
+            frame.slots[1],
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_promise_reject(
+    OseoContext *context,
+    OseoValue reason
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = reason;
+    result = promise_create(context);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_promise_reject_into(
+            context,
+            frame.slots[1],
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_call_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    size_t code_id = 0u;
+    OseoResult result = oseo_function_code_id(context, callee, &code_id);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_call_enter(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
+        code_id == OSEO_PROMISE_REJECT_CODE_ID) {
+        result = oseo_function_environment(context, callee);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, result.value, 0u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoValue argument = argument_count > 0u
+                ? arguments[0]
+                : oseo_undefined();
+            result = code_id == OSEO_PROMISE_RESOLVE_CODE_ID
+                ? oseo_promise_resolve_into(context, result.value, argument)
+                : oseo_promise_reject_into(context, result.value, argument);
+        }
+    } else if (context->function_dispatcher == NULL) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "No generated function dispatcher is installed."
+        );
+    } else {
+        result = context->function_dispatcher(
+            context,
+            callee,
+            receiver,
+            argument_count,
+            arguments,
+            new_target
+        );
+    }
+    oseo_call_leave(context);
+    return result;
+}
+
+OseoResult oseo_promise_construct(
+    OseoContext *context,
+    OseoValue executor
+) {
+    if (!is_function(executor)) return language_failure(context);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = executor;
+    result = promise_create(context);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = resolving_function_create(
+            context,
+            frame.slots[1],
+            OSEO_PROMISE_RESOLVE_CODE_ID
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = resolving_function_create(
+            context,
+            frame.slots[1],
+            OSEO_PROMISE_REJECT_CODE_ID
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[0],
+            oseo_undefined(),
+            2u,
+            &frame.slots[2],
+            oseo_undefined()
+        );
+        if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            oseo_context_clear_language_error(context);
+            result = oseo_promise_reject_into(
+                context,
+                frame.slots[1],
+                result.value
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_promise_then(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+) {
+    if (!is_promise(promise_value)) return language_failure(context);
+    if (tag_of(on_fulfilled) != OSEO_TAG_UNDEFINED &&
+        !is_function(on_fulfilled)) {
+        on_fulfilled = oseo_undefined();
+    }
+    if (tag_of(on_rejected) != OSEO_TAG_UNDEFINED &&
+        !is_function(on_rejected)) {
+        on_rejected = oseo_undefined();
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = on_fulfilled;
+    frame.slots[2] = on_rejected;
+    result = promise_create(context);
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = reaction_create(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3]
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPromise *promise = promise_object(frame.slots[0]);
+        if (promise->reported && !promise->handled) {
+            context->rejection_handled_count += 1u;
+        }
+        promise->handled = true;
+        promise->pending_report = false;
+        if (promise->state == OSEO_PROMISE_PENDING) {
+            if (tag_of(promise->reaction_tail) == OSEO_TAG_UNDEFINED) {
+                promise->reaction_head = frame.slots[4];
+            } else {
+                reaction_object(promise->reaction_tail)->next = frame.slots[4];
+            }
+            promise->reaction_tail = frame.slots[4];
+        } else {
+            result = enqueue_job(
+                context,
+                OSEO_JOB_REACTION,
+                frame.slots[4],
+                oseo_undefined(),
+                promise->result,
+                promise->state == OSEO_PROMISE_FULFILLED
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[3];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoPromiseState oseo_promise_state(OseoValue promise) {
+    return is_promise(promise)
+        ? promise_object(promise)->state
+        : OSEO_PROMISE_INVALID;
+}
+
+OseoResult oseo_promise_result(
+    OseoContext *context,
+    OseoValue promise
+) {
+    if (!is_promise(promise) ||
+        promise_object(promise)->state == OSEO_PROMISE_PENDING) {
+        return language_failure(context);
+    }
+    return normal(promise_object(promise)->result);
+}
+
+static OseoResult run_reaction_job(
+    OseoContext *context,
+    OseoValue job_value
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoJob *job = job_object(job_value);
+    OseoPromiseReaction *reaction = reaction_object(job->primary);
+    frame.slots[0] = job->fulfilled
+        ? reaction->on_fulfilled
+        : reaction->on_rejected;
+    frame.slots[1] = reaction->capability;
+    frame.slots[2] = job->argument;
+    bool fulfilled = job->fulfilled;
+    if (tag_of(frame.slots[0]) == OSEO_TAG_UNDEFINED) {
+        result = fulfilled
+            ? oseo_promise_resolve_into(
+                context,
+                frame.slots[1],
+                frame.slots[2]
+            )
+            : oseo_promise_reject_into(
+                context,
+                frame.slots[1],
+                frame.slots[2]
+            );
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = oseo_call_function(
+        context,
+        frame.slots[0],
+        oseo_undefined(),
+        1u,
+        &frame.slots[2],
+        oseo_undefined()
+    );
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+        oseo_context_clear_language_error(context);
+        result = oseo_promise_reject_into(
+            context,
+            frame.slots[1],
+            frame.slots[3]
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_promise_resolve_into(
+            context,
+            frame.slots[1],
+            frame.slots[3]
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult run_thenable_job(
+    OseoContext *context,
+    OseoValue job_value
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoJob *job = job_object(job_value);
+    frame.slots[0] = job->primary;
+    frame.slots[1] = job->secondary;
+    frame.slots[2] = job->argument;
+    result = resolving_function_create(
+        context,
+        frame.slots[0],
+        OSEO_PROMISE_RESOLVE_CODE_ID
+    );
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = resolving_function_create(
+            context,
+            frame.slots[0],
+            OSEO_PROMISE_REJECT_CODE_ID
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            2u,
+            &frame.slots[3],
+            oseo_undefined()
+        );
+        if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            oseo_context_clear_language_error(context);
+            result = oseo_promise_reject_into(
+                context,
+                frame.slots[0],
+                result.value
+            );
+        }
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_jobs_drain(OseoContext *context) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    while (tag_of(context->microtask_head) != OSEO_TAG_UNDEFINED) {
+        frame.slots[0] = context->microtask_head;
+        OseoValue next = job_object(frame.slots[0])->next;
+        context->microtask_head = next;
+        if (tag_of(next) == OSEO_TAG_UNDEFINED) {
+            context->microtask_tail = oseo_undefined();
+        }
+        result = job_object(frame.slots[0])->kind == OSEO_JOB_REACTION
+            ? run_reaction_job(context, frame.slots[0])
+            : run_thenable_job(context, frame.slots[0]);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        frame.slots[0] = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_rejection_checkpoint(OseoContext *context) {
+    OseoValue current = context->pending_rejections;
+    OseoValue first = oseo_undefined();
+    bool found = false;
+    context->pending_rejections = oseo_undefined();
+    context->pending_rejection_tail = oseo_undefined();
+    while (tag_of(current) != OSEO_TAG_UNDEFINED) {
+        OseoPromise *promise = promise_object(current);
+        OseoValue next = promise->unhandled_next;
+        promise->unhandled_next = oseo_undefined();
+        if (promise->pending_report && !promise->handled &&
+            promise->state == OSEO_PROMISE_REJECTED) {
+            promise->pending_report = false;
+            promise->reported = true;
+            context->unhandled_rejection_count += 1u;
+            if (!found) {
+                first = promise->result;
+                found = true;
+            }
+        }
+        current = next;
+    }
+    if (!found) {
+        return normal(oseo_undefined());
+    }
+    context->error_code = "OSEO2001";
+    context->error_message = "Unhandled promise rejection.";
+    context->has_diagnostic = false;
+    return (OseoResult){OSEO_STATUS_THROW, first};
 }

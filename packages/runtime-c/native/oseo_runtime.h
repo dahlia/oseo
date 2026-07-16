@@ -19,6 +19,23 @@ typedef struct {
 
 typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
+typedef struct OseoContext OseoContext;
+
+typedef OseoResult (*OseoFunctionDispatcher)(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+
+typedef enum {
+    OSEO_PROMISE_PENDING = 0,
+    OSEO_PROMISE_FULFILLED = 1,
+    OSEO_PROMISE_REJECTED = 2,
+    OSEO_PROMISE_INVALID = 3,
+} OseoPromiseState;
 
 typedef struct {
     bool configurable;
@@ -37,9 +54,14 @@ struct OseoRootFrame {
     size_t slot_count;
 };
 
-typedef struct {
+struct OseoContext {
     OseoRootFrame *roots;
     OseoHeapObject *objects;
+    OseoFunctionDispatcher function_dispatcher;
+    OseoValue microtask_head;
+    OseoValue microtask_tail;
+    OseoValue pending_rejections;
+    OseoValue pending_rejection_tail;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;
@@ -57,10 +79,12 @@ typedef struct {
     size_t allocations;
     size_t allocation_attempts;
     size_t collections;
+    size_t rejection_handled_count;
+    size_t unhandled_rejection_count;
     size_t fail_allocation_at;
     bool observe_specialization;
     bool collect_every_safepoint;
-} OseoContext;
+};
 
 /* Private inline primitives used by generated guarded native paths. */
 static inline bool oseo_value_is_smi(OseoValue value) {
@@ -117,6 +141,10 @@ void oseo_context_location(
 );
 void oseo_context_print_error(const OseoContext *context);
 void oseo_context_print_observations(const OseoContext *context);
+void oseo_context_set_function_dispatcher(
+    OseoContext *context,
+    OseoFunctionDispatcher dispatcher
+);
 
 OseoResult oseo_call_enter(OseoContext *context);
 void oseo_call_leave(OseoContext *context);
@@ -202,6 +230,14 @@ OseoResult oseo_function_code_id(
     size_t *code_id
 );
 OseoResult oseo_unknown_function(OseoContext *context, size_t code_id);
+OseoResult oseo_call_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_function_prototype(
     OseoContext *context,
     OseoValue function
@@ -348,5 +384,41 @@ OseoResult oseo_console_log(
     size_t argument_count,
     const OseoValue *arguments
 );
+
+OseoResult oseo_promise_construct(
+    OseoContext *context,
+    OseoValue executor
+);
+OseoResult oseo_promise_resolve(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_promise_reject(
+    OseoContext *context,
+    OseoValue reason
+);
+OseoResult oseo_promise_resolve_into(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue value
+);
+OseoResult oseo_promise_reject_into(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue reason
+);
+OseoResult oseo_promise_then(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+);
+OseoPromiseState oseo_promise_state(OseoValue promise);
+OseoResult oseo_promise_result(
+    OseoContext *context,
+    OseoValue promise
+);
+OseoResult oseo_jobs_drain(OseoContext *context);
+OseoResult oseo_rejection_checkpoint(OseoContext *context);
 
 #endif
