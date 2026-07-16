@@ -230,6 +230,12 @@ export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
       readonly initializer: SyntaxExpression;
+      readonly kind: "binding-init";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
       readonly kind: "const";
       readonly name: string;
     })
@@ -1111,6 +1117,13 @@ export type HirStatement =
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
+      readonly kind: "binding-init";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly hint: Hint | undefined;
+      readonly initializer: HirExpression;
       readonly kind: "const";
       readonly name: string;
     })
@@ -1803,9 +1816,16 @@ function resolveStatement(
   functionBody: boolean,
   loopDepth = 0,
 ): HirStatement | undefined {
-  if (statement.kind === "const" || statement.kind === "let") {
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
     const initializer = resolveExpression(statement.initializer, scopes, state);
-    const binding = scopes.at(-1)?.get(statement.name);
+    const binding =
+      statement.kind === "binding-init"
+        ? findBinding(scopes, statement.name)
+        : scopes.at(-1)?.get(statement.name);
     if (binding == null || initializer == null) return undefined;
     return {
       ...statement,
@@ -2152,7 +2172,11 @@ function appendHirStatement(
   indent: string,
 ): void {
   const location = ` @${rangeText(statement.range)}`;
-  if (statement.kind === "const" || statement.kind === "let") {
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
     lines.push(
       `${indent}${statement.kind} %b${statement.bindingId} ${statement.name}` +
         `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
@@ -3561,7 +3585,11 @@ function lowerStatements(
   builder: MirBuilder,
 ): boolean {
   for (const statement of statements) {
-    if (statement.kind === "const" || statement.kind === "let") {
+    if (
+      statement.kind === "binding-init" ||
+      statement.kind === "const" ||
+      statement.kind === "let"
+    ) {
       const value = lowerExpression(statement.initializer, builder);
       const id = builder.nextValue;
       builder.nextValue += 1;

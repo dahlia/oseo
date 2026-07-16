@@ -1045,6 +1045,129 @@ function awaitPoint(
   };
 }
 
+function asyncScopePlaceholder(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxFunction | SyntaxStatement | undefined {
+  if (value.type === "FunctionDeclaration") {
+    return functionDeclaration(context, value, true);
+  }
+  if (value.type !== "VariableDeclaration") return undefined;
+  if (value.kind !== "const" && value.kind !== "let") return undefined;
+  const declarations = nodes(value.declarations);
+  const declaration = declarations.length === 1 ? declarations[0] : undefined;
+  const identifier = declaration == null ? undefined : node(declaration.id);
+  const name = identifier == null ? undefined : identifierName(identifier);
+  if (declaration == null || identifier == null || name == null) {
+    return undefined;
+  }
+  const range = sourceRange(context.locations, value);
+  return {
+    hint: typeHint(context, identifier.typeAnnotation),
+    initializer: undefinedExpression(range),
+    kind: value.kind,
+    name,
+    range,
+  };
+}
+
+function asyncScopePlaceholders(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): readonly (SyntaxFunction | SyntaxStatement)[] | undefined {
+  const declarations: (SyntaxFunction | SyntaxStatement)[] = [];
+  for (const value of values) {
+    if (
+      value.type !== "FunctionDeclaration" &&
+      value.type !== "VariableDeclaration"
+    ) {
+      continue;
+    }
+    const declaration = asyncScopePlaceholder(context, value);
+    if (declaration == null) {
+      if (value.type === "FunctionDeclaration") return undefined;
+      continue;
+    }
+    declarations.push(declaration);
+  }
+  return declarations;
+}
+
+function resolveExecutorReturns(
+  statementValue: SyntaxStatement,
+  resolveName: string,
+): SyntaxStatement {
+  if (statementValue.kind === "return") {
+    return {
+      body: [
+        callName(
+          resolveName,
+          statementValue.expression ??
+            undefinedExpression(statementValue.range),
+          statementValue.range,
+        ),
+        {
+          expression: undefined,
+          kind: "return",
+          range: statementValue.range,
+        },
+      ],
+      kind: "block",
+      range: statementValue.range,
+    };
+  }
+  if (statementValue.kind === "block") {
+    return {
+      ...statementValue,
+      body: statementValue.body.map((child) =>
+        child.kind === "function"
+          ? child
+          : resolveExecutorReturns(child, resolveName),
+      ),
+    };
+  }
+  if (statementValue.kind === "if") {
+    return {
+      ...statementValue,
+      alternate:
+        statementValue.alternate == null
+          ? undefined
+          : resolveExecutorReturns(statementValue.alternate, resolveName),
+      consequent: resolveExecutorReturns(
+        statementValue.consequent,
+        resolveName,
+      ),
+    };
+  }
+  if (statementValue.kind === "while") {
+    return {
+      ...statementValue,
+      body: resolveExecutorReturns(statementValue.body, resolveName),
+    };
+  }
+  if (statementValue.kind === "try") {
+    return {
+      ...statementValue,
+      block: resolveExecutorReturns(statementValue.block, resolveName),
+      finalizer:
+        statementValue.finalizer == null
+          ? undefined
+          : resolveExecutorReturns(statementValue.finalizer, resolveName),
+      handler:
+        statementValue.handler == null
+          ? undefined
+          : {
+              ...statementValue.handler,
+              body: resolveExecutorReturns(
+                statementValue.handler.body,
+                resolveName,
+              ),
+            },
+    };
+  }
+  return statementValue;
+}
+
 function asyncStatementList(
   context: ConvertContext,
   values: readonly BabelNode[],
@@ -1082,7 +1205,7 @@ function asyncStatementList(
             {
               hint: point.declaration.hint,
               initializer: identifierExpression(valueName, range),
-              kind: point.declaration.kind,
+              kind: "binding-init",
               name: point.declaration.name,
               range,
             },
@@ -1103,8 +1226,14 @@ function asyncStatementList(
         range,
       );
       if (mode === "executor") {
+        const declarations = asyncScopePlaceholders(
+          context,
+          values.slice(index),
+        );
+        if (declarations == null) return undefined;
         body.push(callName(resolveName, chain, range));
         body.push({ expression: undefined, kind: "return", range });
+        body.push(...declarations);
       } else {
         body.push({ expression: chain, kind: "return", range });
       }
@@ -1119,27 +1248,27 @@ function asyncStatementList(
       );
       return undefined;
     }
+    if (mode === "continuation" && value.type === "FunctionDeclaration") {
+      continue;
+    }
     const converted =
       value.type === "FunctionDeclaration"
         ? functionDeclaration(context, value, true)
         : statement(context, value, true);
     if (converted == null) return undefined;
-    if (mode === "executor" && converted.kind === "return") {
-      body.push(
-        callName(
-          resolveName,
-          converted.expression ?? undefinedExpression(converted.range),
-          converted.range,
-        ),
-      );
-      body.push({
-        expression: undefined,
-        kind: "return",
-        range: converted.range,
-      });
-      return body;
+    if (converted.kind === "function") {
+      body.push(converted);
+      continue;
     }
-    body.push(converted);
+    if (mode === "continuation") {
+      body.push(
+        converted.kind === "const" || converted.kind === "let"
+          ? { ...converted, kind: "binding-init" }
+          : converted,
+      );
+    } else {
+      body.push(resolveExecutorReturns(converted, resolveName));
+    }
     if (converted.kind === "return" || converted.kind === "throw") return body;
   }
   const range =

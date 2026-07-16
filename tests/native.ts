@@ -903,6 +903,26 @@ function makeArrow() {
 async function failEarly() { throw "early"; }
 async function failLate() { await 0; throw "late"; }
 async function shadow(Promise) { return await Promise; }
+async function choose(value) {
+  if (value) return 17;
+  return 18;
+}
+async function hoistedAcrossAwait() {
+  const value = later();
+  await 0;
+  function later() { return 19; }
+  return value;
+}
+async function tdzAcrossAwait() {
+  try {
+    console.log(later);
+  } catch (error) {
+    console.log("async tdz");
+  }
+  await 0;
+  let later = 20;
+  return later;
+}
 function rejected(reason) { console.log("async rejected", reason); }
 function showThis(value) { console.log("async this", value); }
 const owner = { value: 41, read: readThis, make: makeArrow };
@@ -916,6 +936,11 @@ other.read().then(showThis);
 failEarly().catch(rejected);
 failLate().catch(rejected);
 shadow(5).then(function (value) { console.log("shadow", value); });
+choose(true).then(function (value) { console.log("choose", value); });
+hoistedAcrossAwait().then(function (value) {
+  console.log("hoisted", value);
+});
+tdzAcrossAwait().then(function (value) { console.log("tdz", value); });
 console.log(
   "async prototype",
   Object.getOwnPropertyDescriptor(expression, "prototype") === undefined,

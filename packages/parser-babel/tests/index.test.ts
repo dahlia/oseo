@@ -614,6 +614,32 @@ test("lowers async functions into owned continuations", () => {
   assert.ok(functionKinds.has("arrow"));
 });
 
+test("preserves async returns and bindings across await", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "async function choose(value) {",
+      "  if (value) return 1;",
+      "  return 2;",
+      "}",
+      "async function hoisted() {",
+      "  const value = later();",
+      "  await 0;",
+      "  function later() { return 3; }",
+      "  return value;",
+      "}",
+      "async function lexical() {",
+      "  console.log(later);",
+      "  await 0;",
+      "  let later = 4;",
+      "  return later;",
+      "}",
+    ].join("\n"),
+    sourceId: "async-scope.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+});
+
 test("lowers timer globals while preserving lexical shadowing", () => {
   const direct = compileSource(babelFrontend, {
     source: [
