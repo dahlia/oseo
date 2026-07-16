@@ -1687,7 +1687,8 @@ assert.equal(nativeModule.stderr, "");
 assert.equal(
   nativeModule.stdout,
   "cycle b ready default ready\ncycle c ready\ncycle a\n" +
-    "default first\ndefault second\nanswer increment 41\n" +
+    "default first\ndefault second\nidentity once\n" +
+    "answer increment 41\n" +
     "42\nimmutable\nnonextensible\ndefault\n",
 );
 

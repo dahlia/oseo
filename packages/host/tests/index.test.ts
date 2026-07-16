@@ -118,6 +118,21 @@ test("normalizes relative file module identities", () => {
   });
 });
 
+test("decodes unreserved bytes in file module identities", () => {
+  const plain = fileModuleResolver.resolve("file:///work/main.js", {
+    byteRange: { end: 10, start: 0 },
+    range: moduleRange,
+    value: "./dep.js",
+  });
+  const encoded = fileModuleResolver.resolve("file:///work/main.js", {
+    byteRange: { end: 12, start: 0 },
+    range: moduleRange,
+    value: "./%64ep.js",
+  });
+  assert.equal(encoded.canonicalId, plain.canonicalId);
+  assert.equal(encoded.canonicalId, "file:///work/dep.js");
+});
+
 test("rejects bare and non-file module resolution", () => {
   const bare = fileModuleResolver.resolve("file:///work/main.js", {
     byteRange: { end: 5, start: 0 },
@@ -162,4 +177,11 @@ test("canonicalizes filesystem characters as file URL data", async () => {
   );
   assert.match(canonicalId ?? "", /^file:\/\//u);
   assert.match(canonicalId ?? "", /space%20and%20%23/u);
+});
+
+test("canonicalizes encoded file URL identities", async () => {
+  const canonicalId = await createNodeHost().canonicalizeFile?.(
+    "file:///work/%64ep.js",
+  );
+  assert.equal(canonicalId, "file:///work/dep.js");
 });

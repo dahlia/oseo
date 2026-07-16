@@ -1,6 +1,8 @@
 import * as values from "./values.js";
 import defaultFunction from "./cycle-a.js";
 import "./default-order.js";
+import "./identity.js";
+import "./%69dentity.js";
 
 const keys = Object.keys(values);
 console.log(keys[0], keys[1], values.answer);
