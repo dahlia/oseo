@@ -24,7 +24,8 @@ linking, strongly connected components, and whole-graph lowering. Imported and
 exported names share one traced cell identity, and namespace creation retains
 sorted live-cell mappings. MIR call targets also name promise operations,
 timers, and top-level await checkpoints without importing a concrete runtime or
-event loop into compiler core.
+event loop into compiler core. Function creation retains ordinary, arrow,
+asynchronous, and asynchronous-arrow identity through HIR and MIR.
 
 `compileSource` and `buildMir` accept an explicit enabled or disabled
 specialization policy. Enabled mode selects the M2 checked small-integer path

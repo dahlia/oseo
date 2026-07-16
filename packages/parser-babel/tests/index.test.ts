@@ -604,6 +604,14 @@ test("lowers async functions into owned continuations", () => {
         operation.target.method === "resolve",
     ),
   );
+  const functionKinds = new Set(
+    operations.flatMap((operation) =>
+      operation.kind === "function-create" ? [operation.functionKind] : [],
+    ),
+  );
+  assert.ok(functionKinds.has("async"));
+  assert.ok(functionKinds.has("async-arrow"));
+  assert.ok(functionKinds.has("arrow"));
 });
 
 test("lowers timer globals while preserving lexical shadowing", () => {

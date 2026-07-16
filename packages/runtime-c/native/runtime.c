@@ -85,8 +85,10 @@ typedef struct {
 typedef struct {
     OseoOrdinaryObject ordinary;
     OseoValue environment;
+    OseoValue lexical_this;
     OseoValue prototype_object;
     size_t code_id;
+    OseoFunctionKind function_kind;
     bool prototype_writable;
 } OseoFunction;
 
@@ -288,6 +290,18 @@ static bool is_function(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
 }
 
+static bool function_is_constructible(OseoValue value) {
+    return is_function(value) &&
+        function_object(value)->function_kind == OSEO_FUNCTION_ORDINARY;
+}
+
+static bool function_has_lexical_this(OseoValue value) {
+    if (!is_function(value)) return false;
+    OseoFunctionKind kind = function_object(value)->function_kind;
+    return kind == OSEO_FUNCTION_ARROW ||
+        kind == OSEO_FUNCTION_ASYNC_ARROW;
+}
+
 static bool is_promise(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_PROMISE;
@@ -355,6 +369,7 @@ static void trace_object(
         if (object->kind == OSEO_HEAP_FUNCTION) {
             OseoFunction *function = (OseoFunction *)object;
             mark_value(function->environment, worklist);
+            mark_value(function->lexical_this, worklist);
             mark_value(function->prototype_object, worklist);
         }
     } else if (object->kind == OSEO_HEAP_PROMISE) {
@@ -942,15 +957,30 @@ OseoResult oseo_function_create(
     const uint16_t *name_units,
     size_t name_length,
     size_t parameter_count,
+    OseoFunctionKind function_kind,
+    OseoValue lexical_this,
     OseoValue inferred_name
 ) {
     if (!is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+    switch (function_kind) {
+        case OSEO_FUNCTION_ORDINARY:
+        case OSEO_FUNCTION_ARROW:
+        case OSEO_FUNCTION_ASYNC:
+        case OSEO_FUNCTION_ASYNC_ARROW:
+            break;
+        default:
+            return failure(context, "OSEO2001", "Invalid function kind.");
+    }
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[5] = inferred_name;
+    frame.slots[7] = function_kind == OSEO_FUNCTION_ARROW ||
+        function_kind == OSEO_FUNCTION_ASYNC_ARROW
+        ? lexical_this
+        : oseo_undefined();
     result = oseo_environment_clone(context, environment);
     frame.slots[0] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) {
@@ -983,8 +1013,10 @@ OseoResult oseo_function_create(
     function->ordinary.length_writable = false;
     function->ordinary.module_namespace = false;
     function->environment = frame.slots[0];
+    function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
     function->code_id = code_id;
+    function->function_kind = function_kind;
     function->prototype_writable = true;
     result = publish_heap(
         context,
@@ -1115,7 +1147,7 @@ OseoResult oseo_function_prototype(
     OseoContext *context,
     OseoValue function_value
 ) {
-    if (!is_function(function_value)) {
+    if (!function_is_constructible(function_value)) {
         return language_failure(context);
     }
     return normal(function_object(function_value)->prototype_object);
@@ -1517,7 +1549,8 @@ OseoResult oseo_object_has_own(
             NULL
         )));
     }
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+    if (function_is_constructible(object_value) &&
+        string_is_ascii(key, "prototype")) {
         return normal(oseo_boolean(true));
     }
     if (is_array(object_value) && string_is_ascii(key, "length")) {
@@ -1545,7 +1578,8 @@ OseoResult oseo_object_set(
     if (ordinary_object(object_value)->module_namespace) {
         return strict ? language_failure(context) : normal(value);
     }
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+    if (function_is_constructible(object_value) &&
+        string_is_ascii(key, "prototype")) {
         OseoFunction *function = function_object(object_value);
         if (!function->prototype_writable) {
             return strict ? language_failure(context) : normal(value);
@@ -1619,7 +1653,8 @@ OseoResult oseo_object_define(
     if (ordinary_object(object_value)->module_namespace) {
         return language_failure(context);
     }
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+    if (function_is_constructible(object_value) &&
+        string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
             return language_failure(context);
         }
@@ -1716,7 +1751,8 @@ OseoResult oseo_object_delete(
         }
         return normal(oseo_boolean(true));
     }
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+    if (function_is_constructible(object_value) &&
+        string_is_ascii(key, "prototype")) {
         return strict
             ? language_failure(context)
             : normal(oseo_boolean(false));
@@ -1940,7 +1976,8 @@ static bool own_descriptor(
     OseoValue *value,
     OseoPropertyAttributes *attributes
 ) {
-    if (is_function(object_value) && string_is_ascii(key, "prototype")) {
+    if (function_is_constructible(object_value) &&
+        string_is_ascii(key, "prototype")) {
         *value = function_object(object_value)->prototype_object;
         *attributes = (OseoPropertyAttributes){
             false,
@@ -2945,6 +2982,8 @@ static OseoResult promise_method_function(
             units,
             length,
             code_id == OSEO_PROMISE_THEN_CODE_ID ? 2u : 1u,
+            OSEO_FUNCTION_ORDINARY,
+            oseo_undefined(),
             oseo_undefined()
         );
     }
@@ -3164,6 +3203,8 @@ static OseoResult resolving_function_create(
             NULL,
             0u,
             1u,
+            OSEO_FUNCTION_ORDINARY,
+            oseo_undefined(),
             oseo_undefined()
         );
     }
@@ -3455,6 +3496,9 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 ) {
+    if (function_has_lexical_this(callee)) {
+        receiver = function_object(callee)->lexical_this;
+    }
     size_t code_id = 0u;
     OseoResult result = oseo_function_code_id(context, callee, &code_id);
     if (result.status != OSEO_STATUS_NORMAL) return result;

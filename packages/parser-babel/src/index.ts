@@ -912,6 +912,7 @@ function syntheticFunction(
   return {
     functionValue: {
       body,
+      functionKind: "arrow",
       kind: "function",
       name: undefined,
       parameters: parameters.map((name) => syntheticParameter(name, range)),
@@ -1288,6 +1289,14 @@ function functionDeclaration(
   return {
     ...location(context, value),
     body,
+    functionKind:
+      value.type === "ArrowFunctionExpression"
+        ? value.async === true
+          ? "async-arrow"
+          : "arrow"
+        : value.async === true
+          ? "async"
+          : "ordinary",
     kind: "function",
     name,
     parameters,

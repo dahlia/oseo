@@ -12,6 +12,13 @@ typedef enum {
     OSEO_STATUS_THROW = 1,
 } OseoStatus;
 
+typedef enum {
+    OSEO_FUNCTION_ORDINARY = 0,
+    OSEO_FUNCTION_ARROW = 1,
+    OSEO_FUNCTION_ASYNC = 2,
+    OSEO_FUNCTION_ASYNC_ARROW = 3,
+} OseoFunctionKind;
+
 typedef struct {
     OseoStatus status;
     OseoValue value;
@@ -225,6 +232,8 @@ OseoResult oseo_function_create(
     const uint16_t *name_units,
     size_t name_length,
     size_t parameter_count,
+    OseoFunctionKind function_kind,
+    OseoValue lexical_this,
     OseoValue inferred_name
 );
 OseoResult oseo_function_environment(

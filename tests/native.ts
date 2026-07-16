@@ -896,17 +896,40 @@ async function calculate(value) {
 }
 const expression = async function (value) { return await value; };
 const arrow = async (value) => await value;
+async function readThis() { await 0; return this.value; }
+function makeArrow() {
+  return async () => { await 0; return this.value; };
+}
 async function failEarly() { throw "early"; }
 async function failLate() { await 0; throw "late"; }
 async function shadow(Promise) { return await Promise; }
 function rejected(reason) { console.log("async rejected", reason); }
+function showThis(value) { console.log("async this", value); }
+const owner = { value: 41, read: readThis, make: makeArrow };
+const other = { value: 0, read: owner.make() };
 console.log("sync start");
 calculate(40).then(function (value) { console.log("result", value); });
 expression(3).then(function (value) { console.log("expression", value); });
 arrow(4).then(function (value) { console.log("arrow", value); });
+owner.read().then(showThis);
+other.read().then(showThis);
 failEarly().catch(rejected);
 failLate().catch(rejected);
 shadow(5).then(function (value) { console.log("shadow", value); });
+console.log(
+  "async prototype",
+  Object.getOwnPropertyDescriptor(expression, "prototype") === undefined,
+);
+try {
+  new expression(0);
+} catch (error) {
+  console.log("async not constructible");
+}
+try {
+  new arrow(0);
+} catch (error) {
+  console.log("async arrow not constructible");
+}
 console.log("sync end");
 `,
   },
@@ -1028,6 +1051,7 @@ for (const fixture of fixtures) {
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
+    fixture.name === "async-continuations" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition"
   ) {

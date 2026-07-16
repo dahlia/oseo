@@ -212,6 +212,9 @@ export interface SyntaxParameter extends LocatedSyntax {
   readonly name: string;
 }
 
+/** Runtime call and construction identity retained for every function. */
+export type FunctionKind = "arrow" | "async" | "async-arrow" | "ordinary";
+
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =
   | (LocatedSyntax & {
@@ -277,6 +280,7 @@ export interface SyntaxFunction extends LocatedSyntax {
   /** Internal declaration binding when it differs from the function name. */
   readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  readonly functionKind?: FunctionKind;
   readonly kind: "function";
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];
@@ -1019,6 +1023,7 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly functionId: number;
+      readonly functionKind: FunctionKind;
       readonly kind: "function";
       readonly name: string;
       readonly parameterCount: number;
@@ -1123,6 +1128,7 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionId: number;
+      readonly functionKind: FunctionKind;
       readonly functionName: string;
       readonly kind: "function-init";
       readonly name: string;
@@ -1169,6 +1175,7 @@ export interface HirParameter extends SyntaxParameter {
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
   readonly body: readonly HirStatement[];
+  readonly functionKind: FunctionKind;
   readonly id: number;
   readonly kind: "hir-function";
   readonly localBindingIds: readonly number[];
@@ -1639,6 +1646,7 @@ function resolveStatementList(
     result.push({
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
+      functionKind: functionValue.functionKind,
       functionName: functionValue.name,
       kind: "function-init",
       name: bindingName,
@@ -1700,6 +1708,7 @@ function resolveFunction(
   const resolved: HirFunction = {
     ...functionValue,
     body,
+    functionKind: functionValue.functionKind ?? "ordinary",
     id,
     kind: "hir-function",
     localBindingIds: [
@@ -1779,6 +1788,7 @@ function resolveFunctionExpression(
   );
   return {
     functionId: id,
+    functionKind: resolved.functionKind,
     kind: "function",
     name: functionValue.name ?? "",
     parameterCount: resolved.parameters.length,
@@ -2349,6 +2359,7 @@ export interface MirOperation {
   readonly completionSlot?: number;
   readonly completionTarget?: number;
   readonly functionId?: number;
+  readonly functionKind?: FunctionKind;
   readonly functionLength?: number;
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
@@ -2715,6 +2726,7 @@ function lowerExpression(
         `name=${JSON.stringify(expression.name)} ` +
         `length=${expression.parameterCount}`,
       functionId: expression.functionId,
+      functionKind: expression.functionKind,
       functionLength: expression.parameterCount,
       functionName: expression.name,
       id,
@@ -3566,6 +3578,7 @@ function lowerStatements(
       const value = lowerExpression(
         {
           functionId: statement.functionId,
+          functionKind: statement.functionKind,
           kind: "function",
           name: statement.functionName,
           parameterCount: statement.parameterCount,

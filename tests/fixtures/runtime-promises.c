@@ -86,6 +86,8 @@ static OseoValue function(
         NULL,
         0u,
         1u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
         oseo_undefined()
     );
     assert(result.status == OSEO_STATUS_NORMAL);

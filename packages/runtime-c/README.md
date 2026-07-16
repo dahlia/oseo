@@ -14,6 +14,9 @@ length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
 Function creation installs the standard configurable, non-enumerable `name` and
 `length` properties through the ordinary descriptor representation.
+Its ABI also retains callable kind and the traced lexical receiver of arrows.
+Arrow and asynchronous functions omit the implicit `prototype` property and
+reject construction.
 The `m4-2` ABI adds traced promises, reactions, jobs, and timer tasks. Promise
 executors run synchronously through a generated-function dispatcher. Reactions
 and thenable assimilation enter a runtime-owned FIFO microtask queue. The

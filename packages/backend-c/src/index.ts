@@ -567,6 +567,17 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
       `MIR function-create %${operation.id} has no function metadata.`,
     );
   }
+  if (operation.functionKind == null) {
+    throw new Error(
+      `MIR function-create %${operation.id} has no callable kind.`,
+    );
+  }
+  const functionKinds = {
+    arrow: "OSEO_FUNCTION_ARROW",
+    async: "OSEO_FUNCTION_ASYNC",
+    "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
+    ordinary: "OSEO_FUNCTION_ORDINARY",
+  } as const;
   const units = utf16Units(operation.functionName);
   let nameInput = "NULL";
   if (units.length > 0) {
@@ -584,7 +595,8 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     state,
     `result = oseo_function_create(context, ${operation.functionId}u, ` +
       `roots[${state.environmentSlot}], ${nameInput}, ${units.length}u, ` +
-      `${operation.functionLength}u, ${inferredName});`,
+      `${operation.functionLength}u, ` +
+      `${functionKinds[operation.functionKind]}, receiver, ${inferredName});`,
   );
   line(state, `roots[${operation.id}] = result.value;`);
 }
