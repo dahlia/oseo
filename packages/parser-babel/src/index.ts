@@ -409,7 +409,12 @@ function callTarget(
   }
   if (value.computed !== true && identifierName(object) === "Promise") {
     const method = identifierName(property);
-    if (method === "reject" || method === "resolve") {
+    if (
+      method === "all" ||
+      method === "race" ||
+      method === "reject" ||
+      method === "resolve"
+    ) {
       return {
         ...location(context, value),
         kind: "promise-intrinsic",

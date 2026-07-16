@@ -839,10 +839,23 @@ function settle(resolve) {
 }
 function show(value) { console.log("fulfilled", value); }
 function showRejected(reason) { console.log("rejected", reason); }
+function showAll(values) { console.log("all", values[0], values[1]); }
+function showEmpty(values) { console.log("empty", values.length); }
+function cleanup() { console.log("cleanup"); }
+function cleanupReject() { return Promise.reject(10); }
+function cleanupThrow() { throw 11; }
 console.log("sync start");
 new Promise(settle).then(show);
 Promise.resolve(2).then(show);
 Promise.reject(3).catch(showRejected);
+Promise.all([Promise.resolve(4), 5]).then(showAll);
+Promise.all([]).then(showEmpty);
+Promise.all([Promise.reject(14), 15]).catch(showRejected);
+Promise.race([Promise.resolve(6), Promise.resolve(7)]).then(show);
+Promise.resolve(8).finally(cleanup).then(show);
+Promise.reject(9).finally(cleanup).catch(showRejected);
+Promise.resolve(12).finally(cleanupReject).catch(showRejected);
+Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
 console.log("sync end");
 `,
   },

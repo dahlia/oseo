@@ -76,7 +76,7 @@ export type SyntaxCallTarget =
     })
   | (LocatedSyntax & {
       readonly kind: "promise-intrinsic";
-      readonly method: "reject" | "resolve";
+      readonly method: "all" | "race" | "reject" | "resolve";
     })
   | (LocatedSyntax & {
       readonly kind: "name";
@@ -953,7 +953,7 @@ export type HirCallTarget =
     }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method: "reject" | "resolve";
+      readonly method: "all" | "race" | "reject" | "resolve";
     }
   | {
       readonly callee: HirExpression;
@@ -2181,7 +2181,7 @@ export type MirCallTarget =
   | { readonly kind: "promise-constructor" }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method: "reject" | "resolve";
+      readonly method: "all" | "race" | "reject" | "resolve";
     }
   | { readonly functionId: number; readonly kind: "function" };
 

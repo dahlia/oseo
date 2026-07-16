@@ -377,6 +377,8 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     );
   } else if (target.kind === "promise-intrinsic") {
     const names = {
+      all: "oseo_promise_all",
+      race: "oseo_promise_race",
       reject: "oseo_promise_reject",
       resolve: "oseo_promise_resolve",
     } as const;

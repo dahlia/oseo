@@ -63,6 +63,7 @@ struct OseoContext {
     OseoValue pending_rejections;
     OseoValue pending_rejection_tail;
     OseoValue promise_catch_function;
+    OseoValue promise_finally_function;
     OseoValue promise_then_function;
     const char *source_id;
     size_t source_id_length;
@@ -399,6 +400,14 @@ OseoResult oseo_promise_reject(
     OseoContext *context,
     OseoValue reason
 );
+OseoResult oseo_promise_all(
+    OseoContext *context,
+    OseoValue iterable
+);
+OseoResult oseo_promise_race(
+    OseoContext *context,
+    OseoValue iterable
+);
 OseoResult oseo_promise_resolve_into(
     OseoContext *context,
     OseoValue promise,
@@ -414,6 +423,11 @@ OseoResult oseo_promise_then(
     OseoValue promise,
     OseoValue on_fulfilled,
     OseoValue on_rejected
+);
+OseoResult oseo_promise_finally(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_finally
 );
 OseoPromiseState oseo_promise_state(OseoValue promise);
 OseoResult oseo_promise_result(

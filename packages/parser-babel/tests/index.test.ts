@@ -469,6 +469,8 @@ test("lowers M4 promise construction and static methods", () => {
       "new Promise(settle).then(observe);",
       "Promise.resolve(2).then(observe);",
       "Promise.reject(3).catch(observe);",
+      "Promise.all([4, 5]).then(observe);",
+      "Promise.race([6, 7]).then(observe);",
     ].join("\n"),
     sourceId: "promises.js",
   });
@@ -490,6 +492,18 @@ test("lowers M4 promise construction and static methods", () => {
     targets.some(
       (target) =>
         target.kind === "promise-intrinsic" && target.method === "reject",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "all",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "race",
     ),
   );
 });
