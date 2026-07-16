@@ -4638,9 +4638,6 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
         awaited->pending_report = false;
         result = oseo_jobs_drain(context);
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_rejection_checkpoint(context);
-    }
     while (result.status == OSEO_STATUS_NORMAL &&
            promise_object(frame.slots[1])->state == OSEO_PROMISE_PENDING) {
         if (tag_of(context->timer_head) == OSEO_TAG_UNDEFINED) {

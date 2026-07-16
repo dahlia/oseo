@@ -1801,6 +1801,25 @@ assert.equal(
   "dependency ready\nentry ready\nlate timer\n",
 );
 
+const rejectionAfterAwait = [
+  root,
+  "tests/fixtures/async-modules/rejection-after-await.js",
+].join("/");
+const nativeRejectionAfterAwait = await runNativeCli(
+  {
+    args: [rejectionAfterAwait],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(
+  nativeRejectionAfterAwait.exitStatus,
+  0,
+  nativeRejectionAfterAwait.stderr,
+);
+assert.equal(nativeRejectionAfterAwait.stderr, "");
+assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
+
 const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
 const nativeBlockedModule = await runNativeCli(
   {
