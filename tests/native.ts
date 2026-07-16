@@ -1456,6 +1456,23 @@ assert.match(
   /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
 );
 
+const objectTimerDelay = await runNativeCli(
+  {
+    args: ["object-timer-delay.ts"],
+    source: `
+function task(value) { console.log(value); }
+setTimeout(task, {}, "object delay");
+setTimeout(task, function delay() {}, "function delay");
+`,
+    sourceId: "object-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(objectTimerDelay.exitStatus, 0);
+assert.equal(objectTimerDelay.stderr, "");
+assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
+
 const accessorDescriptor = await runNativeCli(
   {
     args: ["accessor-descriptor.ts"],

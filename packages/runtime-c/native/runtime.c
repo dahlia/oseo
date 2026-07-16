@@ -4335,6 +4335,14 @@ static uint64_t timer_delay(OseoValue value) {
     return (uint64_t)delay;
 }
 
+static OseoResult timer_delay_number(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_object(value)) return normal(oseo_number(NAN));
+    return to_number(context, value);
+}
+
 OseoResult oseo_set_timeout(
     OseoContext *context,
     size_t argument_count,
@@ -4346,7 +4354,7 @@ OseoResult oseo_set_timeout(
     OseoValue delay_value = argument_count > 1u
         ? arguments[1]
         : oseo_number(0.0);
-    OseoResult result = to_number(context, delay_value);
+    OseoResult result = timer_delay_number(context, delay_value);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     uint64_t delay = timer_delay(result.value);
     size_t callback_argument_count = argument_count > 2u
