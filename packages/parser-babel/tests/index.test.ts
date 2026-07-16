@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { compileSource, printHir, printMir } from "@oseo/compiler";
 
-import { babelFrontend } from "../src/index.ts";
+import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
 test("normalizes Babel parse failures", () => {
   const result = babelFrontend.parse({
@@ -424,4 +424,49 @@ test("converts large files without rescanning every source prefix", () => {
   const elapsed = performance.now() - started;
   assert.ok(result.parsed);
   assert.ok(elapsed < 1_500, `frontend conversion took ${elapsed} ms`);
+});
+
+test("converts M4 imports and exports to owned module syntax", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: `
+      import main, { value as renamed } from "./a.js";
+      import * as namespace from "./b.js";
+      import "./side.js";
+      export const local = 1;
+      export { local as shown };
+      export { other as remote } from "./c.js";
+      export * from "./star.js";
+      export default local;
+    `,
+    sourceId: "file:///app/main.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(
+    result.module?.imports.map((entry) => ({
+      imported: entry.importedName,
+      local: entry.localName,
+      specifier: entry.specifier.value,
+    })),
+    [
+      { imported: "default", local: "main", specifier: "./a.js" },
+      { imported: "value", local: "renamed", specifier: "./a.js" },
+      { imported: "*", local: "namespace", specifier: "./b.js" },
+      { imported: undefined, local: undefined, specifier: "./side.js" },
+    ],
+  );
+  assert.deepEqual(
+    result.module?.exports.map((entry) => entry.kind),
+    ["local", "local", "indirect", "star", "default"],
+  );
+  assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
+});
+
+test("rejects type-only imports instead of creating runtime bindings", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: 'import type { Model } from "./types.ts";',
+    sourceId: "file:///app/main.ts",
+  });
+  assert.equal(result.parsed, false);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Type-only imports/u);
 });

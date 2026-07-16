@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildHir,
   buildMir,
+  buildModuleGraph,
   describeTarget,
   printHir,
   printMir,
@@ -14,6 +15,7 @@ import type {
   DiagnosticCode,
   Hint,
   SourceRange,
+  SyntaxModule,
   SyntaxProgram,
 } from "../src/index.ts";
 
@@ -655,4 +657,186 @@ test("generated hint mutations change only specialization selection", () => {
     const disabled = buildMir(hir, { specialization: "disabled" });
     assert.equal(disabled.functions[0]?.specialization, undefined);
   }
+});
+
+const moduleRange: SourceRange = {
+  end: { column: 1, line: 1 },
+  start: { column: 1, line: 1 },
+};
+
+function testModule(sourceId: string, source: string): SyntaxModule {
+  return {
+    body: [],
+    exports: [],
+    imports:
+      source === ""
+        ? []
+        : source.split(",").map((value) => ({
+            byteRange: { end: value.length, start: 0 },
+            importedName: undefined,
+            localName: undefined,
+            range: moduleRange,
+            specifier: {
+              byteRange: { end: value.length, start: 0 },
+              range: moduleRange,
+              value,
+            },
+          })),
+    kind: "module",
+    range: moduleRange,
+    sourceId,
+  };
+}
+
+test("deduplicates module instances across cycles and aliases", async () => {
+  const sources = new Map([
+    ["file:///app/a.js", "./main.js"],
+    ["file:///app/main.js", "./a.js,././a.js"],
+  ]);
+  const result = await buildModuleGraph(
+    {
+      parseModule(input) {
+        return {
+          diagnostics: [],
+          module: testModule(input.sourceId, input.source),
+          parsed: true,
+          sourceId: input.sourceId,
+        };
+      },
+    },
+    {
+      load(canonicalId) {
+        const source = sources.get(canonicalId);
+        return Promise.resolve(
+          source == null
+            ? { diagnostics: [diagnostic] }
+            : {
+                diagnostics: [],
+                source: {
+                  source,
+                  sourceHash: `hash:${source}`,
+                  sourceId: canonicalId,
+                },
+              },
+        );
+      },
+    },
+    {
+      resolve(importerId, specifier) {
+        return {
+          canonicalId: new URL(specifier.value, importerId).href,
+          diagnostics: [],
+        };
+      },
+    },
+    "file:///app/main.js",
+  );
+  assert.deepEqual(
+    result.graph?.modules.map((module) => ({
+      dependencies: module.dependencies.map((item) => item.canonicalId),
+      id: module.canonicalId,
+      sourceHash: module.sourceHash,
+    })),
+    [
+      {
+        dependencies: ["file:///app/a.js"],
+        id: "file:///app/main.js",
+        sourceHash: "hash:./a.js,././a.js",
+      },
+      {
+        dependencies: ["file:///app/main.js"],
+        id: "file:///app/a.js",
+        sourceHash: "hash:./main.js",
+      },
+    ],
+  );
+});
+
+test("keeps dependency order and canonical parser identity", async () => {
+  const seenSourceIds: string[] = [];
+  const specifier = (value: string, start: number) => ({
+    byteRange: { end: start + value.length, start },
+    range: moduleRange,
+    value,
+  });
+  const result = await buildModuleGraph(
+    {
+      parseModule(input) {
+        seenSourceIds.push(input.sourceId);
+        const syntax = testModule(input.sourceId, "");
+        return {
+          diagnostics: [],
+          module:
+            input.source === "entry"
+              ? {
+                  ...syntax,
+                  exports: [
+                    {
+                      exportedName: "value",
+                      importedName: "value",
+                      kind: "indirect",
+                      range: moduleRange,
+                      specifier: specifier("./first.js", 5),
+                    },
+                  ],
+                  imports: [
+                    {
+                      byteRange: { end: 31, start: 20 },
+                      importedName: undefined,
+                      localName: undefined,
+                      range: moduleRange,
+                      specifier: specifier("./second.js", 20),
+                    },
+                  ],
+                }
+              : syntax,
+          parsed: true,
+          sourceId: input.sourceId,
+        };
+      },
+    },
+    {
+      load(canonicalId) {
+        return Promise.resolve({
+          diagnostics: [],
+          source: {
+            source: canonicalId.endsWith("entry.js") ? "entry" : "leaf",
+            sourceHash: canonicalId,
+            sourceId: "loader-alias",
+          },
+        });
+      },
+    },
+    {
+      resolve(importerId, sourceSpecifier) {
+        return {
+          canonicalId: new URL(sourceSpecifier.value, importerId).href,
+          diagnostics: [],
+        };
+      },
+    },
+    "file:///app/entry.js",
+  );
+  assert.deepEqual(
+    result.graph?.modules[0]?.dependencies.map((item) => item.canonicalId),
+    ["file:///app/first.js", "file:///app/second.js"],
+  );
+  assert.deepEqual(seenSourceIds, [
+    "file:///app/entry.js",
+    "file:///app/first.js",
+    "file:///app/second.js",
+  ]);
+});
+
+test("keeps module loader failures as owned graph diagnostics", async () => {
+  const result = await buildModuleGraph(
+    { parseModule: () => ({ diagnostics: [], parsed: false, sourceId: "x" }) },
+    {
+      load: () => Promise.resolve({ diagnostics: [diagnostic] }),
+    },
+    { resolve: () => ({ diagnostics: [] }) },
+    "file:///missing.js",
+  );
+  assert.equal(result.graph, undefined);
+  assert.deepEqual(result.diagnostics, [diagnostic]);
 });

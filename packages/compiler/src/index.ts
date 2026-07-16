@@ -283,6 +283,199 @@ export interface SourceFrontend {
   parse(input: SourceInput): FrontendResult;
 }
 
+/** One source-located module specifier retained outside a bootstrap AST. */
+export interface SyntaxModuleSpecifier extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly value: string;
+}
+
+/** One imported binding or side-effect-only dependency. */
+export interface SyntaxImportEntry extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly importedName: "*" | "default" | string | undefined;
+  readonly localName: string | undefined;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** One exported name before graph linking. */
+export type SyntaxExportEntry =
+  | (LocatedSyntax & {
+      readonly exportedName: string;
+      readonly kind: "local";
+      readonly localName: string;
+    })
+  | (LocatedSyntax & {
+      readonly exportedName: string;
+      readonly importedName: string;
+      readonly kind: "indirect";
+      readonly specifier: SyntaxModuleSpecifier;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "star";
+      readonly specifier: SyntaxModuleSpecifier;
+    })
+  | (LocatedSyntax & {
+      readonly declaration: SyntaxExpression | SyntaxFunction;
+      readonly exportedName: "default";
+      readonly kind: "default";
+    });
+
+/** Parser-independent syntax for one M4 ECMAScript module. */
+export interface SyntaxModule extends LocatedSyntax {
+  readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  readonly exports: readonly SyntaxExportEntry[];
+  readonly imports: readonly SyntaxImportEntry[];
+  readonly kind: "module";
+  readonly sourceId: string;
+}
+
+/** Production frontend output for owned module syntax. */
+export interface ModuleFrontendResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly module?: SyntaxModule;
+  readonly parsed: boolean;
+  readonly sourceId: string;
+}
+
+/** Replaceable module frontend boundary owned by compiler core. */
+export interface ModuleSourceFrontend {
+  parseModule(input: SourceInput): ModuleFrontendResult;
+}
+
+/** Source and stable content identity supplied by a compiler host. */
+export interface LoadedModuleSource extends SourceInput {
+  readonly sourceHash: string;
+}
+
+/** Owned result of loading one canonical module identifier. */
+export interface ModuleLoadResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly source?: LoadedModuleSource;
+}
+
+/** Host-neutral source loader used during graph discovery. */
+export interface ModuleLoader {
+  load(canonicalId: string): Promise<ModuleLoadResult>;
+}
+
+/** Owned result of resolving one source specifier. */
+export interface ModuleResolutionResult {
+  readonly canonicalId?: string;
+  readonly diagnostics: readonly Diagnostic[];
+}
+
+/** Host-neutral module resolution policy. */
+export interface ModuleResolver {
+  resolve(
+    importerId: string,
+    specifier: SyntaxModuleSpecifier,
+  ): ModuleResolutionResult;
+}
+
+/** One resolved dependency edge in source order. */
+export interface ModuleDependency {
+  readonly canonicalId: string;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** One uniquely identified node in a closed module graph. */
+export interface ModuleGraphNode {
+  readonly canonicalId: string;
+  readonly dependencies: readonly ModuleDependency[];
+  readonly sourceHash: string;
+  readonly syntax: SyntaxModule;
+}
+
+/** Deterministic closed graph rooted at one canonical entry. */
+export interface ModuleGraph {
+  readonly entryId: string;
+  readonly kind: "module-graph";
+  readonly modules: readonly ModuleGraphNode[];
+}
+
+/** Result of host-neutral module graph discovery. */
+export interface ModuleGraphResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly graph?: ModuleGraph;
+}
+
+function moduleSpecifiers(
+  module: SyntaxModule,
+): readonly SyntaxModuleSpecifier[] {
+  const specifiers: SyntaxModuleSpecifier[] = [];
+  for (const entry of module.imports) specifiers.push(entry.specifier);
+  for (const entry of module.exports) {
+    if (entry.kind === "indirect" || entry.kind === "star") {
+      specifiers.push(entry.specifier);
+    }
+  }
+  return specifiers.toSorted(
+    (left, right) => left.byteRange.start - right.byteRange.start,
+  );
+}
+
+/**
+ * Discover and parse one closed module graph without evaluating its modules.
+ */
+export async function buildModuleGraph(
+  frontend: ModuleSourceFrontend,
+  loader: ModuleLoader,
+  resolver: ModuleResolver,
+  entryId: string,
+): Promise<ModuleGraphResult> {
+  const diagnostics: Diagnostic[] = [];
+  const modules: ModuleGraphNode[] = [];
+  const discovered = new Set<string>();
+
+  const visit = async (canonicalId: string): Promise<void> => {
+    if (discovered.has(canonicalId)) return;
+    discovered.add(canonicalId);
+    const loaded = await loader.load(canonicalId);
+    diagnostics.push(...loaded.diagnostics);
+    if (loaded.source == null || loaded.diagnostics.length > 0) return;
+    const parsed = frontend.parseModule({
+      source: loaded.source.source,
+      sourceId: canonicalId,
+    });
+    diagnostics.push(...parsed.diagnostics);
+    if (parsed.module == null || parsed.diagnostics.length > 0) return;
+    const dependencies: ModuleDependency[] = [];
+    const dependencyIds = new Set<string>();
+    for (const specifier of moduleSpecifiers(parsed.module)) {
+      const resolved = resolver.resolve(canonicalId, specifier);
+      diagnostics.push(...resolved.diagnostics);
+      if (resolved.canonicalId == null || resolved.diagnostics.length > 0) {
+        continue;
+      }
+      if (!dependencyIds.has(resolved.canonicalId)) {
+        dependencyIds.add(resolved.canonicalId);
+        dependencies.push({
+          canonicalId: resolved.canonicalId,
+          specifier,
+        });
+      }
+    }
+    modules.push({
+      canonicalId,
+      dependencies,
+      sourceHash: loaded.source.sourceHash,
+      syntax: parsed.module,
+    });
+    for (const dependency of dependencies) {
+      // eslint-disable-next-line no-await-in-loop -- Preserve source order.
+      await visit(dependency.canonicalId);
+    }
+  };
+
+  await visit(entryId);
+  return diagnostics.length > 0
+    ? { diagnostics }
+    : {
+        diagnostics,
+        graph: { entryId, kind: "module-graph", modules },
+      };
+}
+
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {

@@ -5,6 +5,8 @@ import type {
   Diagnostic,
   Hint,
   HintName,
+  ModuleFrontendResult,
+  ModuleSourceFrontend,
   Position,
   SourceFrontend,
   SourceInput,
@@ -12,8 +14,12 @@ import type {
   SyntaxCallTarget,
   SyntaxExpression,
   SyntaxFunction,
+  SyntaxImportEntry,
+  SyntaxModule,
+  SyntaxModuleSpecifier,
   SyntaxParameter,
   SyntaxProgram,
+  SyntaxExportEntry,
   SyntaxStatement,
 } from "@oseo/compiler";
 
@@ -335,6 +341,26 @@ function identifierName(value: BabelNode): string | undefined {
   return value.type === "Identifier" && typeof value.name === "string"
     ? value.name
     : undefined;
+}
+
+function moduleName(value: BabelNode): string | undefined {
+  if (value.type === "StringLiteral" && typeof value.value === "string") {
+    return value.value;
+  }
+  return identifierName(value);
+}
+
+function moduleSpecifier(
+  context: ConvertContext,
+  value: BabelNode | undefined,
+): SyntaxModuleSpecifier | undefined {
+  if (value?.type !== "StringLiteral" || typeof value.value !== "string") {
+    if (value != null) {
+      unsupported(context, value, "A module specifier must be a string.");
+    }
+    return undefined;
+  }
+  return { ...location(context, value), value: value.value };
 }
 
 function callTarget(
@@ -952,6 +978,261 @@ function program(
   };
 }
 
+function exportForDeclaration(
+  declaration: SyntaxFunction | SyntaxStatement,
+): SyntaxExportEntry | undefined {
+  if (
+    declaration.kind !== "const" &&
+    declaration.kind !== "let" &&
+    declaration.kind !== "function"
+  ) {
+    return undefined;
+  }
+  if (declaration.name == null) return undefined;
+  return {
+    exportedName: declaration.name,
+    kind: "local",
+    localName: declaration.name,
+    range: declaration.range,
+  };
+}
+
+function moduleProgram(
+  context: ConvertContext,
+  file: BabelNode,
+): SyntaxModule | undefined {
+  const programNode = node(file.program) ?? file;
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  const exports: SyntaxExportEntry[] = [];
+  const imports: SyntaxImportEntry[] = [];
+  context.strictStack.push(true);
+  for (const item of nodes(programNode.body)) {
+    if (item.type === "ImportDeclaration") {
+      if (item.importKind === "type") {
+        unsupported(context, item, "Type-only imports are outside M4.");
+        break;
+      }
+      const specifier = moduleSpecifier(context, node(item.source));
+      if (specifier == null) break;
+      const rawSpecifiers = nodes(item.specifiers);
+      if (rawSpecifiers.length === 0) {
+        imports.push({
+          ...location(context, item),
+          importedName: undefined,
+          localName: undefined,
+          specifier,
+        });
+        continue;
+      }
+      for (const rawSpecifier of rawSpecifiers) {
+        if (rawSpecifier.importKind === "type") {
+          unsupported(
+            context,
+            rawSpecifier,
+            "Type-only imports are outside M4.",
+          );
+          break;
+        }
+        const local = node(rawSpecifier.local);
+        const localName = local == null ? undefined : identifierName(local);
+        let importedName: string | undefined;
+        if (rawSpecifier.type === "ImportDefaultSpecifier") {
+          importedName = "default";
+        } else if (rawSpecifier.type === "ImportNamespaceSpecifier") {
+          importedName = "*";
+        } else if (rawSpecifier.type === "ImportSpecifier") {
+          const imported = node(rawSpecifier.imported);
+          importedName = imported == null ? undefined : moduleName(imported);
+        }
+        if (localName == null || importedName == null) {
+          unsupported(context, rawSpecifier, "This import is unsupported.");
+          break;
+        }
+        imports.push({
+          ...location(context, rawSpecifier),
+          importedName,
+          localName,
+          specifier,
+        });
+      }
+      if (context.diagnostics.length > 0) break;
+      continue;
+    }
+    if (item.type === "ExportAllDeclaration") {
+      const specifier = moduleSpecifier(context, node(item.source));
+      if (specifier == null) break;
+      if (item.exported != null) {
+        unsupported(context, item, "Namespace re-exports are outside M4.");
+        break;
+      }
+      exports.push({ ...location(context, item), kind: "star", specifier });
+      continue;
+    }
+    if (item.type === "ExportNamedDeclaration") {
+      if (item.exportKind === "type") {
+        unsupported(context, item, "Type-only exports are outside M4.");
+        break;
+      }
+      const sourceNode = node(item.source);
+      const specifier =
+        sourceNode == null ? undefined : moduleSpecifier(context, sourceNode);
+      if (sourceNode != null && specifier == null) break;
+      const declarationNode = node(item.declaration);
+      if (declarationNode != null) {
+        const converted =
+          declarationNode.type === "FunctionDeclaration"
+            ? functionDeclaration(context, declarationNode)
+            : statement(context, declarationNode, false);
+        if (converted == null) break;
+        const exportEntry = exportForDeclaration(converted);
+        if (exportEntry == null) {
+          unsupported(context, declarationNode, "This export is unsupported.");
+          break;
+        }
+        body.push(converted);
+        exports.push(exportEntry);
+      }
+      for (const rawSpecifier of nodes(item.specifiers)) {
+        if (rawSpecifier.exportKind === "type") {
+          unsupported(
+            context,
+            rawSpecifier,
+            "Type-only exports are outside M4.",
+          );
+          break;
+        }
+        if (rawSpecifier.type !== "ExportSpecifier") {
+          unsupported(context, rawSpecifier, "This export is unsupported.");
+          break;
+        }
+        const local = node(rawSpecifier.local);
+        const exported = node(rawSpecifier.exported);
+        const localName = local == null ? undefined : moduleName(local);
+        const exportedName =
+          exported == null ? undefined : moduleName(exported);
+        if (localName == null || exportedName == null) {
+          unsupported(context, rawSpecifier, "This export is unsupported.");
+          break;
+        }
+        exports.push(
+          specifier == null
+            ? {
+                ...location(context, rawSpecifier),
+                exportedName,
+                kind: "local",
+                localName,
+              }
+            : {
+                ...location(context, rawSpecifier),
+                exportedName,
+                importedName: localName,
+                kind: "indirect",
+                specifier,
+              },
+        );
+      }
+      if (context.diagnostics.length > 0) break;
+      continue;
+    }
+    if (item.type === "ExportDefaultDeclaration") {
+      const declarationNode = node(item.declaration);
+      if (declarationNode == null) {
+        unsupported(context, item);
+        break;
+      }
+      if (declarationNode.type === "FunctionDeclaration") {
+        const declaration = functionDeclaration(
+          context,
+          declarationNode,
+          false,
+        );
+        if (declaration == null) break;
+        if (declaration.name == null) {
+          exports.push({
+            declaration,
+            exportedName: "default",
+            kind: "default",
+            range: declaration.range,
+          });
+          continue;
+        }
+        body.push(declaration);
+        exports.push({
+          exportedName: "default",
+          kind: "local",
+          localName: declaration.name,
+          range: declaration.range,
+        });
+        continue;
+      }
+      const declaration = expression(context, declarationNode);
+      if (declaration == null) break;
+      exports.push({
+        declaration,
+        exportedName: "default",
+        kind: "default",
+        range: declaration.range,
+      });
+      continue;
+    }
+    const converted =
+      item.type === "FunctionDeclaration"
+        ? functionDeclaration(context, item)
+        : statement(context, item, false);
+    if (converted == null) break;
+    body.push(converted);
+  }
+  context.strictStack.pop();
+  if (context.diagnostics.length > 0) return undefined;
+  return {
+    ...location(context, programNode),
+    body,
+    exports,
+    imports,
+    kind: "module",
+    sourceId: context.input.sourceId,
+  };
+}
+
+function convertModule(
+  input: SourceInput,
+  file: BabelNode,
+): ModuleFrontendResult {
+  const locations = createSourceIndex(input.source);
+  const parserErrors = Array.isArray(file.errors)
+    ? (file.errors as readonly ParserError[])
+    : [];
+  if (parserErrors.length > 0) {
+    return {
+      diagnostics: parserErrors.map((error) =>
+        diagnosticAt(input, locations, errorOffset(error)),
+      ),
+      parsed: false,
+      sourceId: input.sourceId,
+    };
+  }
+  const context: ConvertContext = {
+    diagnostics: [],
+    functionStack: [],
+    input,
+    locations,
+    strictStack: [],
+  };
+  const converted = moduleProgram(context, file);
+  return converted == null || context.diagnostics.length > 0
+    ? {
+        diagnostics: context.diagnostics,
+        parsed: false,
+        sourceId: input.sourceId,
+      }
+    : {
+        diagnostics: [],
+        module: converted,
+        parsed: true,
+        sourceId: input.sourceId,
+      };
+}
+
 /** Babel implementation of the owned Oseo source-frontend boundary. */
 export const babelFrontend: SourceFrontend = {
   parse(input: SourceInput) {
@@ -999,6 +1280,31 @@ export const babelFrontend: SourceFrontend = {
         program: converted,
         sourceId: input.sourceId,
       };
+    } catch (error) {
+      const value = error as ParserError;
+      return {
+        diagnostics: [diagnosticAt(input, locations, errorOffset(value))],
+        parsed: false,
+        sourceId: input.sourceId,
+      };
+    }
+  },
+};
+
+/** Babel implementation of the owned Oseo module-frontend boundary. */
+export const babelModuleFrontend: ModuleSourceFrontend = {
+  parseModule(input: SourceInput) {
+    const locations = createSourceIndex(input.source);
+    try {
+      const file = parseBabel(input.source, {
+        attachComment: true,
+        createParenthesizedExpressions: true,
+        errorRecovery: true,
+        plugins: ["typescript"],
+        sourceType: "module",
+        tokens: true,
+      }) as unknown as BabelNode;
+      return convertModule(input, file);
     } catch (error) {
       const value = error as ParserError;
       return {
