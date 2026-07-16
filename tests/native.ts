@@ -1392,6 +1392,29 @@ assert.match(
 );
 assert.doesNotMatch(caughtLanguageError.stderr, /immutable binding/u);
 
+const thrownTimer = await runNativeCli(
+  {
+    args: ["thrown-timer-runtime.ts"],
+    source: `
+function observe(value) { console.log(value); }
+function task() {
+  Promise.resolve("microtask after throw").then(observe);
+  throw "timer failure";
+}
+setTimeout(task, 0);
+`,
+    sourceId: "thrown-timer-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownTimer.exitStatus, 1);
+assert.equal(thrownTimer.stdout, "microtask after throw\n");
+assert.match(
+  thrownTimer.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+
 const wideBindings = Array.from(
   { length: 3_000 },
   (_, index) => `const value${index} = ${index};`,

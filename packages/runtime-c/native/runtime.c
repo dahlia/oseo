@@ -4067,7 +4067,7 @@ OseoResult oseo_clear_timeout(
 
 static OseoResult run_timer_turn(OseoContext *context) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     while (tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
         frame.slots[0] = context->timer_head;
@@ -4088,6 +4088,30 @@ static OseoResult run_timer_turn(OseoContext *context) {
             environment_object(frame.slots[1])->slots,
             oseo_undefined()
         );
+        OseoResult callback_result = result;
+        const char *callback_error_code = context->error_code;
+        const char *callback_error_message = context->error_message;
+        size_t callback_line = context->line;
+        size_t callback_column = context->column;
+        bool callback_threw = result.status == OSEO_STATUS_THROW &&
+            !context->has_diagnostic;
+        if (callback_threw) {
+            frame.slots[2] = result.value;
+            result = oseo_jobs_drain(context);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_rejection_checkpoint(context);
+            }
+            if (result.status == OSEO_STATUS_NORMAL ||
+                !context->has_diagnostic) {
+                context->error_code = callback_error_code;
+                context->error_message = callback_error_message;
+                context->has_diagnostic = false;
+                context->line = callback_line;
+                context->column = callback_column;
+                callback_result.value = frame.slots[2];
+                result = callback_result;
+            }
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_jobs_drain(context);
         }
@@ -4096,6 +4120,7 @@ static OseoResult run_timer_turn(OseoContext *context) {
         }
         frame.slots[0] = oseo_undefined();
         frame.slots[1] = oseo_undefined();
+        frame.slots[2] = oseo_undefined();
         break;
     }
     oseo_roots_release(context, &frame);
