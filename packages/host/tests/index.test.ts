@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createDenoHost } from "../src/index.ts";
+import type { CompilerHost } from "@oseo/compiler";
+
+import {
+  createDenoHost,
+  createFileModuleLoader,
+  fileModuleResolver,
+} from "../src/index.ts";
 
 interface MinimalDenoRuntime {
   makeTempFile?(): Promise<string>;
@@ -92,4 +98,59 @@ test("reads local text assets through the Deno file API", async () => {
     if (descriptor == null) Reflect.deleteProperty(globals, "Deno");
     else Object.defineProperty(globals, "Deno", descriptor);
   }
+});
+
+const moduleRange = {
+  end: { column: 10, line: 1 },
+  start: { column: 1, line: 1 },
+} as const;
+
+test("normalizes relative file module identities", () => {
+  const result = fileModuleResolver.resolve("file:///work/src/main.js", {
+    byteRange: { end: 15, start: 8 },
+    range: moduleRange,
+    value: "../lib/./value.js",
+  });
+  assert.deepEqual(result, {
+    canonicalId: "file:///work/lib/value.js",
+    diagnostics: [],
+  });
+});
+
+test("rejects bare and non-file module resolution", () => {
+  const bare = fileModuleResolver.resolve("file:///work/main.js", {
+    byteRange: { end: 5, start: 0 },
+    range: moduleRange,
+    value: "react",
+  });
+  assert.equal(bare.canonicalId, undefined);
+  assert.equal(bare.diagnostics[0]?.sourceId, "file:///work/main.js");
+  assert.deepEqual(bare.diagnostics[0]?.byteRange, { end: 5, start: 0 });
+
+  const remote = fileModuleResolver.resolve("https://example.test/main.js", {
+    byteRange: { end: 8, start: 0 },
+    range: moduleRange,
+    value: "./dep.js",
+  });
+  assert.equal(remote.canonicalId, undefined);
+  assert.match(remote.diagnostics[0]?.message ?? "", /Cannot resolve/u);
+});
+
+test("loads file modules with stable content hashes", async () => {
+  const reads: (string | URL)[] = [];
+  const host = {
+    async readTextFile(path: string | URL): Promise<string> {
+      reads.push(path);
+      return "export const answer = 42;\n";
+    },
+  } as CompilerHost;
+  const loader = createFileModuleLoader(host);
+  const first = await loader.load("file:///work/answer.js");
+  const second = await loader.load("file:///work/answer.js");
+  assert.equal(reads.length, 2);
+  assert.equal(String(reads[0]), "file:///work/answer.js");
+  assert.equal(first.diagnostics.length, 0);
+  assert.equal(first.source?.sourceId, "file:///work/answer.js");
+  assert.match(first.source?.sourceHash ?? "", /^fnv1a64:[0-9a-f]{16}$/u);
+  assert.equal(second.source?.sourceHash, first.source?.sourceHash);
 });

@@ -1,7 +1,11 @@
 import type {
   CompilerHost,
+  Diagnostic,
+  ModuleLoader,
+  ModuleResolver,
   ProcessObservation,
   ProcessRequest,
+  SyntaxModuleSpecifier,
 } from "@oseo/compiler";
 
 interface DenoCommandOutput {
@@ -51,6 +55,119 @@ function remoteUrl(path: string | URL): URL | undefined {
     ? url
     : undefined;
 }
+
+function moduleDiagnostic(
+  sourceId: string,
+  specifier: SyntaxModuleSpecifier | undefined,
+  message: string,
+): Diagnostic {
+  return {
+    byteRange: specifier?.byteRange ?? { end: 0, start: 0 },
+    code: "OSEO3001",
+    message,
+    range: specifier?.range ?? {
+      end: { column: 1, line: 1 },
+      start: { column: 1, line: 1 },
+    },
+    sourceId,
+  };
+}
+
+function sourceHash(source: string): string {
+  let hash = 0xcbf2_9ce4_8422_2325n;
+  for (const byte of new TextEncoder().encode(source)) {
+    hash ^= BigInt(byte);
+    hash = BigInt.asUintN(64, hash * 0x0000_0100_0000_01b3n);
+  }
+  return `fnv1a64:${hash.toString(16).padStart(16, "0")}`;
+}
+
+/** Load canonical file URLs through one explicit compiler host. */
+export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
+  return {
+    async load(canonicalId) {
+      let url: URL;
+      try {
+        url = new URL(canonicalId);
+      } catch {
+        return {
+          diagnostics: [
+            moduleDiagnostic(canonicalId, undefined, "Invalid module URL."),
+          ],
+        };
+      }
+      if (url.protocol !== "file:") {
+        return {
+          diagnostics: [
+            moduleDiagnostic(
+              canonicalId,
+              undefined,
+              "Only file module URLs are supported in M4.",
+            ),
+          ],
+        };
+      }
+      try {
+        const source = await host.readTextFile(url);
+        return {
+          diagnostics: [],
+          source: {
+            source,
+            sourceHash: sourceHash(source),
+            sourceId: url.href,
+          },
+        };
+      } catch {
+        return {
+          diagnostics: [
+            moduleDiagnostic(
+              canonicalId,
+              undefined,
+              "The module source could not be read.",
+            ),
+          ],
+        };
+      }
+    },
+  };
+}
+
+/** Resolve the relative file specifiers frozen by the M4 profile. */
+export const fileModuleResolver: ModuleResolver = {
+  resolve(importerId, specifier) {
+    if (
+      !specifier.value.startsWith("./") &&
+      !specifier.value.startsWith("../")
+    ) {
+      return {
+        diagnostics: [
+          moduleDiagnostic(
+            importerId,
+            specifier,
+            `Unsupported module specifier '${specifier.value}'.`,
+          ),
+        ],
+      };
+    }
+    try {
+      const importer = new URL(importerId);
+      if (importer.protocol !== "file:") throw new Error("not a file URL");
+      const resolved = new URL(specifier.value, importer);
+      if (resolved.protocol !== "file:") throw new Error("not a file URL");
+      return { canonicalId: resolved.href, diagnostics: [] };
+    } catch {
+      return {
+        diagnostics: [
+          moduleDiagnostic(
+            importerId,
+            specifier,
+            `Cannot resolve module specifier '${specifier.value}'.`,
+          ),
+        ],
+      };
+    }
+  },
+};
 
 /** Create the Node.js implementation of compiler host operations. */
 export function createNodeHost(): CompilerHost {

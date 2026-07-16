@@ -29,6 +29,8 @@ Current evidence
     leaking parser nodes.
  -  Graph discovery deduplicates canonical identities, preserves source order,
     records source hashes, and terminates across cycles.
+ -  Node.js and Deno file loaders share relative `file:` URL resolution and
+    stable content hashing without package or ambient search behavior.
  -  Static linking resolves local, indirect, and star exports to shared cells;
     reports missing or ambiguous names; sorts namespace keys; and records
     deterministic strongly connected components.
