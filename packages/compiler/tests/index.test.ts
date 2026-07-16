@@ -1174,7 +1174,7 @@ test("lowers linked modules through shared live binding identities", () => {
   assert.equal(result.graph?.modules[0]?.exports[0]?.cellId, 0);
 });
 
-test("creates one live namespace binding for repeated imports", () => {
+test("creates one live namespace binding for imports and re-exports", () => {
   const specifier = graphSpecifier("./values.js", 0);
   const values = {
     canonicalId: "file:///values.js",
@@ -1230,6 +1230,14 @@ test("creates one live namespace binding for repeated imports", () => {
     syntax: {
       ...testModule("file:///namespace.js", ""),
       body: [],
+      exports: [
+        {
+          exportedName: "namespace",
+          kind: "local" as const,
+          localName: "first",
+          range,
+        },
+      ],
       imports,
     },
   };
@@ -1254,5 +1262,15 @@ test("creates one live namespace binding for repeated imports", () => {
       binding.name.startsWith("*namespace:"),
     ).length,
     1,
+  );
+  const linkedEntry = result.graph?.modules.find(
+    (module) => module.canonicalId === entry.canonicalId,
+  );
+  assert.equal(
+    linkedEntry?.exports.find(
+      (exported) => exported.exportedName === "namespace",
+    )?.cellId,
+    linkedEntry?.imports.find((imported) => imported.localName === "first")
+      ?.cellId,
   );
 });

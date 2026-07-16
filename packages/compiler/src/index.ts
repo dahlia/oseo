@@ -610,10 +610,7 @@ function importedBinding(
   localName: string,
 ): SyntaxImportEntry | undefined {
   return module.syntax.imports.find(
-    (entry) =>
-      entry.localName === localName &&
-      entry.importedName != null &&
-      entry.importedName !== "*",
+    (entry) => entry.localName === localName && entry.importedName != null,
   );
 }
 
@@ -739,6 +736,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
   const exportsByModule = new Map<string, Map<string, ExportCandidate>>();
   const explicitNames = new Map<string, Set<string>>();
   const ambiguousNames = new Map<string, Set<string>>();
+  const namespaceCells = new Map<string, number>();
 
   const cellFor = (moduleId: string, localName: string): number => {
     const key = `${moduleId}\0${localName}`;
@@ -748,6 +746,14 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
     cells.push({ id, localName, moduleId });
     cellIds.set(key, id);
     return id;
+  };
+
+  const namespaceCellFor = (moduleId: string): number => {
+    const existing = namespaceCells.get(moduleId);
+    if (existing != null) return existing;
+    const cellId = cellFor(moduleId, `*namespace:${moduleId}*`);
+    namespaceCells.set(moduleId, cellId);
+    return cellId;
   };
 
   for (const module of graph.modules) {
@@ -807,7 +813,12 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
           const candidate =
             targetId == null || imported.importedName == null
               ? undefined
-              : exportsByModule.get(targetId)?.get(imported.importedName);
+              : imported.importedName === "*"
+                ? {
+                    cellId: namespaceCellFor(targetId),
+                    sourceModuleId: targetId,
+                  }
+                : exportsByModule.get(targetId)?.get(imported.importedName);
           const existing = moduleExports.get(entry.exportedName);
           if (
             candidate != null &&
@@ -915,6 +926,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       }
       if (entry.importedName === "*") {
         imports.push({
+          cellId: namespaceCellFor(targetId),
           importedName: "*",
           localName: entry.localName,
           namespaceModuleId: targetId,
@@ -4346,8 +4358,10 @@ export function compileModuleGraph(
       if (target == null || targetNode == null) {
         throw new Error(`Namespace module '${targetId}' is unavailable.`);
       }
-      const bindingId = nextBindingId;
-      nextBindingId += 1;
+      const bindingId = imported.cellId;
+      if (bindingId == null) {
+        throw new Error("Module namespace cell is unavailable.");
+      }
       namespaceBindings.set(targetId, bindingId);
       namespaceInitializers.push({
         bindingId,
