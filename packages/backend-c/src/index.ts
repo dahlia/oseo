@@ -518,14 +518,13 @@ function emitGuardObject(state: EmitState, operation: MirOperation): void {
 
 function emitGuardShape(state: EmitState, operation: MirOperation): void {
   const object = operationArgument(operation, 0);
-  const key = operationArgument(operation, 1);
   const cache = propertyCacheName(operation);
   state.scalarKinds.set(operation.id, "boolean");
   line(state, `static OseoPropertyCache ${cache} = {0u, 0u};`);
   line(
     state,
     `bool fast_${operation.id} = oseo_property_cache_matches(` +
-      `roots[${object}], roots[${key}], &${cache});`,
+      `roots[${object}], &${cache});`,
   );
 }
 

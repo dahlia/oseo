@@ -104,12 +104,13 @@ Specialization
 
 M3 specializes named property reads with an explicit backend-neutral MIR graph.
 The graph checks object kind, then checks a private monomorphic call-site cache
-for dictionary state, layout identity, slot bounds, and key equality. A cache
-hit reads a fixed slot without allocation or generic lookup. Any miss enters one
-generic lookup block, may relearn a stable own slot, and joins the hit result at
-one continuation. Deletion, descriptor change, prototype mutation, another
-layout, or a non-object receiver cannot reuse the cached slot. Disabling
-specialization removes this graph while preserving observable behavior.
+for dictionary state, layout identity, and slot bounds. Each cache belongs to
+one static named-key site, so the hit path reads a fixed slot without allocating
+the key or entering generic lookup. Any miss materializes the key in one generic
+lookup block, may relearn a stable own slot, and joins the hit result at one
+continuation. Deletion, descriptor change, prototype mutation, another layout,
+or a non-object receiver cannot reuse the cached slot. Disabling specialization
+removes this graph while preserving observable behavior.
 
 
 Test262 evidence

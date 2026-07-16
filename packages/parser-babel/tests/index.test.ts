@@ -203,6 +203,27 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.match(specializedText, /property-get generic/u);
   assert.match(specializedText, /join property read/u);
   assert.doesNotMatch(specializedText, /property-get-cached/u);
+  const namedRead = compileSource(babelFrontend, {
+    source: "function read(value) { return value.item; }",
+    sourceId: "named-read.ts",
+  });
+  assert.ok(namedRead.mir != null);
+  const namedReadText = printMir(namedRead.mir);
+  const shapeGuard = namedReadText.indexOf("guard-shape");
+  const keyConversion = namedReadText.indexOf("property-key");
+  assert.notEqual(shapeGuard, -1);
+  assert.notEqual(keyConversion, -1);
+  assert.ok(shapeGuard < keyConversion);
+  const hitCount = namedReadText.indexOf("count-guard-hit");
+  const fixedLoad = namedReadText.indexOf("load-fixed-slot");
+  const missCount = namedReadText.indexOf("count-guard-miss");
+  assert.ok(shapeGuard < hitCount);
+  assert.ok(hitCount < fixedLoad);
+  assert.ok(fixedLoad < missCount);
+  assert.doesNotMatch(
+    namedReadText.slice(shapeGuard, missCount),
+    /safepoint string allocation|property-key/u,
+  );
   const generic = compileSource(
     babelFrontend,
     {

@@ -1151,15 +1151,13 @@ bool oseo_value_is_object(OseoValue value) {
 
 bool oseo_property_cache_matches(
     OseoValue object_value,
-    OseoValue key,
     const OseoPropertyCache *cache
 ) {
     if (!is_object(object_value)) return false;
     OseoOrdinaryObject *object = ordinary_object(object_value);
     return !object->dictionary && cache->shape_id != 0u &&
         cache->shape_id == object->shape_id &&
-        cache->slot < object->property_count &&
-        string_equal(object->properties[cache->slot].key, key);
+        cache->slot < object->property_count;
 }
 
 OseoValue oseo_property_cache_load(

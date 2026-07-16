@@ -68,9 +68,11 @@ Prototype mutation assigns a fresh layout identity and rejects a cycle before
 publishing the new link. A specialized named read uses explicit MIR blocks for
 the object guard, cache guard, fixed-slot load, generic fallback, and result
 join. Its private monomorphic cache contains the last layout identity and fixed
-slot. The cache guard checks dictionary state, identity, slot bounds, and key
-equality. A miss performs one generic lookup and may relearn a stable own slot.
-No private object or cache layout crosses a public TypeScript interface.
+slot. Each cache belongs to one static named-key site, so the cache guard checks
+dictionary state, identity, and slot bounds without materializing the key. A
+miss materializes that site's key, performs one generic lookup, and may relearn
+a stable own slot. No private object or cache layout crosses a public TypeScript
+interface.
 
 Allocation and resizing collect before publication. Generated code roots all
 live generic values across those safepoints. Tests may force every safepoint or

@@ -227,7 +227,6 @@ OseoResult oseo_object_get(
 bool oseo_value_is_object(OseoValue value);
 bool oseo_property_cache_matches(
     OseoValue object,
-    OseoValue key,
     const OseoPropertyCache *cache
 );
 OseoValue oseo_property_cache_load(

@@ -32,7 +32,9 @@ result into one ordinary continuation.
 M3 named property reads likewise preserve MIR-owned object and shape guards, a
 fixed-slot hit, one generic fallback, and a block-parameter join. The runtime
 exposes only private cache tests, fixed-slot loads, and cache updates to the C
-backend.
+backend. A named cache belongs to one static key site, so its hit path does not
+allocate or materialize the property key.
+
 Pending throws carry their diagnostic location and message through generated
 completion slots, so intervening `finally` operations cannot overwrite an
 unhandled exception's report.

@@ -1667,7 +1667,7 @@ function lowerPropertyKey(
 
 function lowerSpecializedPropertyGet(
   object: number,
-  key: number,
+  keyExpression: HirExpression,
   range: SourceRange,
   builder: MirBuilder,
 ): number {
@@ -1696,7 +1696,7 @@ function lowerSpecializedPropertyGet(
   const shapeGuard = builder.nextValue;
   builder.nextValue += 1;
   shapeBlock.operations.push({
-    arguments: [object, key],
+    arguments: [object],
     cacheId: shapeGuard,
     detail: `cached slot -> bb${hitBlock.id}, miss -> bb${genericBlock.id}`,
     id: shapeGuard,
@@ -1731,6 +1731,7 @@ function lowerSpecializedPropertyGet(
 
   builder.current = genericBlock;
   appendMirMetadata(builder, "count-guard-miss", "property read", [], range);
+  const key = lowerPropertyKey(keyExpression, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -2119,7 +2120,6 @@ function lowerExpression(
     expression.kind === "property-delete"
   ) {
     const object = lowerExpression(expression.object, builder);
-    const key = lowerPropertyKey(expression.key, builder);
     if (
       expression.kind === "property-get" &&
       expression.key.kind === "string" &&
@@ -2127,11 +2127,12 @@ function lowerExpression(
     ) {
       return lowerSpecializedPropertyGet(
         object,
-        key,
+        expression.key,
         expression.range,
         builder,
       );
     }
+    const key = lowerPropertyKey(expression.key, builder);
     if (expression.kind === "property-get") {
       appendMirMetadata(
         builder,
