@@ -465,6 +465,32 @@ test("converts M4 imports and exports to owned module syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
 });
 
+test("retains default export order and anonymous function names", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: `
+      export default function () {}
+      console.log("after");
+    `,
+    sourceId: "file:///app/default.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  const exported = result.module?.exports[0];
+  assert.equal(exported?.kind, "default");
+  assert.ok(exported?.byteRange != null);
+  if (exported?.kind !== "default") return;
+  assert.equal(
+    "parameters" in exported.declaration
+      ? exported.declaration.name
+      : undefined,
+    "default",
+  );
+  assert.ok(
+    exported.byteRange.start <
+      (result.module?.body[0]?.byteRange?.start ?? Number.MAX_SAFE_INTEGER),
+  );
+});
+
 test("lowers top-level await to an owned scheduler checkpoint", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const answer = 1 + await Promise.resolve(41);",

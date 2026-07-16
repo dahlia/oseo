@@ -1542,6 +1542,9 @@ OseoResult oseo_object_set(
         }
         return normal(value);
     }
+    if (ordinary_object(object_value)->module_namespace) {
+        return strict ? language_failure(context) : normal(value);
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         OseoFunction *function = function_object(object_value);
         if (!function->prototype_writable) {

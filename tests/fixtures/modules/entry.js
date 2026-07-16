@@ -1,4 +1,6 @@
 import * as values from "./values.js";
+import defaultFunction from "./cycle-a.js";
+import "./default-order.js";
 
 const keys = Object.keys(values);
 console.log(keys[0], keys[1], values.answer);
@@ -11,3 +13,11 @@ try {
 } catch (error) {
   console.log("immutable");
 }
+try {
+  // eslint-disable-next-line no-import-assign -- Mutation must fail.
+  values.extra = 2;
+  // eslint-disable-next-line no-unused-vars -- Catch is the observation.
+} catch (error) {
+  console.log("nonextensible");
+}
+console.log(defaultFunction.name);

@@ -962,6 +962,51 @@ test("links live cells, namespaces, cycles, and evaluation order", () => {
   ]);
 });
 
+test("preserves dependency order within a cyclic component", () => {
+  const fromA = graphSpecifier("./a.js", 0);
+  const fromB = graphSpecifier("./b.js", 0);
+  const fromC = graphSpecifier("./c.js", 10);
+  const node = (
+    canonicalId: string,
+    dependencies: readonly {
+      readonly canonicalId: string;
+      readonly specifier: SyntaxModuleSpecifier;
+    }[],
+  ) => ({
+    canonicalId,
+    dependencies,
+    resolutions: dependencies,
+    sourceHash: canonicalId,
+    syntax: testModule(canonicalId, ""),
+  });
+  const a = node("file:///a.js", [
+    { canonicalId: "file:///b.js", specifier: fromB },
+    { canonicalId: "file:///c.js", specifier: fromC },
+  ]);
+  const b = node("file:///b.js", [
+    { canonicalId: "file:///a.js", specifier: fromA },
+  ]);
+  const c = node("file:///c.js", [
+    { canonicalId: "file:///a.js", specifier: fromA },
+  ]);
+  const result = linkModuleGraph({
+    entryId: a.canonicalId,
+    kind: "module-graph",
+    modules: [a, b, c],
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.graph?.components[0]?.moduleIds, [
+    "file:///b.js",
+    "file:///c.js",
+    "file:///a.js",
+  ]);
+  assert.deepEqual(result.graph?.evaluationOrder, [
+    "file:///b.js",
+    "file:///c.js",
+    "file:///a.js",
+  ]);
+});
+
 test("reports ambiguous star exports only when a binding requests them", () => {
   const left = graphSpecifier("./left.js", 0);
   const right = graphSpecifier("./right.js", 10);

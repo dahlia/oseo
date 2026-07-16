@@ -1563,7 +1563,12 @@ const nativeModule = await runNativeCli(
 );
 assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
 assert.equal(nativeModule.stderr, "");
-assert.equal(nativeModule.stdout, "answer increment 41\n42\nimmutable\n");
+assert.equal(
+  nativeModule.stdout,
+  "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+    "default first\ndefault second\nanswer increment 41\n" +
+    "42\nimmutable\nnonextensible\ndefault\n",
+);
 
 const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
 const nativeAsyncModule = await runNativeCli(

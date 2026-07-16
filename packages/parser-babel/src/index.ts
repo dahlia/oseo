@@ -1496,10 +1496,10 @@ function moduleProgram(
         if (declaration == null) break;
         if (declaration.name == null) {
           exports.push({
-            declaration,
+            ...location(context, item),
+            declaration: { ...declaration, name: "default" },
             exportedName: "default",
             kind: "default",
-            range: declaration.range,
           });
           continue;
         }
@@ -1515,10 +1515,10 @@ function moduleProgram(
       const declaration = expression(context, declarationNode);
       if (declaration == null) break;
       exports.push({
+        ...location(context, item),
         declaration,
         exportedName: "default",
         kind: "default",
-        range: declaration.range,
       });
       continue;
     }

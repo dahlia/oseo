@@ -274,6 +274,8 @@ export type SyntaxStatement =
 
 /** A top-level function declaration in owned syntax. */
 export interface SyntaxFunction extends LocatedSyntax {
+  /** Internal declaration binding when it differs from the function name. */
+  readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
   readonly kind: "function";
   readonly name: string | undefined;
@@ -601,6 +603,27 @@ function compareCodeUnits(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+function moduleDepthFirstOrder(graph: ModuleGraph): readonly string[] {
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const visited = new Set<string>();
+  const order: string[] = [];
+  const visit = (moduleId: string): void => {
+    if (visited.has(moduleId)) return;
+    visited.add(moduleId);
+    for (const dependency of nodes.get(moduleId)?.dependencies ?? []) {
+      visit(dependency.canonicalId);
+    }
+    order.push(moduleId);
+  };
+  visit(graph.entryId);
+  for (const moduleId of [...nodes.keys()].toSorted(compareCodeUnits)) {
+    visit(moduleId);
+  }
+  return order;
+}
+
 function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
   const nodes = new Map(
     graph.modules.map((module) => [module.canonicalId, module]),
@@ -653,8 +676,23 @@ function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
   };
 
   connect(graph.entryId);
+  const evaluationOrder = moduleDepthFirstOrder(graph);
+  const evaluationIndex = new Map(
+    evaluationOrder.map((moduleId, index) => [moduleId, index]),
+  );
   return found
-    .toSorted((left, right) => compareCodeUnits(left[0] ?? "", right[0] ?? ""))
+    .map((moduleIds) =>
+      moduleIds.toSorted(
+        (left, right) =>
+          (evaluationIndex.get(left) ?? Number.MAX_SAFE_INTEGER) -
+          (evaluationIndex.get(right) ?? Number.MAX_SAFE_INTEGER),
+      ),
+    )
+    .toSorted(
+      (left, right) =>
+        (evaluationIndex.get(left[0] ?? "") ?? Number.MAX_SAFE_INTEGER) -
+        (evaluationIndex.get(right[0] ?? "") ?? Number.MAX_SAFE_INTEGER),
+    )
     .map((moduleIds, id) => {
       const first = nodes.get(moduleIds[0] ?? "");
       const selfCycle = first?.dependencies.some(
@@ -666,45 +704,6 @@ function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
         moduleIds,
       };
     });
-}
-
-function moduleEvaluationOrder(
-  graph: ModuleGraph,
-  components: readonly ModuleComponent[],
-): readonly string[] {
-  const nodes = new Map(
-    graph.modules.map((module) => [module.canonicalId, module]),
-  );
-  const componentByModule = new Map<string, number>();
-  for (const component of components) {
-    for (const moduleId of component.moduleIds) {
-      componentByModule.set(moduleId, component.id);
-    }
-  }
-  const visited = new Set<number>();
-  const order: string[] = [];
-  const visit = (componentId: number): void => {
-    if (visited.has(componentId)) return;
-    visited.add(componentId);
-    const component = components[componentId];
-    if (component == null) throw new Error("Missing module component.");
-    const dependencies = new Set<number>();
-    for (const moduleId of component.moduleIds) {
-      for (const dependency of nodes.get(moduleId)?.dependencies ?? []) {
-        const dependencyId = componentByModule.get(dependency.canonicalId);
-        if (dependencyId != null && dependencyId !== componentId) {
-          dependencies.add(dependencyId);
-        }
-      }
-    }
-    for (const dependencyId of dependencies) visit(dependencyId);
-    order.push(...component.moduleIds);
-  };
-  const entryComponent = componentByModule.get(graph.entryId);
-  if (entryComponent == null) throw new Error("Entry module is not linked.");
-  visit(entryComponent);
-  for (const component of components) visit(component.id);
-  return order;
 }
 
 /** Resolve live imports, exports, namespace keys, and cyclic graph order. */
@@ -946,7 +945,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       cells,
       components,
       entryId: graph.entryId,
-      evaluationOrder: moduleEvaluationOrder(graph, components),
+      evaluationOrder: moduleDepthFirstOrder(graph),
       kind: "linked-module-graph",
       modules: linkedModules,
     },
@@ -1124,6 +1123,7 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionId: number;
+      readonly functionName: string;
       readonly kind: "function-init";
       readonly name: string;
       readonly parameterCount: number;
@@ -1565,7 +1565,10 @@ function predeclareBindings(
     ) {
       continue;
     }
-    const name = statement.name;
+    const name =
+      statement.kind === "function"
+        ? (statement.bindingName ?? statement.name)
+        : statement.name;
     if (name == null) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -1628,15 +1631,17 @@ function resolveStatementList(
   const result: HirStatement[] = [];
   for (const statement of statements) {
     if (statement.kind !== "function" || statement.name == null) continue;
+    const bindingName = statement.bindingName ?? statement.name;
     const info = state.functionInfo.get(statement);
     if (info == null) continue;
-    if (local.get(statement.name)?.functionId !== info.id) continue;
+    if (local.get(bindingName)?.functionId !== info.id) continue;
     const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
+      functionName: functionValue.name,
       kind: "function-init",
-      name: statement.name,
+      name: bindingName,
       parameterCount: functionValue.parameters.length,
       range: statement.range,
     });
@@ -3562,7 +3567,7 @@ function lowerStatements(
         {
           functionId: statement.functionId,
           kind: "function",
-          name: statement.name,
+          name: statement.functionName,
           parameterCount: statement.parameterCount,
           range: statement.range,
         },
@@ -4215,20 +4220,18 @@ function moduleProgramBody(
   const items: SyntaxStatementItem[] = [...module.body];
   for (const [index, entry] of module.exports.entries()) {
     if (entry.kind !== "default") continue;
-    const initializer: SyntaxExpression =
-      "parameters" in entry.declaration
-        ? {
-            kind: "function",
-            range: entry.declaration.range,
-            functionValue: entry.declaration,
-          }
-        : entry.declaration;
+    const bindingName = `*default:${index}*`;
+    if ("parameters" in entry.declaration) {
+      items.push({ ...entry.declaration, bindingName });
+      continue;
+    }
+    const initializer: SyntaxExpression = entry.declaration;
     items.push({
       ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
       hint: undefined,
       initializer,
       kind: "const",
-      name: `*default:${index}*`,
+      name: bindingName,
       range: entry.range,
     });
   }
@@ -4254,6 +4257,7 @@ export function compileModuleGraph(
   );
   const cells = new Map(linked.graph.cells.map((cell) => [cell.id, cell]));
   const body: HirStatement[] = [];
+  const functionInitializers: HirStatement[] = [];
   const functions: HirFunction[] = [];
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
@@ -4361,14 +4365,20 @@ export function compileModuleGraph(
     if (result.program == null) {
       return { diagnostics: result.diagnostics, graph: linked.graph };
     }
-    body.push(...result.program.body);
+    for (const statement of result.program.body) {
+      if (statement.kind === "function-init") {
+        functionInitializers.push(statement);
+      } else {
+        body.push(statement);
+      }
+    }
     functions.push(...result.program.functions);
   }
 
   const entry = nodes.get(graph.entryId);
   if (entry == null) throw new Error("The module entry is unavailable.");
   const hir: HirProgram = {
-    body: [...namespaceInitializers, ...body],
+    body: [...namespaceInitializers, ...functionInitializers, ...body],
     functions,
     kind: "hir-program",
     range: entry.syntax.range,
