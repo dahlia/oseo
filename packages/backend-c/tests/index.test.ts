@@ -6,6 +6,7 @@ import { cBackend } from "../src/index.ts";
 test("emits deterministic generic C without executing a toolchain", () => {
   const range = {
     end: { column: 1, line: 1 },
+    sourceId: "dependency.js",
     start: { column: 1, line: 1 },
   };
   const emitted = cBackend.emit({
@@ -62,6 +63,10 @@ test("emits deterministic generic C without executing a toolchain", () => {
   assert.ok(emitted.source.includes("oseo_frame_enter"));
   assert.ok(emitted.source.includes("oseo_roots_allocate"));
   assert.ok(emitted.source.includes("oseo_number(42.0)"));
+  assert.match(
+    emitted.source,
+    /oseo_context_source_location\(context, "dependency\.js", 13u,/u,
+  );
   assert.doesNotMatch(emitted.source, /OseoValue roots\[/u);
   assert.equal(emitted.sourceName, "generated.c");
 });

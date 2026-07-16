@@ -1816,6 +1816,24 @@ assert.match(
   /error\[OSEO3001\].*Top-level await cannot make progress/u,
 );
 
+const diagnosticModule = `${root}/tests/fixtures/module-diagnostics/entry.mjs`;
+const nativeDiagnosticModule = await runNativeCli(
+  {
+    args: [diagnosticModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeDiagnosticModule.exitStatus, 1);
+assert.equal(
+  nativeDiagnosticModule.stdout,
+  "dependency before throw\ndependency cleanup\n",
+);
+assert.match(
+  nativeDiagnosticModule.stderr,
+  /module-diagnostics\/dep\.mjs:5:3: error\[OSEO2001\]/u,
+);
+
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
 );

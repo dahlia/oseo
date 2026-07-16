@@ -535,6 +535,19 @@ void oseo_context_location(
     context->column = column;
 }
 
+void oseo_context_source_location(
+    OseoContext *context,
+    const char *source_id,
+    size_t source_id_length,
+    size_t line,
+    size_t column
+) {
+    context->source_id = source_id;
+    context->source_id_length = source_id_length;
+    context->line = line;
+    context->column = column;
+}
+
 void oseo_context_print_error(const OseoContext *context) {
     (void)fwrite(
         context->source_id,
@@ -4563,6 +4576,8 @@ static OseoResult run_timer_turn(OseoContext *context) {
         OseoResult callback_result = result;
         const char *callback_error_code = context->error_code;
         const char *callback_error_message = context->error_message;
+        const char *callback_source_id = context->source_id;
+        size_t callback_source_id_length = context->source_id_length;
         size_t callback_line = context->line;
         size_t callback_column = context->column;
         bool callback_threw = result.status == OSEO_STATUS_THROW &&
@@ -4578,6 +4593,8 @@ static OseoResult run_timer_turn(OseoContext *context) {
                 context->error_code = callback_error_code;
                 context->error_message = callback_error_message;
                 context->has_diagnostic = false;
+                context->source_id = callback_source_id;
+                context->source_id_length = callback_source_id_length;
                 context->line = callback_line;
                 context->column = callback_column;
                 callback_result.value = frame.slots[2];
@@ -4657,6 +4674,8 @@ OseoResult oseo_entry_task_checkpoint(
     }
     const char *error_code = context->error_code;
     const char *error_message = context->error_message;
+    const char *source_id = context->source_id;
+    size_t source_id_length = context->source_id_length;
     size_t line = context->line;
     size_t column = context->column;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -4671,6 +4690,8 @@ OseoResult oseo_entry_task_checkpoint(
         context->error_code = error_code;
         context->error_message = error_message;
         context->has_diagnostic = false;
+        context->source_id = source_id;
+        context->source_id_length = source_id_length;
         context->line = line;
         context->column = column;
         completion.value = frame.slots[0];

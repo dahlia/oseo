@@ -1182,6 +1182,14 @@ test("lowers linked modules through shared live binding identities", () => {
     .flatMap((block) => block.operations)
     .find((operation) => operation.kind === "read");
   assert.equal(importedRead?.bindingId, 0);
+  assert.equal(importedRead?.range.sourceId, entry.canonicalId);
+  const dependencyInitialize = result.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .find(
+      (operation) =>
+        operation.kind === "initialize" && operation.bindingId === 0,
+    );
+  assert.equal(dependencyInitialize?.range.sourceId, dependency.canonicalId);
   assert.equal(result.graph?.modules[0]?.exports[0]?.cellId, 0);
 });
 

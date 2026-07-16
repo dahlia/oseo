@@ -13,10 +13,11 @@ export interface Position {
   readonly column: number;
 }
 
-/** A half-open source range. */
+/** A half-open source range with optional retained module identity. */
 export interface SourceRange {
   readonly start: Position;
   readonly end: Position;
+  readonly sourceId?: string;
 }
 
 /** A source-located error independent of a bootstrap parser or host. */
@@ -4342,6 +4343,34 @@ function moduleProgramBody(
   );
 }
 
+function isSourceRange(value: unknown): value is SourceRange {
+  if (value == null || typeof value !== "object") return false;
+  const candidate = value as Partial<SourceRange>;
+  return (
+    candidate.start != null &&
+    typeof candidate.start.line === "number" &&
+    typeof candidate.start.column === "number" &&
+    candidate.end != null &&
+    typeof candidate.end.line === "number" &&
+    typeof candidate.end.column === "number"
+  );
+}
+
+/** Retain module identity on every owned range before graph HIR is merged. */
+function retainModuleSource<T>(value: T, sourceId: string): T {
+  if (isSourceRange(value)) return { ...value, sourceId } as T;
+  if (Array.isArray(value)) {
+    return value.map((item) => retainModuleSource(item, sourceId)) as T;
+  }
+  if (value == null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      retainModuleSource(item, sourceId),
+    ]),
+  ) as T;
+}
+
 /** Link and lower a closed synchronous module graph to shared-cell MIR. */
 export function compileModuleGraph(
   graph: ModuleGraph,
@@ -4378,6 +4407,7 @@ export function compileModuleGraph(
         throw new Error("Module namespace cell is unavailable.");
       }
       namespaceBindings.set(targetId, bindingId);
+      const targetRange = retainModuleSource(targetNode.syntax.range, targetId);
       namespaceInitializers.push({
         bindingId,
         hint: undefined,
@@ -4387,11 +4417,11 @@ export function compileModuleGraph(
             name: entry.exportedName,
           })),
           kind: "module-namespace",
-          range: targetNode.syntax.range,
+          range: targetRange,
         },
         kind: "const",
         name: `*namespace:${targetId}*`,
-        range: targetNode.syntax.range,
+        range: targetRange,
       });
     }
   }
@@ -4467,14 +4497,15 @@ export function compileModuleGraph(
     if (result.program == null) {
       return { diagnostics: result.diagnostics, graph: linked.graph };
     }
-    for (const statement of result.program.body) {
+    const moduleBody = retainModuleSource(result.program.body, moduleId);
+    for (const statement of moduleBody) {
       if (statement.kind === "function-init") {
         functionInitializers.push(statement);
       } else {
         body.push(statement);
       }
     }
-    functions.push(...result.program.functions);
+    functions.push(...retainModuleSource(result.program.functions, moduleId));
   }
 
   const entry = nodes.get(graph.entryId);
@@ -4483,7 +4514,7 @@ export function compileModuleGraph(
     body: [...namespaceInitializers, ...functionInitializers, ...body],
     functions,
     kind: "hir-program",
-    range: entry.syntax.range,
+    range: retainModuleSource(entry.syntax.range, graph.entryId),
     sourceId: graph.entryId,
     strict: true,
   };

@@ -154,6 +154,13 @@ void oseo_context_location(
     size_t line,
     size_t column
 );
+void oseo_context_source_location(
+    OseoContext *context,
+    const char *source_id,
+    size_t source_id_length,
+    size_t line,
+    size_t column
+);
 void oseo_context_print_error(const OseoContext *context);
 void oseo_context_print_observations(const OseoContext *context);
 void oseo_context_set_function_dispatcher(

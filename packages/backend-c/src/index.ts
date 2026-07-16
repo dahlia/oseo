@@ -51,6 +51,16 @@ function line(state: EmitState, source: string): void {
 }
 
 function location(state: EmitState, range: SourceRange): void {
+  if (range.sourceId != null) {
+    const sourceId = escapeCString(range.sourceId);
+    const length = new TextEncoder().encode(range.sourceId).length;
+    line(
+      state,
+      `oseo_context_source_location(context, "${sourceId}", ${length}u, ` +
+        `${range.start.line}u, ${range.start.column}u);`,
+    );
+    return;
+  }
   line(
     state,
     `oseo_context_location(context, ${range.start.line}u, ` +
@@ -749,6 +759,12 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       line(state, "oseo_context_clear_language_error(context);");
       line(state, `completion_line[${slot}u] = context->line;`);
       line(state, `completion_column[${slot}u] = context->column;`);
+      line(state, `completion_source_id[${slot}u] = context->source_id;`);
+      line(
+        state,
+        `completion_source_id_length[${slot}u] = ` +
+          "context->source_id_length;",
+      );
       line(state, `completion_error_code[${slot}u] = context->error_code;`);
       line(
         state,
@@ -835,6 +851,16 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       );
       line(
         state,
+        `    completion_source_id[${operation.abruptTarget}u] = ` +
+          "context->source_id;",
+      );
+      line(
+        state,
+        `    completion_source_id_length[${operation.abruptTarget}u] = ` +
+          "context->source_id_length;",
+      );
+      line(
+        state,
         `    completion_error_code[${operation.abruptTarget}u] = ` +
           "context->error_code;",
       );
@@ -868,6 +894,16 @@ function emitCompletionCopy(
   line(
     state,
     `    completion_column[${target}u] = completion_column[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_source_id[${target}u] = ` +
+      `completion_source_id[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_source_id_length[${target}u] = ` +
+      `completion_source_id_length[${source}u];`,
   );
   line(
     state,
@@ -937,6 +973,12 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, `if (completion_kind[${slot}u] == 2) {`);
     line(state, `    context->line = completion_line[${slot}u];`);
     line(state, `    context->column = completion_column[${slot}u];`);
+    line(state, `    context->source_id = completion_source_id[${slot}u];`);
+    line(
+      state,
+      `    context->source_id_length = ` +
+        `completion_source_id_length[${slot}u];`,
+    );
     line(state, `    context->error_code = completion_error_code[${slot}u];`);
     line(
       state,
@@ -1266,6 +1308,10 @@ function emitFunction(
         `    size_t completion_target[${completionSlots}u] = {0};\n` +
         `    size_t completion_line[${completionSlots}u] = {0};\n` +
         `    size_t completion_column[${completionSlots}u] = {0};\n` +
+        `    const char *completion_source_id[${completionSlots}u] = ` +
+        `{NULL};\n` +
+        `    size_t completion_source_id_length[${completionSlots}u] = ` +
+        `{0};\n` +
         `    const char *completion_error_code[${completionSlots}u] = ` +
         `{NULL};\n` +
         `    const char *completion_error_message[${completionSlots}u] = ` +
@@ -1274,6 +1320,8 @@ function emitFunction(
         "    (void)completion_target;\n" +
         "    (void)completion_line;\n" +
         "    (void)completion_column;\n" +
+        "    (void)completion_source_id;\n" +
+        "    (void)completion_source_id_length;\n" +
         "    (void)completion_error_code;\n" +
         "    (void)completion_error_message;\n"
       : "") +
