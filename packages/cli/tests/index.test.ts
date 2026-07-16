@@ -129,6 +129,38 @@ test("separates the source path from its diagnostic identifier", async () => {
   assert.match(result.stderr, /^display\.ts:/u);
 });
 
+test("reads a file URL entry as a URL", async () => {
+  let readPath: string | URL | undefined;
+  const host: CompilerHost = {
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile(path) {
+      readPath = path;
+      return Promise.resolve("console.log(42);");
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected cleanup"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "file:///work/input.ts"],
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 0);
+  assert.ok(readPath instanceof URL);
+  assert.equal(readPath.href, "file:///work/input.ts");
+});
+
 test("loads and lowers a closed file module graph", async () => {
   const reads: string[] = [];
   const host: CompilerHost = {

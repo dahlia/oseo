@@ -329,6 +329,15 @@ function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
 }
 
+function sourceReadLocation(sourceId: string): string | URL {
+  try {
+    const url = new URL(sourceId);
+    return url.protocol === "file:" ? url : sourceId;
+  } catch {
+    return sourceId;
+  }
+}
+
 async function observeProcess(
   host: CompilerHost,
   request: ProcessRequest,
@@ -420,7 +429,9 @@ export async function runNativeCli(
   const sourceId = request.sourceId ?? parsed.value.sourceId;
   let source: string;
   try {
-    source = request.source ?? (await host.readTextFile(parsed.value.sourceId));
+    source =
+      request.source ??
+      (await host.readTextFile(sourceReadLocation(parsed.value.sourceId)));
   } catch {
     return diagnosticResult(
       hostDiagnostic(sourceId, "The source file could not be read."),
