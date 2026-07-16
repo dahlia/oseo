@@ -8,6 +8,7 @@ postinstall = "mise generate git-pre-commit --write --task=check"
 
 [tools]
 "aqua:dahlia/hongdown" = "0.5.1"
+"aqua:nushell/nushell" = "0.114.1"
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
@@ -146,18 +147,33 @@ mise run probe:value-layouts
 [tasks."test:property:extended"]
 description = "Run property suites at ten times the ordinary case budget"
 depends = ["build"]
+shell = "nu -c"
 run = '''
-for seed in 1592590337 1592590338; do
-  OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
-    OSEO_PROPERTY_SEED="$seed" node --test \
-    packages/testkit/tests/*.property.test.ts
-  OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
-    OSEO_PROPERTY_SEED="$seed" deno test -A \
-    packages/testkit/tests/*.property.test.ts
-done
-OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
-  OSEO_PROPERTY_SEED=1592590339 node --test \
-  tests/property/*.property.test.ts
+let package_tests = (
+  glob "packages/testkit/tests/*.property.test.ts"
+  | each { |path| $path | into string }
+)
+for seed in [1592590337 1592590338] {
+  with-env {
+    OSEO_PROPERTY_RUN_SCALE: "10"
+    OSEO_PROPERTY_SIZE: "large"
+    OSEO_PROPERTY_SEED: ($seed | into string)
+  } {
+    ^node --test ...$package_tests
+    ^deno test -A ...$package_tests
+  }
+}
+let native_tests = (
+  glob "tests/property/*.property.test.ts"
+  | each { |path| $path | into string }
+)
+with-env {
+  OSEO_PROPERTY_RUN_SCALE: "10"
+  OSEO_PROPERTY_SIZE: "large"
+  OSEO_PROPERTY_SEED: "1592590339"
+} {
+  ^node --test ...$native_tests
+}
 '''
 
 [tasks."test:property:native"]
