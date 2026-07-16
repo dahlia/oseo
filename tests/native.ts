@@ -940,6 +940,27 @@ Promise.all([adversarial, Promise.resolve(30)]).catch(showRejected);
 const throwingThen = Promise.resolve(25);
 throwingThen.then = function throwFromThen() { throw 26; };
 Promise.all([throwingThen]).catch(showRejected);
+const shrinkingFirst = Promise.resolve(0);
+const shrinkingValues = [shrinkingFirst, 2];
+shrinkingFirst.then = function shrinkDuringAll(onFulfilled) {
+  shrinkingValues.length = 1;
+  return onFulfilled(40);
+};
+Promise.all(shrinkingValues).then(function showShrinkingAll(values) {
+  console.log("shrinking all", values.length, values[0]);
+});
+const growingFirst = Promise.resolve(0);
+const growingSecond = Promise.resolve(0);
+const growingValues = [growingFirst];
+growingFirst.then = function growDuringRace(onFulfilled) {
+  growingValues[1] = growingSecond;
+  return onFulfilled(41);
+};
+growingSecond.then = function observeGrowingRace(onFulfilled) {
+  console.log("growing race element");
+  return onFulfilled(42);
+};
+Promise.race(growingValues).then(show);
 const decorated = Promise.resolve(21);
 decorated.value = 22;
 console.log("promise property", decorated.value, Object.keys(decorated)[0]);

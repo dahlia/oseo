@@ -3535,13 +3535,13 @@ static OseoResult promise_combine(
         oseo_roots_release(context, &frame);
         return result;
     }
-    size_t length = result.status == OSEO_STATUS_NORMAL
+    size_t initial_length = result.status == OSEO_STATUS_NORMAL
         ? ordinary_object(frame.slots[0])->array_length
         : 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = race
             ? normal(oseo_undefined())
-            : oseo_array_create(context, length);
+            : oseo_array_create(context, 0u);
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -3549,25 +3549,20 @@ static OseoResult promise_combine(
             context,
             frame.slots[1],
             frame.slots[2],
-            length
+            1u
         );
         frame.slots[3] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && length == 0u && !race) {
-        result = oseo_promise_resolve_into(
-            context,
-            frame.slots[1],
-            frame.slots[2]
-        );
-    }
     static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
-    if (result.status == OSEO_STATUS_NORMAL && length > 0u) {
+    if (result.status == OSEO_STATUS_NORMAL && initial_length > 0u) {
         result = oseo_string_from_units(context, then_units, 4u);
         frame.slots[7] = result.value;
     }
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < length;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < ordinary_object(frame.slots[0])->array_length;
          index += 1u) {
+        if (!race) aggregate_object(frame.slots[3])->remaining += 1u;
         result = oseo_property_key(context, oseo_number((double)index));
         frame.slots[11] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -3648,6 +3643,17 @@ static OseoResult promise_combine(
                 frame.slots[4]
             );
             if (result.status == OSEO_STATUS_NORMAL) break;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !race) {
+        OseoPromiseAggregate *aggregate = aggregate_object(frame.slots[3]);
+        aggregate->remaining -= 1u;
+        if (aggregate->remaining == 0u) {
+            result = oseo_promise_resolve_into(
+                context,
+                frame.slots[1],
+                frame.slots[2]
+            );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
