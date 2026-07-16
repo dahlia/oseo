@@ -52,8 +52,10 @@ export type Test262Classification =
 /** Strictness variants requested by test262 frontmatter. */
 export type Test262Strictness = "non-strict" | "strict";
 
-/** Failure phase declared by a negative test262 case. */
-export type Test262FailurePhase = "parse" | "runtime";
+/**
+ * Failure phase declared by test262 metadata. Parse includes early errors.
+ */
+export type Test262FailurePhase = "parse" | "resolution" | "runtime";
 
 /** Frontmatter and suite identity needed to reproduce one reviewed case. */
 export interface Test262Case {
@@ -169,24 +171,19 @@ export function classifyTest262(
   const errorTypeMatches =
     testCase.expectedErrorType == null ||
     testCase.expectedErrorType === observation.errorType;
+  const negativeMatches =
+    testCase.expectedFailurePhase != null &&
+    !observation.passed &&
+    observation.failedPhase === testCase.expectedFailurePhase &&
+    errorTypeMatches;
   let classification: Test262Classification;
   if (observation.harnessFailed) {
     classification = "harness-failure";
   } else if (unsupportedFeatures.length > 0) {
     classification = "unsupported-profile-feature";
-  } else if (
-    testCase.expectedFailurePhase === "parse" &&
-    !observation.passed &&
-    observation.failedPhase === "parse" &&
-    errorTypeMatches
-  ) {
+  } else if (testCase.expectedFailurePhase === "parse" && negativeMatches) {
     classification = "expected-parse-failure";
-  } else if (
-    testCase.expectedFailurePhase === "runtime" &&
-    !observation.passed &&
-    observation.failedPhase === "runtime" &&
-    errorTypeMatches
-  ) {
+  } else if (negativeMatches) {
     classification = "pass";
   } else if (testCase.expectedFailurePhase == null && observation.passed) {
     classification = "pass";

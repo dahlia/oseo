@@ -243,6 +243,46 @@ test("requires the declared phase for negative test262 cases", () => {
   assert.equal(result.classification, "semantic-failure");
 });
 
+test("classifies early errors and resolution failures", () => {
+  const base = {
+    expectedErrorType: "SyntaxError",
+    features: [],
+    includes: [],
+    strictness: ["non-strict"],
+    suiteRevision: "test-revision",
+  } as const;
+  const earlyError = classifyTest262(
+    {
+      ...base,
+      expectedFailurePhase: "parse",
+      path: "language/expressions/let/dstr/dup-lexical.js",
+    },
+    {
+      errorType: "SyntaxError",
+      failedPhase: "parse",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  const resolution = classifyTest262(
+    {
+      ...base,
+      expectedFailurePhase: "resolution",
+      path: "language/module-code/instn-resolve.js",
+    },
+    {
+      errorType: "SyntaxError",
+      failedPhase: "resolution",
+      harnessFailed: false,
+      passed: false,
+    },
+    new Set<string>(),
+  );
+  assert.equal(earlyError.classification, "expected-parse-failure");
+  assert.equal(resolution.classification, "pass");
+});
+
 test("requires the declared error type for negative test262 cases", () => {
   const testCase = {
     expectedErrorType: "TypeError",
