@@ -633,6 +633,13 @@ function expression(
       : { ...located, arguments: argumentValues, kind: "call", target };
   }
   if (value.type === "NewExpression") {
+    if (value.typeArguments != null || value.typeParameters != null) {
+      return unsupported(
+        context,
+        value,
+        "Constructor type arguments are outside the M3 profile.",
+      );
+    }
     const calleeNode = node(value.callee);
     if (calleeNode == null) return unsupported(context, value);
     const callee = expression(context, calleeNode);

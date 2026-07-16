@@ -351,6 +351,18 @@ for (const [name, source] of unsupportedForms) {
   });
 }
 
+test("rejects constructor type arguments instead of erasing them", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function Box(value: number) { return value; }",
+      "new Box<number>(1);",
+    ].join(" "),
+    sourceId: "constructor-type-arguments.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Constructor type/u);
+});
+
 const lineTerminators = [
   ["LF", "\n"],
   ["CR", "\r"],
