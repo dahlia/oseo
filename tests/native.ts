@@ -1517,6 +1517,36 @@ assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
 assert.equal(nativeModule.stderr, "");
 assert.equal(nativeModule.stdout, "answer increment 41\n42\nimmutable\n");
 
+const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
+const nativeAsyncModule = await runNativeCli(
+  {
+    args: [asyncModuleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeAsyncModule.exitStatus, 0, nativeAsyncModule.stderr);
+assert.equal(nativeAsyncModule.stderr, "");
+assert.equal(
+  nativeAsyncModule.stdout,
+  "dependency ready\nentry ready\nlate timer\n",
+);
+
+const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
+const nativeBlockedModule = await runNativeCli(
+  {
+    args: [blockedModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeBlockedModule.exitStatus, 1);
+assert.equal(nativeBlockedModule.stdout, "");
+assert.match(
+  nativeBlockedModule.stderr,
+  /error\[OSEO3001\].*Top-level await cannot make progress/u,
+);
+
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
 );

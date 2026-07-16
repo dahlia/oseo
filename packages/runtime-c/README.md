@@ -19,6 +19,10 @@ executors run synchronously through a generated-function dispatcher. Reactions
 and thenable assimilation enter a runtime-owned FIFO microtask queue. The
 context retains queued work as collector roots and records unhandled rejections
 only at an explicit microtask checkpoint.
+The `m4-3` ABI adds a top-level await scheduler checkpoint. It normalizes an
+awaited value through the promise job queue and advances timer turns only until
+that value settles. A pending value with no owned work reports `OSEO3001`
+instead of leaving the native executable blocked.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

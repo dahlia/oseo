@@ -438,6 +438,7 @@ OseoResult oseo_promise_result(
     OseoContext *context,
     OseoValue promise
 );
+OseoResult oseo_await_value(OseoContext *context, OseoValue value);
 OseoResult oseo_jobs_drain(OseoContext *context);
 OseoResult oseo_rejection_checkpoint(OseoContext *context);
 OseoResult oseo_set_timeout(

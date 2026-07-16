@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource, printHir, printMir } from "@oseo/compiler";
+import {
+  compileModuleGraph,
+  compileSource,
+  printHir,
+  printMir,
+} from "@oseo/compiler";
 
 import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
@@ -458,6 +463,36 @@ test("converts M4 imports and exports to owned module syntax", () => {
     ["local", "local", "indirect", "star", "default"],
   );
   assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
+});
+
+test("lowers top-level await to an owned scheduler checkpoint", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export const answer = 1 + await Promise.resolve(41);",
+    sourceId: "file:///app/answer.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/answer.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/answer.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "answer",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(
+    compiled.mir?.script.blocks
+      .flatMap((block) => block.operations)
+      .some((operation) => operation.target?.kind === "await"),
+  );
+  assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
 });
 
 test("lowers M4 promise construction and static methods", () => {

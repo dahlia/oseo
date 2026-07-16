@@ -116,6 +116,10 @@ export type BinaryOperator =
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
+      readonly argument: SyntaxExpression;
+      readonly kind: "await";
+    })
+  | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
       readonly value: SyntaxExpression;
@@ -984,6 +988,10 @@ export type HirCallTarget =
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
   | (LocatedSyntax & {
+      readonly argument: HirExpression;
+      readonly kind: "await";
+    })
+  | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionNameBinding?: boolean;
       readonly kind: "binding-set";
@@ -1301,6 +1309,10 @@ function resolveExpression(
       elements.push(resolved);
     }
     return { ...expression, elements };
+  }
+  if (expression.kind === "await") {
+    const argument = resolveExpression(expression.argument, scopes, state);
+    return argument == null ? undefined : { ...expression, argument };
   }
   if (
     expression.kind === "boolean" ||
@@ -2082,6 +2094,9 @@ function printHirExpression(expression: HirExpression): string {
       .map((entry) => `${JSON.stringify(entry.name)}: %b${entry.bindingId}`)
       .join(", ")}}`;
   }
+  if (expression.kind === "await") {
+    return `await ${printHirExpression(expression.argument)}`;
+  }
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +
@@ -2220,6 +2235,7 @@ export type MirConstant =
 
 /** A direct call target independent of HIR and source syntax. */
 export type MirCallTarget =
+  | { readonly kind: "await" }
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
   | {
@@ -2783,6 +2799,34 @@ function lowerExpression(
       recordRoot(builder, result, element.range);
     }
     return id;
+  }
+  if (expression.kind === "await") {
+    const argument = lowerExpression(expression.argument, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "top-level await checkpoint",
+      [argument],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [argument],
+      detail: "top-level await",
+      id,
+      kind: "call",
+      range: expression.range,
+      target: { kind: "await" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "binding") {
     appendMirMetadata(

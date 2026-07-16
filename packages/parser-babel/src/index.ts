@@ -491,6 +491,14 @@ function expression(
     }
     return { ...located, elements, kind: "array" };
   }
+  if (value.type === "AwaitExpression") {
+    const argumentNode = node(value.argument);
+    if (argumentNode == null) return unsupported(context, value);
+    const argument = expression(context, argumentNode);
+    return argument == null
+      ? undefined
+      : { ...located, argument, kind: "await" };
+  }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
   }

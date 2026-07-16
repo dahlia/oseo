@@ -349,7 +349,10 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   const argumentsValue = emitArguments(state, callArguments);
   location(state, operation.range);
   state.usesAbrupt = true;
-  if (target.kind === "console-log") {
+  if (target.kind === "await") {
+    const value = operationArgument(operation, 0);
+    line(state, `result = oseo_await_value(context, roots[${value}]);`);
+  } else if (target.kind === "console-log") {
     line(
       state,
       `result = oseo_console_log(context, ${argumentsValue.count}u, ` +
