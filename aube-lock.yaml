@@ -26,12 +26,18 @@ importers:
       publint:
         specifier: 0.3.21
         version: 0.3.21
+      test262:
+        specifier: github:tc39/test262#f2d1435644797268dca1f7988cad5a4e89ccd8d2
+        version: https://codeload.github.com/tc39/test262/tar.gz/f2d1435644797268dca1f7988cad5a4e89ccd8d2
       tsdown:
         specifier: 0.22.7
         version: 0.22.7(@arethetypeswrong/core@0.18.5)(publint@0.3.21)(typescript@7.0.2)
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+      yaml:
+        specifier: 2.9.0
+        version: 2.9.0
 
   packages/backend-c:
     dependencies:
@@ -634,6 +640,10 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  test262@https://codeload.github.com/tc39/test262/tar.gz/f2d1435644797268dca1f7988cad5a4e89ccd8d2:
+    resolution: {gitHosted: true, integrity: sha512-4cp7FM9kn4tQLXoUnF0OfWRjcUP8v8geDYjg1XIGu0tz/drApsvijIaXR4ELuF5c9ja8gTaQi/7q3oodZ91WQw==, tarball: https://codeload.github.com/tc39/test262/tar.gz/f2d1435644797268dca1f7988cad5a4e89ccd8d2}
+    version: 5.0.0
+
   tinyexec@1.2.4:
     resolution: {integrity: sha512-SHf/r48b7vOrjve9PxJo3MN5v5yuyjHvdUcrQffT3WXMUfnGmHDVbC4k3sHJaJTgZCwpUplIaAo5ANtMyp3YHg==}
     engines: {node: '>=18'}
@@ -702,6 +712,11 @@ packages:
   validate-npm-package-name@5.0.1:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
 
   yuku-ast@0.1.7:
     resolution: {integrity: sha512-2RiMEWv500TixY5rJy6OZd4fSy9WYZKWh6gGbIJ7y7vAGcuCugWOWwOLGaQcRZrXcPUfqtLtvpaJ3SdXtWlhKA==}
@@ -1064,6 +1079,8 @@ snapshots:
 
   semver@7.8.5: {}
 
+  test262@https://codeload.github.com/tc39/test262/tar.gz/f2d1435644797268dca1f7988cad5a4e89ccd8d2: {}
+
   tinyexec@1.2.4: {}
 
   tinyglobby@0.2.17:
@@ -1135,6 +1152,8 @@ snapshots:
   undici-types@7.18.2: {}
 
   validate-npm-package-name@5.0.1: {}
+
+  yaml@2.9.0: {}
 
   yuku-ast@0.1.7:
     dependencies:

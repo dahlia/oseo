@@ -472,6 +472,12 @@ M2 observation-enabled builds emit one private counter record. The testkit
 removes it from process stderr before differential comparison. Ordinary CLI
 builds neither update specialized counters nor print an observation record.
 
+M3 pins a reviewed test262 subset and retains its complete frontmatter and
+native observations in a deterministic manifest. Applicable Script cases run
+in every requested strictness mode with specialization disabled and enabled.
+The gate rejects semantic failures, harness failures, or changes from the
+reviewed classification instead of counting unsupported cases as passes.
+
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to
 trace a native block back to the originating expression.
@@ -485,7 +491,6 @@ generic call result, and explicit root protocol. The following questions still
 need decision records before the affected implementation becomes a dependency
 of later milestones:
 
- -  the object shape and dictionary layouts;
  -  the long-term native code-generation backend;
  -  the native event-loop and system-library boundary;
  -  the treatment of dynamic source evaluation;

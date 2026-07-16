@@ -42,6 +42,7 @@ jobs:
           install: true
       - run: mise run test:native
       - run: mise run test:probes
+      - run: mise run test:test262
       - if: failure()
         uses: actions/upload-artifact@v7
         with:

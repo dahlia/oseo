@@ -75,6 +75,7 @@ export interface Test262Observation {
   readonly failedPhase?: Test262FailurePhase;
   readonly harnessFailed: boolean;
   readonly passed: boolean;
+  readonly unsupportedCapability?: string;
 }
 
 /** Complete reviewed result for one test262 case. */
@@ -179,7 +180,10 @@ export function classifyTest262(
   let classification: Test262Classification;
   if (observation.harnessFailed) {
     classification = "harness-failure";
-  } else if (unsupportedFeatures.length > 0) {
+  } else if (
+    unsupportedFeatures.length > 0 ||
+    observation.unsupportedCapability != null
+  ) {
     classification = "unsupported-profile-feature";
   } else if (testCase.expectedFailurePhase === "parse" && negativeMatches) {
     classification = "expected-parse-failure";

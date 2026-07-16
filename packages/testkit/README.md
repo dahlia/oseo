@@ -18,3 +18,9 @@ status, and errors.
 
 Test262 observations retain the declared `parse`, `resolution`, or `runtime`
 failure phase. The `parse` phase includes static-semantics early errors.
+An unavailable observation capability is recorded explicitly and classifies
+the case as unsupported rather than manufacturing an expected observation.
+One reviewed result aggregates every strictness mode requested by the upstream
+case. A positive case passes only when specialization-disabled and
+specialization-enabled native execution both succeed with identical output in
+every mode.

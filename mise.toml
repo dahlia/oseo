@@ -112,7 +112,13 @@ run = "bash experiments/native/run.sh"
 run = "bash experiments/value/run.sh"
 
 [tasks.test]
-depends = ["test:deno", "test:native", "test:node", "test:probes"]
+depends = [
+  "test:deno",
+  "test:native",
+  "test:node",
+  "test:probes",
+  "test:test262",
+]
 
 [tasks."test:deno"]
 description = "Run package source tests under Deno"
@@ -136,3 +142,13 @@ mise run probe:host-parser
 mise run probe:native-boundary
 mise run probe:value-layouts
 '''
+
+[tasks."test:test262"]
+description = "Run the pinned reviewed test262 subset"
+depends = ["build"]
+run = "node tools/test262.ts"
+
+[tasks."test262:update"]
+description = "Regenerate the pinned reviewed test262 result manifest"
+depends = ["build"]
+run = "node tools/test262.ts --update"

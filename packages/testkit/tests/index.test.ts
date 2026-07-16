@@ -243,6 +243,29 @@ test("requires the declared phase for negative test262 cases", () => {
   assert.equal(result.classification, "semantic-failure");
 });
 
+test("classifies unavailable observation capabilities as unsupported", () => {
+  const result = classifyTest262(
+    {
+      expectedErrorType: "TypeError",
+      expectedFailurePhase: "runtime",
+      features: [],
+      includes: [],
+      path: "language/statements/throw/runtime.js",
+      strictness: ["non-strict"],
+      suiteRevision: "test-revision",
+    },
+    {
+      detail: "The runtime error type is not observable.",
+      harnessFailed: false,
+      passed: false,
+      unsupportedCapability: "runtime-error-types",
+    },
+    new Set<string>(),
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.deepEqual(result.unsupportedFeatures, []);
+});
+
 test("classifies early errors and resolution failures", () => {
   const base = {
     expectedErrorType: "SyntaxError",

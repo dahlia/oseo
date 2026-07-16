@@ -6,9 +6,9 @@ Status
 
 This document freezes the source profile implemented for M3. It extends
 [*language-profile-m1.md*](./language-profile-m1.md). M2 specialization remains
-removable as described by [*specialization-m2.md*](./specialization-m2.md). The
-profile implementation is not a milestone-completion claim: executable
-test262 subset evidence remains outstanding in [*PLAN-M3.md*](../PLAN-M3.md).
+removable as described by [*specialization-m2.md*](./specialization-m2.md).
+The profile and its reviewed evidence satisfy the M3 exit criteria in
+[*ROADMAP.md*](../ROADMAP.md).
 
 
 Program and value model
@@ -126,8 +126,23 @@ The repository classification model records suite revision, path, frontmatter
 features, strictness modes, harness includes, expected phase, and actual
 observation. Results are classified as pass, semantic failure, unsupported
 profile feature, expected parse failure, or harness failure. Unsupported and
-harness cases never increase the pass count. An executable runner, pinned suite
-revision, reviewed subset, and checked-in result manifest are still required.
+harness cases never increase the pass count.
+
+Runtime-negative cases that require a named ECMAScript error type remain
+unsupported in M3. The native boundary reports an unhandled thrown completion,
+but the M3 profile does not expose enough error identity to distinguish the
+actual type. The runner does not copy the expected frontmatter type into the
+observation.
+
+The reviewed subset pins test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. It records 30 passes, 6 expected
+parse failures, 1 unsupported profile feature, 0 semantic failures, and 0
+harness failures. The positive cases produce 98 native executions across their
+requested strictness modes and specialization-disabled and
+specialization-enabled compilation. The runner forces collection at every
+safepoint and requires exact agreement with *tests/test262/results.yaml*.
+Run it with `mise run test:test262`; refresh reviewed evidence explicitly with
+`mise run test262:update` on x86-64 Linux.
 
 
 Negative profile boundaries

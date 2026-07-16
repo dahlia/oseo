@@ -4,11 +4,11 @@ Oseo roadmap
 Status
 ------
 
-Oseo is completing M3. Traced ordinary objects and arrays, closures, dynamic
+Oseo has completed M3: traced ordinary objects and arrays, closures, dynamic
 calls, constructors, explicit abrupt completion, and guarded property reads
-are implemented, but the executable test262 evidence gate remains open. The
-current implementation plan is [*PLAN-M3.md*](./PLAN-M3.md). This roadmap uses
-capability gates rather than calendar dates.
+with a compiled generic fallback. The current implementation plan is
+[*PLAN-M4.md*](./PLAN-M4.md). This roadmap uses capability gates rather than
+calendar dates.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -253,9 +253,9 @@ M3 implementation evidence is recorded in
 owns descriptors, prototypes, arrays, closures, function objects, constructors,
 and completion propagation. Differential fixtures match Node.js and Deno in
 specialization-disabled and specialization-enabled native modes. The same
-corpus cross-links for AArch64. M3 is not complete until reviewed test262
-subsets run through a repository-owned runner at a pinned revision and produce
-a checked-in result manifest.
+corpus cross-links for AArch64. The reviewed test262 subset at revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2` records 30 passes, 6 expected parse
+failures, 1 unsupported profile feature, and no semantic or harness failures.
 
 
 M4: Modules and asynchronous execution
@@ -446,19 +446,19 @@ Initial work queue
 ------------------
 
 The package scaffold, compiler pipeline, native runtime, arithmetic
-specialization, managed object graph, array semantics, and first property cache
-are implemented. M3 follows [*PLAN-M3.md*](./PLAN-M3.md) to close its remaining
-evidence gate:
+specialization, and M3 dynamic language core are complete. M4 follows
+[*PLAN-M4.md*](./PLAN-M4.md):
 
-1.  Add a repository-owned executable test262 runner.
-2.  Pin the suite revision and define reviewed M3 subsets.
-3.  Check in a result manifest that separates passes, semantic failures,
-    unsupported cases, expected parse failures, and harness failures.
-4.  Re-run the complete differential, sanitizer, cross-target, package, and M2
-    invariance gates before declaring M3 complete.
+1.  Freeze the M4 language profile and the module, job, continuation, and event
+    loop decisions.
+2.  Add owned module syntax, host-neutral graph loading, linking, live cells,
+    and synchronous cyclic evaluation.
+3.  Add namespace objects, graph diagnostics, and whole-graph native linking.
+4.  Add promises, reaction jobs, and unhandled-rejection tracking.
+5.  Add asynchronous functions, top-level await, timers, and shutdown rules.
 
-[*PLAN-M4.md*](./PLAN-M4.md) remains a draft for the next milestone. M4 work
-does not begin until the M3 exit criteria are repeatable.
+M4 preserves the M2 and M3 generic-fallback, forced-collection, sanitizer,
+cross-target, package, and test262 evidence gates.
 
 
 Risks that affect ordering
