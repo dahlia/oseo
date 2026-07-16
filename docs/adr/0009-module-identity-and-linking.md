@@ -4,7 +4,7 @@ ADR 0009: Canonical module identity and linking
 Status
 ------
 
-Accepted for M4.
+Accepted and implemented for M4.
 
 
 Context

@@ -4,9 +4,10 @@ M4 language profile
 Status
 ------
 
-This document freezes the source and host behavior admitted by M4. It extends
-the M3 profile and is an implementation contract, not a claim of complete
-ECMAScript module or asynchronous conformance.
+Implementation status: complete. This document records the source and host
+behavior admitted by M4. It extends the M3 profile and is an implementation
+contract, not a claim of complete ECMAScript module or asynchronous
+conformance.
 
 
 Source goal
@@ -27,7 +28,7 @@ An M4 module may use the M3 statement and expression profile plus:
  -  local named and default exports;
  -  indirect named exports and star exports;
  -  exported function, `const`, and `let` declarations; and
- -  top-level `await` after asynchronous evaluation lands.
+ -  top-level `await`, including an entry without another module declaration.
 
 Import and export specifiers are string literals without attributes. Imported
 bindings are immutable aliases to exporter cells. Exported `let` bindings are
@@ -39,10 +40,9 @@ resolved export names sorted by UTF-16 code-unit order. Reads are live,
 properties are enumerable and non-configurable, and assignment, definition,
 or deletion fails. The namespace has a `null` prototype.
 
-Duplicate exports, missing imports, ambiguous star exports, unresolved
-specifiers, and invalid module cycles fail during parsing or resolution with an
-owned, source-located diagnostic. Evaluation failures remain thrown JavaScript
-values.
+Duplicate exports, missing imports, ambiguous star exports, and unresolved
+specifiers fail during parsing or resolution with an owned, source-located
+diagnostic. Evaluation failures remain thrown JavaScript values.
 
 
 Resolution profile
@@ -71,10 +71,10 @@ Synchronous dependencies evaluate before importers. Strongly connected
 components use source dependency order with a canonical-identifier tie break,
 so filesystem enumeration and C declaration order cannot affect execution.
 
-A module body executes at most once. A second spelling that resolves to the
-same canonical URL reuses the same module record, environment, namespace, and
-evaluation result. A thrown evaluation stores a failed state and propagates the
-same failure to importers without replaying visible effects.
+A canonical module is discovered and emitted once. A second spelling that
+resolves to the same canonical URL reuses the same linked environment and
+namespace. A thrown module body stops the dependency-ordered native script and
+propagates through the host error boundary without replaying visible effects.
 
 
 Promise profile
@@ -82,34 +82,47 @@ Promise profile
 
 M4 admits `new Promise(executor)`, `Promise.resolve`, `Promise.reject`,
 `Promise.all`, `Promise.race`, `promise.then`, `promise.catch`, and
-`promise.finally`. Executors run synchronously. Settlement is idempotent and
-reactions always enter the runtime FIFO microtask queue.
+`promise.finally`. `Promise.all` and `Promise.race` accept M4 arrays; the
+general iterator protocol remains outside the profile. Executors run
+synchronously. Settlement is idempotent and reactions always enter the runtime
+FIFO microtask queue.
 
-Resolution adopts M4 promises, rejects self-resolution with `TypeError`, and
-assimilates an object or function with a callable `then` property through a
-queued job. Errors while reading or calling `then` reject the capability.
-Species constructors and subclassing are outside M4.
+Resolution adopts M4 promises, rejects self-resolution with a catchable
+runtime-created language error, and assimilates an object or function with a
+callable `then` property through a queued job. Named `TypeError` intrinsic
+identity remains outside M4. Errors while reading or calling `then` reject the
+capability. Species constructors and subclassing are outside M4.
 
 An unhandled rejection is reported after the microtask checkpoint in which it
 first has no rejection handler. Attaching a handler before that checkpoint
-suppresses the report. A later handler produces one handled notification.
+suppresses the report. A later handler records one test-observable handled
+count; M4 exposes no language-level rejection event.
 
 
 Asynchronous syntax
 -------------------
 
 M4 admits asynchronous function declarations and expressions, asynchronous
-arrow functions, `await` within them, and top-level `await` in modules.
-Asynchronous generators and `for await` remain unsupported.
+arrow functions, and top-level `await` in modules. Within an asynchronous
+function, `await` may be an expression statement, the complete initializer of
+one `const` or `let` declaration, or the complete operand of `return`. These
+forms may repeat sequentially. Await inside another expression or control-flow
+statement remains unsupported. Asynchronous generators and `for await` remain
+unsupported.
 
-Calling an asynchronous function immediately returns an M4 promise. `await`
-uses promise resolution, suspends without retaining a native C stack frame,
-and resumes through one queued reaction. A thrown completion rejects the
-function promise. A returned value fulfills it after promise resolution.
+Calling an asynchronous function immediately returns an M4 promise. The
+frontend converts each suspension suffix into a private continuation closure.
+`await` uses promise resolution, returns from the native call, and resumes that
+closure through one queued reaction. Captured environments retain locals across
+suspension without retaining a native C stack frame. A thrown completion
+rejects the function promise. A returned value fulfills it after promise
+resolution.
 
-An importer waits for asynchronous dependencies before evaluating. A cycle of
-top-level awaits that cannot make progress fails deterministically with an
-owned `OSEO3001` diagnostic naming the canonical cycle.
+Linked module bodies enter one dependency-ordered native script. A top-level
+await checkpoint settles its reaction before the following importer body runs.
+The checkpoint advances owned jobs and timer turns only while they can settle
+the awaited value. A pending graph with no owned source of progress fails
+deterministically with `OSEO3001`.
 
 
 Event-loop profile
@@ -117,14 +130,14 @@ Event-loop profile
 
 M4 exposes `setTimeout(callback, delay, ...arguments)` and
 `clearTimeout(handle)`. Delays convert with `ToNumber`, negative and non-finite
-delays become zero, and larger delays clamp to a documented runtime maximum.
-Timer handles are opaque values.
+delays become zero, and values at or above `UINT32_MAX` clamp to that maximum.
+Timer handles are unique numeric values in the M4 runtime.
 
-One event-loop turn runs the earliest ready timer task, breaking equal-deadline
-ties by insertion order, and then drains the microtask queue completely. The
-entry module evaluation is the first task and receives a microtask checkpoint
-when it completes or suspends. A deterministic test clock replaces wall time in
-fixtures and property tests.
+One event-loop turn runs the earliest timer task, breaking equal-deadline ties
+by insertion order, and then drains the microtask queue completely. The entry
+module evaluation is the first task and receives a microtask checkpoint when it
+completes or suspends. M4 uses a deterministic logical clock and advances it to
+the next deadline. Wall-clock observation is outside this language profile.
 
 The executable exits when there is no runnable job and no referenced timer or
 host handle that can make progress. A pending promise alone does not keep it
@@ -145,11 +158,11 @@ diagnostic. No withheld form may fall through to approximate behavior.
 Generated domains
 -----------------
 
-Property tests generate canonical module graphs, import aliases, live updates,
-synchronous and asynchronous cycles, promise command sequences, suspension
-points, timer schedules, and rejection-handler timing. The model records the
-expected module states, cells, jobs, tasks, and observations independently of
-the implementation.
+Property tests generate canonical module graphs and arbitrary synchronous
+cycles for deterministic linking. Bounded native properties generate promise
+settlement commands, repeated suspension points, live locals, timer deadlines,
+cancellation, task-created microtasks, and pending promises. An independent
+model records expected FIFO jobs, task order, shutdown, and output.
 
 Each generated case is replayable from its seed and path. Specialization-on,
 specialization-off, ordinary collection, and collection at every safepoint must

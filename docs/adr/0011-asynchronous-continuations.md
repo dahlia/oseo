@@ -4,7 +4,7 @@ ADR 0011: Traced asynchronous continuations
 Status
 ------
 
-Accepted for M4.
+Accepted and implemented for M4.
 
 
 Context
@@ -18,28 +18,33 @@ implementation details.
 Decision
 --------
 
-Each asynchronous function lowers to a state machine with an entry and private
-resume entry. Calling it creates a capability promise and a traced continuation
-record. The record contains a numeric state, live lexical cells or values, the
-capability, and the minimum completion data needed after suspension.
+Each admitted asynchronous function lowers to continuation-passing form. Its
+entry creates a capability promise and runs synchronously until the first
+`await`. Each remaining suffix becomes a private generated function. Its traced
+closure environment is the continuation record and contains exactly the
+bindings referenced by that suffix.
 
-At `await`, lowering resolves the operand as a promise, stores values live
-across suspension, registers fulfillment and rejection reactions, and returns
-normally from native code. A reaction job enters the resume entry with one
-normal or thrown completion. Dead locals remain in the ordinary native frame.
+At `await`, lowering resolves the operand, attaches the continuation as a
+reaction, and returns normally from native code. The reaction invokes the next
+generated function through the shared dispatcher. Rejection bypasses the
+fulfillment continuation and rejects the returned chain. Resolving the outer
+capability with that chain preserves returned and thrown completion.
 
-Top-level await uses the same continuation contract on a module evaluation
-record. The module graph, rather than native recursion, owns dependency
-resumption and cycle-progress detection.
+Top-level await is a scheduler checkpoint in the dependency-ordered whole-graph
+script. It normalizes the value through one reaction and advances owned jobs and
+timer turns only until that reaction settles. If no owned task can make
+progress, it reports `OSEO3001` instead of retaining native recursion or
+blocking indefinitely.
 
 
 Consequences
 ------------
 
-Continuation layouts are inspectable compiler output and explicit collector
-roots. Every allocation, suspension, and resumption boundary is a MIR
-safepoint. Specialization can occur inside an asynchronous function but cannot
-change state numbering or reschedule visible work.
+Continuation functions, closure captures, and scheduler checkpoints are
+inspectable compiler output and explicit collector roots. Every allocation,
+suspension, and resumption boundary is a MIR safepoint. Specialization can
+occur inside an asynchronous function but cannot duplicate a suffix or
+reschedule visible work.
 
 
 Alternatives
@@ -54,6 +59,7 @@ were rejected because native executables cannot depend on a bootstrap runtime.
 Replacement trigger
 -------------------
 
-Revisit the record layout if liveness measurements show unacceptable retained
-state. Preserve heap ownership, explicit roots, one resume per reaction, and no
-suspended native stack in any replacement.
+Revisit continuation closure granularity if liveness measurements show
+unacceptable retained state or if broader M5 control flow needs a numeric state
+dispatcher. Preserve heap ownership, explicit roots, one resume per reaction,
+and no suspended native stack in any replacement.

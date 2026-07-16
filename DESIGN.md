@@ -341,6 +341,17 @@ isolation and discovering ordinary imports at run time. Static ECMAScript
 imports are resolved before native code generation. The linker records module
 instantiation order, live bindings, and top-level evaluation order.
 
+M4 canonicalizes `file:` identities through a host-neutral resolver and records
+source hashes before linking. Tarjan components make cycles inspectable. The
+compiler allocates every exported cell and shared namespace before lowering
+module bodies into one dependency-ordered MIR script. Imports reuse exporter
+cell identifiers, so whole-graph flattening does not copy a binding or make C
+declaration order semantic.
+
+Top-level await lowers to an explicit scheduler checkpoint in that script. It
+settles the dependency before later importer operations execute and reports an
+owned diagnostic when no runtime-owned job or timer can make progress.
+
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native
 binary has been built. They remain outside the initial language profile.
@@ -356,17 +367,26 @@ Host boundary and event loop
 ----------------------------
 
 Generated programs use runtime host interfaces rather than calling Node.js or
-Deno. The native runtime eventually provides an event loop, timers, networking,
-cryptography, files, and other capabilities required by its selected
-compatibility profiles.
+Deno. The M4 native runtime provides promise jobs, a timer scheduler, and
+shutdown. Later compatibility profiles add networking, cryptography, files, and
+other capabilities through the same boundary.
 
 The compiler itself uses narrow host adapters for file access, subprocesses,
 environment variables, and diagnostics. Node.js and Deno adapters implement the
 same internal interface. Compiler-core tests run against both adapters.
 
-Promises and the ECMAScript job queue precede web APIs that depend on them.
-Unhandled-rejection tracking, timers, streams, and `fetch()` must share one
-documented scheduling model.
+Promises and the ECMAScript job queue precede web APIs that depend on them. M4
+owns promises, reactions, thenable jobs, rejection checkpoints, a timer queue,
+and a deterministic logical clock in the C runtime. Asynchronous functions use
+generated continuation closures, so a suspension returns from the native C
+frame before a queued reaction resumes it. Each timer task drains microtasks
+before the next timer, and pending promises alone do not keep the executable
+alive.
+
+The runtime ABI is the replacement boundary for a future platform event
+adapter. Streams, `fetch()`, I/O readiness, wakeups, and wall-clock observation
+remain outside M4 and must extend the same documented scheduling and liveness
+model.
 
 
 Native backend
@@ -473,6 +493,13 @@ the admitted profile. A failure report records enough metadata to replay the
 same case directly. Interrupted or incomplete runs are failures, not shortened
 passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
 models and replay contract into grammar-based differential generation.
+
+The M4 native schedule property prints promise commands, repeated async
+suspensions, timer deadlines, cancellations, and task-created microtasks from
+one structured model. It compares the model with Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at each safepoint. The ordinary gate runs ten native
+cases; the extended task increases both case count and schedule size.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of

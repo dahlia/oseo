@@ -4,7 +4,7 @@ ADR 0012: Replaceable native event loop
 Status
 ------
 
-Accepted for M4.
+Accepted and implemented for M4.
 
 
 Context
@@ -19,15 +19,15 @@ new system dependencies.
 Decision
 --------
 
-Runtime core owns host-neutral task, timer, clock, wakeup, and liveness
-interfaces. The first POSIX adapter uses the C11-compatible platform clock and
-sleep boundary already supplied by the Zig libc target. It introduces no
-third-party event-loop library.
+Runtime core owns the FIFO microtask queue, timer task queue, logical clock, and
+liveness decision. The C runtime ABI is the replacement boundary for future
+host task and I/O adapters. M4 introduces no third-party event-loop library or
+platform-specific handles.
 
 Timers are ordered by deadline and monotonically increasing insertion number.
-Tests inject a clock and advance directly to the next deadline. Production
-execution sleeps only when a referenced timer is the next possible source of
-progress.
+The scheduler advances its logical clock directly to the next deadline. M4 has
+no language-visible wall-clock API, so native and generated tests observe the
+same ordering without sleeping.
 
 The entry module is the first task. Each completed or suspended task drains the
 FIFO microtask queue before another task begins. Shutdown is a query over
@@ -38,9 +38,9 @@ runtime objects.
 Consequences
 ------------
 
-Timer behavior is deterministic in tests and cross-links with the existing
-AArch64 musl target. Future I/O adapters can integrate through the same wakeup
-and liveness boundary without changing compiler IR or promise semantics.
+Timer behavior is deterministic in every M4 executable and cross-links with the
+existing AArch64 musl target. Future I/O adapters can extend the runtime ABI
+without changing compiler IR or promise semantics.
 
 Clock and sleep failures are owned host diagnostics. Thrown callbacks and
 unhandled rejections pass through one host error reporter after the checkpoint.
@@ -59,6 +59,6 @@ Replacement trigger
 -------------------
 
 Adopt a measured event library when sockets or filesystem readiness require it
-or when timer measurements show the initial adapter is inadequate. Keep the
-runtime interface, injected-clock tests, ordering rules, and liveness query
+or when wall-clock APIs enter a selected host profile. Keep the runtime
+boundary, deterministic logical-clock tests, ordering rules, and liveness query
 stable across that change.

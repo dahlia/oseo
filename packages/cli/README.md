@@ -25,4 +25,9 @@ Module entries may use only relative file specifiers. Programmatic callers may
 override `sourceId` for script diagnostics without changing the positional path
 used to read the source file.
 
+An entry with imports, exports, or top-level await enters the module-graph
+workflow. Top-level await does not need an otherwise unused module declaration.
+The produced executable drains runtime-owned promise jobs and timer tasks; it
+does not embed the Node.js or Deno host used to compile it.
+
 [Optique]: https://optique.dev/

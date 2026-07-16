@@ -4,7 +4,7 @@ ADR 0010: Runtime-owned promise jobs
 Status
 ------
 
-Accepted for M4.
+Accepted and implemented for M4.
 
 
 Context

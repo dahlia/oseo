@@ -24,3 +24,9 @@ One reviewed result aggregates every strictness mode requested by the upstream
 case. A positive case passes only when specialization-disabled and
 specialization-enabled native execution both succeed with identical output in
 every mode.
+
+Cross-package M4 properties use the same retained native-fixture protocol for
+generated asynchronous schedules. The repository property runner records an
+explicit seed, replay path, size tier, run scale, profile, and domain. Its
+asynchronous entry point waits for shrinking and native inspection to finish,
+and an interrupted budget is a failure rather than a shortened pass.
