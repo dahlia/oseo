@@ -236,6 +236,53 @@ test("recognizes top-level await without module declarations", async () => {
   assert.match(result.stdout, /top-level await/u);
 });
 
+test("preserves module parsing for plain mjs entries", async () => {
+  const host: CompilerHost = {
+    canonicalizeFile(path) {
+      return Promise.resolve(new URL(String(path), "file:///work/").href);
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile() {
+      return Promise.reject(new Error("unexpected read"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const source = "function duplicate(parameter, parameter) {}";
+  const moduleResults = await Promise.all(
+    ["entry.mjs", "C:\\work\\entry.mjs", "file:///work/entry.mjs"].map(
+      (sourcePath) =>
+        runNativeCli(
+          {
+            args: ["--dump-mir", sourcePath],
+            source,
+            version: "0.0.0",
+          },
+          host,
+        ),
+    ),
+  );
+  for (const result of moduleResults) {
+    assert.equal(result.exitStatus, 1);
+    assert.match(result.stderr, /error\[OSEO0001\]/u);
+  }
+  const script = await runNativeCli({
+    args: ["--dump-mir", "entry.js"],
+    source,
+    version: "0.0.0",
+  });
+  assert.equal(script.exitStatus, 0);
+});
+
 test("normalizes process spawn failures into host diagnostics", async () => {
   let cleanupCount = 0;
   const host: CompilerHost = {

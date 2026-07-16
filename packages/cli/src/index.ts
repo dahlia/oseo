@@ -284,7 +284,22 @@ async function compileCliModuleGraph(
   return { mir: compiled.mir };
 }
 
-function isModuleSource(source: string, sourceId: string): boolean {
+function hasModulePathIntent(sourcePath: string): boolean {
+  try {
+    const url = new URL(sourcePath);
+    if (url.protocol === "file:") return url.pathname.endsWith(".mjs");
+  } catch {
+    // Ordinary filesystem paths are checked below.
+  }
+  return sourcePath.endsWith(".mjs");
+}
+
+function isModuleSource(
+  source: string,
+  sourceId: string,
+  sourcePath: string,
+): boolean {
+  if (hasModulePathIntent(sourcePath)) return true;
   const parsed = defaultComponents.moduleFrontend.parseModule({
     source,
     sourceId,
@@ -438,7 +453,7 @@ export async function runNativeCli(
     );
   }
   let mir: MirProgram;
-  if (isModuleSource(source, sourceId)) {
+  if (isModuleSource(source, sourceId, parsed.value.sourceId)) {
     const compiled = await compileCliModuleGraph(
       host,
       parsed.value.sourceId,
