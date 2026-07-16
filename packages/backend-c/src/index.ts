@@ -1425,6 +1425,8 @@ export const cBackend: NativeBackend = {
         "    }\n" +
         "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
         "        result = oseo_event_loop_run(&context);\n" +
+        "    } else {\n" +
+        "        result = oseo_entry_task_checkpoint(&context, result);\n" +
         "    }\n" +
         "    if (result.status != OSEO_STATUS_NORMAL) {\n" +
         "        oseo_context_print_error(&context);\n" +

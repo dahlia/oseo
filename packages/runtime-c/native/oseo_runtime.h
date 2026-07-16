@@ -459,6 +459,10 @@ OseoResult oseo_clear_timeout(
     OseoContext *context,
     OseoValue handle
 );
+OseoResult oseo_entry_task_checkpoint(
+    OseoContext *context,
+    OseoResult completion
+);
 OseoResult oseo_event_loop_run(OseoContext *context);
 
 #endif

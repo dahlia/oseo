@@ -4301,6 +4301,39 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
     return result;
 }
 
+OseoResult oseo_entry_task_checkpoint(
+    OseoContext *context,
+    OseoResult completion
+) {
+    if (completion.status != OSEO_STATUS_THROW ||
+        context->has_diagnostic) {
+        return completion;
+    }
+    const char *error_code = context->error_code;
+    const char *error_message = context->error_message;
+    size_t line = context->line;
+    size_t column = context->column;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = completion.value;
+    result = oseo_jobs_drain(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_rejection_checkpoint(context);
+    }
+    if (result.status == OSEO_STATUS_NORMAL || !context->has_diagnostic) {
+        context->error_code = error_code;
+        context->error_message = error_message;
+        context->has_diagnostic = false;
+        context->line = line;
+        context->column = column;
+        completion.value = frame.slots[0];
+        result = completion;
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_event_loop_run(OseoContext *context) {
     OseoResult result = oseo_jobs_drain(context);
     if (result.status == OSEO_STATUS_NORMAL) {

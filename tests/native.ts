@@ -1489,6 +1489,26 @@ assert.match(
   /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
 );
 
+const thrownEntry = await runNativeCli(
+  {
+    args: ["thrown-entry-runtime.ts"],
+    source: `
+function observe(value) { console.log(value); }
+Promise.resolve("microtask after entry throw").then(observe);
+throw "entry failure";
+`,
+    sourceId: "thrown-entry-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownEntry.exitStatus, 1);
+assert.equal(thrownEntry.stdout, "microtask after entry throw\n");
+assert.match(
+  thrownEntry.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+
 const wideBindings = Array.from(
   { length: 3_000 },
   (_, index) => `const value${index} = ${index};`,
