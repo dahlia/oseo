@@ -1001,6 +1001,13 @@ export type HirExpression =
       readonly kind: "null";
     })
   | (LocatedSyntax & {
+      readonly entries: readonly {
+        readonly bindingId: number;
+        readonly name: string;
+      }[];
+      readonly kind: "module-namespace";
+    })
+  | (LocatedSyntax & {
       readonly arguments: readonly HirExpression[];
       readonly callee: HirExpression;
       readonly kind: "new";
@@ -1983,6 +1990,11 @@ function printHirExpression(expression: HirExpression): string {
       printHirExpression(expression.value)
     );
   }
+  if (expression.kind === "module-namespace") {
+    return `module-namespace {${expression.entries
+      .map((entry) => `${JSON.stringify(entry.name)}: %b${entry.bindingId}`)
+      .join(", ")}}`;
+  }
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +
@@ -2186,6 +2198,7 @@ export interface MirOperation {
     | "initialize"
     | "join"
     | "load-fixed-slot"
+    | "module-namespace-create"
     | "object-create"
     | "property-key"
     | "property-delete"
@@ -2200,6 +2213,8 @@ export interface MirOperation {
     | "update-property-cache"
     | "write";
   readonly mutable?: boolean;
+  readonly namespaceBindingIds?: readonly number[];
+  readonly namespaceNames?: readonly string[];
   readonly checkedResult?: number;
   readonly abruptTarget?: number;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
@@ -2495,6 +2510,34 @@ function lowerExpression(
   builder: MirBuilder,
   inferredFunctionName?: number,
 ): number {
+  if (expression.kind === "module-namespace") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "module namespace allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `${expression.entries.length} live exports`,
+      id,
+      kind: "module-namespace-create",
+      namespaceBindingIds: expression.entries.map((entry) => entry.bindingId),
+      namespaceNames: expression.entries.map((entry) => entry.name),
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "binding-set") {
     const value = lowerExpression(expression.value, builder);
     appendMirMetadata(
@@ -4012,6 +4055,38 @@ export function compileModuleGraph(
   const functions: HirFunction[] = [];
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
+  const namespaceBindings = new Map<string, number>();
+  const namespaceInitializers: HirStatement[] = [];
+
+  for (const module of linked.graph.modules) {
+    for (const imported of module.imports) {
+      const targetId = imported.namespaceModuleId;
+      if (targetId == null || namespaceBindings.has(targetId)) continue;
+      const target = linkedModules.get(targetId);
+      const targetNode = nodes.get(targetId);
+      if (target == null || targetNode == null) {
+        throw new Error(`Namespace module '${targetId}' is unavailable.`);
+      }
+      const bindingId = nextBindingId;
+      nextBindingId += 1;
+      namespaceBindings.set(targetId, bindingId);
+      namespaceInitializers.push({
+        bindingId,
+        hint: undefined,
+        initializer: {
+          entries: target.exports.map((entry) => ({
+            bindingId: entry.cellId,
+            name: entry.exportedName,
+          })),
+          kind: "module-namespace",
+          range: targetNode.syntax.range,
+        },
+        kind: "const",
+        name: `*namespace:${targetId}*`,
+        range: targetNode.syntax.range,
+      });
+    }
+  }
 
   for (const moduleId of linked.graph.evaluationOrder) {
     const node = nodes.get(moduleId);
@@ -4022,19 +4097,16 @@ export function compileModuleGraph(
     const bindings = new Map<string, Binding>();
     for (const imported of linkedModule.imports) {
       if (imported.namespaceModuleId != null) {
-        const syntax = node.syntax.imports.find(
-          (entry) => entry.localName === imported.localName,
-        );
-        return {
-          diagnostics: [
-            sourceDiagnostic(
-              moduleId,
-              syntax ?? node.syntax,
-              "Module namespace values are not lowered yet.",
-            ),
-          ],
-          graph: linked.graph,
-        };
+        const bindingId = namespaceBindings.get(imported.namespaceModuleId);
+        if (bindingId == null) {
+          throw new Error("Module namespace binding is unavailable.");
+        }
+        bindings.set(imported.localName, {
+          id: bindingId,
+          mutable: false,
+          name: imported.localName,
+        });
+        continue;
       }
       if (imported.cellId == null) continue;
       bindings.set(imported.localName, {
@@ -4094,7 +4166,7 @@ export function compileModuleGraph(
   const entry = nodes.get(graph.entryId);
   if (entry == null) throw new Error("The module entry is unavailable.");
   const hir: HirProgram = {
-    body,
+    body: [...namespaceInitializers, ...body],
     functions,
     kind: "hir-program",
     range: entry.syntax.range,
@@ -4211,6 +4283,7 @@ export interface NativeToolchain {
 
 /** Narrow host boundary used by compiler adapters and test infrastructure. */
 export interface CompilerHost {
+  canonicalizeFile?(path: string): Promise<string>;
   makeTemporaryDirectory(prefix: string): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove(path: string): Promise<void>;

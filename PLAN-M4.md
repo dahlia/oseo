@@ -9,7 +9,9 @@ frozen, the property runner is active, owned module syntax and graph discovery
 have landed, and the linker now fixes live-cell identity, namespace names,
 strongly connected components, and dependency-first evaluation order. Named
 and default bindings now lower through one shared MIR environment. Namespace
-objects and the native CLI graph workflow are the next checkpoint.
+objects retain live cells with immutable sorted keys, and the CLI compiles
+closed file graphs into one native executable. Promise jobs are the next
+checkpoint.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md), the frozen language
@@ -37,6 +39,10 @@ Current evidence
     deterministic strongly connected components.
  -  Whole-graph HIR reuses exporter cell identities for imported names and
     lowers synchronous module bodies once in dependency-first order.
+ -  Namespace objects are shared per module, retain sorted live export cells,
+    use a `null` prototype, and reject mutation through generic object paths.
+ -  The Node.js and Deno CLI hosts canonicalize one entry, load its closed
+    graph, and emit or execute one whole-graph native program.
 
 
 Goal

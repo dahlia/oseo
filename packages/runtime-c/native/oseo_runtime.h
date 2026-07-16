@@ -175,6 +175,14 @@ OseoResult oseo_cell_set(
     OseoValue cell,
     OseoValue value
 );
+OseoResult oseo_module_namespace_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t count,
+    const uint16_t *const *names,
+    const size_t *name_lengths,
+    const size_t *binding_ids
+);
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,

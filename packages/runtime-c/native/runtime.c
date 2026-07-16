@@ -69,6 +69,7 @@ typedef struct {
     uint32_t array_length;
     bool dictionary;
     bool length_writable;
+    bool module_namespace;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -714,6 +715,58 @@ OseoResult oseo_cell_initialize(
     return normal(value);
 }
 
+OseoResult oseo_module_namespace_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t count,
+    const uint16_t *const *names,
+    const size_t *name_lengths,
+    const size_t *binding_ids
+) {
+    if (count > 0u &&
+        (names == NULL || name_lengths == NULL || binding_ids == NULL)) {
+        return failure(context, "OSEO2001", "Invalid module namespace.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_object_create(context, oseo_null());
+    frame.slots[0] = result.value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count;
+         index += 1u) {
+        result = oseo_string_from_units(
+            context,
+            names[index],
+            name_lengths[index]
+        );
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_environment_get(
+            context,
+            environment,
+            binding_ids[index]
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            (OseoPropertyAttributes){false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
+        object->dictionary = true;
+        object->module_namespace = true;
+        result.value = frame.slots[0];
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
@@ -760,6 +813,7 @@ OseoResult oseo_function_create(
     function->ordinary.array_length = 0u;
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
+    function->ordinary.module_namespace = false;
     function->environment = frame.slots[0];
     function->prototype_object = frame.slots[1];
     function->code_id = code_id;
@@ -1109,6 +1163,7 @@ OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
     object->array_length = 0u;
     object->dictionary = false;
     object->length_writable = false;
+    object->module_namespace = false;
     return publish_heap(context, &object->header, OSEO_HEAP_OBJECT);
 }
 
@@ -1129,6 +1184,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->array_length = (uint32_t)length;
     array->dictionary = false;
     array->length_writable = true;
+    array->module_namespace = false;
     return publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
@@ -1203,6 +1259,9 @@ OseoResult oseo_object_get(
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false};
         if (own_descriptor(current, key, &value, &attributes)) {
+            if (object->module_namespace && is_cell(value)) {
+                return oseo_cell_get(context, value);
+            }
             return normal(value);
         }
         current = object->prototype;
@@ -1367,6 +1426,9 @@ OseoResult oseo_object_define(
     OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) return language_failure(context);
+    if (ordinary_object(object_value)->module_namespace) {
+        return language_failure(context);
+    }
     if (is_function(object_value) && string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
             return language_failure(context);
@@ -1496,6 +1558,9 @@ OseoResult oseo_object_set_prototype(
 ) {
     if (!is_object(object_value) ||
         (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype))) {
+        return language_failure(context);
+    }
+    if (ordinary_object(object_value)->module_namespace) {
         return language_failure(context);
     }
     OseoValue current = prototype;
@@ -1753,6 +1818,13 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
                 exists = result.status == OSEO_STATUS_NORMAL;
             }
         }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && exists &&
+        is_object(object_value) &&
+        ordinary_object(object_value)->module_namespace &&
+        is_cell(value)) {
+        result = oseo_cell_get(context, value);
+        value = result.value;
     }
     frame.slots[2] = value;
     if (result.status == OSEO_STATUS_NORMAL && !exists) {

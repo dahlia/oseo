@@ -1428,6 +1428,18 @@ assert.equal(allocationFailure.exitStatus, 1);
 assert.equal(allocationFailure.stdout, "");
 assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
 
+const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
+const nativeModule = await runNativeCli(
+  {
+    args: [moduleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
+assert.equal(nativeModule.stderr, "");
+assert.equal(nativeModule.stdout, "answer increment 41\n42\nimmutable\n");
+
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
 );

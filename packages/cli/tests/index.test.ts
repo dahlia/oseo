@@ -129,6 +129,48 @@ test("separates the source path from its diagnostic identifier", async () => {
   assert.match(result.stderr, /^display\.ts:/u);
 });
 
+test("loads and lowers a closed file module graph", async () => {
+  const reads: string[] = [];
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/entry.js");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile(path) {
+      reads.push(String(path));
+      if (String(path) === "file:///work/values.js") {
+        return Promise.resolve("export let answer = 42;");
+      }
+      return Promise.reject(new Error("unexpected module"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected cleanup"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/entry.js"],
+      source:
+        'import * as values from "./values.js"; ' +
+        "console.log(values.answer);",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 0);
+  assert.deepEqual(reads, ["file:///work/values.js"]);
+  assert.match(result.stdout, /module-namespace-create 1 live exports/u);
+  assert.match(result.stdout, /property-get generic/u);
+});
+
 test("normalizes process spawn failures into host diagnostics", async () => {
   let cleanupCount = 0;
   const host: CompilerHost = {

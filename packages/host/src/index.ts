@@ -31,6 +31,7 @@ interface DenoCommandConstructor {
 
 interface DenoRuntime {
   readonly Command: DenoCommandConstructor;
+  cwd(): string;
   makeTempDir(options: { readonly prefix: string }): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove(path: string, options: { readonly recursive: boolean }): Promise<void>;
@@ -73,7 +74,8 @@ function moduleDiagnostic(
   };
 }
 
-function sourceHash(source: string): string {
+/** Produce the stable content identity recorded in a module graph. */
+export function hashModuleSource(source: string): string {
   let hash = 0xcbf2_9ce4_8422_2325n;
   for (const byte of new TextEncoder().encode(source)) {
     hash ^= BigInt(byte);
@@ -113,7 +115,7 @@ export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
           diagnostics: [],
           source: {
             source,
-            sourceHash: sourceHash(source),
+            sourceHash: hashModuleSource(source),
             sourceId: url.href,
           },
         };
@@ -172,6 +174,19 @@ export const fileModuleResolver: ModuleResolver = {
 /** Create the Node.js implementation of compiler host operations. */
 export function createNodeHost(): CompilerHost {
   return {
+    async canonicalizeFile(path: string): Promise<string> {
+      try {
+        const url = new URL(path);
+        if (url.protocol === "file:") return url.href;
+      } catch {
+        // A filesystem path is canonicalized below.
+      }
+      const [{ resolve }, { pathToFileURL }] = await Promise.all([
+        import("node:path"),
+        import("node:url"),
+      ]);
+      return pathToFileURL(resolve(path)).href;
+    },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       const [{ mkdtemp }, { tmpdir }, { join }] = await Promise.all([
         import("node:fs/promises"),
@@ -222,6 +237,20 @@ export function createDenoHost(): CompilerHost {
   const runtime = denoRuntime();
   const decoder = new TextDecoder();
   return {
+    canonicalizeFile(path: string): Promise<string> {
+      try {
+        const url = new URL(path);
+        if (url.protocol === "file:") return Promise.resolve(url.href);
+      } catch {
+        // A filesystem path is canonicalized below.
+      }
+      const basePath = path.startsWith("/")
+        ? path
+        : `${runtime.cwd().replace(/\/$/u, "")}/${path}`;
+      const url = new URL("file:///");
+      url.pathname = basePath;
+      return Promise.resolve(url.href);
+    },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       return await runtime.makeTempDir({ prefix });
     },

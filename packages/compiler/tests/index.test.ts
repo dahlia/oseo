@@ -1119,3 +1119,86 @@ test("lowers linked modules through shared live binding identities", () => {
     .find((operation) => operation.kind === "read");
   assert.equal(importedRead?.bindingId, 0);
 });
+
+test("creates one live namespace binding for repeated imports", () => {
+  const specifier = graphSpecifier("./values.js", 0);
+  const values = {
+    canonicalId: "file:///values.js",
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "values",
+    syntax: {
+      ...testModule("file:///values.js", ""),
+      body: [
+        {
+          hint: undefined,
+          initializer: { kind: "number" as const, range, value: 1 },
+          kind: "let" as const,
+          name: "zeta",
+          range,
+        },
+        {
+          hint: undefined,
+          initializer: { kind: "number" as const, range, value: 2 },
+          kind: "const" as const,
+          name: "alpha",
+          range,
+        },
+      ],
+      exports: [
+        {
+          exportedName: "zeta",
+          kind: "local" as const,
+          localName: "zeta",
+          range,
+        },
+        {
+          exportedName: "alpha",
+          kind: "local" as const,
+          localName: "alpha",
+          range,
+        },
+      ],
+    },
+  };
+  const imports = ["first", "second"].map((localName) => ({
+    byteRange: specifier.byteRange,
+    importedName: "*",
+    localName,
+    range,
+    specifier,
+  }));
+  const entry = {
+    canonicalId: "file:///namespace.js",
+    dependencies: [{ canonicalId: values.canonicalId, specifier }],
+    resolutions: [{ canonicalId: values.canonicalId, specifier }],
+    sourceHash: "namespace",
+    syntax: {
+      ...testModule("file:///namespace.js", ""),
+      body: [],
+      imports,
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: entry.canonicalId,
+    kind: "module-graph",
+    modules: [entry, values],
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const operations = result.mir.script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const namespaces = operations.filter(
+    (operation) => operation.kind === "module-namespace-create",
+  );
+  assert.equal(namespaces.length, 1);
+  assert.deepEqual(namespaces[0]?.namespaceNames, ["alpha", "zeta"]);
+  assert.deepEqual(namespaces[0]?.namespaceBindingIds, [1, 0]);
+  assert.equal(
+    result.mir.globalBindings.filter((binding) =>
+      binding.name.startsWith("*namespace:"),
+    ).length,
+    1,
+  );
+});

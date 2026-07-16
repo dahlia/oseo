@@ -602,6 +602,69 @@ function emitConstructReceiver(
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+function emitModuleNamespace(state: EmitState, operation: MirOperation): void {
+  const names = operation.namespaceNames;
+  const namespaceBindingIds = operation.namespaceBindingIds;
+  if (
+    names == null ||
+    namespaceBindingIds == null ||
+    names.length !== namespaceBindingIds.length
+  ) {
+    throw new Error(`MIR namespace %${operation.id} has invalid entries.`);
+  }
+  if (names.length === 0) {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(
+      state,
+      `result = oseo_module_namespace_create(context, ` +
+        `roots[${state.environmentSlot}], 0u, NULL, NULL, NULL);`,
+    );
+    line(state, `roots[${operation.id}] = result.value;`);
+    return;
+  }
+  const pointers: string[] = [];
+  const lengths: number[] = [];
+  for (const [index, name] of names.entries()) {
+    const units = utf16Units(name);
+    lengths.push(units.length);
+    if (units.length === 0) {
+      pointers.push("NULL");
+      continue;
+    }
+    const constantName = `namespace_units_${operation.id}_${index}`;
+    line(
+      state,
+      `static const uint16_t ${constantName}[] = {${units.join(", ")}};`,
+    );
+    pointers.push(constantName);
+  }
+  const prefix = `namespace_${operation.id}`;
+  line(
+    state,
+    `static const uint16_t *const ${prefix}_names[] = ` +
+      `{${pointers.join(", ")}};`,
+  );
+  line(
+    state,
+    `static const size_t ${prefix}_lengths[] = {${lengths.join(", ")}};`,
+  );
+  line(
+    state,
+    `static const size_t ${prefix}_bindings[] = ` +
+      `{${namespaceBindingIds.join(", ")}};`,
+  );
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_module_namespace_create(context, ` +
+      `roots[${state.environmentSlot}], ${names.length}u, ` +
+      `${prefix}_names, ${prefix}_lengths, ${prefix}_bindings);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitOperation(state: EmitState, operation: MirOperation): void {
   if (operation.kind === "constant") {
     if (operation.constant == null) {
@@ -620,6 +683,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitFunctionCreate(state, operation);
   } else if (operation.kind === "construct-receiver") {
     emitConstructReceiver(state, operation);
+  } else if (operation.kind === "module-namespace-create") {
+    emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {
     line(state, `roots[${operation.id}] = receiver;`);
   } else if (operation.kind === "caught") {

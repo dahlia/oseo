@@ -6,6 +6,7 @@ import type { CompilerHost } from "@oseo/compiler";
 import {
   createDenoHost,
   createFileModuleLoader,
+  createNodeHost,
   fileModuleResolver,
 } from "../src/index.ts";
 
@@ -153,4 +154,12 @@ test("loads file modules with stable content hashes", async () => {
   assert.equal(first.source?.sourceId, "file:///work/answer.js");
   assert.match(first.source?.sourceHash ?? "", /^fnv1a64:[0-9a-f]{16}$/u);
   assert.equal(second.source?.sourceHash, first.source?.sourceHash);
+});
+
+test("canonicalizes filesystem characters as file URL data", async () => {
+  const canonicalId = await createNodeHost().canonicalizeFile?.(
+    "fixtures/space and #/entry.js",
+  );
+  assert.match(canonicalId ?? "", /^file:\/\//u);
+  assert.match(canonicalId ?? "", /space%20and%20%23/u);
 });
