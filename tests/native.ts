@@ -859,6 +859,32 @@ Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
 console.log("sync end");
 `,
   },
+  {
+    name: "async-continuations",
+    source: `
+async function calculate(value) {
+  console.log("entered", value);
+  const first = await Promise.resolve(value);
+  console.log("resumed", first);
+  const second = await 2;
+  return first + second;
+}
+const expression = async function (value) { return await value; };
+const arrow = async (value) => await value;
+async function failEarly() { throw "early"; }
+async function failLate() { await 0; throw "late"; }
+async function shadow(Promise) { return await Promise; }
+function rejected(reason) { console.log("async rejected", reason); }
+console.log("sync start");
+calculate(40).then(function (value) { console.log("result", value); });
+expression(3).then(function (value) { console.log("expression", value); });
+arrow(4).then(function (value) { console.log("arrow", value); });
+failEarly().catch(rejected);
+failLate().catch(rejected);
+shadow(5).then(function (value) { console.log("shadow", value); });
+console.log("sync end");
+`,
+  },
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {

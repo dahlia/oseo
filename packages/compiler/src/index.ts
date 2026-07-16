@@ -79,6 +79,10 @@ export type SyntaxCallTarget =
       readonly method: "all" | "race" | "reject" | "resolve";
     })
   | (LocatedSyntax & {
+      readonly kind: "promise-intrinsic-direct";
+      readonly method: "resolve";
+    })
+  | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
     })
@@ -146,6 +150,10 @@ export type SyntaxExpression =
       readonly arguments: readonly SyntaxExpression[];
       readonly callee: SyntaxExpression;
       readonly kind: "new";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly SyntaxExpression[];
+      readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -1406,6 +1414,19 @@ function resolveExpression(
       ? undefined
       : { ...expression, arguments: argumentsValue, callee };
   }
+  if (expression.kind === "promise-construct") {
+    const argumentsValue: HirExpression[] = [];
+    for (const argument of expression.arguments) {
+      const resolved = resolveExpression(argument, scopes, state);
+      if (resolved == null) return undefined;
+      argumentsValue.push(resolved);
+    }
+    return {
+      arguments: argumentsValue,
+      kind: "promise-construct",
+      range: expression.range,
+    };
+  }
   const argumentValues: HirExpression[] = [];
   for (const argument of expression.arguments) {
     const resolved = resolveExpression(argument, scopes, state);
@@ -1449,6 +1470,11 @@ function resolveExpression(
         method: expression.target.method,
       };
     }
+  } else if (expression.target.kind === "promise-intrinsic-direct") {
+    target = {
+      kind: "promise-intrinsic",
+      method: expression.target.method,
+    };
   } else if (expression.target.kind === "promise-intrinsic") {
     const binding = findBinding(scopes, "Promise");
     target =

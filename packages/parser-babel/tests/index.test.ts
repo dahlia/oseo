@@ -337,7 +337,6 @@ const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
-  ["async", "async function work() {}"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],
@@ -504,6 +503,44 @@ test("lowers M4 promise construction and static methods", () => {
     targets.some(
       (target) =>
         target.kind === "promise-intrinsic" && target.method === "race",
+    ),
+  );
+});
+
+test("lowers async functions into owned continuations", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "async function add(value) {",
+      "  const first = await Promise.resolve(value);",
+      "  const second = await 2;",
+      "  return first + second;",
+      "}",
+      "const expression = async function (value) { return await value; };",
+      "const arrow = async (value) => await value;",
+      "function observe(value) { console.log(value); }",
+      "add(1).then(observe);",
+      "expression(2).then(observe);",
+      "arrow(3).then(observe);",
+    ].join("\n"),
+    sourceId: "async.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.ok(result.mir.functions.length >= 9);
+  const operations = [
+    ...result.mir.script.blocks,
+    ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
+  ].flatMap((block) => block.operations);
+  assert.ok(
+    operations.some(
+      (operation) => operation.target?.kind === "promise-constructor",
+    ),
+  );
+  assert.ok(
+    operations.some(
+      (operation) =>
+        operation.target?.kind === "promise-intrinsic" &&
+        operation.target.method === "resolve",
     ),
   );
 });
