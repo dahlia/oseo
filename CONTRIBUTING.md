@@ -223,6 +223,41 @@ fixtures, built-artifact validation, and workspace tooling. A package test may
 import only its public source entry point or an explicitly tested internal
 module from the same package.
 
+### Property-based tests
+
+Use property tests when a semantic unit has a useful generated domain or state
+model. Keep example, differential, structural, sanitizer, and standards tests
+when they prove contracts that generated observations cannot.
+
+Property tests use `fast-check` and the *.property.test.ts* suffix. Package
+properties live under *packages/<package>/tests/*; cross-package native
+properties live under *tests/property/*. The same package test source runs
+unchanged under Node.js and Deno.
+
+Define the generated domain, construction preconditions, independent oracle,
+seed, size limit, case count, and failure observation in each suite. Generate
+admitted structured inputs directly instead of filtering arbitrary source. Keep
+that structure until the predicate prints source so shrinking can preserve
+scope, graph, and schedule invariants.
+
+New syntax, operators, values, runtime states, and module behavior extend their
+applicable valid and invalid generators. A specialization adds generated hits,
+every distinct miss or invalidation, false hints, and disabled-policy cases.
+Changing a generator must preserve or deliberately replace its shrinking and
+replay quality.
+
+Failures report `fast-check` version, seed, replay path, profile, and domain.
+Replay an ordinary or extended suite by setting `OSEO_PROPERTY_SEED` and
+`OSEO_PROPERTY_PATH`; use `OSEO_PROPERTY_RUN_SCALE` and `OSEO_PROPERTY_SIZE`
+only to change the reviewed case budget and size. Minimize a failure and retain
+it as an ordinary regression fixture before fixing the implementation.
+
+`mise run test` owns the ordinary property gate. Run
+`mise run test:property:extended` before submitting changes to generators,
+compiler lowering, runtime state, or specialization. The extended task executes
+ten times the ordinary case budget under both hosts and treats an interrupted
+run as a failure.
+
 Before submitting a change, run:
 
 ~~~~ sh

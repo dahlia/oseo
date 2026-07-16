@@ -36,6 +36,8 @@ Milestone work follows these rules:
  -  A milestone has written scope, deliverables, and exit criteria before
     implementation begins.
  -  Correctness tests are written with or before the implementation they cover.
+ -  Generated semantic domains use the property and replay infrastructure begun
+    in M4 rather than introducing independent random-program frameworks.
  -  Every specialized operation has specialization-invariance tests and
     deliberate guard failures.
  -  `mise run check` and `mise run test` are the local and
@@ -458,7 +460,9 @@ specialization, and M3 dynamic language core are complete. M4 follows
 5.  Add asynchronous functions, top-level await, timers, and shutdown rules.
 
 M4 preserves the M2 and M3 generic-fallback, forced-collection, sanitizer,
-cross-target, package, and test262 evidence gates.
+cross-target, package, and test262 evidence gates. Property suites begin with
+the stable M2 and M3 domains, then extend with each M4 semantic unit. M5 expands
+the same generators, shrinkers, and replay records instead of replacing them.
 
 
 Risks that affect ordering

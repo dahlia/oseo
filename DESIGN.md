@@ -449,7 +449,7 @@ Testing and observability
 -------------------------
 
 Oseo needs tests that distinguish semantic correctness from successful
-compilation. The test strategy has five layers:
+compilation. The test strategy has six layers:
 
  -  Unit tests cover parsing, hint extraction, normalization, MIR construction,
     value tags, and runtime helpers.
@@ -463,6 +463,16 @@ compilation. The test strategy has five layers:
     avoid allocation and generic helper calls.
  -  Standards tests add applicable test262 and web-platform-test cases as the
     supported profiles expand.
+ -  Property tests generate structured programs, values, module graphs, and
+    schedules, then compare reference, specialization, collection, or model
+    observations.
+
+Property suites use explicit reviewed seeds, case budgets, and size limits.
+They retain structured inputs through source printing so failures shrink within
+the admitted profile. A failure report records enough metadata to replay the
+same case directly. Interrupted or incomplete runs are failures, not shortened
+passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
+models and replay contract into grammar-based differential generation.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of
