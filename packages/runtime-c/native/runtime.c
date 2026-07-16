@@ -4335,6 +4335,27 @@ static uint64_t timer_delay(OseoValue value) {
     return (uint64_t)delay;
 }
 
+static bool timer_conversion_property_exists(
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoValue current = object_value;
+    while (is_object(current)) {
+        OseoValue property_value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false};
+        if (own_descriptor(
+                current,
+                key,
+                &property_value,
+                &attributes
+            )) {
+            return true;
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
+}
+
 static OseoResult timer_delay_number(
     OseoContext *context,
     OseoValue value
@@ -4361,6 +4382,19 @@ static OseoResult timer_delay_number(
             lengths[index]
         );
         frame.slots[1] = result.value;
+        bool property_exists = result.status == OSEO_STATUS_NORMAL &&
+            timer_conversion_property_exists(
+                frame.slots[0],
+                frame.slots[1]
+            );
+        if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
+            if (index == 1u) {
+                result = normal(oseo_number(NAN));
+                oseo_roots_release(context, &frame);
+                return result;
+            }
+            continue;
+        }
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_get(
                 context,
@@ -4393,7 +4427,7 @@ static OseoResult timer_delay_number(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = normal(oseo_number(NAN));
+        result = language_failure(context);
     }
     oseo_roots_release(context, &frame);
     return result;

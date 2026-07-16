@@ -1072,6 +1072,11 @@ functionDelay.valueOf = function functionDelayValue() {
   console.log("coerce function delay");
   return 40;
 };
+try {
+  setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
+} catch (error) {
+  console.log("invalid timer delay");
+}
 const canceled = setTimeout(task, 0, "canceled");
 clearTimeout(canceled);
 setTimeout(task, 100, "late");
