@@ -7,8 +7,9 @@ Status
 Implementation status: in progress. The profile and four boundary decisions are
 frozen, the property runner is active, owned module syntax and graph discovery
 have landed, and the linker now fixes live-cell identity, namespace names,
-strongly connected components, and dependency-first evaluation order. Native
-module evaluation is the next checkpoint.
+strongly connected components, and dependency-first evaluation order. Named
+and default bindings now lower through one shared MIR environment. Namespace
+objects and the native CLI graph workflow are the next checkpoint.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md), the frozen language
@@ -34,6 +35,8 @@ Current evidence
  -  Static linking resolves local, indirect, and star exports to shared cells;
     reports missing or ambiguous names; sorts namespace keys; and records
     deterministic strongly connected components.
+ -  Whole-graph HIR reuses exporter cell identities for imported names and
+    lowers synchronous module bodies once in dependency-first order.
 
 
 Goal

@@ -5,6 +5,7 @@ import {
   buildHir,
   buildMir,
   buildModuleGraph,
+  compileModuleGraph,
   describeTarget,
   printHir,
   printMir,
@@ -1030,4 +1031,91 @@ test("reports ambiguous star exports only when a binding requests them", () => {
   const result = linkModuleGraph(graph);
   assert.equal(result.graph, undefined);
   assert.match(result.diagnostics[0]?.message ?? "", /ambiguous/u);
+});
+
+test("lowers linked modules through shared live binding identities", () => {
+  const dependencySpecifier = graphSpecifier("./dependency.js", 0);
+  const dependency = {
+    canonicalId: "file:///dependency.js",
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "dependency",
+    syntax: {
+      ...testModule("file:///dependency.js", ""),
+      body: [
+        {
+          byteRange: { end: 22, start: 0 },
+          hint: undefined,
+          initializer: { kind: "number" as const, range, value: 41 },
+          kind: "let" as const,
+          name: "answer",
+          range,
+        },
+      ],
+      exports: [
+        {
+          exportedName: "answer",
+          kind: "local" as const,
+          localName: "answer",
+          range,
+        },
+      ],
+    },
+  };
+  const entry = {
+    canonicalId: "file:///entry.js",
+    dependencies: [
+      {
+        canonicalId: dependency.canonicalId,
+        specifier: dependencySpecifier,
+      },
+    ],
+    resolutions: [
+      {
+        canonicalId: dependency.canonicalId,
+        specifier: dependencySpecifier,
+      },
+    ],
+    sourceHash: "entry",
+    syntax: {
+      ...testModule("file:///entry.js", ""),
+      body: [
+        {
+          byteRange: { end: 40, start: 20 },
+          expression: {
+            arguments: [{ kind: "identifier" as const, name: "value", range }],
+            kind: "call" as const,
+            range,
+            target: { kind: "console-log" as const, range },
+          },
+          kind: "expression" as const,
+          range,
+        },
+      ],
+      imports: [
+        {
+          byteRange: dependencySpecifier.byteRange,
+          importedName: "answer",
+          localName: "value",
+          range,
+          specifier: dependencySpecifier,
+        },
+      ],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: entry.canonicalId,
+    kind: "module-graph",
+    modules: [entry, dependency],
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.deepEqual(result.mir.globalBindings, [{ id: 0, name: "answer" }]);
+  const text = printMir(result.mir);
+  assert.ok(text.indexOf("initialize answer") < text.indexOf("read value"));
+  assert.match(text, /initialize %b0 answer/u);
+  const importedRead = result.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .find((operation) => operation.kind === "read");
+  assert.equal(importedRead?.bindingId, 0);
 });

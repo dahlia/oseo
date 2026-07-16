@@ -1158,6 +1158,7 @@ interface Binding {
   readonly id: number;
   readonly mutable: boolean;
   readonly name: string;
+  readonly pendingDeclaration?: boolean;
 }
 
 interface ResolveState {
@@ -1470,7 +1471,11 @@ function predeclareBindings(
       continue;
     }
     const previous = scope.get(name);
-    if (previous != null && statement.kind !== "function") {
+    if (
+      previous != null &&
+      previous.pendingDeclaration !== true &&
+      (statement.kind !== "function" || previous.functionId == null)
+    ) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -1494,11 +1499,11 @@ function predeclareBindings(
       state.functionInfo.set(statement, { bindingId, id: functionId });
     } else {
       scope.set(name, {
-        id: state.nextBindingId,
+        id: previous?.id ?? state.nextBindingId,
         mutable: statement.kind === "let",
         name,
       });
-      state.nextBindingId += 1;
+      if (previous == null) state.nextBindingId += 1;
     }
   }
 }
@@ -1829,18 +1834,31 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
-/** Validate owned syntax and resolve all lexical and function identities. */
-export function buildHir(program: SyntaxProgram): HirResult {
+interface HirSeed {
+  readonly bindings?: ReadonlyMap<string, Binding>;
+  readonly nextBindingId?: number;
+  readonly nextFunctionId?: number;
+}
+
+interface SeededHirResult extends HirResult {
+  readonly nextBindingId: number;
+  readonly nextFunctionId: number;
+}
+
+function buildSeededHir(
+  program: SyntaxProgram,
+  seed: HirSeed = {},
+): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],
-    nextBindingId: 0,
-    nextFunctionId: 0,
+    nextBindingId: seed.nextBindingId ?? 0,
+    nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
   };
-  const scriptScope = new Map<string, Binding>();
+  const scriptScope = new Map(seed.bindings);
   predeclareBindings(program.body, scriptScope, state);
   const body = resolveStatementList(
     program.body,
@@ -1849,9 +1867,17 @@ export function buildHir(program: SyntaxProgram): HirResult {
     false,
     scriptScope,
   );
-  if (diagnostics.length > 0) return { diagnostics };
+  if (diagnostics.length > 0) {
+    return {
+      diagnostics,
+      nextBindingId: state.nextBindingId,
+      nextFunctionId: state.nextFunctionId,
+    };
+  }
   return {
     diagnostics,
+    nextBindingId: state.nextBindingId,
+    nextFunctionId: state.nextFunctionId,
     program: {
       body,
       functions: state.hirFunctions,
@@ -1861,6 +1887,11 @@ export function buildHir(program: SyntaxProgram): HirResult {
       strict: program.strict === true,
     },
   };
+}
+
+/** Validate owned syntax and resolve all lexical and function identities. */
+export function buildHir(program: SyntaxProgram): HirResult {
+  return buildSeededHir(program);
 }
 
 function rangeText(range: SourceRange): string {
@@ -3923,6 +3954,159 @@ export interface CompilationResult {
   readonly hir?: HirProgram;
   readonly mir?: MirProgram;
   readonly syntax?: SyntaxProgram;
+}
+
+/** Whole-graph compilation result for one closed ECMAScript module entry. */
+export interface ModuleCompilationResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly graph?: LinkedModuleGraph;
+  readonly hir?: HirProgram;
+  readonly mir?: MirProgram;
+}
+
+function moduleProgramBody(
+  module: SyntaxModule,
+): readonly SyntaxStatementItem[] {
+  const items: SyntaxStatementItem[] = [...module.body];
+  for (const [index, entry] of module.exports.entries()) {
+    if (entry.kind !== "default") continue;
+    const initializer: SyntaxExpression =
+      "parameters" in entry.declaration
+        ? {
+            kind: "function",
+            range: entry.declaration.range,
+            functionValue: entry.declaration,
+          }
+        : entry.declaration;
+    items.push({
+      ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
+      hint: undefined,
+      initializer,
+      kind: "const",
+      name: `*default:${index}*`,
+      range: entry.range,
+    });
+  }
+  return items.toSorted(
+    (left, right) =>
+      (left.byteRange?.start ?? Number.MAX_SAFE_INTEGER) -
+      (right.byteRange?.start ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
+/** Link and lower a closed synchronous module graph to shared-cell MIR. */
+export function compileModuleGraph(
+  graph: ModuleGraph,
+  options: CompilerOptions = {},
+): ModuleCompilationResult {
+  const linked = linkModuleGraph(graph);
+  if (linked.graph == null) return { diagnostics: linked.diagnostics };
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const linkedModules = new Map(
+    linked.graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const cells = new Map(linked.graph.cells.map((cell) => [cell.id, cell]));
+  const body: HirStatement[] = [];
+  const functions: HirFunction[] = [];
+  let nextBindingId = linked.graph.cells.length;
+  let nextFunctionId = 0;
+
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const linkedModule = linkedModules.get(moduleId);
+    if (node == null || linkedModule == null) {
+      throw new Error(`Linked module '${moduleId}' is unavailable.`);
+    }
+    const bindings = new Map<string, Binding>();
+    for (const imported of linkedModule.imports) {
+      if (imported.namespaceModuleId != null) {
+        const syntax = node.syntax.imports.find(
+          (entry) => entry.localName === imported.localName,
+        );
+        return {
+          diagnostics: [
+            sourceDiagnostic(
+              moduleId,
+              syntax ?? node.syntax,
+              "Module namespace values are not lowered yet.",
+            ),
+          ],
+          graph: linked.graph,
+        };
+      }
+      if (imported.cellId == null) continue;
+      bindings.set(imported.localName, {
+        id: imported.cellId,
+        mutable: false,
+        name: imported.localName,
+      });
+    }
+    for (const cellId of linkedModule.cellIds) {
+      const cell = cells.get(cellId);
+      if (cell == null) throw new Error(`Module cell '${cellId}' is missing.`);
+      if (bindings.has(cell.localName)) {
+        const declaration = node.syntax.body.find(
+          (item) =>
+            (item.kind === "const" ||
+              item.kind === "let" ||
+              item.kind === "function") &&
+            item.name === cell.localName,
+        );
+        return {
+          diagnostics: [
+            sourceDiagnostic(
+              moduleId,
+              declaration ?? node.syntax,
+              `Duplicate declaration '${cell.localName}'.`,
+            ),
+          ],
+          graph: linked.graph,
+        };
+      }
+      bindings.set(cell.localName, {
+        id: cell.id,
+        mutable: false,
+        name: cell.localName,
+        pendingDeclaration: true,
+      });
+    }
+    const result = buildSeededHir(
+      {
+        body: moduleProgramBody(node.syntax),
+        kind: "program",
+        range: node.syntax.range,
+        sourceId: moduleId,
+        strict: true,
+      },
+      { bindings, nextBindingId, nextFunctionId },
+    );
+    nextBindingId = result.nextBindingId;
+    nextFunctionId = result.nextFunctionId;
+    if (result.program == null) {
+      return { diagnostics: result.diagnostics, graph: linked.graph };
+    }
+    body.push(...result.program.body);
+    functions.push(...result.program.functions);
+  }
+
+  const entry = nodes.get(graph.entryId);
+  if (entry == null) throw new Error("The module entry is unavailable.");
+  const hir: HirProgram = {
+    body,
+    functions,
+    kind: "hir-program",
+    range: entry.syntax.range,
+    sourceId: graph.entryId,
+    strict: true,
+  };
+  return {
+    diagnostics: [],
+    graph: linked.graph,
+    hir,
+    mir: buildMir(hir, options),
+  };
 }
 
 /** Compile source through owned syntax, HIR, and policy-selected MIR. */
