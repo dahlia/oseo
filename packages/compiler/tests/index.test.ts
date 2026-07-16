@@ -9,13 +9,16 @@ import {
   printHir,
   printMir,
   renderDiagnostic,
+  linkModuleGraph,
 } from "../src/index.ts";
 import type {
   Diagnostic,
   DiagnosticCode,
   Hint,
+  ModuleGraph,
   SourceRange,
   SyntaxModule,
+  SyntaxModuleSpecifier,
   SyntaxProgram,
 } from "../src/index.ts";
 
@@ -839,4 +842,192 @@ test("keeps module loader failures as owned graph diagnostics", async () => {
   );
   assert.equal(result.graph, undefined);
   assert.deepEqual(result.diagnostics, [diagnostic]);
+});
+
+function graphSpecifier(value: string, start: number): SyntaxModuleSpecifier {
+  return {
+    byteRange: { end: start + value.length, start },
+    range: moduleRange,
+    value,
+  };
+}
+
+test("links live cells, namespaces, cycles, and evaluation order", () => {
+  const fromA = graphSpecifier("./a.js", 0);
+  const fromB = graphSpecifier("./b.js", 0);
+  const a = {
+    canonicalId: "file:///a.js",
+    dependencies: [{ canonicalId: "file:///b.js", specifier: fromB }],
+    resolutions: [{ canonicalId: "file:///b.js", specifier: fromB }],
+    sourceHash: "a",
+    syntax: {
+      ...testModule("file:///a.js", ""),
+      exports: [
+        {
+          exportedName: "value",
+          kind: "local" as const,
+          localName: "value",
+          range: moduleRange,
+        },
+        {
+          exportedName: "beta",
+          kind: "local" as const,
+          localName: "beta",
+          range: moduleRange,
+        },
+      ],
+      imports: [
+        {
+          byteRange: fromB.byteRange,
+          importedName: undefined,
+          localName: undefined,
+          range: moduleRange,
+          specifier: fromB,
+        },
+      ],
+    },
+  };
+  const b = {
+    canonicalId: "file:///b.js",
+    dependencies: [{ canonicalId: "file:///a.js", specifier: fromA }],
+    resolutions: [{ canonicalId: "file:///a.js", specifier: fromA }],
+    sourceHash: "b",
+    syntax: {
+      ...testModule("file:///b.js", ""),
+      exports: [
+        {
+          exportedName: "forwarded",
+          importedName: "value",
+          kind: "indirect" as const,
+          range: moduleRange,
+          specifier: fromA,
+        },
+        { kind: "star" as const, range: moduleRange, specifier: fromA },
+      ],
+      imports: [
+        {
+          byteRange: fromA.byteRange,
+          importedName: "value",
+          localName: "alias",
+          range: moduleRange,
+          specifier: fromA,
+        },
+        {
+          byteRange: fromA.byteRange,
+          importedName: "*",
+          localName: "namespace",
+          range: moduleRange,
+          specifier: fromA,
+        },
+      ],
+    },
+  };
+  const result = linkModuleGraph({
+    entryId: "file:///b.js",
+    kind: "module-graph",
+    modules: [b, a],
+  });
+  assert.equal(result.diagnostics.length, 0);
+  const linkedA = result.graph?.modules.find(
+    (module) => module.canonicalId === "file:///a.js",
+  );
+  const linkedB = result.graph?.modules.find(
+    (module) => module.canonicalId === "file:///b.js",
+  );
+  const valueCell = linkedA?.exports.find(
+    (entry) => entry.exportedName === "value",
+  )?.cellId;
+  assert.equal(
+    linkedB?.imports.find((entry) => entry.localName === "alias")?.cellId,
+    valueCell,
+  );
+  assert.equal(
+    linkedB?.exports.find((entry) => entry.exportedName === "forwarded")
+      ?.cellId,
+    valueCell,
+  );
+  assert.deepEqual(linkedA?.namespaceNames, ["beta", "value"]);
+  assert.deepEqual(linkedB?.namespaceNames, ["beta", "forwarded", "value"]);
+  assert.deepEqual(result.graph?.components, [
+    {
+      cyclic: true,
+      id: 0,
+      moduleIds: ["file:///a.js", "file:///b.js"],
+    },
+  ]);
+  assert.deepEqual(result.graph?.evaluationOrder, [
+    "file:///a.js",
+    "file:///b.js",
+  ]);
+});
+
+test("reports ambiguous star exports only when a binding requests them", () => {
+  const left = graphSpecifier("./left.js", 0);
+  const right = graphSpecifier("./right.js", 10);
+  const root = graphSpecifier("./root.js", 0);
+  const leaf = (canonicalId: string, localName: string) => ({
+    canonicalId,
+    dependencies: [],
+    resolutions: [],
+    sourceHash: localName,
+    syntax: {
+      ...testModule(canonicalId, ""),
+      exports: [
+        {
+          exportedName: "shared",
+          kind: "local" as const,
+          localName,
+          range: moduleRange,
+        },
+      ],
+    },
+  });
+  const graph: ModuleGraph = {
+    entryId: "file:///consumer.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///consumer.js",
+        dependencies: [{ canonicalId: "file:///root.js", specifier: root }],
+        resolutions: [{ canonicalId: "file:///root.js", specifier: root }],
+        sourceHash: "consumer",
+        syntax: {
+          ...testModule("file:///consumer.js", ""),
+          imports: [
+            {
+              byteRange: root.byteRange,
+              importedName: "shared",
+              localName: "shared",
+              range: moduleRange,
+              specifier: root,
+            },
+          ],
+        },
+      },
+      {
+        canonicalId: "file:///root.js",
+        dependencies: [
+          { canonicalId: "file:///left.js", specifier: left },
+          { canonicalId: "file:///right.js", specifier: right },
+        ],
+        resolutions: [
+          { canonicalId: "file:///left.js", specifier: left },
+          { canonicalId: "file:///right.js", specifier: right },
+        ],
+        sourceHash: "root",
+        syntax: {
+          ...testModule("file:///root.js", ""),
+          exports: [
+            { kind: "star", range: moduleRange, specifier: left },
+            { kind: "star", range: moduleRange, specifier: right },
+          ],
+        },
+      },
+      leaf("file:///left.js", "leftShared"),
+      leaf("file:///right.js", "rightShared"),
+    ],
+  };
+  const result = linkModuleGraph(graph);
+  assert.equal(result.graph, undefined);
+  assert.match(result.diagnostics[0]?.message ?? "", /ambiguous/u);
 });

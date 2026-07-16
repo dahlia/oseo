@@ -59,7 +59,8 @@ host-dependent search paths are outside M4. A source hash is recorded for each
 canonical module so a graph changes deterministically when its source changes.
 
 Dynamic `import()` remains unsupported. `eval` and the `Function` constructor
-remain unsupported.
+remain unsupported. Type-only imports and exports remain unsupported until a
+later profile freezes whether and where Oseo erases them.
 
 
 Evaluation profile

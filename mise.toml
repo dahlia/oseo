@@ -149,10 +149,10 @@ run = '''
 for seed in 1592590337 1592590338; do
   OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
     OSEO_PROPERTY_SEED="$seed" node --test \
-    packages/testkit/tests/property-runner.property.test.ts
+    packages/testkit/tests/*.property.test.ts
   OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
     OSEO_PROPERTY_SEED="$seed" deno test -A \
-    packages/testkit/tests/property-runner.property.test.ts
+    packages/testkit/tests/*.property.test.ts
 done
 '''
 
