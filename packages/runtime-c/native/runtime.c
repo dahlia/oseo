@@ -26,6 +26,9 @@
 #define OSEO_PROMISE_FINALLY_CODE_ID (SIZE_MAX - 4u)
 #define OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID (SIZE_MAX - 5u)
 #define OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID (SIZE_MAX - 6u)
+#define OSEO_PROMISE_FINALLY_FULFILL_CODE_ID (SIZE_MAX - 7u)
+#define OSEO_PROMISE_FINALLY_REJECT_CODE_ID (SIZE_MAX - 8u)
+#define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID (SIZE_MAX - 9u)
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -110,8 +113,6 @@ typedef enum {
     OSEO_REACTION_NORMAL = 0,
     OSEO_REACTION_ALL = 1,
     OSEO_REACTION_RACE = 2,
-    OSEO_REACTION_FINALLY = 3,
-    OSEO_REACTION_FINALLY_CONTINUATION = 4,
 } OseoReactionKind;
 
 typedef struct {
@@ -121,10 +122,8 @@ typedef struct {
     OseoValue on_rejected;
     OseoValue capability;
     OseoValue aggregate;
-    OseoValue preserved;
     size_t index;
     OseoReactionKind kind;
-    bool preserved_fulfilled;
 } OseoPromiseReaction;
 
 typedef struct {
@@ -388,7 +387,6 @@ static void trace_object(
         mark_value(reaction->on_rejected, worklist);
         mark_value(reaction->capability, worklist);
         mark_value(reaction->aggregate, worklist);
-        mark_value(reaction->preserved, worklist);
     } else if (object->kind == OSEO_HEAP_JOB) {
         OseoJob *job = (OseoJob *)object;
         mark_value(job->next, worklist);
@@ -974,6 +972,7 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_ARROW:
         case OSEO_FUNCTION_ASYNC:
         case OSEO_FUNCTION_ASYNC_ARROW:
+        case OSEO_FUNCTION_INTERNAL:
             break;
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");
@@ -3032,10 +3031,8 @@ static OseoResult reaction_create(
     reaction->on_rejected = on_rejected;
     reaction->capability = capability;
     reaction->aggregate = oseo_undefined();
-    reaction->preserved = oseo_undefined();
     reaction->index = 0u;
     reaction->kind = OSEO_REACTION_NORMAL;
-    reaction->preserved_fulfilled = false;
     return publish_heap(
         context,
         &reaction->header,
@@ -3223,7 +3220,7 @@ static OseoResult resolving_function_create(
             NULL,
             0u,
             1u,
-            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
             oseo_undefined()
         );
@@ -3672,6 +3669,168 @@ OseoResult oseo_promise_race(
     return promise_combine(context, iterable, true);
 }
 
+static OseoResult promise_invoke_then(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+) {
+    static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = on_fulfilled;
+    frame.slots[2] = on_rejected;
+    result = oseo_string_from_units(context, then_units, 4u);
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[3]
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[4],
+            frame.slots[0],
+            2u,
+            &frame.slots[1],
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult promise_finally_function_create(
+    OseoContext *context,
+    OseoValue on_finally,
+    size_t code_id
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = on_finally;
+    result = oseo_environment_create(context, 1u);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            0u,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            frame.slots[1],
+            NULL,
+            0u,
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult promise_finally_continuation_create(
+    OseoContext *context,
+    OseoValue preserved,
+    bool fulfilled
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = preserved;
+    result = oseo_environment_create(context, 2u);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            0u,
+            frame.slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            1u,
+            oseo_boolean(fulfilled)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID,
+            frame.slots[1],
+            NULL,
+            0u,
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult promise_finally_invoke(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_finally
+) {
+    if (!is_object(promise_value)) return language_failure(context);
+    if (!is_function(on_finally)) {
+        return promise_invoke_then(
+            context,
+            promise_value,
+            on_finally,
+            on_finally
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = on_finally;
+    result = promise_finally_function_create(
+        context,
+        frame.slots[1],
+        OSEO_PROMISE_FINALLY_FULFILL_CODE_ID
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = promise_finally_function_create(
+            context,
+            frame.slots[1],
+            OSEO_PROMISE_FINALLY_REJECT_CODE_ID
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = promise_invoke_then(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[3]
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_call_function(
     OseoContext *context,
     OseoValue callee,
@@ -3721,6 +3880,73 @@ OseoResult oseo_call_function(
                 ? oseo_promise_resolve_into(context, result.value, argument)
                 : oseo_promise_reject_into(context, result.value, argument);
         }
+    } else if (code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID ||
+               code_id == OSEO_PROMISE_FINALLY_REJECT_CODE_ID) {
+        OseoRootFrame frame = {NULL, NULL, 0u};
+        result = oseo_roots_allocate(context, &frame, 7u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            frame.slots[0] = callee;
+            frame.slots[3] = argument_count > 0u
+                ? arguments[0]
+                : oseo_undefined();
+            result = oseo_function_environment(context, frame.slots[0]);
+            frame.slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, frame.slots[1], 0u);
+            frame.slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                oseo_undefined(),
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_promise_resolve(context, frame.slots[4]);
+            frame.slots[5] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            bool fulfilled =
+                code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID;
+            result = promise_finally_continuation_create(
+                context,
+                frame.slots[3],
+                fulfilled
+            );
+            frame.slots[6] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = promise_invoke_then(
+                context,
+                frame.slots[5],
+                frame.slots[6],
+                oseo_undefined()
+            );
+        }
+        oseo_roots_release(context, &frame);
+    } else if (code_id == OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID) {
+        result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        OseoValue preserved = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 1u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value)) {
+            result = normal(preserved);
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            oseo_context_clear_language_error(context);
+            result = (OseoResult){OSEO_STATUS_THROW, preserved};
+        }
     } else if (code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID ||
                code_id == OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID) {
         result = oseo_function_environment(context, callee);
@@ -3769,14 +3995,14 @@ OseoResult oseo_call_function(
         if (code_id == OSEO_PROMISE_THEN_CODE_ID) {
             result = oseo_promise_then(context, receiver, first, second);
         } else if (code_id == OSEO_PROMISE_CATCH_CODE_ID) {
-            result = oseo_promise_then(
+            result = promise_invoke_then(
                 context,
                 receiver,
                 oseo_undefined(),
                 first
             );
         } else {
-            result = oseo_promise_finally(context, receiver, first);
+            result = promise_finally_invoke(context, receiver, first);
         }
     } else if (context->function_dispatcher == NULL) {
         result = failure(
@@ -3905,42 +4131,7 @@ OseoResult oseo_promise_finally(
     OseoValue promise_value,
     OseoValue on_finally
 ) {
-    if (!is_promise(promise_value)) return language_failure(context);
-    if (!is_function(on_finally)) {
-        return oseo_promise_then(
-            context,
-            promise_value,
-            oseo_undefined(),
-            oseo_undefined()
-        );
-    }
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = promise_value;
-    frame.slots[1] = on_finally;
-    result = promise_create(context);
-    frame.slots[2] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = reaction_create(
-            context,
-            frame.slots[1],
-            oseo_undefined(),
-            frame.slots[2]
-        );
-        frame.slots[3] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL) {
-        reaction_object(frame.slots[3])->kind = OSEO_REACTION_FINALLY;
-        result = promise_attach_reaction(
-            context,
-            frame.slots[0],
-            frame.slots[3]
-        );
-    }
-    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[2];
-    oseo_roots_release(context, &frame);
-    return result;
+    return promise_finally_invoke(context, promise_value, on_finally);
 }
 
 OseoPromiseState oseo_promise_state(OseoValue promise) {
@@ -3976,115 +4167,6 @@ static OseoResult run_reaction_job(
             job->argument,
             job->fulfilled
         );
-    }
-    if (selected->kind == OSEO_REACTION_FINALLY_CONTINUATION) {
-        OseoRootFrame continuation_frame = {NULL, NULL, 0u};
-        OseoResult continuation_result = oseo_roots_allocate(
-            context,
-            &continuation_frame,
-            3u
-        );
-        if (continuation_result.status != OSEO_STATUS_NORMAL) {
-            return continuation_result;
-        }
-        OseoJob *continuation_job = job_object(job_value);
-        OseoPromiseReaction *continuation = reaction_object(
-            continuation_job->primary
-        );
-        continuation_frame.slots[0] = continuation->capability;
-        continuation_frame.slots[1] = continuation->preserved;
-        continuation_frame.slots[2] = continuation_job->argument;
-        bool preserved_fulfilled = continuation->preserved_fulfilled;
-        if (!continuation_job->fulfilled) {
-            continuation_result = oseo_promise_reject_into(
-                context,
-                continuation_frame.slots[0],
-                continuation_frame.slots[2]
-            );
-        } else if (preserved_fulfilled) {
-            continuation_result = oseo_promise_resolve_into(
-                context,
-                continuation_frame.slots[0],
-                continuation_frame.slots[1]
-            );
-        } else {
-            continuation_result = oseo_promise_reject_into(
-                context,
-                continuation_frame.slots[0],
-                continuation_frame.slots[1]
-            );
-        }
-        oseo_roots_release(context, &continuation_frame);
-        return continuation_result;
-    }
-    if (selected->kind == OSEO_REACTION_FINALLY) {
-        OseoRootFrame finally_frame = {NULL, NULL, 0u};
-        OseoResult finally_result = oseo_roots_allocate(
-            context,
-            &finally_frame,
-            6u
-        );
-        if (finally_result.status != OSEO_STATUS_NORMAL) {
-            return finally_result;
-        }
-        OseoJob *finally_job = job_object(job_value);
-        OseoPromiseReaction *finally_reaction = reaction_object(
-            finally_job->primary
-        );
-        finally_frame.slots[0] = finally_reaction->on_fulfilled;
-        finally_frame.slots[1] = finally_reaction->capability;
-        finally_frame.slots[2] = finally_job->argument;
-        bool fulfilled = finally_job->fulfilled;
-        finally_result = oseo_call_function(
-            context,
-            finally_frame.slots[0],
-            oseo_undefined(),
-            0u,
-            NULL,
-            oseo_undefined()
-        );
-        finally_frame.slots[3] = finally_result.value;
-        if (finally_result.status == OSEO_STATUS_THROW &&
-            !context->has_diagnostic) {
-            oseo_context_clear_language_error(context);
-            finally_result = oseo_promise_reject_into(
-                context,
-                finally_frame.slots[1],
-                finally_frame.slots[3]
-            );
-            oseo_roots_release(context, &finally_frame);
-            return finally_result;
-        } else if (finally_result.status == OSEO_STATUS_NORMAL) {
-            finally_result = oseo_promise_resolve(
-                context,
-                finally_frame.slots[3]
-            );
-            finally_frame.slots[4] = finally_result.value;
-        }
-        if (finally_result.status == OSEO_STATUS_NORMAL) {
-            finally_result = reaction_create(
-                context,
-                oseo_undefined(),
-                oseo_undefined(),
-                finally_frame.slots[1]
-            );
-            finally_frame.slots[5] = finally_result.value;
-        }
-        if (finally_result.status == OSEO_STATUS_NORMAL) {
-            OseoPromiseReaction *continuation = reaction_object(
-                finally_frame.slots[5]
-            );
-            continuation->kind = OSEO_REACTION_FINALLY_CONTINUATION;
-            continuation->preserved = finally_frame.slots[2];
-            continuation->preserved_fulfilled = fulfilled;
-            finally_result = promise_attach_reaction(
-                context,
-                finally_frame.slots[4],
-                finally_frame.slots[5]
-            );
-        }
-        oseo_roots_release(context, &finally_frame);
-        return finally_result;
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);

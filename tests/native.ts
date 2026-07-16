@@ -845,6 +845,13 @@ function cleanup() { console.log("cleanup"); }
 function cleanupReject() { return Promise.reject(10); }
 function cleanupThrow() { throw 11; }
 function invalidInput() { console.log("invalid input"); }
+function showConstructible(label, callback) {
+  try {
+    new callback(31);
+  } catch (error) {
+    console.log(label, "not constructible");
+  }
+}
 function showObservableAll(values) {
   console.log("observable all", values[0]);
 }
@@ -886,6 +893,37 @@ Promise.resolve(12).finally(cleanupReject).catch(showRejected);
 Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
 Promise.all(1).catch(invalidInput);
 Promise.race(null).catch(invalidInput);
+let exposedResolve;
+let exposedReject;
+const exposedPromise = new Promise(function expose(resolve, reject) {
+  exposedResolve = resolve;
+  exposedReject = reject;
+});
+showConstructible("resolve", exposedResolve);
+showConstructible("reject", exposedReject);
+exposedPromise.then(show, showRejected);
+exposedResolve(32);
+const catchObservable = Promise.resolve(33);
+catchObservable.then = function observableCatch(onFulfilled, onRejected) {
+  console.log("observable catch then");
+  return onRejected(34);
+};
+catchObservable.catch(showRejected);
+const finallyObservable = Promise.resolve(35);
+finallyObservable.then = function observableFinally(onFulfilled) {
+  console.log("observable finally then");
+  return onFulfilled(36);
+};
+finallyObservable.finally(cleanup).then(show);
+function observableCleanup() {
+  const result = Promise.resolve(0);
+  result.then = function observableCleanupThen(onFulfilled) {
+    console.log("observable cleanup then");
+    return onFulfilled(0);
+  };
+  return result;
+}
+Promise.resolve(37).finally(observableCleanup).then(show);
 const observable = Promise.resolve(23);
 observable.then = function observableThen(onFulfilled) {
   console.log("observable then");

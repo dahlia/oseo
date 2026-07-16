@@ -17,6 +17,7 @@ typedef enum {
     OSEO_FUNCTION_ARROW = 1,
     OSEO_FUNCTION_ASYNC = 2,
     OSEO_FUNCTION_ASYNC_ARROW = 3,
+    OSEO_FUNCTION_INTERNAL = 4,
 } OseoFunctionKind;
 
 typedef struct {
