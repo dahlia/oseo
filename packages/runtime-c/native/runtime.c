@@ -3106,16 +3106,15 @@ OseoResult oseo_promise_reject_into(
     return enqueue_reactions(context, promise_value);
 }
 
-static OseoResult resolving_function_create(
+static OseoResult resolving_environment_create(
     OseoContext *context,
-    OseoValue promise,
-    size_t code_id
+    OseoValue promise
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = promise;
-    result = oseo_environment_create(context, 1u);
+    result = oseo_environment_create(context, 2u);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_environment_set(
@@ -3126,10 +3125,39 @@ static OseoResult resolving_function_create(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_cell_create(context, oseo_boolean(false));
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            1u,
+            frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult resolving_function_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t code_id
+) {
+    if (!is_environment(environment)) {
+        return failure(context, "OSEO2001", "Invalid resolving environment.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = environment;
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_function_create(
             context,
             code_id,
-            frame.slots[1],
+            frame.slots[0],
             NULL,
             0u,
             1u,
@@ -3310,14 +3338,30 @@ static OseoResult promise_combine(
     OseoValue iterable,
     bool race
 ) {
-    if (!is_array(iterable)) return language_failure(context);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = iterable;
-    size_t length = ordinary_object(frame.slots[0])->array_length;
     result = promise_create(context);
     frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_array(frame.slots[0])) {
+        result = language_failure(context);
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            oseo_context_clear_language_error(context);
+            result = oseo_promise_reject_into(
+                context,
+                frame.slots[1],
+                frame.slots[2]
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    size_t length = result.status == OSEO_STATUS_NORMAL
+        ? ordinary_object(frame.slots[0])->array_length
+        : 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = race
             ? normal(oseo_undefined())
@@ -3416,10 +3460,29 @@ OseoResult oseo_call_function(
     if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
         code_id == OSEO_PROMISE_REJECT_CODE_ID) {
         result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, result.value, 0u);
+            result = oseo_environment_get(context, environment, 1u);
         }
+        OseoValue latch = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_cell_get(context, latch);
+        }
+        bool already_resolved = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
+        if (already_resolved) {
+            result = normal(oseo_undefined());
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_cell_set(
+                context,
+                latch,
+                oseo_boolean(true)
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
             OseoValue argument = argument_count > 0u
                 ? arguments[0]
                 : oseo_undefined();
@@ -3474,15 +3537,19 @@ OseoResult oseo_promise_construct(
 ) {
     if (!is_function(executor)) return language_failure(context);
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = executor;
     result = promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = resolving_environment_create(context, frame.slots[1]);
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = resolving_function_create(
             context,
-            frame.slots[1],
+            frame.slots[4],
             OSEO_PROMISE_RESOLVE_CODE_ID
         );
         frame.slots[2] = result.value;
@@ -3490,7 +3557,7 @@ OseoResult oseo_promise_construct(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = resolving_function_create(
             context,
-            frame.slots[1],
+            frame.slots[4],
             OSEO_PROMISE_REJECT_CODE_ID
         );
         frame.slots[3] = result.value;
@@ -3505,11 +3572,15 @@ OseoResult oseo_promise_construct(
             oseo_undefined()
         );
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
-            result = oseo_promise_reject_into(
+            result = oseo_call_function(
                 context,
-                frame.slots[1],
-                result.value
+                frame.slots[3],
+                oseo_undefined(),
+                1u,
+                &frame.slots[4],
+                oseo_undefined()
             );
         }
     }
@@ -3866,22 +3937,26 @@ static OseoResult run_thenable_job(
     OseoValue job_value
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoJob *job = job_object(job_value);
     frame.slots[0] = job->primary;
     frame.slots[1] = job->secondary;
     frame.slots[2] = job->argument;
-    result = resolving_function_create(
-        context,
-        frame.slots[0],
-        OSEO_PROMISE_RESOLVE_CODE_ID
-    );
-    frame.slots[3] = result.value;
+    result = resolving_environment_create(context, frame.slots[0]);
+    frame.slots[5] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = resolving_function_create(
             context,
-            frame.slots[0],
+            frame.slots[5],
+            OSEO_PROMISE_RESOLVE_CODE_ID
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = resolving_function_create(
+            context,
+            frame.slots[5],
             OSEO_PROMISE_REJECT_CODE_ID
         );
         frame.slots[4] = result.value;
@@ -3896,11 +3971,15 @@ static OseoResult run_thenable_job(
             oseo_undefined()
         );
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            frame.slots[5] = result.value;
             oseo_context_clear_language_error(context);
-            result = oseo_promise_reject_into(
+            result = oseo_call_function(
                 context,
-                frame.slots[0],
-                result.value
+                frame.slots[4],
+                oseo_undefined(),
+                1u,
+                &frame.slots[5],
+                oseo_undefined()
             );
         }
     }

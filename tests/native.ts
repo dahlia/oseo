@@ -844,8 +844,30 @@ function showEmpty(values) { console.log("empty", values.length); }
 function cleanup() { console.log("cleanup"); }
 function cleanupReject() { return Promise.reject(10); }
 function cleanupThrow() { throw 11; }
+function invalidInput() { console.log("invalid input"); }
+let settleAdopted;
+const adopted = new Promise(function pending(resolve) {
+  settleAdopted = resolve;
+});
+const latched = new Promise(function resolveFirst(resolve, reject) {
+  resolve(adopted);
+  reject("late rejection");
+});
+const thrownAfterResolve = new Promise(function resolveThenThrow(resolve) {
+  resolve(adopted);
+  throw "late executor throw";
+});
+const thenable = {
+  then: function resolveFirst(resolve, reject) {
+    resolve(adopted);
+    reject("late thenable rejection");
+  },
+};
 console.log("sync start");
 new Promise(settle).then(show);
+latched.then(show, showRejected);
+thrownAfterResolve.then(show, showRejected);
+Promise.resolve(thenable).then(show, showRejected);
 Promise.resolve(2).then(show);
 Promise.reject(3).catch(showRejected);
 Promise.all([Promise.resolve(4), 5]).then(showAll);
@@ -856,7 +878,10 @@ Promise.resolve(8).finally(cleanup).then(show);
 Promise.reject(9).finally(cleanup).catch(showRejected);
 Promise.resolve(12).finally(cleanupReject).catch(showRejected);
 Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
+Promise.all(1).catch(invalidInput);
+Promise.race(null).catch(invalidInput);
 console.log("sync end");
+settleAdopted(16);
 `,
   },
   {
