@@ -161,6 +161,19 @@ test("accepts expression-valued dynamic call targets", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
+test("marks allocating member lookup as a safepoint", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'try { "a"[0](); } catch (error) {}',
+    sourceId: "member-lookup.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(
+    printMir(result.mir),
+    /safepoint method lookup[^\n]*\n[^\n]*property-get method lookup/u,
+  );
+});
+
 test("accepts parenthesized direct call targets", () => {
   const result = compileSource(babelFrontend, {
     source: "function value() { return 42; }\n(console.log)((value)());\n",

@@ -11,6 +11,8 @@ M3 property operations implement descriptors, prototypes, array holes and
 length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
+Catchable runtime-generated language errors carry distinct opaque ordinary
+objects, while resource and host failures retain non-catchable diagnostics.
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.
 Numeric coercion distinguishes an ordinary `NaN` conversion from temporary

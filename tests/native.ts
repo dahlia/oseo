@@ -523,10 +523,14 @@ function strictErrors() {
   try { delete fixed.item; } catch (error) { console.log("strict delete"); }
 }
 strictErrors();
+let firstError;
 try { const value = 1; value(); } catch (error) {
-  console.log("not callable");
+  firstError = error;
+  console.log("not callable", error === undefined, error === null);
 }
-try { null.item; } catch (error) { console.log("null receiver"); }
+try { null.item; } catch (error) {
+  console.log("null receiver", error === undefined, error === firstError);
+}
 try { Object.create(1); } catch (error) { console.log("invalid prototype"); }
 console.log((1).missing, true.missing, "abc".length, "abc"[1]);
 try { tdzRead; } catch (error) { console.log("tdz read"); }
@@ -864,6 +868,7 @@ for (const fixture of fixtures) {
   }
 
   if (
+    fixture.name === "catchable-type-errors" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition"
   ) {

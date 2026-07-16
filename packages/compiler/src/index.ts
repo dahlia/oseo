@@ -1791,6 +1791,13 @@ function lowerExpression(
 ): number {
   if (expression.kind === "binding-set") {
     const value = lowerExpression(expression.value, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "binding assignment error",
+      [value],
+      expression.range,
+    );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -1917,6 +1924,13 @@ function lowerExpression(
     return id;
   }
   if (expression.kind === "binding") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "binding read error",
+      [],
+      expression.range,
+    );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -2126,6 +2140,14 @@ function lowerExpression(
         [object, key],
         expression.range,
       );
+    } else {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "property deletion error",
+        [object, key],
+        expression.range,
+      );
     }
     const id = builder.nextValue;
     builder.nextValue += 1;
@@ -2257,6 +2279,13 @@ function lowerExpression(
     } else {
       receiver = lowerExpression(expression.target.object, builder);
       const key = lowerPropertyKey(expression.target.key, builder);
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "method lookup",
+        [receiver, key],
+        expression.range,
+      );
       callee = builder.nextValue;
       builder.nextValue += 1;
       builder.current.operations.push({

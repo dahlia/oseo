@@ -89,6 +89,11 @@ are ordinary admitted values. A catch binding is lexical and mutable. A
 `finally` completion replaces a pending normal, return, throw, break, or
 continue completion according to ECMAScript ordering.
 
+Runtime-generated binding, callability, receiver, and strict-operation errors
+throw distinct opaque ordinary objects. They are never represented by
+`undefined`. The standard `Error` constructor hierarchy, names, messages, and
+prototype identities remain outside the M3 profile.
+
 Runtime resource limits and unsupported host capabilities remain `OSEO2001` and
 `OSEO3001` diagnostics. They are not catchable JavaScript values.
 

@@ -12,6 +12,7 @@ import type {
 
 interface EmitState {
   readonly argumentSlotStart: number;
+  readonly completionSlotStart: number;
   readonly functionId: number;
   readonly functionRootCounts: ReadonlyMap<number, number>;
   readonly lines: string[];
@@ -606,11 +607,14 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (slot == null) {
       throw new Error(`MIR caught %${operation.id} has no completion slot.`);
     }
-    line(state, `roots[${operation.id}] = completion_value[${slot}u];`);
+    line(
+      state,
+      `roots[${operation.id}] = roots[${state.completionSlotStart + slot}u];`,
+    );
     line(
       state,
       `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
-        `completion_value[${slot}u]};`,
+        `roots[${state.completionSlotStart + slot}u]};`,
     );
   } else if (operation.kind === "completion-set") {
     state.usesCompletion = true;
@@ -629,7 +633,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (operation.arguments[0] != null) {
       line(
         state,
-        `completion_value[${slot}u] = roots[${operation.arguments[0]}];`,
+        `roots[${state.completionSlotStart + slot}u] = ` +
+          `roots[${operation.arguments[0]}];`,
       );
     }
     if (operation.completionTarget != null) {
@@ -691,7 +696,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       line(state, `    completion_kind[${operation.abruptTarget}u] = 2;`);
       line(
         state,
-        `    completion_value[${operation.abruptTarget}u] = result.value;`,
+        `    roots[${state.completionSlotStart + operation.abruptTarget}u] = ` +
+          "result.value;",
       );
       line(state, `    goto bb${operation.abruptTarget};`);
       line(state, "}");
@@ -707,7 +713,8 @@ function emitCompletionCopy(
   line(state, `    completion_kind[${target}u] = completion_kind[${source}u];`);
   line(
     state,
-    `    completion_value[${target}u] = completion_value[${source}u];`,
+    `    roots[${state.completionSlotStart + target}u] = ` +
+      `roots[${state.completionSlotStart + source}u];`,
   );
   line(
     state,
@@ -763,7 +770,7 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(
       state,
       `    result = (OseoResult){OSEO_STATUS_NORMAL, ` +
-        `completion_value[${slot}u]};`,
+        `roots[${state.completionSlotStart + slot}u]};`,
     );
     line(state, "    oseo_roots_release(context, &frame);");
     line(state, "    return result;");
@@ -772,7 +779,7 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(
       state,
       `    result = (OseoResult){OSEO_STATUS_THROW, ` +
-        `completion_value[${slot}u]};`,
+        `roots[${state.completionSlotStart + slot}u]};`,
     );
     line(state, "    goto abrupt;");
     line(state, "}");
@@ -847,6 +854,23 @@ function maximumArgumentCount(blocks: readonly MirBlock[]): number {
   return maximum;
 }
 
+function completionSlotCount(blocks: readonly MirBlock[]): number {
+  const usesCompletion = blocks.some(
+    (block) =>
+      block.terminator.kind === "resume-completion" ||
+      block.operations.some(
+        (operation) =>
+          operation.kind === "caught" ||
+          operation.kind === "completion-set" ||
+          (operation.kind === "check-status" && operation.abruptTarget != null),
+      ),
+  );
+  if (!usesCompletion) return 0;
+  let count = 1;
+  for (const block of blocks) count = Math.max(count, block.id + 1);
+  return count;
+}
+
 function rootCount(functionValue: MirFunction): number {
   const blocks = reachableBlocks(functionValue);
   const valueSlotCount = maximumValueId(blocks) + 1;
@@ -855,7 +879,9 @@ function rootCount(functionValue: MirFunction): number {
     valueSlotCount + 2,
     32,
   );
-  return baseRootCount + maximumArgumentCount(blocks);
+  return (
+    baseRootCount + maximumArgumentCount(blocks) + completionSlotCount(blocks)
+  );
 }
 
 function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
@@ -947,10 +973,7 @@ function emitFunction(
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
   }
   const blocks = reachableBlocks(functionValue);
-  let completionSlotCount = 1;
-  for (const block of blocks) {
-    completionSlotCount = Math.max(completionSlotCount, block.id + 1);
-  }
+  const completionSlots = completionSlotCount(blocks);
   const valueSlotCount = maximumValueId(blocks) + 1;
   const parameters = functionValue.parameters;
   const bindingIdValues =
@@ -963,6 +986,7 @@ function emitFunction(
     valueSlotCount + 2,
     32,
   );
+  const argumentSlots = maximumArgumentCount(blocks);
   const functionRootCount = functionRootCounts.get(functionValue.id);
   if (functionRootCount == null) {
     throw new Error(
@@ -974,6 +998,7 @@ function emitFunction(
     blockParameters: new Map(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
+    completionSlotStart: baseRootCount + argumentSlots,
     functionRootCounts,
     lines: [],
     environmentSlot,
@@ -1070,12 +1095,10 @@ function emitFunction(
     "    OseoValue *roots;\n" +
     "    OseoResult result;\n" +
     (state.usesCompletion
-      ? `    int completion_kind[${completionSlotCount}u] = {0};\n` +
-        `    size_t completion_target[${completionSlotCount}u] = {0};\n` +
-        `    OseoValue completion_value[${completionSlotCount}u] = {0};\n` +
+      ? `    int completion_kind[${completionSlots}u] = {0};\n` +
+        `    size_t completion_target[${completionSlots}u] = {0};\n` +
         "    (void)completion_kind;\n" +
-        "    (void)completion_target;\n" +
-        "    (void)completion_value;\n"
+        "    (void)completion_target;\n"
       : "") +
     "    (void)callee;\n" +
     "    (void)receiver;\n" +
