@@ -633,6 +633,12 @@ test("preserves async returns and bindings across await", () => {
       "  let later = 4;",
       "  return later;",
       "}",
+      "async function finalValue() {",
+      "  try { return 1; } finally { return 2; }",
+      "}",
+      "const promise = Promise.resolve(3);",
+      "promise.then = function () { return 4; };",
+      "async function internalAwait() { return await promise; }",
     ].join("\n"),
     sourceId: "async-scope.js",
   });

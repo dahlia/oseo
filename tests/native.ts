@@ -928,6 +928,26 @@ async function tdzAcrossAwait() {
   let later = 20;
   return later;
 }
+async function finalReturn() {
+  try {
+    return 21;
+  } finally {
+    return 22;
+  }
+}
+async function finalThrow() {
+  try {
+    return 23;
+  } finally {
+    throw "final throw";
+  }
+}
+const internallyAwaited = Promise.resolve(24);
+internallyAwaited.then = function overriddenAwait() {
+  console.log("incorrect await override");
+  return Promise.resolve(0);
+};
+async function awaitInternally() { return await internallyAwaited; }
 function rejected(reason) { console.log("async rejected", reason); }
 function showThis(value) { console.log("async this", value); }
 const owner = { value: 41, read: readThis, make: makeArrow };
@@ -946,6 +966,11 @@ hoistedAcrossAwait().then(function (value) {
   console.log("hoisted", value);
 });
 tdzAcrossAwait().then(function (value) { console.log("tdz", value); });
+finalReturn().then(function (value) { console.log("final return", value); });
+finalThrow().catch(function (reason) { console.log("final throw", reason); });
+awaitInternally().then(function (value) {
+  console.log("internal await", value);
+});
 console.log(
   "async prototype",
   Object.getOwnPropertyDescriptor(expression, "prototype") === undefined,

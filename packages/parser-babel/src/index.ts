@@ -948,21 +948,16 @@ function directPromiseResolve(
   };
 }
 
-function promiseThen(
+function internalPromiseThen(
   promise: SyntaxExpression,
   callback: SyntaxExpression,
   range: SourceRange,
 ): SyntaxExpression {
   return {
-    arguments: [callback],
+    arguments: [promise, callback],
     kind: "call",
     range,
-    target: {
-      key: { kind: "string", range, value: "then" },
-      kind: "property",
-      object: promise,
-      range,
-    },
+    target: { kind: "promise-intrinsic-direct", method: "then", range },
   };
 }
 
@@ -1093,86 +1088,10 @@ function asyncScopePlaceholders(
   return declarations;
 }
 
-function resolveExecutorReturns(
-  statementValue: SyntaxStatement,
-  resolveName: string,
-): SyntaxStatement {
-  if (statementValue.kind === "return") {
-    return {
-      body: [
-        callName(
-          resolveName,
-          statementValue.expression ??
-            undefinedExpression(statementValue.range),
-          statementValue.range,
-        ),
-        {
-          expression: undefined,
-          kind: "return",
-          range: statementValue.range,
-        },
-      ],
-      kind: "block",
-      range: statementValue.range,
-    };
-  }
-  if (statementValue.kind === "block") {
-    return {
-      ...statementValue,
-      body: statementValue.body.map((child) =>
-        child.kind === "function"
-          ? child
-          : resolveExecutorReturns(child, resolveName),
-      ),
-    };
-  }
-  if (statementValue.kind === "if") {
-    return {
-      ...statementValue,
-      alternate:
-        statementValue.alternate == null
-          ? undefined
-          : resolveExecutorReturns(statementValue.alternate, resolveName),
-      consequent: resolveExecutorReturns(
-        statementValue.consequent,
-        resolveName,
-      ),
-    };
-  }
-  if (statementValue.kind === "while") {
-    return {
-      ...statementValue,
-      body: resolveExecutorReturns(statementValue.body, resolveName),
-    };
-  }
-  if (statementValue.kind === "try") {
-    return {
-      ...statementValue,
-      block: resolveExecutorReturns(statementValue.block, resolveName),
-      finalizer:
-        statementValue.finalizer == null
-          ? undefined
-          : resolveExecutorReturns(statementValue.finalizer, resolveName),
-      handler:
-        statementValue.handler == null
-          ? undefined
-          : {
-              ...statementValue.handler,
-              body: resolveExecutorReturns(
-                statementValue.handler.body,
-                resolveName,
-              ),
-            },
-    };
-  }
-  return statementValue;
-}
-
 function asyncStatementList(
   context: ConvertContext,
   values: readonly BabelNode[],
   mode: "continuation" | "executor",
-  resolveName: string,
 ): readonly (SyntaxFunction | SyntaxStatement)[] | undefined {
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   for (const [index, value] of values.entries()) {
@@ -1198,7 +1117,6 @@ function asyncStatementList(
           context,
           values.slice(index + 1),
           "continuation",
-          resolveName,
         );
         if (continuationBody != null && point.declaration != null) {
           continuationBody = [
@@ -1220,7 +1138,7 @@ function asyncStatementList(
         [valueName],
         continuationBody,
       );
-      const chain = promiseThen(
+      const chain = internalPromiseThen(
         directPromiseResolve(operand, range),
         callback,
         range,
@@ -1231,8 +1149,7 @@ function asyncStatementList(
           values.slice(index),
         );
         if (declarations == null) return undefined;
-        body.push(callName(resolveName, chain, range));
-        body.push({ expression: undefined, kind: "return", range });
+        body.push({ expression: chain, kind: "return", range });
         body.push(...declarations);
       } else {
         body.push({ expression: chain, kind: "return", range });
@@ -1267,7 +1184,7 @@ function asyncStatementList(
           : converted,
       );
     } else {
-      body.push(resolveExecutorReturns(converted, resolveName));
+      body.push(converted);
     }
     if (converted.kind === "return" || converted.kind === "throw") return body;
   }
@@ -1275,15 +1192,11 @@ function asyncStatementList(
     values.length === 0
       ? { end: { column: 1, line: 1 }, start: { column: 1, line: 1 } }
       : sourceRange(context.locations, values.at(-1) ?? values[0]!);
-  if (mode === "executor") {
-    body.push(callName(resolveName, undefinedExpression(range), range));
-  } else {
-    body.push({
-      expression: undefinedExpression(range),
-      kind: "return",
-      range,
-    });
-  }
+  body.push({
+    expression: undefinedExpression(range),
+    kind: "return",
+    range,
+  });
   return body;
 }
 
@@ -1369,19 +1282,21 @@ function functionDeclaration(
   if (value.async === true) {
     const resolveName = syntheticName(context, "resolve");
     const rejectName = syntheticName(context, "reject");
-    const executorBody = asyncStatementList(
-      context,
-      children,
-      "executor",
-      resolveName,
-    );
-    if (executorBody != null) {
+    const executionBody = asyncStatementList(context, children, "executor");
+    if (executionBody != null) {
       const range = location(context, value).range;
+      const execution = syntheticFunction(context, range, [], executionBody);
+      const executionCall: SyntaxExpression = {
+        arguments: [],
+        kind: "call",
+        range,
+        target: { callee: execution, kind: "dynamic", range },
+      };
       const executor = syntheticFunction(
         context,
         range,
         [resolveName, rejectName],
-        executorBody,
+        [callName(resolveName, executionCall, range)],
       );
       body.push({
         expression: {
@@ -1393,7 +1308,7 @@ function functionDeclaration(
         range,
       });
     }
-    if (executorBody == null) {
+    if (executionBody == null) {
       context.functionStack.pop();
       context.strictStack.pop();
       return undefined;

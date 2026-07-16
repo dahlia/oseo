@@ -379,18 +379,32 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = oseo_promise_construct(context, roots[${executor}]);`,
     );
   } else if (target.kind === "promise-intrinsic") {
-    const names = {
-      all: "oseo_promise_all",
-      race: "oseo_promise_race",
-      reject: "oseo_promise_reject",
-      resolve: "oseo_promise_resolve",
-    } as const;
-    const value = operation.arguments[0];
-    line(
-      state,
-      `result = ${names[target.method]}(context, ` +
-        `${value == null ? "oseo_undefined()" : `roots[${value}]`});`,
-    );
+    if (target.method === "then") {
+      const promise = operationArgument(operation, 0);
+      const onFulfilled = operationArgument(operation, 1);
+      const onRejected = operation.arguments[2];
+      const rejectedValue =
+        onRejected == null ? "oseo_undefined()" : `roots[${onRejected}]`;
+      line(
+        state,
+        "result = oseo_promise_then(context, " +
+          `roots[${promise}], roots[${onFulfilled}], ` +
+          `${rejectedValue});`,
+      );
+    } else {
+      const names = {
+        all: "oseo_promise_all",
+        race: "oseo_promise_race",
+        reject: "oseo_promise_reject",
+        resolve: "oseo_promise_resolve",
+      } as const;
+      const value = operation.arguments[0];
+      line(
+        state,
+        `result = ${names[target.method]}(context, ` +
+          `${value == null ? "oseo_undefined()" : `roots[${value}]`});`,
+      );
+    }
   } else if (target.kind === "timer-intrinsic") {
     if (target.method === "setTimeout") {
       line(
