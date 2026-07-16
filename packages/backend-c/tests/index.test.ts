@@ -57,6 +57,7 @@ test("emits deterministic generic C without executing a toolchain", () => {
     specialization: "disabled",
   });
   assert.ok(emitted.source.includes("oseo_context_init"));
+  assert.ok(emitted.source.includes("oseo_context_set_function_dispatcher"));
   assert.ok(emitted.source.includes("oseo_console_log"));
   assert.ok(emitted.source.includes("oseo_frame_enter"));
   assert.ok(emitted.source.includes("oseo_roots_allocate"));

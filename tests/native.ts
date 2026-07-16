@@ -1106,8 +1106,9 @@ await withNativeFixture(
     toolchain: zigToolchain,
   },
   (cross) => {
-    assert.match(cross.emittedC, /switch \(dynamic_code_id_\d+\)/u);
-    assert.match(cross.emittedC, /oseo_function_0\(context/u);
+    assert.match(cross.emittedC, /switch \(code_id\)/u);
+    assert.match(cross.emittedC, /oseo_call_function\(context/u);
+    assert.match(cross.emittedC, /result = oseo_function_0\(/u);
   },
 );
 

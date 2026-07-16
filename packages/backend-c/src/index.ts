@@ -372,49 +372,13 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
     const receiver = operationArgument(operation, 1);
-    line(state, `size_t dynamic_code_id_${operation.id} = 0u;`);
     line(
       state,
-      `result = oseo_function_code_id(` +
-        `context, roots[${callee}], &dynamic_code_id_${operation.id});`,
+      `result = oseo_call_function(context, roots[${callee}], ` +
+        `roots[${receiver}], ${argumentsValue.count}u, ` +
+        `${argumentsValue.name}, ` +
+        (constructing ? `roots[${callee}]);` : "oseo_undefined());"),
     );
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-    line(state, "    result = oseo_call_enter(context);");
-    line(state, "}");
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-    line(state, `    switch (dynamic_code_id_${operation.id}) {`);
-    for (const [functionId, targetRootCount] of state.functionRootCounts) {
-      if (functionId < 0) continue;
-      line(state, `    case ${functionId}u:`);
-      line(
-        state,
-        `        result = oseo_frame_enter(context, ${targetRootCount}u);`,
-      );
-      line(state, "        if (result.status == OSEO_STATUS_NORMAL) {");
-      line(
-        state,
-        `            result = oseo_function_${functionId}(` +
-          `context, roots[${callee}], roots[${receiver}], ` +
-          `${argumentsValue.count}u, ${argumentsValue.name}, ` +
-          (constructing ? `roots[${callee}]);` : "oseo_undefined());"),
-      );
-      line(
-        state,
-        `            oseo_frame_leave(context, ${targetRootCount}u);`,
-      );
-      line(state, "        }");
-      line(state, "        break;");
-    }
-    line(state, "    default:");
-    line(
-      state,
-      `        result = oseo_unknown_function(` +
-        `context, dynamic_code_id_${operation.id});`,
-    );
-    line(state, "        break;");
-    line(state, "    }");
-    line(state, "    oseo_call_leave(context);");
-    line(state, "}");
     if (constructing) {
       line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
       line(
@@ -1273,6 +1237,57 @@ function prototype(functionValue: MirFunction): string {
   );
 }
 
+function emitFunctionDispatcher(
+  functions: readonly MirFunction[],
+  functionRootCounts: ReadonlyMap<number, number>,
+): string {
+  const lines = [
+    "static OseoResult oseo_dispatch_function(",
+    "    OseoContext *context,",
+    "    OseoValue callee,",
+    "    OseoValue receiver,",
+    "    size_t argument_count,",
+    "    const OseoValue *arguments,",
+    "    OseoValue new_target",
+    ") {",
+    "    size_t code_id = 0u;",
+    "    OseoResult result = oseo_function_code_id(",
+    "        context, callee, &code_id);",
+    "    if (result.status != OSEO_STATUS_NORMAL) return result;",
+    "    (void)receiver;",
+    "    (void)argument_count;",
+    "    (void)arguments;",
+    "    (void)new_target;",
+    "    switch (code_id) {",
+  ];
+  for (const functionValue of functions) {
+    const count = functionRootCounts.get(functionValue.id);
+    if (count == null) {
+      throw new Error(
+        `MIR function '${functionValue.name}' has no root frame layout.`,
+      );
+    }
+    lines.push(
+      `    case ${functionValue.id}u:`,
+      `        result = oseo_frame_enter(context, ${count}u);`,
+      "        if (result.status == OSEO_STATUS_NORMAL) {",
+      `            result = oseo_function_${functionValue.id}(`,
+      "                context, callee, receiver, argument_count,",
+      "                arguments, new_target);",
+      `            oseo_frame_leave(context, ${count}u);`,
+      "        }",
+      "        return result;",
+    );
+  }
+  lines.push(
+    "    default:",
+    "        return oseo_unknown_function(context, code_id);",
+    "    }",
+    "}",
+  );
+  return lines.join("\n");
+}
+
 /** Deterministic C11 lowering whose only semantic input is MIR. */
 export const cBackend: NativeBackend = {
   emit(input) {
@@ -1304,6 +1319,10 @@ export const cBackend: NativeBackend = {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
     const declarations = functions.map(prototype).join("\n");
+    const dispatcher = emitFunctionDispatcher(
+      declaredFunctions,
+      functionRootCounts,
+    );
     const functionReferences = declaredFunctions
       .map((functionValue) => `    (void)oseo_function_${functionValue.id};`)
       .join("\n");
@@ -1333,6 +1352,7 @@ export const cBackend: NativeBackend = {
         "#include <stdlib.h>\n\n" +
         functionEntryType +
         `${declarations}\n\n` +
+        `${dispatcher}\n\n` +
         `${definitions}\n` +
         "int main(void) {\n" +
         "    OseoContext context;\n" +
@@ -1340,6 +1360,8 @@ export const cBackend: NativeBackend = {
         `${functionReferences}${functionReferences === "" ? "" : "\n"}` +
         `    oseo_context_init(\n` +
         `        &context, "${sourceId}", ${sourceIdByteLength}u);\n` +
+        "    oseo_context_set_function_dispatcher(\n" +
+        "        &context, oseo_dispatch_function);\n" +
         (input.observeSpecialization === true
           ? "    context.observe_specialization = true;\n"
           : "") +
