@@ -75,6 +75,10 @@ export type SyntaxCallTarget =
         | "setPrototypeOf";
     })
   | (LocatedSyntax & {
+      readonly kind: "promise-intrinsic";
+      readonly method: "reject" | "resolve";
+    })
+  | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
     })
@@ -948,6 +952,10 @@ export type HirCallTarget =
         | "setPrototypeOf";
     }
   | {
+      readonly kind: "promise-intrinsic";
+      readonly method: "reject" | "resolve";
+    }
+  | {
       readonly callee: HirExpression;
       readonly kind: "dynamic";
     }
@@ -1011,6 +1019,10 @@ export type HirExpression =
       readonly arguments: readonly HirExpression[];
       readonly callee: HirExpression;
       readonly kind: "new";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly HirExpression[];
+      readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -1372,13 +1384,24 @@ function resolveExpression(
       : { ...expression, key, object, value };
   }
   if (expression.kind === "new") {
-    const callee = resolveExpression(expression.callee, scopes, state);
     const argumentsValue: HirExpression[] = [];
     for (const argument of expression.arguments) {
       const resolved = resolveExpression(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
+    if (
+      expression.callee.kind === "identifier" &&
+      expression.callee.name === "Promise" &&
+      findBinding(scopes, "Promise") == null
+    ) {
+      return {
+        arguments: argumentsValue,
+        kind: "promise-construct",
+        range: expression.range,
+      };
+    }
+    const callee = resolveExpression(expression.callee, scopes, state);
     return callee == null
       ? undefined
       : { ...expression, arguments: argumentsValue, callee };
@@ -1426,6 +1449,19 @@ function resolveExpression(
         method: expression.target.method,
       };
     }
+  } else if (expression.target.kind === "promise-intrinsic") {
+    const binding = findBinding(scopes, "Promise");
+    target =
+      binding == null
+        ? {
+            kind: "promise-intrinsic",
+            method: expression.target.method,
+          }
+        : shadowedMethodTarget(
+            binding,
+            expression.target.method,
+            expression.target.range,
+          );
   } else if (expression.target.kind === "name") {
     const callee = resolveExpression(
       {
@@ -2002,15 +2038,24 @@ function printHirExpression(expression: HirExpression): string {
       ")"
     );
   }
+  if (expression.kind === "promise-construct") {
+    return (
+      "new intrinsic Promise(" +
+      expression.arguments.map(printHirExpression).join(", ") +
+      ")"
+    );
+  }
   const target =
     expression.target.kind === "console-log"
       ? "intrinsic console.log"
       : expression.target.kind === "object-intrinsic"
         ? `intrinsic Object.${expression.target.method}`
-        : expression.target.kind === "dynamic"
-          ? printHirExpression(expression.target.callee)
-          : `${printHirExpression(expression.target.object)}[` +
-            `${printHirExpression(expression.target.key)}]`;
+        : expression.target.kind === "promise-intrinsic"
+          ? `intrinsic Promise.${expression.target.method}`
+          : expression.target.kind === "dynamic"
+            ? printHirExpression(expression.target.callee)
+            : `${printHirExpression(expression.target.object)}[` +
+              `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirExpression).join(", ") +
@@ -2132,6 +2177,11 @@ export type MirCallTarget =
         | "getOwnPropertyDescriptor"
         | "keys"
         | "setPrototypeOf";
+    }
+  | { readonly kind: "promise-constructor" }
+  | {
+      readonly kind: "promise-intrinsic";
+      readonly method: "reject" | "resolve";
     }
   | { readonly functionId: number; readonly kind: "function" };
 
@@ -2956,6 +3006,39 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "promise-construct") {
+    const argumentIds = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    if (argumentIds.length === 0) {
+      argumentIds.push(lowerSyntheticUndefined(expression.range, builder));
+    }
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "Promise constructor",
+      argumentIds,
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: argumentIds,
+      detail: "Promise constructor",
+      id,
+      kind: "call",
+      range: expression.range,
+      target: { kind: "promise-constructor" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
     const argumentIds = expression.arguments.map((argument) =>
@@ -3030,6 +3113,15 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = `Object.${expression.target.method}`;
+  } else if (expression.target.kind === "promise-intrinsic") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = {
+      kind: "promise-intrinsic",
+      method: expression.target.method,
+    };
+    detail = `Promise.${expression.target.method}`;
   } else {
     let callee: number;
     let receiver: number;

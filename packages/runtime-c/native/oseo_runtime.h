@@ -62,6 +62,8 @@ struct OseoContext {
     OseoValue microtask_tail;
     OseoValue pending_rejections;
     OseoValue pending_rejection_tail;
+    OseoValue promise_catch_function;
+    OseoValue promise_then_function;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;

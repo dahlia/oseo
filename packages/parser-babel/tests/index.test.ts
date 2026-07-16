@@ -461,6 +461,39 @@ test("converts M4 imports and exports to owned module syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
 });
 
+test("lowers M4 promise construction and static methods", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function settle(resolve) { resolve(1); }",
+      "function observe(value) { console.log(value); }",
+      "new Promise(settle).then(observe);",
+      "Promise.resolve(2).then(observe);",
+      "Promise.reject(3).catch(observe);",
+    ].join("\n"),
+    sourceId: "promises.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const targets = result.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.target == null ? [] : [operation.target],
+    );
+  assert.ok(targets.some((target) => target.kind === "promise-constructor"));
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "resolve",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "reject",
+    ),
+  );
+});
+
 test("rejects type-only imports instead of creating runtime bindings", () => {
   const result = babelModuleFrontend.parseModule({
     source: 'import type { Model } from "./types.ts";',

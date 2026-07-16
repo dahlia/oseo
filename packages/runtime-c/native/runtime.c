@@ -21,6 +21,8 @@
 #define OSEO_UNHANDLED_THROW_MESSAGE "Unhandled JavaScript throw."
 #define OSEO_PROMISE_RESOLVE_CODE_ID SIZE_MAX
 #define OSEO_PROMISE_REJECT_CODE_ID (SIZE_MAX - 1u)
+#define OSEO_PROMISE_THEN_CODE_ID (SIZE_MAX - 2u)
+#define OSEO_PROMISE_CATCH_CODE_ID (SIZE_MAX - 3u)
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -357,6 +359,8 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->microtask_tail, &worklist);
     mark_value(context->pending_rejections, &worklist);
     mark_value(context->pending_rejection_tail, &worklist);
+    mark_value(context->promise_catch_function, &worklist);
+    mark_value(context->promise_then_function, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;
         worklist = object->trace_next;
@@ -388,6 +392,8 @@ void oseo_context_init(
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
+    context->promise_catch_function = oseo_undefined();
+    context->promise_then_function = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -435,6 +441,8 @@ void oseo_context_destroy(OseoContext *context) {
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
+    context->promise_catch_function = oseo_undefined();
+    context->promise_then_function = oseo_undefined();
     oseo_collect(context);
 }
 
@@ -1066,7 +1074,9 @@ OseoResult oseo_constructor_result(
     OseoValue receiver
 ) {
     (void)context;
-    return normal(is_object(returned) ? returned : receiver);
+    return normal(
+        is_object(returned) || is_promise(returned) ? returned : receiver
+    );
 }
 
 static bool string_equal(OseoValue left, OseoValue right) {
@@ -1331,6 +1341,11 @@ static bool own_descriptor(
     OseoPropertyAttributes *attributes
 );
 
+static OseoResult promise_method_function(
+    OseoContext *context,
+    const char *name
+);
+
 OseoResult oseo_object_get(
     OseoContext *context,
     OseoValue object_value,
@@ -1338,6 +1353,15 @@ OseoResult oseo_object_get(
 ) {
     OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    if (is_promise(object_value)) {
+        if (string_is_ascii(key, "then")) {
+            return promise_method_function(context, "then");
+        }
+        if (string_is_ascii(key, "catch")) {
+            return promise_method_function(context, "catch");
+        }
+        return normal(oseo_undefined());
+    }
     if (!is_object(object_value)) {
         if (is_nullish(object_value)) return language_failure(context);
         if (is_string(object_value) && string_is_ascii(key, "length")) {
@@ -1367,7 +1391,7 @@ OseoResult oseo_object_get(
 }
 
 bool oseo_value_is_object(OseoValue value) {
-    return is_object(value);
+    return is_object(value) || is_promise(value);
 }
 
 bool oseo_property_cache_matches(
@@ -2807,6 +2831,51 @@ static OseoResult promise_create(OseoContext *context) {
     return publish_heap(context, &promise->header, OSEO_HEAP_PROMISE);
 }
 
+static OseoResult promise_method_function(
+    OseoContext *context,
+    const char *name
+) {
+    OseoValue *cache;
+    size_t code_id;
+    const uint16_t *units;
+    size_t length;
+    static const uint16_t catch_units[] = {'c', 'a', 't', 'c', 'h'};
+    static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
+    if (strcmp(name, "then") == 0) {
+        cache = &context->promise_then_function;
+        code_id = OSEO_PROMISE_THEN_CODE_ID;
+        units = then_units;
+        length = sizeof(then_units) / sizeof(*then_units);
+    } else if (strcmp(name, "catch") == 0) {
+        cache = &context->promise_catch_function;
+        code_id = OSEO_PROMISE_CATCH_CODE_ID;
+        units = catch_units;
+        length = sizeof(catch_units) / sizeof(*catch_units);
+    } else {
+        return failure(context, "OSEO2001", "Unknown promise method.");
+    }
+    if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_environment_create(context, 0u);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            frame.slots[0],
+            units,
+            length,
+            code_id == OSEO_PROMISE_THEN_CODE_ID ? 2u : 1u,
+            oseo_undefined()
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) *cache = result.value;
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static OseoResult reaction_create(
     OseoContext *context,
     OseoValue on_fulfilled,
@@ -3147,6 +3216,22 @@ OseoResult oseo_call_function(
                 ? oseo_promise_resolve_into(context, result.value, argument)
                 : oseo_promise_reject_into(context, result.value, argument);
         }
+    } else if (code_id == OSEO_PROMISE_THEN_CODE_ID ||
+               code_id == OSEO_PROMISE_CATCH_CODE_ID) {
+        OseoValue first = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        OseoValue second = argument_count > 1u
+            ? arguments[1]
+            : oseo_undefined();
+        result = code_id == OSEO_PROMISE_THEN_CODE_ID
+            ? oseo_promise_then(context, receiver, first, second)
+            : oseo_promise_then(
+                context,
+                receiver,
+                oseo_undefined(),
+                first
+            );
     } else if (context->function_dispatcher == NULL) {
         result = failure(
             context,

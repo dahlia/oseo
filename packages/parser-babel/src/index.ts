@@ -407,6 +407,16 @@ function callTarget(
       };
     }
   }
+  if (value.computed !== true && identifierName(object) === "Promise") {
+    const method = identifierName(property);
+    if (method === "reject" || method === "resolve") {
+      return {
+        ...location(context, value),
+        kind: "promise-intrinsic",
+        method,
+      };
+    }
+  }
   const parts = memberParts(context, value);
   return parts == null
     ? undefined

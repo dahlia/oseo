@@ -369,6 +369,23 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = ${names[target.method]}(context, ` +
         `${argumentsValue.count}u, ${argumentsValue.name});`,
     );
+  } else if (target.kind === "promise-constructor") {
+    const executor = operationArgument(operation, 0);
+    line(
+      state,
+      `result = oseo_promise_construct(context, roots[${executor}]);`,
+    );
+  } else if (target.kind === "promise-intrinsic") {
+    const names = {
+      reject: "oseo_promise_reject",
+      resolve: "oseo_promise_resolve",
+    } as const;
+    const value = operation.arguments[0];
+    line(
+      state,
+      `result = ${names[target.method]}(context, ` +
+        `${value == null ? "oseo_undefined()" : `roots[${value}]`});`,
+    );
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
     const receiver = operationArgument(operation, 1);
@@ -1373,6 +1390,12 @@ export const cBackend: NativeBackend = {
         "            NULL, oseo_undefined());\n" +
         `        oseo_frame_leave(\n` +
         `            &context, ${scriptRootCount}u);\n` +
+        "    }\n" +
+        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
+        "        result = oseo_jobs_drain(&context);\n" +
+        "    }\n" +
+        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
+        "        result = oseo_rejection_checkpoint(&context);\n" +
         "    }\n" +
         "    if (result.status != OSEO_STATUS_NORMAL) {\n" +
         "        oseo_context_print_error(&context);\n" +

@@ -830,6 +830,22 @@ console.log(conflicting("value", 1));
       overflowMisses: 0,
     },
   },
+  {
+    name: "promises-and-reactions",
+    source: `
+function settle(resolve) {
+  resolve(41);
+  resolve(0);
+}
+function show(value) { console.log("fulfilled", value); }
+function showRejected(reason) { console.log("rejected", reason); }
+console.log("sync start");
+new Promise(settle).then(show);
+Promise.resolve(2).then(show);
+Promise.reject(3).catch(showRejected);
+console.log("sync end");
+`,
+  },
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {
