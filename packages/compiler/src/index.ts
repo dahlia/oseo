@@ -605,6 +605,18 @@ function resolvedModuleId(
   )?.canonicalId;
 }
 
+function importedBinding(
+  module: ModuleGraphNode,
+  localName: string,
+): SyntaxImportEntry | undefined {
+  return module.syntax.imports.find(
+    (entry) =>
+      entry.localName === localName &&
+      entry.importedName != null &&
+      entry.importedName !== "*",
+  );
+}
+
 function sameExport(left: ExportCandidate, right: ExportCandidate): boolean {
   return left.cellId === right.cellId;
 }
@@ -758,10 +770,12 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       }
       names.add(entry.exportedName);
       if (entry.kind === "local") {
-        moduleExports.set(entry.exportedName, {
-          cellId: cellFor(module.canonicalId, entry.localName),
-          sourceModuleId: module.canonicalId,
-        });
+        if (importedBinding(module, entry.localName) == null) {
+          moduleExports.set(entry.exportedName, {
+            cellId: cellFor(module.canonicalId, entry.localName),
+            sourceModuleId: module.canonicalId,
+          });
+        }
       } else if (entry.kind === "default") {
         moduleExports.set("default", {
           cellId: cellFor(module.canonicalId, `*default:${index}*`),
@@ -786,6 +800,24 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
         throw new Error("Module link state is incomplete.");
       }
       for (const entry of module.syntax.exports) {
+        if (entry.kind === "local") {
+          const imported = importedBinding(module, entry.localName);
+          if (imported == null) continue;
+          const targetId = resolvedModuleId(module, imported.specifier);
+          const candidate =
+            targetId == null || imported.importedName == null
+              ? undefined
+              : exportsByModule.get(targetId)?.get(imported.importedName);
+          const existing = moduleExports.get(entry.exportedName);
+          if (
+            candidate != null &&
+            (existing == null || !sameExport(existing, candidate))
+          ) {
+            moduleExports.set(entry.exportedName, candidate);
+            changed = true;
+          }
+          continue;
+        }
         if (entry.kind === "indirect") {
           const targetId = resolvedModuleId(module, entry.specifier);
           const candidate =

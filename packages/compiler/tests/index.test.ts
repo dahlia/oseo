@@ -1146,6 +1146,14 @@ test("lowers linked modules through shared live binding identities", () => {
           specifier: dependencySpecifier,
         },
       ],
+      exports: [
+        {
+          exportedName: "value",
+          kind: "local" as const,
+          localName: "value",
+          range,
+        },
+      ],
     },
   };
   const result = compileModuleGraph({
@@ -1163,6 +1171,7 @@ test("lowers linked modules through shared live binding identities", () => {
     .flatMap((block) => block.operations)
     .find((operation) => operation.kind === "read");
   assert.equal(importedRead?.bindingId, 0);
+  assert.equal(result.graph?.modules[0]?.exports[0]?.cellId, 0);
 });
 
 test("creates one live namespace binding for repeated imports", () => {
