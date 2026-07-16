@@ -607,6 +607,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (slot == null) {
       throw new Error(`MIR caught %${operation.id} has no completion slot.`);
     }
+    line(state, "oseo_context_clear_language_error(context);");
     line(
       state,
       `roots[${operation.id}] = roots[${state.completionSlotStart + slot}u];`,

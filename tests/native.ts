@@ -1212,6 +1212,26 @@ assert.equal(caughtRecursion.exitStatus, 1);
 assert.equal(caughtRecursion.stdout, "");
 assert.match(caughtRecursion.stderr, /error\[OSEO2001\].*call depth/u);
 
+const caughtLanguageError = await runNativeCli(
+  {
+    args: ["caught-language-error.ts"],
+    source: `
+try { const value = 1; value = 2; } catch (error) {}
+throw 1;
+`,
+    sourceId: "caught-language-error.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(caughtLanguageError.exitStatus, 1);
+assert.equal(caughtLanguageError.stdout, "");
+assert.match(
+  caughtLanguageError.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+assert.doesNotMatch(caughtLanguageError.stderr, /immutable binding/u);
+
 const wideBindings = Array.from(
   { length: 3_000 },
   (_, index) => `const value${index} = ${index};`,

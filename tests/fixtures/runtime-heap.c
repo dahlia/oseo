@@ -363,9 +363,9 @@ static void test_cell_initialization(
         oseo_cell_set(context, roots[0], oseo_number(1.0)).status ==
         OSEO_STATUS_THROW
     );
-    context->error_code = NULL;
-    context->error_message = NULL;
-    context->has_diagnostic = false;
+    oseo_context_clear_language_error(context);
+    assert(strcmp(context->error_code, "OSEO2001") == 0);
+    assert(strcmp(context->error_message, "Unhandled JavaScript throw.") == 0);
     (void)require_normal(
         oseo_cell_initialize(context, roots[0], oseo_number(2.0))
     );

@@ -109,6 +109,7 @@ void oseo_context_init(
 );
 void oseo_context_destroy(OseoContext *context);
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt);
+void oseo_context_clear_language_error(OseoContext *context);
 void oseo_context_location(
     OseoContext *context,
     size_t line,

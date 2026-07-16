@@ -18,6 +18,7 @@
 #define OSEO_TAG_UNINITIALIZED UINT64_C(6)
 #define OSEO_SMI_MIN INT64_C(-140737488355328)
 #define OSEO_SMI_MAX INT64_C(140737488355327)
+#define OSEO_UNHANDLED_THROW_MESSAGE "Unhandled JavaScript throw."
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -132,19 +133,25 @@ static OseoResult failure(
     return result;
 }
 
-static OseoResult language_failure(OseoContext *context) {
+static OseoResult create_language_failure(OseoContext *context) {
     OseoResult result = oseo_object_create(context, oseo_null());
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result.status = OSEO_STATUS_THROW;
     return result;
 }
 
+static OseoResult language_failure(OseoContext *context) {
+    oseo_context_clear_language_error(context);
+    return create_language_failure(context);
+}
+
 static OseoResult language_failure_message(
     OseoContext *context,
     const char *message
 ) {
+    oseo_context_clear_language_error(context);
     context->error_message = message;
-    return language_failure(context);
+    return create_language_failure(context);
 }
 
 static uint64_t double_bits(double value) {
@@ -298,9 +305,7 @@ void oseo_context_init(
     context->objects = NULL;
     context->source_id = source_id;
     context->source_id_length = source_id_length;
-    context->error_code = "OSEO2001";
-    context->error_message = "Unsupported runtime behavior.";
-    context->has_diagnostic = false;
+    oseo_context_clear_language_error(context);
     context->active_frame_slots = 0u;
     context->call_depth = 0u;
     context->line = 1u;
@@ -322,6 +327,12 @@ void oseo_context_init(
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt) {
     context->allocation_attempts = 0u;
     context->fail_allocation_at = attempt;
+}
+
+void oseo_context_clear_language_error(OseoContext *context) {
+    context->error_code = "OSEO2001";
+    context->error_message = OSEO_UNHANDLED_THROW_MESSAGE;
+    context->has_diagnostic = false;
 }
 
 void oseo_context_destroy(OseoContext *context) {
