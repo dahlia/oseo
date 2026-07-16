@@ -4,6 +4,7 @@ import test from "node:test";
 import fc from "fast-check";
 
 import {
+  assertAsyncProperty,
   assertProperty,
   propertyParameters,
   propertySize,
@@ -56,6 +57,19 @@ test("records explicit replay inputs and incomplete-run failures", () => {
       verbose: true,
     },
   );
+});
+
+test("awaits asynchronous property predicates", async () => {
+  let completed = false;
+  await assertAsyncProperty(
+    "asynchronous runner completion",
+    fc.asyncProperty(fc.constant(null), async () => {
+      await Promise.resolve();
+      completed = true;
+    }),
+    { ...ordinarySuite, numRuns: 1 },
+  );
+  assert.equal(completed, true);
 });
 
 test("rejects invalid replay configuration", () => {

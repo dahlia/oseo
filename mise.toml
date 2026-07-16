@@ -154,7 +154,15 @@ for seed in 1592590337 1592590338; do
     OSEO_PROPERTY_SEED="$seed" deno test -A \
     packages/testkit/tests/*.property.test.ts
 done
+OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
+  OSEO_PROPERTY_SEED=1592590339 node --test \
+  tests/property/*.property.test.ts
 '''
+
+[tasks."test:property:native"]
+description = "Run bounded source-to-native M4 schedule properties"
+depends = ["build"]
+run = "node --test tests/property/*.property.test.ts"
 
 [tasks."test:test262"]
 description = "Run the pinned reviewed test262 subset"

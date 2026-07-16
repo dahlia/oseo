@@ -2,7 +2,7 @@ import process from "node:process";
 
 import fc from "fast-check";
 import { __version as fastCheckVersion } from "fast-check";
-import type { IProperty, Parameters } from "fast-check";
+import type { IAsyncProperty, IProperty, Parameters } from "fast-check";
 
 /** Reviewed structural size tiers for Oseo property generators. */
 export type PropertySize = "large" | "small";
@@ -93,6 +93,26 @@ export function assertProperty<T>(
 ): void {
   try {
     fc.assert(property, propertyParameters(options) as Parameters<T>);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : `${error}`;
+    throw new Error(
+      `${name} failed\n` +
+        `profile=${options.profile} domain=${options.domain}\n` +
+        `size-limit=${options.sizeLimit}\n` +
+        `fast-check=${fastCheckVersion}\n${detail}`,
+      { cause: error },
+    );
+  }
+}
+
+/** Run one asynchronous property with the same replay failure contract. */
+export async function assertAsyncProperty<T>(
+  name: string,
+  property: IAsyncProperty<T>,
+  options: PropertySuiteOptions,
+): Promise<void> {
+  try {
+    await fc.assert(property, propertyParameters(options) as Parameters<T>);
   } catch (error) {
     const detail = error instanceof Error ? error.message : `${error}`;
     throw new Error(
