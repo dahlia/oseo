@@ -27,6 +27,27 @@ static void test_deep_graph(OseoContext *context, OseoValue *roots) {
     (void)require_normal(oseo_environment_get(context, current, 0u));
 }
 
+static void test_forward_graph(OseoContext *context, OseoValue *roots) {
+    const size_t depth = 16384u;
+    roots[0] = require_normal(oseo_environment_create(context, 1u));
+    roots[1] = roots[0];
+    for (size_t index = 0u; index < depth; index += 1u) {
+        roots[2] = require_normal(oseo_environment_create(context, 1u));
+        (void)require_normal(
+            oseo_environment_set(context, roots[1], 0u, roots[2])
+        );
+        roots[1] = roots[2];
+    }
+    roots[1] = oseo_undefined();
+    roots[2] = oseo_undefined();
+    oseo_collect(context);
+    OseoValue current = roots[0];
+    for (size_t index = 0u; index < depth; index += 1u) {
+        current = require_normal(oseo_environment_get(context, current, 0u));
+    }
+    (void)require_normal(oseo_environment_get(context, current, 0u));
+}
+
 static void test_cycle_and_sharing(
     OseoContext *context,
     OseoValue *roots
@@ -359,6 +380,7 @@ int main(void) {
     oseo_context_init(&context, "runtime-heap.c", 14u);
     (void)require_normal(oseo_roots_allocate(&context, &frame, 8u));
     test_deep_graph(&context, frame.slots);
+    test_forward_graph(&context, frame.slots);
     test_cycle_and_sharing(&context, frame.slots);
     test_allocation_failure(&context, frame.slots);
     test_ordinary_properties(&context, frame.slots);

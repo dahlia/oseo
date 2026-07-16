@@ -30,9 +30,9 @@ typedef enum {
 
 struct OseoHeapObject {
     OseoHeapObject *next;
+    OseoHeapObject *trace_next;
     OseoHeapKind kind;
     bool marked;
-    bool traced;
 };
 
 typedef struct {
@@ -210,33 +210,42 @@ static double number_value(OseoValue value) {
     return bits_double(value);
 }
 
-static void mark_value(OseoValue value) {
+static void mark_value(
+    OseoValue value,
+    OseoHeapObject **worklist
+) {
     if (tag_of(value) != OSEO_TAG_HEAP) return;
     OseoHeapObject *object = heap_object(value);
+    if (object->marked) return;
     object->marked = true;
+    object->trace_next = *worklist;
+    *worklist = object;
 }
 
-static void trace_object(OseoHeapObject *object) {
+static void trace_object(
+    OseoHeapObject *object,
+    OseoHeapObject **worklist
+) {
     if (object->kind == OSEO_HEAP_ENVIRONMENT) {
         OseoEnvironment *environment = (OseoEnvironment *)object;
         for (size_t index = 0u; index < environment->slot_count; index += 1u) {
-            mark_value(environment->slots[index]);
+            mark_value(environment->slots[index], worklist);
         }
     } else if (object->kind == OSEO_HEAP_CELL) {
-        mark_value(((OseoCell *)object)->value);
+        mark_value(((OseoCell *)object)->value, worklist);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
-        mark_value(ordinary->prototype);
+        mark_value(ordinary->prototype, worklist);
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
-            mark_value(ordinary->properties[index].key);
-            mark_value(ordinary->properties[index].value);
+            mark_value(ordinary->properties[index].key, worklist);
+            mark_value(ordinary->properties[index].value, worklist);
         }
         if (object->kind == OSEO_HEAP_FUNCTION) {
             OseoFunction *function = (OseoFunction *)object;
-            mark_value(function->environment);
-            mark_value(function->prototype_object);
+            mark_value(function->environment, worklist);
+            mark_value(function->prototype_object, worklist);
         }
     }
 }
@@ -253,32 +262,25 @@ static void destroy_heap_object(OseoHeapObject *object) {
 
 void oseo_collect(OseoContext *context) {
     if (context->observe_specialization) context->collections += 1u;
+    OseoHeapObject *worklist = NULL;
     for (OseoRootFrame *frame = context->roots;
          frame != NULL;
          frame = frame->previous) {
         for (size_t index = 0u; index < frame->slot_count; index += 1u) {
-            mark_value(frame->slots[index]);
+            mark_value(frame->slots[index], &worklist);
         }
     }
-    bool traced_object;
-    do {
-        traced_object = false;
-        for (OseoHeapObject *object = context->objects;
-             object != NULL;
-             object = object->next) {
-            if (object->marked && !object->traced) {
-                object->traced = true;
-                trace_object(object);
-                traced_object = true;
-            }
-        }
-    } while (traced_object);
+    while (worklist != NULL) {
+        OseoHeapObject *object = worklist;
+        worklist = object->trace_next;
+        object->trace_next = NULL;
+        trace_object(object, &worklist);
+    }
     OseoHeapObject **link = &context->objects;
     while (*link != NULL) {
         OseoHeapObject *object = *link;
         if (object->marked) {
             object->marked = false;
-            object->traced = false;
             link = &object->next;
         } else {
             *link = object->next;
@@ -534,9 +536,9 @@ static OseoResult publish_heap(
         );
     }
     object->next = context->objects;
+    object->trace_next = NULL;
     object->kind = kind;
     object->marked = false;
-    object->traced = false;
     context->objects = object;
     if (context->observe_specialization &&
         kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&

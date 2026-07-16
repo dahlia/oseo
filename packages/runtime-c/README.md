@@ -7,6 +7,8 @@ results, explicit root frames, mark-and-sweep collection, ordinary objects,
 arrays, environments, binding cells, function objects, and the deterministic
 `console.log` intrinsic. Native assets remain separate files and are included
 in npm and JSR packages.
+The collector queues newly marked objects through an intrusive worklist, so it
+traces each reachable object once regardless of allocation-list order.
 M3 property operations implement descriptors, prototypes, array holes and
 length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.

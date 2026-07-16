@@ -21,7 +21,7 @@ function run(command: string, args: readonly string[]): void {
   );
 }
 
-test("traces deep, cyclic, and shared heap graphs", async () => {
+test("traces deep, cyclic, shared, and forward heap graphs", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oseo-runtime-heap-"));
   try {
     const executable = join(directory, "runtime-heap");
