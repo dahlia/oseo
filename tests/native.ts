@@ -845,6 +845,12 @@ function cleanup() { console.log("cleanup"); }
 function cleanupReject() { return Promise.reject(10); }
 function cleanupThrow() { throw 11; }
 function invalidInput() { console.log("invalid input"); }
+function showObservableAll(values) {
+  console.log("observable all", values[0]);
+}
+function showObservableRace(value) {
+  console.log("observable race", value);
+}
 let settleAdopted;
 const adopted = new Promise(function pending(resolve) {
   settleAdopted = resolve;
@@ -880,6 +886,22 @@ Promise.resolve(12).finally(cleanupReject).catch(showRejected);
 Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
 Promise.all(1).catch(invalidInput);
 Promise.race(null).catch(invalidInput);
+const observable = Promise.resolve(23);
+observable.then = function observableThen(onFulfilled) {
+  console.log("observable then");
+  onFulfilled(24);
+};
+Promise.all([observable]).then(showObservableAll);
+Promise.race([observable]).then(showObservableRace);
+const adversarial = Promise.resolve(27);
+adversarial.then = function callBoth(onFulfilled, onRejected) {
+  onFulfilled(28);
+  onRejected(29);
+};
+Promise.all([adversarial, Promise.resolve(30)]).catch(showRejected);
+const throwingThen = Promise.resolve(25);
+throwingThen.then = function throwFromThen() { throw 26; };
+Promise.all([throwingThen]).catch(showRejected);
 const decorated = Promise.resolve(21);
 decorated.value = 22;
 console.log("promise property", decorated.value, Object.keys(decorated)[0]);
