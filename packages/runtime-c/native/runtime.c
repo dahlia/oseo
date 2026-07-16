@@ -1791,7 +1791,9 @@ OseoResult oseo_object_set_prototype(
         return language_failure(context);
     }
     if (ordinary_object(object_value)->module_namespace) {
-        return language_failure(context);
+        return tag_of(prototype) == OSEO_TAG_NULL
+            ? normal(object_value)
+            : language_failure(context);
     }
     OseoValue current = prototype;
     while (is_object(current)) {

@@ -22,4 +22,6 @@ try {
 } catch (error) {
   console.log("nonextensible");
 }
+// eslint-disable-next-line no-import-assign -- The namespace stays unchanged.
+console.log(Object.setPrototypeOf(values, null) === values);
 console.log(defaultFunction.name);
