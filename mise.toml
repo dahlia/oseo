@@ -145,6 +145,7 @@ mise run probe:value-layouts
 
 [tasks."test:property:extended"]
 description = "Run property suites at ten times the ordinary case budget"
+depends = ["build"]
 run = '''
 for seed in 1592590337 1592590338; do
   OSEO_PROPERTY_RUN_SCALE=10 OSEO_PROPERTY_SIZE=large \
