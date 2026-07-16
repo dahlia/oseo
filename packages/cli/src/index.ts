@@ -250,7 +250,7 @@ async function compileCliModuleGraph(
   const result = await buildModuleGraph(
     defaultComponents.moduleFrontend,
     {
-      load(canonicalId) {
+      load(canonicalId, referrer) {
         return canonicalId === entryId
           ? Promise.resolve({
               diagnostics: [],
@@ -260,7 +260,7 @@ async function compileCliModuleGraph(
                 sourceId: entryId,
               },
             })
-          : fileLoader.load(canonicalId);
+          : fileLoader.load(canonicalId, referrer);
       },
     },
     fileModuleResolver,

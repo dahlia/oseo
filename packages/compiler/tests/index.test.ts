@@ -758,6 +758,7 @@ test("deduplicates module instances across cycles and aliases", async () => {
 
 test("keeps dependency order and canonical parser identity", async () => {
   const seenSourceIds: string[] = [];
+  const seenReferrers: (string | undefined)[] = [];
   const specifier = (value: string, start: number) => ({
     byteRange: { end: start + value.length, start },
     range: moduleRange,
@@ -800,7 +801,12 @@ test("keeps dependency order and canonical parser identity", async () => {
       },
     },
     {
-      load(canonicalId) {
+      load(canonicalId, referrer) {
+        seenReferrers.push(
+          referrer == null
+            ? undefined
+            : `${referrer.importerId}:${referrer.specifier.value}`,
+        );
         return Promise.resolve({
           diagnostics: [],
           source: {
@@ -829,6 +835,11 @@ test("keeps dependency order and canonical parser identity", async () => {
     "file:///app/entry.js",
     "file:///app/first.js",
     "file:///app/second.js",
+  ]);
+  assert.deepEqual(seenReferrers, [
+    undefined,
+    "file:///app/entry.js:./first.js",
+    "file:///app/entry.js:./second.js",
   ]);
 });
 

@@ -385,9 +385,18 @@ export interface ModuleLoadResult {
   readonly source?: LoadedModuleSource;
 }
 
+/** Import site that caused a dependency module to be loaded. */
+export interface ModuleLoadReferrer {
+  readonly importerId: string;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
 /** Host-neutral source loader used during graph discovery. */
 export interface ModuleLoader {
-  load(canonicalId: string): Promise<ModuleLoadResult>;
+  load(
+    canonicalId: string,
+    referrer?: ModuleLoadReferrer,
+  ): Promise<ModuleLoadResult>;
 }
 
 /** Owned result of resolving one source specifier. */
@@ -463,10 +472,13 @@ export async function buildModuleGraph(
   const modules: ModuleGraphNode[] = [];
   const discovered = new Set<string>();
 
-  const visit = async (canonicalId: string): Promise<void> => {
+  const visit = async (
+    canonicalId: string,
+    referrer?: ModuleLoadReferrer,
+  ): Promise<void> => {
     if (discovered.has(canonicalId)) return;
     discovered.add(canonicalId);
-    const loaded = await loader.load(canonicalId);
+    const loaded = await loader.load(canonicalId, referrer);
     diagnostics.push(...loaded.diagnostics);
     if (loaded.source == null || loaded.diagnostics.length > 0) return;
     const parsed = frontend.parseModule({
@@ -505,7 +517,10 @@ export async function buildModuleGraph(
     });
     for (const dependency of dependencies) {
       // eslint-disable-next-line no-await-in-loop -- Preserve source order.
-      await visit(dependency.canonicalId);
+      await visit(dependency.canonicalId, {
+        importerId: canonicalId,
+        specifier: dependency.specifier,
+      });
     }
   };
 

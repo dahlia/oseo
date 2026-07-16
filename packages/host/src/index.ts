@@ -110,14 +110,20 @@ export function hashModuleSource(source: string): string {
 /** Load canonical file URLs through one explicit compiler host. */
 export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
   return {
-    async load(canonicalId) {
+    async load(canonicalId, referrer) {
+      const diagnosticSourceId = referrer?.importerId ?? canonicalId;
+      const diagnosticSpecifier = referrer?.specifier;
       let url: URL;
       try {
         url = new URL(canonicalId);
       } catch {
         return {
           diagnostics: [
-            moduleDiagnostic(canonicalId, undefined, "Invalid module URL."),
+            moduleDiagnostic(
+              diagnosticSourceId,
+              diagnosticSpecifier,
+              "Invalid module URL.",
+            ),
           ],
         };
       }
@@ -125,8 +131,8 @@ export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
         return {
           diagnostics: [
             moduleDiagnostic(
-              canonicalId,
-              undefined,
+              diagnosticSourceId,
+              diagnosticSpecifier,
               "Only file module URLs are supported in M4.",
             ),
           ],
@@ -146,8 +152,8 @@ export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
         return {
           diagnostics: [
             moduleDiagnostic(
-              canonicalId,
-              undefined,
+              diagnosticSourceId,
+              diagnosticSpecifier,
               "The module source could not be read.",
             ),
           ],

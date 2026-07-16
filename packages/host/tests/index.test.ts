@@ -171,6 +171,29 @@ test("loads file modules with stable content hashes", async () => {
   assert.equal(second.source?.sourceHash, first.source?.sourceHash);
 });
 
+test("locates dependency load failures at the import specifier", async () => {
+  const loader = createFileModuleLoader({
+    readTextFile() {
+      return Promise.reject(new Error("missing dependency"));
+    },
+  } as unknown as CompilerHost);
+  const specifier = {
+    byteRange: { end: 27, start: 15 },
+    range: {
+      end: { column: 28, line: 3 },
+      start: { column: 16, line: 3 },
+    },
+    value: "./missing.js",
+  };
+  const result = await loader.load("file:///work/missing.js", {
+    importerId: "file:///work/entry.js",
+    specifier,
+  });
+  assert.equal(result.diagnostics[0]?.sourceId, "file:///work/entry.js");
+  assert.deepEqual(result.diagnostics[0]?.byteRange, specifier.byteRange);
+  assert.deepEqual(result.diagnostics[0]?.range, specifier.range);
+});
+
 test("canonicalizes filesystem characters as file URL data", async () => {
   const canonicalId = await createNodeHost().canonicalizeFile?.(
     "fixtures/space and #/entry.js",

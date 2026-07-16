@@ -203,6 +203,43 @@ test("loads and lowers a closed file module graph", async () => {
   assert.match(result.stdout, /property-get generic/u);
 });
 
+test("locates unreadable dependencies at their import sites", async () => {
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/entry.js");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile() {
+      return Promise.reject(new Error("missing dependency"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected cleanup"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/entry.js"],
+      source: 'console.log("before");\nimport "./missing.js";',
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 1);
+  assert.match(
+    result.stderr,
+    /file:\/\/\/work\/entry\.js:2:\d+: error\[OSEO3001\]/u,
+  );
+  assert.doesNotMatch(result.stderr, /missing\.js:1:1/u);
+});
+
 test("recognizes top-level await without module declarations", async () => {
   const host: CompilerHost = {
     canonicalizeFile() {
