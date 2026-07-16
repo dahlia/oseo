@@ -885,6 +885,27 @@ shadow(5).then(function (value) { console.log("shadow", value); });
 console.log("sync end");
 `,
   },
+  {
+    name: "timer-event-loop",
+    source: `
+function microtask(value) { console.log("microtask", value); }
+function task(value) {
+  console.log("timer", value);
+  Promise.resolve(value).then(microtask);
+}
+function scheduleNested() {
+  console.log("timer second");
+  setTimeout(task, 0, "nested");
+  Promise.resolve("second").then(microtask);
+}
+const canceled = setTimeout(task, 0, "canceled");
+clearTimeout(canceled);
+setTimeout(task, 100, "late");
+setTimeout(task, 0, "first");
+setTimeout(scheduleNested, 0);
+console.log("scheduled");
+`,
+  },
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {

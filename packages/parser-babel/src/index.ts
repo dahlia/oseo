@@ -375,6 +375,13 @@ function callTarget(
       : callTarget(context, inner);
   }
   const name = identifierName(value);
+  if (name === "setTimeout" || name === "clearTimeout") {
+    return {
+      ...location(context, value),
+      kind: "timer-intrinsic",
+      method: name,
+    };
+  }
   if (name != null) return { ...location(context, value), kind: "name", name };
   if (value.type !== "MemberExpression") {
     const callee = expression(context, value);

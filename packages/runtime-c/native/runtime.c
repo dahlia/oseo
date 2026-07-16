@@ -36,6 +36,7 @@ typedef enum {
     OSEO_HEAP_PROMISE_REACTION = 8,
     OSEO_HEAP_JOB = 9,
     OSEO_HEAP_PROMISE_AGGREGATE = 10,
+    OSEO_HEAP_TIMER = 11,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -144,6 +145,18 @@ typedef struct {
     bool fulfilled;
 } OseoJob;
 
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue callback;
+    OseoValue arguments;
+    uint64_t deadline;
+    uint64_t id;
+    uint64_t order;
+    size_t argument_count;
+    bool canceled;
+} OseoTimer;
+
 static OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
         (payload & OSEO_PAYLOAD_MASK);
@@ -195,6 +208,10 @@ static OseoPromiseAggregate *aggregate_object(OseoValue value) {
 
 static OseoJob *job_object(OseoValue value) {
     return (OseoJob *)heap_object(value);
+}
+
+static OseoTimer *timer_object(OseoValue value) {
+    return (OseoTimer *)heap_object(value);
 }
 
 static OseoResult normal(OseoValue value) {
@@ -364,6 +381,11 @@ static void trace_object(
         OseoPromiseAggregate *aggregate = (OseoPromiseAggregate *)object;
         mark_value(aggregate->capability, worklist);
         mark_value(aggregate->values, worklist);
+    } else if (object->kind == OSEO_HEAP_TIMER) {
+        OseoTimer *timer = (OseoTimer *)object;
+        mark_value(timer->next, worklist);
+        mark_value(timer->callback, worklist);
+        mark_value(timer->arguments, worklist);
     }
 }
 
@@ -394,6 +416,7 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->promise_catch_function, &worklist);
     mark_value(context->promise_finally_function, &worklist);
     mark_value(context->promise_then_function, &worklist);
+    mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;
         worklist = object->trace_next;
@@ -428,6 +451,7 @@ void oseo_context_init(
     context->promise_catch_function = oseo_undefined();
     context->promise_finally_function = oseo_undefined();
     context->promise_then_function = oseo_undefined();
+    context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -445,6 +469,9 @@ void oseo_context_init(
     context->collections = 0u;
     context->rejection_handled_count = 0u;
     context->unhandled_rejection_count = 0u;
+    context->clock_milliseconds = 0u;
+    context->next_timer_id = 1u;
+    context->next_timer_order = 0u;
     context->fail_allocation_at = 0u;
     context->observe_specialization = false;
     context->collect_every_safepoint =
@@ -478,6 +505,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->promise_catch_function = oseo_undefined();
     context->promise_finally_function = oseo_undefined();
     context->promise_then_function = oseo_undefined();
+    context->timer_head = oseo_undefined();
     oseo_collect(context);
 }
 
@@ -3930,4 +3958,150 @@ OseoResult oseo_rejection_checkpoint(OseoContext *context) {
     context->error_message = "Unhandled promise rejection.";
     context->has_diagnostic = false;
     return (OseoResult){OSEO_STATUS_THROW, first};
+}
+
+static uint64_t timer_delay(OseoValue value) {
+    double delay = number_value(value);
+    if (!isfinite(delay) || delay <= 0.0) return 0u;
+    if (delay >= (double)UINT32_MAX) return UINT32_MAX;
+    return (uint64_t)delay;
+}
+
+OseoResult oseo_set_timeout(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count == 0u || !is_function(arguments[0])) {
+        return language_failure(context);
+    }
+    OseoValue delay_value = argument_count > 1u
+        ? arguments[1]
+        : oseo_number(0.0);
+    OseoResult result = to_number(context, delay_value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    uint64_t delay = timer_delay(result.value);
+    size_t callback_argument_count = argument_count > 2u
+        ? argument_count - 2u
+        : 0u;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = arguments[0];
+    result = oseo_environment_create(context, callback_argument_count);
+    frame.slots[1] = result.value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < callback_argument_count;
+         index += 1u) {
+        result = oseo_environment_set(
+            context,
+            frame.slots[1],
+            index,
+            arguments[index + 2u]
+        );
+    }
+    OseoTimer *timer = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        timer = allocate_heap_bytes(context, sizeof(*timer));
+        if (timer == NULL) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "Timer allocation failed."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && timer != NULL) {
+        timer->next = oseo_undefined();
+        timer->callback = frame.slots[0];
+        timer->arguments = frame.slots[1];
+        timer->deadline = UINT64_MAX - context->clock_milliseconds < delay
+            ? UINT64_MAX
+            : context->clock_milliseconds + delay;
+        timer->id = context->next_timer_id;
+        context->next_timer_id += 1u;
+        timer->order = context->next_timer_order;
+        context->next_timer_order += 1u;
+        timer->argument_count = callback_argument_count;
+        timer->canceled = false;
+        result = publish_heap(context, &timer->header, OSEO_HEAP_TIMER);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue *link = &context->timer_head;
+        while (tag_of(*link) != OSEO_TAG_UNDEFINED) {
+            OseoTimer *current = timer_object(*link);
+            if (current->deadline > timer->deadline ||
+                (current->deadline == timer->deadline &&
+                 current->order > timer->order)) {
+                break;
+            }
+            link = &current->next;
+        }
+        timer->next = *link;
+        *link = frame.slots[2];
+        result.value = oseo_number((double)timer->id);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_clear_timeout(
+    OseoContext *context,
+    OseoValue handle
+) {
+    if (!is_number(handle)) return normal(oseo_undefined());
+    double requested = number_value(handle);
+    OseoValue current = context->timer_head;
+    while (tag_of(current) != OSEO_TAG_UNDEFINED) {
+        OseoTimer *timer = timer_object(current);
+        if ((double)timer->id == requested) {
+            timer->canceled = true;
+            break;
+        }
+        current = timer->next;
+    }
+    return normal(oseo_undefined());
+}
+
+OseoResult oseo_event_loop_run(OseoContext *context) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_jobs_drain(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_rejection_checkpoint(context);
+    }
+    while (result.status == OSEO_STATUS_NORMAL &&
+           tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
+        frame.slots[0] = context->timer_head;
+        OseoTimer *timer = timer_object(frame.slots[0]);
+        context->timer_head = timer->next;
+        timer->next = oseo_undefined();
+        if (timer->canceled) {
+            frame.slots[0] = oseo_undefined();
+            continue;
+        }
+        context->clock_milliseconds = timer->deadline;
+        frame.slots[1] = timer->arguments;
+        result = oseo_call_function(
+            context,
+            timer->callback,
+            oseo_undefined(),
+            timer->argument_count,
+            environment_object(frame.slots[1])->slots,
+            oseo_undefined()
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_jobs_drain(context);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_rejection_checkpoint(context);
+        }
+        frame.slots[0] = oseo_undefined();
+        frame.slots[1] = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }

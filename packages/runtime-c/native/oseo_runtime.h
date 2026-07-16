@@ -65,6 +65,7 @@ struct OseoContext {
     OseoValue promise_catch_function;
     OseoValue promise_finally_function;
     OseoValue promise_then_function;
+    OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;
@@ -84,6 +85,9 @@ struct OseoContext {
     size_t collections;
     size_t rejection_handled_count;
     size_t unhandled_rejection_count;
+    uint64_t clock_milliseconds;
+    uint64_t next_timer_id;
+    uint64_t next_timer_order;
     size_t fail_allocation_at;
     bool observe_specialization;
     bool collect_every_safepoint;
@@ -436,5 +440,15 @@ OseoResult oseo_promise_result(
 );
 OseoResult oseo_jobs_drain(OseoContext *context);
 OseoResult oseo_rejection_checkpoint(OseoContext *context);
+OseoResult oseo_set_timeout(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_clear_timeout(
+    OseoContext *context,
+    OseoValue handle
+);
+OseoResult oseo_event_loop_run(OseoContext *context);
 
 #endif

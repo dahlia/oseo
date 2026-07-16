@@ -388,6 +388,21 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = ${names[target.method]}(context, ` +
         `${value == null ? "oseo_undefined()" : `roots[${value}]`});`,
     );
+  } else if (target.kind === "timer-intrinsic") {
+    if (target.method === "setTimeout") {
+      line(
+        state,
+        `result = oseo_set_timeout(context, ${argumentsValue.count}u, ` +
+          `${argumentsValue.name});`,
+      );
+    } else {
+      const handle = operation.arguments[0];
+      line(
+        state,
+        `result = oseo_clear_timeout(context, ` +
+          `${handle == null ? "oseo_undefined()" : `roots[${handle}]`});`,
+      );
+    }
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
     const receiver = operationArgument(operation, 1);
@@ -1394,10 +1409,7 @@ export const cBackend: NativeBackend = {
         `            &context, ${scriptRootCount}u);\n` +
         "    }\n" +
         "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
-        "        result = oseo_jobs_drain(&context);\n" +
-        "    }\n" +
-        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
-        "        result = oseo_rejection_checkpoint(&context);\n" +
+        "        result = oseo_event_loop_run(&context);\n" +
         "    }\n" +
         "    if (result.status != OSEO_STATUS_NORMAL) {\n" +
         "        oseo_context_print_error(&context);\n" +

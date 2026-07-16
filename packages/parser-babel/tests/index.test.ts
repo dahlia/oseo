@@ -545,6 +545,47 @@ test("lowers async functions into owned continuations", () => {
   );
 });
 
+test("lowers timer globals while preserving lexical shadowing", () => {
+  const direct = compileSource(babelFrontend, {
+    source: [
+      "function task() {}",
+      "const handle = setTimeout(task, 0);",
+      "clearTimeout(handle);",
+    ].join("\n"),
+    sourceId: "timers.js",
+  });
+  assert.deepEqual(direct.diagnostics, []);
+  const targets = direct.mir?.script.blocks
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.target == null ? [] : [operation.target],
+    );
+  assert.ok(
+    targets?.some(
+      (target) =>
+        target.kind === "timer-intrinsic" && target.method === "setTimeout",
+    ),
+  );
+  assert.ok(
+    targets?.some(
+      (target) =>
+        target.kind === "timer-intrinsic" && target.method === "clearTimeout",
+    ),
+  );
+
+  const shadowed = compileSource(babelFrontend, {
+    source: "function call(setTimeout, task) { return setTimeout(task, 0); }",
+    sourceId: "shadowed-timer.js",
+  });
+  assert.deepEqual(shadowed.diagnostics, []);
+  assert.ok(
+    shadowed.mir?.functions
+      .flatMap((functionValue) => functionValue.blocks)
+      .flatMap((block) => block.operations)
+      .some((operation) => operation.target?.kind === "dynamic"),
+  );
+});
+
 test("rejects type-only imports instead of creating runtime bindings", () => {
   const result = babelModuleFrontend.parseModule({
     source: 'import type { Model } from "./types.ts";',

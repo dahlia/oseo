@@ -14,11 +14,11 @@ length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
 Function creation installs the standard configurable, non-enumerable `name` and
 `length` properties through the ordinary descriptor representation.
-The `m4-1` ABI adds traced promises, reactions, and jobs. Promise executors run
-synchronously through a generated-function dispatcher, while reactions and
-thenable assimilation enter a runtime-owned FIFO microtask queue. The context
-retains queued work as collector roots and records unhandled rejections only at
-an explicit microtask checkpoint.
+The `m4-2` ABI adds traced promises, reactions, jobs, and timer tasks. Promise
+executors run synchronously through a generated-function dispatcher. Reactions
+and thenable assimilation enter a runtime-owned FIFO microtask queue. The
+context retains queued work as collector roots and records unhandled rejections
+only at an explicit microtask checkpoint.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

@@ -83,6 +83,10 @@ export type SyntaxCallTarget =
       readonly method: "resolve";
     })
   | (LocatedSyntax & {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
+    })
+  | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
     })
@@ -964,6 +968,10 @@ export type HirCallTarget =
       readonly method: "all" | "race" | "reject" | "resolve";
     }
   | {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
+    }
+  | {
       readonly callee: HirExpression;
       readonly kind: "dynamic";
     }
@@ -1488,6 +1496,23 @@ function resolveExpression(
             expression.target.method,
             expression.target.range,
           );
+  } else if (expression.target.kind === "timer-intrinsic") {
+    const binding = findBinding(scopes, expression.target.method);
+    target =
+      binding == null
+        ? {
+            kind: "timer-intrinsic",
+            method: expression.target.method,
+          }
+        : {
+            callee: {
+              bindingId: binding.id,
+              kind: "binding",
+              name: binding.name,
+              range: expression.target.range,
+            },
+            kind: "dynamic",
+          };
   } else if (expression.target.kind === "name") {
     const callee = resolveExpression(
       {
@@ -2078,10 +2103,12 @@ function printHirExpression(expression: HirExpression): string {
         ? `intrinsic Object.${expression.target.method}`
         : expression.target.kind === "promise-intrinsic"
           ? `intrinsic Promise.${expression.target.method}`
-          : expression.target.kind === "dynamic"
-            ? printHirExpression(expression.target.callee)
-            : `${printHirExpression(expression.target.object)}[` +
-              `${printHirExpression(expression.target.key)}]`;
+          : expression.target.kind === "timer-intrinsic"
+            ? `intrinsic ${expression.target.method}`
+            : expression.target.kind === "dynamic"
+              ? printHirExpression(expression.target.callee)
+              : `${printHirExpression(expression.target.object)}[` +
+                `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirExpression).join(", ") +
@@ -2208,6 +2235,10 @@ export type MirCallTarget =
   | {
       readonly kind: "promise-intrinsic";
       readonly method: "all" | "race" | "reject" | "resolve";
+    }
+  | {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
     }
   | { readonly functionId: number; readonly kind: "function" };
 
@@ -3148,6 +3179,15 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = `Promise.${expression.target.method}`;
+  } else if (expression.target.kind === "timer-intrinsic") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = {
+      kind: "timer-intrinsic",
+      method: expression.target.method,
+    };
+    detail = expression.target.method;
   } else {
     let callee: number;
     let receiver: number;
