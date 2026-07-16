@@ -75,6 +75,12 @@ as `this`; plain calls pass `undefined` under the M3 function-body contract.
 Function bodies may read `this`. `new` accepts an admitted function value,
 creates a receiver whose prototype comes from the function's `prototype`
 property, and returns the explicit object result or otherwise the receiver.
+Every function has own `name` and `length` data properties. They are
+non-writable, non-enumerable, and configurable. `length` is the number of plain
+parameters. Named functions retain their declared name; anonymous functions
+infer a name from a lexical assignment or an object-literal key and otherwise
+use the empty string.
+
 `new.target`, `super`, bound functions, and reflection APIs remain unsupported.
 Assignment to a named function expression's inner name is ignored in a
 non-strict function body and throws in a strict function body.

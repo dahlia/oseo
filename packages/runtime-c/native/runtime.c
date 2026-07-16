@@ -717,14 +717,19 @@ OseoResult oseo_cell_initialize(
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
-    OseoValue environment
+    OseoValue environment,
+    const uint16_t *name_units,
+    size_t name_length,
+    size_t parameter_count,
+    OseoValue inferred_name
 ) {
     if (!is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[5] = inferred_name;
     result = oseo_environment_clone(context, environment);
     frame.slots[0] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) {
@@ -766,6 +771,66 @@ OseoResult oseo_function_create(
     );
     frame.slots[2] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
+        static const uint16_t length_name[] = {
+            'l', 'e', 'n', 'g', 't', 'h',
+        };
+        result = allocate_string(
+            context,
+            length_name,
+            sizeof(length_name) / sizeof(*length_name)
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPropertyAttributes attributes = {true, false, false};
+        result = oseo_object_define(
+            context,
+            frame.slots[2],
+            frame.slots[3],
+            oseo_number(parameter_count),
+            attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        static const uint16_t name_name[] = {'n', 'a', 'm', 'e'};
+        result = allocate_string(
+            context,
+            name_name,
+            sizeof(name_name) / sizeof(*name_name)
+        );
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[5]) == OSEO_TAG_UNDEFINED) {
+        result = allocate_string(context, name_units, name_length);
+        frame.slots[5] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_string(frame.slots[5])) {
+        result = failure(context, "OSEO2001", "Invalid function name.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPropertyAttributes attributes = {true, false, false};
+        result = oseo_object_define(
+            context,
+            frame.slots[2],
+            frame.slots[4],
+            frame.slots[5],
+            attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         static const uint16_t constructor_name[] = {
             'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
         };
@@ -774,7 +839,7 @@ OseoResult oseo_function_create(
             constructor_name,
             sizeof(constructor_name) / sizeof(*constructor_name)
         );
-        frame.slots[3] = result.value;
+        frame.slots[6] = result.value;
         if (result.status == OSEO_STATUS_NORMAL &&
             context->observe_specialization && context->allocations > 0u) {
             context->allocations -= 1u;
@@ -785,7 +850,7 @@ OseoResult oseo_function_create(
         result = oseo_object_define(
             context,
             frame.slots[1],
-            frame.slots[3],
+            frame.slots[6],
             frame.slots[2],
             attributes
         );

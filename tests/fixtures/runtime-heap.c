@@ -310,6 +310,9 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
 }
 
 static void test_function_cells(OseoContext *context, OseoValue *roots) {
+    static const uint16_t function_name[] = {
+        'f', 'i', 'x', 't', 'u', 'r', 'e',
+    };
     roots[0] = require_normal(oseo_environment_create(context, 2u));
     roots[1] = require_normal(
         oseo_cell_create(context, oseo_number(1.0))
@@ -317,7 +320,15 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
     (void)require_normal(
         oseo_environment_set(context, roots[0], 0u, roots[1])
     );
-    roots[2] = require_normal(oseo_function_create(context, 7u, roots[0]));
+    roots[2] = require_normal(oseo_function_create(
+        context,
+        7u,
+        roots[0],
+        function_name,
+        sizeof(function_name) / sizeof(*function_name),
+        0u,
+        oseo_undefined()
+    ));
     roots[3] = require_normal(oseo_environment_clone(context, roots[0]));
     roots[4] = require_normal(oseo_environment_get(context, roots[3], 0u));
     roots[7] = make_text(context, "constructor");

@@ -182,6 +182,21 @@ test("accepts parenthesized direct call targets", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
+test("retains function name and length metadata in MIR", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function declared(first, second) {}",
+      "const inferred = function (value) {};",
+    ].join(" "),
+    sourceId: "function-metadata.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const text = printMir(result.mir);
+  assert.match(text, /function @f\d+ name="declared" length=2/u);
+  assert.match(text, /function @f\d+ name="inferred" length=1/u);
+});
+
 test("converts ordinary object operations to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:

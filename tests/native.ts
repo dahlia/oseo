@@ -64,6 +64,41 @@ console.log(first.read(), first.increment(), first.read());
 console.log(second.increment(), second.read(), first.read());
 const identity = function (value) { return value; };
 console.log(identity("function expression"));
+function declaredMetadata(first, second) {}
+const namedMetadata = function innerMetadata(value) {};
+const inferredMetadata = function (first, second, third) {};
+const objectMetadata = { method: function (value) {} };
+const computedMetadataName = "computedMetadata";
+const computedMetadata = {
+  [computedMetadataName]: function (first, second) {},
+};
+console.log(declaredMetadata.name, declaredMetadata.length);
+console.log(namedMetadata.name, namedMetadata.length);
+console.log(inferredMetadata.name, inferredMetadata.length);
+console.log(objectMetadata.method.name, objectMetadata.method.length);
+console.log(computedMetadata.computedMetadata.name);
+console.log(computedMetadata.computedMetadata.length);
+console.log((function (value) {}).name === "", (function (value) {}).length);
+const nameDescriptor = Object.getOwnPropertyDescriptor(
+  declaredMetadata,
+  "name",
+);
+const lengthDescriptor = Object.getOwnPropertyDescriptor(
+  declaredMetadata,
+  "length",
+);
+console.log(
+  nameDescriptor.value,
+  nameDescriptor.writable,
+  nameDescriptor.enumerable,
+  nameDescriptor.configurable,
+);
+console.log(
+  lengthDescriptor.value,
+  lengthDescriptor.writable,
+  lengthDescriptor.enumerable,
+  lengthDescriptor.configurable,
+);
 console.log((function () { return 42; })());
 function makeFunction() {
   return function () { return "nested call"; };
@@ -890,6 +925,7 @@ for (const fixture of fixtures) {
   }
 
   if (
+    fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition"

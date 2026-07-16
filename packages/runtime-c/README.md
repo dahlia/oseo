@@ -12,6 +12,9 @@ traces each reachable object once regardless of allocation-list order.
 M3 property operations implement descriptors, prototypes, array holes and
 length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
+Function creation installs the standard configurable, non-enumerable `name` and
+`length` properties through the ordinary descriptor representation.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary
 objects. Catching one clears its transient diagnostic message, while resource

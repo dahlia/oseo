@@ -95,15 +95,20 @@ function numberLiteral(value: number): string {
   return text;
 }
 
+function utf16Units(value: string): readonly number[] {
+  const units: number[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    units.push(value.charCodeAt(index));
+  }
+  return units;
+}
+
 function emitStringConstant(
   state: EmitState,
   operation: MirOperation,
   value: string,
 ): void {
-  const units: number[] = [];
-  for (let index = 0; index < value.length; index += 1) {
-    units.push(value.charCodeAt(index));
-  }
+  const units = utf16Units(value);
   let input = "NULL, 0u";
   if (units.length > 0) {
     const name = `string_units_${operation.id}`;
@@ -556,12 +561,29 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
   if (operation.functionId == null) {
     throw new Error(`MIR function-create %${operation.id} has no code id.`);
   }
+  if (operation.functionName == null || operation.functionLength == null) {
+    throw new Error(
+      `MIR function-create %${operation.id} has no function metadata.`,
+    );
+  }
+  const units = utf16Units(operation.functionName);
+  let nameInput = "NULL";
+  if (units.length > 0) {
+    const name = `function_name_units_${operation.id}`;
+    line(state, `static const uint16_t ${name}[] = {${units.join(", ")}};`);
+    nameInput = name;
+  }
+  const inferredName =
+    operation.arguments[0] == null
+      ? "oseo_undefined()"
+      : `roots[${operation.arguments[0]}]`;
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
     `result = oseo_function_create(context, ${operation.functionId}u, ` +
-      `roots[${state.environmentSlot}]);`,
+      `roots[${state.environmentSlot}], ${nameInput}, ${units.length}u, ` +
+      `${operation.functionLength}u, ${inferredName});`,
   );
   line(state, `roots[${operation.id}] = result.value;`);
 }

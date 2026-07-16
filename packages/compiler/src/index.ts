@@ -340,6 +340,7 @@ export type HirExpression =
       readonly functionId: number;
       readonly kind: "function";
       readonly name: string;
+      readonly parameterCount: number;
     })
   | (LocatedSyntax & {
       readonly bindingId: number;
@@ -432,6 +433,7 @@ export type HirStatement =
       readonly functionId: number;
       readonly kind: "function-init";
       readonly name: string;
+      readonly parameterCount: number;
     })
   | (LocatedSyntax & {
       readonly alternate: HirStatement | undefined;
@@ -562,6 +564,15 @@ function shadowedMethodTarget(
   };
 }
 
+function inferFunctionName(
+  expression: HirExpression,
+  name: string,
+): HirExpression {
+  return expression.kind === "function" && expression.name === ""
+    ? { ...expression, name }
+    : expression;
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -589,7 +600,7 @@ function resolveExpression(
             ? { functionNameBinding: true }
             : {}),
           mutable: binding.mutable,
-          value,
+          value: inferFunctionName(value, binding.name),
         };
   }
   if (expression.kind === "array") {
@@ -676,7 +687,11 @@ function resolveExpression(
       const key = resolveExpression(property.key, scopes, state);
       const value = resolveExpression(property.value, scopes, state);
       if (key == null || value == null) return undefined;
-      properties.push({ key, value });
+      properties.push({
+        key,
+        value:
+          key.kind === "string" ? inferFunctionName(value, key.value) : value,
+      });
     }
     return { ...expression, properties };
   }
@@ -855,12 +870,13 @@ function resolveStatementList(
     const info = state.functionInfo.get(statement);
     if (info == null) continue;
     if (local.get(statement.name)?.functionId !== info.id) continue;
-    resolveFunction(statement, scopes, state, info.id);
+    const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
       kind: "function-init",
       name: statement.name,
+      parameterCount: functionValue.parameters.length,
       range: statement.range,
     });
   }
@@ -998,7 +1014,8 @@ function resolveFunctionExpression(
   return {
     functionId: id,
     kind: "function",
-    name: resolved.name,
+    name: functionValue.name ?? "",
+    parameterCount: resolved.parameters.length,
     range: expression.range,
   };
 }
@@ -1014,7 +1031,11 @@ function resolveStatement(
     const initializer = resolveExpression(statement.initializer, scopes, state);
     const binding = scopes.at(-1)?.get(statement.name);
     if (binding == null || initializer == null) return undefined;
-    return { ...statement, bindingId: binding.id, initializer };
+    return {
+      ...statement,
+      bindingId: binding.id,
+      initializer: inferFunctionName(initializer, binding.name),
+    };
   }
   if (statement.kind === "expression") {
     const expression = resolveExpression(statement.expression, scopes, state);
@@ -1504,6 +1525,8 @@ export interface MirOperation {
   readonly completionSlot?: number;
   readonly completionTarget?: number;
   readonly functionId?: number;
+  readonly functionLength?: number;
+  readonly functionName?: string;
   readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
   readonly operator?: BinaryOperator | "!" | "-";
@@ -1789,6 +1812,7 @@ function lowerSpecializedPropertyGet(
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
+  inferredFunctionName?: number,
 ): number {
   if (expression.kind === "binding-set") {
     const value = lowerExpression(expression.value, builder);
@@ -1833,9 +1857,14 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      arguments: [],
-      detail: `function @f${expression.functionId}`,
+      arguments: inferredFunctionName == null ? [] : [inferredFunctionName],
+      detail:
+        `function @f${expression.functionId} ` +
+        `name=${JSON.stringify(expression.name)} ` +
+        `length=${expression.parameterCount}`,
       functionId: expression.functionId,
+      functionLength: expression.parameterCount,
+      functionName: expression.name,
       id,
       kind: "function-create",
       range: expression.range,
@@ -2087,7 +2116,13 @@ function lowerExpression(
     recordRoot(builder, id, expression.range);
     for (const property of expression.properties) {
       const key = lowerPropertyKey(property.key, builder);
-      const value = lowerExpression(property.value, builder);
+      const value = lowerExpression(
+        property.value,
+        builder,
+        property.value.kind === "function" && property.value.name === ""
+          ? key
+          : undefined,
+      );
       appendMirMetadata(
         builder,
         "safepoint",
@@ -2602,6 +2637,7 @@ function lowerStatements(
           functionId: statement.functionId,
           kind: "function",
           name: statement.name,
+          parameterCount: statement.parameterCount,
           range: statement.range,
         },
         builder,

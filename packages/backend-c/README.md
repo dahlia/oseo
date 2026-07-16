@@ -21,6 +21,9 @@ before an owned resource diagnostic is possible.
 UTF-16 string-constant units use static read-only storage rather than automatic
 compound literals, so source literal size does not enlarge a generated stack
 frame.
+Function creation passes MIR-owned UTF-16 names and plain parameter counts to
+the runtime, without consulting HIR or source syntax.
+
 Value-slot discovery scans MIR argument IDs iteratively, so source-level call
 size does not become a JavaScript call-stack limit during C emission. Generated
 entry code passes diagnostic source identifiers with their UTF-8 byte lengths.

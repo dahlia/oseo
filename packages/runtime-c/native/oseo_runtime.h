@@ -178,7 +178,11 @@ OseoResult oseo_cell_set(
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
-    OseoValue environment
+    OseoValue environment,
+    const uint16_t *name_units,
+    size_t name_length,
+    size_t parameter_count,
+    OseoValue inferred_name
 );
 OseoResult oseo_function_environment(
     OseoContext *context,
