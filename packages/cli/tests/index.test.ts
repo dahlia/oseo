@@ -171,6 +171,39 @@ test("loads and lowers a closed file module graph", async () => {
   assert.match(result.stdout, /property-get generic/u);
 });
 
+test("recognizes top-level await without module declarations", async () => {
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/await.js");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile() {
+      return Promise.reject(new Error("unexpected read"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/await.js"],
+      source: "await Promise.resolve(1);",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 0);
+  assert.match(result.stdout, /top-level await/u);
+});
+
 test("normalizes process spawn failures into host diagnostics", async () => {
   let cleanupCount = 0;
   const host: CompilerHost = {

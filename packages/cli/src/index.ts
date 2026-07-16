@@ -284,15 +284,19 @@ async function compileCliModuleGraph(
   return { mir: compiled.mir };
 }
 
-function hasModuleDeclarations(source: string, sourceId: string): boolean {
+function isModuleSource(source: string, sourceId: string): boolean {
   const parsed = defaultComponents.moduleFrontend.parseModule({
     source,
     sourceId,
   });
-  return (
+  if (
     parsed.module != null &&
     (parsed.module.imports.length > 0 || parsed.module.exports.length > 0)
-  );
+  ) {
+    return true;
+  }
+  if (!parsed.parsed) return false;
+  return !defaultComponents.frontend.parse({ source, sourceId }).parsed;
 }
 
 function emitCliMir(mode: CliInvocation["mode"], mir: MirProgram): CliResult {
@@ -423,7 +427,7 @@ export async function runNativeCli(
     );
   }
   let mir: MirProgram;
-  if (hasModuleDeclarations(source, sourceId)) {
+  if (isModuleSource(source, sourceId)) {
     const compiled = await compileCliModuleGraph(
       host,
       parsed.value.sourceId,
