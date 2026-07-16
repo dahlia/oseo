@@ -93,7 +93,7 @@ typedef struct {
 } OseoFunction;
 
 typedef struct {
-    OseoHeapObject header;
+    OseoOrdinaryObject ordinary;
     OseoValue result;
     OseoValue reaction_head;
     OseoValue reaction_tail;
@@ -311,7 +311,7 @@ static bool is_object(OseoValue value) {
     if (tag_of(value) != OSEO_TAG_HEAP) return false;
     OseoHeapKind kind = heap_object(value)->kind;
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
-        kind == OSEO_HEAP_FUNCTION;
+        kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE;
 }
 
 static bool is_array(OseoValue value) {
@@ -359,7 +359,8 @@ static void trace_object(
         mark_value(((OseoCell *)object)->value, worklist);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
-               object->kind == OSEO_HEAP_FUNCTION) {
+               object->kind == OSEO_HEAP_FUNCTION ||
+               object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
@@ -371,13 +372,13 @@ static void trace_object(
             mark_value(function->environment, worklist);
             mark_value(function->lexical_this, worklist);
             mark_value(function->prototype_object, worklist);
+        } else if (object->kind == OSEO_HEAP_PROMISE) {
+            OseoPromise *promise = (OseoPromise *)object;
+            mark_value(promise->result, worklist);
+            mark_value(promise->reaction_head, worklist);
+            mark_value(promise->reaction_tail, worklist);
+            mark_value(promise->unhandled_next, worklist);
         }
-    } else if (object->kind == OSEO_HEAP_PROMISE) {
-        OseoPromise *promise = (OseoPromise *)object;
-        mark_value(promise->result, worklist);
-        mark_value(promise->reaction_head, worklist);
-        mark_value(promise->reaction_tail, worklist);
-        mark_value(promise->unhandled_next, worklist);
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
         mark_value(reaction->next, worklist);
@@ -407,7 +408,8 @@ static void trace_object(
 static void destroy_heap_object(OseoHeapObject *object) {
     if (object->kind == OSEO_HEAP_OBJECT ||
         object->kind == OSEO_HEAP_ARRAY ||
-        object->kind == OSEO_HEAP_FUNCTION) {
+        object->kind == OSEO_HEAP_FUNCTION ||
+        object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
     }
@@ -1448,18 +1450,6 @@ OseoResult oseo_object_get(
 ) {
     OseoResult valid = require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
-    if (is_promise(object_value)) {
-        if (string_is_ascii(key, "then")) {
-            return promise_method_function(context, "then");
-        }
-        if (string_is_ascii(key, "catch")) {
-            return promise_method_function(context, "catch");
-        }
-        if (string_is_ascii(key, "finally")) {
-            return promise_method_function(context, "finally");
-        }
-        return normal(oseo_undefined());
-    }
     if (!is_object(object_value)) {
         if (is_nullish(object_value)) return language_failure(context);
         if (is_string(object_value) && string_is_ascii(key, "length")) {
@@ -1482,6 +1472,18 @@ OseoResult oseo_object_get(
                 return oseo_cell_get(context, value);
             }
             return normal(value);
+        }
+        if (is_promise(current) &&
+            tag_of(object->prototype) == OSEO_TAG_NULL) {
+            if (string_is_ascii(key, "then")) {
+                return promise_method_function(context, "then");
+            }
+            if (string_is_ascii(key, "catch")) {
+                return promise_method_function(context, "catch");
+            }
+            if (string_is_ascii(key, "finally")) {
+                return promise_method_function(context, "finally");
+            }
         }
         current = object->prototype;
     }
@@ -2926,6 +2928,16 @@ static OseoResult promise_create(OseoContext *context) {
     if (promise == NULL) {
         return failure(context, "OSEO2001", "Promise allocation failed.");
     }
+    promise->ordinary.prototype = oseo_null();
+    promise->ordinary.properties = NULL;
+    promise->ordinary.property_capacity = 0u;
+    promise->ordinary.property_count = 0u;
+    promise->ordinary.shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    promise->ordinary.array_length = 0u;
+    promise->ordinary.dictionary = false;
+    promise->ordinary.length_writable = false;
+    promise->ordinary.module_namespace = false;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();
@@ -2934,7 +2946,11 @@ static OseoResult promise_create(OseoContext *context) {
     promise->handled = false;
     promise->pending_report = false;
     promise->reported = false;
-    return publish_heap(context, &promise->header, OSEO_HEAP_PROMISE);
+    return publish_heap(
+        context,
+        &promise->ordinary.header,
+        OSEO_HEAP_PROMISE
+    );
 }
 
 static OseoResult promise_method_function(

@@ -880,6 +880,11 @@ Promise.resolve(12).finally(cleanupReject).catch(showRejected);
 Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
 Promise.all(1).catch(invalidInput);
 Promise.race(null).catch(invalidInput);
+const decorated = Promise.resolve(21);
+decorated.value = 22;
+console.log("promise property", decorated.value, Object.keys(decorated)[0]);
+decorated.then = function ownThen() { console.log("own then"); };
+decorated.then();
 console.log("sync end");
 settleAdopted(16);
 `,
