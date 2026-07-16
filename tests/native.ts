@@ -931,6 +931,20 @@ observable.then = function observableThen(onFulfilled) {
 };
 Promise.all([observable]).then(showObservableAll);
 Promise.race([observable]).then(showObservableRace);
+const allCallbacks = Promise.resolve(0);
+allCallbacks.then = function inspectAllCallbacks(onFulfilled, onRejected) {
+  showConstructible("all resolve", onFulfilled);
+  showConstructible("all reject", onRejected);
+  onFulfilled(43);
+};
+Promise.all([allCallbacks]).then(showObservableAll, showRejected);
+const raceCallbacks = Promise.resolve(0);
+raceCallbacks.then = function inspectRaceCallbacks(onFulfilled, onRejected) {
+  showConstructible("race resolve", onFulfilled);
+  showConstructible("race reject", onRejected);
+  onFulfilled(44);
+};
+Promise.race([raceCallbacks]).then(showObservableRace, showRejected);
 const adversarial = Promise.resolve(27);
 adversarial.then = function callBoth(onFulfilled, onRejected) {
   onFulfilled(28);

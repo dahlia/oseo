@@ -3454,7 +3454,7 @@ static OseoResult promise_aggregate_function_create(
         NULL,
         0u,
         1u,
-        OSEO_FUNCTION_ORDINARY,
+        OSEO_FUNCTION_INTERNAL,
         oseo_undefined(),
         oseo_undefined()
     );
