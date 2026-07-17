@@ -760,3 +760,31 @@ test("rejects type-only imports instead of creating runtime bindings", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.match(result.diagnostics[0]?.message ?? "", /Type-only imports/u);
 });
+
+test("rejects module attributes before lowering module entries", () => {
+  for (const source of [
+    'import data from "./data.json" with { type: "json" };',
+    'import data from "./data.json" with {};',
+    'export { value } from "./data.js" with { type: "json" };',
+    'export * from "./data.js" with { type: "json" };',
+  ]) {
+    const result = babelModuleFrontend.parseModule({
+      source,
+      sourceId: "file:///app/main.js",
+    });
+    assert.equal(result.parsed, false);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(result.diagnostics[0]?.message ?? "", /attributes/u);
+    assert.deepEqual(result.diagnostics[0]?.range.start, {
+      column: 1,
+      line: 1,
+    });
+  }
+
+  const comment = babelModuleFrontend.parseModule({
+    source: 'import data from "./data.js" /* with {} */;',
+    sourceId: "file:///app/comment.js",
+  });
+  assert.ok(comment.parsed);
+  assert.deepEqual(comment.diagnostics, []);
+});

@@ -1424,6 +1424,24 @@ function exportForDeclaration(
   };
 }
 
+function hasModuleAttributes(
+  context: ConvertContext,
+  value: BabelNode,
+): boolean {
+  if (
+    nodes(value.attributes).length > 0 ||
+    nodes(value.assertions).length > 0
+  ) {
+    return true;
+  }
+  const source = node(value.source);
+  if (source?.end == null || value.end == null) return false;
+  const suffix = context.input.source
+    .slice(source.end, value.end)
+    .replaceAll(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/gu, "");
+  return /\b(?:assert|with)\s*\{/u.test(suffix);
+}
+
 function moduleProgram(
   context: ConvertContext,
   file: BabelNode,
@@ -1435,6 +1453,10 @@ function moduleProgram(
   context.strictStack.push(true);
   for (const item of nodes(programNode.body)) {
     if (item.type === "ImportDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
       if (item.importKind === "type") {
         unsupported(context, item, "Type-only imports are outside M4.");
         break;
@@ -1486,6 +1508,10 @@ function moduleProgram(
       continue;
     }
     if (item.type === "ExportAllDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
       const specifier = moduleSpecifier(context, node(item.source));
       if (specifier == null) break;
       if (item.exported != null) {
@@ -1496,6 +1522,10 @@ function moduleProgram(
       continue;
     }
     if (item.type === "ExportNamedDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
       if (item.exportKind === "type") {
         unsupported(context, item, "Type-only exports are outside M4.");
         break;
