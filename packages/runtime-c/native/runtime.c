@@ -4801,7 +4801,9 @@ static OseoResult timer_delay_number(
                     );
                     frame.slots[3] = result.value;
                     if (result.status == OSEO_STATUS_NORMAL) {
-                        result = to_number(context, frame.slots[3]);
+                        result = is_object(frame.slots[3])
+                            ? language_failure(context)
+                            : to_number(context, frame.slots[3]);
                     }
                 } else if (is_array(frame.slots[0])) {
                     result = language_failure(context);

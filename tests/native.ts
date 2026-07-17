@@ -1170,10 +1170,19 @@ inheritedJoinPrototype.join = function inheritedJoinDelayJoin() {
 };
 const inheritedJoinDelay = [1];
 Object.setPrototypeOf(inheritedJoinDelay, inheritedJoinPrototype);
+const invalidJoinDelay = [1];
+invalidJoinDelay.join = function invalidJoinDelayJoin() {
+  return {};
+};
 try {
   setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
 } catch (error) {
   console.log("invalid timer delay");
+}
+try {
+  setTimeout(task, invalidJoinDelay, "invalid join delay");
+} catch (error) {
+  console.log("invalid array join delay");
 }
 const canceled = setTimeout(task, 0, "canceled");
 clearTimeout(canceled);
