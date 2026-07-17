@@ -1907,6 +1907,24 @@ assert.match(
   /module-diagnostics\/dep\.mjs:5:3: error\[OSEO2001\]/u,
 );
 
+const rejectionLocation = [
+  root,
+  "tests/fixtures/rejection-location/entry.mjs",
+].join("/");
+const nativeRejectionLocation = await runNativeCli(
+  {
+    args: [rejectionLocation],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeRejectionLocation.exitStatus, 1);
+assert.equal(nativeRejectionLocation.stdout, "entry after rejection\n");
+assert.match(
+  nativeRejectionLocation.stderr,
+  /rejection-location\/dep\.mjs:2:3: error\[OSEO2001\]/u,
+);
+
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
 );

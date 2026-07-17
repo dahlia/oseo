@@ -104,6 +104,10 @@ typedef struct {
     OseoValue reaction_head;
     OseoValue reaction_tail;
     OseoValue unhandled_next;
+    const char *rejection_source_id;
+    size_t rejection_source_id_length;
+    size_t rejection_line;
+    size_t rejection_column;
     OseoPromiseState state;
     bool handled;
     bool pending_report;
@@ -2975,6 +2979,10 @@ static OseoResult promise_create(OseoContext *context) {
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();
     promise->unhandled_next = oseo_undefined();
+    promise->rejection_source_id = context->source_id;
+    promise->rejection_source_id_length = context->source_id_length;
+    promise->rejection_line = context->line;
+    promise->rejection_column = context->column;
     promise->state = OSEO_PROMISE_PENDING;
     promise->handled = false;
     promise->pending_report = false;
@@ -3182,6 +3190,10 @@ OseoResult oseo_promise_reject_into(
     }
     promise->state = OSEO_PROMISE_REJECTED;
     promise->result = reason;
+    promise->rejection_source_id = context->source_id;
+    promise->rejection_source_id_length = context->source_id_length;
+    promise->rejection_line = context->line;
+    promise->rejection_column = context->column;
     if (!promise->handled) {
         promise->pending_report = true;
         if (tag_of(context->pending_rejection_tail) == OSEO_TAG_UNDEFINED) {
@@ -4336,6 +4348,10 @@ OseoResult oseo_jobs_drain(OseoContext *context) {
 OseoResult oseo_rejection_checkpoint(OseoContext *context) {
     OseoValue current = context->pending_rejections;
     OseoValue first = oseo_undefined();
+    const char *first_source_id = context->source_id;
+    size_t first_source_id_length = context->source_id_length;
+    size_t first_line = context->line;
+    size_t first_column = context->column;
     bool found = false;
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
@@ -4350,6 +4366,11 @@ OseoResult oseo_rejection_checkpoint(OseoContext *context) {
             context->unhandled_rejection_count += 1u;
             if (!found) {
                 first = promise->result;
+                first_source_id = promise->rejection_source_id;
+                first_source_id_length =
+                    promise->rejection_source_id_length;
+                first_line = promise->rejection_line;
+                first_column = promise->rejection_column;
                 found = true;
             }
         }
@@ -4361,6 +4382,10 @@ OseoResult oseo_rejection_checkpoint(OseoContext *context) {
     context->error_code = "OSEO2001";
     context->error_message = "Unhandled promise rejection.";
     context->has_diagnostic = false;
+    context->source_id = first_source_id;
+    context->source_id_length = first_source_id_length;
+    context->line = first_line;
+    context->column = first_column;
     return (OseoResult){OSEO_STATUS_THROW, first};
 }
 
