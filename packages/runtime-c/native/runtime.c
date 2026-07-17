@@ -1503,8 +1503,7 @@ OseoResult oseo_object_get(
             }
             return normal(value);
         }
-        if (is_promise(current) &&
-            tag_of(object->prototype) == OSEO_TAG_NULL) {
+        if (is_promise(current) && object->default_intrinsics) {
             if (string_is_ascii(key, "then")) {
                 return promise_method_function(context, "then");
             }
@@ -3032,7 +3031,7 @@ static OseoResult promise_method_function(
             units,
             length,
             code_id == OSEO_PROMISE_THEN_CODE_ID ? 2u : 1u,
-            OSEO_FUNCTION_ORDINARY,
+            OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
             oseo_undefined()
         );

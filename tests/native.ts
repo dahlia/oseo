@@ -980,6 +980,23 @@ decorated.value = 22;
 console.log("promise property", decorated.value, Object.keys(decorated)[0]);
 decorated.then = function ownThen() { console.log("own then"); };
 decorated.then();
+const methodOwner = Promise.resolve(45);
+console.log(
+  "promise method prototypes",
+  Object.getOwnPropertyDescriptor(methodOwner.then, "prototype") ===
+    undefined,
+  Object.getOwnPropertyDescriptor(methodOwner.catch, "prototype") ===
+    undefined,
+  Object.getOwnPropertyDescriptor(methodOwner.finally, "prototype") ===
+    undefined,
+);
+Object.setPrototypeOf(methodOwner, null);
+console.log(
+  "null promise prototype",
+  methodOwner.then === undefined,
+  methodOwner.catch === undefined,
+  methodOwner.finally === undefined,
+);
 console.log("sync end");
 settleAdopted(16);
 `,
