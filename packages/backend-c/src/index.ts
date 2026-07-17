@@ -498,7 +498,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       `result = oseo_array_create(context, ${operation.arrayLength}u);`,
     );
   } else if (operation.kind === "object-create") {
-    line(state, "result = oseo_object_create(context, oseo_null());");
+    line(state, "result = oseo_object_literal_create(context);");
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(state, `result = oseo_property_key(context, roots[${input}]);`);

@@ -85,6 +85,7 @@ typedef struct {
     bool dictionary;
     bool length_writable;
     bool module_namespace;
+    bool default_intrinsics;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -1028,6 +1029,7 @@ OseoResult oseo_function_create(
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
     function->ordinary.module_namespace = false;
+    function->ordinary.default_intrinsics = true;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
@@ -1364,7 +1366,11 @@ static bool string_own_property(
     return true;
 }
 
-OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
+static OseoResult object_create(
+    OseoContext *context,
+    OseoValue prototype,
+    bool default_intrinsics
+) {
     if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
         return language_failure(context);
     }
@@ -1382,7 +1388,16 @@ OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
     object->dictionary = false;
     object->length_writable = false;
     object->module_namespace = false;
+    object->default_intrinsics = default_intrinsics;
     return publish_heap(context, &object->header, OSEO_HEAP_OBJECT);
+}
+
+OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
+    return object_create(context, prototype, false);
+}
+
+OseoResult oseo_object_literal_create(OseoContext *context) {
+    return object_create(context, oseo_null(), true);
 }
 
 OseoResult oseo_array_create(OseoContext *context, size_t length) {
@@ -1403,6 +1418,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->dictionary = false;
     array->length_writable = true;
     array->module_namespace = false;
+    array->default_intrinsics = true;
     return publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
@@ -1816,6 +1832,7 @@ OseoResult oseo_object_set_prototype(
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     object->prototype = prototype;
+    object->default_intrinsics = false;
     object->dictionary = true;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
@@ -2954,6 +2971,7 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.dictionary = false;
     promise->ordinary.length_writable = false;
     promise->ordinary.module_namespace = false;
+    promise->ordinary.default_intrinsics = true;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();
@@ -4388,7 +4406,8 @@ static OseoResult timer_array_string(
 
 static OseoResult timer_string_hint_primitive(
     OseoContext *context,
-    OseoValue value
+    OseoValue value,
+    const TimerArrayAncestor *previous
 ) {
     static const uint16_t to_string_units[] = {
         't', 'o', 'S', 't', 'r', 'i', 'n', 'g'
@@ -4423,11 +4442,24 @@ static OseoResult timer_string_hint_primitive(
             );
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 0u) {
-                result = oseo_string_from_units(
-                    context,
-                    default_units,
-                    15u
-                );
+                if (is_array(frame.slots[0]) &&
+                    ordinary_object(frame.slots[0])
+                        ->default_intrinsics) {
+                    result = timer_array_string(
+                        context,
+                        frame.slots[0],
+                        previous
+                    );
+                } else if (ordinary_object(frame.slots[0])
+                    ->default_intrinsics) {
+                    result = oseo_string_from_units(
+                        context,
+                        default_units,
+                        15u
+                    );
+                } else {
+                    continue;
+                }
                 converted = result.status == OSEO_STATUS_NORMAL;
                 break;
             }
@@ -4488,6 +4520,9 @@ static OseoResult timer_array_string(
     OseoValue array_value,
     const TimerArrayAncestor *previous
 ) {
+    if (timer_array_is_ancestor(array_value, previous)) {
+        return oseo_string_from_units(context, NULL, 0u);
+    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -4535,20 +4570,14 @@ static OseoResult timer_array_string(
             frame.slots[2] = result.value;
         }
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (is_nullish(frame.slots[2]) ||
-            timer_array_is_ancestor(frame.slots[2], &current)) {
+        if (is_nullish(frame.slots[2])) {
             continue;
         }
-        if (is_array(frame.slots[2])) {
-            result = timer_array_string(
+        if (is_object(frame.slots[2])) {
+            result = timer_string_hint_primitive(
                 context,
                 frame.slots[2],
                 &current
-            );
-        } else if (is_object(frame.slots[2])) {
-            result = timer_string_hint_primitive(
-                context,
-                frame.slots[2]
             );
             frame.slots[3] = result.value;
             if (result.status == OSEO_STATUS_NORMAL) {
@@ -4635,14 +4664,19 @@ static OseoResult timer_delay_number(
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 1u) {
                 if (is_array(frame.slots[0])) {
-                    result = timer_array_string(
-                        context,
-                        frame.slots[0],
-                        NULL
-                    );
-                    frame.slots[3] = result.value;
-                    if (result.status == OSEO_STATUS_NORMAL) {
-                        result = to_number(context, frame.slots[3]);
+                    if (ordinary_object(frame.slots[0])
+                        ->default_intrinsics) {
+                        result = timer_array_string(
+                            context,
+                            frame.slots[0],
+                            NULL
+                        );
+                        frame.slots[3] = result.value;
+                        if (result.status == OSEO_STATUS_NORMAL) {
+                            result = to_number(context, frame.slots[3]);
+                        }
+                    } else {
+                        result = language_failure(context);
                     }
                 } else {
                     result = normal(oseo_number(NAN));

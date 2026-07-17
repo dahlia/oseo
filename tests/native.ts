@@ -1107,6 +1107,24 @@ functionDelay.valueOf = function functionDelayValue() {
   console.log("coerce function delay");
   return 40;
 };
+const nestedDelay = [1];
+nestedDelay.toString = function nestedDelayString() {
+  console.log("coerce nested array delay");
+  return "10";
+};
+const nestedValueDelay = [1];
+nestedValueDelay.toString = function nestedValueDelayString() {
+  return nestedValueDelay;
+};
+nestedValueDelay.valueOf = function nestedValueDelayValue() {
+  console.log("coerce nested array valueOf");
+  return "15";
+};
+const nullPrototypeDelay = Object.create(null);
+nullPrototypeDelay.valueOf = function nullPrototypeDelayValue() {
+  console.log("coerce null prototype delay");
+  return "20";
+};
 try {
   setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
 } catch (error) {
@@ -1118,6 +1136,9 @@ setTimeout(task, 100, "late");
 setTimeout(task, 0, "first");
 setTimeout(scheduleNested, 0);
 setTimeout(task, [5], "array delay");
+setTimeout(task, [nestedDelay], "nested array delay");
+setTimeout(task, [nestedValueDelay], "nested array valueOf");
+setTimeout(task, [nullPrototypeDelay], "null prototype delay");
 setTimeout(task, objectDelay, "object delay");
 setTimeout(task, functionDelay, "function delay");
 console.log("scheduled");
