@@ -86,7 +86,8 @@ function isUnreservedPathByte(value: number): boolean {
   );
 }
 
-function canonicalFileUrl(url: URL): string {
+/** Normalize one file URL to the canonical module identity spelling. */
+export function canonicalizeFileModuleUrl(url: URL): string {
   const canonical = new URL(url.href);
   canonical.pathname = canonical.pathname.replace(/%[0-9a-f]{2}/giu, (part) => {
     const value = Number.parseInt(part.slice(1), 16);
@@ -185,7 +186,10 @@ export const fileModuleResolver: ModuleResolver = {
       if (importer.protocol !== "file:") throw new Error("not a file URL");
       const resolved = new URL(specifier.value, importer);
       if (resolved.protocol !== "file:") throw new Error("not a file URL");
-      return { canonicalId: canonicalFileUrl(resolved), diagnostics: [] };
+      return {
+        canonicalId: canonicalizeFileModuleUrl(resolved),
+        diagnostics: [],
+      };
     } catch {
       return {
         diagnostics: [
@@ -206,7 +210,9 @@ export function createNodeHost(): CompilerHost {
     async canonicalizeFile(path: string): Promise<string> {
       try {
         const url = new URL(path);
-        if (url.protocol === "file:") return canonicalFileUrl(url);
+        if (url.protocol === "file:") {
+          return canonicalizeFileModuleUrl(url);
+        }
       } catch {
         // A filesystem path is canonicalized below.
       }
@@ -214,7 +220,7 @@ export function createNodeHost(): CompilerHost {
         import("node:path"),
         import("node:url"),
       ]);
-      return canonicalFileUrl(pathToFileURL(resolve(path)));
+      return canonicalizeFileModuleUrl(pathToFileURL(resolve(path)));
     },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       const [{ mkdtemp }, { tmpdir }, { join }] = await Promise.all([
@@ -270,7 +276,7 @@ export function createDenoHost(): CompilerHost {
       try {
         const url = new URL(path);
         if (url.protocol === "file:") {
-          return Promise.resolve(canonicalFileUrl(url));
+          return Promise.resolve(canonicalizeFileModuleUrl(url));
         }
       } catch {
         // A filesystem path is canonicalized below.
@@ -280,7 +286,7 @@ export function createDenoHost(): CompilerHost {
         : `${runtime.cwd().replace(/\/$/u, "")}/${path}`;
       const url = new URL("file:///");
       url.pathname = basePath.replaceAll("%", "%25");
-      return Promise.resolve(canonicalFileUrl(url));
+      return Promise.resolve(canonicalizeFileModuleUrl(url));
     },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       return await runtime.makeTempDir({ prefix });

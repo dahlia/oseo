@@ -19,6 +19,7 @@ import {
   renderDiagnostic,
 } from "@oseo/compiler";
 import {
+  canonicalizeFileModuleUrl,
   createDenoHost,
   createFileModuleLoader,
   createNodeHost,
@@ -291,7 +292,10 @@ function hasModuleExtension(path: string): boolean {
 function hasModulePathIntent(sourcePath: string): boolean {
   try {
     const url = new URL(sourcePath);
-    if (url.protocol === "file:") return hasModuleExtension(url.pathname);
+    if (url.protocol === "file:") {
+      const canonical = new URL(canonicalizeFileModuleUrl(url));
+      return hasModuleExtension(canonical.pathname);
+    }
   } catch {
     // Ordinary filesystem paths are checked below.
   }

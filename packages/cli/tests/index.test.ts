@@ -303,6 +303,8 @@ test("preserves module parsing for plain module entries", async () => {
       "entry.mts",
       "C:\\work\\entry.mts",
       "file:///work/entry.mts",
+      "file:///work/entry%2Emjs",
+      "file:///work/entry%2Emts",
     ].map((sourcePath) =>
       runNativeCli(
         {
