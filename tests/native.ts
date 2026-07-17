@@ -1622,6 +1622,24 @@ assert.equal(objectTimerDelay.exitStatus, 0);
 assert.equal(objectTimerDelay.stderr, "");
 assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
 
+const retargetedArrayTimerDelay = await runNativeCli(
+  {
+    args: ["retargeted-array-timer-delay.ts"],
+    source: `
+function task() { console.log("retargeted array delay"); }
+const delay = [];
+Object.setPrototypeOf(delay, {});
+setTimeout(task, delay);
+`,
+    sourceId: "retargeted-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(retargetedArrayTimerDelay.exitStatus, 0);
+assert.equal(retargetedArrayTimerDelay.stderr, "");
+assert.equal(retargetedArrayTimerDelay.stdout, "retargeted array delay\n");
+
 const accessorDescriptor = await runNativeCli(
   {
     args: ["accessor-descriptor.ts"],

@@ -4900,8 +4900,6 @@ static OseoResult timer_delay_number(
                             ? language_failure(context)
                             : to_number(context, frame.slots[3]);
                     }
-                } else if (is_array(frame.slots[0])) {
-                    result = language_failure(context);
                 } else if (timer_has_default_object_conversion(
                                frame.slots[0]
                            )) {
