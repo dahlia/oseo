@@ -4583,8 +4583,9 @@ static OseoResult timer_string_hint_primitive(
                         frame.slots[0],
                         previous
                     );
-                } else if (ordinary_object(frame.slots[0])
-                    ->default_intrinsics) {
+                } else if (timer_has_default_object_conversion(
+                               frame.slots[0]
+                           )) {
                     result = oseo_string_from_units(
                         context,
                         default_units,

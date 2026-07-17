@@ -1640,6 +1640,26 @@ assert.equal(retargetedArrayTimerDelay.exitStatus, 0);
 assert.equal(retargetedArrayTimerDelay.stderr, "");
 assert.equal(retargetedArrayTimerDelay.stdout, "retargeted array delay\n");
 
+const inheritedObjectArrayTimerDelay = await runNativeCli(
+  {
+    args: ["inherited-object-array-timer-delay.ts"],
+    source: `
+function task() { console.log("inherited object array delay"); }
+const delay = Object.create({});
+setTimeout(task, [delay]);
+`,
+    sourceId: "inherited-object-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(inheritedObjectArrayTimerDelay.exitStatus, 0);
+assert.equal(inheritedObjectArrayTimerDelay.stderr, "");
+assert.equal(
+  inheritedObjectArrayTimerDelay.stdout,
+  "inherited object array delay\n",
+);
+
 const accessorDescriptor = await runNativeCli(
   {
     args: ["accessor-descriptor.ts"],
