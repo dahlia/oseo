@@ -1679,6 +1679,33 @@ assert.equal(
   "inherited object array delay\n",
 );
 
+const objectLengthArrayTimerDelay = await runNativeCli(
+  {
+    args: ["object-length-array-timer-delay.ts"],
+    source: `
+function task() { console.log("object length array delay"); }
+const delay = {};
+Object.setPrototypeOf(delay, [1]);
+delay.length = {
+  valueOf: function delayLength() {
+    console.log("coerce array length");
+    return 1;
+  },
+};
+setTimeout(task, delay);
+`,
+    sourceId: "object-length-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(objectLengthArrayTimerDelay.exitStatus, 0);
+assert.equal(objectLengthArrayTimerDelay.stderr, "");
+assert.equal(
+  objectLengthArrayTimerDelay.stdout,
+  "coerce array length\nobject length array delay\n",
+);
+
 const accessorDescriptor = await runNativeCli(
   {
     args: ["accessor-descriptor.ts"],

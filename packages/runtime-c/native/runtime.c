@@ -4560,6 +4560,11 @@ static OseoResult timer_array_string(
     const TimerArrayAncestor *previous
 );
 
+static OseoResult timer_delay_number(
+    OseoContext *context,
+    OseoValue value
+);
+
 static OseoResult timer_default_array_string(
     OseoContext *context,
     OseoValue array_value,
@@ -4709,7 +4714,7 @@ static OseoResult timer_array_string(
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = to_number(context, frame.slots[2]);
+        result = timer_delay_number(context, frame.slots[2]);
         frame.slots[2] = result.value;
     }
     uint32_t array_length = 0u;
