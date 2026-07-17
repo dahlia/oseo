@@ -150,7 +150,7 @@ depends = ["build"]
 shell = "nu -c"
 run = '''
 let package_tests = (
-  glob "packages/testkit/tests/*.property.test.ts"
+  glob "packages/*/tests/**/*.property.test.ts"
   | each { |path| $path | into string }
 )
 for seed in [1592590337 1592590338] {
