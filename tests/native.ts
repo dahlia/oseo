@@ -1068,6 +1068,11 @@ internallyAwaited.then = function overriddenAwait() {
   return Promise.resolve(0);
 };
 async function awaitInternally() { return await internallyAwaited; }
+const orderingReady = Promise.resolve(0);
+async function orderedAsync() {
+  await orderingReady;
+  console.log("async ordering");
+}
 function rejected(reason) { console.log("async rejected", reason); }
 function showThis(value) { console.log("async this", value); }
 const owner = { value: 41, read: readThis, make: makeArrow };
@@ -1096,6 +1101,12 @@ finalReturn().then(function (value) { console.log("final return", value); });
 finalThrow().catch(function (reason) { console.log("final throw", reason); });
 awaitInternally().then(function (value) {
   console.log("internal await", value);
+});
+orderedAsync();
+orderingReady.then(function firstPlainStep() {
+  return Promise.resolve().then(function secondPlainStep() {
+    console.log("plain ordering");
+  });
 });
 console.log(
   "async prototype",

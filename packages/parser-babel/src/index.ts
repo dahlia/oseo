@@ -957,24 +957,23 @@ function internalPromiseThen(
     arguments: [promise, callback],
     kind: "call",
     range,
-    target: { kind: "promise-intrinsic-direct", method: "then", range },
+    target: {
+      kind: "promise-intrinsic-direct",
+      method: "awaitThen",
+      range,
+    },
   };
 }
 
-function callName(
-  name: string,
-  argument: SyntaxExpression,
+function asyncCall(
+  execution: SyntaxExpression,
   range: SourceRange,
-): SyntaxStatement {
+): SyntaxExpression {
   return {
-    expression: {
-      arguments: [argument],
-      kind: "call",
-      range,
-      target: { kind: "name", name, range },
-    },
-    kind: "expression",
+    arguments: [execution],
+    kind: "call",
     range,
+    target: { kind: "promise-intrinsic-direct", method: "asyncCall", range },
   };
 }
 
@@ -1326,30 +1325,12 @@ function functionDeclaration(
         ]
       : nodes(bodyNode?.body);
   if (value.async === true) {
-    const resolveName = syntheticName(context, "resolve");
-    const rejectName = syntheticName(context, "reject");
     const executionBody = asyncStatementList(context, children, "executor");
     if (executionBody != null) {
       const range = location(context, value).range;
       const execution = syntheticFunction(context, range, [], executionBody);
-      const executionCall: SyntaxExpression = {
-        arguments: [],
-        kind: "call",
-        range,
-        target: { callee: execution, kind: "dynamic", range },
-      };
-      const executor = syntheticFunction(
-        context,
-        range,
-        [resolveName, rejectName],
-        [callName(resolveName, executionCall, range)],
-      );
       body.push({
-        expression: {
-          arguments: [executor],
-          kind: "promise-construct",
-          range,
-        },
+        expression: asyncCall(execution, range),
         kind: "return",
         range,
       });

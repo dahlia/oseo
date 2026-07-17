@@ -621,14 +621,16 @@ test("lowers async functions into owned continuations", () => {
   ].flatMap((block) => block.operations);
   assert.ok(
     operations.some(
-      (operation) => operation.target?.kind === "promise-constructor",
+      (operation) =>
+        operation.target?.kind === "promise-intrinsic" &&
+        operation.target.method === "asyncCall",
     ),
   );
   assert.ok(
     operations.some(
       (operation) =>
         operation.target?.kind === "promise-intrinsic" &&
-        operation.target.method === "resolve",
+        operation.target.method === "awaitThen",
     ),
   );
   const functionKinds = new Set(

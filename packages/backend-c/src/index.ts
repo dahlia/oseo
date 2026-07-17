@@ -389,7 +389,21 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       `result = oseo_promise_construct(context, roots[${executor}]);`,
     );
   } else if (target.kind === "promise-intrinsic") {
-    if (target.method === "then") {
+    if (target.method === "asyncCall") {
+      const execution = operationArgument(operation, 0);
+      line(
+        state,
+        `result = oseo_promise_async_call(context, roots[${execution}]);`,
+      );
+    } else if (target.method === "awaitThen") {
+      const promise = operationArgument(operation, 0);
+      const onFulfilled = operationArgument(operation, 1);
+      line(
+        state,
+        "result = oseo_promise_await_then(context, " +
+          `roots[${promise}], roots[${onFulfilled}]);`,
+      );
+    } else if (target.method === "then") {
       const promise = operationArgument(operation, 0);
       const onFulfilled = operationArgument(operation, 1);
       const onRejected = operation.arguments[2];

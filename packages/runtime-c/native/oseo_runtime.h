@@ -446,6 +446,15 @@ OseoResult oseo_promise_then(
     OseoValue on_fulfilled,
     OseoValue on_rejected
 );
+OseoResult oseo_promise_async_call(
+    OseoContext *context,
+    OseoValue execution
+);
+OseoResult oseo_promise_await_then(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_fulfilled
+);
 OseoResult oseo_promise_finally(
     OseoContext *context,
     OseoValue promise,

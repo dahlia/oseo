@@ -81,7 +81,7 @@ export type SyntaxCallTarget =
     })
   | (LocatedSyntax & {
       readonly kind: "promise-intrinsic-direct";
-      readonly method: "resolve" | "then";
+      readonly method: "asyncCall" | "awaitThen" | "resolve" | "then";
     })
   | (LocatedSyntax & {
       readonly kind: "timer-intrinsic";
@@ -1040,7 +1040,14 @@ export type HirCallTarget =
     }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method: "all" | "race" | "reject" | "resolve" | "then";
+      readonly method:
+        | "all"
+        | "asyncCall"
+        | "awaitThen"
+        | "race"
+        | "reject"
+        | "resolve"
+        | "then";
     }
   | {
       readonly kind: "timer-intrinsic";
@@ -2351,7 +2358,14 @@ export type MirCallTarget =
   | { readonly kind: "promise-constructor" }
   | {
       readonly kind: "promise-intrinsic";
-      readonly method: "all" | "race" | "reject" | "resolve" | "then";
+      readonly method:
+        | "all"
+        | "asyncCall"
+        | "awaitThen"
+        | "race"
+        | "reject"
+        | "resolve"
+        | "then";
     }
   | {
       readonly kind: "timer-intrinsic";
