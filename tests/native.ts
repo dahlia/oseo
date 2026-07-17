@@ -1926,6 +1926,21 @@ assert.equal(
 assert.equal(nativeRejectionAfterAwait.stderr, "");
 assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
 
+const awaitQueueOrder = [
+  root,
+  "tests/fixtures/async-modules/await-queue-order.js",
+].join("/");
+const nativeAwaitQueueOrder = await runNativeCli(
+  {
+    args: [awaitQueueOrder],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeAwaitQueueOrder.exitStatus, 0, nativeAwaitQueueOrder.stderr);
+assert.equal(nativeAwaitQueueOrder.stderr, "");
+assert.equal(nativeAwaitQueueOrder.stdout, "after\nnested\n");
+
 const unhandledBeforeTimer = [
   root,
   "tests/fixtures/async-modules/unhandled-before-timer.js",

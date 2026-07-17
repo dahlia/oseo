@@ -4390,11 +4390,16 @@ static OseoResult run_thenable_job(
     return result;
 }
 
-OseoResult oseo_jobs_drain(OseoContext *context) {
+static bool jobs_reached_promise(OseoValue promise) {
+    return is_promise(promise) &&
+        promise_object(promise)->state != OSEO_PROMISE_PENDING;
+}
+
+static OseoResult jobs_run_next(OseoContext *context) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    while (tag_of(context->microtask_head) != OSEO_TAG_UNDEFINED) {
+    if (tag_of(context->microtask_head) != OSEO_TAG_UNDEFINED) {
         frame.slots[0] = context->microtask_head;
         OseoValue next = job_object(frame.slots[0])->next;
         context->microtask_head = next;
@@ -4404,11 +4409,26 @@ OseoResult oseo_jobs_drain(OseoContext *context) {
         result = job_object(frame.slots[0])->kind == OSEO_JOB_REACTION
             ? run_reaction_job(context, frame.slots[0])
             : run_thenable_job(context, frame.slots[0]);
-        if (result.status != OSEO_STATUS_NORMAL) break;
-        frame.slots[0] = oseo_undefined();
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+static OseoResult jobs_drain_until(
+    OseoContext *context,
+    OseoValue promise
+) {
+    OseoResult result = normal(oseo_undefined());
+    while (tag_of(context->microtask_head) != OSEO_TAG_UNDEFINED &&
+           !jobs_reached_promise(promise)) {
+        result = jobs_run_next(context);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+    }
+    return result;
+}
+
+OseoResult oseo_jobs_drain(OseoContext *context) {
+    return jobs_drain_until(context, oseo_undefined());
 }
 
 OseoResult oseo_rejection_checkpoint(OseoContext *context) {
@@ -5017,7 +5037,10 @@ OseoResult oseo_clear_timeout(
     return normal(oseo_undefined());
 }
 
-static OseoResult run_timer_turn(OseoContext *context) {
+static OseoResult run_timer_turn(
+    OseoContext *context,
+    OseoValue awaited_promise
+) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -5051,8 +5074,9 @@ static OseoResult run_timer_turn(OseoContext *context) {
             !context->has_diagnostic;
         if (callback_threw) {
             frame.slots[2] = result.value;
-            result = oseo_jobs_drain(context);
-            if (result.status == OSEO_STATUS_NORMAL) {
+            result = jobs_drain_until(context, awaited_promise);
+            if (result.status == OSEO_STATUS_NORMAL &&
+                !jobs_reached_promise(awaited_promise)) {
                 result = oseo_rejection_checkpoint(context);
             }
             if (result.status == OSEO_STATUS_NORMAL ||
@@ -5069,9 +5093,10 @@ static OseoResult run_timer_turn(OseoContext *context) {
             }
         }
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_jobs_drain(context);
+            result = jobs_drain_until(context, awaited_promise);
         }
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !jobs_reached_promise(awaited_promise)) {
             result = oseo_rejection_checkpoint(context);
         }
         frame.slots[0] = oseo_undefined();
@@ -5103,7 +5128,7 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
         OseoPromise *awaited = promise_object(frame.slots[1]);
         awaited->handled = true;
         awaited->pending_report = false;
-        result = oseo_jobs_drain(context);
+        result = jobs_drain_until(context, frame.slots[1]);
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         promise_object(frame.slots[1])->state == OSEO_PROMISE_PENDING) {
@@ -5119,7 +5144,7 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
             );
             break;
         }
-        result = run_timer_turn(context);
+        result = run_timer_turn(context, frame.slots[1]);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoPromise *awaited = promise_object(frame.slots[1]);
@@ -5176,7 +5201,7 @@ OseoResult oseo_event_loop_run(OseoContext *context) {
     }
     while (result.status == OSEO_STATUS_NORMAL &&
            tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
-        result = run_timer_turn(context);
+        result = run_timer_turn(context, oseo_undefined());
     }
     return result;
 }
