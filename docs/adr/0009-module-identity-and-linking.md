@@ -33,6 +33,13 @@ Tarjan strongly connected components make cycles inspectable. Dependencies and
 members retain source order, with canonical URL as the deterministic tie break
 where source order cannot distinguish them.
 
+Each module body lowers to a private evaluator after graph-wide instantiation.
+Dependency-ready evaluators start in source order. A top-level suspension
+returns a promise and generated continuation instead of blocking the next
+independent sibling. An importer evaluator waits for every asynchronous
+dependency. Asynchronous cycles remain outside M4 and receive an owned
+diagnostic.
+
 
 Consequences
 ------------
@@ -40,6 +47,11 @@ Consequences
 Compiler core can test graph semantics without filesystem access. Native code
 receives a closed, deterministic graph. Package resolution and loading policy
 remain replaceable host concerns.
+
+Module evaluation state remains explicit even though every evaluator and live
+cell is linked into one native executable. Synchronous cycles retain their
+source order, while an asynchronous dependency does not serialize unrelated
+siblings.
 
 Graph construction must diagnose missing, duplicate, and ambiguous exports
 before native compilation. Source changes alter the recorded hash even when a

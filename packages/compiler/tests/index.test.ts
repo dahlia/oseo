@@ -1174,21 +1174,27 @@ test("lowers linked modules through shared live binding identities", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.deepEqual(result.mir.globalBindings, [{ id: 0, name: "answer" }]);
+  assert.deepEqual(
+    result.mir.globalBindings.filter(
+      (binding) => !binding.name.startsWith("*module-promise:"),
+    ),
+    [{ id: 0, name: "answer" }],
+  );
   const text = printMir(result.mir);
   assert.ok(text.indexOf("initialize answer") < text.indexOf("read value"));
   assert.match(text, /initialize %b0 answer/u);
-  const importedRead = result.mir.script.blocks
-    .flatMap((block) => block.operations)
-    .find((operation) => operation.kind === "read");
+  const operations = [...result.mir.functions, result.mir.script]
+    .flatMap((functionValue) => functionValue.blocks)
+    .flatMap((block) => block.operations);
+  const importedRead = operations.find(
+    (operation) =>
+      operation.kind === "read" && operation.detail.includes("value"),
+  );
   assert.equal(importedRead?.bindingId, 0);
   assert.equal(importedRead?.range.sourceId, entry.canonicalId);
-  const dependencyInitialize = result.mir.script.blocks
-    .flatMap((block) => block.operations)
-    .find(
-      (operation) =>
-        operation.kind === "initialize" && operation.bindingId === 0,
-    );
+  const dependencyInitialize = operations.find(
+    (operation) => operation.kind === "initialize" && operation.bindingId === 0,
+  );
   assert.equal(dependencyInitialize?.range.sourceId, dependency.canonicalId);
   assert.equal(result.graph?.modules[0]?.exports[0]?.cellId, 0);
 });
@@ -1292,4 +1298,45 @@ test("creates one live namespace binding for imports and re-exports", () => {
     linkedEntry?.imports.find((imported) => imported.localName === "first")
       ?.cellId,
   );
+});
+
+test("rejects asynchronous module cycles before scheduling", () => {
+  const canonicalId = "file:///cycle.js";
+  const specifier = graphSpecifier("./cycle.js", 0);
+  const module = {
+    canonicalId,
+    dependencies: [{ canonicalId, specifier }],
+    resolutions: [{ canonicalId, specifier }],
+    sourceHash: "cycle",
+    syntax: {
+      ...testModule(canonicalId, ""),
+      body: [
+        {
+          expression: {
+            argument: { kind: "number" as const, range, value: 0 },
+            kind: "await" as const,
+            range,
+          },
+          kind: "expression" as const,
+          range,
+        },
+      ],
+      imports: [
+        {
+          byteRange: specifier.byteRange,
+          importedName: undefined,
+          localName: undefined,
+          range,
+          specifier,
+        },
+      ],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [module],
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(result.diagnostics[0]?.message ?? "", /asynchronous module/iu);
 });

@@ -293,10 +293,12 @@ decision explains how they fit an ahead-of-time runtime.
 M4 completion is recorded in
 [*docs/language-profile-m4.md*](./docs/language-profile-m4.md) and ADRs 0009
 through 0012. The compiler builds deterministic canonical graphs, links live
-cells and namespaces, and emits one dependency-ordered native program. The C11
-runtime owns promise settlement, FIFO reactions, thenable jobs, rejection
-checkpoints, asynchronous continuations, timer tasks, and shutdown. Differential
-fixtures and generated schedules agree across Node.js, Deno, both
+cells and namespaces, and schedules private module evaluators in one native
+program. Independent siblings continue past a suspended evaluator, while
+importers wait for asynchronous dependencies. The C11 runtime owns promise
+settlement, FIFO reactions, thenable jobs, rejection checkpoints, asynchronous
+continuations, timer tasks, and shutdown. Differential fixtures and generated
+schedules agree across Node.js, Deno, both
 specialization policies, forced collection, x86-64 execution, and AArch64
 compile-link checks.
 

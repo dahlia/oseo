@@ -73,8 +73,10 @@ so filesystem enumeration and C declaration order cannot affect execution.
 
 A canonical module is discovered and emitted once. A second spelling that
 resolves to the same canonical URL reuses the same linked environment and
-namespace. A thrown module body stops the dependency-ordered native script and
-propagates through the host error boundary without replaying visible effects.
+namespace. Dependency-ready module evaluators start in source order. If one
+evaluator suspends, an independent sibling may evaluate before it resumes;
+importers still wait for every asynchronous dependency. A synchronous thrown
+module body stops evaluation without replaying visible effects.
 
 
 Promise profile
@@ -106,9 +108,14 @@ M4 admits asynchronous function declarations and expressions, asynchronous
 arrow functions, and top-level `await` in modules. Within an asynchronous
 function, `await` may be an expression statement, the complete initializer of
 one `const` or `let` declaration, or the complete operand of `return`. These
-forms may repeat sequentially. Await inside another expression or control-flow
-statement remains unsupported. Asynchronous generators and `for await` remain
-unsupported.
+forms may repeat sequentially. Await inside another asynchronous-function
+expression or control-flow statement remains unsupported.
+
+At module level, `await` may occur in an expression statement or in one
+`const` or `let` initializer, including a nested expression position whose
+left-to-right operands can be retained across suspension. These forms may
+repeat. Await in module control flow and asynchronous module cycles remain
+outside M4. Asynchronous generators and `for await` remain unsupported.
 
 Calling an asynchronous function immediately returns an M4 promise. The
 frontend converts each suspension suffix into a private continuation closure.
@@ -118,10 +125,11 @@ suspension without retaining a native C stack frame. A thrown completion
 rejects the function promise. A returned value fulfills it after promise
 resolution.
 
-Linked module bodies enter one dependency-ordered native script. A top-level
-await checkpoint settles its reaction before the following importer body runs.
-The checkpoint advances owned jobs and timer turns only while they can settle
-the awaited value. A pending graph with no owned source of progress fails
+Linked module bodies become private evaluators in one native program. A
+top-level await returns from its evaluator and resumes a generated continuation
+through the job queue. Dependency-ready siblings may start before that
+continuation, while an importer evaluator remains chained to the dependency's
+completion promise. A pending graph with no owned source of progress fails
 deterministically with `OSEO3001`.
 
 

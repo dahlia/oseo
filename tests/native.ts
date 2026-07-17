@@ -1964,6 +1964,21 @@ assert.equal(nativeAwaitQueueOrder.exitStatus, 0, nativeAwaitQueueOrder.stderr);
 assert.equal(nativeAwaitQueueOrder.stderr, "");
 assert.equal(nativeAwaitQueueOrder.stdout, "after\nnested\n");
 
+const independentModuleEntry = [
+  root,
+  "tests/fixtures/async-modules/independent-entry.mjs",
+].join("/");
+const nativeIndependentModule = await runNativeCli(
+  {
+    args: [independentModuleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeIndependentModule.exitStatus, 0);
+assert.equal(nativeIndependentModule.stderr, "");
+assert.equal(nativeIndependentModule.stdout, "a start\noperand\nb\na done 2\n");
+
 const unhandledBeforeTimer = [
   root,
   "tests/fixtures/async-modules/unhandled-before-timer.js",

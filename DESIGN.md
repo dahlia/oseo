@@ -344,13 +344,16 @@ instantiation order, live bindings, and top-level evaluation order.
 M4 canonicalizes `file:` identities through a host-neutral resolver and records
 source hashes before linking. Tarjan components make cycles inspectable. The
 compiler allocates every exported cell and shared namespace before lowering
-module bodies into one dependency-ordered MIR script. Imports reuse exporter
-cell identifiers, so whole-graph flattening does not copy a binding or make C
+each module body into a private evaluator. Imports reuse exporter cell
+identifiers, so evaluator boundaries do not copy a binding or make C
 declaration order semantic.
 
-Top-level await lowers to an explicit scheduler checkpoint in that script. It
-settles the dependency before later importer operations execute and reports an
-owned diagnostic when no runtime-owned job or timer can make progress.
+An evaluator with top-level await returns a promise backed by generated
+continuation closures. Evaluation starts every dependency-ready module in
+source order, so an independent sibling can run while another module is
+suspended. Importers wait for their asynchronous dependencies before their own
+evaluator runs. The entry task reports an owned diagnostic when no runtime-owned
+job or timer can make progress. Asynchronous module cycles remain outside M4.
 
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native

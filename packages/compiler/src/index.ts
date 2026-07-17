@@ -1268,10 +1268,17 @@ export interface HirFunction extends LocatedSyntax {
   readonly strict?: boolean;
 }
 
+/** One script environment cell required outside the script statement list. */
+export interface HirGlobalBinding {
+  readonly id: number;
+  readonly name: string;
+}
+
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
+  readonly globalBindings?: readonly HirGlobalBinding[];
   readonly kind: "hir-program";
   readonly range: SourceRange;
   readonly sourceId: string;
@@ -4182,6 +4189,22 @@ export function buildMir(
   options: CompilerOptions = {},
 ): MirProgram {
   const specialization = options.specialization ?? "enabled";
+  const explicitGlobals = program.globalBindings ?? [];
+  const bodyGlobals = program.body.flatMap((statement) =>
+    statement.kind === "const" ||
+    statement.kind === "let" ||
+    statement.kind === "function-init"
+      ? [{ id: statement.bindingId, name: statement.name }]
+      : [],
+  );
+  const globalBindings = [
+    ...new Map(
+      [...explicitGlobals, ...bodyGlobals].map((binding) => [
+        binding.id,
+        binding,
+      ]),
+    ).values(),
+  ];
   return {
     functions: program.functions.map((functionValue) => {
       const generic = buildMirFunction(
@@ -4199,13 +4222,7 @@ export function buildMir(
         ? specializeAddition(generic, functionValue)
         : generic;
     }),
-    globalBindings: program.body.flatMap((statement) =>
-      statement.kind === "const" ||
-      statement.kind === "let" ||
-      statement.kind === "function-init"
-        ? [{ id: statement.bindingId, name: statement.name }]
-        : [],
-    ),
+    globalBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
     script: buildMirFunction(
@@ -4213,7 +4230,12 @@ export function buildMir(
       "<script>",
       program.body,
       [],
-      declaredHirBindingIds(program.body),
+      [
+        ...new Set([
+          ...globalBindings.map((binding) => binding.id),
+          ...declaredHirBindingIds(program.body),
+        ]),
+      ],
       undefined,
       program.range,
       specialization,
@@ -4391,7 +4413,529 @@ function retainModuleSource<T>(value: T, sourceId: string): T {
   ) as T;
 }
 
-/** Link and lower a closed synchronous module graph to shared-cell MIR. */
+function hirExpressionHasAwait(expression: HirExpression): boolean {
+  if (expression.kind === "await") return true;
+  if (expression.kind === "binding-set") {
+    return hirExpressionHasAwait(expression.value);
+  }
+  if (expression.kind === "array") {
+    return expression.elements.some(
+      (element) => element != null && hirExpressionHasAwait(element),
+    );
+  }
+  if (expression.kind === "binary") {
+    return (
+      hirExpressionHasAwait(expression.left) ||
+      hirExpressionHasAwait(expression.right)
+    );
+  }
+  if (expression.kind === "call") {
+    const targetAwait =
+      expression.target.kind === "dynamic"
+        ? hirExpressionHasAwait(expression.target.callee)
+        : expression.target.kind === "method"
+          ? hirExpressionHasAwait(expression.target.object) ||
+            hirExpressionHasAwait(expression.target.key)
+          : false;
+    return targetAwait || expression.arguments.some(hirExpressionHasAwait);
+  }
+  if (expression.kind === "new") {
+    return (
+      hirExpressionHasAwait(expression.callee) ||
+      expression.arguments.some(hirExpressionHasAwait)
+    );
+  }
+  if (expression.kind === "promise-construct") {
+    return expression.arguments.some(hirExpressionHasAwait);
+  }
+  if (expression.kind === "object") {
+    return expression.properties.some(
+      (property) =>
+        hirExpressionHasAwait(property.key) ||
+        hirExpressionHasAwait(property.value),
+    );
+  }
+  if (
+    expression.kind === "property-delete" ||
+    expression.kind === "property-get"
+  ) {
+    return (
+      hirExpressionHasAwait(expression.object) ||
+      hirExpressionHasAwait(expression.key)
+    );
+  }
+  if (expression.kind === "property-set") {
+    return (
+      hirExpressionHasAwait(expression.object) ||
+      hirExpressionHasAwait(expression.key) ||
+      hirExpressionHasAwait(expression.value)
+    );
+  }
+  return (
+    expression.kind === "unary" && hirExpressionHasAwait(expression.argument)
+  );
+}
+
+function hirStatementHasAwait(statement: HirStatement): boolean {
+  if (statement.kind === "block") {
+    return statement.body.some(hirStatementHasAwait);
+  }
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
+    return hirExpressionHasAwait(statement.initializer);
+  }
+  if (statement.kind === "expression" || statement.kind === "throw") {
+    return hirExpressionHasAwait(statement.expression);
+  }
+  if (statement.kind === "return") {
+    return (
+      statement.expression != null &&
+      hirExpressionHasAwait(statement.expression)
+    );
+  }
+  if (statement.kind === "if") {
+    return (
+      hirExpressionHasAwait(statement.test) ||
+      hirStatementHasAwait(statement.consequent) ||
+      (statement.alternate != null && hirStatementHasAwait(statement.alternate))
+    );
+  }
+  if (statement.kind === "try") {
+    return (
+      hirStatementHasAwait(statement.block) ||
+      (statement.handler != null &&
+        hirStatementHasAwait(statement.handler.body)) ||
+      (statement.finalizer != null && hirStatementHasAwait(statement.finalizer))
+    );
+  }
+  return (
+    statement.kind === "while" &&
+    (hirExpressionHasAwait(statement.test) ||
+      hirStatementHasAwait(statement.body))
+  );
+}
+
+function hirStatementsHaveAwait(statements: readonly HirStatement[]): boolean {
+  return statements.some(hirStatementHasAwait);
+}
+
+function collectHirBindings(
+  statements: readonly HirStatement[],
+): readonly HirGlobalBinding[] {
+  const bindings: HirGlobalBinding[] = [];
+  const collect = (statement: HirStatement): void => {
+    if (
+      statement.kind === "const" ||
+      statement.kind === "let" ||
+      statement.kind === "function-init"
+    ) {
+      bindings.push({ id: statement.bindingId, name: statement.name });
+    } else if (statement.kind === "block") {
+      statement.body.forEach(collect);
+    } else if (statement.kind === "if") {
+      collect(statement.consequent);
+      if (statement.alternate != null) collect(statement.alternate);
+    } else if (statement.kind === "try") {
+      collect(statement.block);
+      if (statement.handler != null) {
+        bindings.push({
+          id: statement.handler.bindingId,
+          name: statement.handler.name,
+        });
+        collect(statement.handler.body);
+      }
+      if (statement.finalizer != null) collect(statement.finalizer);
+    } else if (statement.kind === "while") {
+      collect(statement.body);
+    }
+  };
+  statements.forEach(collect);
+  return bindings;
+}
+
+interface ModuleAwaitPoint {
+  readonly argument: HirExpression;
+  readonly prefix: readonly HirStatement[];
+  readonly range: SourceRange;
+  resume(value: HirExpression): HirStatement;
+}
+
+interface ModuleAsyncLoweringState {
+  readonly diagnostics: Diagnostic[];
+  readonly functions: HirFunction[];
+  readonly globalBindings: HirGlobalBinding[];
+  nextBindingId: number;
+  nextFunctionId: number;
+  readonly sourceId: string;
+}
+
+interface ModuleExpressionParts {
+  readonly children: readonly HirExpression[];
+  rebuild(children: readonly HirExpression[]): HirExpression;
+}
+
+function moduleExpressionParts(
+  expression: HirExpression,
+): ModuleExpressionParts | undefined {
+  if (expression.kind === "await") {
+    return {
+      children: [expression.argument],
+      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
+    };
+  }
+  if (expression.kind === "binding-set") {
+    return {
+      children: [expression.value],
+      rebuild: ([value]) => ({ ...expression, value: value! }),
+    };
+  }
+  if (expression.kind === "array") {
+    const indices = expression.elements.flatMap((element, index) =>
+      element == null ? [] : [index],
+    );
+    return {
+      children: indices.map((index) => expression.elements[index]!),
+      rebuild: (children) => ({
+        ...expression,
+        elements: expression.elements.map((element, index) => {
+          const childIndex = indices.indexOf(index);
+          return childIndex < 0 ? element : children[childIndex];
+        }),
+      }),
+    };
+  }
+  if (expression.kind === "binary") {
+    return {
+      children: [expression.left, expression.right],
+      rebuild: ([left, right]) => ({
+        ...expression,
+        left: left!,
+        right: right!,
+      }),
+    };
+  }
+  if (expression.kind === "call") {
+    if (expression.target.kind === "dynamic") {
+      return {
+        children: [expression.target.callee, ...expression.arguments],
+        rebuild: ([callee, ...argumentsValue]) => ({
+          ...expression,
+          arguments: argumentsValue,
+          target: { callee: callee!, kind: "dynamic" },
+        }),
+      };
+    }
+    if (expression.target.kind === "method") {
+      return {
+        children: [
+          expression.target.object,
+          expression.target.key,
+          ...expression.arguments,
+        ],
+        rebuild: ([object, key, ...argumentsValue]) => ({
+          ...expression,
+          arguments: argumentsValue,
+          target: { key: key!, kind: "method", object: object! },
+        }),
+      };
+    }
+    return {
+      children: expression.arguments,
+      rebuild: (argumentsValue) => ({
+        ...expression,
+        arguments: argumentsValue,
+      }),
+    };
+  }
+  if (expression.kind === "new") {
+    return {
+      children: [expression.callee, ...expression.arguments],
+      rebuild: ([callee, ...argumentsValue]) => ({
+        ...expression,
+        arguments: argumentsValue,
+        callee: callee!,
+      }),
+    };
+  }
+  if (expression.kind === "promise-construct") {
+    return {
+      children: expression.arguments,
+      rebuild: (argumentsValue) => ({
+        ...expression,
+        arguments: argumentsValue,
+      }),
+    };
+  }
+  if (expression.kind === "object") {
+    const children = expression.properties.flatMap((property) => [
+      property.key,
+      property.value,
+    ]);
+    return {
+      children,
+      rebuild: (rebuilt) => ({
+        ...expression,
+        properties: expression.properties.map((property, index) => ({
+          key: rebuilt[index * 2] ?? property.key,
+          value: rebuilt[index * 2 + 1] ?? property.value,
+        })),
+      }),
+    };
+  }
+  if (
+    expression.kind === "property-delete" ||
+    expression.kind === "property-get"
+  ) {
+    return {
+      children: [expression.object, expression.key],
+      rebuild: ([object, key]) => ({
+        ...expression,
+        key: key!,
+        object: object!,
+      }),
+    };
+  }
+  if (expression.kind === "property-set") {
+    return {
+      children: [expression.object, expression.key, expression.value],
+      rebuild: ([object, key, value]) => ({
+        ...expression,
+        key: key!,
+        object: object!,
+        value: value!,
+      }),
+    };
+  }
+  if (expression.kind === "unary") {
+    return {
+      children: [expression.argument],
+      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
+    };
+  }
+  return undefined;
+}
+
+interface ExtractedModuleAwait {
+  readonly argument: HirExpression;
+  readonly prefix: readonly HirStatement[];
+  rebuild(value: HirExpression): HirExpression;
+}
+
+function stabilizeModuleExpression(
+  expression: HirExpression,
+  state: ModuleAsyncLoweringState,
+): readonly [HirStatement, HirExpression] {
+  const bindingId = state.nextBindingId;
+  state.nextBindingId += 1;
+  const name = `*module-temp:${bindingId}*`;
+  state.globalBindings.push({ id: bindingId, name });
+  return [
+    {
+      bindingId,
+      hint: undefined,
+      initializer: expression,
+      kind: "const",
+      name,
+      range: expression.range,
+    },
+    { bindingId, kind: "binding", name, range: expression.range },
+  ];
+}
+
+function extractModuleAwait(
+  expression: HirExpression,
+  state: ModuleAsyncLoweringState,
+): ExtractedModuleAwait | undefined {
+  if (
+    expression.kind === "await" &&
+    !hirExpressionHasAwait(expression.argument)
+  ) {
+    return {
+      argument: expression.argument,
+      prefix: [],
+      rebuild: (value) => value,
+    };
+  }
+  const parts = moduleExpressionParts(expression);
+  if (parts == null) return undefined;
+  const childIndex = parts.children.findIndex(hirExpressionHasAwait);
+  if (childIndex < 0) return undefined;
+  const prefix: HirStatement[] = [];
+  const children = [...parts.children];
+  for (let index = 0; index < childIndex; index += 1) {
+    const [statement, binding] = stabilizeModuleExpression(
+      children[index]!,
+      state,
+    );
+    prefix.push(statement);
+    children[index] = binding;
+  }
+  const extracted = extractModuleAwait(children[childIndex]!, state);
+  if (extracted == null) return undefined;
+  prefix.push(...extracted.prefix);
+  return {
+    argument: extracted.argument,
+    prefix,
+    rebuild: (value) => {
+      const rebuilt = [...children];
+      rebuilt[childIndex] = extracted.rebuild(value);
+      return parts.rebuild(rebuilt);
+    },
+  };
+}
+
+function moduleAwaitPoint(
+  statement: HirStatement,
+  state: ModuleAsyncLoweringState,
+): ModuleAwaitPoint | undefined {
+  const expression =
+    statement.kind === "expression" || statement.kind === "throw"
+      ? statement.expression
+      : statement.kind === "binding-init" ||
+          statement.kind === "const" ||
+          statement.kind === "let"
+        ? statement.initializer
+        : undefined;
+  if (expression == null) return undefined;
+  const extracted = extractModuleAwait(expression, state);
+  if (extracted == null) return undefined;
+  return {
+    argument: extracted.argument,
+    prefix: extracted.prefix,
+    range: expression.range,
+    resume: (value) => {
+      const resumed = extracted.rebuild(value);
+      if (
+        statement.kind === "binding-init" ||
+        statement.kind === "const" ||
+        statement.kind === "let"
+      ) {
+        return {
+          ...statement,
+          initializer: resumed,
+          kind: "binding-init",
+        };
+      }
+      return { ...statement, expression: resumed };
+    },
+  };
+}
+
+function moduleUndefined(range: SourceRange): HirExpression {
+  return { kind: "undefined", range };
+}
+
+function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
+  return {
+    functionId: functionValue.id,
+    functionKind: functionValue.functionKind,
+    kind: "function",
+    name: functionValue.name,
+    parameterCount: functionValue.parameters.length,
+    range: functionValue.range,
+  };
+}
+
+function modulePromiseCall(
+  method: "all" | "asyncCall" | "awaitThen" | "resolve",
+  argumentsValue: readonly HirExpression[],
+  range: SourceRange,
+): HirExpression {
+  return {
+    arguments: argumentsValue,
+    kind: "call",
+    range,
+    target: { kind: "promise-intrinsic", method },
+  };
+}
+
+function lowerModuleEvaluationBody(
+  statements: readonly HirStatement[],
+  range: SourceRange,
+  state: ModuleAsyncLoweringState,
+): readonly HirStatement[] | undefined {
+  const body: HirStatement[] = [];
+  for (const [index, statement] of statements.entries()) {
+    const point = moduleAwaitPoint(statement, state);
+    if (point == null) {
+      if (hirStatementHasAwait(statement)) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement,
+            "Top-level await in this control-flow position is outside M4.",
+          ),
+        );
+        return undefined;
+      }
+      body.push(statement);
+      continue;
+    }
+    const bindingId = state.nextBindingId;
+    state.nextBindingId += 1;
+    const functionId = state.nextFunctionId;
+    state.nextFunctionId += 1;
+    const name = `*module-await:${functionId}*`;
+    const parameter: HirParameter = {
+      bindingId,
+      hints: [],
+      name,
+      range: point.range,
+    };
+    const awaitedValue: HirExpression = {
+      bindingId,
+      kind: "binding",
+      name,
+      range: point.range,
+    };
+    const suffix = lowerModuleEvaluationBody(
+      [point.resume(awaitedValue), ...statements.slice(index + 1)],
+      range,
+      state,
+    );
+    if (suffix == null) return undefined;
+    const continuation: HirFunction = {
+      body: suffix,
+      functionKind: "arrow",
+      id: functionId,
+      kind: "hir-function",
+      localBindingIds: [bindingId],
+      name,
+      parameters: [parameter],
+      range: point.range,
+      returnHints: [],
+      strict: true,
+    };
+    state.functions.push(continuation);
+    body.push(...point.prefix);
+    const resolved = modulePromiseCall(
+      "resolve",
+      [point.argument],
+      point.range,
+    );
+    body.push({
+      expression: modulePromiseCall(
+        "awaitThen",
+        [resolved, moduleFunctionExpression(continuation)],
+        point.range,
+      ),
+      kind: "return",
+      range: point.range,
+    });
+    return body;
+  }
+  body.push({
+    expression: moduleUndefined(range),
+    kind: "return",
+    range,
+  });
+  return body;
+}
+
+/** Link and lower a closed module graph to shared-cell scheduled MIR. */
 export function compileModuleGraph(
   graph: ModuleGraph,
   options: CompilerOptions = {},
@@ -4405,9 +4949,10 @@ export function compileModuleGraph(
     linked.graph.modules.map((module) => [module.canonicalId, module]),
   );
   const cells = new Map(linked.graph.cells.map((cell) => [cell.id, cell]));
-  const body: HirStatement[] = [];
   const functionInitializers: HirStatement[] = [];
   const functions: HirFunction[] = [];
+  const globalBindings: HirGlobalBinding[] = [];
+  const moduleBodies = new Map<string, readonly HirStatement[]>();
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
   const namespaceBindings = new Map<string, number>();
@@ -4518,23 +5063,212 @@ export function compileModuleGraph(
       return { diagnostics: result.diagnostics, graph: linked.graph };
     }
     const moduleBody = retainModuleSource(result.program.body, moduleId);
+    globalBindings.push(...collectHirBindings(moduleBody));
+    const evaluationBody: HirStatement[] = [];
     for (const statement of moduleBody) {
       if (statement.kind === "function-init") {
         functionInitializers.push(statement);
       } else {
-        body.push(statement);
+        evaluationBody.push(statement);
       }
     }
+    moduleBodies.set(moduleId, evaluationBody);
     functions.push(...retainModuleSource(result.program.functions, moduleId));
+  }
+
+  const directlyAsync = new Set(
+    linked.graph.evaluationOrder.filter((moduleId) =>
+      hirStatementsHaveAwait(moduleBodies.get(moduleId) ?? []),
+    ),
+  );
+  const asyncModules = new Set(directlyAsync);
+  let asyncChanged = true;
+  while (asyncChanged) {
+    asyncChanged = false;
+    for (const moduleId of linked.graph.evaluationOrder) {
+      if (asyncModules.has(moduleId)) continue;
+      const node = nodes.get(moduleId);
+      if (
+        node?.dependencies.some((dependency) =>
+          asyncModules.has(dependency.canonicalId),
+        ) !== true
+      ) {
+        continue;
+      }
+      asyncModules.add(moduleId);
+      asyncChanged = true;
+    }
+  }
+  for (const component of linked.graph.components) {
+    if (!component.cyclic) continue;
+    const asyncModuleId = component.moduleIds.find((moduleId) =>
+      asyncModules.has(moduleId),
+    );
+    if (asyncModuleId == null) continue;
+    const node = nodes.get(asyncModuleId);
+    if (node == null) {
+      throw new Error(`Asynchronous module '${asyncModuleId}' is missing.`);
+    }
+    const moduleBody = moduleBodies.get(asyncModuleId) ?? [];
+    const awaitStatement = moduleBody.find(hirStatementHasAwait);
+    return {
+      diagnostics: [
+        sourceDiagnostic(
+          asyncModuleId,
+          awaitStatement ?? node.syntax,
+          "Asynchronous module cycles are outside M4.",
+        ),
+      ],
+      graph: linked.graph,
+    };
+  }
+
+  const evaluators = new Map<string, HirFunction>();
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const moduleBody = moduleBodies.get(moduleId);
+    if (node == null || moduleBody == null) {
+      throw new Error(`Module evaluation '${moduleId}' is unavailable.`);
+    }
+    const evaluatorId = nextFunctionId;
+    nextFunctionId += 1;
+    const state: ModuleAsyncLoweringState = {
+      diagnostics: [],
+      functions,
+      globalBindings,
+      nextBindingId,
+      nextFunctionId,
+      sourceId: moduleId,
+    };
+    const evaluatorBody = lowerModuleEvaluationBody(
+      moduleBody,
+      retainModuleSource(node.syntax.range, moduleId),
+      state,
+    );
+    nextBindingId = state.nextBindingId;
+    nextFunctionId = state.nextFunctionId;
+    if (evaluatorBody == null) {
+      return { diagnostics: state.diagnostics, graph: linked.graph };
+    }
+    const evaluator: HirFunction = {
+      body: evaluatorBody,
+      functionKind: "arrow",
+      id: evaluatorId,
+      kind: "hir-function",
+      localBindingIds: [],
+      name: `*module:${moduleId}*`,
+      parameters: [],
+      range: retainModuleSource(node.syntax.range, moduleId),
+      returnHints: [],
+      strict: true,
+    };
+    evaluators.set(moduleId, evaluator);
+    functions.push(evaluator);
+  }
+
+  const moduleInitializers: HirStatement[] = [];
+  const promiseBindings = new Map<string, number>();
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const evaluator = evaluators.get(moduleId);
+    if (node == null || evaluator == null) {
+      throw new Error(`Module scheduler '${moduleId}' is unavailable.`);
+    }
+    const range = retainModuleSource(node.syntax.range, moduleId);
+    const evaluatorExpression = moduleFunctionExpression(evaluator);
+    const asyncDependencies = [
+      ...new Set(
+        node.dependencies
+          .map((dependency) => dependency.canonicalId)
+          .filter((dependencyId) => asyncModules.has(dependencyId)),
+      ),
+    ];
+    let initializer: HirExpression;
+    if (asyncDependencies.length > 0) {
+      const dependencies = asyncDependencies.map((dependencyId) => {
+        const bindingId = promiseBindings.get(dependencyId);
+        if (bindingId == null) {
+          throw new Error(`Module promise '${dependencyId}' is unavailable.`);
+        }
+        return {
+          bindingId,
+          kind: "binding",
+          name: `*module-promise:${dependencyId}*`,
+          range,
+        } satisfies HirExpression;
+      });
+      const awaited =
+        dependencies.length === 1
+          ? dependencies[0]!
+          : modulePromiseCall(
+              "all",
+              [{ elements: dependencies, kind: "array", range }],
+              range,
+            );
+      initializer = modulePromiseCall(
+        "awaitThen",
+        [awaited, evaluatorExpression],
+        range,
+      );
+    } else if (directlyAsync.has(moduleId)) {
+      initializer = modulePromiseCall(
+        "asyncCall",
+        [evaluatorExpression],
+        range,
+      );
+    } else {
+      const result: HirExpression = {
+        arguments: [],
+        kind: "call",
+        range,
+        target: { callee: evaluatorExpression, kind: "dynamic" },
+      };
+      initializer = modulePromiseCall("resolve", [result], range);
+    }
+    const bindingId = nextBindingId;
+    nextBindingId += 1;
+    promiseBindings.set(moduleId, bindingId);
+    moduleInitializers.push({
+      bindingId,
+      hint: undefined,
+      initializer,
+      kind: "const",
+      name: `*module-promise:${moduleId}*`,
+      range,
+    });
   }
 
   const entry = nodes.get(graph.entryId);
   if (entry == null) throw new Error("The module entry is unavailable.");
+  const entryPromiseId = promiseBindings.get(graph.entryId);
+  if (entryPromiseId == null) {
+    throw new Error("The entry module promise is unavailable.");
+  }
+  const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
   const hir: HirProgram = {
-    body: [...namespaceInitializers, ...functionInitializers, ...body],
+    body: [
+      ...namespaceInitializers,
+      ...functionInitializers,
+      ...moduleInitializers,
+      {
+        expression: {
+          argument: {
+            bindingId: entryPromiseId,
+            kind: "binding",
+            name: `*module-promise:${graph.entryId}*`,
+            range: entryRange,
+          },
+          kind: "await",
+          range: entryRange,
+        },
+        kind: "expression",
+        range: entryRange,
+      },
+    ],
     functions,
+    globalBindings,
     kind: "hir-program",
-    range: retainModuleSource(entry.syntax.range, graph.entryId),
+    range: entryRange,
     sourceId: graph.entryId,
     strict: true,
   };
