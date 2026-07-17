@@ -1024,6 +1024,14 @@ async function choose(value) {
   if (value) return 17;
   return 18;
 }
+async function returnedDeclaration() {
+  return later();
+  function later() { return 25; }
+}
+async function thrownDeclaration() {
+  throw later();
+  function later() { return "hoisted throw"; }
+}
 async function hoistedAcrossAwait() {
   const value = later();
   await 0;
@@ -1074,6 +1082,12 @@ failEarly().catch(rejected);
 failLate().catch(rejected);
 shadow(5).then(function (value) { console.log("shadow", value); });
 choose(true).then(function (value) { console.log("choose", value); });
+returnedDeclaration().then(function (value) {
+  console.log("returned declaration", value);
+});
+thrownDeclaration().catch(function (reason) {
+  console.log("thrown declaration", reason);
+});
 hoistedAcrossAwait().then(function (value) {
   console.log("hoisted", value);
 });

@@ -1186,7 +1186,17 @@ function asyncStatementList(
     } else {
       body.push(converted);
     }
-    if (converted.kind === "return" || converted.kind === "throw") return body;
+    if (converted.kind === "return" || converted.kind === "throw") {
+      if (mode === "executor") {
+        const declarations = asyncScopePlaceholders(
+          context,
+          values.slice(index + 1),
+        );
+        if (declarations == null) return undefined;
+        body.push(...declarations);
+      }
+      return body;
+    }
   }
   const range =
     values.length === 0
