@@ -279,7 +279,7 @@ export function createDenoHost(): CompilerHost {
         ? path
         : `${runtime.cwd().replace(/\/$/u, "")}/${path}`;
       const url = new URL("file:///");
-      url.pathname = basePath;
+      url.pathname = basePath.replaceAll("%", "%25");
       return Promise.resolve(canonicalFileUrl(url));
     },
     async makeTemporaryDirectory(prefix: string): Promise<string> {

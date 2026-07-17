@@ -11,6 +11,7 @@ import {
 } from "../src/index.ts";
 
 interface MinimalDenoRuntime {
+  cwd?(): string;
   makeTempFile?(): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove?(path: string): Promise<void>;
@@ -200,6 +201,36 @@ test("canonicalizes filesystem characters as file URL data", async () => {
   );
   assert.match(canonicalId ?? "", /^file:\/\//u);
   assert.match(canonicalId ?? "", /space%20and%20%23/u);
+});
+
+test("encodes literal percent signs in Deno file identities", async () => {
+  const globals = globalThis as typeof globalThis & {
+    Deno?: MinimalDenoRuntime;
+  };
+  const descriptor = Object.getOwnPropertyDescriptor(globals, "Deno");
+  if (globals.Deno == null) {
+    Object.defineProperty(globals, "Deno", {
+      configurable: true,
+      value: { cwd: () => "/work", readTextFile: async () => "" },
+    });
+  }
+  try {
+    const host = createDenoHost();
+    const canonicalId =
+      await createDenoHost().canonicalizeFile?.("/work/entry%20.mjs");
+    const relativeId = await host.canonicalizeFile?.("entry%20.mjs");
+    const resolved = fileModuleResolver.resolve("file:///work/root.mjs", {
+      byteRange: { end: 20, start: 2 },
+      range: moduleRange,
+      value: "./entry%2520.mjs",
+    });
+    assert.equal(canonicalId, "file:///work/entry%2520.mjs");
+    assert.match(relativeId ?? "", /\/entry%2520\.mjs$/u);
+    assert.equal(resolved.canonicalId, canonicalId);
+  } finally {
+    if (descriptor == null) Reflect.deleteProperty(globals, "Deno");
+    else Object.defineProperty(globals, "Deno", descriptor);
+  }
 });
 
 test("canonicalizes encoded file URL identities", async () => {
