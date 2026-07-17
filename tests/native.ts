@@ -1195,6 +1195,11 @@ try {
 } catch (error) {
   console.log("invalid array join delay");
 }
+try {
+  setTimeout(task, Object.create(null), "invalid null delay");
+} catch (error) {
+  console.log("invalid null prototype delay");
+}
 const canceled = setTimeout(task, 0, "canceled");
 clearTimeout(canceled);
 setTimeout(task, 100, "late");

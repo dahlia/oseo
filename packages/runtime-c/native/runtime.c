@@ -4518,6 +4518,15 @@ static bool timer_has_default_array_string(OseoValue value) {
     return false;
 }
 
+static bool timer_has_default_object_conversion(OseoValue value) {
+    OseoValue current = value;
+    while (is_object(current)) {
+        if (ordinary_object(current)->default_intrinsics) return true;
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
+}
+
 static OseoResult timer_array_string(
     OseoContext *context,
     OseoValue array_value,
@@ -4893,8 +4902,12 @@ static OseoResult timer_delay_number(
                     }
                 } else if (is_array(frame.slots[0])) {
                     result = language_failure(context);
-                } else {
+                } else if (timer_has_default_object_conversion(
+                               frame.slots[0]
+                           )) {
                     result = normal(oseo_number(NAN));
+                } else {
+                    result = language_failure(context);
                 }
                 oseo_roots_release(context, &frame);
                 return result;
