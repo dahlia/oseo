@@ -112,7 +112,6 @@ typedef struct {
     bool handled;
     bool pending_report;
     bool reported;
-    bool async_continuation;
 } OseoPromise;
 
 typedef enum {
@@ -433,6 +432,7 @@ void oseo_collect(OseoContext *context) {
         }
     }
     mark_value(context->microtask_head, &worklist);
+    mark_value(context->async_call_capability, &worklist);
     mark_value(context->microtask_tail, &worklist);
     mark_value(context->pending_rejections, &worklist);
     mark_value(context->pending_rejection_tail, &worklist);
@@ -467,6 +467,7 @@ void oseo_context_init(
     context->roots = NULL;
     context->objects = NULL;
     context->function_dispatcher = NULL;
+    context->async_call_capability = oseo_undefined();
     context->microtask_head = oseo_undefined();
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
@@ -521,6 +522,7 @@ void oseo_context_clear_language_error(OseoContext *context) {
 
 void oseo_context_destroy(OseoContext *context) {
     context->roots = NULL;
+    context->async_call_capability = oseo_undefined();
     context->microtask_head = oseo_undefined();
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
@@ -2988,7 +2990,6 @@ static OseoResult promise_create(OseoContext *context) {
     promise->handled = false;
     promise->pending_report = false;
     promise->reported = false;
-    promise->async_continuation = false;
     return publish_heap(
         context,
         &promise->ordinary.header,
@@ -4132,11 +4133,12 @@ OseoResult oseo_promise_construct(
     return result;
 }
 
-OseoResult oseo_promise_then(
+static OseoResult promise_then_with_capability(
     OseoContext *context,
     OseoValue promise_value,
     OseoValue on_fulfilled,
-    OseoValue on_rejected
+    OseoValue on_rejected,
+    OseoValue capability
 ) {
     if (!is_promise(promise_value)) return language_failure(context);
     if (tag_of(on_fulfilled) != OSEO_TAG_UNDEFINED &&
@@ -4153,8 +4155,17 @@ OseoResult oseo_promise_then(
     frame.slots[0] = promise_value;
     frame.slots[1] = on_fulfilled;
     frame.slots[2] = on_rejected;
-    result = promise_create(context);
-    frame.slots[3] = result.value;
+    frame.slots[3] = capability;
+    if (tag_of(frame.slots[3]) == OSEO_TAG_UNDEFINED) {
+        result = promise_create(context);
+        frame.slots[3] = result.value;
+    } else if (!is_promise(frame.slots[3])) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Invalid promise reaction capability."
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = reaction_create(
             context,
@@ -4176,21 +4187,35 @@ OseoResult oseo_promise_then(
     return result;
 }
 
+OseoResult oseo_promise_then(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+) {
+    return promise_then_with_capability(
+        context,
+        promise_value,
+        on_fulfilled,
+        on_rejected,
+        oseo_undefined()
+    );
+}
+
 OseoResult oseo_promise_await_then(
     OseoContext *context,
     OseoValue promise_value,
     OseoValue on_fulfilled
 ) {
-    OseoResult result = oseo_promise_then(
+    OseoValue capability = context->async_call_capability;
+    context->async_call_capability = oseo_undefined();
+    return promise_then_with_capability(
         context,
         promise_value,
         on_fulfilled,
-        oseo_undefined()
+        oseo_undefined(),
+        capability
     );
-    if (result.status == OSEO_STATUS_NORMAL) {
-        promise_object(result.value)->async_continuation = true;
-    }
-    return result;
 }
 
 OseoResult oseo_promise_async_call(
@@ -4199,12 +4224,14 @@ OseoResult oseo_promise_async_call(
 ) {
     if (!is_function(execution)) return language_failure(context);
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = execution;
     result = promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[3] = context->async_call_capability;
+        context->async_call_capability = frame.slots[1];
         result = oseo_call_function(
             context,
             frame.slots[0],
@@ -4214,11 +4241,11 @@ OseoResult oseo_promise_async_call(
             oseo_undefined()
         );
         frame.slots[2] = result.value;
+        context->async_call_capability = frame.slots[3];
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        is_promise(frame.slots[2]) &&
-        promise_object(frame.slots[2])->async_continuation) {
-        result.value = frame.slots[2];
+        frame.slots[2] == frame.slots[1]) {
+        result.value = frame.slots[1];
     } else if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_promise_resolve_into(
             context,

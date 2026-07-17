@@ -1622,6 +1622,25 @@ assert.equal(objectTimerDelay.exitStatus, 0);
 assert.equal(objectTimerDelay.stderr, "");
 assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
 
+const asyncPromiseIdentity = await runNativeCli(
+  {
+    args: ["async-promise-identity.ts"],
+    source: `
+let inner;
+async function source() { await 0; }
+async function wrapper() { inner = source(); return inner; }
+const outer = wrapper();
+console.log(outer === inner);
+`,
+    sourceId: "async-promise-identity.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(asyncPromiseIdentity.exitStatus, 0);
+assert.equal(asyncPromiseIdentity.stderr, "");
+assert.equal(asyncPromiseIdentity.stdout, "false\n");
+
 const retargetedArrayTimerDelay = await runNativeCli(
   {
     args: ["retargeted-array-timer-delay.ts"],

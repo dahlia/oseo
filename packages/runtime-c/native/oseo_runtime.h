@@ -66,6 +66,7 @@ struct OseoContext {
     OseoRootFrame *roots;
     OseoHeapObject *objects;
     OseoFunctionDispatcher function_dispatcher;
+    OseoValue async_call_capability;
     OseoValue microtask_head;
     OseoValue microtask_tail;
     OseoValue pending_rejections;
