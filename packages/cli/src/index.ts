@@ -284,14 +284,18 @@ async function compileCliModuleGraph(
   return { mir: compiled.mir };
 }
 
+function hasModuleExtension(path: string): boolean {
+  return path.endsWith(".mjs") || path.endsWith(".mts");
+}
+
 function hasModulePathIntent(sourcePath: string): boolean {
   try {
     const url = new URL(sourcePath);
-    if (url.protocol === "file:") return url.pathname.endsWith(".mjs");
+    if (url.protocol === "file:") return hasModuleExtension(url.pathname);
   } catch {
     // Ordinary filesystem paths are checked below.
   }
-  return sourcePath.endsWith(".mjs");
+  return hasModuleExtension(sourcePath);
 }
 
 function isModuleSource(

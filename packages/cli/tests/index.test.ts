@@ -273,7 +273,7 @@ test("recognizes top-level await without module declarations", async () => {
   assert.match(result.stdout, /top-level await/u);
 });
 
-test("preserves module parsing for plain mjs entries", async () => {
+test("preserves module parsing for plain module entries", async () => {
   const host: CompilerHost = {
     canonicalizeFile(path) {
       return Promise.resolve(new URL(String(path), "file:///work/").href);
@@ -296,16 +296,22 @@ test("preserves module parsing for plain mjs entries", async () => {
   };
   const source = "function duplicate(parameter, parameter) {}";
   const moduleResults = await Promise.all(
-    ["entry.mjs", "C:\\work\\entry.mjs", "file:///work/entry.mjs"].map(
-      (sourcePath) =>
-        runNativeCli(
-          {
-            args: ["--dump-mir", sourcePath],
-            source,
-            version: "0.0.0",
-          },
-          host,
-        ),
+    [
+      "entry.mjs",
+      "C:\\work\\entry.mjs",
+      "file:///work/entry.mjs",
+      "entry.mts",
+      "C:\\work\\entry.mts",
+      "file:///work/entry.mts",
+    ].map((sourcePath) =>
+      runNativeCli(
+        {
+          args: ["--dump-mir", sourcePath],
+          source,
+          version: "0.0.0",
+        },
+        host,
+      ),
     ),
   );
   for (const result of moduleResults) {
