@@ -1088,6 +1088,39 @@ function asyncScopePlaceholders(
   return declarations;
 }
 
+function validateAsyncStatements(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): boolean {
+  const validationContext: ConvertContext = {
+    ...context,
+    functionStack: [...context.functionStack],
+    strictStack: [...context.strictStack],
+  };
+  for (const value of values) {
+    const point = awaitPoint(validationContext, value);
+    if (point != null) {
+      if (expression(validationContext, point.operand) == null) return false;
+      continue;
+    }
+    if (nodeContainsAwait(value)) {
+      unsupported(
+        validationContext,
+        value,
+        "Await is supported in declarations, expression statements, and " +
+          "returns.",
+      );
+      return false;
+    }
+    const converted =
+      value.type === "FunctionDeclaration"
+        ? functionDeclaration(validationContext, value, true)
+        : statement(validationContext, value, true);
+    if (converted == null) return false;
+  }
+  return true;
+}
+
 function asyncStatementList(
   context: ConvertContext,
   values: readonly BabelNode[],
@@ -1187,6 +1220,9 @@ function asyncStatementList(
       body.push(converted);
     }
     if (converted.kind === "return" || converted.kind === "throw") {
+      if (!validateAsyncStatements(context, values.slice(index + 1))) {
+        return undefined;
+      }
       if (mode === "executor") {
         const declarations = asyncScopePlaceholders(
           context,
