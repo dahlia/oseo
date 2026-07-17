@@ -491,6 +491,33 @@ test("retains default export order and anonymous function names", () => {
   );
 });
 
+test("names anonymous default export expressions", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export default (function () {});",
+    sourceId: "file:///app/default-expression.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/default-expression.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/default-expression.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "default-expression",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /name="default"/u);
+  assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
+});
+
 test("lowers top-level await to an owned scheduler checkpoint", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const answer = 1 + await Promise.resolve(41);",

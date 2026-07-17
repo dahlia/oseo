@@ -146,6 +146,8 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly functionValue: SyntaxFunction;
+      /** Function name inferred independently from a storage binding. */
+      readonly inferredName?: string;
       readonly kind: "function";
     })
   | (LocatedSyntax & {
@@ -1837,7 +1839,7 @@ function resolveFunctionExpression(
   functionValue: SyntaxFunction,
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
-  expression: LocatedSyntax,
+  expression: LocatedSyntax & { readonly inferredName?: string },
 ): HirExpression {
   const id = state.nextFunctionId;
   state.nextFunctionId += 1;
@@ -1863,7 +1865,7 @@ function resolveFunctionExpression(
     functionId: id,
     functionKind: resolved.functionKind,
     kind: "function",
-    name: functionValue.name ?? "",
+    name: expression.inferredName ?? functionValue.name ?? "",
     parameterCount: resolved.parameters.length,
     range: expression.range,
   };
@@ -4326,7 +4328,11 @@ function moduleProgramBody(
       items.push({ ...entry.declaration, bindingName });
       continue;
     }
-    const initializer: SyntaxExpression = entry.declaration;
+    const initializer: SyntaxExpression =
+      entry.declaration.kind === "function" &&
+      entry.declaration.functionValue.name == null
+        ? { ...entry.declaration, inferredName: "default" }
+        : entry.declaration;
     items.push({
       ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
       hint: undefined,

@@ -1,5 +1,6 @@
 import * as values from "./values.js";
 import defaultFunction from "./cycle-a.js";
+import defaultExpression from "./default-expression.js";
 import "./default-order.js";
 import "./identity.js";
 import "./%69dentity.js";
@@ -25,3 +26,4 @@ try {
 // eslint-disable-next-line no-import-assign -- The namespace stays unchanged.
 console.log(Object.setPrototypeOf(values, null) === values);
 console.log(defaultFunction.name);
+console.log(defaultExpression.name);
