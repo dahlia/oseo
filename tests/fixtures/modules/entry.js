@@ -9,6 +9,12 @@ const keys = Object.keys(values);
 console.log(keys[0], keys[1], values.answer);
 values.increment();
 console.log(values.answer);
+const answerDescriptor = Object.getOwnPropertyDescriptor(values, "answer");
+console.log(
+  answerDescriptor.writable,
+  answerDescriptor.enumerable,
+  answerDescriptor.configurable,
+);
 try {
   // eslint-disable-next-line no-import-assign -- Mutation must fail.
   Object.defineProperty(values, "answer", { value: 0 });

@@ -1854,7 +1854,8 @@ assert.equal(
   "cycle b ready default ready\ncycle c ready\ncycle a\n" +
     "default first\ndefault second\nidentity once\n" +
     "answer increment 41\n" +
-    "42\nimmutable\nnonextensible\ntrue\ndefault\ndefault\n",
+    "42\ntrue true false\n" +
+    "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
 );
 
 const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
