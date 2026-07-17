@@ -1158,6 +1158,18 @@ nullPrototypeDelay.valueOf = function nullPrototypeDelayValue() {
 };
 const inheritedArrayDelay = {};
 Object.setPrototypeOf(inheritedArrayDelay, [5]);
+const customJoinDelay = [1];
+customJoinDelay.join = function customJoinDelayJoin() {
+  console.log("coerce custom array join");
+  return "7";
+};
+const inheritedJoinPrototype = [];
+inheritedJoinPrototype.join = function inheritedJoinDelayJoin() {
+  console.log("coerce inherited array join");
+  return "9";
+};
+const inheritedJoinDelay = [1];
+Object.setPrototypeOf(inheritedJoinDelay, inheritedJoinPrototype);
 try {
   setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
 } catch (error) {
@@ -1173,6 +1185,8 @@ setTimeout(task, [nestedDelay], "nested array delay");
 setTimeout(task, [nestedValueDelay], "nested array valueOf");
 setTimeout(task, [nullPrototypeDelay], "null prototype delay");
 setTimeout(task, inheritedArrayDelay, "inherited array delay");
+setTimeout(task, customJoinDelay, "custom join delay");
+setTimeout(task, inheritedJoinDelay, "inherited join delay");
 setTimeout(task, objectDelay, "object delay");
 setTimeout(task, functionDelay, "function delay");
 console.log("scheduled");

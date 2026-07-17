@@ -4438,6 +4438,12 @@ static OseoResult timer_array_string(
     const TimerArrayAncestor *previous
 );
 
+static OseoResult timer_default_array_string(
+    OseoContext *context,
+    OseoValue array_value,
+    const TimerArrayAncestor *previous
+);
+
 static OseoResult timer_string_hint_primitive(
     OseoContext *context,
     OseoValue value,
@@ -4477,7 +4483,7 @@ static OseoResult timer_string_hint_primitive(
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 0u) {
                 if (timer_has_default_array_string(frame.slots[0])) {
-                    result = timer_array_string(
+                    result = timer_default_array_string(
                         context,
                         frame.slots[0],
                         previous
@@ -4490,6 +4496,10 @@ static OseoResult timer_string_hint_primitive(
                         15u
                     );
                 } else {
+                    continue;
+                }
+                if (result.status == OSEO_STATUS_NORMAL &&
+                    is_object(result.value)) {
                     continue;
                 }
                 converted = result.status == OSEO_STATUS_NORMAL;
@@ -4687,6 +4697,69 @@ static OseoResult timer_array_string(
     return result;
 }
 
+static OseoResult timer_default_array_string(
+    OseoContext *context,
+    OseoValue array_value,
+    const TimerArrayAncestor *previous
+) {
+    static const uint16_t join_units[] = {'j', 'o', 'i', 'n'};
+    static const uint16_t array_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'A', 'r', 'r', 'a', 'y', ']'
+    };
+    static const uint16_t object_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'O', 'b', 'j', 'e', 'c', 't', ']'
+    };
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = array_value;
+    result = oseo_string_from_units(context, join_units, 4u);
+    frame.slots[1] = result.value;
+    bool property_exists = result.status == OSEO_STATUS_NORMAL &&
+        timer_conversion_property_exists(
+            frame.slots[0],
+            frame.slots[1]
+        );
+    if (result.status == OSEO_STATUS_NORMAL && property_exists) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            is_function(frame.slots[2])) {
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                frame.slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            frame.slots[2] = result.value;
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_string_from_units(
+                context,
+                is_array(frame.slots[0]) ? array_units : object_units,
+                is_array(frame.slots[0]) ? 14u : 15u
+            );
+            frame.slots[2] = result.value;
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = timer_array_string(
+            context,
+            frame.slots[0],
+            previous
+        );
+        frame.slots[2] = result.value;
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static OseoResult timer_delay_number(
     OseoContext *context,
     OseoValue value
@@ -4721,7 +4794,7 @@ static OseoResult timer_delay_number(
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 1u) {
                 if (timer_has_default_array_string(frame.slots[0])) {
-                    result = timer_array_string(
+                    result = timer_default_array_string(
                         context,
                         frame.slots[0],
                         NULL
