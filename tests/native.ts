@@ -1906,6 +1906,24 @@ assert.equal(
 assert.equal(nativeRejectionAfterAwait.stderr, "");
 assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
 
+const unhandledBeforeTimer = [
+  root,
+  "tests/fixtures/async-modules/unhandled-before-timer.js",
+].join("/");
+const nativeUnhandledBeforeTimer = await runNativeCli(
+  {
+    args: [unhandledBeforeTimer],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeUnhandledBeforeTimer.exitStatus, 1);
+assert.equal(nativeUnhandledBeforeTimer.stdout, "");
+assert.match(
+  nativeUnhandledBeforeTimer.stderr,
+  /error\[OSEO2001\].*Unhandled promise rejection/u,
+);
+
 const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
 const nativeBlockedModule = await runNativeCli(
   {
