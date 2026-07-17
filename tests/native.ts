@@ -1156,6 +1156,8 @@ nullPrototypeDelay.valueOf = function nullPrototypeDelayValue() {
   console.log("coerce null prototype delay");
   return "20";
 };
+const inheritedArrayDelay = {};
+Object.setPrototypeOf(inheritedArrayDelay, [5]);
 try {
   setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
 } catch (error) {
@@ -1170,6 +1172,7 @@ setTimeout(task, [5], "array delay");
 setTimeout(task, [nestedDelay], "nested array delay");
 setTimeout(task, [nestedValueDelay], "nested array valueOf");
 setTimeout(task, [nullPrototypeDelay], "null prototype delay");
+setTimeout(task, inheritedArrayDelay, "inherited array delay");
 setTimeout(task, objectDelay, "object delay");
 setTimeout(task, functionDelay, "function delay");
 console.log("scheduled");

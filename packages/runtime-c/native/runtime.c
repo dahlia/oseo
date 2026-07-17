@@ -4422,6 +4422,16 @@ typedef struct TimerArrayAncestor {
     const struct TimerArrayAncestor *previous;
 } TimerArrayAncestor;
 
+static bool timer_has_default_array_string(OseoValue value) {
+    OseoValue current = value;
+    while (is_object(current)) {
+        OseoOrdinaryObject *object = ordinary_object(current);
+        if (is_array(current) && object->default_intrinsics) return true;
+        current = object->prototype;
+    }
+    return false;
+}
+
 static OseoResult timer_array_string(
     OseoContext *context,
     OseoValue array_value,
@@ -4466,9 +4476,7 @@ static OseoResult timer_string_hint_primitive(
             );
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 0u) {
-                if (is_array(frame.slots[0]) &&
-                    ordinary_object(frame.slots[0])
-                        ->default_intrinsics) {
+                if (timer_has_default_array_string(frame.slots[0])) {
                     result = timer_array_string(
                         context,
                         frame.slots[0],
@@ -4554,7 +4562,32 @@ static OseoResult timer_array_string(
     TimerArrayAncestor current = {frame.slots[0], previous};
     uint16_t *units = NULL;
     size_t length = 0u;
-    uint32_t array_length = ordinary_object(frame.slots[0])->array_length;
+    static const uint16_t length_units[] = {
+        'l', 'e', 'n', 'g', 't', 'h'
+    };
+    result = oseo_string_from_units(context, length_units, 6u);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = to_number(context, frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    uint32_t array_length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        double numeric_length = number_value(frame.slots[2]);
+        if (isfinite(numeric_length) && numeric_length > 0.0) {
+            array_length = numeric_length >= (double)UINT32_MAX
+                ? UINT32_MAX
+                : (uint32_t)floor(numeric_length);
+        }
+    }
     for (uint32_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < array_length;
         index += 1u) {
@@ -4687,21 +4720,18 @@ static OseoResult timer_delay_number(
             );
         if (result.status == OSEO_STATUS_NORMAL && !property_exists) {
             if (index == 1u) {
-                if (is_array(frame.slots[0])) {
-                    if (ordinary_object(frame.slots[0])
-                        ->default_intrinsics) {
-                        result = timer_array_string(
-                            context,
-                            frame.slots[0],
-                            NULL
-                        );
-                        frame.slots[3] = result.value;
-                        if (result.status == OSEO_STATUS_NORMAL) {
-                            result = to_number(context, frame.slots[3]);
-                        }
-                    } else {
-                        result = language_failure(context);
+                if (timer_has_default_array_string(frame.slots[0])) {
+                    result = timer_array_string(
+                        context,
+                        frame.slots[0],
+                        NULL
+                    );
+                    frame.slots[3] = result.value;
+                    if (result.status == OSEO_STATUS_NORMAL) {
+                        result = to_number(context, frame.slots[3]);
                     }
+                } else if (is_array(frame.slots[0])) {
+                    result = language_failure(context);
                 } else {
                     result = normal(oseo_number(NAN));
                 }
