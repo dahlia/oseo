@@ -5358,15 +5358,36 @@ export function compileSource(
   };
 }
 
-/** The targets exercised by the native fixture harness. */
-export type TargetName = "aarch64-linux-musl" | "x86_64-linux-gnu";
+/** Architecture facts admitted by Oseo native targets. */
+export type NativeArchitecture = "aarch64" | "x86_64";
 
-/** Explicit target properties consumed by native toolchain adapters. */
+/** Operating-system facts admitted by Oseo native targets. */
+export type NativeOperatingSystem = "linux" | "macos";
+
+/** ABI environments distinguished by Oseo's native Linux targets. */
+export type NativeAbi = "gnu" | "musl";
+
+/** Stable Oseo native target IDs in OS-architecture-ABI order. */
+export type TargetName =
+  | "linux-aarch64-musl"
+  | "linux-x86_64-gnu"
+  | "macos-aarch64";
+
+/** Normalized host detection, including explicitly unknown reported facts. */
+export interface ExecutionHostDescription {
+  readonly architecture: NativeArchitecture | "unknown";
+  readonly operatingSystem: NativeOperatingSystem | "unknown";
+}
+
+/** Toolchain-neutral artifact facts for one explicit Oseo target ID. */
 export interface TargetDescription {
+  readonly abi?: NativeAbi;
+  readonly architecture: NativeArchitecture;
   readonly cStandard: "c11";
-  readonly execute: boolean;
+  readonly executableFormat: "elf" | "mach-o";
   readonly name: TargetName;
-  readonly sanitizeUndefinedBehavior: boolean;
+  readonly operatingSystem: NativeOperatingSystem;
+  readonly sanitizers: readonly ("address" | "undefined")[];
 }
 
 /** Deterministic source emitted by a replaceable native backend. */
@@ -5436,6 +5457,7 @@ export interface NativeToolchain {
 /** Narrow host boundary used by compiler adapters and test infrastructure. */
 export interface CompilerHost {
   canonicalizeFile?(path: string): Promise<string>;
+  readonly executionHost?: ExecutionHostDescription;
   makeTemporaryDirectory(prefix: string): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove(path: string): Promise<void>;
@@ -5452,20 +5474,60 @@ export function renderDiagnostic(diagnostic: Diagnostic): string {
   );
 }
 
-/** Return the accepted M1 target description for an explicit target name. */
+/** Return the immutable artifact facts for an explicit native target. */
 export function describeTarget(name: TargetName): TargetDescription {
-  if (name === "x86_64-linux-gnu") {
+  if (name === "linux-x86_64-gnu") {
     return {
+      abi: "gnu",
+      architecture: "x86_64",
       cStandard: "c11",
-      execute: true,
+      executableFormat: "elf",
       name,
-      sanitizeUndefinedBehavior: true,
+      operatingSystem: "linux",
+      sanitizers: ["address", "undefined"],
     };
   }
-  return {
-    cStandard: "c11",
-    execute: false,
-    name,
-    sanitizeUndefinedBehavior: false,
-  };
+  if (name === "macos-aarch64") {
+    return {
+      architecture: "aarch64",
+      cStandard: "c11",
+      executableFormat: "mach-o",
+      name,
+      operatingSystem: "macos",
+      sanitizers: ["address", "undefined"],
+    };
+  }
+  if (name === "linux-aarch64-musl") {
+    return {
+      abi: "musl",
+      architecture: "aarch64",
+      cStandard: "c11",
+      executableFormat: "elf",
+      name,
+      operatingSystem: "linux",
+      sanitizers: [],
+    };
+  }
+  throw new Error(`Unsupported native target '${String(name)}'.`);
+}
+
+/** Whether one normalized host may execute an artifact for a target. */
+export function canExecuteTarget(
+  host: ExecutionHostDescription,
+  target: TargetDescription,
+): boolean {
+  return targetForExecutionHost(host)?.name === target.name;
+}
+
+/** Select the supported native target matching one execution host. */
+export function targetForExecutionHost(
+  host: ExecutionHostDescription,
+): TargetDescription | undefined {
+  if (host.architecture === "x86_64" && host.operatingSystem === "linux") {
+    return describeTarget("linux-x86_64-gnu");
+  }
+  if (host.architecture === "aarch64" && host.operatingSystem === "macos") {
+    return describeTarget("macos-aarch64");
+  }
+  return undefined;
 }

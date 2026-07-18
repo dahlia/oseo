@@ -5,11 +5,13 @@ import {
   buildHir,
   buildMir,
   buildModuleGraph,
+  canExecuteTarget,
   compileModuleGraph,
   describeTarget,
   printHir,
   printMir,
   renderDiagnostic,
+  targetForExecutionHost,
   linkModuleGraph,
 } from "../src/index.ts";
 import type {
@@ -56,8 +58,43 @@ test("renders every owned diagnostic class without a host stack", () => {
 });
 
 test("requires explicit native and cross targets", () => {
-  assert.ok(describeTarget("x86_64-linux-gnu").execute);
-  assert.ok(!describeTarget("aarch64-linux-musl").execute);
+  const linuxHost = {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  } as const;
+  const macHost = {
+    architecture: "aarch64",
+    operatingSystem: "macos",
+  } as const;
+  assert.equal(targetForExecutionHost(linuxHost)?.name, "linux-x86_64-gnu");
+  assert.equal(targetForExecutionHost(macHost)?.name, "macos-aarch64");
+  assert.equal(describeTarget("linux-x86_64-gnu").abi, "gnu");
+  assert.equal(describeTarget("linux-aarch64-musl").abi, "musl");
+  assert.equal(describeTarget("macos-aarch64").abi, undefined);
+  assert.ok(canExecuteTarget(linuxHost, describeTarget("linux-x86_64-gnu")));
+  assert.ok(canExecuteTarget(macHost, describeTarget("macos-aarch64")));
+  assert.ok(!canExecuteTarget(macHost, describeTarget("linux-aarch64-musl")));
+  assert.ok(
+    !canExecuteTarget(
+      { architecture: "aarch64", operatingSystem: "linux" },
+      describeTarget("linux-aarch64-musl"),
+    ),
+  );
+  assert.equal(
+    targetForExecutionHost({
+      architecture: "unknown",
+      operatingSystem: "unknown",
+    }),
+    undefined,
+  );
+  assert.throws(
+    () => describeTarget("unknown" as never),
+    /Unsupported native target/u,
+  );
+  assert.throws(
+    () => describeTarget("aarch64-macos" as never),
+    /Unsupported native target/u,
+  );
 });
 
 const range: SourceRange = {

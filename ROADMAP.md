@@ -13,10 +13,11 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
-The planned macOS AArch64 native execution work follows
-[*PLAN-MACOS.md*](./PLAN-MACOS.md) alongside M5. It expands target evidence
-without changing the current language profile or compatibility counts by
-itself.
+The macOS AArch64 native execution work accepted by
+[ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
+and macOS on AArch64 execute the same native semantic corpus, while AArch64
+Linux retains compile-link and inspection evidence. This target expansion does
+not change the current language profile or compatibility counts by itself.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -160,8 +161,9 @@ expand the profile, but accepted features may not have placeholder semantics.
     throw arbitrary exceptions.
 
 M1 completion is exercised by eight reviewed differential fixture classes.
-Their observations match under Node.js, Deno, and native x86-64 execution, and
-each fixture compile-links for `aarch64-linux-musl`. The matrix covers all M1
+Their observations match under Node.js, Deno, Linux AMD64, and macOS AArch64
+execution, and each fixture compile-links for `linux-aarch64-musl`. The matrix
+covers all M1
 primitive kinds, conversions, operators, lexical control flow, direct calls,
 recursion, argument ordering, hint invariance, numeric edges, strict C11
 warnings, undefined-behavior sanitization, and collection forced at every
@@ -262,8 +264,9 @@ M3 implementation evidence is recorded in
 [*ADR 0008*](./docs/adr/0008-object-layout-and-shapes.md). The generic runtime
 owns descriptors, prototypes, arrays, closures, function objects, constructors,
 and completion propagation. Differential fixtures match Node.js and Deno in
-specialization-disabled and specialization-enabled native modes. The same
-corpus cross-links for AArch64. The reviewed test262 subset at revision
+specialization-disabled and specialization-enabled native modes on both
+supported execution targets. The same corpus cross-links for AArch64 Linux.
+The reviewed test262 subset at revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2` records 30 passes, 6 expected parse
 failures, 1 unsupported profile feature, and no semantic or harness failures.
 
@@ -307,8 +310,8 @@ program. Independent siblings continue past a suspended evaluator, while
 importers wait for asynchronous dependencies. The C11 runtime owns promise
 settlement, FIFO reactions, thenable jobs, rejection checkpoints, asynchronous
 continuations, timer tasks, and shutdown. Differential fixtures and generated
-schedules agree across Node.js, Deno, both
-specialization policies, forced collection, x86-64 execution, and AArch64
+schedules agree across Node.js, Deno, both specialization policies, forced
+collection, Linux AMD64 execution, macOS AArch64 execution, and AArch64 Linux
 compile-link checks.
 
 
@@ -482,7 +485,8 @@ dependency-indexed baseline is published. The remaining queue is:
     evidence.
 
 M5 preserves every earlier generic-fallback, forced-collection, sanitizer,
-cross-target, package, standards, and property gate. It expands the same
+dual-execution-target, cross-target, package, standards, and property gate. It
+expands the same
 generators, shrinkers, and replay records instead of replacing them.
 
 

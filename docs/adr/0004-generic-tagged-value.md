@@ -4,7 +4,8 @@ Generic tagged-value representation
 Status
 ------
 
-Accepted for the initial x86-64 runtime.
+Accepted for the initial x86-64 runtime. The AArch64 deferral is superseded by
+[ADR 0014](./0014-native-target-support.md).
 
 
 Context

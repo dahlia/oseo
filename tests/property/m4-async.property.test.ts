@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
 import { babelFrontend } from "../../packages/parser-babel/src/index.ts";
@@ -49,6 +50,12 @@ interface Schedule {
 }
 
 const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
 const large = propertySize() === "large";
 const awaitArbitrary = fc.record({
   first: fc.integer({ max: 20, min: -20 }),
@@ -226,10 +233,7 @@ async function referenceObservations(source: string): Promise<
 test(
   "generated asynchronous schedules match the M4 model",
   {
-    skip:
-      process.platform !== "linux" || process.arch !== "x64"
-        ? "requires x86-64 Linux"
-        : false,
+    skip: nativeTarget == null ? "requires a supported native host" : false,
   },
   async () => {
     await assertAsyncProperty(
@@ -260,8 +264,9 @@ test(
                 backend: cBackend,
                 host,
                 input: compiled.mir,
+                operation: "execute",
                 runtime: cRuntimeProvider,
-                target: describeTarget("x86_64-linux-gnu"),
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
                 toolchain: zigToolchain,
               },
               (native) => assertMatchingObservations([expected, native]),
@@ -272,6 +277,15 @@ test(
         }
       }),
       {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
         domain: "bounded promise commands and deterministic timer schedules",
         numRuns: 10,
         profile: "M4 promises, jobs, timers, and shutdown",

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { describeTarget } from "@oseo/compiler";
+
 import {
   assertMatchingObservations,
   classifyTest262,
@@ -17,16 +19,26 @@ interface MemoryHost {
   readonly files: Map<string, string>;
   readonly host: Host;
   readonly removed: string[];
+  readonly temporaryDirectoryRequests: string[];
 }
 
-function memoryHost(results: readonly ProcessObservation[]): MemoryHost {
+function memoryHost(
+  results: readonly ProcessObservation[],
+  executionHost: NonNullable<Host["executionHost"]> = {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  },
+): MemoryHost {
   const files = new Map<string, string>();
   const removed: string[] = [];
+  const temporaryDirectoryRequests: string[] = [];
   let resultIndex = 0;
   return {
     files,
     host: {
-      async makeTemporaryDirectory(): Promise<string> {
+      executionHost,
+      async makeTemporaryDirectory(prefix): Promise<string> {
+        temporaryDirectoryRequests.push(prefix);
         return "/tmp/oseo-native-test";
       },
       async readTextFile(): Promise<string> {
@@ -46,6 +58,7 @@ function memoryHost(results: readonly ProcessObservation[]): MemoryHost {
       },
     },
     removed,
+    temporaryDirectoryRequests,
   };
 }
 
@@ -53,12 +66,7 @@ function fixtureOptions(
   host: Host,
   commands: readonly string[],
 ): NativeFixtureOptions {
-  const target = {
-    cStandard: "c11",
-    execute: true,
-    name: "x86_64-linux-gnu",
-    sanitizeUndefinedBehavior: true,
-  } as const;
+  const target = describeTarget("linux-x86_64-gnu");
   return {
     backend: {
       emit() {
@@ -87,6 +95,7 @@ function fixtureOptions(
       sourceId: "fixture.ts",
       specialization: "disabled",
     },
+    operation: "execute",
     runtime: {
       getRuntimeInput() {
         return {
@@ -136,6 +145,26 @@ test("retains artifacts when differential comparison fails", async () => {
   assert.deepEqual(state.removed, []);
   assert.ok(state.files.has("/tmp/oseo-native-test/generated.c"));
   assert.ok(state.files.has("/tmp/oseo-native-test/native-observation.json"));
+});
+
+test("rejects compile-only targets before creating a fixture", async () => {
+  const state = memoryHost([], {
+    architecture: "aarch64",
+    operatingSystem: "linux",
+  });
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        target: describeTarget("linux-aarch64-musl"),
+      },
+      () => assert.fail("An invalid execution target must not be inspected."),
+    ),
+    /cannot execute on linux\/aarch64/u,
+  );
+  assert.deepEqual(state.temporaryDirectoryRequests, []);
+  assert.deepEqual(state.files, new Map());
 });
 
 test("records complete failed build observations", async () => {

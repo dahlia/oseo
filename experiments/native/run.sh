@@ -2,26 +2,31 @@
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/../.." && pwd)
+source "$root/experiments/native-targets.sh"
 temporary=$(mktemp -d)
 trap 'rm -rf "$temporary"' EXIT
 common=(-std=c11 -Wall -Wextra -Werror -pedantic -I "$root/experiments/native")
 
 echo "zig=$(zig version)"
-echo "native-target=x86_64-linux-gnu sanitizer=undefined"
-zig cc -target x86_64-linux-gnu "${common[@]}" -fsanitize=undefined \
+echo "native-target=$oseo_execution_target sanitizer=$oseo_sanitizer"
+zig cc -target "$oseo_zig_execution_target" "${common[@]}" \
+  -fsanitize="$oseo_sanitizer" \
   -c "$root/experiments/native/runtime.c" -o "$temporary/runtime.o"
 zig ar rcs "$temporary/liboseo_probe_runtime.a" "$temporary/runtime.o"
-zig cc -target x86_64-linux-gnu "${common[@]}" -fsanitize=undefined \
+zig cc -target "$oseo_zig_execution_target" "${common[@]}" \
+  -fsanitize="$oseo_sanitizer" \
   "$root/experiments/native/generated.c" \
   "$temporary/liboseo_probe_runtime.a" -o "$temporary/native-probe"
 "$temporary/native-probe"
 
-echo "cross-target=aarch64-linux-musl execution=compile-and-link-only"
-zig cc -target aarch64-linux-musl "${common[@]}" \
+cross_target=linux-aarch64-musl
+zig_cross_target=$(oseo_zig_target "$cross_target")
+echo "cross-target=$cross_target execution=compile-and-link-only"
+zig cc -target "$zig_cross_target" "${common[@]}" \
   -c "$root/experiments/native/runtime.c" -o "$temporary/runtime-aarch64.o"
 zig ar rcs "$temporary/liboseo_probe_runtime-aarch64.a" \
   "$temporary/runtime-aarch64.o"
-zig cc -target aarch64-linux-musl "${common[@]}" \
+zig cc -target "$zig_cross_target" "${common[@]}" \
   "$root/experiments/native/generated.c" \
   "$temporary/liboseo_probe_runtime-aarch64.a" \
   -o "$temporary/native-probe-aarch64"

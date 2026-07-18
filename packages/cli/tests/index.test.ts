@@ -10,6 +10,7 @@ test("prints deterministic MIR and C for accepted source", () => {
   assert.ok(help.stdout.includes("--emit-c"));
   assert.ok(help.stdout.includes("--dump-mir"));
   assert.ok(help.stdout.includes("--no-specialization"));
+  assert.ok(help.stdout.includes("--target"));
   const mir = runCli({
     args: ["--dump-mir", "fixture.ts"],
     source: "console.log(42);",
@@ -79,6 +80,89 @@ test("rejects invalid command-line shapes before compilation", () => {
   });
   assert.equal(duplicateMode.exitStatus, 1);
   assert.match(duplicateMode.stderr, /cannot be used multiple times/u);
+
+  const invalidTarget = runCli({
+    args: ["--target", "unknown", "fixture.ts"],
+    source: "console.log(42);",
+    version: "0.0.0",
+  });
+  assert.equal(invalidTarget.exitStatus, 1);
+  assert.match(invalidTarget.stderr, /unknown/u);
+
+  const externalTarget = runCli({
+    args: ["--target", "aarch64-macos", "fixture.ts"],
+    source: "console.log(42);",
+    version: "0.0.0",
+  });
+  assert.equal(externalTarget.exitStatus, 1);
+  assert.match(externalTarget.stderr, /aarch64-macos/u);
+});
+
+test("rejects target selection for host-neutral output", () => {
+  const result = runCli({
+    args: ["--target", "macos-aarch64", "--emit-c", "fixture.ts"],
+    source: "console.log(42);",
+    version: "0.0.0",
+  });
+  assert.equal(result.exitStatus, 1);
+  assert.match(result.stderr, /asynchronous native execution/u);
+});
+
+test("rejects unsupported target-host pairs before building", async () => {
+  const cases = [
+    {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+      target: "macos-aarch64",
+    },
+    {
+      architecture: "aarch64",
+      operatingSystem: "linux",
+      target: "linux-aarch64-musl",
+    },
+  ] as const;
+  await Promise.all(
+    cases.map(async (fixture) => {
+      let temporaryDirectoryRequested = false;
+      const host: CompilerHost = {
+        executionHost: fixture,
+        makeTemporaryDirectory() {
+          temporaryDirectoryRequested = true;
+          return Promise.reject(new Error("unexpected temporary directory"));
+        },
+        readTextFile() {
+          return Promise.reject(new Error("unexpected read"));
+        },
+        remove() {
+          return Promise.reject(new Error("unexpected cleanup"));
+        },
+        run() {
+          return Promise.reject(new Error("unexpected process"));
+        },
+        writeTextFile() {
+          return Promise.reject(new Error("unexpected write"));
+        },
+      };
+      const result = await runNativeCli(
+        {
+          args: ["--target", fixture.target, "fixture.ts"],
+          source: "console.log(42);",
+          version: "0.0.0",
+        },
+        host,
+      );
+      assert.equal(result.exitStatus, 1);
+      assert.match(
+        result.stderr,
+        new RegExp(
+          `cannot execute on ${fixture.operatingSystem}/` +
+            fixture.architecture,
+          "u",
+        ),
+      );
+      assert.ok(!temporaryDirectoryRequested);
+    }),
+  );
 });
 
 test("accepts mode options on either side of the source argument", () => {
@@ -395,6 +479,10 @@ test("preserves module parsing for plain module entries", async () => {
 test("normalizes process spawn failures into host diagnostics", async () => {
   let cleanupCount = 0;
   const host: CompilerHost = {
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
     makeTemporaryDirectory() {
       return Promise.resolve("/temporary/oseo-cli");
     },
@@ -431,6 +519,10 @@ test("cleans temporary artifacts after native execution fails", async () => {
   let cleanupCount = 0;
   let processCount = 0;
   const host: CompilerHost = {
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
     makeTemporaryDirectory() {
       return Promise.resolve("/temporary/oseo-cli");
     },
@@ -476,6 +568,10 @@ test("waits for pending runtime asset writes before cleanup", async () => {
   });
   let writeCount = 0;
   const host: CompilerHost = {
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
     makeTemporaryDirectory() {
       return Promise.resolve("/temporary/oseo-cli");
     },
@@ -537,6 +633,10 @@ type HostFailure =
 function hostFailingAt(failure: HostFailure): CompilerHost {
   let writeCount = 0;
   return {
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
     makeTemporaryDirectory() {
       return failure === "temporary-directory"
         ? Promise.reject(new Error("temporary directory failed"))

@@ -111,6 +111,12 @@ target, and injected host state are fixed. It must not depend on wall-clock
 timing, filesystem enumeration order, ambient environment variables, or an
 unrecorded random source.
 
+Native properties select the supported target from normalized execution-host
+facts. Replay and retained failure records include the operating system,
+architecture, exact target, and sanitizer modes. Linux AMD64 and macOS AArch64
+run the same ordinary and extended generated domains; AArch64 Linux remains
+compile-link evidence rather than a property execution.
+
 The property runner's success count means executed cases. Unsupported syntax,
 discarded generations, reference disagreement, infrastructure failures, and
 timeouts must not be counted as semantic passes.
@@ -404,9 +410,10 @@ seed is:
 
 The extended tier runs through `mise run test:property:extended`. It executes at
 least ten times the ordinary case count and varies size limits and reviewed
-seeds. Native builds retain their sanitizer target. The task runs before a
-release and when a change alters generators, lowering, the runtime, or
-specialization. A scheduled continuous-integration owner and a
+seeds. Native builds retain their execution host, target, and sanitizer
+context. The task runs before a release and when a change alters generators,
+lowering, the runtime, or specialization. A scheduled continuous-integration
+owner and a
 machine-readable aggregate summary remain adoption work.
 
 Case floors may change only after recording test duration, generated size, and

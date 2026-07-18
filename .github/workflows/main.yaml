@@ -34,18 +34,31 @@ jobs:
       - run: mise run test:${{ matrix.runtime }}
 
   test-native:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+          - os: macos-15
+            target: macos-aarch64
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
-      - run: mise run test:native
-      - run: mise run test:probes
-      - run: mise run test:test262
-      - if: failure()
+      - run: mise run check
+      - run: mise run test
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - run: mise run test:property:extended
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-fixture-diagnostics
-          path: /tmp/oseo-native-*
-          if-no-files-found: ignore
+          name: native-fixture-diagnostics-${{ matrix.target }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn

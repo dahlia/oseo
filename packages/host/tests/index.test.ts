@@ -8,6 +8,7 @@ import {
   createFileModuleLoader,
   createNodeHost,
   fileModuleResolver,
+  normalizeExecutionHost,
 } from "../src/index.ts";
 
 interface MinimalDenoRuntime {
@@ -17,6 +18,29 @@ interface MinimalDenoRuntime {
   remove?(path: string): Promise<void>;
   writeTextFile?(path: string, contents: string): Promise<void>;
 }
+
+test("normalizes execution hosts without choosing a target", () => {
+  assert.deepEqual(normalizeExecutionHost("linux", "x64"), {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  });
+  assert.deepEqual(normalizeExecutionHost("linux", "amd64"), {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  });
+  assert.deepEqual(normalizeExecutionHost("darwin", "arm64"), {
+    architecture: "aarch64",
+    operatingSystem: "macos",
+  });
+  assert.deepEqual(normalizeExecutionHost("windows", "riscv64"), {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  });
+  assert.deepEqual(
+    createNodeHost().executionHost,
+    normalizeExecutionHost(process.platform, process.arch),
+  );
+});
 
 test("fetches remote text assets in the Deno host", async () => {
   const globals = globalThis as typeof globalThis & {

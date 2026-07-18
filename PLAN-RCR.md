@@ -50,8 +50,8 @@ The refactoring begins from these current contracts:
  -  the Zig adapter compiles that source once, archives one object, and links
     generated C against the archive;
  -  package checks currently require only *oseo\_runtime.h* and *runtime.c*;
- -  native differential fixtures cover x86-64 execution and AArch64
-    compile-link behavior;
+ -  native differential fixtures cover Linux AMD64 and macOS AArch64 execution
+    plus AArch64 Linux compile-link behavior;
  -  forced collection, allocation failure, strict warnings, undefined-behavior
     sanitization, assembly inspection, and deterministic asynchronous property
     tests already exercise the runtime; and
@@ -241,9 +241,9 @@ migration, not only after the final file move.
 The ordinary gate remains `mise run check` followed by `mise run test`. Because
 the work changes runtime and toolchain behavior, every extraction also runs the
 applicable focused tasks reported by `mise tasks`, and the completed migration
-runs `mise run test:property:extended` from a clean checkout. x86-64 execution,
-AArch64 compile-link, assembly inspection, package dry runs, and sanitizer
-evidence remain required.
+runs `mise run test:property:extended` from a clean checkout. Linux AMD64 and
+macOS AArch64 execution, AArch64 Linux compile-link, assembly inspection,
+package dry runs, and sanitizer evidence remain required.
 
 
 Documentation changes
@@ -310,7 +310,8 @@ The refactoring is complete only when:
     or internal declarations;
  -  package archives contain every required header and source and build from a
     clean unpacked artifact;
- -  strict warnings, sanitizers, x86-64 execution, AArch64 compile-link,
-    assembly inspection, and forced-collection tests pass; and
+ -  strict warnings, sanitizers, both supported execution targets, AArch64
+    Linux compile-link, assembly inspection, and forced-collection tests pass;
+    and
  -  `mise run check`, `mise run test`, and
     `mise run test:property:extended` pass from a clean checkout.

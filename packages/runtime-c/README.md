@@ -7,6 +7,10 @@ results, explicit root frames, mark-and-sweep collection, ordinary objects,
 arrays, environments, binding cells, function objects, and the deterministic
 `console.log` intrinsic. Native assets remain separate files and are included
 in npm and JSR packages.
+The shared NaN-boxed layout admits allocator-provided data pointers only after
+an explicit low-48-bit payload check. Linux AMD64 and macOS AArch64 execution
+exercise that boundary under the target's address and undefined-behavior
+sanitizer policy.
 The collector queues newly marked objects through an intrusive worklist, so it
 traces each reachable object once regardless of allocation-list order.
 M3 property operations implement descriptors, prototypes, array holes and

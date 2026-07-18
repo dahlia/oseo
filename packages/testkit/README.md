@@ -10,6 +10,11 @@ completes. A build, execution, or inspection failure retains the directory and
 writes *native-observation.json* with the target, emitted C, complete compiler
 request sequence, and every captured process observation.
 
+Each fixture declares whether it needs compilation or execution. Execution
+fixtures validate the injected host against the selected target before a build
+starts. Retained observations and property failures include both normalized
+host and target identities so a replay does not silently change environments.
+
 When compiler observation is enabled, the harness removes the runtime's private
 counter record from stderr and exposes typed guard, overflow, generic-addition,
 allocation, and collection counts beside the ordinary process observation.

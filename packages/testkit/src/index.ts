@@ -1,5 +1,6 @@
 import type {
   CompilerHost,
+  ExecutionHostDescription,
   NativeBackend,
   NativeToolchain,
   MirProgram,
@@ -9,14 +10,19 @@ import type {
   SpecializationMode,
   TargetDescription,
 } from "@oseo/compiler";
+import { canExecuteTarget } from "@oseo/compiler";
 
 /** Complete observation retained for one native fixture build and run. */
 export interface NativeFixtureObservation extends ProcessObservation {
   readonly compilerInvocation: readonly string[];
   readonly counters?: RuntimeObservationCounters;
   readonly emittedC: string;
+  readonly executionHost?: ExecutionHostDescription;
   readonly target: TargetDescription;
 }
+
+/** Operation requested from one explicit target and host pair. */
+export type NativeFixtureOperation = "compile" | "execute";
 
 /** Test-only runtime counters kept separate from JavaScript observations. */
 export interface RuntimeObservationCounters {
@@ -34,6 +40,7 @@ export interface NativeFixtureOptions {
   readonly host: CompilerHost;
   readonly input: MirProgram;
   readonly keepArtifacts?: boolean;
+  readonly operation: NativeFixtureOperation;
   readonly runtime: RuntimeInputProvider;
   readonly target: TargetDescription;
   readonly toolchain: NativeToolchain;
@@ -375,6 +382,20 @@ export async function withNativeFixture<T>(
   options: NativeFixtureOptions,
   inspect: (observation: NativeFixtureObservation) => T | PromiseLike<T>,
 ): Promise<T> {
+  if (options.operation === "execute") {
+    if (options.host.executionHost == null) {
+      throw new Error(
+        "Native execution requires normalized execution-host metadata.",
+      );
+    }
+    if (!canExecuteTarget(options.host.executionHost, options.target)) {
+      throw new Error(
+        `Target ${options.target.name} cannot execute on ` +
+          `${options.host.executionHost.operatingSystem}/` +
+          `${options.host.executionHost.architecture}.`,
+      );
+    }
+  }
   const directory = await options.host.makeTemporaryDirectory("oseo-native-");
   let compilerInvocation: readonly string[] = [];
   let emittedC: string | undefined;
@@ -421,7 +442,7 @@ export async function withNativeFixture<T>(
     }
 
     let observation: ProcessObservation;
-    if (options.target.execute) {
+    if (options.operation === "execute") {
       const request = {
         args: [],
         command: plan.executablePath,
@@ -441,7 +462,7 @@ export async function withNativeFixture<T>(
     const separated = splitCounters(observation);
     if (
       options.input.observeSpecialization === true &&
-      options.target.execute &&
+      options.operation === "execute" &&
       separated.counters == null
     ) {
       throw new Error("Native fixture did not report runtime observations.");
@@ -451,6 +472,9 @@ export async function withNativeFixture<T>(
       compilerInvocation,
       ...(separated.counters == null ? {} : { counters: separated.counters }),
       emittedC: emitted.source,
+      ...(options.host.executionHost == null
+        ? {}
+        : { executionHost: options.host.executionHost }),
       target: options.target,
     };
     nativeObservation = completeObservation;
@@ -464,6 +488,7 @@ export async function withNativeFixture<T>(
       error: errorMessage(error),
       observation: nativeObservation ?? steps.at(-1)?.observation,
       steps,
+      executionHost: options.host.executionHost,
       target: options.target,
     };
     try {

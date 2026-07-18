@@ -111,7 +111,7 @@ cover TypeScript and JSDoc selection, hint mutations, conflicting hints,
 immediate boundaries, overflow, negative zero, the admitted primitive kinds,
 recursion, repeated calls, argument evaluation order, string allocation, and
 forced collection. M2 fixtures also compile and link in both modes for
-`aarch64-linux-musl`.
+`linux-aarch64-musl`.
 
 Strict C11 warnings and undefined-behavior sanitization apply to native x86-64
 execution. The assembly inspection compiles the same selected path with `-O2`

@@ -3,7 +3,14 @@ import type {
   NativeBuildPlan,
   NativeToolchain,
   ProcessRequest,
+  TargetName,
 } from "@oseo/compiler";
+
+const zigTargetNames = {
+  "linux-aarch64-musl": "aarch64-linux-musl",
+  "linux-x86_64-gnu": "x86_64-linux-gnu",
+  "macos-aarch64": "aarch64-macos",
+} as const satisfies Readonly<Record<TargetName, string>>;
 
 function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
@@ -20,7 +27,8 @@ function request(
 /** Pinned Zig C toolchain adapter with explicit target selection. */
 export const zigToolchain: NativeToolchain = {
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan {
-    const suffix = input.target.name === "x86_64-linux-gnu" ? "native" : "arm";
+    const suffix = input.target.name;
+    const zigTargetName = zigTargetNames[input.target.name];
     const objectPath = join(input.workingDirectory, `runtime-${suffix}.o`);
     const archivePath = join(
       input.workingDirectory,
@@ -29,7 +37,7 @@ export const zigToolchain: NativeToolchain = {
     const executablePath = join(input.workingDirectory, `fixture-${suffix}`);
     const common = [
       "-target",
-      input.target.name,
+      zigTargetName,
       "-std=c11",
       "-Wall",
       "-Wextra",
@@ -38,9 +46,10 @@ export const zigToolchain: NativeToolchain = {
       "-I",
       input.runtimeDirectory,
     ];
-    const sanitizer = input.target.sanitizeUndefinedBehavior
-      ? ["-fsanitize=undefined"]
-      : [];
+    const sanitizer =
+      input.target.sanitizers.length === 0
+        ? []
+        : [`-fsanitize=${input.target.sanitizers.join(",")}`];
     return {
       executablePath,
       requests: [

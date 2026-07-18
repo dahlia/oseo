@@ -9,6 +9,7 @@ export type PropertySize = "large" | "small";
 
 /** Options recorded for one deterministic property suite. */
 export interface PropertySuiteOptions {
+  readonly context?: readonly string[];
   readonly domain: string;
   readonly numRuns: number;
   readonly profile: string;
@@ -41,6 +42,12 @@ function scaledPositive(name: string, value: number, scale: number): number {
     throw new Error(`${name} times OSEO_PROPERTY_RUN_SCALE must be safe.`);
   }
   return scaled;
+}
+
+function propertyContext(options: PropertySuiteOptions): string {
+  return options.context == null || options.context.length === 0
+    ? ""
+    : `${options.context.join(" ")}\n`;
 }
 
 /** Select one reviewed generator size without process-global configuration. */
@@ -98,6 +105,7 @@ export function assertProperty<T>(
     throw new Error(
       `${name} failed\n` +
         `profile=${options.profile} domain=${options.domain}\n` +
+        propertyContext(options) +
         `size-limit=${options.sizeLimit}\n` +
         `fast-check=${fastCheckVersion}\n${detail}`,
       { cause: error },
@@ -118,6 +126,7 @@ export async function assertAsyncProperty<T>(
     throw new Error(
       `${name} failed\n` +
         `profile=${options.profile} domain=${options.domain}\n` +
+        propertyContext(options) +
         `size-limit=${options.sizeLimit}\n` +
         `fast-check=${fastCheckVersion}\n${detail}`,
       { cause: error },

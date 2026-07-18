@@ -1,10 +1,11 @@
 Contributing to Oseo
 ====================
 
-Thank you for helping build Oseo. The project is currently entering M2, so
-interfaces and implementation details will change as the first guarded native
-specialization replaces assumptions with evidence. Small, testable changes are
-especially valuable at this stage.
+Thank you for helping build Oseo. The project has completed M4 and is expanding
+measured ECMAScript compatibility during M5. Interfaces and implementation
+details will continue to change as standards, generated, and native target
+evidence replaces assumptions. Small, testable changes are especially valuable
+at this stage.
 
 
 Before you start
@@ -180,6 +181,19 @@ machine's ABI. Platform-specific work should stay behind the toolchain and host
 interfaces so that another C compiler, native backend, or runtime language can
 replace the initial implementation.
 
+Linux on AMD64 and macOS on AArch64 are supported native execution
+environments. AArch64 Linux is a compile-link and inspection target. A
+successful cross-link is portability evidence, not a native semantic pass.
+Target and host changes must preserve explicit selection, reject unsupported
+pairs before execution, and retain the exact host and target in failure and
+replay metadata.
+
+Native target IDs use operating-system, architecture, and optional ABI order,
+such as `macos-aarch64` and `linux-x86_64-gnu`. These are stable Oseo IDs, not
+external compiler strings. A concrete toolchain adapter owns that mapping.
+Keep `NativeOperatingSystem` limited to operating-system facts; unknown values
+belong to host detection rather than build targets.
+
 
 Semantics and optimization
 --------------------------
@@ -268,6 +282,14 @@ mise run test
 Also run any focused test task shown by `mise tasks` for the packages you
 changed. Do not commit generated binaries, temporary C output, or debug dumps
 unless they are reviewed fixtures with a documented purpose.
+
+Changes to targets, host adapters, C lowering, the runtime, collector,
+specialization, or native generators run `mise run test:native`,
+`mise run test:probes`, `mise run test:property:native`, and
+`mise run test:test262` in addition to the ordinary gates. They also run
+`mise run test:property:extended` before submission. The native and standards
+tasks execute the matching host target and retain the AArch64 Linux cross-link;
+do not replace a required execution with a blanket skip.
 
 
 Package manifests and versions
