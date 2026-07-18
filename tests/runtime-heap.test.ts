@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const runtime = join(root, "packages/runtime-c/native");
 const fixture = join(root, "tests/fixtures/runtime-heap.c");
-const nativeTarget =
+const zigNativeTarget =
   process.platform === "linux" && process.arch === "x64"
     ? "x86_64-linux-gnu"
     : process.platform === "darwin" && process.arch === "arm64"
@@ -37,7 +37,7 @@ function run(command: string, args: readonly string[]): void {
 test(
   "traces heap graphs on the host-native target",
   {
-    skip: nativeTarget == null ? "requires a supported native host" : false,
+    skip: zigNativeTarget == null ? "requires a supported native host" : false,
   },
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "oseo-runtime-heap-"));
@@ -47,7 +47,7 @@ test(
       run("zig", [
         "cc",
         "-target",
-        nativeTarget ?? "x86_64-linux-gnu",
+        zigNativeTarget ?? "x86_64-linux-gnu",
         "-std=c11",
         "-Wall",
         "-Wextra",

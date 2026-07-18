@@ -5,12 +5,14 @@ Status
 ------
 
 Implementation status: complete. Oseo executes native fixtures as
-`x86_64-linux-gnu` on Linux AMD64 and `aarch64-macos` on macOS AArch64. It
-retains `aarch64-linux-musl` as a portability target. Node.js and Deno source
+`linux-x86_64-gnu` on Linux AMD64 and `macos-aarch64` on macOS AArch64. It
+retains `linux-aarch64-musl` as a portability target. Node.js and Deno source
 tests continue to run on Linux, macOS, and Windows in continuous integration.
 
 [ADR 0014](./docs/adr/0014-native-target-support.md) records the accepted
 target, host, value-layout, sanitizer, CLI, and standards-evidence contracts.
+[ADR 0015](./docs/adr/0015-native-target-identifiers.md) defines stable Oseo
+target IDs and their toolchain mapping boundary.
 [*docs/native-target-baseline.md*](./docs/native-target-baseline.md) preserves
 the before-state measurements. The CLI, probes, differential fixtures,
 properties, reviewed test262 subset, and native continuous-integration matrix
@@ -38,8 +40,8 @@ collector protocol.
 The completed work should let a contributor use either of the project's two
 primary development environments:
 
- -  Linux on AMD64, executing `x86_64-linux-gnu`; or
- -  macOS on AArch64, executing `aarch64-macos`.
+ -  Linux on AMD64, executing `linux-x86_64-gnu`; or
+ -  macOS on AArch64, executing `macos-aarch64`.
 
 Both environments must retain explicit target selection. Host-native defaults
 may choose a documented target for execution, but a cross build must never
@@ -70,9 +72,9 @@ The intended matrix is:
 
 | Native target        | Matching execution host | Required evidence                         |
 | -------------------- | ----------------------- | ----------------------------------------- |
-| `x86_64-linux-gnu`   | Linux on AMD64          | Compile, link, execute, sanitize, inspect |
-| `aarch64-macos`      | macOS on AArch64        | Compile, link, execute, sanitize, inspect |
-| `aarch64-linux-musl` | None in the primary CI  | Compile, link, and inspect                |
+| `linux-x86_64-gnu`   | Linux on AMD64          | Compile, link, execute, sanitize, inspect |
+| `macos-aarch64`      | macOS on AArch64        | Compile, link, execute, sanitize, inspect |
+| `linux-aarch64-musl` | None in the primary CI  | Compile, link, and inspect                |
 
 Node.js and Deno package tests continue to run on the existing operating-system
 matrix. Their success is bootstrap-host evidence, not native-target evidence.
@@ -84,6 +86,9 @@ generated C, and runtime source.
 
 Entry evidence
 --------------
+
+This section preserves the Zig-shaped identifiers used before implementation.
+ADR 0015 later replaced them with stable OS-first Oseo target IDs.
 
 The work begins from these current contracts and observations:
 
@@ -122,7 +127,7 @@ Scope
 
 This plan owns:
 
- -  an explicit `aarch64-macos` native target description;
+ -  an explicit `macos-aarch64` native target description;
  -  separation of target properties from execution-host capabilities;
  -  host-native target selection at the CLI composition boundary;
  -  explicit cross-target selection and unsupported-pair diagnostics;
@@ -172,21 +177,21 @@ The normalized host vocabulary must distinguish at least:
  -  unsupported or unknown values.
 
 Unknown host data produces an owned diagnostic. It must not fall back to
-`x86_64-linux-gnu`, use the machine's default `cc` target, or mark an unexecuted
+`linux-x86_64-gnu`, use the machine's default `cc` target, or mark an unexecuted
 fixture as passing.
 
-The target description records the exact Zig target name used in every compile
-and link request. Artifact names and object names derive from a deterministic
-target identifier rather than a two-way `native` or `arm` suffix. Package tests
-cover every supported target and reject an unrecognized target before process
-execution.
+The target description records toolchain-neutral Oseo facts. The Zig adapter
+maps the Oseo target ID to the exact Zig string used in every compile and link
+request. Artifact names and object names derive from the stable Oseo ID rather
+than a two-way `native` or `arm` suffix. Package tests cover every supported
+target and reject an unrecognized target before process execution.
 
 
 CLI target selection
 --------------------
 
 The CLI composition root owns default native execution selection. Linux on
-AMD64 selects `x86_64-linux-gnu`; macOS on AArch64 selects `aarch64-macos`.
+AMD64 selects `linux-x86_64-gnu`; macOS on AArch64 selects `macos-aarch64`.
 Other hosts receive a source-located unsupported-host diagnostic before the
 toolchain starts.
 
@@ -251,7 +256,7 @@ The architecture probes keep two distinct forms of evidence:
 The ABI-root, native-boundary, and value-layout probes select their executable
 target from normalized host capabilities. Their existing x86-64 and AArch64
 assembly observations remain target-named. Adding macOS execution must not
-silently replace the `aarch64-linux-musl` compile-link check or relabel Mach-O
+silently replace the `linux-aarch64-musl` compile-link check or relabel Mach-O
 evidence as Linux AArch64 evidence.
 
 A skipped execution is acceptable only for a target not declared executable on
@@ -291,7 +296,7 @@ Property evidence
 -----------------
 
 Native property suites parameterize execution by supported target rather than
-embedding `x86_64-linux-gnu`. A replay record includes both the native target
+embedding `linux-x86_64-gnu`. A replay record includes both the native target
 and normalized execution host alongside its seed, path, size, specialization,
 collector, and sanitizer modes.
 
@@ -328,7 +333,7 @@ classification or observation disagreement between supported execution targets.
 Host-specific canonical paths, temporary directories, and executable names do
 not enter the checked-in result.
 
-The current `x86_64-linux-gnu` manifest remains authoritative until the schema
+The current `linux-x86_64-gnu` manifest remains authoritative until the schema
 change is accepted and regenerated deliberately. Target support work must not
 mix a schema migration with unrelated additions to the reviewed test262 subset.
 
@@ -393,7 +398,7 @@ Delivery order
 3.  Separate immutable target facts from host execution capability in compiler,
     host, CLI, testkit, and toolchain contracts. Preserve the existing Linux
     behavior while adding focused unit tests for unsupported pairs.
-4.  Add deterministic `aarch64-macos` build plans, artifact names, static
+4.  Add deterministic `macos-aarch64` build plans, artifact names, static
     runtime archives, host-native CLI selection, and complete subprocess
     diagnostics.
 5.  Migrate ABI-root, native-boundary, value-layout, heap, and promise probes to
@@ -446,13 +451,13 @@ Exit criteria
 macOS AArch64 native execution is supported only when:
 
  -  the accepted target decision names Linux on AMD64 and macOS on AArch64 as
-    supported execution environments and retains `aarch64-linux-musl` as an
+    supported execution environments and retains `linux-aarch64-musl` as an
     explicit portability target;
  -  target descriptions and execution-host capabilities are separate, and no
     unknown host silently selects a native target;
  -  the CLI selects or accepts an explicit target through documented behavior
     and reports unsupported target-host pairs before execution;
- -  `aarch64-macos` builds use deterministic explicit Zig requests and produce
+ -  `macos-aarch64` builds use deterministic explicit Zig requests and produce
     reviewed Mach-O artifacts from the same MIR, C backend, and runtime inputs;
  -  AArch64 pointer, tag, alignment, collector, and sanitizer evidence satisfies
     the accepted value-layout decision without unchecked truncation;

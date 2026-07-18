@@ -66,7 +66,7 @@ function fixtureOptions(
   host: Host,
   commands: readonly string[],
 ): NativeFixtureOptions {
-  const target = describeTarget("x86_64-linux-gnu");
+  const target = describeTarget("linux-x86_64-gnu");
   return {
     backend: {
       emit() {
@@ -157,7 +157,7 @@ test("rejects compile-only targets before creating a fixture", async () => {
     withNativeFixture(
       {
         ...options,
-        target: describeTarget("aarch64-linux-musl"),
+        target: describeTarget("linux-aarch64-musl"),
       },
       () => assert.fail("An invalid execution target must not be inspected."),
     ),

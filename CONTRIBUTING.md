@@ -188,6 +188,12 @@ Target and host changes must preserve explicit selection, reject unsupported
 pairs before execution, and retain the exact host and target in failure and
 replay metadata.
 
+Native target IDs use operating-system, architecture, and optional ABI order,
+such as `macos-aarch64` and `linux-x86_64-gnu`. These are stable Oseo IDs, not
+external compiler strings. A concrete toolchain adapter owns that mapping.
+Keep `NativeOperatingSystem` limited to operating-system facts; unknown values
+belong to host detection rather than build targets.
+
 
 Semantics and optimization
 --------------------------

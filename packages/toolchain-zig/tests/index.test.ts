@@ -5,12 +5,12 @@ import { describeTarget } from "@oseo/compiler";
 
 import { zigToolchain } from "../src/index.ts";
 
-for (const target of [
-  "x86_64-linux-gnu",
-  "aarch64-macos",
-  "aarch64-linux-musl",
+for (const [target, zigTarget] of [
+  ["linux-x86_64-gnu", "x86_64-linux-gnu"],
+  ["macos-aarch64", "aarch64-macos"],
+  ["linux-aarch64-musl", "aarch64-linux-musl"],
 ] as const) {
-  test(`records deterministic ${target} compiler requests`, () => {
+  test(`maps deterministic ${target} compiler requests`, () => {
     const plan = zigToolchain.createBuildPlan({
       generatedSourcePath: "/tmp/generated.c",
       runtimeDirectory: "/tmp/runtime",
@@ -22,7 +22,7 @@ for (const target of [
       plan.requests.every((request) =>
         request.command === "zig" && request.args[0] === "ar"
           ? true
-          : request.args.includes(target),
+          : request.args.includes(zigTarget),
       ),
     );
     assert.match(plan.executablePath, new RegExp(target, "u"));

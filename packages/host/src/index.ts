@@ -11,20 +11,22 @@ import type {
 
 /** Normalize Node.js or Deno platform facts at the concrete host boundary. */
 export function normalizeExecutionHost(
-  operatingSystem: string,
-  architecture: string,
+  reportedOperatingSystem: string,
+  reportedArchitecture: string,
 ): ExecutionHostDescription {
   return {
     architecture:
-      architecture === "arm64" || architecture === "aarch64"
+      reportedArchitecture === "arm64" || reportedArchitecture === "aarch64"
         ? "aarch64"
-        : architecture === "x64" || architecture === "x86_64"
+        : reportedArchitecture === "amd64" ||
+            reportedArchitecture === "x64" ||
+            reportedArchitecture === "x86_64"
           ? "x86_64"
           : "unknown",
     operatingSystem:
-      operatingSystem === "darwin"
+      reportedOperatingSystem === "darwin"
         ? "macos"
-        : operatingSystem === "linux"
+        : reportedOperatingSystem === "linux"
           ? "linux"
           : "unknown",
   };

@@ -24,6 +24,10 @@ test("normalizes execution hosts without choosing a target", () => {
     architecture: "x86_64",
     operatingSystem: "linux",
   });
+  assert.deepEqual(normalizeExecutionHost("linux", "amd64"), {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  });
   assert.deepEqual(normalizeExecutionHost("darwin", "arm64"), {
     architecture: "aarch64",
     operatingSystem: "macos",

@@ -31,6 +31,12 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 assert(nativeTarget != null, "supported native execution host");
+const zigNativeTarget =
+  nativeTarget.name === "macos-aarch64"
+    ? "aarch64-macos"
+    : nativeTarget.name === "linux-x86_64-gnu"
+      ? "x86_64-linux-gnu"
+      : assert.fail(`unsupported execution target: ${nativeTarget.name}`);
 
 const referencePrelude = `
 const oseoReferenceConsole = console;
@@ -1397,7 +1403,7 @@ for (const fixture of fixtures) {
           assert(
             native.compilerInvocation
               .filter((line) => line.startsWith("zig cc "))
-              .every((line) => line.includes(nativeTarget.name)),
+              .every((line) => line.includes(zigNativeTarget)),
             "native compiler invocation records an explicit target",
           );
         },
@@ -1418,7 +1424,7 @@ for (const fixture of fixtures) {
         keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
         operation: "compile",
         runtime: cRuntimeProvider,
-        target: describeTarget("aarch64-linux-musl"),
+        target: describeTarget("linux-aarch64-musl"),
         toolchain: zigToolchain,
       },
       (cross) => {
@@ -1446,10 +1452,10 @@ const assemblyCompilation = compileSource(
 const assemblyMir = assemblyCompilation.mir;
 assert(assemblyMir != null, "assembly specialization MIR");
 const assemblySource = cBackend.emit(assemblyMir).source;
-for (const target of [
-  "x86_64-linux-gnu",
-  "aarch64-macos",
-  "aarch64-linux-musl",
+for (const [target, zigTarget] of [
+  ["linux-x86_64-gnu", "x86_64-linux-gnu"],
+  ["macos-aarch64", "aarch64-macos"],
+  ["linux-aarch64-musl", "aarch64-linux-musl"],
 ] as const) {
   const directory = await host.makeTemporaryDirectory("oseo-assembly-");
   try {
@@ -1469,7 +1475,7 @@ for (const target of [
       args: [
         "cc",
         "-target",
-        target,
+        zigTarget,
         "-std=c11",
         "-O2",
         "-S",
@@ -1512,7 +1518,7 @@ await withNativeFixture(
     input: recursiveCompilation.mir,
     operation: "compile",
     runtime: cRuntimeProvider,
-    target: describeTarget("aarch64-linux-musl"),
+    target: describeTarget("linux-aarch64-musl"),
     toolchain: zigToolchain,
   },
   (cross) => {
@@ -2199,6 +2205,6 @@ console.log(
     `${nativeTarget.name} outputs match`,
 );
 console.log(
-  `cross fixtures: ${fixtures.length + 1} aarch64-linux-musl builds passed`,
+  `cross fixtures: ${fixtures.length + 1} linux-aarch64-musl builds passed`,
 );
 console.log("assembly fixtures: all configured target paths inspected");

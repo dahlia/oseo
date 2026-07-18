@@ -85,9 +85,9 @@ const targetParser = optional(
   option(
     "--target",
     choice([
-      "aarch64-linux-musl",
-      "aarch64-macos",
-      "x86_64-linux-gnu",
+      "linux-aarch64-musl",
+      "linux-x86_64-gnu",
+      "macos-aarch64",
     ] as const),
     {
       description: message`Select an explicit native execution target.`,

@@ -7,7 +7,7 @@ import { runCli } from "../packages/cli/dist/index.js";
 import { describeTarget } from "../packages/compiler/dist/index.js";
 
 test("built ESM packages compose through public exports", () => {
-  assert.equal(describeTarget("x86_64-linux-gnu").executableFormat, "elf");
+  assert.equal(describeTarget("linux-x86_64-gnu").executableFormat, "elf");
   assert.match(
     runCli({ args: ["--help"], version: "0.0.0" }).stdout,
     /--emit-c/u,

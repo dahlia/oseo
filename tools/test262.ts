@@ -47,7 +47,7 @@ import type {
   Test262Summary,
   Test262Variant,
 } from "../packages/testkit/src/index.ts";
-import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
@@ -75,7 +75,7 @@ const classifications = new Set<Test262Classification>([
   "unsupported-profile-feature",
 ]);
 
-const canonicalTarget = "x86_64-linux-gnu";
+const canonicalTarget = "linux-x86_64-gnu";
 const runnerHost = createNodeHost();
 const executionTarget = targetForExecutionHost(
   runnerHost.executionHost ?? {
@@ -83,7 +83,7 @@ const executionTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 )?.name;
-const parityTargets = [canonicalTarget, "aarch64-macos"] as const;
+const parityTargets = [canonicalTarget, "macos-aarch64"] as const;
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -1147,13 +1147,16 @@ function manifestDigest(serialized: string): string {
   return `sha256:${createHash("sha256").update(serialized).digest("hex")}`;
 }
 
-function serializeTargetParity(
+/** Serialize the canonical manifest digest and supported execution targets. */
+export function serializeTargetParity(
   serializedManifest: string,
   suiteRevision: string,
 ): string {
+  const canonicalDigest = new Scalar(manifestDigest(serializedManifest));
+  canonicalDigest.type = Scalar.BLOCK_FOLDED;
   return stringifyYaml(
     {
-      canonicalDigest: manifestDigest(serializedManifest),
+      canonicalDigest,
       canonicalManifest: "results.yaml",
       suiteRevision,
       targets: parityTargets,

@@ -88,11 +88,19 @@ test("rejects invalid command-line shapes before compilation", () => {
   });
   assert.equal(invalidTarget.exitStatus, 1);
   assert.match(invalidTarget.stderr, /unknown/u);
+
+  const externalTarget = runCli({
+    args: ["--target", "aarch64-macos", "fixture.ts"],
+    source: "console.log(42);",
+    version: "0.0.0",
+  });
+  assert.equal(externalTarget.exitStatus, 1);
+  assert.match(externalTarget.stderr, /aarch64-macos/u);
 });
 
 test("rejects target selection for host-neutral output", () => {
   const result = runCli({
-    args: ["--target", "aarch64-macos", "--emit-c", "fixture.ts"],
+    args: ["--target", "macos-aarch64", "--emit-c", "fixture.ts"],
     source: "console.log(42);",
     version: "0.0.0",
   });
@@ -105,12 +113,12 @@ test("rejects unsupported target-host pairs before building", async () => {
     {
       architecture: "x86_64",
       operatingSystem: "linux",
-      target: "aarch64-macos",
+      target: "macos-aarch64",
     },
     {
       architecture: "aarch64",
       operatingSystem: "linux",
-      target: "aarch64-linux-musl",
+      target: "linux-aarch64-musl",
     },
   ] as const;
   await Promise.all(

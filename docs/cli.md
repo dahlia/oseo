@@ -93,16 +93,20 @@ Oseo forwards the native program's standard output, standard error, and exit
 status. It removes the temporary directory after both successful and failed
 workflows.
 
-Native execution selects `x86_64-linux-gnu` on Linux AMD64 and
-`aarch64-macos` on macOS AArch64. Both targets use address and
+Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
+`macos-aarch64` on macOS AArch64. Both targets use address and
 undefined-behavior sanitization. Every Zig request names the target explicitly.
-`aarch64-linux-musl` remains a compile-link and inspection target in repository
+`linux-aarch64-musl` remains a compile-link and inspection target in repository
 tasks; the CLI does not pretend that it can execute on either primary host.
+
+These names are stable Oseo target IDs in operating-system, architecture, and
+optional ABI order. They are not Zig target strings. The Zig adapter maps them
+to its architecture-first spelling when it creates a compiler request.
 
 Use `--target` to state the execution target explicitly:
 
 ~~~~ sh
-oseo --target aarch64-macos add.ts
+oseo --target macos-aarch64 add.ts
 ~~~~
 
 The target must match the normalized execution host. Unknown hosts and

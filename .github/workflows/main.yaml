@@ -43,9 +43,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-linux-gnu
+            target: linux-x86_64-gnu
           - os: macos-15
-            target: aarch64-macos
+            target: macos-aarch64
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4

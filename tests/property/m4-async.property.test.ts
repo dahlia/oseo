@@ -266,7 +266,7 @@ test(
                 input: compiled.mir,
                 operation: "execute",
                 runtime: cRuntimeProvider,
-                target: nativeTarget ?? describeTarget("x86_64-linux-gnu"),
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
                 toolchain: zigToolchain,
               },
               (native) => assertMatchingObservations([expected, native]),

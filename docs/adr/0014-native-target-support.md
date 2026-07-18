@@ -8,6 +8,8 @@ Accepted. This record supersedes the execution-target limitations in
 [ADR 0001](./0001-initial-platform-and-tools.md), the single-target build
 description in [ADR 0003](./0003-c11-runtime-and-zig-boundary.md), and the
 AArch64 deferral in [ADR 0004](./0004-generic-tagged-value.md).
+The target-name ordering in this record is superseded by
+[ADR 0015](./0015-native-target-identifiers.md).
 
 
 Context
@@ -72,9 +74,9 @@ mise run test:property:extended
 ~~~~
 
 On an Apple M4 host, the ABI-root, native-boundary, NaN-box, and low-tag probes
-execute as `aarch64-macos` with address and undefined-behavior sanitizers. The
-probes also inspect named `x86_64-linux-gnu`, `aarch64-macos`, and
-`aarch64-linux-musl` assembly. The boundary probe retains the AArch64 Linux
+execute as `macos-aarch64` with address and undefined-behavior sanitizers. The
+probes also inspect named `linux-x86_64-gnu`, `macos-aarch64`, and
+`linux-aarch64-musl` assembly. The boundary probe retains the AArch64 Linux
 compile-link.
 
 The heap and promise fixtures, complete differential fixture corpus, forced
@@ -118,13 +120,13 @@ Support these target descriptions:
 
 | Target               | Artifact facts              | Sanitizers            |
 | -------------------- | --------------------------- | --------------------- |
-| `x86_64-linux-gnu`   | AMD64, Linux, ELF, C11      | Address and undefined |
-| `aarch64-macos`      | AArch64, macOS, Mach-O, C11 | Address and undefined |
-| `aarch64-linux-musl` | AArch64, Linux, ELF, C11    | Compile-link only     |
+| `linux-x86_64-gnu`   | AMD64, Linux, ELF, C11      | Address and undefined |
+| `macos-aarch64`      | AArch64, macOS, Mach-O, C11 | Address and undefined |
+| `linux-aarch64-musl` | AArch64, Linux, ELF, C11    | Compile-link only     |
 
 Node.js and Deno host adapters normalize the operating system and architecture
 without choosing a target. The outer CLI and test composition layers select
-`x86_64-linux-gnu` for Linux on AMD64 and `aarch64-macos` for macOS on AArch64.
+`linux-x86_64-gnu` for Linux on AMD64 and `macos-aarch64` for macOS on AArch64.
 Unknown hosts and mismatched target-host pairs fail before a temporary build
 directory or toolchain process is created.
 
@@ -145,7 +147,7 @@ Artifact, archive, and object names derive from the complete target identifier.
 
 ### Value layout
 
-Accept the ADR 0004 NaN-boxed layout for `aarch64-macos` with the existing
+Accept the ADR 0004 NaN-boxed layout for `macos-aarch64` with the existing
 checked 48-bit heap payload. This acceptance applies to ordinary C data
 pointers produced by the checked allocator and sanitizer configurations. It
 does not permit stripping pointer authentication, top-byte metadata, or wider
@@ -158,14 +160,14 @@ owned failure and requires a new representation decision before support.
 ### Standards evidence
 
 Keep *tests/test262/results.yaml* as the canonical compatibility manifest with
-one row per upstream path and `x86_64-linux-gnu` as its canonical target
-spelling. Keep *tests/test262/target-parity.yaml* as the separate target-parity
+one row per upstream path and `linux-x86_64-gnu` as its canonical target ID.
+Keep *tests/test262/target-parity.yaml* as the separate target-parity
 record. It pins the canonical manifest digest, suite revision, and supported
 execution targets.
 
 Each primary host executes the same reviewed subset, strictness modes,
 specialization policies, harness includes, module graphs, scheduler mode, and
-observations. The runner normalizes only the target spelling before comparing
+observations. The runner normalizes only the target ID before comparing
 the complete generated manifest with the canonical bytes. Any other difference
 fails the gate. This preserves one compatibility count while proving target
 agreement.
@@ -175,7 +177,7 @@ Consequences
 ------------
 
 Linux on AMD64 and macOS on AArch64 run the same native semantic corpus.
-`aarch64-linux-musl` remains portability evidence and cannot satisfy an
+`linux-aarch64-musl` remains portability evidence and cannot satisfy an
 execution requirement. Property failures and native fixture metadata record
 the normalized host, target, and sanitizer modes.
 

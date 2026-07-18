@@ -66,15 +66,18 @@ test("requires explicit native and cross targets", () => {
     architecture: "aarch64",
     operatingSystem: "macos",
   } as const;
-  assert.equal(targetForExecutionHost(linuxHost)?.name, "x86_64-linux-gnu");
-  assert.equal(targetForExecutionHost(macHost)?.name, "aarch64-macos");
-  assert.ok(canExecuteTarget(linuxHost, describeTarget("x86_64-linux-gnu")));
-  assert.ok(canExecuteTarget(macHost, describeTarget("aarch64-macos")));
-  assert.ok(!canExecuteTarget(macHost, describeTarget("aarch64-linux-musl")));
+  assert.equal(targetForExecutionHost(linuxHost)?.name, "linux-x86_64-gnu");
+  assert.equal(targetForExecutionHost(macHost)?.name, "macos-aarch64");
+  assert.equal(describeTarget("linux-x86_64-gnu").abi, "gnu");
+  assert.equal(describeTarget("linux-aarch64-musl").abi, "musl");
+  assert.equal(describeTarget("macos-aarch64").abi, undefined);
+  assert.ok(canExecuteTarget(linuxHost, describeTarget("linux-x86_64-gnu")));
+  assert.ok(canExecuteTarget(macHost, describeTarget("macos-aarch64")));
+  assert.ok(!canExecuteTarget(macHost, describeTarget("linux-aarch64-musl")));
   assert.ok(
     !canExecuteTarget(
       { architecture: "aarch64", operatingSystem: "linux" },
-      describeTarget("aarch64-linux-musl"),
+      describeTarget("linux-aarch64-musl"),
     ),
   );
   assert.equal(
@@ -86,6 +89,10 @@ test("requires explicit native and cross targets", () => {
   );
   assert.throws(
     () => describeTarget("unknown" as never),
+    /Unsupported native target/u,
+  );
+  assert.throws(
+    () => describeTarget("aarch64-macos" as never),
     /Unsupported native target/u,
   );
 });

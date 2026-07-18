@@ -13,6 +13,7 @@ import {
   parseReviewedSubset,
   parseTest262Case,
   serializeTest262Manifest,
+  serializeTargetParity,
 } from "../tools/test262.ts";
 import type {
   Test262ExecutionRequest,
@@ -281,7 +282,7 @@ test("executes every strictness and specialization variant", async () => {
   assert.deepEqual(result.dependencies, ["lexical-bindings"]);
   assert.deepEqual(result.execution, {
     harnessIncludes: ["base.js"],
-    target: "x86_64-linux-gnu",
+    target: "linux-x86_64-gnu",
     variants: [
       { specialization: "disabled", strictness: "non-strict" },
       { specialization: "enabled", strictness: "non-strict" },
@@ -411,6 +412,9 @@ test("serializes reviewed manifests without volatile metadata", () => {
   });
   assert.doesNotMatch(serialized, /timestamp|generatedAt/u);
   assert.ok(serialized.endsWith("\n"));
+  const parity = serializeTargetParity(serialized, revision);
+  assert.match(parity, /canonicalDigest: >-/u);
+  assert.ok(parity.split("\n").every((line) => line.length <= 80));
 });
 
 function respond(stdout: string): Test262Executor {

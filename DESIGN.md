@@ -85,8 +85,8 @@ that may change after the first vertical slice.
 | Bootstrap hosts        | Node.js and Deno                                              | Decided                             |
 | Type information       | Syntax-level hints, without TypeScript type checking          | Decided                             |
 | Optimization model     | Guarded specialized paths beside a generic path               | Decided                             |
-| Execution targets      | `x86_64-linux-gnu` and `aarch64-macos`                        | Implemented                         |
-| Portability target     | `aarch64-linux-musl` compile-link and inspection              | Implemented                         |
+| Execution targets      | `linux-x86_64-gnu` and `macos-aarch64`                        | Implemented                         |
+| Portability target     | `linux-aarch64-musl` compile-link and inspection              | Implemented                         |
 | Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Implemented in M1                   |
 | Generic value          | One 64-bit tagged word                                        | Decided in principle                |
 | Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for both execution targets |
@@ -405,8 +405,8 @@ model.
 Native backend
 --------------
 
-The initial backend emits shared C11 for `x86_64-linux-gnu`, `aarch64-macos`,
-and `aarch64-linux-musl`. A separate native toolchain adapter invokes pinned
+The initial backend emits shared C11 for `linux-x86_64-gnu`, `macos-aarch64`,
+and `linux-aarch64-musl`. A separate native toolchain adapter invokes pinned
 `zig cc` with an explicit target by default. Linux on AMD64 and macOS on
 AArch64 execute their matching artifacts. AArch64 Linux remains compile-link
 and inspection evidence. This keeps the first implementation in TypeScript,
@@ -417,6 +417,12 @@ milestone.
 Zig is a pinned bootstrap tool, not part of the generated program's semantic
 contract. Toolchain selection stays behind an interface so another C compiler
 can replace Zig without changing backend lowering or runtime semantics.
+
+Oseo target IDs use operating-system, architecture, and optional ABI order.
+They are stable compiler identifiers, not Zig or LLVM target strings. Concrete
+toolchain adapters own the mapping from structured target facts to their
+external spelling. `NativeOperatingSystem` remains an operating-system type;
+only execution-host detection may report `unknown`.
 
 The C backend is downstream of a backend-neutral interface. Oseo may later emit
 LLVM IR, use another code generator, or write object files directly without
@@ -540,10 +546,10 @@ under the deterministic native scheduler through the explicit CLI module
 goal. The gate rejects semantic failures, harness failures, or changes from
 the reviewed classification instead of counting unsupported cases as
 passes, and summaries keep raw, path-group, and dependency-tag totals.
-ADR 0014 keeps the Linux spelling as the canonical manifest target and adds a
-digest-pinned parity record. Each supported execution host reruns the complete
-reviewed subset and normalizes only the target spelling before comparing the
-manifest, so target evidence cannot duplicate compatibility counts.
+ADR 0015 keeps `linux-x86_64-gnu` as the canonical manifest target, while ADR
+0014 adds a digest-pinned parity record. Each supported execution host reruns
+the complete reviewed subset and normalizes only the target ID before comparing
+the manifest, so target evidence cannot duplicate compatibility counts.
 
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to

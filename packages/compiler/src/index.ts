@@ -5358,31 +5358,35 @@ export function compileSource(
   };
 }
 
-/** Architectures normalized at the compiler host boundary. */
-export type NativeArchitecture = "aarch64" | "unknown" | "x86_64";
+/** Architecture facts admitted by Oseo native targets. */
+export type NativeArchitecture = "aarch64" | "x86_64";
 
-/** Operating systems normalized at the compiler host boundary. */
-export type NativeOperatingSystem = "linux" | "macos" | "unknown";
+/** Operating-system facts admitted by Oseo native targets. */
+export type NativeOperatingSystem = "linux" | "macos";
 
-/** The targets exercised by the native fixture harness. */
+/** ABI environments distinguished by Oseo's native Linux targets. */
+export type NativeAbi = "gnu" | "musl";
+
+/** Stable Oseo native target IDs in OS-architecture-ABI order. */
 export type TargetName =
-  | "aarch64-linux-musl"
-  | "aarch64-macos"
-  | "x86_64-linux-gnu";
+  | "linux-aarch64-musl"
+  | "linux-x86_64-gnu"
+  | "macos-aarch64";
 
-/** Normalized facts about the host that may execute a native artifact. */
+/** Normalized host detection, including explicitly unknown reported facts. */
 export interface ExecutionHostDescription {
-  readonly architecture: NativeArchitecture;
-  readonly operatingSystem: NativeOperatingSystem;
+  readonly architecture: NativeArchitecture | "unknown";
+  readonly operatingSystem: NativeOperatingSystem | "unknown";
 }
 
-/** Explicit target properties consumed by native toolchain adapters. */
+/** Toolchain-neutral artifact facts for one explicit Oseo target ID. */
 export interface TargetDescription {
-  readonly architecture: Exclude<NativeArchitecture, "unknown">;
+  readonly abi?: NativeAbi;
+  readonly architecture: NativeArchitecture;
   readonly cStandard: "c11";
   readonly executableFormat: "elf" | "mach-o";
   readonly name: TargetName;
-  readonly operatingSystem: Exclude<NativeOperatingSystem, "unknown">;
+  readonly operatingSystem: NativeOperatingSystem;
   readonly sanitizers: readonly ("address" | "undefined")[];
 }
 
@@ -5472,8 +5476,9 @@ export function renderDiagnostic(diagnostic: Diagnostic): string {
 
 /** Return the immutable artifact facts for an explicit native target. */
 export function describeTarget(name: TargetName): TargetDescription {
-  if (name === "x86_64-linux-gnu") {
+  if (name === "linux-x86_64-gnu") {
     return {
+      abi: "gnu",
       architecture: "x86_64",
       cStandard: "c11",
       executableFormat: "elf",
@@ -5482,7 +5487,7 @@ export function describeTarget(name: TargetName): TargetDescription {
       sanitizers: ["address", "undefined"],
     };
   }
-  if (name === "aarch64-macos") {
+  if (name === "macos-aarch64") {
     return {
       architecture: "aarch64",
       cStandard: "c11",
@@ -5492,8 +5497,9 @@ export function describeTarget(name: TargetName): TargetDescription {
       sanitizers: ["address", "undefined"],
     };
   }
-  if (name === "aarch64-linux-musl") {
+  if (name === "linux-aarch64-musl") {
     return {
+      abi: "musl",
       architecture: "aarch64",
       cStandard: "c11",
       executableFormat: "elf",
@@ -5518,10 +5524,10 @@ export function targetForExecutionHost(
   host: ExecutionHostDescription,
 ): TargetDescription | undefined {
   if (host.architecture === "x86_64" && host.operatingSystem === "linux") {
-    return describeTarget("x86_64-linux-gnu");
+    return describeTarget("linux-x86_64-gnu");
   }
   if (host.architecture === "aarch64" && host.operatingSystem === "macos") {
-    return describeTarget("aarch64-macos");
+    return describeTarget("macos-aarch64");
   }
   return undefined;
 }

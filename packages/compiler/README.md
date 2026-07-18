@@ -7,8 +7,10 @@ Concrete parser, backend, runtime, toolchain, and host packages implement these
 contracts without becoming compiler-core dependencies.
 
 Native target descriptions contain immutable artifact facts, including the
-architecture, operating system, executable format, C standard, Zig triple, and
-sanitizer policy. Execution-host descriptions are separate capabilities.
+architecture, operating system, ABI, executable format, C standard, and
+sanitizer policy. Stable Oseo target IDs use operating-system, architecture,
+and optional ABI order. Concrete toolchain spellings do not enter the compiler
+core. Execution-host descriptions are separate capabilities.
 `targetForExecutionHost` selects the one supported target for a normalized
 host, while `canExecuteTarget` rejects mismatched pairs before process
 execution.

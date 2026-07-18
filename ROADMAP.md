@@ -162,7 +162,7 @@ expand the profile, but accepted features may not have placeholder semantics.
 
 M1 completion is exercised by eight reviewed differential fixture classes.
 Their observations match under Node.js, Deno, Linux AMD64, and macOS AArch64
-execution, and each fixture compile-links for `aarch64-linux-musl`. The matrix
+execution, and each fixture compile-links for `linux-aarch64-musl`. The matrix
 covers all M1
 primitive kinds, conversions, operators, lexical control flow, direct calls,
 recursion, argument ordering, hint invariance, numeric edges, strict C11

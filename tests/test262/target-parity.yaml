@@ -1,7 +1,7 @@
 canonicalDigest: >-
-  sha256:459c96ad2c6a18678155513ae42f842d518542442e20157705bc0e2a79325905
+  sha256:76dd7d820c0933d1965944ead6d119470aecf9348448a6249df41e9bf703230e
 canonicalManifest: results.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 targets:
-  - x86_64-linux-gnu
-  - aarch64-macos
+  - linux-x86_64-gnu
+  - macos-aarch64

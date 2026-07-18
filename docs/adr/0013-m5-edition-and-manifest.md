@@ -122,7 +122,7 @@ results:
     dependencies: [module-linking, top-level-await]
     execution:            # omitted when nothing executed
       harnessIncludes: [base.js, doneprintHandle.js, compareArray.js]
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       scheduler: deterministic-logical-clock   # module and async cases
       variants:           # every executed combination, in order
         - { strictness: strict, specialization: disabled }

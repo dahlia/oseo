@@ -16,7 +16,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -47,7 +47,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -78,7 +78,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -109,7 +109,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -140,7 +140,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -171,7 +171,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -202,7 +202,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -1078,7 +1078,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -1499,7 +1499,7 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -1972,7 +1972,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2048,7 +2048,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2173,7 +2173,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2222,7 +2222,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2274,7 +2274,7 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2305,7 +2305,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2332,7 +2332,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2381,7 +2381,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -2408,7 +2408,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -3136,7 +3136,7 @@ results:
           id: test/language/module-code/eval-gtbndng-local-bndng-const.js
           sourceHash: fnv1a64:5dcb2a067ecf477c
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -3169,7 +3169,7 @@ results:
           id: test/language/module-code/eval-gtbndng-local-bndng-let.js
           sourceHash: fnv1a64:7339e32b0ea0921b
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -3249,7 +3249,7 @@ results:
           id: test/language/module-code/export-default-asyncfunction-declaration-binding.js
           sourceHash: fnv1a64:4e0ba7dadeb3f229
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -3333,7 +3333,7 @@ results:
           id: test/language/module-code/export-default-function-declaration-binding.js
           sourceHash: fnv1a64:6324898041c476db
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -4408,7 +4408,7 @@ results:
           id: test/language/module-code/instn-star-equality-other_FIXTURE.js
           sourceHash: fnv1a64:4be5550c656ee09a
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -4482,7 +4482,7 @@ results:
           id: test/language/module-code/instn-star-iee-multi-cycle-same-name-d_FIXTURE.js
           sourceHash: fnv1a64:72e25195b7e74174
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -4527,7 +4527,7 @@ results:
           id: test/language/module-code/instn-star-iee-single-cycle-same-name-c_FIXTURE.js
           sourceHash: fnv1a64:4510fa9b47e69033
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -7242,7 +7242,7 @@ results:
           id: test/language/module-code/parse-export-empty.js
           sourceHash: fnv1a64:3551b19fff3fdbbd
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -7524,7 +7524,7 @@ results:
           id: test/language/module-code/top-level-await/await-expr-func-expression.js
           sourceHash: fnv1a64:f5ac6e05d4d1a081
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -8235,7 +8235,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8269,7 +8269,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8303,7 +8303,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8337,7 +8337,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8514,7 +8514,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8679,7 +8679,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8766,7 +8766,7 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8797,7 +8797,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8828,7 +8828,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -8855,7 +8855,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: strict
@@ -8882,7 +8882,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8931,7 +8931,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -8983,7 +8983,7 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9014,7 +9014,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9041,7 +9041,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9093,7 +9093,7 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9124,7 +9124,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9155,7 +9155,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9186,7 +9186,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9217,7 +9217,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9248,7 +9248,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9279,7 +9279,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict
@@ -9310,7 +9310,7 @@ results:
     execution:
       harnessIncludes:
         - base.js
-      target: x86_64-linux-gnu
+      target: linux-x86_64-gnu
       variants:
         - specialization: disabled
           strictness: non-strict

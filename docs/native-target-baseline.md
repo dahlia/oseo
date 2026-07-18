@@ -7,6 +7,8 @@ Status
 This baseline records the target evidence immediately before implementation of
 [*PLAN-MACOS.md*](../PLAN-MACOS.md). The baseline commit is
 `35d90ba57cd503f82685509a0991de0449636f8c`.
+Its target names preserve the Zig-shaped identifiers in that commit. ADR 0015
+later introduced stable OS-first Oseo target IDs.
 
 
 Linux on AMD64
