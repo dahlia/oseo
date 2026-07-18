@@ -663,6 +663,61 @@ console.log(
 `,
   },
   {
+    name: "short-circuit-and-conditional",
+    source: `
+function logging(label, value) { console.log(label); return value; }
+console.log(true && "right", 0 || "fallback", "left" || "unused");
+console.log(false && logging("skipped-and", 1));
+console.log("" || logging("or-right", "reached"));
+console.log(logging("first", null) && logging("skipped-chain", 2));
+console.log(logging("second", 1) && logging("third", "kept"));
+console.log(null || undefined, "" && 0, NaN || "nan-fallback");
+console.log(1 && 0 || "chain", 0 && 1 || "short");
+console.log(1 ? logging("taken", "yes") : logging("skipped-else", "no"));
+console.log("" ? logging("skipped-then", 1) : logging("else", "no"));
+console.log(1 ? 2 ? "both" : "first-only" : "neither");
+console.log((0 ? "a" : "b") + (1 && "c") + (undefined || "d"));
+let effects = 0;
+const touch = function () { effects = effects + 1; return effects; };
+console.log(touch() && touch(), effects);
+console.log(false && touch(), effects);
+`,
+  },
+  {
+    name: "do-while-loops",
+    source: `
+let count = 0;
+do { count = count + 1; } while (count < 3);
+console.log(count);
+let once = 0;
+do { once = once + 1; } while (false);
+console.log(once);
+let controlled = 0;
+do {
+  controlled = controlled + 1;
+  if (controlled === 2) continue;
+  if (controlled >= 4) break;
+  console.log("body", controlled);
+} while (true);
+console.log("after", controlled);
+function returning(limit) {
+  let steps = 0;
+  do {
+    steps = steps + 1;
+    if (steps >= limit) return steps;
+  } while (true);
+}
+console.log(returning(5));
+function alwaysReturns() {
+  do { return "immediate"; } while (true);
+}
+console.log(alwaysReturns());
+let text = "";
+do text = text + "x"; while (text !== "xxx");
+console.log(text);
+`,
+  },
+  {
     name: "typeof-void-remainder",
     source: `
 const numberBinding = 1;

@@ -480,7 +480,8 @@ dependency-indexed baseline is published.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
 source challenge features through explicit unsupported classifications, and
 the core expression stream has begun with the `typeof`, `void`, and `%`
-operators. The remaining queue is:
+operators, short-circuit and conditional expressions, and the `do-while`
+statement. The remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.

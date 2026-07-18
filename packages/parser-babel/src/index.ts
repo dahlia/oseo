@@ -637,6 +637,39 @@ function expression(
       ? undefined
       : { ...located, ...member, kind: "property-set", value: assigned };
   }
+  if (value.type === "LogicalExpression") {
+    const operator = value.operator;
+    if (operator !== "&&" && operator !== "||") {
+      return unsupported(
+        context,
+        value,
+        "This logical operator is unsupported.",
+      );
+    }
+    const leftNode = node(value.left);
+    const rightNode = node(value.right);
+    if (leftNode == null || rightNode == null)
+      return unsupported(context, value);
+    const left = expression(context, leftNode);
+    const right = expression(context, rightNode);
+    if (left == null || right == null) return undefined;
+    return { ...located, kind: "logical", left, operator, right };
+  }
+  if (value.type === "ConditionalExpression") {
+    const testNode = node(value.test);
+    const consequentNode = node(value.consequent);
+    const alternateNode = node(value.alternate);
+    if (testNode == null || consequentNode == null || alternateNode == null) {
+      return unsupported(context, value);
+    }
+    const test = expression(context, testNode);
+    const consequent = expression(context, consequentNode);
+    const alternate = expression(context, alternateNode);
+    if (test == null || consequent == null || alternate == null) {
+      return undefined;
+    }
+    return { ...located, alternate, consequent, kind: "conditional", test };
+  }
   if (value.type === "BinaryExpression") {
     const operator = value.operator;
     const accepted = new Set<unknown>([
@@ -803,6 +836,17 @@ function statement(
     return test == null || body == null
       ? undefined
       : { ...located, body, kind: "while", test };
+  }
+  if (value.type === "DoWhileStatement") {
+    const bodyNode = node(value.body);
+    const testNode = node(value.test);
+    if (bodyNode == null || testNode == null)
+      return unsupported(context, value);
+    const body = statement(context, bodyNode, functionBody);
+    const test = expression(context, testNode);
+    return body == null || test == null
+      ? undefined
+      : { ...located, body, kind: "do-while", test };
   }
   if (value.type === "ReturnStatement") {
     if (!functionBody) {

@@ -24,9 +24,10 @@ Delivery item 7 is resolved for dynamic source:
 `Function` constructor, and dynamic import explicitly unsupported with owned
 diagnostics and the `dynamic-source` manifest tag. Realms, agents, and
 shared memory remain classified through missing harness capabilities.
-Delivery item 4 is in progress: the `typeof`, `void`, and `%` operators are
-admitted with native differential, structural, and reviewed test262
-evidence. Delivery items 4 through 6, 8, and 9, from the remaining
+Delivery item 4 is in progress: the `typeof`, `void`, and `%` operators,
+the `&&`, `||`, and conditional `?:` operators, and the `do-while`
+statement are admitted with native differential, structural, and reviewed
+test262 evidence. Delivery items 4 through 6, 8, and 9, from the remaining
 foundational expressions through closing the named edition, remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),

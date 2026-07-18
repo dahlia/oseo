@@ -2136,6 +2136,74 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/conditional/S11.12_A2.1_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/conditional/S11.12_A2.1_T1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/conditional/S11.12_A2.1_T1.js:70:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/conditional/in-branch-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/conditional/in-condition.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -2392,6 +2460,54 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/logical-and/S11.11.1_A2.1_T1.js:70:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/logical-or/S11.11.2_A3_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/logical-or/S11.11.2_A3_T1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/logical-or/S11.11.2_A3_T1.js:72:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -9012,6 +9128,120 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/S12.6.1_A15.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/S12.6.1_A6_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/cptn-normal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+    observation:
+      detail: "test/language/statements/do-while/cptn-normal.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/do-while/cptn-normal.js:71:18:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/decl-const.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/decl-let.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -9556,11 +9786,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 178
+  expectedNegatives: 184
   harnessFailures: 0
   passes: 52
   semanticFailures: 0
-  unsupportedProfileFeatures: 157
+  unsupportedProfileFeatures: 161
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -9574,18 +9804,24 @@ summary:
       passes: 10
       semanticFailures: 0
       unsupportedProfileFeatures: 26
+    - dependency: control-flow
+      expectedNegatives: 4
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
     - dependency: expression-operators
-      expectedNegatives: 0
+      expectedNegatives: 2
       harnessFailures: 0
       passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 10
     - dependency: functions
       expectedNegatives: 8
       harnessFailures: 0
@@ -9593,7 +9829,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: lexical-bindings
-      expectedNegatives: 0
+      expectedNegatives: 2
       harnessFailures: 0
       passes: 4
       semanticFailures: 0
@@ -9636,11 +9872,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 31
+      expectedNegatives: 33
       harnessFailures: 0
       passes: 12
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 23
     - group: language/module-code
       expectedNegatives: 122
       harnessFailures: 0
@@ -9648,8 +9884,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 87
     - group: language/statements
-      expectedNegatives: 25
+      expectedNegatives: 29
       harnessFailures: 0
       passes: 23
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 15

@@ -85,6 +85,20 @@ its deliberate boundary and its evidence:
     unresolved reference, and this deviation is explicit rather than a
     silent approximation. The affected test262 case remains classified
     unsupported until an owned decision admits unresolved references.
+ -  The `&&` and `||` logical operators and the conditional `?:` operator,
+    lowered through explicit MIR branches and a parameterized join block.
+    The untaken operand never evaluates, the produced value is the operand
+    value rather than a coerced boolean, and evaluation order and abrupt
+    completion follow the lowered control flow. `??` and the logical
+    assignment operators remain rejected. `await` inside a logical or
+    conditional operand is rejected with a source-located diagnostic in
+    both async function bodies and module top level, because a
+    conditionally evaluated suspension has no owned continuation contract
+    yet.
+ -  The `do-while` statement, lowered body-first with the same loop, join,
+    `break`, and `continue` structure as `while`. `continue` re-enters the
+    loop through the condition, and a body that always completes abruptly
+    leaves the condition unreachable rather than approximated.
 
 
 Known gaps inside the claim

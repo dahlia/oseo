@@ -353,6 +353,60 @@ test("converts typeof, void, and remainder to owned syntax", () => {
   assert.match(hirText, /% 2/u);
 });
 
+test("converts logical, conditional, and do-while to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let value = 0;\n" +
+      "do { value = value + 1; } while (value < 3);\n" +
+      'console.log(value && "kept", value || "fallback");\n' +
+      'console.log(value === 3 ? "three" : "other");\n',
+    sourceId: "control-flow.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /do @/u);
+  assert.match(hirText, /&&/u);
+  assert.match(hirText, /\|\|/u);
+  assert.match(hirText, /\? "three" : "other"/u);
+});
+
+test("rejects await inside logical operands of async functions", () => {
+  const result = compileSource(babelFrontend, {
+    source: "async function first(input) { return input && (await input); }",
+    sourceId: "async-logical.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Await is supported/u);
+});
+
+test("rejects top-level await inside logical operands", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export const ready = (await Promise.resolve(1)) && 2;",
+    sourceId: "file:///app/logical-await.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/logical-await.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/logical-await.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "logical-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.match(
+    compiled.diagnostics[0]?.message ?? "",
+    /control-flow position/u,
+  );
+});
+
 test("rejects typeof with an unresolved name explicitly", () => {
   const result = compileSource(babelFrontend, {
     source: "console.log(typeof missing);",
@@ -370,6 +424,9 @@ const unsupportedForms = [
   ["bitwise complement", "console.log(~1);"],
   ["update expression", "let value = 1; value++;"],
   ["bitwise and", "console.log(1 & 1);"],
+  ["nullish coalescing", "console.log(null ?? 1);"],
+  ["logical assignment", "let value = null; value ||= 1;"],
+  ["comma sequence", "console.log((1, 2));"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
   ["module", 'import "fixture";'],
