@@ -2001,8 +2001,7 @@ results:
     dependencies:
       - async-functions
     observation:
-      detail:
-        'test/language/expressions/await/await-BindingIdentifier-in-global.js
+      detail: 'test/language/expressions/await/await-BindingIdentifier-in-global.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/expressions/await/await-BindingIdentifier-in-global.js:61:8:
         error[OSEO1001]: This binary operator is unsupported.\n"'
@@ -8463,8 +8462,7 @@ results:
     dependencies:
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
+      detail: 'test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js:66:8:
         error[OSEO1001]: This binary operator is unsupported.\n"'
@@ -8547,8 +8545,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-reject-finally-reject.js
+      detail: 'test/language/statements/async-function/try-reject-finally-reject.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-reject-finally-reject.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8574,8 +8571,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-reject-finally-return.js
+      detail: 'test/language/statements/async-function/try-reject-finally-return.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-reject-finally-return.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8601,8 +8597,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-reject-finally-throw.js
+      detail: 'test/language/statements/async-function/try-reject-finally-throw.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-reject-finally-throw.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8628,8 +8623,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-return-finally-reject.js
+      detail: 'test/language/statements/async-function/try-return-finally-reject.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-return-finally-reject.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8655,8 +8649,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-return-finally-return.js
+      detail: 'test/language/statements/async-function/try-return-finally-return.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-return-finally-return.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8717,8 +8710,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-throw-finally-reject.js
+      detail: 'test/language/statements/async-function/try-throw-finally-reject.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-throw-finally-reject.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression
@@ -8744,8 +8736,7 @@ results:
       - abrupt-completion
       - async-functions
     observation:
-      detail:
-        'test/language/statements/async-function/try-throw-finally-return.js
+      detail: 'test/language/statements/async-function/try-throw-finally-return.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/async-function/try-throw-finally-return.js:77:3:
         error[OSEO1001]: Await is supported in declarations, expression

@@ -8,11 +8,17 @@ Implementation status: active. M4 established closed native module graphs,
 live bindings, promises, asynchronous continuations, top-level await, and a
 deterministic native scheduler. M5 expands that documented subset through
 measured compatibility work rather than treating ECMAScript as one feature.
-The first checkpoint is complete:
+
+The first three delivery items are complete.
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
 edition, optional-section policy, and manifest schema, and
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) is the living
-M5 profile.
+M5 profile. The test262 harness executes module and asynchronous cases under
+the deterministic native scheduler through the explicit CLI module goal, and
+the dependency-indexed baseline manifest covers module linking and early
+errors, top-level await, asynchronous functions, and the Promise family with
+honest unsupported classifications. Delivery items 4 through 9, from
+foundational expressions through closing the named edition, remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
