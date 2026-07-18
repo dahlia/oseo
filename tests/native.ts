@@ -830,6 +830,393 @@ console.log(conflicting("value", 1));
       overflowMisses: 0,
     },
   },
+  {
+    name: "promises-and-reactions",
+    source: `
+function settle(resolve) {
+  resolve(41);
+  resolve(0);
+}
+function show(value) { console.log("fulfilled", value); }
+function showRejected(reason) { console.log("rejected", reason); }
+function showAll(values) { console.log("all", values[0], values[1]); }
+function showEmpty(values) { console.log("empty", values.length); }
+function cleanup() { console.log("cleanup"); }
+function cleanupReject() { return Promise.reject(10); }
+function cleanupThrow() { throw 11; }
+function invalidInput() { console.log("invalid input"); }
+function showConstructible(label, callback) {
+  try {
+    new callback(31);
+  } catch (error) {
+    console.log(label, "not constructible");
+  }
+}
+function showObservableAll(values) {
+  console.log("observable all", values[0]);
+}
+function showObservableRace(value) {
+  console.log("observable race", value);
+}
+let settleAdopted;
+const adopted = new Promise(function pending(resolve) {
+  settleAdopted = resolve;
+});
+const latched = new Promise(function resolveFirst(resolve, reject) {
+  resolve(adopted);
+  reject("late rejection");
+});
+const thrownAfterResolve = new Promise(function resolveThenThrow(resolve) {
+  resolve(adopted);
+  throw "late executor throw";
+});
+const thenable = {
+  then: function resolveFirst(resolve, reject) {
+    resolve(adopted);
+    reject("late thenable rejection");
+  },
+};
+console.log("sync start");
+new Promise(settle).then(show);
+latched.then(show, showRejected);
+thrownAfterResolve.then(show, showRejected);
+Promise.resolve(thenable).then(show, showRejected);
+Promise.resolve(2).then(show);
+Promise.reject(3).catch(showRejected);
+Promise.all([Promise.resolve(4), 5]).then(showAll);
+Promise.all([]).then(showEmpty);
+Promise.all([Promise.reject(14), 15]).catch(showRejected);
+Promise.race([Promise.resolve(6), Promise.resolve(7)]).then(show);
+Promise.resolve(8).finally(cleanup).then(show);
+Promise.reject(9).finally(cleanup).catch(showRejected);
+Promise.resolve(12).finally(cleanupReject).catch(showRejected);
+Promise.resolve(13).finally(cleanupThrow).catch(showRejected);
+Promise.all(1).catch(invalidInput);
+Promise.race(null).catch(invalidInput);
+let exposedResolve;
+let exposedReject;
+const exposedPromise = new Promise(function expose(resolve, reject) {
+  exposedResolve = resolve;
+  exposedReject = reject;
+});
+showConstructible("resolve", exposedResolve);
+showConstructible("reject", exposedReject);
+exposedPromise.then(show, showRejected);
+exposedResolve(32);
+const catchObservable = Promise.resolve(33);
+catchObservable.then = function observableCatch(onFulfilled, onRejected) {
+  console.log("observable catch then");
+  return onRejected(34);
+};
+catchObservable.catch(showRejected);
+const finallyObservable = Promise.resolve(35);
+finallyObservable.then = function observableFinally(onFulfilled) {
+  console.log("observable finally then");
+  return onFulfilled(36);
+};
+finallyObservable.finally(cleanup).then(show);
+function observableCleanup() {
+  const result = Promise.resolve(0);
+  result.then = function observableCleanupThen(onFulfilled) {
+    console.log("observable cleanup then");
+    return onFulfilled(0);
+  };
+  return result;
+}
+Promise.resolve(37).finally(observableCleanup).then(show);
+const observable = Promise.resolve(23);
+observable.then = function observableThen(onFulfilled) {
+  console.log("observable then");
+  onFulfilled(24);
+};
+Promise.all([observable]).then(showObservableAll);
+Promise.race([observable]).then(showObservableRace);
+const allCallbacks = Promise.resolve(0);
+allCallbacks.then = function inspectAllCallbacks(onFulfilled, onRejected) {
+  showConstructible("all resolve", onFulfilled);
+  showConstructible("all reject", onRejected);
+  onFulfilled(43);
+};
+Promise.all([allCallbacks]).then(showObservableAll, showRejected);
+const raceCallbacks = Promise.resolve(0);
+raceCallbacks.then = function inspectRaceCallbacks(onFulfilled, onRejected) {
+  showConstructible("race resolve", onFulfilled);
+  showConstructible("race reject", onRejected);
+  onFulfilled(44);
+};
+Promise.race([raceCallbacks]).then(showObservableRace, showRejected);
+const adversarial = Promise.resolve(27);
+adversarial.then = function callBoth(onFulfilled, onRejected) {
+  onFulfilled(28);
+  onRejected(29);
+};
+Promise.all([adversarial, Promise.resolve(30)]).catch(showRejected);
+const throwingThen = Promise.resolve(25);
+throwingThen.then = function throwFromThen() { throw 26; };
+Promise.all([throwingThen]).catch(showRejected);
+const shrinkingFirst = Promise.resolve(0);
+const shrinkingValues = [shrinkingFirst, 2];
+shrinkingFirst.then = function shrinkDuringAll(onFulfilled) {
+  shrinkingValues.length = 1;
+  return onFulfilled(40);
+};
+Promise.all(shrinkingValues).then(function showShrinkingAll(values) {
+  console.log("shrinking all", values.length, values[0]);
+});
+const growingFirst = Promise.resolve(0);
+const growingSecond = Promise.resolve(0);
+const growingValues = [growingFirst];
+growingFirst.then = function growDuringRace(onFulfilled) {
+  growingValues[1] = growingSecond;
+  return onFulfilled(41);
+};
+growingSecond.then = function observeGrowingRace(onFulfilled) {
+  console.log("growing race element");
+  return onFulfilled(42);
+};
+Promise.race(growingValues).then(show);
+const decorated = Promise.resolve(21);
+decorated.value = 22;
+console.log("promise property", decorated.value, Object.keys(decorated)[0]);
+decorated.then = function ownThen() { console.log("own then"); };
+decorated.then();
+const methodOwner = Promise.resolve(45);
+console.log(
+  "promise method prototypes",
+  Object.getOwnPropertyDescriptor(methodOwner.then, "prototype") ===
+    undefined,
+  Object.getOwnPropertyDescriptor(methodOwner.catch, "prototype") ===
+    undefined,
+  Object.getOwnPropertyDescriptor(methodOwner.finally, "prototype") ===
+    undefined,
+);
+Object.setPrototypeOf(methodOwner, null);
+console.log(
+  "null promise prototype",
+  methodOwner.then === undefined,
+  methodOwner.catch === undefined,
+  methodOwner.finally === undefined,
+);
+console.log("sync end");
+settleAdopted(16);
+`,
+  },
+  {
+    name: "async-continuations",
+    source: `
+async function calculate(value) {
+  console.log("entered", value);
+  const first = await Promise.resolve(value);
+  console.log("resumed", first);
+  const second = await 2;
+  return first + second;
+}
+const expression = async function (value) { return await value; };
+const arrow = async (value) => await value;
+async function readThis() { await 0; return this.value; }
+function makeArrow() {
+  return async () => { await 0; return this.value; };
+}
+async function failEarly() { throw "early"; }
+async function failLate() { await 0; throw "late"; }
+async function shadow(Promise) { return await Promise; }
+async function choose(value) {
+  if (value) return 17;
+  return 18;
+}
+async function returnedDeclaration() {
+  return later();
+  function later() { return 25; }
+}
+async function thrownDeclaration() {
+  throw later();
+  function later() { return "hoisted throw"; }
+}
+async function hoistedAcrossAwait() {
+  const value = later();
+  await 0;
+  function later() { return 19; }
+  return value;
+}
+async function tdzAcrossAwait() {
+  try {
+    console.log(later);
+  } catch (error) {
+    console.log("async tdz");
+  }
+  await 0;
+  let later = 20;
+  return later;
+}
+async function finalReturn() {
+  try {
+    return 21;
+  } finally {
+    return 22;
+  }
+}
+async function finalThrow() {
+  try {
+    return 23;
+  } finally {
+    throw "final throw";
+  }
+}
+const internallyAwaited = Promise.resolve(24);
+internallyAwaited.then = function overriddenAwait() {
+  console.log("incorrect await override");
+  return Promise.resolve(0);
+};
+async function awaitInternally() { return await internallyAwaited; }
+const orderingReady = Promise.resolve(0);
+async function orderedAsync() {
+  await orderingReady;
+  console.log("async ordering");
+}
+function rejected(reason) { console.log("async rejected", reason); }
+function showThis(value) { console.log("async this", value); }
+const owner = { value: 41, read: readThis, make: makeArrow };
+const other = { value: 0, read: owner.make() };
+console.log("sync start");
+calculate(40).then(function (value) { console.log("result", value); });
+expression(3).then(function (value) { console.log("expression", value); });
+arrow(4).then(function (value) { console.log("arrow", value); });
+owner.read().then(showThis);
+other.read().then(showThis);
+failEarly().catch(rejected);
+failLate().catch(rejected);
+shadow(5).then(function (value) { console.log("shadow", value); });
+choose(true).then(function (value) { console.log("choose", value); });
+returnedDeclaration().then(function (value) {
+  console.log("returned declaration", value);
+});
+thrownDeclaration().catch(function (reason) {
+  console.log("thrown declaration", reason);
+});
+hoistedAcrossAwait().then(function (value) {
+  console.log("hoisted", value);
+});
+tdzAcrossAwait().then(function (value) { console.log("tdz", value); });
+finalReturn().then(function (value) { console.log("final return", value); });
+finalThrow().catch(function (reason) { console.log("final throw", reason); });
+awaitInternally().then(function (value) {
+  console.log("internal await", value);
+});
+orderedAsync();
+orderingReady.then(function firstPlainStep() {
+  return Promise.resolve().then(function secondPlainStep() {
+    console.log("plain ordering");
+  });
+});
+console.log(
+  "async prototype",
+  Object.getOwnPropertyDescriptor(expression, "prototype") === undefined,
+);
+try {
+  new expression(0);
+} catch (error) {
+  console.log("async not constructible");
+}
+try {
+  new arrow(0);
+} catch (error) {
+  console.log("async arrow not constructible");
+}
+console.log("sync end");
+`,
+  },
+  {
+    name: "timer-event-loop",
+    source: `
+function microtask(value) { console.log("microtask", value); }
+function task(value) {
+  console.log("timer", value);
+  Promise.resolve(value).then(microtask);
+}
+function scheduleNested() {
+  console.log("timer second");
+  setTimeout(task, 0, "nested");
+  Promise.resolve("second").then(microtask);
+}
+const objectDelay = {
+  valueOf: function objectDelayValue() {
+    console.log("coerce object delay");
+    return 30;
+  },
+};
+function functionDelay() {}
+functionDelay.valueOf = function functionDelayValue() {
+  console.log("coerce function delay");
+  return 40;
+};
+const nestedDelay = [1];
+nestedDelay.toString = function nestedDelayString() {
+  console.log("coerce nested array delay");
+  return "10";
+};
+const nestedValueDelay = [1];
+nestedValueDelay.toString = function nestedValueDelayString() {
+  return nestedValueDelay;
+};
+nestedValueDelay.valueOf = function nestedValueDelayValue() {
+  console.log("coerce nested array valueOf");
+  return "15";
+};
+const nullPrototypeDelay = Object.create(null);
+nullPrototypeDelay.valueOf = function nullPrototypeDelayValue() {
+  console.log("coerce null prototype delay");
+  return "20";
+};
+const inheritedArrayDelay = {};
+Object.setPrototypeOf(inheritedArrayDelay, [5]);
+const customJoinDelay = [1];
+customJoinDelay.join = function customJoinDelayJoin() {
+  console.log("coerce custom array join");
+  return "7";
+};
+const inheritedJoinPrototype = [];
+inheritedJoinPrototype.join = function inheritedJoinDelayJoin() {
+  console.log("coerce inherited array join");
+  return "9";
+};
+const inheritedJoinDelay = [1];
+Object.setPrototypeOf(inheritedJoinDelay, inheritedJoinPrototype);
+const invalidJoinDelay = [1];
+invalidJoinDelay.join = function invalidJoinDelayJoin() {
+  return {};
+};
+try {
+  setTimeout(task, { valueOf: 1, toString: 2 }, "invalid delay");
+} catch (error) {
+  console.log("invalid timer delay");
+}
+try {
+  setTimeout(task, invalidJoinDelay, "invalid join delay");
+} catch (error) {
+  console.log("invalid array join delay");
+}
+try {
+  setTimeout(task, Object.create(null), "invalid null delay");
+} catch (error) {
+  console.log("invalid null prototype delay");
+}
+const canceled = setTimeout(task, 0, "canceled");
+clearTimeout(canceled);
+setTimeout(task, 100, "late");
+setTimeout(task, 0, "first");
+setTimeout(scheduleNested, 0);
+setTimeout(task, [5], "array delay");
+setTimeout(task, [nestedDelay], "nested array delay");
+setTimeout(task, [nestedValueDelay], "nested array valueOf");
+setTimeout(task, [nullPrototypeDelay], "null prototype delay");
+setTimeout(task, inheritedArrayDelay, "inherited array delay");
+setTimeout(task, customJoinDelay, "custom join delay");
+setTimeout(task, inheritedJoinDelay, "inherited join delay");
+setTimeout(task, objectDelay, "object delay");
+setTimeout(task, functionDelay, "function delay");
+console.log("scheduled");
+`,
+  },
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {
@@ -927,8 +1314,10 @@ for (const fixture of fixtures) {
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
+    fixture.name === "async-continuations" ||
     fixture.name === "generic-addition" ||
-    fixture.name === "guarded-addition"
+    fixture.name === "guarded-addition" ||
+    fixture.name === "timer-event-loop"
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
@@ -1106,8 +1495,9 @@ await withNativeFixture(
     toolchain: zigToolchain,
   },
   (cross) => {
-    assert.match(cross.emittedC, /switch \(dynamic_code_id_\d+\)/u);
-    assert.match(cross.emittedC, /oseo_function_0\(context/u);
+    assert.match(cross.emittedC, /switch \(code_id\)/u);
+    assert.match(cross.emittedC, /oseo_call_function\(context/u);
+    assert.match(cross.emittedC, /result = oseo_function_0\(/u);
   },
 );
 
@@ -1215,6 +1605,148 @@ assert.match(
   /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
 );
 
+const objectTimerDelay = await runNativeCli(
+  {
+    args: ["object-timer-delay.ts"],
+    source: `
+function task(value) { console.log(value); }
+setTimeout(task, {}, "object delay");
+setTimeout(task, function delay() {}, "function delay");
+`,
+    sourceId: "object-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(objectTimerDelay.exitStatus, 0);
+assert.equal(objectTimerDelay.stderr, "");
+assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
+
+const asyncPromiseIdentity = await runNativeCli(
+  {
+    args: ["async-promise-identity.ts"],
+    source: `
+let inner;
+async function source() { await 0; }
+async function wrapper() { inner = source(); return inner; }
+const outer = wrapper();
+console.log(outer === inner);
+`,
+    sourceId: "async-promise-identity.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(asyncPromiseIdentity.exitStatus, 0);
+assert.equal(asyncPromiseIdentity.stderr, "");
+assert.equal(asyncPromiseIdentity.stdout, "false\n");
+
+const asyncPromiseAssimilation = await runNativeCli(
+  {
+    args: ["async-promise-assimilation.ts"],
+    source: `
+const inner = Promise.resolve(1);
+inner.then = function customThen(onFulfilled) {
+  console.log("custom then");
+  return onFulfilled(2);
+};
+async function wrapper() { return inner; }
+wrapper().then(function show(value) { console.log(value); });
+`,
+    sourceId: "async-promise-assimilation.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(asyncPromiseAssimilation.exitStatus, 0);
+assert.equal(asyncPromiseAssimilation.stderr, "");
+assert.equal(asyncPromiseAssimilation.stdout, "custom then\n2\n");
+
+const rejectionPassThroughLocation = await runNativeCli(
+  {
+    args: ["rejection-pass-through.ts"],
+    source: `async function fail() { throw "failure"; }
+async function wrapper() { return fail(); }
+wrapper();
+console.log("after");
+`,
+    sourceId: "rejection-pass-through.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(rejectionPassThroughLocation.exitStatus, 1);
+assert.equal(rejectionPassThroughLocation.stdout, "after\n");
+assert.match(
+  rejectionPassThroughLocation.stderr,
+  /^rejection-pass-through\.ts:1:\d+: error\[OSEO2001\]/u,
+);
+
+const retargetedArrayTimerDelay = await runNativeCli(
+  {
+    args: ["retargeted-array-timer-delay.ts"],
+    source: `
+function task() { console.log("retargeted array delay"); }
+const delay = [];
+Object.setPrototypeOf(delay, {});
+setTimeout(task, delay);
+`,
+    sourceId: "retargeted-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(retargetedArrayTimerDelay.exitStatus, 0);
+assert.equal(retargetedArrayTimerDelay.stderr, "");
+assert.equal(retargetedArrayTimerDelay.stdout, "retargeted array delay\n");
+
+const inheritedObjectArrayTimerDelay = await runNativeCli(
+  {
+    args: ["inherited-object-array-timer-delay.ts"],
+    source: `
+function task() { console.log("inherited object array delay"); }
+const delay = Object.create({});
+setTimeout(task, [delay]);
+`,
+    sourceId: "inherited-object-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(inheritedObjectArrayTimerDelay.exitStatus, 0);
+assert.equal(inheritedObjectArrayTimerDelay.stderr, "");
+assert.equal(
+  inheritedObjectArrayTimerDelay.stdout,
+  "inherited object array delay\n",
+);
+
+const objectLengthArrayTimerDelay = await runNativeCli(
+  {
+    args: ["object-length-array-timer-delay.ts"],
+    source: `
+function task() { console.log("object length array delay"); }
+const delay = {};
+Object.setPrototypeOf(delay, [1]);
+delay.length = {
+  valueOf: function delayLength() {
+    console.log("coerce array length");
+    return 1;
+  },
+};
+setTimeout(task, delay);
+`,
+    sourceId: "object-length-array-timer-delay.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(objectLengthArrayTimerDelay.exitStatus, 0);
+assert.equal(objectLengthArrayTimerDelay.stderr, "");
+assert.equal(
+  objectLengthArrayTimerDelay.stdout,
+  "coerce array length\nobject length array delay\n",
+);
+
 const accessorDescriptor = await runNativeCli(
   {
     args: ["accessor-descriptor.ts"],
@@ -1314,6 +1846,49 @@ assert.match(
   /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
 );
 assert.doesNotMatch(caughtLanguageError.stderr, /immutable binding/u);
+
+const thrownTimer = await runNativeCli(
+  {
+    args: ["thrown-timer-runtime.ts"],
+    source: `
+function observe(value) { console.log(value); }
+function task() {
+  Promise.resolve("microtask after throw").then(observe);
+  throw "timer failure";
+}
+setTimeout(task, 0);
+`,
+    sourceId: "thrown-timer-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownTimer.exitStatus, 1);
+assert.equal(thrownTimer.stdout, "microtask after throw\n");
+assert.match(
+  thrownTimer.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+
+const thrownEntry = await runNativeCli(
+  {
+    args: ["thrown-entry-runtime.ts"],
+    source: `
+function observe(value) { console.log(value); }
+Promise.resolve("microtask after entry throw").then(observe);
+throw "entry failure";
+`,
+    sourceId: "thrown-entry-runtime.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownEntry.exitStatus, 1);
+assert.equal(thrownEntry.stdout, "microtask after entry throw\n");
+assert.match(
+  thrownEntry.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
 
 const wideBindings = Array.from(
   { length: 3_000 },
@@ -1427,6 +2002,176 @@ const allocationFailure = await runNativeCli(
 assert.equal(allocationFailure.exitStatus, 1);
 assert.equal(allocationFailure.stdout, "");
 assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+
+const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
+const nativeModule = await runNativeCli(
+  {
+    args: [moduleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
+assert.equal(nativeModule.stderr, "");
+assert.equal(
+  nativeModule.stdout,
+  "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+    "default first\ndefault second\nidentity once\n" +
+    "answer increment 41\n" +
+    "42\ntrue true false\n" +
+    "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
+);
+
+const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
+const nativeAsyncModule = await runNativeCli(
+  {
+    args: [asyncModuleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeAsyncModule.exitStatus, 0, nativeAsyncModule.stderr);
+assert.equal(nativeAsyncModule.stderr, "");
+assert.equal(
+  nativeAsyncModule.stdout,
+  "dependency ready\nentry ready\nlate timer\n",
+);
+
+const rejectionAfterAwait = [
+  root,
+  "tests/fixtures/async-modules/rejection-after-await.js",
+].join("/");
+const nativeRejectionAfterAwait = await runNativeCli(
+  {
+    args: [rejectionAfterAwait],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(
+  nativeRejectionAfterAwait.exitStatus,
+  0,
+  nativeRejectionAfterAwait.stderr,
+);
+assert.equal(nativeRejectionAfterAwait.stderr, "");
+assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
+
+const awaitQueueOrder = [
+  root,
+  "tests/fixtures/async-modules/await-queue-order.js",
+].join("/");
+const nativeAwaitQueueOrder = await runNativeCli(
+  {
+    args: [awaitQueueOrder],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeAwaitQueueOrder.exitStatus, 0, nativeAwaitQueueOrder.stderr);
+assert.equal(nativeAwaitQueueOrder.stderr, "");
+assert.equal(nativeAwaitQueueOrder.stdout, "after\nnested\n");
+
+const independentModuleEntry = [
+  root,
+  "tests/fixtures/async-modules/independent-entry.mjs",
+].join("/");
+const nativeIndependentModule = await runNativeCli(
+  {
+    args: [independentModuleEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeIndependentModule.exitStatus, 0);
+assert.equal(nativeIndependentModule.stderr, "");
+assert.equal(nativeIndependentModule.stdout, "a start\noperand\nb\na done 2\n");
+
+const unhandledBeforeTimer = [
+  root,
+  "tests/fixtures/async-modules/unhandled-before-timer.js",
+].join("/");
+const nativeUnhandledBeforeTimer = await runNativeCli(
+  {
+    args: [unhandledBeforeTimer],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeUnhandledBeforeTimer.exitStatus, 1);
+assert.equal(nativeUnhandledBeforeTimer.stdout, "");
+assert.match(
+  nativeUnhandledBeforeTimer.stderr,
+  /error\[OSEO2001\].*Unhandled promise rejection/u,
+);
+
+const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
+const nativeBlockedModule = await runNativeCli(
+  {
+    args: [blockedModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeBlockedModule.exitStatus, 1);
+assert.equal(nativeBlockedModule.stdout, "");
+assert.match(
+  nativeBlockedModule.stderr,
+  /error\[OSEO3001\].*Top-level await cannot make progress/u,
+);
+
+const diagnosticModule = `${root}/tests/fixtures/module-diagnostics/entry.mjs`;
+const nativeDiagnosticModule = await runNativeCli(
+  {
+    args: [diagnosticModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeDiagnosticModule.exitStatus, 1);
+assert.equal(
+  nativeDiagnosticModule.stdout,
+  "dependency before throw\ndependency cleanup\n",
+);
+assert.match(
+  nativeDiagnosticModule.stderr,
+  /module-diagnostics\/dep\.mjs:5:3: error\[OSEO2001\]/u,
+);
+
+const rejectionLocation = [
+  root,
+  "tests/fixtures/rejection-location/entry.mjs",
+].join("/");
+const nativeRejectionLocation = await runNativeCli(
+  {
+    args: [rejectionLocation],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeRejectionLocation.exitStatus, 1);
+assert.equal(nativeRejectionLocation.stdout, "entry after rejection\n");
+assert.match(
+  nativeRejectionLocation.stderr,
+  /rejection-location\/dep\.mjs:2:3: error\[OSEO2001\]/u,
+);
+
+const topLevelAwaitRejection = await runNativeCli(
+  {
+    args: ["top-level-await-rejection.mjs"],
+    source: `console.log("before rejection");
+await Promise.reject("bad");
+`,
+    sourceId: "top-level-await-rejection.mjs",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(topLevelAwaitRejection.exitStatus, 1);
+assert.equal(topLevelAwaitRejection.stdout, "before rejection\n");
+assert.match(
+  topLevelAwaitRejection.stderr,
+  /top-level-await-rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
+);
 
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,

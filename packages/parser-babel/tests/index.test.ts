@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource, printHir, printMir } from "@oseo/compiler";
+import {
+  compileModuleGraph,
+  compileSource,
+  printHir,
+  printMir,
+} from "@oseo/compiler";
 
-import { babelFrontend } from "../src/index.ts";
+import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
 test("normalizes Babel parse failures", () => {
   const result = babelFrontend.parse({
@@ -337,7 +342,6 @@ const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
-  ["async", "async function work() {}"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],
@@ -424,4 +428,445 @@ test("converts large files without rescanning every source prefix", () => {
   const elapsed = performance.now() - started;
   assert.ok(result.parsed);
   assert.ok(elapsed < 1_500, `frontend conversion took ${elapsed} ms`);
+});
+
+test("converts M4 imports and exports to owned module syntax", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: `
+      import main, { value as renamed } from "./a.js";
+      import * as namespace from "./b.js";
+      import "./side.js";
+      export const local = 1;
+      export { local as shown };
+      export { other as remote } from "./c.js";
+      export * from "./star.js";
+      export default local;
+    `,
+    sourceId: "file:///app/main.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(
+    result.module?.imports.map((entry) => ({
+      imported: entry.importedName,
+      local: entry.localName,
+      specifier: entry.specifier.value,
+    })),
+    [
+      { imported: "default", local: "main", specifier: "./a.js" },
+      { imported: "value", local: "renamed", specifier: "./a.js" },
+      { imported: "*", local: "namespace", specifier: "./b.js" },
+      { imported: undefined, local: undefined, specifier: "./side.js" },
+    ],
+  );
+  assert.deepEqual(
+    result.module?.exports.map((entry) => entry.kind),
+    ["local", "local", "indirect", "star", "default"],
+  );
+  assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
+});
+
+test("retains default export order and anonymous function names", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: `
+      export default function () {}
+      console.log("after");
+    `,
+    sourceId: "file:///app/default.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  const exported = result.module?.exports[0];
+  assert.equal(exported?.kind, "default");
+  assert.ok(exported?.byteRange != null);
+  if (exported?.kind !== "default") return;
+  assert.equal(
+    "parameters" in exported.declaration
+      ? exported.declaration.name
+      : undefined,
+    "default",
+  );
+  assert.ok(
+    exported.byteRange.start <
+      (result.module?.body[0]?.byteRange?.start ?? Number.MAX_SAFE_INTEGER),
+  );
+});
+
+test("names anonymous default export expressions", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export default (function () {});",
+    sourceId: "file:///app/default-expression.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/default-expression.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/default-expression.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "default-expression",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /name="default"/u);
+  assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
+});
+
+test("lowers top-level await to an owned scheduler checkpoint", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export const answer = 1 + await Promise.resolve(41);",
+    sourceId: "file:///app/answer.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/answer.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/answer.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "answer",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(
+    compiled.mir?.script.blocks
+      .flatMap((block) => block.operations)
+      .some((operation) => operation.target?.kind === "await"),
+  );
+  assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
+});
+
+test("diagnoses excessive top-level await depth", () => {
+  const sourceId = "file:///app/deep-await.js";
+  const accepted = babelModuleFrontend.parseModule({
+    source: "await 0;\n".repeat(256),
+    sourceId,
+  });
+  assert.ok(accepted.module != null);
+  const acceptedCompilation = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "accepted-await",
+        syntax: accepted.module,
+      },
+    ],
+  });
+  assert.deepEqual(acceptedCompilation.diagnostics, []);
+  assert.ok(acceptedCompilation.mir != null);
+
+  const result = babelModuleFrontend.parseModule({
+    source: "await 0;\n".repeat(15_000),
+    sourceId,
+  });
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "deep-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.match(compiled.diagnostics[0]?.message ?? "", /at most 256/u);
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 257);
+});
+
+test("lowers M4 promise construction and static methods", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function settle(resolve) { resolve(1); }",
+      "function observe(value) { console.log(value); }",
+      "new Promise(settle).then(observe);",
+      "Promise.resolve(2).then(observe);",
+      "Promise.reject(3).catch(observe);",
+      "Promise.all([4, 5]).then(observe);",
+      "Promise.race([6, 7]).then(observe);",
+    ].join("\n"),
+    sourceId: "promises.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const targets = result.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.target == null ? [] : [operation.target],
+    );
+  assert.ok(targets.some((target) => target.kind === "promise-constructor"));
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "resolve",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "reject",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "all",
+    ),
+  );
+  assert.ok(
+    targets.some(
+      (target) =>
+        target.kind === "promise-intrinsic" && target.method === "race",
+    ),
+  );
+});
+
+test("lowers async functions into owned continuations", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "async function add(value) {",
+      "  const first = await Promise.resolve(value);",
+      "  const second = await 2;",
+      "  return first + second;",
+      "}",
+      "const expression = async function (value) { return await value; };",
+      "const arrow = async (value) => await value;",
+      "function observe(value) { console.log(value); }",
+      "add(1).then(observe);",
+      "expression(2).then(observe);",
+      "arrow(3).then(observe);",
+    ].join("\n"),
+    sourceId: "async.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.ok(result.mir.functions.length >= 9);
+  const operations = [
+    ...result.mir.script.blocks,
+    ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
+  ].flatMap((block) => block.operations);
+  assert.ok(
+    operations.some(
+      (operation) =>
+        operation.target?.kind === "promise-intrinsic" &&
+        operation.target.method === "asyncCall",
+    ),
+  );
+  assert.ok(
+    operations.some(
+      (operation) =>
+        operation.target?.kind === "promise-intrinsic" &&
+        operation.target.method === "awaitThen",
+    ),
+  );
+  const functionKinds = new Set(
+    operations.flatMap((operation) =>
+      operation.kind === "function-create" ? [operation.functionKind] : [],
+    ),
+  );
+  assert.ok(functionKinds.has("async"));
+  assert.ok(functionKinds.has("async-arrow"));
+  assert.ok(functionKinds.has("arrow"));
+});
+
+test("diagnoses excessive async continuation depth", () => {
+  const accepted = compileSource(babelFrontend, {
+    source: `async function deep() {\n${"await 0;\n".repeat(256)}}`,
+    sourceId: "accepted-async.js",
+  });
+  assert.deepEqual(accepted.diagnostics, []);
+  assert.ok(accepted.mir != null);
+
+  const result = compileSource(babelFrontend, {
+    source: `async function deep() {\n${"await 0;\n".repeat(1_200)}}`,
+    sourceId: "deep-async.js",
+  });
+  assert.equal(result.mir, undefined);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
+  assert.equal(result.diagnostics[0]?.range.start.line, 258);
+});
+
+test("preserves async returns and bindings across await", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "async function choose(value) {",
+      "  if (value) return 1;",
+      "  return 2;",
+      "}",
+      "async function returnedDeclaration() {",
+      "  return later();",
+      "  function later() { return 3; }",
+      "}",
+      "async function thrownDeclaration() {",
+      "  throw later();",
+      '  function later() { return "reason"; }',
+      "}",
+      "async function lexicalAfterReturn() {",
+      "  return later;",
+      "  let later = 4;",
+      "}",
+      "async function hoisted() {",
+      "  const value = later();",
+      "  await 0;",
+      "  function later() { return 5; }",
+      "  return value;",
+      "}",
+      "async function lexical() {",
+      "  console.log(later);",
+      "  await 0;",
+      "  let later = 6;",
+      "  return later;",
+      "}",
+      "async function finalValue() {",
+      "  try { return 1; } finally { return 2; }",
+      "}",
+      "const promise = Promise.resolve(3);",
+      "promise.then = function () { return 4; };",
+      "async function internalAwait() { return await promise; }",
+    ].join("\n"),
+    sourceId: "async-scope.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+});
+
+test("validates unreachable async statements", () => {
+  const loop = compileSource(babelFrontend, {
+    source: "async function invalid() { return 1; for (;;) {} }",
+    sourceId: "async-unreachable-loop.js",
+  });
+  assert.equal(loop.mir, undefined);
+  assert.match(loop.diagnostics[0]?.message ?? "", /ForStatement/u);
+
+  const awaitValue = compileSource(babelFrontend, {
+    source: "async function invalid() { throw 1; if (true) await 0; }",
+    sourceId: "async-unreachable-await.js",
+  });
+  assert.equal(awaitValue.mir, undefined);
+  assert.match(awaitValue.diagnostics[0]?.message ?? "", /Await/u);
+
+  const continuation = compileSource(babelFrontend, {
+    source: "async function invalid() { await 0; return 1; for (;;) {} }",
+    sourceId: "async-unreachable-continuation.js",
+  });
+  assert.equal(continuation.mir, undefined);
+  assert.match(continuation.diagnostics[0]?.message ?? "", /ForStatement/u);
+});
+
+test("rejects nested async await operands", () => {
+  for (const source of [
+    "async function nested(ready) { return await (await ready); }",
+    "async function nested(ready) { await (await ready); }",
+    "async function nested(ready) { const value = await (await ready); }",
+    "async function nested(ready) { return 1; return await (await ready); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "nested-await.js",
+    });
+    assert.equal(result.mir, undefined);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(result.diagnostics[0]?.message ?? "", /Nested await/u);
+  }
+});
+
+test("lowers timer globals while preserving lexical shadowing", () => {
+  const direct = compileSource(babelFrontend, {
+    source: [
+      "function task() {}",
+      "const handle = setTimeout(task, 0);",
+      "clearTimeout(handle);",
+    ].join("\n"),
+    sourceId: "timers.js",
+  });
+  assert.deepEqual(direct.diagnostics, []);
+  const targets = direct.mir?.script.blocks
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.target == null ? [] : [operation.target],
+    );
+  assert.ok(
+    targets?.some(
+      (target) =>
+        target.kind === "timer-intrinsic" && target.method === "setTimeout",
+    ),
+  );
+  assert.ok(
+    targets?.some(
+      (target) =>
+        target.kind === "timer-intrinsic" && target.method === "clearTimeout",
+    ),
+  );
+
+  const shadowed = compileSource(babelFrontend, {
+    source: "function call(setTimeout, task) { return setTimeout(task, 0); }",
+    sourceId: "shadowed-timer.js",
+  });
+  assert.deepEqual(shadowed.diagnostics, []);
+  assert.ok(
+    shadowed.mir?.functions
+      .flatMap((functionValue) => functionValue.blocks)
+      .flatMap((block) => block.operations)
+      .some((operation) => operation.target?.kind === "dynamic"),
+  );
+});
+
+test("rejects type-only imports instead of creating runtime bindings", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: 'import type { Model } from "./types.ts";',
+    sourceId: "file:///app/main.ts",
+  });
+  assert.equal(result.parsed, false);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Type-only imports/u);
+});
+
+test("rejects module attributes before lowering module entries", () => {
+  for (const source of [
+    'import data from "./data.json" with { type: "json" };',
+    'import data from "./data.json" with {};',
+    'export { value } from "./data.js" with { type: "json" };',
+    'export * from "./data.js" with { type: "json" };',
+  ]) {
+    const result = babelModuleFrontend.parseModule({
+      source,
+      sourceId: "file:///app/main.js",
+    });
+    assert.equal(result.parsed, false);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(result.diagnostics[0]?.message ?? "", /attributes/u);
+    assert.deepEqual(result.diagnostics[0]?.range.start, {
+      column: 1,
+      line: 1,
+    });
+  }
+
+  const comment = babelModuleFrontend.parseModule({
+    source: 'import data from "./data.js" /* with {} */;',
+    sourceId: "file:///app/comment.js",
+  });
+  assert.ok(comment.parsed);
+  assert.deepEqual(comment.diagnostics, []);
 });

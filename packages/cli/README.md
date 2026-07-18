@@ -19,9 +19,15 @@ unknown or duplicate options before compilation. Optique also derives help,
 usage, version, and parse-error output from the same command-line grammar.
 
 The npm package installs the `oseo` executable. A source path without a dump
-option compiles, links, and runs the M1 program through the pinned Zig
-toolchain, with M2 specialization when eligible. Programmatic callers may
-override `sourceId` for diagnostics without changing the positional path used
-to read the source file.
+option compiles, links, and runs a script or a closed M4 `file:` module graph
+through the pinned Zig toolchain, with guarded specialization when eligible.
+Module entries may use only relative file specifiers. Programmatic callers may
+override `sourceId` for script diagnostics without changing the positional path
+used to read the source file.
+
+An entry with imports, exports, or top-level await enters the module-graph
+workflow. Top-level await does not need an otherwise unused module declaration.
+The produced executable drains runtime-owned promise jobs and timer tasks; it
+does not embed the Node.js or Deno host used to compile it.
 
 [Optique]: https://optique.dev/

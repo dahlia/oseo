@@ -341,6 +341,20 @@ isolation and discovering ordinary imports at run time. Static ECMAScript
 imports are resolved before native code generation. The linker records module
 instantiation order, live bindings, and top-level evaluation order.
 
+M4 canonicalizes `file:` identities through a host-neutral resolver and records
+source hashes before linking. Tarjan components make cycles inspectable. The
+compiler allocates every exported cell and shared namespace before lowering
+each module body into a private evaluator. Imports reuse exporter cell
+identifiers, so evaluator boundaries do not copy a binding or make C
+declaration order semantic.
+
+An evaluator with top-level await returns a promise backed by generated
+continuation closures. Evaluation starts every dependency-ready module in
+source order, so an independent sibling can run while another module is
+suspended. Importers wait for their asynchronous dependencies before their own
+evaluator runs. The entry task reports an owned diagnostic when no runtime-owned
+job or timer can make progress. Asynchronous module cycles remain outside M4.
+
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native
 binary has been built. They remain outside the initial language profile.
@@ -356,17 +370,26 @@ Host boundary and event loop
 ----------------------------
 
 Generated programs use runtime host interfaces rather than calling Node.js or
-Deno. The native runtime eventually provides an event loop, timers, networking,
-cryptography, files, and other capabilities required by its selected
-compatibility profiles.
+Deno. The M4 native runtime provides promise jobs, a timer scheduler, and
+shutdown. Later compatibility profiles add networking, cryptography, files, and
+other capabilities through the same boundary.
 
 The compiler itself uses narrow host adapters for file access, subprocesses,
 environment variables, and diagnostics. Node.js and Deno adapters implement the
 same internal interface. Compiler-core tests run against both adapters.
 
-Promises and the ECMAScript job queue precede web APIs that depend on them.
-Unhandled-rejection tracking, timers, streams, and `fetch()` must share one
-documented scheduling model.
+Promises and the ECMAScript job queue precede web APIs that depend on them. M4
+owns promises, reactions, thenable jobs, rejection checkpoints, a timer queue,
+and a deterministic logical clock in the C runtime. Asynchronous functions use
+generated continuation closures, so a suspension returns from the native C
+frame before a queued reaction resumes it. Each timer task drains microtasks
+before the next timer, and pending promises alone do not keep the executable
+alive.
+
+The runtime ABI is the replacement boundary for a future platform event
+adapter. Streams, `fetch()`, I/O readiness, wakeups, and wall-clock observation
+remain outside M4 and must extend the same documented scheduling and liveness
+model.
 
 
 Native backend
@@ -449,7 +472,7 @@ Testing and observability
 -------------------------
 
 Oseo needs tests that distinguish semantic correctness from successful
-compilation. The test strategy has five layers:
+compilation. The test strategy has six layers:
 
  -  Unit tests cover parsing, hint extraction, normalization, MIR construction,
     value tags, and runtime helpers.
@@ -463,6 +486,23 @@ compilation. The test strategy has five layers:
     avoid allocation and generic helper calls.
  -  Standards tests add applicable test262 and web-platform-test cases as the
     supported profiles expand.
+ -  Property tests generate structured programs, values, module graphs, and
+    schedules, then compare reference, specialization, collection, or model
+    observations.
+
+Property suites use explicit reviewed seeds, case budgets, and size limits.
+They retain structured inputs through source printing so failures shrink within
+the admitted profile. A failure report records enough metadata to replay the
+same case directly. Interrupted or incomplete runs are failures, not shortened
+passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
+models and replay contract into grammar-based differential generation.
+
+The M4 native schedule property prints promise commands, repeated async
+suspensions, timer deadlines, cancellations, and task-created microtasks from
+one structured model. It compares the model with Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at each safepoint. The ordinary gate runs ten native
+cases; the extended task increases both case count and schedule size.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of

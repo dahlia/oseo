@@ -8,6 +8,7 @@ postinstall = "mise generate git-pre-commit --write --task=check"
 
 [tools]
 "aqua:dahlia/hongdown" = "0.5.1"
+"aqua:nushell/nushell" = "0.114.1"
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
@@ -142,6 +143,43 @@ mise run probe:host-parser
 mise run probe:native-boundary
 mise run probe:value-layouts
 '''
+
+[tasks."test:property:extended"]
+description = "Run property suites at ten times the ordinary case budget"
+depends = ["build"]
+shell = "nu -c"
+run = '''
+let package_tests = (
+  glob "packages/*/tests/**/*.property.test.ts"
+  | each { |path| $path | into string }
+)
+for seed in [1592590337 1592590338] {
+  with-env {
+    OSEO_PROPERTY_RUN_SCALE: "10"
+    OSEO_PROPERTY_SIZE: "large"
+    OSEO_PROPERTY_SEED: ($seed | into string)
+  } {
+    ^node --test ...$package_tests
+    ^deno test -A ...$package_tests
+  }
+}
+let native_tests = (
+  glob "tests/property/*.property.test.ts"
+  | each { |path| $path | into string }
+)
+with-env {
+  OSEO_PROPERTY_RUN_SCALE: "10"
+  OSEO_PROPERTY_SIZE: "large"
+  OSEO_PROPERTY_SEED: "1592590339"
+} {
+  ^node --test ...$native_tests
+}
+'''
+
+[tasks."test:property:native"]
+description = "Run bounded source-to-native M4 schedule properties"
+depends = ["build"]
+run = "node --test tests/property/*.property.test.ts"
 
 [tasks."test:test262"]
 description = "Run the pinned reviewed test262 subset"

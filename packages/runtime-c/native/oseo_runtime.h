@@ -12,6 +12,14 @@ typedef enum {
     OSEO_STATUS_THROW = 1,
 } OseoStatus;
 
+typedef enum {
+    OSEO_FUNCTION_ORDINARY = 0,
+    OSEO_FUNCTION_ARROW = 1,
+    OSEO_FUNCTION_ASYNC = 2,
+    OSEO_FUNCTION_ASYNC_ARROW = 3,
+    OSEO_FUNCTION_INTERNAL = 4,
+} OseoFunctionKind;
+
 typedef struct {
     OseoStatus status;
     OseoValue value;
@@ -19,6 +27,23 @@ typedef struct {
 
 typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
+typedef struct OseoContext OseoContext;
+
+typedef OseoResult (*OseoFunctionDispatcher)(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+
+typedef enum {
+    OSEO_PROMISE_PENDING = 0,
+    OSEO_PROMISE_FULFILLED = 1,
+    OSEO_PROMISE_REJECTED = 2,
+    OSEO_PROMISE_INVALID = 3,
+} OseoPromiseState;
 
 typedef struct {
     bool configurable;
@@ -37,9 +62,19 @@ struct OseoRootFrame {
     size_t slot_count;
 };
 
-typedef struct {
+struct OseoContext {
     OseoRootFrame *roots;
     OseoHeapObject *objects;
+    OseoFunctionDispatcher function_dispatcher;
+    OseoValue async_call_capability;
+    OseoValue microtask_head;
+    OseoValue microtask_tail;
+    OseoValue pending_rejections;
+    OseoValue pending_rejection_tail;
+    OseoValue promise_catch_function;
+    OseoValue promise_finally_function;
+    OseoValue promise_then_function;
+    OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;
@@ -57,10 +92,15 @@ typedef struct {
     size_t allocations;
     size_t allocation_attempts;
     size_t collections;
+    size_t rejection_handled_count;
+    size_t unhandled_rejection_count;
+    uint64_t clock_milliseconds;
+    uint64_t next_timer_id;
+    uint64_t next_timer_order;
     size_t fail_allocation_at;
     bool observe_specialization;
     bool collect_every_safepoint;
-} OseoContext;
+};
 
 /* Private inline primitives used by generated guarded native paths. */
 static inline bool oseo_value_is_smi(OseoValue value) {
@@ -115,8 +155,19 @@ void oseo_context_location(
     size_t line,
     size_t column
 );
+void oseo_context_source_location(
+    OseoContext *context,
+    const char *source_id,
+    size_t source_id_length,
+    size_t line,
+    size_t column
+);
 void oseo_context_print_error(const OseoContext *context);
 void oseo_context_print_observations(const OseoContext *context);
+void oseo_context_set_function_dispatcher(
+    OseoContext *context,
+    OseoFunctionDispatcher dispatcher
+);
 
 OseoResult oseo_call_enter(OseoContext *context);
 void oseo_call_leave(OseoContext *context);
@@ -175,6 +226,14 @@ OseoResult oseo_cell_set(
     OseoValue cell,
     OseoValue value
 );
+OseoResult oseo_module_namespace_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t count,
+    const uint16_t *const *names,
+    const size_t *name_lengths,
+    const size_t *binding_ids
+);
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
@@ -182,6 +241,8 @@ OseoResult oseo_function_create(
     const uint16_t *name_units,
     size_t name_length,
     size_t parameter_count,
+    OseoFunctionKind function_kind,
+    OseoValue lexical_this,
     OseoValue inferred_name
 );
 OseoResult oseo_function_environment(
@@ -194,6 +255,14 @@ OseoResult oseo_function_code_id(
     size_t *code_id
 );
 OseoResult oseo_unknown_function(OseoContext *context, size_t code_id);
+OseoResult oseo_call_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 OseoResult oseo_function_prototype(
     OseoContext *context,
     OseoValue function
@@ -209,6 +278,7 @@ OseoResult oseo_constructor_receiver(
 );
 OseoResult oseo_array_create(OseoContext *context, size_t length);
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
+OseoResult oseo_object_literal_create(OseoContext *context);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);
 OseoResult oseo_object_define(
     OseoContext *context,
@@ -340,5 +410,78 @@ OseoResult oseo_console_log(
     size_t argument_count,
     const OseoValue *arguments
 );
+
+OseoResult oseo_promise_construct(
+    OseoContext *context,
+    OseoValue executor
+);
+OseoResult oseo_promise_resolve(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_promise_reject(
+    OseoContext *context,
+    OseoValue reason
+);
+OseoResult oseo_promise_all(
+    OseoContext *context,
+    OseoValue iterable
+);
+OseoResult oseo_promise_race(
+    OseoContext *context,
+    OseoValue iterable
+);
+OseoResult oseo_promise_resolve_into(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue value
+);
+OseoResult oseo_promise_reject_into(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue reason
+);
+OseoResult oseo_promise_then(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+);
+OseoResult oseo_promise_async_call(
+    OseoContext *context,
+    OseoValue execution
+);
+OseoResult oseo_promise_await_then(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_fulfilled
+);
+OseoResult oseo_promise_finally(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue on_finally
+);
+OseoPromiseState oseo_promise_state(OseoValue promise);
+OseoResult oseo_promise_result(
+    OseoContext *context,
+    OseoValue promise
+);
+OseoResult oseo_await_value(OseoContext *context, OseoValue value);
+OseoResult oseo_jobs_drain(OseoContext *context);
+OseoResult oseo_rejection_checkpoint(OseoContext *context);
+OseoResult oseo_set_timeout(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_clear_timeout(
+    OseoContext *context,
+    OseoValue handle
+);
+OseoResult oseo_entry_task_checkpoint(
+    OseoContext *context,
+    OseoResult completion
+);
+OseoResult oseo_event_loop_run(OseoContext *context);
 
 #endif

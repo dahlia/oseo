@@ -4,11 +4,10 @@ Oseo roadmap
 Status
 ------
 
-Oseo has completed M3: traced ordinary objects and arrays, closures, dynamic
-calls, constructors, explicit abrupt completion, and guarded property reads
-with a compiled generic fallback. The current implementation plan is
-[*PLAN-M4.md*](./PLAN-M4.md). This roadmap uses capability gates rather than
-calendar dates.
+Oseo has completed M4: closed native module graphs, live bindings, promises,
+asynchronous continuations, top-level await, timers, and a deterministic native
+scheduler. The current implementation plan is [*PLAN-M5.md*](./PLAN-M5.md).
+This roadmap uses capability gates rather than calendar dates.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -36,6 +35,8 @@ Milestone work follows these rules:
  -  A milestone has written scope, deliverables, and exit criteria before
     implementation begins.
  -  Correctness tests are written with or before the implementation they cover.
+ -  Generated semantic domains use the property and replay infrastructure begun
+    in M4 rather than introducing independent random-program frameworks.
  -  Every specialized operation has specialization-invariance tests and
     deliberate guard failures.
  -  `mise run check` and `mise run test` are the local and
@@ -289,6 +290,18 @@ decision explains how they fit an ahead-of-time runtime.
  -  Compiler-core packages can be represented as an Oseo module graph, even if
     the current language profile cannot compile all of them yet.
 
+M4 completion is recorded in
+[*docs/language-profile-m4.md*](./docs/language-profile-m4.md) and ADRs 0009
+through 0012. The compiler builds deterministic canonical graphs, links live
+cells and namespaces, and schedules private module evaluators in one native
+program. Independent siblings continue past a suspended evaluator, while
+importers wait for asynchronous dependencies. The C11 runtime owns promise
+settlement, FIFO reactions, thenable jobs, rejection checkpoints, asynchronous
+continuations, timer tasks, and shutdown. Differential fixtures and generated
+schedules agree across Node.js, Deno, both
+specialization policies, forced collection, x86-64 execution, and AArch64
+compile-link checks.
+
 
 M5: Measured ECMAScript compatibility
 -------------------------------------
@@ -445,20 +458,23 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The package scaffold, compiler pipeline, native runtime, arithmetic
-specialization, and M3 dynamic language core are complete. M4 follows
-[*PLAN-M4.md*](./PLAN-M4.md):
+The compiler and runtime capability sequence is complete through M4. M5 follows
+[*PLAN-M5.md*](./PLAN-M5.md):
 
-1.  Freeze the M4 language profile and the module, job, continuation, and event
-    loop decisions.
-2.  Add owned module syntax, host-neutral graph loading, linking, live cells,
-    and synchronous cyclic evaluation.
-3.  Add namespace objects, graph diagnostics, and whole-graph native linking.
-4.  Add promises, reaction jobs, and unhandled-rejection tracking.
-5.  Add asynchronous functions, top-level await, timers, and shutdown rules.
+1.  Freeze a candidate ECMA-262 edition boundary and compatibility manifest.
+2.  Expand test262 module and asynchronous harness observations for existing M4
+    behavior.
+3.  Publish a dependency-indexed baseline with exact unsupported reasons.
+4.  Complete foundational expressions, coercions, errors, symbols, and
+    iterator protocols.
+5.  Add built-in families and broader executable syntax in dependency order.
+6.  Resolve ahead-of-time challenge features through decisions or explicit
+    unsupported classifications.
+7.  Close the named edition with reproducible standards and generated evidence.
 
-M4 preserves the M2 and M3 generic-fallback, forced-collection, sanitizer,
-cross-target, package, and test262 evidence gates.
+M5 preserves every earlier generic-fallback, forced-collection, sanitizer,
+cross-target, package, standards, and property gate. It expands the same
+generators, shrinkers, and replay records instead of replacing them.
 
 
 Risks that affect ordering

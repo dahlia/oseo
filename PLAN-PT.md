@@ -4,10 +4,11 @@ Property-based testing plan
 Status
 ------
 
-Implementation status: ready, not started. This is a cross-milestone plan. It
-adds a property-based testing discipline during M4 and expands it as the
-language profile grows through M5 and later milestones. It does not replace
-[*PLAN-M4.md*](./PLAN-M4.md) or change the order of M4 runtime work.
+Implementation status: active, initial adoption in progress. M4 landed the
+pinned runner, explicit replay configuration, deterministic module-graph
+properties, and bounded native asynchronous schedule properties. M5 expands
+these models into grammar-based compatibility work. This cross-milestone plan
+does not replace [*PLAN-M5.md*](./PLAN-M5.md).
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md), the frozen language
@@ -43,11 +44,11 @@ the compiler preserved JavaScript behavior.
 Relationship to the roadmap
 ---------------------------
 
-M4 needs generated module graphs, promise transitions, asynchronous
-continuations, and task schedules. Property infrastructure therefore begins in
-M4 with the stable M2 and M3 semantics, then grows alongside each M4 semantic
-unit. The first M4 feature change that needs a generated domain must extend the
-shared property infrastructure in the same change.
+M4 established generated module graphs, promise transitions, asynchronous
+continuations, and task schedules. The shared runner uses unchanged package
+test sources under Node.js and Deno. A bounded native suite compares generated
+schedules with both hosts, both specialization policies, forced collection, and
+an independent observation model.
 
 M5 broadens this work into grammar-based differential generation across the
 expanded ECMAScript profile. M5 should reuse the generator, shrinker,
@@ -331,9 +332,9 @@ sanitizer output belong to one retained failure record.
 M4 module and asynchronous properties
 -------------------------------------
 
-M4 extends the test model only after the corresponding profile section and
-architecture decision are frozen. Each semantic unit lands with its generator
-and properties rather than waiting for the end of the milestone.
+The landed M4 model follows the frozen profile and architecture records. Later
+extensions update the model only after their corresponding profile section and
+decision are current.
 
 Module generators create canonical module identifiers, source modules, import
 and export entries, dependency edges, and controlled aliases. They cover
@@ -390,9 +391,10 @@ Property testing uses two execution tiers. Both are deterministic once their
 reported seeds are known.
 
 The ordinary gate runs through `mise run test`. Package-level pure properties
-are discovered by the existing Node.js and Deno tasks. A planned bounded native
-property task becomes part of the same gate after its runtime is measured. The
-initial minimum per property and reviewed seed is:
+are discovered by the Node.js and Deno tasks. Cross-package native properties
+are discovered by the Node.js task and can run alone through
+`mise run test:property:native`. The initial minimum per property and reviewed
+seed is:
 
 | Property cost                          | Successful cases |
 | -------------------------------------- | ---------------- |
@@ -400,11 +402,12 @@ initial minimum per property and reviewed seed is:
 | Frontend, HIR, MIR, or C emission      | 250              |
 | Native compile and execution           | 10               |
 
-The extended tier runs through a planned `mise run test:property:extended`
-task. It executes at least ten times the ordinary case count, varies size limits
-and reviewed seeds, enables sanitizers where applicable, and retains a machine-
-readable summary. It runs in scheduled continuous integration, before a release,
-and when a change alters generators, lowering, the runtime, or specialization.
+The extended tier runs through `mise run test:property:extended`. It executes at
+least ten times the ordinary case count and varies size limits and reviewed
+seeds. Native builds retain their sanitizer target. The task runs before a
+release and when a change alters generators, lowering, the runtime, or
+specialization. A scheduled continuous-integration owner and a
+machine-readable aggregate summary remain adoption work.
 
 Case floors may change only after recording test duration, generated size, and
 bug-finding evidence. A time limit must mark an incomplete suite as a failure;
@@ -433,10 +436,10 @@ Every failure report includes:
  -  private counters when enabled; and
  -  the retained artifact directory for a native failure.
 
-The property task accepts a seed and replay path without editing the test. The
-exact planned command interface is documented when the task lands and is added
-to `mise tasks`; this plan does not present an unavailable command as current
-repository behavior.
+The property tasks accept `OSEO_PROPERTY_SEED`, `OSEO_PROPERTY_PATH`,
+`OSEO_PROPERTY_RUN_SCALE`, and `OSEO_PROPERTY_SIZE` without editing a test. A
+minimized native failure can be replayed by setting the reported seed and path
+before `mise run test:property:native`.
 
 A fixed defect is represented by a reviewed example-based regression test or
 fixture containing the minimized case. Seed replay is diagnostic metadata, not

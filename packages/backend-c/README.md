@@ -41,3 +41,10 @@ allocate or materialize the property key.
 Pending throws carry their diagnostic location and message through generated
 completion slots, so intervening `finally` operations cannot overwrite an
 unhandled exception's report.
+
+M4 whole-graph programs allocate shared module cells and namespaces before
+executing dependency-ordered bodies. Generated functions register one shared
+code-identity dispatcher used by dynamic calls, promise executors, reactions,
+and asynchronous continuations. Promise, timer, and top-level await MIR targets
+remain runtime calls, so generated C does not own job queues or scheduler
+policy.

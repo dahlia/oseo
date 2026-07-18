@@ -13,10 +13,11 @@ export interface Position {
   readonly column: number;
 }
 
-/** A half-open source range. */
+/** A half-open source range with optional retained module identity. */
 export interface SourceRange {
   readonly start: Position;
   readonly end: Position;
+  readonly sourceId?: string;
 }
 
 /** A source-located error independent of a bootstrap parser or host. */
@@ -75,6 +76,18 @@ export type SyntaxCallTarget =
         | "setPrototypeOf";
     })
   | (LocatedSyntax & {
+      readonly kind: "promise-intrinsic";
+      readonly method: "all" | "race" | "reject" | "resolve";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "promise-intrinsic-direct";
+      readonly method: "asyncCall" | "awaitThen" | "resolve" | "then";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
+    })
+  | (LocatedSyntax & {
       readonly kind: "name";
       readonly name: string;
     })
@@ -104,6 +117,10 @@ export type BinaryOperator =
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
+      readonly argument: SyntaxExpression;
+      readonly kind: "await";
+    })
+  | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
       readonly value: SyntaxExpression;
@@ -129,6 +146,8 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly functionValue: SyntaxFunction;
+      /** Function name inferred independently from a storage binding. */
+      readonly inferredName?: string;
       readonly kind: "function";
     })
   | (LocatedSyntax & {
@@ -142,6 +161,10 @@ export type SyntaxExpression =
       readonly arguments: readonly SyntaxExpression[];
       readonly callee: SyntaxExpression;
       readonly kind: "new";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly SyntaxExpression[];
+      readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -192,6 +215,9 @@ export interface SyntaxParameter extends LocatedSyntax {
   readonly name: string;
 }
 
+/** Runtime call and construction identity retained for every function. */
+export type FunctionKind = "arrow" | "async" | "async-arrow" | "ordinary";
+
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =
   | (LocatedSyntax & {
@@ -203,6 +229,12 @@ export type SyntaxStatement =
     })
   | (LocatedSyntax & {
       readonly kind: "continue";
+    })
+  | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
+      readonly kind: "binding-init";
+      readonly name: string;
     })
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
@@ -254,7 +286,10 @@ export type SyntaxStatement =
 
 /** A top-level function declaration in owned syntax. */
 export interface SyntaxFunction extends LocatedSyntax {
+  /** Internal declaration binding when it differs from the function name. */
+  readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  readonly functionKind?: FunctionKind;
   readonly kind: "function";
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];
@@ -283,6 +318,749 @@ export interface SourceFrontend {
   parse(input: SourceInput): FrontendResult;
 }
 
+/** One source-located module specifier retained outside a bootstrap AST. */
+export interface SyntaxModuleSpecifier extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly value: string;
+}
+
+/** One imported binding or side-effect-only dependency. */
+export interface SyntaxImportEntry extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly importedName: "*" | "default" | string | undefined;
+  readonly localName: string | undefined;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** One exported name before graph linking. */
+export type SyntaxExportEntry =
+  | (LocatedSyntax & {
+      readonly exportedName: string;
+      readonly kind: "local";
+      readonly localName: string;
+    })
+  | (LocatedSyntax & {
+      readonly exportedName: string;
+      readonly importedName: string;
+      readonly kind: "indirect";
+      readonly specifier: SyntaxModuleSpecifier;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "star";
+      readonly specifier: SyntaxModuleSpecifier;
+    })
+  | (LocatedSyntax & {
+      readonly declaration: SyntaxExpression | SyntaxFunction;
+      readonly exportedName: "default";
+      readonly kind: "default";
+    });
+
+/** Parser-independent syntax for one M4 ECMAScript module. */
+export interface SyntaxModule extends LocatedSyntax {
+  readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  readonly exports: readonly SyntaxExportEntry[];
+  readonly imports: readonly SyntaxImportEntry[];
+  readonly kind: "module";
+  readonly sourceId: string;
+}
+
+/** Production frontend output for owned module syntax. */
+export interface ModuleFrontendResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly module?: SyntaxModule;
+  readonly parsed: boolean;
+  readonly sourceId: string;
+}
+
+/** Replaceable module frontend boundary owned by compiler core. */
+export interface ModuleSourceFrontend {
+  parseModule(input: SourceInput): ModuleFrontendResult;
+}
+
+/** Source and stable content identity supplied by a compiler host. */
+export interface LoadedModuleSource extends SourceInput {
+  readonly sourceHash: string;
+}
+
+/** Owned result of loading one canonical module identifier. */
+export interface ModuleLoadResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly source?: LoadedModuleSource;
+}
+
+/** Import site that caused a dependency module to be loaded. */
+export interface ModuleLoadReferrer {
+  readonly importerId: string;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** Host-neutral source loader used during graph discovery. */
+export interface ModuleLoader {
+  load(
+    canonicalId: string,
+    referrer?: ModuleLoadReferrer,
+  ): Promise<ModuleLoadResult>;
+}
+
+/** Owned result of resolving one source specifier. */
+export interface ModuleResolutionResult {
+  readonly canonicalId?: string;
+  readonly diagnostics: readonly Diagnostic[];
+}
+
+/** Host-neutral module resolution policy. */
+export interface ModuleResolver {
+  resolve(
+    importerId: string,
+    specifier: SyntaxModuleSpecifier,
+  ): ModuleResolutionResult;
+}
+
+/** One resolved dependency edge in source order. */
+export interface ModuleDependency {
+  readonly canonicalId: string;
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** One resolved source occurrence before dependency deduplication. */
+export interface ModuleResolution extends ModuleDependency {}
+
+/** One uniquely identified node in a closed module graph. */
+export interface ModuleGraphNode {
+  readonly canonicalId: string;
+  readonly dependencies: readonly ModuleDependency[];
+  readonly resolutions: readonly ModuleResolution[];
+  readonly sourceHash: string;
+  readonly syntax: SyntaxModule;
+}
+
+/** Deterministic closed graph rooted at one canonical entry. */
+export interface ModuleGraph {
+  readonly entryId: string;
+  readonly kind: "module-graph";
+  readonly modules: readonly ModuleGraphNode[];
+}
+
+/** Result of host-neutral module graph discovery. */
+export interface ModuleGraphResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly graph?: ModuleGraph;
+}
+
+function moduleSpecifiers(
+  module: SyntaxModule,
+): readonly SyntaxModuleSpecifier[] {
+  const specifiers: SyntaxModuleSpecifier[] = [];
+  for (const entry of module.imports) specifiers.push(entry.specifier);
+  for (const entry of module.exports) {
+    if (entry.kind === "indirect" || entry.kind === "star") {
+      specifiers.push(entry.specifier);
+    }
+  }
+  return specifiers.toSorted(
+    (left, right) => left.byteRange.start - right.byteRange.start,
+  );
+}
+
+/**
+ * Discover and parse one closed module graph without evaluating its modules.
+ */
+export async function buildModuleGraph(
+  frontend: ModuleSourceFrontend,
+  loader: ModuleLoader,
+  resolver: ModuleResolver,
+  entryId: string,
+): Promise<ModuleGraphResult> {
+  const diagnostics: Diagnostic[] = [];
+  const modules: ModuleGraphNode[] = [];
+  const discovered = new Set<string>();
+
+  const visit = async (
+    canonicalId: string,
+    referrer?: ModuleLoadReferrer,
+  ): Promise<void> => {
+    if (discovered.has(canonicalId)) return;
+    discovered.add(canonicalId);
+    const loaded = await loader.load(canonicalId, referrer);
+    diagnostics.push(...loaded.diagnostics);
+    if (loaded.source == null || loaded.diagnostics.length > 0) return;
+    const parsed = frontend.parseModule({
+      source: loaded.source.source,
+      sourceId: canonicalId,
+    });
+    diagnostics.push(...parsed.diagnostics);
+    if (parsed.module == null || parsed.diagnostics.length > 0) return;
+    const dependencies: ModuleDependency[] = [];
+    const resolutions: ModuleResolution[] = [];
+    const dependencyIds = new Set<string>();
+    for (const specifier of moduleSpecifiers(parsed.module)) {
+      const resolved = resolver.resolve(canonicalId, specifier);
+      diagnostics.push(...resolved.diagnostics);
+      if (resolved.canonicalId == null || resolved.diagnostics.length > 0) {
+        continue;
+      }
+      resolutions.push({
+        canonicalId: resolved.canonicalId,
+        specifier,
+      });
+      if (!dependencyIds.has(resolved.canonicalId)) {
+        dependencyIds.add(resolved.canonicalId);
+        dependencies.push({
+          canonicalId: resolved.canonicalId,
+          specifier,
+        });
+      }
+    }
+    modules.push({
+      canonicalId,
+      dependencies,
+      resolutions,
+      sourceHash: loaded.source.sourceHash,
+      syntax: parsed.module,
+    });
+    for (const dependency of dependencies) {
+      // eslint-disable-next-line no-await-in-loop -- Preserve source order.
+      await visit(dependency.canonicalId, {
+        importerId: canonicalId,
+        specifier: dependency.specifier,
+      });
+    }
+  };
+
+  await visit(entryId);
+  return diagnostics.length > 0
+    ? { diagnostics }
+    : {
+        diagnostics,
+        graph: { entryId, kind: "module-graph", modules },
+      };
+}
+
+/** One runtime cell allocated during module instantiation. */
+export interface LinkedModuleCell {
+  readonly id: number;
+  readonly localName: string;
+  readonly moduleId: string;
+}
+
+/** One linked imported binding or namespace reference. */
+export interface LinkedModuleImport {
+  readonly cellId?: number;
+  readonly importedName: string;
+  readonly localName: string;
+  readonly namespaceModuleId?: string;
+}
+
+/** One export resolved to the cell that provides its live value. */
+export interface LinkedModuleExport {
+  readonly cellId: number;
+  readonly exportedName: string;
+  readonly sourceModuleId: string;
+}
+
+/** One module after import and export name resolution. */
+export interface LinkedModule {
+  readonly canonicalId: string;
+  readonly cellIds: readonly number[];
+  readonly componentId: number;
+  readonly exports: readonly LinkedModuleExport[];
+  readonly imports: readonly LinkedModuleImport[];
+  readonly namespaceNames: readonly string[];
+}
+
+/** One deterministic strongly connected module component. */
+export interface ModuleComponent {
+  readonly cyclic: boolean;
+  readonly id: number;
+  readonly moduleIds: readonly string[];
+}
+
+/** Closed graph with live-cell and evaluation identities fixed. */
+export interface LinkedModuleGraph {
+  readonly cells: readonly LinkedModuleCell[];
+  readonly components: readonly ModuleComponent[];
+  readonly entryId: string;
+  readonly evaluationOrder: readonly string[];
+  readonly kind: "linked-module-graph";
+  readonly modules: readonly LinkedModule[];
+}
+
+/** Result of static module linking and instantiation planning. */
+export interface ModuleLinkResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly graph?: LinkedModuleGraph;
+}
+
+interface ExportCandidate {
+  readonly cellId: number;
+  readonly sourceModuleId: string;
+}
+
+function linkDiagnostic(
+  sourceId: string,
+  locationValue: LocatedSyntax,
+  message: string,
+): Diagnostic {
+  return {
+    byteRange: locationValue.byteRange ?? { end: 0, start: 0 },
+    code: "OSEO2001",
+    message,
+    range: locationValue.range,
+    sourceId,
+  };
+}
+
+function resolvedModuleId(
+  module: ModuleGraphNode,
+  specifier: SyntaxModuleSpecifier,
+): string | undefined {
+  return module.resolutions.find(
+    (resolution) =>
+      resolution.specifier === specifier ||
+      (resolution.specifier.value === specifier.value &&
+        resolution.specifier.byteRange.start === specifier.byteRange.start &&
+        resolution.specifier.byteRange.end === specifier.byteRange.end),
+  )?.canonicalId;
+}
+
+function importedBinding(
+  module: ModuleGraphNode,
+  localName: string,
+): SyntaxImportEntry | undefined {
+  return module.syntax.imports.find(
+    (entry) => entry.localName === localName && entry.importedName != null,
+  );
+}
+
+function sameExport(left: ExportCandidate, right: ExportCandidate): boolean {
+  return left.cellId === right.cellId;
+}
+
+function compareCodeUnits(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function moduleDepthFirstOrder(graph: ModuleGraph): readonly string[] {
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const visited = new Set<string>();
+  const order: string[] = [];
+  const visit = (rootId: string): void => {
+    if (visited.has(rootId)) return;
+    visited.add(rootId);
+    const frames: { dependencyIndex: number; moduleId: string }[] = [
+      { dependencyIndex: 0, moduleId: rootId },
+    ];
+    while (frames.length > 0) {
+      const frame = frames.at(-1)!;
+      const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
+      const dependency = dependencies[frame.dependencyIndex];
+      if (dependency != null) {
+        frame.dependencyIndex += 1;
+        if (visited.has(dependency.canonicalId)) continue;
+        visited.add(dependency.canonicalId);
+        frames.push({
+          dependencyIndex: 0,
+          moduleId: dependency.canonicalId,
+        });
+        continue;
+      }
+      order.push(frame.moduleId);
+      frames.pop();
+    }
+  };
+  visit(graph.entryId);
+  for (const moduleId of [...nodes.keys()].toSorted(compareCodeUnits)) {
+    visit(moduleId);
+  }
+  return order;
+}
+
+function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const indices = new Map<string, number>();
+  const lowLinks = new Map<string, number>();
+  const stack: string[] = [];
+  const stacked = new Set<string>();
+  const found: string[][] = [];
+  let nextIndex = 0;
+
+  const begin = (moduleId: string): void => {
+    const index = nextIndex;
+    nextIndex += 1;
+    indices.set(moduleId, index);
+    lowLinks.set(moduleId, index);
+    stack.push(moduleId);
+    stacked.add(moduleId);
+  };
+
+  begin(graph.entryId);
+  const frames: { dependencyIndex: number; moduleId: string }[] = [
+    { dependencyIndex: 0, moduleId: graph.entryId },
+  ];
+  while (frames.length > 0) {
+    const frame = frames.at(-1)!;
+    const index = indices.get(frame.moduleId)!;
+    const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
+    const dependency = dependencies[frame.dependencyIndex];
+    if (dependency != null) {
+      frame.dependencyIndex += 1;
+      if (!indices.has(dependency.canonicalId)) {
+        begin(dependency.canonicalId);
+        frames.push({
+          dependencyIndex: 0,
+          moduleId: dependency.canonicalId,
+        });
+      } else if (stacked.has(dependency.canonicalId)) {
+        lowLinks.set(
+          frame.moduleId,
+          Math.min(
+            lowLinks.get(frame.moduleId) ?? index,
+            indices.get(dependency.canonicalId) ?? index,
+          ),
+        );
+      }
+      continue;
+    }
+    if (lowLinks.get(frame.moduleId) === index) {
+      const component: string[] = [];
+      for (;;) {
+        const member = stack.pop();
+        if (member == null) {
+          throw new Error("Module component stack underflow.");
+        }
+        stacked.delete(member);
+        component.push(member);
+        if (member === frame.moduleId) break;
+      }
+      found.push(component);
+    }
+    frames.pop();
+    const parent = frames.at(-1);
+    if (parent != null) {
+      lowLinks.set(
+        parent.moduleId,
+        Math.min(
+          lowLinks.get(parent.moduleId) ?? index,
+          lowLinks.get(frame.moduleId) ?? index,
+        ),
+      );
+    }
+  }
+  const evaluationOrder = moduleDepthFirstOrder(graph);
+  const evaluationIndex = new Map(
+    evaluationOrder.map((moduleId, index) => [moduleId, index]),
+  );
+  return found
+    .map((moduleIds) =>
+      moduleIds.toSorted(
+        (left, right) =>
+          (evaluationIndex.get(left) ?? Number.MAX_SAFE_INTEGER) -
+          (evaluationIndex.get(right) ?? Number.MAX_SAFE_INTEGER),
+      ),
+    )
+    .toSorted(
+      (left, right) =>
+        (evaluationIndex.get(left[0] ?? "") ?? Number.MAX_SAFE_INTEGER) -
+        (evaluationIndex.get(right[0] ?? "") ?? Number.MAX_SAFE_INTEGER),
+    )
+    .map((moduleIds, id) => {
+      const first = nodes.get(moduleIds[0] ?? "");
+      const selfCycle = first?.dependencies.some(
+        (dependency) => dependency.canonicalId === first.canonicalId,
+      );
+      return {
+        cyclic: moduleIds.length > 1 || selfCycle === true,
+        id,
+        moduleIds,
+      };
+    });
+}
+
+/** Resolve live imports, exports, namespace keys, and cyclic graph order. */
+export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
+  const diagnostics: Diagnostic[] = [];
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const cells: LinkedModuleCell[] = [];
+  const cellIds = new Map<string, number>();
+  const exportsByModule = new Map<string, Map<string, ExportCandidate>>();
+  const explicitNames = new Map<string, Set<string>>();
+  const ambiguousNames = new Map<string, Set<string>>();
+  const namespaceCells = new Map<string, number>();
+
+  const cellFor = (moduleId: string, localName: string): number => {
+    const key = `${moduleId}\0${localName}`;
+    const existing = cellIds.get(key);
+    if (existing != null) return existing;
+    const id = cells.length;
+    cells.push({ id, localName, moduleId });
+    cellIds.set(key, id);
+    return id;
+  };
+
+  const namespaceCellFor = (moduleId: string): number => {
+    const existing = namespaceCells.get(moduleId);
+    if (existing != null) return existing;
+    const cellId = cellFor(moduleId, `*namespace:${moduleId}*`);
+    namespaceCells.set(moduleId, cellId);
+    return cellId;
+  };
+
+  for (const module of graph.modules) {
+    const moduleExports = new Map<string, ExportCandidate>();
+    const names = new Set<string>();
+    exportsByModule.set(module.canonicalId, moduleExports);
+    explicitNames.set(module.canonicalId, names);
+    ambiguousNames.set(module.canonicalId, new Set());
+    for (const [index, entry] of module.syntax.exports.entries()) {
+      if (entry.kind === "star") continue;
+      if (names.has(entry.exportedName)) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Duplicate export '${entry.exportedName}'.`,
+          ),
+        );
+        continue;
+      }
+      names.add(entry.exportedName);
+      if (entry.kind === "local") {
+        if (importedBinding(module, entry.localName) == null) {
+          moduleExports.set(entry.exportedName, {
+            cellId: cellFor(module.canonicalId, entry.localName),
+            sourceModuleId: module.canonicalId,
+          });
+        }
+      } else if (entry.kind === "default") {
+        moduleExports.set("default", {
+          cellId: cellFor(module.canonicalId, `*default:${index}*`),
+          sourceModuleId: module.canonicalId,
+        });
+      }
+    }
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const module of graph.modules) {
+      const moduleExports = exportsByModule.get(module.canonicalId);
+      const moduleAmbiguous = ambiguousNames.get(module.canonicalId);
+      const moduleExplicit = explicitNames.get(module.canonicalId);
+      if (
+        moduleExports == null ||
+        moduleAmbiguous == null ||
+        moduleExplicit == null
+      ) {
+        throw new Error("Module link state is incomplete.");
+      }
+      for (const entry of module.syntax.exports) {
+        if (entry.kind === "local") {
+          const imported = importedBinding(module, entry.localName);
+          if (imported == null) continue;
+          const targetId = resolvedModuleId(module, imported.specifier);
+          const candidate =
+            targetId == null || imported.importedName == null
+              ? undefined
+              : imported.importedName === "*"
+                ? {
+                    cellId: namespaceCellFor(targetId),
+                    sourceModuleId: targetId,
+                  }
+                : exportsByModule.get(targetId)?.get(imported.importedName);
+          const existing = moduleExports.get(entry.exportedName);
+          if (
+            candidate != null &&
+            (existing == null || !sameExport(existing, candidate))
+          ) {
+            moduleExports.set(entry.exportedName, candidate);
+            changed = true;
+          }
+          continue;
+        }
+        if (entry.kind === "indirect") {
+          const targetId = resolvedModuleId(module, entry.specifier);
+          const candidate =
+            targetId == null
+              ? undefined
+              : exportsByModule.get(targetId)?.get(entry.importedName);
+          if (
+            candidate != null &&
+            !moduleExports.has(entry.exportedName) &&
+            !moduleAmbiguous.has(entry.exportedName)
+          ) {
+            moduleExports.set(entry.exportedName, candidate);
+            changed = true;
+          }
+          continue;
+        }
+        if (entry.kind !== "star") continue;
+        const targetId = resolvedModuleId(module, entry.specifier);
+        if (targetId == null) continue;
+        const targetExports = exportsByModule.get(targetId);
+        const targetAmbiguous = ambiguousNames.get(targetId);
+        if (targetExports == null || targetAmbiguous == null) continue;
+        for (const name of targetAmbiguous) {
+          if (name !== "default" && !moduleExplicit.has(name)) {
+            if (!moduleAmbiguous.has(name)) changed = true;
+            moduleAmbiguous.add(name);
+            moduleExports.delete(name);
+          }
+        }
+        for (const [name, candidate] of targetExports) {
+          if (
+            name === "default" ||
+            moduleExplicit.has(name) ||
+            moduleAmbiguous.has(name)
+          ) {
+            continue;
+          }
+          const existing = moduleExports.get(name);
+          if (existing == null) {
+            moduleExports.set(name, candidate);
+            changed = true;
+          } else if (!sameExport(existing, candidate)) {
+            moduleExports.delete(name);
+            moduleAmbiguous.add(name);
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+
+  const linkedImports = new Map<string, LinkedModuleImport[]>();
+  for (const module of graph.modules) {
+    const imports: LinkedModuleImport[] = [];
+    linkedImports.set(module.canonicalId, imports);
+    for (const entry of module.syntax.exports) {
+      if (entry.kind !== "indirect") continue;
+      const targetId = resolvedModuleId(module, entry.specifier);
+      const targetAmbiguous =
+        targetId == null ? undefined : ambiguousNames.get(targetId);
+      const candidate =
+        targetId == null
+          ? undefined
+          : exportsByModule.get(targetId)?.get(entry.importedName);
+      if (targetAmbiguous?.has(entry.importedName) === true) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Export '${entry.importedName}' is ambiguous.`,
+          ),
+        );
+      } else if (candidate == null) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Module has no export '${entry.importedName}'.`,
+          ),
+        );
+      }
+    }
+    for (const entry of module.syntax.imports) {
+      if (entry.localName == null || entry.importedName == null) continue;
+      const targetId = resolvedModuleId(module, entry.specifier);
+      if (targetId == null || !nodes.has(targetId)) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Module '${entry.specifier.value}' was not resolved.`,
+          ),
+        );
+        continue;
+      }
+      if (entry.importedName === "*") {
+        imports.push({
+          cellId: namespaceCellFor(targetId),
+          importedName: "*",
+          localName: entry.localName,
+          namespaceModuleId: targetId,
+        });
+        continue;
+      }
+      const targetAmbiguous = ambiguousNames.get(targetId);
+      const candidate = exportsByModule.get(targetId)?.get(entry.importedName);
+      if (targetAmbiguous?.has(entry.importedName) === true) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Import '${entry.importedName}' is ambiguous.`,
+          ),
+        );
+      } else if (candidate == null) {
+        diagnostics.push(
+          linkDiagnostic(
+            module.canonicalId,
+            entry,
+            `Module has no export '${entry.importedName}'.`,
+          ),
+        );
+      } else {
+        imports.push({
+          cellId: candidate.cellId,
+          importedName: entry.importedName,
+          localName: entry.localName,
+        });
+      }
+    }
+  }
+  if (diagnostics.length > 0) return { diagnostics };
+
+  const components = moduleComponents(graph);
+  const componentByModule = new Map<string, number>();
+  for (const component of components) {
+    for (const moduleId of component.moduleIds) {
+      componentByModule.set(moduleId, component.id);
+    }
+  }
+  const linkedModules = graph.modules.map((module): LinkedModule => {
+    const moduleExports = exportsByModule.get(module.canonicalId);
+    const componentId = componentByModule.get(module.canonicalId);
+    if (moduleExports == null || componentId == null) {
+      throw new Error("Linked module state is incomplete.");
+    }
+    const exports = [...moduleExports]
+      .toSorted(([left], [right]) => compareCodeUnits(left, right))
+      .map(([exportedName, candidate]) => ({
+        cellId: candidate.cellId,
+        exportedName,
+        sourceModuleId: candidate.sourceModuleId,
+      }));
+    return {
+      canonicalId: module.canonicalId,
+      cellIds: cells
+        .filter((cell) => cell.moduleId === module.canonicalId)
+        .map((cell) => cell.id),
+      componentId,
+      exports,
+      imports: linkedImports.get(module.canonicalId) ?? [],
+      namespaceNames: exports.map((entry) => entry.exportedName),
+    };
+  });
+  return {
+    diagnostics,
+    graph: {
+      cells,
+      components,
+      entryId: graph.entryId,
+      evaluationOrder: moduleDepthFirstOrder(graph),
+      kind: "linked-module-graph",
+      modules: linkedModules,
+    },
+  };
+}
+
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
@@ -298,6 +1076,21 @@ export type HirCallTarget =
         | "setPrototypeOf";
     }
   | {
+      readonly kind: "promise-intrinsic";
+      readonly method:
+        | "all"
+        | "asyncCall"
+        | "awaitThen"
+        | "race"
+        | "reject"
+        | "resolve"
+        | "then";
+    }
+  | {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
+    }
+  | {
       readonly callee: HirExpression;
       readonly kind: "dynamic";
     }
@@ -309,6 +1102,10 @@ export type HirCallTarget =
 
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
+  | (LocatedSyntax & {
+      readonly argument: HirExpression;
+      readonly kind: "await";
+    })
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionNameBinding?: boolean;
@@ -338,6 +1135,7 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly functionId: number;
+      readonly functionKind: FunctionKind;
       readonly kind: "function";
       readonly name: string;
       readonly parameterCount: number;
@@ -351,9 +1149,20 @@ export type HirExpression =
       readonly kind: "null";
     })
   | (LocatedSyntax & {
+      readonly entries: readonly {
+        readonly bindingId: number;
+        readonly name: string;
+      }[];
+      readonly kind: "module-namespace";
+    })
+  | (LocatedSyntax & {
       readonly arguments: readonly HirExpression[];
       readonly callee: HirExpression;
       readonly kind: "new";
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly HirExpression[];
+      readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -414,6 +1223,13 @@ export type HirStatement =
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
+      readonly kind: "binding-init";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly hint: Hint | undefined;
+      readonly initializer: HirExpression;
       readonly kind: "const";
       readonly name: string;
     })
@@ -431,6 +1247,8 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionId: number;
+      readonly functionKind: FunctionKind;
+      readonly functionName: string;
       readonly kind: "function-init";
       readonly name: string;
       readonly parameterCount: number;
@@ -476,6 +1294,7 @@ export interface HirParameter extends SyntaxParameter {
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
   readonly body: readonly HirStatement[];
+  readonly functionKind: FunctionKind;
   readonly id: number;
   readonly kind: "hir-function";
   readonly localBindingIds: readonly number[];
@@ -486,10 +1305,17 @@ export interface HirFunction extends LocatedSyntax {
   readonly strict?: boolean;
 }
 
+/** One script environment cell required outside the script statement list. */
+export interface HirGlobalBinding {
+  readonly id: number;
+  readonly name: string;
+}
+
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
+  readonly globalBindings?: readonly HirGlobalBinding[];
   readonly kind: "hir-program";
   readonly range: SourceRange;
   readonly sourceId: string;
@@ -508,6 +1334,7 @@ interface Binding {
   readonly id: number;
   readonly mutable: boolean;
   readonly name: string;
+  readonly pendingDeclaration?: boolean;
 }
 
 interface ResolveState {
@@ -616,6 +1443,10 @@ function resolveExpression(
     }
     return { ...expression, elements };
   }
+  if (expression.kind === "await") {
+    const argument = resolveExpression(expression.argument, scopes, state);
+    return argument == null ? undefined : { ...expression, argument };
+  }
   if (
     expression.kind === "boolean" ||
     expression.kind === "null" ||
@@ -714,16 +1545,40 @@ function resolveExpression(
       : { ...expression, key, object, value };
   }
   if (expression.kind === "new") {
-    const callee = resolveExpression(expression.callee, scopes, state);
     const argumentsValue: HirExpression[] = [];
     for (const argument of expression.arguments) {
       const resolved = resolveExpression(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
+    if (
+      expression.callee.kind === "identifier" &&
+      expression.callee.name === "Promise" &&
+      findBinding(scopes, "Promise") == null
+    ) {
+      return {
+        arguments: argumentsValue,
+        kind: "promise-construct",
+        range: expression.range,
+      };
+    }
+    const callee = resolveExpression(expression.callee, scopes, state);
     return callee == null
       ? undefined
       : { ...expression, arguments: argumentsValue, callee };
+  }
+  if (expression.kind === "promise-construct") {
+    const argumentsValue: HirExpression[] = [];
+    for (const argument of expression.arguments) {
+      const resolved = resolveExpression(argument, scopes, state);
+      if (resolved == null) return undefined;
+      argumentsValue.push(resolved);
+    }
+    return {
+      arguments: argumentsValue,
+      kind: "promise-construct",
+      range: expression.range,
+    };
   }
   const argumentValues: HirExpression[] = [];
   for (const argument of expression.arguments) {
@@ -768,6 +1623,41 @@ function resolveExpression(
         method: expression.target.method,
       };
     }
+  } else if (expression.target.kind === "promise-intrinsic-direct") {
+    target = {
+      kind: "promise-intrinsic",
+      method: expression.target.method,
+    };
+  } else if (expression.target.kind === "promise-intrinsic") {
+    const binding = findBinding(scopes, "Promise");
+    target =
+      binding == null
+        ? {
+            kind: "promise-intrinsic",
+            method: expression.target.method,
+          }
+        : shadowedMethodTarget(
+            binding,
+            expression.target.method,
+            expression.target.range,
+          );
+  } else if (expression.target.kind === "timer-intrinsic") {
+    const binding = findBinding(scopes, expression.target.method);
+    target =
+      binding == null
+        ? {
+            kind: "timer-intrinsic",
+            method: expression.target.method,
+          }
+        : {
+            callee: {
+              bindingId: binding.id,
+              kind: "binding",
+              name: binding.name,
+              range: expression.target.range,
+            },
+            kind: "dynamic",
+          };
   } else if (expression.target.kind === "name") {
     const callee = resolveExpression(
       {
@@ -808,7 +1698,10 @@ function predeclareBindings(
     ) {
       continue;
     }
-    const name = statement.name;
+    const name =
+      statement.kind === "function"
+        ? (statement.bindingName ?? statement.name)
+        : statement.name;
     if (name == null) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -820,7 +1713,11 @@ function predeclareBindings(
       continue;
     }
     const previous = scope.get(name);
-    if (previous != null && statement.kind !== "function") {
+    if (
+      previous != null &&
+      previous.pendingDeclaration !== true &&
+      (statement.kind !== "function" || previous.functionId == null)
+    ) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -844,11 +1741,11 @@ function predeclareBindings(
       state.functionInfo.set(statement, { bindingId, id: functionId });
     } else {
       scope.set(name, {
-        id: state.nextBindingId,
+        id: previous?.id ?? state.nextBindingId,
         mutable: statement.kind === "let",
         name,
       });
-      state.nextBindingId += 1;
+      if (previous == null) state.nextBindingId += 1;
     }
   }
 }
@@ -867,15 +1764,18 @@ function resolveStatementList(
   const result: HirStatement[] = [];
   for (const statement of statements) {
     if (statement.kind !== "function" || statement.name == null) continue;
+    const bindingName = statement.bindingName ?? statement.name;
     const info = state.functionInfo.get(statement);
     if (info == null) continue;
-    if (local.get(statement.name)?.functionId !== info.id) continue;
+    if (local.get(bindingName)?.functionId !== info.id) continue;
     const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
+      functionKind: functionValue.functionKind,
+      functionName: functionValue.name,
       kind: "function-init",
-      name: statement.name,
+      name: bindingName,
       parameterCount: functionValue.parameters.length,
       range: statement.range,
     });
@@ -934,6 +1834,7 @@ function resolveFunction(
   const resolved: HirFunction = {
     ...functionValue,
     body,
+    functionKind: functionValue.functionKind ?? "ordinary",
     id,
     kind: "hir-function",
     localBindingIds: [
@@ -989,7 +1890,7 @@ function resolveFunctionExpression(
   functionValue: SyntaxFunction,
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
-  expression: LocatedSyntax,
+  expression: LocatedSyntax & { readonly inferredName?: string },
 ): HirExpression {
   const id = state.nextFunctionId;
   state.nextFunctionId += 1;
@@ -1013,8 +1914,9 @@ function resolveFunctionExpression(
   );
   return {
     functionId: id,
+    functionKind: resolved.functionKind,
     kind: "function",
-    name: functionValue.name ?? "",
+    name: expression.inferredName ?? functionValue.name ?? "",
     parameterCount: resolved.parameters.length,
     range: expression.range,
   };
@@ -1027,9 +1929,16 @@ function resolveStatement(
   functionBody: boolean,
   loopDepth = 0,
 ): HirStatement | undefined {
-  if (statement.kind === "const" || statement.kind === "let") {
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
     const initializer = resolveExpression(statement.initializer, scopes, state);
-    const binding = scopes.at(-1)?.get(statement.name);
+    const binding =
+      statement.kind === "binding-init"
+        ? findBinding(scopes, statement.name)
+        : scopes.at(-1)?.get(statement.name);
     if (binding == null || initializer == null) return undefined;
     return {
       ...statement,
@@ -1179,18 +2088,31 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
-/** Validate owned syntax and resolve all lexical and function identities. */
-export function buildHir(program: SyntaxProgram): HirResult {
+interface HirSeed {
+  readonly bindings?: ReadonlyMap<string, Binding>;
+  readonly nextBindingId?: number;
+  readonly nextFunctionId?: number;
+}
+
+interface SeededHirResult extends HirResult {
+  readonly nextBindingId: number;
+  readonly nextFunctionId: number;
+}
+
+function buildSeededHir(
+  program: SyntaxProgram,
+  seed: HirSeed = {},
+): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],
-    nextBindingId: 0,
-    nextFunctionId: 0,
+    nextBindingId: seed.nextBindingId ?? 0,
+    nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
   };
-  const scriptScope = new Map<string, Binding>();
+  const scriptScope = new Map(seed.bindings);
   predeclareBindings(program.body, scriptScope, state);
   const body = resolveStatementList(
     program.body,
@@ -1199,9 +2121,17 @@ export function buildHir(program: SyntaxProgram): HirResult {
     false,
     scriptScope,
   );
-  if (diagnostics.length > 0) return { diagnostics };
+  if (diagnostics.length > 0) {
+    return {
+      diagnostics,
+      nextBindingId: state.nextBindingId,
+      nextFunctionId: state.nextFunctionId,
+    };
+  }
   return {
     diagnostics,
+    nextBindingId: state.nextBindingId,
+    nextFunctionId: state.nextFunctionId,
     program: {
       body,
       functions: state.hirFunctions,
@@ -1211,6 +2141,11 @@ export function buildHir(program: SyntaxProgram): HirResult {
       strict: program.strict === true,
     },
   };
+}
+
+/** Validate owned syntax and resolve all lexical and function identities. */
+export function buildHir(program: SyntaxProgram): HirResult {
+  return buildSeededHir(program);
 }
 
 function rangeText(range: SourceRange): string {
@@ -1302,9 +2237,24 @@ function printHirExpression(expression: HirExpression): string {
       printHirExpression(expression.value)
     );
   }
+  if (expression.kind === "module-namespace") {
+    return `module-namespace {${expression.entries
+      .map((entry) => `${JSON.stringify(entry.name)}: %b${entry.bindingId}`)
+      .join(", ")}}`;
+  }
+  if (expression.kind === "await") {
+    return `await ${printHirExpression(expression.argument)}`;
+  }
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +
+      expression.arguments.map(printHirExpression).join(", ") +
+      ")"
+    );
+  }
+  if (expression.kind === "promise-construct") {
+    return (
+      "new intrinsic Promise(" +
       expression.arguments.map(printHirExpression).join(", ") +
       ")"
     );
@@ -1314,10 +2264,14 @@ function printHirExpression(expression: HirExpression): string {
       ? "intrinsic console.log"
       : expression.target.kind === "object-intrinsic"
         ? `intrinsic Object.${expression.target.method}`
-        : expression.target.kind === "dynamic"
-          ? printHirExpression(expression.target.callee)
-          : `${printHirExpression(expression.target.object)}[` +
-            `${printHirExpression(expression.target.key)}]`;
+        : expression.target.kind === "promise-intrinsic"
+          ? `intrinsic Promise.${expression.target.method}`
+          : expression.target.kind === "timer-intrinsic"
+            ? `intrinsic ${expression.target.method}`
+            : expression.target.kind === "dynamic"
+              ? printHirExpression(expression.target.callee)
+              : `${printHirExpression(expression.target.object)}[` +
+                `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirExpression).join(", ") +
@@ -1331,7 +2285,11 @@ function appendHirStatement(
   indent: string,
 ): void {
   const location = ` @${rangeText(statement.range)}`;
-  if (statement.kind === "const" || statement.kind === "let") {
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
     lines.push(
       `${indent}${statement.kind} %b${statement.bindingId} ${statement.name}` +
         `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
@@ -1429,6 +2387,7 @@ export type MirConstant =
 
 /** A direct call target independent of HIR and source syntax. */
 export type MirCallTarget =
+  | { readonly kind: "await" }
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
   | {
@@ -1439,6 +2398,22 @@ export type MirCallTarget =
         | "getOwnPropertyDescriptor"
         | "keys"
         | "setPrototypeOf";
+    }
+  | { readonly kind: "promise-constructor" }
+  | {
+      readonly kind: "promise-intrinsic";
+      readonly method:
+        | "all"
+        | "asyncCall"
+        | "awaitThen"
+        | "race"
+        | "reject"
+        | "resolve"
+        | "then";
+    }
+  | {
+      readonly kind: "timer-intrinsic";
+      readonly method: "clearTimeout" | "setTimeout";
     }
   | { readonly functionId: number; readonly kind: "function" };
 
@@ -1505,6 +2480,7 @@ export interface MirOperation {
     | "initialize"
     | "join"
     | "load-fixed-slot"
+    | "module-namespace-create"
     | "object-create"
     | "property-key"
     | "property-delete"
@@ -1519,12 +2495,15 @@ export interface MirOperation {
     | "update-property-cache"
     | "write";
   readonly mutable?: boolean;
+  readonly namespaceBindingIds?: readonly number[];
+  readonly namespaceNames?: readonly string[];
   readonly checkedResult?: number;
   readonly abruptTarget?: number;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
   readonly completionSlot?: number;
   readonly completionTarget?: number;
   readonly functionId?: number;
+  readonly functionKind?: FunctionKind;
   readonly functionLength?: number;
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
@@ -1814,6 +2793,34 @@ function lowerExpression(
   builder: MirBuilder,
   inferredFunctionName?: number,
 ): number {
+  if (expression.kind === "module-namespace") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "module namespace allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `${expression.entries.length} live exports`,
+      id,
+      kind: "module-namespace-create",
+      namespaceBindingIds: expression.entries.map((entry) => entry.bindingId),
+      namespaceNames: expression.entries.map((entry) => entry.name),
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "binding-set") {
     const value = lowerExpression(expression.value, builder);
     appendMirMetadata(
@@ -1863,6 +2870,7 @@ function lowerExpression(
         `name=${JSON.stringify(expression.name)} ` +
         `length=${expression.parameterCount}`,
       functionId: expression.functionId,
+      functionKind: expression.functionKind,
       functionLength: expression.parameterCount,
       functionName: expression.name,
       id,
@@ -1952,6 +2960,34 @@ function lowerExpression(
       recordRoot(builder, result, element.range);
     }
     return id;
+  }
+  if (expression.kind === "await") {
+    const argument = lowerExpression(expression.argument, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "top-level await checkpoint",
+      [argument],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [argument],
+      detail: "top-level await",
+      id,
+      kind: "call",
+      range: expression.range,
+      target: { kind: "await" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "binding") {
     appendMirMetadata(
@@ -2232,6 +3268,39 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "promise-construct") {
+    const argumentIds = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    if (argumentIds.length === 0) {
+      argumentIds.push(lowerSyntheticUndefined(expression.range, builder));
+    }
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "Promise constructor",
+      argumentIds,
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: argumentIds,
+      detail: "Promise constructor",
+      id,
+      kind: "call",
+      range: expression.range,
+      target: { kind: "promise-constructor" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
     const argumentIds = expression.arguments.map((argument) =>
@@ -2306,6 +3375,24 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = `Object.${expression.target.method}`;
+  } else if (expression.target.kind === "promise-intrinsic") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = {
+      kind: "promise-intrinsic",
+      method: expression.target.method,
+    };
+    detail = `Promise.${expression.target.method}`;
+  } else if (expression.target.kind === "timer-intrinsic") {
+    callArguments = expression.arguments.map((argument) =>
+      lowerExpression(argument, builder),
+    );
+    callTarget = {
+      kind: "timer-intrinsic",
+      method: expression.target.method,
+    };
+    detail = expression.target.method;
   } else {
     let callee: number;
     let receiver: number;
@@ -2618,7 +3705,11 @@ function lowerStatements(
   builder: MirBuilder,
 ): boolean {
   for (const statement of statements) {
-    if (statement.kind === "const" || statement.kind === "let") {
+    if (
+      statement.kind === "binding-init" ||
+      statement.kind === "const" ||
+      statement.kind === "let"
+    ) {
       const value = lowerExpression(statement.initializer, builder);
       const id = builder.nextValue;
       builder.nextValue += 1;
@@ -2635,8 +3726,9 @@ function lowerStatements(
       const value = lowerExpression(
         {
           functionId: statement.functionId,
+          functionKind: statement.functionKind,
           kind: "function",
-          name: statement.name,
+          name: statement.functionName,
           parameterCount: statement.parameterCount,
           range: statement.range,
         },
@@ -3134,6 +4226,22 @@ export function buildMir(
   options: CompilerOptions = {},
 ): MirProgram {
   const specialization = options.specialization ?? "enabled";
+  const explicitGlobals = program.globalBindings ?? [];
+  const bodyGlobals = program.body.flatMap((statement) =>
+    statement.kind === "const" ||
+    statement.kind === "let" ||
+    statement.kind === "function-init"
+      ? [{ id: statement.bindingId, name: statement.name }]
+      : [],
+  );
+  const globalBindings = [
+    ...new Map(
+      [...explicitGlobals, ...bodyGlobals].map((binding) => [
+        binding.id,
+        binding,
+      ]),
+    ).values(),
+  ];
   return {
     functions: program.functions.map((functionValue) => {
       const generic = buildMirFunction(
@@ -3151,13 +4259,7 @@ export function buildMir(
         ? specializeAddition(generic, functionValue)
         : generic;
     }),
-    globalBindings: program.body.flatMap((statement) =>
-      statement.kind === "const" ||
-      statement.kind === "let" ||
-      statement.kind === "function-init"
-        ? [{ id: statement.bindingId, name: statement.name }]
-        : [],
-    ),
+    globalBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
     script: buildMirFunction(
@@ -3165,7 +4267,12 @@ export function buildMir(
       "<script>",
       program.body,
       [],
-      declaredHirBindingIds(program.body),
+      [
+        ...new Set([
+          ...globalBindings.map((binding) => binding.id),
+          ...declaredHirBindingIds(program.body),
+        ]),
+      ],
       undefined,
       program.range,
       specialization,
@@ -3275,6 +4382,957 @@ export interface CompilationResult {
   readonly syntax?: SyntaxProgram;
 }
 
+/** Whole-graph compilation result for one closed ECMAScript module entry. */
+export interface ModuleCompilationResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly graph?: LinkedModuleGraph;
+  readonly hir?: HirProgram;
+  readonly mir?: MirProgram;
+}
+
+function moduleProgramBody(
+  module: SyntaxModule,
+): readonly SyntaxStatementItem[] {
+  const items: SyntaxStatementItem[] = [...module.body];
+  for (const [index, entry] of module.exports.entries()) {
+    if (entry.kind !== "default") continue;
+    const bindingName = `*default:${index}*`;
+    if ("parameters" in entry.declaration) {
+      items.push({ ...entry.declaration, bindingName });
+      continue;
+    }
+    const initializer: SyntaxExpression =
+      entry.declaration.kind === "function" &&
+      entry.declaration.functionValue.name == null
+        ? { ...entry.declaration, inferredName: "default" }
+        : entry.declaration;
+    items.push({
+      ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
+      hint: undefined,
+      initializer,
+      kind: "const",
+      name: bindingName,
+      range: entry.range,
+    });
+  }
+  return items.toSorted(
+    (left, right) =>
+      (left.byteRange?.start ?? Number.MAX_SAFE_INTEGER) -
+      (right.byteRange?.start ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
+function isSourceRange(value: unknown): value is SourceRange {
+  if (value == null || typeof value !== "object") return false;
+  const candidate = value as Partial<SourceRange>;
+  return (
+    candidate.start != null &&
+    typeof candidate.start.line === "number" &&
+    typeof candidate.start.column === "number" &&
+    candidate.end != null &&
+    typeof candidate.end.line === "number" &&
+    typeof candidate.end.column === "number"
+  );
+}
+
+/** Retain module identity on every owned range before graph HIR is merged. */
+function retainModuleSource<T>(value: T, sourceId: string): T {
+  if (isSourceRange(value)) return { ...value, sourceId } as T;
+  if (Array.isArray(value)) {
+    return value.map((item) => retainModuleSource(item, sourceId)) as T;
+  }
+  if (value == null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      retainModuleSource(item, sourceId),
+    ]),
+  ) as T;
+}
+
+function hirExpressionHasAwait(expression: HirExpression): boolean {
+  if (expression.kind === "await") return true;
+  if (expression.kind === "binding-set") {
+    return hirExpressionHasAwait(expression.value);
+  }
+  if (expression.kind === "array") {
+    return expression.elements.some(
+      (element) => element != null && hirExpressionHasAwait(element),
+    );
+  }
+  if (expression.kind === "binary") {
+    return (
+      hirExpressionHasAwait(expression.left) ||
+      hirExpressionHasAwait(expression.right)
+    );
+  }
+  if (expression.kind === "call") {
+    const targetAwait =
+      expression.target.kind === "dynamic"
+        ? hirExpressionHasAwait(expression.target.callee)
+        : expression.target.kind === "method"
+          ? hirExpressionHasAwait(expression.target.object) ||
+            hirExpressionHasAwait(expression.target.key)
+          : false;
+    return targetAwait || expression.arguments.some(hirExpressionHasAwait);
+  }
+  if (expression.kind === "new") {
+    return (
+      hirExpressionHasAwait(expression.callee) ||
+      expression.arguments.some(hirExpressionHasAwait)
+    );
+  }
+  if (expression.kind === "promise-construct") {
+    return expression.arguments.some(hirExpressionHasAwait);
+  }
+  if (expression.kind === "object") {
+    return expression.properties.some(
+      (property) =>
+        hirExpressionHasAwait(property.key) ||
+        hirExpressionHasAwait(property.value),
+    );
+  }
+  if (
+    expression.kind === "property-delete" ||
+    expression.kind === "property-get"
+  ) {
+    return (
+      hirExpressionHasAwait(expression.object) ||
+      hirExpressionHasAwait(expression.key)
+    );
+  }
+  if (expression.kind === "property-set") {
+    return (
+      hirExpressionHasAwait(expression.object) ||
+      hirExpressionHasAwait(expression.key) ||
+      hirExpressionHasAwait(expression.value)
+    );
+  }
+  return (
+    expression.kind === "unary" && hirExpressionHasAwait(expression.argument)
+  );
+}
+
+function hirStatementHasAwait(statement: HirStatement): boolean {
+  if (statement.kind === "block") {
+    return statement.body.some(hirStatementHasAwait);
+  }
+  if (
+    statement.kind === "binding-init" ||
+    statement.kind === "const" ||
+    statement.kind === "let"
+  ) {
+    return hirExpressionHasAwait(statement.initializer);
+  }
+  if (statement.kind === "expression" || statement.kind === "throw") {
+    return hirExpressionHasAwait(statement.expression);
+  }
+  if (statement.kind === "return") {
+    return (
+      statement.expression != null &&
+      hirExpressionHasAwait(statement.expression)
+    );
+  }
+  if (statement.kind === "if") {
+    return (
+      hirExpressionHasAwait(statement.test) ||
+      hirStatementHasAwait(statement.consequent) ||
+      (statement.alternate != null && hirStatementHasAwait(statement.alternate))
+    );
+  }
+  if (statement.kind === "try") {
+    return (
+      hirStatementHasAwait(statement.block) ||
+      (statement.handler != null &&
+        hirStatementHasAwait(statement.handler.body)) ||
+      (statement.finalizer != null && hirStatementHasAwait(statement.finalizer))
+    );
+  }
+  return (
+    statement.kind === "while" &&
+    (hirExpressionHasAwait(statement.test) ||
+      hirStatementHasAwait(statement.body))
+  );
+}
+
+function hirStatementsHaveAwait(statements: readonly HirStatement[]): boolean {
+  return statements.some(hirStatementHasAwait);
+}
+
+function collectHirBindings(
+  statements: readonly HirStatement[],
+): readonly HirGlobalBinding[] {
+  const bindings: HirGlobalBinding[] = [];
+  const collect = (statement: HirStatement): void => {
+    if (
+      statement.kind === "const" ||
+      statement.kind === "let" ||
+      statement.kind === "function-init"
+    ) {
+      bindings.push({ id: statement.bindingId, name: statement.name });
+    } else if (statement.kind === "block") {
+      statement.body.forEach(collect);
+    } else if (statement.kind === "if") {
+      collect(statement.consequent);
+      if (statement.alternate != null) collect(statement.alternate);
+    } else if (statement.kind === "try") {
+      collect(statement.block);
+      if (statement.handler != null) {
+        bindings.push({
+          id: statement.handler.bindingId,
+          name: statement.handler.name,
+        });
+        collect(statement.handler.body);
+      }
+      if (statement.finalizer != null) collect(statement.finalizer);
+    } else if (statement.kind === "while") {
+      collect(statement.body);
+    }
+  };
+  statements.forEach(collect);
+  return bindings;
+}
+
+interface ModuleAwaitPoint {
+  readonly argument: HirExpression;
+  readonly prefix: readonly HirStatement[];
+  readonly range: SourceRange;
+  resume(value: HirExpression): HirStatement;
+}
+
+interface ModuleAsyncLoweringState {
+  awaitCount: number;
+  readonly diagnostics: Diagnostic[];
+  readonly functions: HirFunction[];
+  readonly globalBindings: HirGlobalBinding[];
+  nextBindingId: number;
+  nextFunctionId: number;
+  readonly sourceId: string;
+}
+
+const maximumModuleContinuationCount = 256;
+
+interface ModuleExpressionParts {
+  readonly children: readonly HirExpression[];
+  rebuild(children: readonly HirExpression[]): HirExpression;
+}
+
+function moduleExpressionParts(
+  expression: HirExpression,
+): ModuleExpressionParts | undefined {
+  if (expression.kind === "await") {
+    return {
+      children: [expression.argument],
+      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
+    };
+  }
+  if (expression.kind === "binding-set") {
+    return {
+      children: [expression.value],
+      rebuild: ([value]) => ({ ...expression, value: value! }),
+    };
+  }
+  if (expression.kind === "array") {
+    const indices = expression.elements.flatMap((element, index) =>
+      element == null ? [] : [index],
+    );
+    return {
+      children: indices.map((index) => expression.elements[index]!),
+      rebuild: (children) => ({
+        ...expression,
+        elements: expression.elements.map((element, index) => {
+          const childIndex = indices.indexOf(index);
+          return childIndex < 0 ? element : children[childIndex];
+        }),
+      }),
+    };
+  }
+  if (expression.kind === "binary") {
+    return {
+      children: [expression.left, expression.right],
+      rebuild: ([left, right]) => ({
+        ...expression,
+        left: left!,
+        right: right!,
+      }),
+    };
+  }
+  if (expression.kind === "call") {
+    if (expression.target.kind === "dynamic") {
+      return {
+        children: [expression.target.callee, ...expression.arguments],
+        rebuild: ([callee, ...argumentsValue]) => ({
+          ...expression,
+          arguments: argumentsValue,
+          target: { callee: callee!, kind: "dynamic" },
+        }),
+      };
+    }
+    if (expression.target.kind === "method") {
+      return {
+        children: [
+          expression.target.object,
+          expression.target.key,
+          ...expression.arguments,
+        ],
+        rebuild: ([object, key, ...argumentsValue]) => ({
+          ...expression,
+          arguments: argumentsValue,
+          target: { key: key!, kind: "method", object: object! },
+        }),
+      };
+    }
+    return {
+      children: expression.arguments,
+      rebuild: (argumentsValue) => ({
+        ...expression,
+        arguments: argumentsValue,
+      }),
+    };
+  }
+  if (expression.kind === "new") {
+    return {
+      children: [expression.callee, ...expression.arguments],
+      rebuild: ([callee, ...argumentsValue]) => ({
+        ...expression,
+        arguments: argumentsValue,
+        callee: callee!,
+      }),
+    };
+  }
+  if (expression.kind === "promise-construct") {
+    return {
+      children: expression.arguments,
+      rebuild: (argumentsValue) => ({
+        ...expression,
+        arguments: argumentsValue,
+      }),
+    };
+  }
+  if (expression.kind === "object") {
+    const children = expression.properties.flatMap((property) => [
+      property.key,
+      property.value,
+    ]);
+    return {
+      children,
+      rebuild: (rebuilt) => ({
+        ...expression,
+        properties: expression.properties.map((property, index) => ({
+          key: rebuilt[index * 2] ?? property.key,
+          value: rebuilt[index * 2 + 1] ?? property.value,
+        })),
+      }),
+    };
+  }
+  if (
+    expression.kind === "property-delete" ||
+    expression.kind === "property-get"
+  ) {
+    return {
+      children: [expression.object, expression.key],
+      rebuild: ([object, key]) => ({
+        ...expression,
+        key: key!,
+        object: object!,
+      }),
+    };
+  }
+  if (expression.kind === "property-set") {
+    return {
+      children: [expression.object, expression.key, expression.value],
+      rebuild: ([object, key, value]) => ({
+        ...expression,
+        key: key!,
+        object: object!,
+        value: value!,
+      }),
+    };
+  }
+  if (expression.kind === "unary") {
+    return {
+      children: [expression.argument],
+      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
+    };
+  }
+  return undefined;
+}
+
+interface ExtractedModuleAwait {
+  readonly argument: HirExpression;
+  readonly prefix: readonly HirStatement[];
+  rebuild(value: HirExpression): HirExpression;
+}
+
+function stabilizeModuleExpression(
+  expression: HirExpression,
+  state: ModuleAsyncLoweringState,
+): readonly [HirStatement, HirExpression] {
+  const bindingId = state.nextBindingId;
+  state.nextBindingId += 1;
+  const name = `*module-temp:${bindingId}*`;
+  state.globalBindings.push({ id: bindingId, name });
+  return [
+    {
+      bindingId,
+      hint: undefined,
+      initializer: expression,
+      kind: "const",
+      name,
+      range: expression.range,
+    },
+    { bindingId, kind: "binding", name, range: expression.range },
+  ];
+}
+
+function extractModuleAwait(
+  expression: HirExpression,
+  state: ModuleAsyncLoweringState,
+): ExtractedModuleAwait | undefined {
+  if (
+    expression.kind === "await" &&
+    !hirExpressionHasAwait(expression.argument)
+  ) {
+    return {
+      argument: expression.argument,
+      prefix: [],
+      rebuild: (value) => value,
+    };
+  }
+  const parts = moduleExpressionParts(expression);
+  if (parts == null) return undefined;
+  const childIndex = parts.children.findIndex(hirExpressionHasAwait);
+  if (childIndex < 0) return undefined;
+  const prefix: HirStatement[] = [];
+  const children = [...parts.children];
+  for (let index = 0; index < childIndex; index += 1) {
+    const [statement, binding] = stabilizeModuleExpression(
+      children[index]!,
+      state,
+    );
+    prefix.push(statement);
+    children[index] = binding;
+  }
+  const extracted = extractModuleAwait(children[childIndex]!, state);
+  if (extracted == null) return undefined;
+  prefix.push(...extracted.prefix);
+  return {
+    argument: extracted.argument,
+    prefix,
+    rebuild: (value) => {
+      const rebuilt = [...children];
+      rebuilt[childIndex] = extracted.rebuild(value);
+      return parts.rebuild(rebuilt);
+    },
+  };
+}
+
+function moduleAwaitPoint(
+  statement: HirStatement,
+  state: ModuleAsyncLoweringState,
+): ModuleAwaitPoint | undefined {
+  const expression =
+    statement.kind === "expression" || statement.kind === "throw"
+      ? statement.expression
+      : statement.kind === "binding-init" ||
+          statement.kind === "const" ||
+          statement.kind === "let"
+        ? statement.initializer
+        : undefined;
+  if (expression == null) return undefined;
+  const extracted = extractModuleAwait(expression, state);
+  if (extracted == null) return undefined;
+  return {
+    argument: extracted.argument,
+    prefix: extracted.prefix,
+    range: expression.range,
+    resume: (value) => {
+      const resumed = extracted.rebuild(value);
+      if (
+        statement.kind === "binding-init" ||
+        statement.kind === "const" ||
+        statement.kind === "let"
+      ) {
+        return {
+          ...statement,
+          initializer: resumed,
+          kind: "binding-init",
+        };
+      }
+      return { ...statement, expression: resumed };
+    },
+  };
+}
+
+function moduleUndefined(range: SourceRange): HirExpression {
+  return { kind: "undefined", range };
+}
+
+function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
+  return {
+    functionId: functionValue.id,
+    functionKind: functionValue.functionKind,
+    kind: "function",
+    name: functionValue.name,
+    parameterCount: functionValue.parameters.length,
+    range: functionValue.range,
+  };
+}
+
+function modulePromiseCall(
+  method: "all" | "asyncCall" | "awaitThen" | "resolve",
+  argumentsValue: readonly HirExpression[],
+  range: SourceRange,
+): HirExpression {
+  return {
+    arguments: argumentsValue,
+    kind: "call",
+    range,
+    target: { kind: "promise-intrinsic", method },
+  };
+}
+
+function lowerModuleEvaluationBody(
+  statements: readonly HirStatement[],
+  range: SourceRange,
+  state: ModuleAsyncLoweringState,
+): readonly HirStatement[] | undefined {
+  const body: HirStatement[] = [];
+  for (const [index, statement] of statements.entries()) {
+    const point = moduleAwaitPoint(statement, state);
+    if (point == null) {
+      if (hirStatementHasAwait(statement)) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement,
+            "Top-level await in this control-flow position is outside M4.",
+          ),
+        );
+        return undefined;
+      }
+      body.push(statement);
+      continue;
+    }
+    state.awaitCount += 1;
+    if (state.awaitCount > maximumModuleContinuationCount) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `A module may contain at most ` +
+            `${maximumModuleContinuationCount} top-level await points.`,
+        ),
+      );
+      return undefined;
+    }
+    const bindingId = state.nextBindingId;
+    state.nextBindingId += 1;
+    const functionId = state.nextFunctionId;
+    state.nextFunctionId += 1;
+    const name = `*module-await:${functionId}*`;
+    const parameter: HirParameter = {
+      bindingId,
+      hints: [],
+      name,
+      range: point.range,
+    };
+    const awaitedValue: HirExpression = {
+      bindingId,
+      kind: "binding",
+      name,
+      range: point.range,
+    };
+    const suffix = lowerModuleEvaluationBody(
+      [point.resume(awaitedValue), ...statements.slice(index + 1)],
+      range,
+      state,
+    );
+    if (suffix == null) return undefined;
+    const continuation: HirFunction = {
+      body: suffix,
+      functionKind: "arrow",
+      id: functionId,
+      kind: "hir-function",
+      localBindingIds: [bindingId],
+      name,
+      parameters: [parameter],
+      range: point.range,
+      returnHints: [],
+      strict: true,
+    };
+    state.functions.push(continuation);
+    body.push(...point.prefix);
+    const resolved = modulePromiseCall(
+      "resolve",
+      [point.argument],
+      point.range,
+    );
+    body.push({
+      expression: modulePromiseCall(
+        "awaitThen",
+        [resolved, moduleFunctionExpression(continuation)],
+        point.range,
+      ),
+      kind: "return",
+      range: point.range,
+    });
+    return body;
+  }
+  body.push({
+    expression: moduleUndefined(range),
+    kind: "return",
+    range,
+  });
+  return body;
+}
+
+/** Link and lower a closed module graph to shared-cell scheduled MIR. */
+export function compileModuleGraph(
+  graph: ModuleGraph,
+  options: CompilerOptions = {},
+): ModuleCompilationResult {
+  const linked = linkModuleGraph(graph);
+  if (linked.graph == null) return { diagnostics: linked.diagnostics };
+  const nodes = new Map(
+    graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const linkedModules = new Map(
+    linked.graph.modules.map((module) => [module.canonicalId, module]),
+  );
+  const cells = new Map(linked.graph.cells.map((cell) => [cell.id, cell]));
+  const functionInitializers: HirStatement[] = [];
+  const functions: HirFunction[] = [];
+  const globalBindings: HirGlobalBinding[] = [];
+  const moduleBodies = new Map<string, readonly HirStatement[]>();
+  let nextBindingId = linked.graph.cells.length;
+  let nextFunctionId = 0;
+  const namespaceBindings = new Map<string, number>();
+  const namespaceInitializers: HirStatement[] = [];
+
+  for (const module of linked.graph.modules) {
+    for (const imported of module.imports) {
+      const targetId = imported.namespaceModuleId;
+      if (targetId == null || namespaceBindings.has(targetId)) continue;
+      const target = linkedModules.get(targetId);
+      const targetNode = nodes.get(targetId);
+      if (target == null || targetNode == null) {
+        throw new Error(`Namespace module '${targetId}' is unavailable.`);
+      }
+      const bindingId = imported.cellId;
+      if (bindingId == null) {
+        throw new Error("Module namespace cell is unavailable.");
+      }
+      namespaceBindings.set(targetId, bindingId);
+      const targetRange = retainModuleSource(targetNode.syntax.range, targetId);
+      namespaceInitializers.push({
+        bindingId,
+        hint: undefined,
+        initializer: {
+          entries: target.exports.map((entry) => ({
+            bindingId: entry.cellId,
+            name: entry.exportedName,
+          })),
+          kind: "module-namespace",
+          range: targetRange,
+        },
+        kind: "const",
+        name: `*namespace:${targetId}*`,
+        range: targetRange,
+      });
+    }
+  }
+
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const linkedModule = linkedModules.get(moduleId);
+    if (node == null || linkedModule == null) {
+      throw new Error(`Linked module '${moduleId}' is unavailable.`);
+    }
+    const bindings = new Map<string, Binding>();
+    for (const imported of linkedModule.imports) {
+      if (imported.namespaceModuleId != null) {
+        const bindingId = namespaceBindings.get(imported.namespaceModuleId);
+        if (bindingId == null) {
+          throw new Error("Module namespace binding is unavailable.");
+        }
+        bindings.set(imported.localName, {
+          id: bindingId,
+          mutable: false,
+          name: imported.localName,
+        });
+        continue;
+      }
+      if (imported.cellId == null) continue;
+      bindings.set(imported.localName, {
+        id: imported.cellId,
+        mutable: false,
+        name: imported.localName,
+      });
+    }
+    for (const cellId of linkedModule.cellIds) {
+      const cell = cells.get(cellId);
+      if (cell == null) throw new Error(`Module cell '${cellId}' is missing.`);
+      if (bindings.has(cell.localName)) {
+        const declaration = node.syntax.body.find(
+          (item) =>
+            (item.kind === "const" ||
+              item.kind === "let" ||
+              item.kind === "function") &&
+            item.name === cell.localName,
+        );
+        return {
+          diagnostics: [
+            sourceDiagnostic(
+              moduleId,
+              declaration ?? node.syntax,
+              `Duplicate declaration '${cell.localName}'.`,
+            ),
+          ],
+          graph: linked.graph,
+        };
+      }
+      bindings.set(cell.localName, {
+        id: cell.id,
+        mutable: false,
+        name: cell.localName,
+        pendingDeclaration: true,
+      });
+    }
+    const result = buildSeededHir(
+      {
+        body: moduleProgramBody(node.syntax),
+        kind: "program",
+        range: node.syntax.range,
+        sourceId: moduleId,
+        strict: true,
+      },
+      { bindings, nextBindingId, nextFunctionId },
+    );
+    nextBindingId = result.nextBindingId;
+    nextFunctionId = result.nextFunctionId;
+    if (result.program == null) {
+      return { diagnostics: result.diagnostics, graph: linked.graph };
+    }
+    const moduleBody = retainModuleSource(result.program.body, moduleId);
+    globalBindings.push(...collectHirBindings(moduleBody));
+    const evaluationBody: HirStatement[] = [];
+    for (const statement of moduleBody) {
+      if (statement.kind === "function-init") {
+        functionInitializers.push(statement);
+      } else {
+        evaluationBody.push(statement);
+      }
+    }
+    moduleBodies.set(moduleId, evaluationBody);
+    functions.push(...retainModuleSource(result.program.functions, moduleId));
+  }
+
+  const directlyAsync = new Set(
+    linked.graph.evaluationOrder.filter((moduleId) =>
+      hirStatementsHaveAwait(moduleBodies.get(moduleId) ?? []),
+    ),
+  );
+  const asyncModules = new Set(directlyAsync);
+  let asyncChanged = true;
+  while (asyncChanged) {
+    asyncChanged = false;
+    for (const moduleId of linked.graph.evaluationOrder) {
+      if (asyncModules.has(moduleId)) continue;
+      const node = nodes.get(moduleId);
+      if (
+        node?.dependencies.some((dependency) =>
+          asyncModules.has(dependency.canonicalId),
+        ) !== true
+      ) {
+        continue;
+      }
+      asyncModules.add(moduleId);
+      asyncChanged = true;
+    }
+  }
+  for (const component of linked.graph.components) {
+    if (!component.cyclic) continue;
+    const asyncModuleId = component.moduleIds.find((moduleId) =>
+      asyncModules.has(moduleId),
+    );
+    if (asyncModuleId == null) continue;
+    const node = nodes.get(asyncModuleId);
+    if (node == null) {
+      throw new Error(`Asynchronous module '${asyncModuleId}' is missing.`);
+    }
+    const moduleBody = moduleBodies.get(asyncModuleId) ?? [];
+    const awaitStatement = moduleBody.find(hirStatementHasAwait);
+    return {
+      diagnostics: [
+        sourceDiagnostic(
+          asyncModuleId,
+          awaitStatement ?? node.syntax,
+          "Asynchronous module cycles are outside M4.",
+        ),
+      ],
+      graph: linked.graph,
+    };
+  }
+
+  const evaluators = new Map<string, HirFunction>();
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const moduleBody = moduleBodies.get(moduleId);
+    if (node == null || moduleBody == null) {
+      throw new Error(`Module evaluation '${moduleId}' is unavailable.`);
+    }
+    const evaluatorId = nextFunctionId;
+    nextFunctionId += 1;
+    const state: ModuleAsyncLoweringState = {
+      awaitCount: 0,
+      diagnostics: [],
+      functions,
+      globalBindings,
+      nextBindingId,
+      nextFunctionId,
+      sourceId: moduleId,
+    };
+    const evaluatorBody = lowerModuleEvaluationBody(
+      moduleBody,
+      retainModuleSource(node.syntax.range, moduleId),
+      state,
+    );
+    nextBindingId = state.nextBindingId;
+    nextFunctionId = state.nextFunctionId;
+    if (evaluatorBody == null) {
+      return { diagnostics: state.diagnostics, graph: linked.graph };
+    }
+    const evaluator: HirFunction = {
+      body: evaluatorBody,
+      functionKind: "arrow",
+      id: evaluatorId,
+      kind: "hir-function",
+      localBindingIds: [],
+      name: `*module:${moduleId}*`,
+      parameters: [],
+      range: retainModuleSource(node.syntax.range, moduleId),
+      returnHints: [],
+      strict: true,
+    };
+    evaluators.set(moduleId, evaluator);
+    functions.push(evaluator);
+  }
+
+  const moduleInitializers: HirStatement[] = [];
+  const promiseBindings = new Map<string, number>();
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const evaluator = evaluators.get(moduleId);
+    if (node == null || evaluator == null) {
+      throw new Error(`Module scheduler '${moduleId}' is unavailable.`);
+    }
+    const range = retainModuleSource(node.syntax.range, moduleId);
+    const evaluatorExpression = moduleFunctionExpression(evaluator);
+    const asyncDependencies = [
+      ...new Set(
+        node.dependencies
+          .map((dependency) => dependency.canonicalId)
+          .filter((dependencyId) => asyncModules.has(dependencyId)),
+      ),
+    ];
+    let initializer: HirExpression;
+    if (asyncDependencies.length > 0) {
+      const dependencies = asyncDependencies.map((dependencyId) => {
+        const bindingId = promiseBindings.get(dependencyId);
+        if (bindingId == null) {
+          throw new Error(`Module promise '${dependencyId}' is unavailable.`);
+        }
+        return {
+          bindingId,
+          kind: "binding",
+          name: `*module-promise:${dependencyId}*`,
+          range,
+        } satisfies HirExpression;
+      });
+      const awaited =
+        dependencies.length === 1
+          ? dependencies[0]!
+          : modulePromiseCall(
+              "all",
+              [{ elements: dependencies, kind: "array", range }],
+              range,
+            );
+      initializer = modulePromiseCall(
+        "awaitThen",
+        [awaited, evaluatorExpression],
+        range,
+      );
+    } else if (directlyAsync.has(moduleId)) {
+      initializer = modulePromiseCall(
+        "asyncCall",
+        [evaluatorExpression],
+        range,
+      );
+    } else {
+      const result: HirExpression = {
+        arguments: [],
+        kind: "call",
+        range,
+        target: { callee: evaluatorExpression, kind: "dynamic" },
+      };
+      initializer = modulePromiseCall("resolve", [result], range);
+    }
+    const bindingId = nextBindingId;
+    nextBindingId += 1;
+    promiseBindings.set(moduleId, bindingId);
+    moduleInitializers.push({
+      bindingId,
+      hint: undefined,
+      initializer,
+      kind: "const",
+      name: `*module-promise:${moduleId}*`,
+      range,
+    });
+  }
+
+  const entry = nodes.get(graph.entryId);
+  if (entry == null) throw new Error("The module entry is unavailable.");
+  const entryPromiseId = promiseBindings.get(graph.entryId);
+  if (entryPromiseId == null) {
+    throw new Error("The entry module promise is unavailable.");
+  }
+  const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
+  const hir: HirProgram = {
+    body: [
+      ...namespaceInitializers,
+      ...functionInitializers,
+      ...moduleInitializers,
+      {
+        expression: {
+          argument: {
+            bindingId: entryPromiseId,
+            kind: "binding",
+            name: `*module-promise:${graph.entryId}*`,
+            range: entryRange,
+          },
+          kind: "await",
+          range: entryRange,
+        },
+        kind: "expression",
+        range: entryRange,
+      },
+    ],
+    functions,
+    globalBindings,
+    kind: "hir-program",
+    range: entryRange,
+    sourceId: graph.entryId,
+    strict: true,
+  };
+  return {
+    diagnostics: [],
+    graph: linked.graph,
+    hir,
+    mir: buildMir(hir, options),
+  };
+}
+
 /** Compile source through owned syntax, HIR, and policy-selected MIR. */
 export function compileSource(
   frontend: SourceFrontend,
@@ -3377,6 +5435,7 @@ export interface NativeToolchain {
 
 /** Narrow host boundary used by compiler adapters and test infrastructure. */
 export interface CompilerHost {
+  canonicalizeFile?(path: string): Promise<string>;
   makeTemporaryDirectory(prefix: string): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove(path: string): Promise<void>;

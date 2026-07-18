@@ -3,6 +3,7 @@ import type {
   CompilerHost,
   Diagnostic,
   MirProgram,
+  ModuleSourceFrontend,
   NativeBackend,
   NativeToolchain,
   ProcessObservation,
@@ -10,9 +11,22 @@ import type {
   RuntimeInputProvider,
   SourceFrontend,
 } from "@oseo/compiler";
-import { compileSource, printMir, renderDiagnostic } from "@oseo/compiler";
-import { createDenoHost, createNodeHost } from "@oseo/host";
-import { babelFrontend } from "@oseo/parser-babel";
+import {
+  buildModuleGraph,
+  compileModuleGraph,
+  compileSource,
+  printMir,
+  renderDiagnostic,
+} from "@oseo/compiler";
+import {
+  canonicalizeFileModuleUrl,
+  createDenoHost,
+  createFileModuleLoader,
+  createNodeHost,
+  fileModuleResolver,
+  hashModuleSource,
+} from "@oseo/host";
+import { babelFrontend, babelModuleFrontend } from "@oseo/parser-babel";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 import { zigToolchain } from "@oseo/toolchain-zig";
 import { object, or } from "@optique/core/constructs";
@@ -80,6 +94,7 @@ export interface DefaultComponents {
   readonly createDenoHost: () => CompilerHost;
   readonly createNodeHost: () => CompilerHost;
   readonly frontend: SourceFrontend;
+  readonly moduleFrontend: ModuleSourceFrontend;
   readonly runtime: RuntimeInputProvider;
   readonly toolchain: NativeToolchain;
 }
@@ -105,6 +120,7 @@ export const defaultComponents: DefaultComponents = {
   createDenoHost,
   createNodeHost,
   frontend: babelFrontend,
+  moduleFrontend: babelModuleFrontend,
   runtime: cRuntimeProvider,
   toolchain: zigToolchain,
 };
@@ -211,6 +227,115 @@ function compileCliSource(
   );
 }
 
+async function compileCliModuleGraph(
+  host: CompilerHost,
+  sourcePath: string,
+  source: string,
+  specialization: CliInvocation["specialization"],
+): Promise<{ readonly diagnostic: Diagnostic } | { readonly mir: MirProgram }> {
+  let entryId: string;
+  try {
+    entryId =
+      host.canonicalizeFile == null
+        ? new URL(sourcePath).href
+        : await host.canonicalizeFile(sourcePath);
+  } catch {
+    return {
+      diagnostic: hostDiagnostic(
+        sourcePath,
+        "The module entry could not be canonicalized.",
+      ),
+    };
+  }
+  const fileLoader = createFileModuleLoader(host);
+  const result = await buildModuleGraph(
+    defaultComponents.moduleFrontend,
+    {
+      load(canonicalId, referrer) {
+        return canonicalId === entryId
+          ? Promise.resolve({
+              diagnostics: [],
+              source: {
+                source,
+                sourceHash: hashModuleSource(source),
+                sourceId: entryId,
+              },
+            })
+          : fileLoader.load(canonicalId, referrer);
+      },
+    },
+    fileModuleResolver,
+    entryId,
+  );
+  const graphDiagnostic = result.diagnostics[0];
+  if (graphDiagnostic != null) return { diagnostic: graphDiagnostic };
+  if (result.graph == null) {
+    return {
+      diagnostic: hostDiagnostic(entryId, "The module graph is unavailable."),
+    };
+  }
+  const compiled = compileModuleGraph(result.graph, { specialization });
+  const diagnostic = compiled.diagnostics[0];
+  if (diagnostic != null) return { diagnostic };
+  if (compiled.mir == null) {
+    return {
+      diagnostic: hostDiagnostic(entryId, "The compiler did not produce MIR."),
+    };
+  }
+  return { mir: compiled.mir };
+}
+
+function hasModuleExtension(path: string): boolean {
+  return path.endsWith(".mjs") || path.endsWith(".mts");
+}
+
+function hasModulePathIntent(sourcePath: string): boolean {
+  try {
+    const url = new URL(sourcePath);
+    if (url.protocol === "file:") {
+      const canonical = new URL(canonicalizeFileModuleUrl(url));
+      return hasModuleExtension(canonical.pathname);
+    }
+  } catch {
+    // Ordinary filesystem paths are checked below.
+  }
+  return hasModuleExtension(sourcePath);
+}
+
+function isModuleSource(
+  source: string,
+  sourceId: string,
+  sourcePath: string,
+): boolean {
+  if (hasModulePathIntent(sourcePath)) return true;
+  const parsed = defaultComponents.moduleFrontend.parseModule({
+    source,
+    sourceId,
+  });
+  if (
+    parsed.module != null &&
+    (parsed.module.imports.length > 0 || parsed.module.exports.length > 0)
+  ) {
+    return true;
+  }
+  if (!parsed.parsed) return false;
+  return !defaultComponents.frontend.parse({ source, sourceId }).parsed;
+}
+
+function emitCliMir(mode: CliInvocation["mode"], mir: MirProgram): CliResult {
+  if (mode === "dump-mir") {
+    return { exitStatus: 0, stderr: "", stdout: printMir(mir) };
+  }
+  if (mode === "emit-c") {
+    return {
+      exitStatus: 0,
+      stderr: "",
+      stdout: defaultComponents.backend.emit(mir).source,
+    };
+  }
+  throw new Error("The native execution mode does not emit compiler text.");
+}
+
 /** Run parsing, dumps, and C emission without touching a host process. */
 export function runCli(request: CliRequest): CliResult {
   const parsed = parseCliRequest(request);
@@ -225,6 +350,15 @@ export function runCli(request: CliRequest): CliResult {
 
 function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
+}
+
+function sourceReadLocation(sourceId: string): string | URL {
+  try {
+    const url = new URL(sourceId);
+    return url.protocol === "file:" ? url : sourceId;
+  } catch {
+    return sourceId;
+  }
 }
 
 async function observeProcess(
@@ -318,34 +452,53 @@ export async function runNativeCli(
   const sourceId = request.sourceId ?? parsed.value.sourceId;
   let source: string;
   try {
-    source = request.source ?? (await host.readTextFile(parsed.value.sourceId));
+    source =
+      request.source ??
+      (await host.readTextFile(sourceReadLocation(parsed.value.sourceId)));
   } catch {
     return diagnosticResult(
       hostDiagnostic(sourceId, "The source file could not be read."),
     );
   }
-  if (parsed.value.mode !== "execute") {
+  let mir: MirProgram;
+  if (isModuleSource(source, sourceId, parsed.value.sourceId)) {
+    const compiled = await compileCliModuleGraph(
+      host,
+      parsed.value.sourceId,
+      source,
+      parsed.value.specialization,
+    );
+    if ("diagnostic" in compiled) {
+      return diagnosticResult(compiled.diagnostic);
+    }
+    mir = compiled.mir;
+    if (parsed.value.mode !== "execute") {
+      return emitCliMir(parsed.value.mode, mir);
+    }
+  } else if (parsed.value.mode !== "execute") {
     return compileCliSource(
       parsed.value.mode,
       source,
       sourceId,
       parsed.value.specialization,
     );
-  }
-  const compiled = compileSource(
-    defaultComponents.frontend,
-    {
-      source,
-      sourceId,
-    },
-    { specialization: parsed.value.specialization },
-  );
-  const diagnostic = compiled.diagnostics[0];
-  if (diagnostic != null) return diagnosticResult(diagnostic);
-  if (compiled.mir == null) {
-    return diagnosticResult(
-      hostDiagnostic(sourceId, "The compiler did not produce MIR."),
+  } else {
+    const compiled = compileSource(
+      defaultComponents.frontend,
+      {
+        source,
+        sourceId,
+      },
+      { specialization: parsed.value.specialization },
     );
+    const diagnostic = compiled.diagnostics[0];
+    if (diagnostic != null) return diagnosticResult(diagnostic);
+    if (compiled.mir == null) {
+      return diagnosticResult(
+        hostDiagnostic(sourceId, "The compiler did not produce MIR."),
+      );
+    }
+    mir = compiled.mir;
   }
   let directory: string;
   try {
@@ -360,12 +513,7 @@ export async function runNativeCli(
   }
   let result: CliResult;
   try {
-    result = await executeNativeWorkflow(
-      host,
-      sourceId,
-      directory,
-      compiled.mir,
-    );
+    result = await executeNativeWorkflow(host, sourceId, directory, mir);
   } catch {
     result = diagnosticResult(
       hostDiagnostic(sourceId, "The native host workflow failed."),

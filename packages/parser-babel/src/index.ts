@@ -5,6 +5,8 @@ import type {
   Diagnostic,
   Hint,
   HintName,
+  ModuleFrontendResult,
+  ModuleSourceFrontend,
   Position,
   SourceFrontend,
   SourceInput,
@@ -12,8 +14,12 @@ import type {
   SyntaxCallTarget,
   SyntaxExpression,
   SyntaxFunction,
+  SyntaxImportEntry,
+  SyntaxModule,
+  SyntaxModuleSpecifier,
   SyntaxParameter,
   SyntaxProgram,
+  SyntaxExportEntry,
   SyntaxStatement,
 } from "@oseo/compiler";
 
@@ -44,6 +50,7 @@ interface ConvertContext {
   readonly input: SourceInput;
   readonly locations: SourceIndex;
   readonly strictStack: boolean[];
+  syntheticIndex: number;
 }
 
 interface SourceIndex {
@@ -337,6 +344,26 @@ function identifierName(value: BabelNode): string | undefined {
     : undefined;
 }
 
+function moduleName(value: BabelNode): string | undefined {
+  if (value.type === "StringLiteral" && typeof value.value === "string") {
+    return value.value;
+  }
+  return identifierName(value);
+}
+
+function moduleSpecifier(
+  context: ConvertContext,
+  value: BabelNode | undefined,
+): SyntaxModuleSpecifier | undefined {
+  if (value?.type !== "StringLiteral" || typeof value.value !== "string") {
+    if (value != null) {
+      unsupported(context, value, "A module specifier must be a string.");
+    }
+    return undefined;
+  }
+  return { ...location(context, value), value: value.value };
+}
+
 function callTarget(
   context: ConvertContext,
   value: BabelNode,
@@ -348,6 +375,13 @@ function callTarget(
       : callTarget(context, inner);
   }
   const name = identifierName(value);
+  if (name === "setTimeout" || name === "clearTimeout") {
+    return {
+      ...location(context, value),
+      kind: "timer-intrinsic",
+      method: name,
+    };
+  }
   if (name != null) return { ...location(context, value), kind: "name", name };
   if (value.type !== "MemberExpression") {
     const callee = expression(context, value);
@@ -377,6 +411,21 @@ function callTarget(
       return {
         ...location(context, value),
         kind: "object-intrinsic",
+        method,
+      };
+    }
+  }
+  if (value.computed !== true && identifierName(object) === "Promise") {
+    const method = identifierName(property);
+    if (
+      method === "all" ||
+      method === "race" ||
+      method === "reject" ||
+      method === "resolve"
+    ) {
+      return {
+        ...location(context, value),
+        kind: "promise-intrinsic",
         method,
       };
     }
@@ -441,6 +490,14 @@ function expression(
       elements.push(converted);
     }
     return { ...located, elements, kind: "array" };
+  }
+  if (value.type === "AwaitExpression") {
+    const argumentNode = node(value.argument);
+    if (argumentNode == null) return unsupported(context, value);
+    const argument = expression(context, argumentNode);
+    return argument == null
+      ? undefined
+      : { ...located, argument, kind: "await" };
   }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
@@ -540,7 +597,10 @@ function expression(
     }
     return { ...located, kind: "object", properties };
   }
-  if (value.type === "FunctionExpression") {
+  if (
+    value.type === "FunctionExpression" ||
+    (value.type === "ArrowFunctionExpression" && value.async === true)
+  ) {
     const functionValue = functionDeclaration(context, value, false);
     return functionValue == null
       ? undefined
@@ -833,17 +893,418 @@ function statement(
   return unsupported(context, value);
 }
 
+function syntheticName(context: ConvertContext, role: string): string {
+  const index = context.syntheticIndex;
+  context.syntheticIndex += 1;
+  return `\0oseo-${role}-${index}`;
+}
+
+function syntheticParameter(name: string, range: SourceRange): SyntaxParameter {
+  return { hints: [], name, range };
+}
+
+function syntheticFunction(
+  context: ConvertContext,
+  range: SourceRange,
+  parameters: readonly string[],
+  body: readonly (SyntaxFunction | SyntaxStatement)[],
+): SyntaxExpression {
+  return {
+    functionValue: {
+      body,
+      functionKind: "arrow",
+      kind: "function",
+      name: undefined,
+      parameters: parameters.map((name) => syntheticParameter(name, range)),
+      range,
+      returnHints: [],
+      strict: context.strictStack.at(-1) === true,
+    },
+    kind: "function",
+    range,
+  };
+}
+
+function undefinedExpression(range: SourceRange): SyntaxExpression {
+  return { kind: "undefined", range };
+}
+
+function identifierExpression(
+  name: string,
+  range: SourceRange,
+): SyntaxExpression {
+  return { kind: "identifier", name, range };
+}
+
+function directPromiseResolve(
+  value: SyntaxExpression,
+  range: SourceRange,
+): SyntaxExpression {
+  return {
+    arguments: [value],
+    kind: "call",
+    range,
+    target: { kind: "promise-intrinsic-direct", method: "resolve", range },
+  };
+}
+
+function internalPromiseThen(
+  promise: SyntaxExpression,
+  callback: SyntaxExpression,
+  range: SourceRange,
+): SyntaxExpression {
+  return {
+    arguments: [promise, callback],
+    kind: "call",
+    range,
+    target: {
+      kind: "promise-intrinsic-direct",
+      method: "awaitThen",
+      range,
+    },
+  };
+}
+
+function asyncCall(
+  execution: SyntaxExpression,
+  range: SourceRange,
+): SyntaxExpression {
+  return {
+    arguments: [execution],
+    kind: "call",
+    range,
+    target: { kind: "promise-intrinsic-direct", method: "asyncCall", range },
+  };
+}
+
+function nodeContainsAwait(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(nodeContainsAwait);
+  const valueNode = node(value);
+  if (valueNode == null) return false;
+  if (valueNode.type === "AwaitExpression") return true;
+  if (
+    valueNode.type === "FunctionDeclaration" ||
+    valueNode.type === "FunctionExpression" ||
+    valueNode.type === "ArrowFunctionExpression"
+  ) {
+    return false;
+  }
+  return Object.values(valueNode).some(nodeContainsAwait);
+}
+
+const maximumAsyncContinuationCount = 256;
+
+function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
+  if (value.type === "ExpressionStatement") {
+    return node(value.expression)?.type === "AwaitExpression";
+  }
+  if (value.type === "ReturnStatement") {
+    return node(value.argument)?.type === "AwaitExpression";
+  }
+  if (value.type !== "VariableDeclaration") return false;
+  if (value.kind !== "const" && value.kind !== "let") return false;
+  const declarations = nodes(value.declarations);
+  return (
+    declarations.length === 1 &&
+    node(declarations[0]?.init)?.type === "AwaitExpression"
+  );
+}
+
+function validateAsyncContinuationCount(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): boolean {
+  let count = 0;
+  for (const value of values) {
+    if (!isDirectAsyncAwaitPoint(value)) continue;
+    count += 1;
+    if (count <= maximumAsyncContinuationCount) continue;
+    unsupported(
+      context,
+      value,
+      `An async function may contain at most ` +
+        `${maximumAsyncContinuationCount} sequential await points.`,
+    );
+    return false;
+  }
+  return true;
+}
+
+interface AwaitPoint {
+  readonly declaration?: {
+    readonly hint: Hint | undefined;
+    readonly kind: "const" | "let";
+    readonly name: string;
+  };
+  readonly operand: BabelNode;
+  readonly returnValue: boolean;
+}
+
+function awaitPoint(
+  context: ConvertContext,
+  value: BabelNode,
+): AwaitPoint | undefined {
+  if (value.type === "ExpressionStatement") {
+    const awaited = node(value.expression);
+    const operand =
+      awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
+    return operand == null ? undefined : { operand, returnValue: false };
+  }
+  if (value.type === "ReturnStatement") {
+    const awaited = node(value.argument);
+    const operand =
+      awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
+    return operand == null ? undefined : { operand, returnValue: true };
+  }
+  if (value.type !== "VariableDeclaration") return undefined;
+  if (value.kind !== "const" && value.kind !== "let") return undefined;
+  const declarations = nodes(value.declarations);
+  const declaration = declarations.length === 1 ? declarations[0] : undefined;
+  const identifier = declaration == null ? undefined : node(declaration.id);
+  const awaited = declaration == null ? undefined : node(declaration.init);
+  const operand =
+    awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
+  const name = identifier == null ? undefined : identifierName(identifier);
+  if (identifier == null || name == null || operand == null) return undefined;
+  return {
+    declaration: {
+      hint: typeHint(context, identifier.typeAnnotation),
+      kind: value.kind,
+      name,
+    },
+    operand,
+    returnValue: false,
+  };
+}
+
+function asyncScopePlaceholder(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxFunction | SyntaxStatement | undefined {
+  if (value.type === "FunctionDeclaration") {
+    return functionDeclaration(context, value, true);
+  }
+  if (value.type !== "VariableDeclaration") return undefined;
+  if (value.kind !== "const" && value.kind !== "let") return undefined;
+  const declarations = nodes(value.declarations);
+  const declaration = declarations.length === 1 ? declarations[0] : undefined;
+  const identifier = declaration == null ? undefined : node(declaration.id);
+  const name = identifier == null ? undefined : identifierName(identifier);
+  if (declaration == null || identifier == null || name == null) {
+    return undefined;
+  }
+  const range = sourceRange(context.locations, value);
+  return {
+    hint: typeHint(context, identifier.typeAnnotation),
+    initializer: undefinedExpression(range),
+    kind: value.kind,
+    name,
+    range,
+  };
+}
+
+function asyncScopePlaceholders(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): readonly (SyntaxFunction | SyntaxStatement)[] | undefined {
+  const declarations: (SyntaxFunction | SyntaxStatement)[] = [];
+  for (const value of values) {
+    if (
+      value.type !== "FunctionDeclaration" &&
+      value.type !== "VariableDeclaration"
+    ) {
+      continue;
+    }
+    const declaration = asyncScopePlaceholder(context, value);
+    if (declaration == null) {
+      if (value.type === "FunctionDeclaration") return undefined;
+      continue;
+    }
+    declarations.push(declaration);
+  }
+  return declarations;
+}
+
+function validateAsyncStatements(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): boolean {
+  const validationContext: ConvertContext = {
+    ...context,
+    functionStack: [...context.functionStack],
+    strictStack: [...context.strictStack],
+  };
+  for (const value of values) {
+    const point = awaitPoint(validationContext, value);
+    if (point != null) {
+      if (nodeContainsAwait(point.operand)) {
+        unsupported(
+          validationContext,
+          point.operand,
+          "Nested await operands are outside M4.",
+        );
+        return false;
+      }
+      if (expression(validationContext, point.operand) == null) return false;
+      continue;
+    }
+    if (nodeContainsAwait(value)) {
+      unsupported(
+        validationContext,
+        value,
+        "Await is supported in declarations, expression statements, and " +
+          "returns.",
+      );
+      return false;
+    }
+    const converted =
+      value.type === "FunctionDeclaration"
+        ? functionDeclaration(validationContext, value, true)
+        : statement(validationContext, value, true);
+    if (converted == null) return false;
+  }
+  return true;
+}
+
+function asyncStatementList(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+  mode: "continuation" | "executor",
+): readonly (SyntaxFunction | SyntaxStatement)[] | undefined {
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  for (const [index, value] of values.entries()) {
+    const point = awaitPoint(context, value);
+    if (point != null) {
+      if (nodeContainsAwait(point.operand)) {
+        return unsupported(
+          context,
+          point.operand,
+          "Nested await operands are outside M4.",
+        );
+      }
+      const operand = expression(context, point.operand);
+      if (operand == null) return undefined;
+      const range = sourceRange(context.locations, value);
+      const valueName = syntheticName(context, "await");
+      let continuationBody:
+        | readonly (SyntaxFunction | SyntaxStatement)[]
+        | undefined;
+      if (point.returnValue) {
+        continuationBody = [
+          {
+            expression: identifierExpression(valueName, range),
+            kind: "return",
+            range,
+          },
+        ];
+      } else {
+        continuationBody = asyncStatementList(
+          context,
+          values.slice(index + 1),
+          "continuation",
+        );
+        if (continuationBody != null && point.declaration != null) {
+          continuationBody = [
+            {
+              hint: point.declaration.hint,
+              initializer: identifierExpression(valueName, range),
+              kind: "binding-init",
+              name: point.declaration.name,
+              range,
+            },
+            ...continuationBody,
+          ];
+        }
+      }
+      if (continuationBody == null) return undefined;
+      const callback = syntheticFunction(
+        context,
+        range,
+        [valueName],
+        continuationBody,
+      );
+      const chain = internalPromiseThen(
+        directPromiseResolve(operand, range),
+        callback,
+        range,
+      );
+      if (mode === "executor") {
+        const declarations = asyncScopePlaceholders(
+          context,
+          values.slice(index),
+        );
+        if (declarations == null) return undefined;
+        body.push({ expression: chain, kind: "return", range });
+        body.push(...declarations);
+      } else {
+        body.push({ expression: chain, kind: "return", range });
+      }
+      return body;
+    }
+    if (nodeContainsAwait(value)) {
+      unsupported(
+        context,
+        value,
+        "Await is supported in declarations, expression statements, and " +
+          "returns.",
+      );
+      return undefined;
+    }
+    if (mode === "continuation" && value.type === "FunctionDeclaration") {
+      continue;
+    }
+    const converted =
+      value.type === "FunctionDeclaration"
+        ? functionDeclaration(context, value, true)
+        : statement(context, value, true);
+    if (converted == null) return undefined;
+    if (converted.kind === "function") {
+      body.push(converted);
+      continue;
+    }
+    if (mode === "continuation") {
+      body.push(
+        converted.kind === "const" || converted.kind === "let"
+          ? { ...converted, kind: "binding-init" }
+          : converted,
+      );
+    } else {
+      body.push(converted);
+    }
+    if (converted.kind === "return" || converted.kind === "throw") {
+      if (!validateAsyncStatements(context, values.slice(index + 1))) {
+        return undefined;
+      }
+      if (mode === "executor") {
+        const declarations = asyncScopePlaceholders(
+          context,
+          values.slice(index + 1),
+        );
+        if (declarations == null) return undefined;
+        body.push(...declarations);
+      }
+      return body;
+    }
+  }
+  const range =
+    values.length === 0
+      ? { end: { column: 1, line: 1 }, start: { column: 1, line: 1 } }
+      : sourceRange(context.locations, values.at(-1) ?? values[0]!);
+  body.push({
+    expression: undefinedExpression(range),
+    kind: "return",
+    range,
+  });
+  return body;
+}
+
 function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
   requireName = true,
 ): SyntaxFunction | undefined {
-  if (value.async === true || value.generator === true) {
-    return unsupported(
-      context,
-      value,
-      "Async and generator functions are unsupported.",
-    );
+  if (value.generator === true) {
+    return unsupported(context, value, "Generator functions are unsupported.");
   }
   if (value.typeParameters != null) {
     return unsupported(
@@ -855,7 +1316,14 @@ function functionDeclaration(
   const identifier = node(value.id);
   const name = identifier == null ? undefined : identifierName(identifier);
   const bodyNode = node(value.body);
-  if ((requireName && name == null) || bodyNode?.type !== "BlockStatement") {
+  const asyncArrowExpression =
+    value.type === "ArrowFunctionExpression" &&
+    value.async === true &&
+    bodyNode?.type !== "BlockStatement";
+  if (
+    (requireName && name == null) ||
+    (bodyNode?.type !== "BlockStatement" && !asyncArrowExpression)
+  ) {
     return unsupported(
       context,
       value,
@@ -893,21 +1361,56 @@ function functionDeclaration(
   if (returnHint != null) returnHints.push(returnHint);
   returnHints.push(...jsdoc.returns);
   const strict =
-    context.strictStack.at(-1) === true || hasUseStrictDirective(bodyNode);
+    context.strictStack.at(-1) === true ||
+    (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
   context.functionStack.push(true);
-  for (const child of nodes(bodyNode.body)) {
-    const converted =
-      child.type === "FunctionDeclaration"
-        ? functionDeclaration(context, child, true)
-        : statement(context, child, true);
-    if (converted == null) {
+  const children =
+    asyncArrowExpression && bodyNode != null
+      ? [
+          {
+            argument: bodyNode,
+            ...(bodyNode.end == null ? {} : { end: bodyNode.end }),
+            ...(bodyNode.start == null ? {} : { start: bodyNode.start }),
+            type: "ReturnStatement",
+          } satisfies BabelNode,
+        ]
+      : nodes(bodyNode?.body);
+  if (value.async === true) {
+    if (!validateAsyncContinuationCount(context, children)) {
       context.functionStack.pop();
       context.strictStack.pop();
       return undefined;
     }
-    body.push(converted);
+    const executionBody = asyncStatementList(context, children, "executor");
+    if (executionBody != null) {
+      const range = location(context, value).range;
+      const execution = syntheticFunction(context, range, [], executionBody);
+      body.push({
+        expression: asyncCall(execution, range),
+        kind: "return",
+        range,
+      });
+    }
+    if (executionBody == null) {
+      context.functionStack.pop();
+      context.strictStack.pop();
+      return undefined;
+    }
+  } else {
+    for (const child of children) {
+      const converted =
+        child.type === "FunctionDeclaration"
+          ? functionDeclaration(context, child, true)
+          : statement(context, child, true);
+      if (converted == null) {
+        context.functionStack.pop();
+        context.strictStack.pop();
+        return undefined;
+      }
+      body.push(converted);
+    }
   }
   context.functionStack.pop();
   context.strictStack.pop();
@@ -915,6 +1418,14 @@ function functionDeclaration(
   return {
     ...location(context, value),
     body,
+    functionKind:
+      value.type === "ArrowFunctionExpression"
+        ? value.async === true
+          ? "async-arrow"
+          : "arrow"
+        : value.async === true
+          ? "async"
+          : "ordinary",
     kind: "function",
     name,
     parameters,
@@ -952,6 +1463,292 @@ function program(
   };
 }
 
+function exportForDeclaration(
+  declaration: SyntaxFunction | SyntaxStatement,
+): SyntaxExportEntry | undefined {
+  if (
+    declaration.kind !== "const" &&
+    declaration.kind !== "let" &&
+    declaration.kind !== "function"
+  ) {
+    return undefined;
+  }
+  if (declaration.name == null) return undefined;
+  return {
+    exportedName: declaration.name,
+    kind: "local",
+    localName: declaration.name,
+    range: declaration.range,
+  };
+}
+
+function hasModuleAttributes(
+  context: ConvertContext,
+  value: BabelNode,
+): boolean {
+  if (
+    nodes(value.attributes).length > 0 ||
+    nodes(value.assertions).length > 0
+  ) {
+    return true;
+  }
+  const source = node(value.source);
+  if (source?.end == null || value.end == null) return false;
+  const suffix = context.input.source
+    .slice(source.end, value.end)
+    .replaceAll(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/gu, "");
+  return /\b(?:assert|with)\s*\{/u.test(suffix);
+}
+
+function moduleProgram(
+  context: ConvertContext,
+  file: BabelNode,
+): SyntaxModule | undefined {
+  const programNode = node(file.program) ?? file;
+  const body: (SyntaxFunction | SyntaxStatement)[] = [];
+  const exports: SyntaxExportEntry[] = [];
+  const imports: SyntaxImportEntry[] = [];
+  context.strictStack.push(true);
+  for (const item of nodes(programNode.body)) {
+    if (item.type === "ImportDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
+      if (item.importKind === "type") {
+        unsupported(context, item, "Type-only imports are outside M4.");
+        break;
+      }
+      const specifier = moduleSpecifier(context, node(item.source));
+      if (specifier == null) break;
+      const rawSpecifiers = nodes(item.specifiers);
+      if (rawSpecifiers.length === 0) {
+        imports.push({
+          ...location(context, item),
+          importedName: undefined,
+          localName: undefined,
+          specifier,
+        });
+        continue;
+      }
+      for (const rawSpecifier of rawSpecifiers) {
+        if (rawSpecifier.importKind === "type") {
+          unsupported(
+            context,
+            rawSpecifier,
+            "Type-only imports are outside M4.",
+          );
+          break;
+        }
+        const local = node(rawSpecifier.local);
+        const localName = local == null ? undefined : identifierName(local);
+        let importedName: string | undefined;
+        if (rawSpecifier.type === "ImportDefaultSpecifier") {
+          importedName = "default";
+        } else if (rawSpecifier.type === "ImportNamespaceSpecifier") {
+          importedName = "*";
+        } else if (rawSpecifier.type === "ImportSpecifier") {
+          const imported = node(rawSpecifier.imported);
+          importedName = imported == null ? undefined : moduleName(imported);
+        }
+        if (localName == null || importedName == null) {
+          unsupported(context, rawSpecifier, "This import is unsupported.");
+          break;
+        }
+        imports.push({
+          ...location(context, rawSpecifier),
+          importedName,
+          localName,
+          specifier,
+        });
+      }
+      if (context.diagnostics.length > 0) break;
+      continue;
+    }
+    if (item.type === "ExportAllDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
+      const specifier = moduleSpecifier(context, node(item.source));
+      if (specifier == null) break;
+      if (item.exported != null) {
+        unsupported(context, item, "Namespace re-exports are outside M4.");
+        break;
+      }
+      exports.push({ ...location(context, item), kind: "star", specifier });
+      continue;
+    }
+    if (item.type === "ExportNamedDeclaration") {
+      if (hasModuleAttributes(context, item)) {
+        unsupported(context, item, "Module attributes are outside M4.");
+        break;
+      }
+      if (item.exportKind === "type") {
+        unsupported(context, item, "Type-only exports are outside M4.");
+        break;
+      }
+      const sourceNode = node(item.source);
+      const specifier =
+        sourceNode == null ? undefined : moduleSpecifier(context, sourceNode);
+      if (sourceNode != null && specifier == null) break;
+      const declarationNode = node(item.declaration);
+      if (declarationNode != null) {
+        const converted =
+          declarationNode.type === "FunctionDeclaration"
+            ? functionDeclaration(context, declarationNode)
+            : statement(context, declarationNode, false);
+        if (converted == null) break;
+        const exportEntry = exportForDeclaration(converted);
+        if (exportEntry == null) {
+          unsupported(context, declarationNode, "This export is unsupported.");
+          break;
+        }
+        body.push(converted);
+        exports.push(exportEntry);
+      }
+      for (const rawSpecifier of nodes(item.specifiers)) {
+        if (rawSpecifier.exportKind === "type") {
+          unsupported(
+            context,
+            rawSpecifier,
+            "Type-only exports are outside M4.",
+          );
+          break;
+        }
+        if (rawSpecifier.type !== "ExportSpecifier") {
+          unsupported(context, rawSpecifier, "This export is unsupported.");
+          break;
+        }
+        const local = node(rawSpecifier.local);
+        const exported = node(rawSpecifier.exported);
+        const localName = local == null ? undefined : moduleName(local);
+        const exportedName =
+          exported == null ? undefined : moduleName(exported);
+        if (localName == null || exportedName == null) {
+          unsupported(context, rawSpecifier, "This export is unsupported.");
+          break;
+        }
+        exports.push(
+          specifier == null
+            ? {
+                ...location(context, rawSpecifier),
+                exportedName,
+                kind: "local",
+                localName,
+              }
+            : {
+                ...location(context, rawSpecifier),
+                exportedName,
+                importedName: localName,
+                kind: "indirect",
+                specifier,
+              },
+        );
+      }
+      if (context.diagnostics.length > 0) break;
+      continue;
+    }
+    if (item.type === "ExportDefaultDeclaration") {
+      const declarationNode = node(item.declaration);
+      if (declarationNode == null) {
+        unsupported(context, item);
+        break;
+      }
+      if (declarationNode.type === "FunctionDeclaration") {
+        const declaration = functionDeclaration(
+          context,
+          declarationNode,
+          false,
+        );
+        if (declaration == null) break;
+        if (declaration.name == null) {
+          exports.push({
+            ...location(context, item),
+            declaration: { ...declaration, name: "default" },
+            exportedName: "default",
+            kind: "default",
+          });
+          continue;
+        }
+        body.push(declaration);
+        exports.push({
+          exportedName: "default",
+          kind: "local",
+          localName: declaration.name,
+          range: declaration.range,
+        });
+        continue;
+      }
+      const declaration = expression(context, declarationNode);
+      if (declaration == null) break;
+      exports.push({
+        ...location(context, item),
+        declaration,
+        exportedName: "default",
+        kind: "default",
+      });
+      continue;
+    }
+    const converted =
+      item.type === "FunctionDeclaration"
+        ? functionDeclaration(context, item)
+        : statement(context, item, false);
+    if (converted == null) break;
+    body.push(converted);
+  }
+  context.strictStack.pop();
+  if (context.diagnostics.length > 0) return undefined;
+  return {
+    ...location(context, programNode),
+    body,
+    exports,
+    imports,
+    kind: "module",
+    sourceId: context.input.sourceId,
+  };
+}
+
+function convertModule(
+  input: SourceInput,
+  file: BabelNode,
+): ModuleFrontendResult {
+  const locations = createSourceIndex(input.source);
+  const parserErrors = Array.isArray(file.errors)
+    ? (file.errors as readonly ParserError[])
+    : [];
+  if (parserErrors.length > 0) {
+    return {
+      diagnostics: parserErrors.map((error) =>
+        diagnosticAt(input, locations, errorOffset(error)),
+      ),
+      parsed: false,
+      sourceId: input.sourceId,
+    };
+  }
+  const context: ConvertContext = {
+    diagnostics: [],
+    functionStack: [],
+    input,
+    locations,
+    strictStack: [],
+    syntheticIndex: 0,
+  };
+  const converted = moduleProgram(context, file);
+  return converted == null || context.diagnostics.length > 0
+    ? {
+        diagnostics: context.diagnostics,
+        parsed: false,
+        sourceId: input.sourceId,
+      }
+    : {
+        diagnostics: [],
+        module: converted,
+        parsed: true,
+        sourceId: input.sourceId,
+      };
+}
+
 /** Babel implementation of the owned Oseo source-frontend boundary. */
 export const babelFrontend: SourceFrontend = {
   parse(input: SourceInput) {
@@ -984,6 +1781,7 @@ export const babelFrontend: SourceFrontend = {
         input,
         locations,
         strictStack: [],
+        syntheticIndex: 0,
       };
       const converted = program(context, file);
       if (converted == null || context.diagnostics.length > 0) {
@@ -999,6 +1797,31 @@ export const babelFrontend: SourceFrontend = {
         program: converted,
         sourceId: input.sourceId,
       };
+    } catch (error) {
+      const value = error as ParserError;
+      return {
+        diagnostics: [diagnosticAt(input, locations, errorOffset(value))],
+        parsed: false,
+        sourceId: input.sourceId,
+      };
+    }
+  },
+};
+
+/** Babel implementation of the owned Oseo module-frontend boundary. */
+export const babelModuleFrontend: ModuleSourceFrontend = {
+  parseModule(input: SourceInput) {
+    const locations = createSourceIndex(input.source);
+    try {
+      const file = parseBabel(input.source, {
+        attachComment: true,
+        createParenthesizedExpressions: true,
+        errorRecovery: true,
+        plugins: ["typescript"],
+        sourceType: "module",
+        tokens: true,
+      }) as unknown as BabelNode;
+      return convertModule(input, file);
     } catch (error) {
       const value = error as ParserError;
       return {

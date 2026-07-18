@@ -327,6 +327,8 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
         function_name,
         sizeof(function_name) / sizeof(*function_name),
         0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
         oseo_undefined()
     ));
     roots[3] = require_normal(oseo_environment_clone(context, roots[0]));
