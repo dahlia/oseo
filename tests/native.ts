@@ -663,6 +663,34 @@ console.log(
 `,
   },
   {
+    name: "typeof-void-remainder",
+    source: `
+const numberBinding = 1;
+let uninitializedBinding;
+const objectBinding = { key: 1 };
+const arrayBinding = [1, 2];
+const promiseBinding = Promise.resolve(1);
+function chosen() { return 2; }
+console.log(typeof undefined, typeof null, typeof true, typeof 1.5);
+console.log(typeof numberBinding, typeof "text", typeof chosen);
+console.log(typeof objectBinding, typeof arrayBinding, typeof promiseBinding);
+console.log(typeof uninitializedBinding, typeof NaN, typeof (1 === 1));
+function readBeforeInitialization() {
+  try {
+    return typeof shadowed;
+  } catch (caught) {
+    return "temporal dead zone";
+  }
+  let shadowed;
+}
+console.log(readBeforeInitialization());
+console.log(void 0, void "operand", void chosen());
+console.log(7 % 3, -7 % 3, 7 % -3, 7.25 % 0.5, -5 % 5);
+console.log(0 % 5, 5 % 0, 5 % Infinity, Infinity % 5, NaN % 1);
+console.log("10" % "3", true % 2, null % 2, undefined % 2);
+`,
+  },
+  {
     name: "generic-addition",
     source: `
 function show(left, right) { console.log(left + right); }

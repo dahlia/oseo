@@ -537,7 +537,12 @@ function expression(
         ? undefined
         : { ...located, ...member, kind: "property-delete" };
     }
-    if (value.operator !== "-" && value.operator !== "!") {
+    if (
+      value.operator !== "-" &&
+      value.operator !== "!" &&
+      value.operator !== "typeof" &&
+      value.operator !== "void"
+    ) {
       return unsupported(context, value, "This unary operator is unsupported.");
     }
     const argumentNode = node(value.argument);
@@ -636,6 +641,7 @@ function expression(
     const operator = value.operator;
     const accepted = new Set<unknown>([
       "!==",
+      "%",
       "*",
       "+",
       "-",

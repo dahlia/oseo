@@ -30,6 +30,10 @@ The `m4-3` ABI adds a top-level await scheduler checkpoint. It normalizes an
 awaited value through the promise job queue and advances timer turns only until
 that value settles. A pending value with no owned work reports `OSEO3001`
 instead of leaving the native executable blocked.
+The `m5-1` ABI adds the `oseo_typeof` and `oseo_remainder` helpers.
+`oseo_typeof` allocates its result string and can trigger collection, so
+lowering declares it a safepoint; `oseo_remainder` applies the shared
+primitive numeric coercion and IEEE 754 remainder semantics.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

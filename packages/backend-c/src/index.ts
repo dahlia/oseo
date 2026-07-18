@@ -82,6 +82,7 @@ function operationArgument(operation: MirOperation, index: number): number {
 function operatorHelper(operator: BinaryOperator): string {
   const helpers: Readonly<Record<BinaryOperator, string>> = {
     "!==": "oseo_not_strict_equal",
+    "%": "oseo_remainder",
     "*": "oseo_multiply",
     "+": "oseo_add",
     "-": "oseo_subtract",
@@ -268,12 +269,17 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
     );
     return;
   }
-  if (operation.operator !== "-") {
+  if (operation.operator === "void") {
+    line(state, `roots[${operation.id}] = oseo_undefined();`);
+    return;
+  }
+  if (operation.operator !== "-" && operation.operator !== "typeof") {
     throw new Error(`MIR unary %${operation.id} has no valid operator.`);
   }
+  const helper = operation.operator === "-" ? "oseo_negate" : "oseo_typeof";
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, `result = oseo_negate(context, roots[${argument}]);`);
+  line(state, `result = ${helper}(context, roots[${argument}]);`);
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
@@ -282,6 +288,8 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   if (
     operator == null ||
     operator === "!" ||
+    operator === "typeof" ||
+    operator === "void" ||
     (operator === "-" && operation.arguments.length !== 2)
   ) {
     throw new Error(`MIR binary %${operation.id} has no valid operator.`);

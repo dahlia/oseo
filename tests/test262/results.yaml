@@ -329,7 +329,9 @@ results:
       detail: 'test/built-ins/Promise/constructor.js non-strict disabled
         failed (1): stdout=""
         stderr="test/built-ins/Promise/constructor.js:58:18:
-        error[OSEO1001]: This unary operator is unsupported.\n"'
+        error[OSEO1001]: typeof with an unresolved name is outside the
+        admitted profile; ECMAScript would evaluate it to
+        \"undefined\".\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -515,10 +517,10 @@ results:
     dependencies:
       - promise-settlement
     observation:
-      detail: 'test/built-ins/Promise/prototype/catch/prop-desc.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/built-ins/Promise/prototype/catch/prop-desc.js:101:18:
-        error[OSEO1001]: This unary operator is unsupported.\n"'
+      detail: "test/built-ins/Promise/prototype/catch/prop-desc.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:10\
+        1:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -765,10 +767,10 @@ results:
     dependencies:
       - promise-settlement
     observation:
-      detail: 'test/built-ins/Promise/prototype/then/prop-desc.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/built-ins/Promise/prototype/then/prop-desc.js:101:18:
-        error[OSEO1001]: This unary operator is unsupported.\n"'
+      detail: "test/built-ins/Promise/prototype/then/prop-desc.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/prototype/then/prop-desc.js:101\
+        :25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2397,6 +2399,30 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/modulus/S11.5.3_A2.1_T1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/modulus/S11.5.3_A2.1_T1.js:65:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/language/expressions/object/property-name-yield.js
       strictness:
         - non-strict
@@ -2421,6 +2447,210 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/boolean.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/typeof/null.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/typeof/null.js:77:10:
+        error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/number.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/typeof/number.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/typeof/number.js:95:10:
+        error[OSEO1001]: Unknown binding 'Math'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/string.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/typeof/string.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/typeof/string.js:101:10:
+        error[OSEO1001]: Unknown binding 'Date'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/syntax.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/typeof/syntax.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/typeof/syntax.js:63:3:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/typeof/unresolvable-reference.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/typeof/unresolvable-reference.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/typeof/unresolvable-reference.js:69:3:
+        error[OSEO1001]: typeof with an unresolved name is outside the
+        admitted profile; ECMAScript would evaluate it to
+        \"undefined\".\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/void/S11.4.2_A2_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/void/S11.4.2_A2_T1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/void/S11.4.2_A2_T1.js:65:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -3689,8 +3919,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-bndng-const.js:92:3:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-iee-bndng-const_FIXTURE.js:10:\
+        3: error[OSEO1001]: Unknown binding 'A'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3710,8 +3940,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-bndng-fun_FIXTURE.js:12:28:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-iee-bndng-fun_FIXTURE.js:10:3:
+        error[OSEO1001]: Unknown binding 'A'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3731,8 +3961,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-bndng-let.js:92:3:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-iee-bndng-let_FIXTURE.js:10:3:
+        error[OSEO1001]: Unknown binding 'A'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3939,8 +4169,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-bndng-const.js:91:3:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-named-bndng-const.js:90:15:
+        error[OSEO1001]: Unknown binding 'ReferenceError'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3960,8 +4190,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-bndng-dflt-expr.js:82:3:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-named-bndng-dflt-expr.js:81:15:
+        error[OSEO1001]: Unknown binding 'ReferenceError'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -4046,8 +4276,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-bndng-let.js:91:3:
-        error[OSEO1001]: This unary operator is unsupported."
+      detail: "test/language/module-code/instn-named-bndng-let.js:90:15:
+        error[OSEO1001]: Unknown binding 'ReferenceError'."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -9328,9 +9558,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 178
   harnessFailures: 0
-  passes: 50
+  passes: 52
   semanticFailures: 0
-  unsupportedProfileFeatures: 150
+  unsupportedProfileFeatures: 157
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -9344,6 +9574,18 @@ summary:
       passes: 10
       semanticFailures: 0
       unsupportedProfileFeatures: 26
+    - dependency: dynamic-source
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - dependency: expression-operators
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 2
+      semanticFailures: 0
+      unsupportedProfileFeatures: 7
     - dependency: functions
       expectedNegatives: 8
       harnessFailures: 0
@@ -9396,9 +9638,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 31
       harnessFailures: 0
-      passes: 10
+      passes: 12
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 20
     - group: language/module-code
       expectedNegatives: 122
       harnessFailures: 0

@@ -355,6 +355,7 @@ OseoResult oseo_object_builtin_set_prototype_of(
     const OseoValue *arguments
 );
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
+OseoResult oseo_typeof(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
     OseoContext *context,
     OseoValue left,
@@ -371,6 +372,11 @@ OseoResult oseo_multiply(
     OseoValue right
 );
 OseoResult oseo_divide(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_remainder(
     OseoContext *context,
     OseoValue left,
     OseoValue right

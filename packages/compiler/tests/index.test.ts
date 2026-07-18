@@ -523,6 +523,118 @@ test("marks generic addition as an allocation safepoint", () => {
   assert.match(printMir(buildMir(hir)), /safepoint string addition/u);
 });
 
+test("lowers typeof and remainder through checked runtime calls", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 7 },
+        kind: "const",
+        name: "value",
+        range,
+      },
+      {
+        expression: {
+          argument: { kind: "identifier", name: "value", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: {
+          kind: "binary",
+          left: { kind: "identifier", name: "value", range },
+          operator: "%",
+          range,
+          right: { kind: "number", range, value: 2 },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "typeof-remainder.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const typeofIndex = operations.findIndex(
+    (operation) =>
+      operation.kind === "unary" && operation.operator === "typeof",
+  );
+  assert.ok(typeofIndex >= 0);
+  assert.equal(operations[typeofIndex - 1]?.kind, "safepoint");
+  assert.match(operations[typeofIndex - 1]?.detail ?? "", /typeof string/u);
+  assert.equal(operations[typeofIndex + 1]?.kind, "check-status");
+  const remainderIndex = operations.findIndex(
+    (operation) => operation.kind === "binary" && operation.operator === "%",
+  );
+  assert.ok(remainderIndex >= 0);
+  assert.equal(operations[remainderIndex + 1]?.kind, "check-status");
+});
+
+test("lowers void to an operand evaluation without a status check", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "number", range, value: 1 },
+          kind: "unary",
+          operator: "void",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "void-operand.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const voidIndex = operations.findIndex(
+    (operation) => operation.kind === "unary" && operation.operator === "void",
+  );
+  assert.ok(voidIndex >= 0);
+  assert.notEqual(operations[voidIndex + 1]?.kind, "check-status");
+});
+
+test("rejects typeof with an unresolved name during resolution", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "missing", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "typeof-unresolved.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /typeof with an unresolved name/u,
+  );
+});
+
 test("copies parameters into a MIR-owned representation", () => {
   const syntax: SyntaxProgram = {
     body: [

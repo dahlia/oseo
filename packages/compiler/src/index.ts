@@ -104,6 +104,7 @@ export type SyntaxCallTarget =
 /** Binary operations selected before native backend lowering. */
 export type BinaryOperator =
   | "!=="
+  | "%"
   | "*"
   | "+"
   | "-"
@@ -113,6 +114,9 @@ export type BinaryOperator =
   | "==="
   | ">"
   | ">=";
+
+/** Unary operations selected before native backend lowering. */
+export type UnaryOperator = "!" | "-" | "typeof" | "void";
 
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
@@ -203,7 +207,7 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly argument: SyntaxExpression;
       readonly kind: "unary";
-      readonly operator: "!" | "-";
+      readonly operator: UnaryOperator;
     })
   | (LocatedSyntax & {
       readonly kind: "undefined";
@@ -1201,7 +1205,7 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly argument: HirExpression;
       readonly kind: "unary";
-      readonly operator: "!" | "-";
+      readonly operator: UnaryOperator;
     })
   | (LocatedSyntax & {
       readonly kind: "undefined";
@@ -1495,6 +1499,24 @@ function resolveExpression(
     };
   }
   if (expression.kind === "unary") {
+    if (
+      expression.operator === "typeof" &&
+      expression.argument.kind === "identifier" &&
+      findBinding(scopes, expression.argument.name) == null &&
+      expression.argument.name !== "undefined" &&
+      expression.argument.name !== "NaN" &&
+      expression.argument.name !== "Infinity"
+    ) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          "typeof with an unresolved name is outside the admitted " +
+            'profile; ECMAScript would evaluate it to "undefined".',
+        ),
+      );
+      return undefined;
+    }
     const argument = resolveExpression(expression.argument, scopes, state);
     if (argument == null) return undefined;
     return { ...expression, argument };
@@ -2199,7 +2221,11 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "number") return numberText(expression.value);
   if (expression.kind === "boolean") return String(expression.value);
   if (expression.kind === "unary") {
-    return `(${expression.operator}${printHirExpression(expression.argument)})`;
+    const spacing = expression.operator.length > 1 ? " " : "";
+    return (
+      `(${expression.operator}${spacing}` +
+      `${printHirExpression(expression.argument)})`
+    );
   }
   if (expression.kind === "binary") {
     const left = printHirExpression(expression.left);
@@ -2508,7 +2534,7 @@ export interface MirOperation {
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
-  readonly operator?: BinaryOperator | "!" | "-";
+  readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
   readonly target?: MirCallTarget;
 }
@@ -3073,6 +3099,15 @@ function lowerExpression(
   }
   if (expression.kind === "unary") {
     const argument = lowerExpression(expression.argument, builder);
+    if (expression.operator === "typeof") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "typeof string allocation",
+        [argument],
+        expression.range,
+      );
+    }
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -3083,7 +3118,7 @@ function lowerExpression(
       operator: expression.operator,
       range: expression.range,
     });
-    if (expression.operator === "-") {
+    if (expression.operator === "-" || expression.operator === "typeof") {
       appendMirMetadata(
         builder,
         "check-status",

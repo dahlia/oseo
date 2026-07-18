@@ -2657,6 +2657,27 @@ OseoResult oseo_negate(OseoContext *context, OseoValue value) {
     return normal(oseo_number(-number_value(number.value)));
 }
 
+OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
+    const char *constant = NULL;
+    uint64_t tag = tag_of(value);
+    if (tag == OSEO_TAG_UNDEFINED) constant = "undefined";
+    else if (tag == OSEO_TAG_NULL) constant = "object";
+    else if (tag == OSEO_TAG_BOOLEAN) constant = "boolean";
+    else if (is_number(value)) constant = "number";
+    else if (is_string(value)) constant = "string";
+    else if (is_function(value)) constant = "function";
+    else if (is_object(value)) constant = "object";
+    if (constant == NULL) {
+        return failure(context, "OSEO2001", "Value has no typeof text.");
+    }
+    size_t length = strlen(constant);
+    uint16_t units[16];
+    for (size_t index = 0u; index < length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)constant[index];
+    }
+    return allocate_string(context, units, length);
+}
+
 static OseoResult numeric_binary(
     OseoContext *context,
     OseoValue left,
@@ -2673,6 +2694,7 @@ static OseoResult numeric_binary(
     if (operator == '+') value = left_value + right_value;
     else if (operator == '-') value = left_value - right_value;
     else if (operator == '*') value = left_value * right_value;
+    else if (operator == '%') value = fmod(left_value, right_value);
     else value = left_value / right_value;
     return normal(oseo_number(value));
 }
@@ -2766,6 +2788,14 @@ OseoResult oseo_divide(
     OseoValue right
 ) {
     return numeric_binary(context, left, right, '/');
+}
+
+OseoResult oseo_remainder(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return numeric_binary(context, left, right, '%');
 }
 
 static bool strict_equal_value(OseoValue left, OseoValue right) {

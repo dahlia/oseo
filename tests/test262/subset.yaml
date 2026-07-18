@@ -297,9 +297,36 @@ tests:
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/typeof/boolean.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/syntax.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/typeof/undefined.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/unresolvable-reference.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/void/S11.4.2_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]

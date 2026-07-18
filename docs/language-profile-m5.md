@@ -61,6 +61,32 @@ first reviewed test262 cases land.
 every other form rejected by a source-located diagnostic.
 
 
+Admitted M5 syntax
+------------------
+
+M5 admits these forms beyond the frozen M3 and M4 profiles. Each entry names
+its deliberate boundary and its evidence:
+
+ -  The `typeof` and `void` unary operators and the `%` remainder operator.
+    `typeof` distinguishes `undefined`, `null`, booleans, numbers, strings,
+    callable objects, and other objects; reading a binding before
+    initialization throws the same catchable completion as any other read,
+    and the allocating result string is a declared MIR safepoint. `void`
+    evaluates its operand and produces `undefined`. `%` applies primitive
+    numeric coercion and IEEE 754 remainder semantics, including negative
+    zero, infinite, and `NaN` operands; object operands keep the same
+    unsupported object-to-primitive coercion boundary as the existing
+    arithmetic operators until generic `ToPrimitive` lands. Native
+    differential fixtures, MIR structural tests, and reviewed test262
+    cases cover the three operators.
+ -  `typeof` applied to a name that does not resolve to a binding is
+    rejected with a source-located diagnostic instead of evaluating to
+    `"undefined"`. The closed ahead-of-time profile rejects every other
+    unresolved reference, and this deviation is explicit rather than a
+    silent approximation. The affected test262 case remains classified
+    unsupported until an owned decision admits unresolved references.
+
+
 Known gaps inside the claim
 ---------------------------
 

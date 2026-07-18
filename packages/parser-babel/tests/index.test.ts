@@ -338,8 +338,38 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
   });
 });
 
+test("converts typeof, void, and remainder to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = 1;\n" +
+      "console.log(typeof value, void value, value % 2);\n",
+    sourceId: "m5-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\(typeof /u);
+  assert.match(hirText, /\(void /u);
+  assert.match(hirText, /% 2/u);
+});
+
+test("rejects typeof with an unresolved name explicitly", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof missing);",
+    sourceId: "typeof-unresolved.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /typeof with an unresolved name/u,
+  );
+});
+
 const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
+  ["bitwise complement", "console.log(~1);"],
+  ["update expression", "let value = 1; value++;"],
+  ["bitwise and", "console.log(1 & 1);"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
   ["module", 'import "fixture";'],
