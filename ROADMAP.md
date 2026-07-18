@@ -13,6 +13,11 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
+The planned macOS AArch64 native execution work follows
+[*PLAN-MACOS.md*](./PLAN-MACOS.md) alongside M5. It expands target evidence
+without changing the current language profile or compatibility counts by
+itself.
+
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
 may change whenever implementation work, standards changes, or compatibility
