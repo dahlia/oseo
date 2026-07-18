@@ -36,8 +36,6 @@ jobs:
   test-native:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
-    env:
-      TMPDIR: ${{ runner.temp }}
     strategy:
       fail-fast: false
       matrix:
@@ -53,7 +51,11 @@ jobs:
           install: true
       - run: mise run check
       - run: mise run test
+        env:
+          TMPDIR: ${{ runner.temp }}
       - run: mise run test:property:extended
+        env:
+          TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
