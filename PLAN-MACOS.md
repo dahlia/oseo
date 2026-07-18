@@ -4,10 +4,16 @@ macOS AArch64 native execution plan
 Status
 ------
 
-Implementation status: complete. Oseo executes native fixtures as
+Implementation status: complete. Exit evidence status: pending. Oseo executes
+native fixtures as
 `linux-x86_64-gnu` on Linux AMD64 and `macos-aarch64` on macOS AArch64. It
 retains `linux-aarch64-musl` as a portability target. Node.js and Deno source
 tests continue to run on Linux, macOS, and Windows in continuous integration.
+
+The implementation branch still needs clean-checkout Linux and macOS evidence
+for `mise run check`, `mise run test`, and
+`mise run test:property:extended`. The final gate durations must then be
+recorded before this plan is retired.
 
 [ADR 0014](./docs/adr/0014-native-target-support.md) records the accepted
 target, host, value-layout, sanitizer, CLI, and standards-evidence contracts.

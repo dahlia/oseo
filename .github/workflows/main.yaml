@@ -35,7 +35,7 @@ jobs:
 
   test-native:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       TMPDIR: ${{ runner.temp }}
     strategy:
@@ -51,11 +51,10 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install: true
-      - run: mise run test:native
-      - run: mise run test:probes
-      - run: mise run test:property:native
-      - run: mise run test:test262
-      - if: failure()
+      - run: mise run check
+      - run: mise run test
+      - run: mise run test:property:extended
+      - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: native-fixture-diagnostics-${{ matrix.target }}
