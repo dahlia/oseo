@@ -4,7 +4,8 @@ C11 backend, runtime, and Zig toolchain boundary
 Status
 ------
 
-Accepted.
+Accepted. The single-target build description is superseded by
+[ADR 0014](./0014-native-target-support.md).
 
 
 Context

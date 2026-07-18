@@ -2,16 +2,19 @@
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/../.." && pwd)
+source "$root/experiments/native-targets.sh"
 temporary=$(mktemp -d)
 trap 'rm -rf "$temporary"' EXIT
 common=(-std=c11 -Wall -Wextra -Werror -pedantic -I "$root/experiments/native")
 
 echo "zig=$(zig version)"
-echo "native-target=x86_64-linux-gnu sanitizer=undefined"
-zig cc -target x86_64-linux-gnu "${common[@]}" -fsanitize=undefined \
+echo "native-target=$oseo_execution_target sanitizer=$oseo_sanitizer"
+zig cc -target "$oseo_execution_target" "${common[@]}" \
+  -fsanitize="$oseo_sanitizer" \
   -c "$root/experiments/native/runtime.c" -o "$temporary/runtime.o"
 zig ar rcs "$temporary/liboseo_probe_runtime.a" "$temporary/runtime.o"
-zig cc -target x86_64-linux-gnu "${common[@]}" -fsanitize=undefined \
+zig cc -target "$oseo_execution_target" "${common[@]}" \
+  -fsanitize="$oseo_sanitizer" \
   "$root/experiments/native/generated.c" \
   "$temporary/liboseo_probe_runtime.a" -o "$temporary/native-probe"
 "$temporary/native-probe"

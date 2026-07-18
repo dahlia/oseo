@@ -1,12 +1,34 @@
 import type {
   CompilerHost,
   Diagnostic,
+  ExecutionHostDescription,
   ModuleLoader,
   ModuleResolver,
   ProcessObservation,
   ProcessRequest,
   SyntaxModuleSpecifier,
 } from "@oseo/compiler";
+
+/** Normalize Node.js or Deno platform facts at the concrete host boundary. */
+export function normalizeExecutionHost(
+  operatingSystem: string,
+  architecture: string,
+): ExecutionHostDescription {
+  return {
+    architecture:
+      architecture === "arm64" || architecture === "aarch64"
+        ? "aarch64"
+        : architecture === "x64" || architecture === "x86_64"
+          ? "x86_64"
+          : "unknown",
+    operatingSystem:
+      operatingSystem === "darwin"
+        ? "macos"
+        : operatingSystem === "linux"
+          ? "linux"
+          : "unknown",
+  };
+}
 
 interface DenoCommandOutput {
   readonly code: number;
@@ -31,6 +53,10 @@ interface DenoCommandConstructor {
 
 interface DenoRuntime {
   readonly Command: DenoCommandConstructor;
+  readonly build?: {
+    readonly arch: string;
+    readonly os: string;
+  };
   cwd(): string;
   makeTempDir(options: { readonly prefix: string }): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
@@ -207,6 +233,7 @@ export const fileModuleResolver: ModuleResolver = {
 /** Create the Node.js implementation of compiler host operations. */
 export function createNodeHost(): CompilerHost {
   return {
+    executionHost: normalizeExecutionHost(process.platform, process.arch),
     async canonicalizeFile(path: string): Promise<string> {
       try {
         const url = new URL(path);
@@ -272,6 +299,10 @@ export function createDenoHost(): CompilerHost {
   const runtime = denoRuntime();
   const decoder = new TextDecoder();
   return {
+    executionHost: normalizeExecutionHost(
+      runtime.build?.os ?? "unknown",
+      runtime.build?.arch ?? "unknown",
+    ),
     canonicalizeFile(path: string): Promise<string> {
       try {
         const url = new URL(path);

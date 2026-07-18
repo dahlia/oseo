@@ -6,6 +6,13 @@ specialization policy, diagnostics, targets, and extension interfaces.
 Concrete parser, backend, runtime, toolchain, and host packages implement these
 contracts without becoming compiler-core dependencies.
 
+Native target descriptions contain immutable artifact facts, including the
+architecture, operating system, executable format, C standard, Zig triple, and
+sanitizer policy. Execution-host descriptions are separate capabilities.
+`targetForExecutionHost` selects the one supported target for a normalized
+host, while `canExecuteTarget` rejects mismatched pairs before process
+execution.
+
 MIR is self-contained: constants, lexical binding reads and writes, MIR-owned
 parameters and hints, operators, call targets, control-flow blocks, and
 terminators do not retain HIR nodes. M3 bindings use shared mutable cells in

@@ -10,13 +10,18 @@ import type {
   ProcessRequest,
   RuntimeInputProvider,
   SourceFrontend,
+  TargetDescription,
+  TargetName,
 } from "@oseo/compiler";
 import {
   buildModuleGraph,
+  canExecuteTarget,
   compileModuleGraph,
   compileSource,
+  describeTarget,
   printMir,
   renderDiagnostic,
+  targetForExecutionHost,
 } from "@oseo/compiler";
 import {
   canonicalizeFileModuleUrl,
@@ -32,11 +37,11 @@ import { zigToolchain } from "@oseo/toolchain-zig";
 import { object, or } from "@optique/core/constructs";
 import { runParser } from "@optique/core/facade";
 import { message } from "@optique/core/message";
-import { map, withDefault } from "@optique/core/modifiers";
+import { map, optional, withDefault } from "@optique/core/modifiers";
 import type { InferValue } from "@optique/core/parser";
-import { argument, flag } from "@optique/core/primitives";
+import { argument, flag, option } from "@optique/core/primitives";
 import { defineProgram } from "@optique/core/program";
-import { string as stringValue } from "@optique/core/valueparser";
+import { choice, string as stringValue } from "@optique/core/valueparser";
 
 const modeParser = withDefault(
   or(
@@ -76,6 +81,20 @@ const moduleParser = withDefault(
   false,
 );
 
+const targetParser = optional(
+  option(
+    "--target",
+    choice([
+      "aarch64-linux-musl",
+      "aarch64-macos",
+      "x86_64-linux-gnu",
+    ] as const),
+    {
+      description: message`Select an explicit native execution target.`,
+    },
+  ),
+);
+
 const cliParser = object({
   module: moduleParser,
   mode: modeParser,
@@ -83,6 +102,7 @@ const cliParser = object({
     description: message`Source file to compile.`,
   }),
   specialization: specializationParser,
+  target: targetParser,
 });
 
 const cliProgram = defineProgram({
@@ -351,6 +371,14 @@ function emitCliMir(mode: CliInvocation["mode"], mir: MirProgram): CliResult {
 export function runCli(request: CliRequest): CliResult {
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
+  if (parsed.value.target != null) {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        "The --target option applies only to asynchronous native execution.",
+      ),
+    );
+  }
   if (parsed.value.module) {
     return diagnosticResult(
       hostDiagnostic(
@@ -396,6 +424,7 @@ async function executeNativeWorkflow(
   sourceId: string,
   directory: string,
   mir: MirProgram,
+  target: TargetDescription,
 ): Promise<CliResult> {
   const emitted = defaultComponents.backend.emit(mir);
   const generatedSourcePath = join(directory, emitted.sourceName);
@@ -422,12 +451,7 @@ async function executeNativeWorkflow(
     generatedSourcePath,
     runtimeDirectory: directory,
     runtimeSourcePath,
-    target: {
-      cStandard: "c11",
-      execute: true,
-      name: "x86_64-linux-gnu",
-      sanitizeUndefinedBehavior: true,
-    },
+    target,
     workingDirectory: directory,
   });
   for (const processRequest of plan.requests) {
@@ -435,12 +459,20 @@ async function executeNativeWorkflow(
     const observation = await observeProcess(host, processRequest);
     if (observation == null) {
       return diagnosticResult(
-        hostDiagnostic(sourceId, "The native toolchain could not be started."),
+        hostDiagnostic(
+          sourceId,
+          `The native toolchain for target '${target.name}' ` +
+            "could not be started.",
+        ),
       );
     }
     if (observation.exitStatus !== 0) {
       return diagnosticResult(
-        hostDiagnostic(sourceId, "The native toolchain failed."),
+        hostDiagnostic(
+          sourceId,
+          `The native toolchain for target '${target.name}' failed ` +
+            `(exit ${observation.exitStatus}).`,
+        ),
       );
     }
   }
@@ -461,6 +493,48 @@ async function executeNativeWorkflow(
   };
 }
 
+function selectExecutionTarget(
+  host: CompilerHost,
+  requested: TargetName | undefined,
+  sourceId: string,
+):
+  | { readonly diagnostic: Diagnostic }
+  | { readonly target: TargetDescription } {
+  const executionHost = host.executionHost;
+  if (executionHost == null) {
+    return {
+      diagnostic: hostDiagnostic(
+        sourceId,
+        "The execution host did not report its operating system and " +
+          "architecture.",
+      ),
+    };
+  }
+  const target =
+    requested == null
+      ? targetForExecutionHost(executionHost)
+      : describeTarget(requested);
+  if (target == null) {
+    return {
+      diagnostic: hostDiagnostic(
+        sourceId,
+        `Native execution is unsupported on ` +
+          `${executionHost.operatingSystem}/${executionHost.architecture}.`,
+      ),
+    };
+  }
+  if (!canExecuteTarget(executionHost, target)) {
+    return {
+      diagnostic: hostDiagnostic(
+        sourceId,
+        `Target '${target.name}' cannot execute on ` +
+          `${executionHost.operatingSystem}/${executionHost.architecture}.`,
+      ),
+    };
+  }
+  return { target };
+}
+
 /** Compile and execute one source invocation through the native toolchain. */
 export async function runNativeCli(
   request: CliRequest,
@@ -469,6 +543,21 @@ export async function runNativeCli(
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
   const sourceId = request.sourceId ?? parsed.value.sourceId;
+  if (parsed.value.mode !== "execute" && parsed.value.target != null) {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The --target option applies only to native execution.",
+      ),
+    );
+  }
+  const selected =
+    parsed.value.mode === "execute"
+      ? selectExecutionTarget(host, parsed.value.target, sourceId)
+      : undefined;
+  if (selected != null && "diagnostic" in selected) {
+    return diagnosticResult(selected.diagnostic);
+  }
   let source: string;
   try {
     source =
@@ -535,7 +624,16 @@ export async function runNativeCli(
   }
   let result: CliResult;
   try {
-    result = await executeNativeWorkflow(host, sourceId, directory, mir);
+    if (selected == null) {
+      throw new Error("The native execution target is unavailable.");
+    }
+    result = await executeNativeWorkflow(
+      host,
+      sourceId,
+      directory,
+      mir,
+      selected.target,
+    );
   } catch {
     result = diagnosticResult(
       hostDiagnostic(sourceId, "The native host workflow failed."),

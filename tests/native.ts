@@ -11,6 +11,7 @@ import {
   compileSource,
   describeTarget,
   printMir,
+  targetForExecutionHost,
 } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import { babelFrontend } from "../packages/parser-babel/src/index.ts";
@@ -23,6 +24,13 @@ import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
+assert(nativeTarget != null, "supported native execution host");
 
 const referencePrelude = `
 const oseoReferenceConsole = console;
@@ -1338,8 +1346,9 @@ for (const fixture of fixtures) {
           host,
           input: compilation,
           keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+          operation: "execute",
           runtime: cRuntimeProvider,
-          target: describeTarget("x86_64-linux-gnu"),
+          target: nativeTarget,
           toolchain: zigToolchain,
         },
         (native) => {
@@ -1388,7 +1397,7 @@ for (const fixture of fixtures) {
           assert(
             native.compilerInvocation
               .filter((line) => line.startsWith("zig cc "))
-              .every((line) => line.includes("x86_64-linux-gnu")),
+              .every((line) => line.includes(nativeTarget.name)),
             "native compiler invocation records an explicit target",
           );
         },
@@ -1407,6 +1416,7 @@ for (const fixture of fixtures) {
         host,
         input: compilation,
         keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        operation: "compile",
         runtime: cRuntimeProvider,
         target: describeTarget("aarch64-linux-musl"),
         toolchain: zigToolchain,
@@ -1436,7 +1446,11 @@ const assemblyCompilation = compileSource(
 const assemblyMir = assemblyCompilation.mir;
 assert(assemblyMir != null, "assembly specialization MIR");
 const assemblySource = cBackend.emit(assemblyMir).source;
-for (const target of ["x86_64-linux-gnu", "aarch64-linux-musl"] as const) {
+for (const target of [
+  "x86_64-linux-gnu",
+  "aarch64-macos",
+  "aarch64-linux-musl",
+] as const) {
   const directory = await host.makeTemporaryDirectory("oseo-assembly-");
   try {
     const generatedPath = `${directory}/generated.c`;
@@ -1472,12 +1486,12 @@ for (const target of ["x86_64-linux-gnu", "aarch64-linux-musl"] as const) {
     const text = await host.readTextFile(assemblyPath);
     assert.match(
       text,
-      /(?:callq?|bl)\s+oseo_add(?:@PLT)?/u,
+      /(?:callq?|bl)\s+_?oseo_add(?:@PLT)?/u,
       `${target}: generic fallback retained`,
     );
     assert.doesNotMatch(
       text,
-      /(?:callq?|bl)\s+oseo_(?:value_is_smi|smi_try_add|value_box_smi)/u,
+      /(?:callq?|bl)\s+_?oseo_(?:value_is_smi|smi_try_add|value_box_smi)/u,
       `${target}: small-integer primitives inline`,
     );
   } finally {
@@ -1496,6 +1510,7 @@ await withNativeFixture(
     backend: cBackend,
     host,
     input: recursiveCompilation.mir,
+    operation: "compile",
     runtime: cRuntimeProvider,
     target: describeTarget("aarch64-linux-musl"),
     toolchain: zigToolchain,
@@ -2180,9 +2195,10 @@ assert.match(
 );
 
 console.log(
-  `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
+  `native fixtures: ${fixtures.length} Node, Deno, and ` +
+    `${nativeTarget.name} outputs match`,
 );
 console.log(
   `cross fixtures: ${fixtures.length + 1} aarch64-linux-musl builds passed`,
 );
-console.log("assembly fixtures: x86-64 and AArch64 guarded paths inspected");
+console.log("assembly fixtures: all configured target paths inspected");

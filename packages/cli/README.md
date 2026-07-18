@@ -25,6 +25,12 @@ Module entries may use only relative file specifiers. Programmatic callers may
 override `sourceId` for script diagnostics without changing the positional path
 used to read the source file.
 
+Native execution selects `x86_64-linux-gnu` on Linux AMD64 and
+`aarch64-macos` on macOS AArch64. `--target` makes that choice explicit and is
+valid only for native execution. Unsupported or mismatched host-target pairs
+fail before compilation rather than producing or starting an incompatible
+artifact.
+
 An entry with imports, exports, or top-level await enters the module-graph
 workflow. Top-level await does not need an otherwise unused module declaration.
 The produced executable drains runtime-owned promise jobs and timer tasks; it

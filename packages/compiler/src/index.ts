@@ -5358,15 +5358,32 @@ export function compileSource(
   };
 }
 
+/** Architectures normalized at the compiler host boundary. */
+export type NativeArchitecture = "aarch64" | "unknown" | "x86_64";
+
+/** Operating systems normalized at the compiler host boundary. */
+export type NativeOperatingSystem = "linux" | "macos" | "unknown";
+
 /** The targets exercised by the native fixture harness. */
-export type TargetName = "aarch64-linux-musl" | "x86_64-linux-gnu";
+export type TargetName =
+  | "aarch64-linux-musl"
+  | "aarch64-macos"
+  | "x86_64-linux-gnu";
+
+/** Normalized facts about the host that may execute a native artifact. */
+export interface ExecutionHostDescription {
+  readonly architecture: NativeArchitecture;
+  readonly operatingSystem: NativeOperatingSystem;
+}
 
 /** Explicit target properties consumed by native toolchain adapters. */
 export interface TargetDescription {
+  readonly architecture: Exclude<NativeArchitecture, "unknown">;
   readonly cStandard: "c11";
-  readonly execute: boolean;
+  readonly executableFormat: "elf" | "mach-o";
   readonly name: TargetName;
-  readonly sanitizeUndefinedBehavior: boolean;
+  readonly operatingSystem: Exclude<NativeOperatingSystem, "unknown">;
+  readonly sanitizers: readonly ("address" | "undefined")[];
 }
 
 /** Deterministic source emitted by a replaceable native backend. */
@@ -5436,6 +5453,7 @@ export interface NativeToolchain {
 /** Narrow host boundary used by compiler adapters and test infrastructure. */
 export interface CompilerHost {
   canonicalizeFile?(path: string): Promise<string>;
+  readonly executionHost?: ExecutionHostDescription;
   makeTemporaryDirectory(prefix: string): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;
   remove(path: string): Promise<void>;
@@ -5452,20 +5470,58 @@ export function renderDiagnostic(diagnostic: Diagnostic): string {
   );
 }
 
-/** Return the accepted M1 target description for an explicit target name. */
+/** Return the immutable artifact facts for an explicit native target. */
 export function describeTarget(name: TargetName): TargetDescription {
   if (name === "x86_64-linux-gnu") {
     return {
+      architecture: "x86_64",
       cStandard: "c11",
-      execute: true,
+      executableFormat: "elf",
       name,
-      sanitizeUndefinedBehavior: true,
+      operatingSystem: "linux",
+      sanitizers: ["address", "undefined"],
     };
   }
-  return {
-    cStandard: "c11",
-    execute: false,
-    name,
-    sanitizeUndefinedBehavior: false,
-  };
+  if (name === "aarch64-macos") {
+    return {
+      architecture: "aarch64",
+      cStandard: "c11",
+      executableFormat: "mach-o",
+      name,
+      operatingSystem: "macos",
+      sanitizers: ["address", "undefined"],
+    };
+  }
+  if (name === "aarch64-linux-musl") {
+    return {
+      architecture: "aarch64",
+      cStandard: "c11",
+      executableFormat: "elf",
+      name,
+      operatingSystem: "linux",
+      sanitizers: [],
+    };
+  }
+  throw new Error(`Unsupported native target '${String(name)}'.`);
+}
+
+/** Whether one normalized host may execute an artifact for a target. */
+export function canExecuteTarget(
+  host: ExecutionHostDescription,
+  target: TargetDescription,
+): boolean {
+  return targetForExecutionHost(host)?.name === target.name;
+}
+
+/** Select the supported native target matching one execution host. */
+export function targetForExecutionHost(
+  host: ExecutionHostDescription,
+): TargetDescription | undefined {
+  if (host.architecture === "x86_64" && host.operatingSystem === "linux") {
+    return describeTarget("x86_64-linux-gnu");
+  }
+  if (host.architecture === "aarch64" && host.operatingSystem === "macos") {
+    return describeTarget("aarch64-macos");
+  }
+  return undefined;
 }

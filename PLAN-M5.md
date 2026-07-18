@@ -62,8 +62,9 @@ M5 begins with these repeatable contracts:
     honest unsupported classifications;
  -  deterministic property suites retain seeds, replay paths, structured
     inputs, and incomplete-run failures;
- -  Node.js, Deno, native x86-64, and AArch64 compile-link evidence remains in
-    ordinary repository gates; and
+ -  Node.js, Deno, Linux AMD64 native execution, macOS AArch64 native
+    execution, and AArch64 Linux compile-link evidence remains in ordinary
+    repository gates; and
  -  strict C warnings, undefined-behavior sanitization, package dry runs, and
     version checks remain green.
 
@@ -287,8 +288,9 @@ M5 is complete only when:
     Node.js, Deno, specialization policies, and collection modes;
  -  every specialization retains a compiled generic fallback and deliberate
     guard-failure evidence;
- -  strict warnings, sanitizers, x86-64 execution, and AArch64 compile-link
-    checks pass across the complete native corpus;
+ -  strict warnings, sanitizers, Linux AMD64 execution, macOS AArch64
+    execution, and AArch64 Linux compile-link checks pass across the complete
+    native corpus;
  -  capability, performance, and code-size reports are reproducible from
     documented tasks; and
  -  `mise run check`, `mise run test`, and the extended property task pass from

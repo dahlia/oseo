@@ -79,18 +79,19 @@ Initial technical direction
 Some choices follow directly from the white paper. Others are starting points
 that may change after the first vertical slice.
 
-| Area                   | Direction                                                     | Status               |
-| ---------------------- | ------------------------------------------------------------- | -------------------- |
-| Compiler language      | TypeScript                                                    | Decided              |
-| Bootstrap hosts        | Node.js and Deno                                              | Decided              |
-| Type information       | Syntax-level hints, without TypeScript type checking          | Decided              |
-| Optimization model     | Guarded specialized paths beside a generic path               | Decided              |
-| Initial target         | `x86_64-linux-gnu`                                            | Implemented in M1    |
-| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Implemented in M1    |
-| Generic value          | One 64-bit tagged word                                        | Decided in principle |
-| Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for x86-64  |
-| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Implemented in M1    |
-| First specialization   | Guarded signed 48-bit addition with one generic fallback      | Implemented in M2    |
+| Area                   | Direction                                                     | Status                              |
+| ---------------------- | ------------------------------------------------------------- | ----------------------------------- |
+| Compiler language      | TypeScript                                                    | Decided                             |
+| Bootstrap hosts        | Node.js and Deno                                              | Decided                             |
+| Type information       | Syntax-level hints, without TypeScript type checking          | Decided                             |
+| Optimization model     | Guarded specialized paths beside a generic path               | Decided                             |
+| Execution targets      | `x86_64-linux-gnu` and `aarch64-macos`                        | Implemented                         |
+| Portability target     | `aarch64-linux-musl` compile-link and inspection              | Implemented                         |
+| Initial native backend | Generate C11, then invoke Zig's C toolchain by default        | Implemented in M1                   |
+| Generic value          | One 64-bit tagged word                                        | Decided in principle                |
+| Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for both execution targets |
+| Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Implemented in M1                   |
+| First specialization   | Guarded signed 48-bit addition with one generic fallback      | Implemented in M2                   |
 
 The accepted M0 choices and their replacement triggers are recorded under
 [*docs/adr/*](./docs/adr/). Choices that remain provisional require an
@@ -250,12 +251,15 @@ this document. It must represent at least numbers, strings, booleans, `null`,
 `undefined`, symbols, big integers, and heap object references as those values
 enter the supported language profile.
 
-The initial x86-64 runtime uses a NaN-boxed layout. It canonicalizes numeric NaN
+The initial runtime uses a NaN-boxed layout on both supported execution
+targets. It canonicalizes numeric NaN
 to `0x7ff8000000000000`, stores signed 48-bit small integers immediately, and
 uses a distinct tag for heap references below the checked 48-bit user-address
-limit. The tag masks are private runtime ABI. AArch64 execution requires a new
-address-space validation because 52-bit virtual addresses and pointer metadata
-can violate this layout.
+limit. The tag masks are private runtime ABI. ADR 0014 accepts this layout for
+macOS AArch64 only with the checked publication boundary, allocator evidence,
+forced collection, and address and undefined-behavior sanitizer coverage. The
+runtime rejects a pointer with high address or metadata bits before publishing
+it and never silently strips pointer authentication or top-byte metadata.
 
 Specialized blocks may hold raw integers, doubles, or pointers in native
 registers. A value must be converted back to `OseoValue` before it crosses a
@@ -378,6 +382,12 @@ The compiler itself uses narrow host adapters for file access, subprocesses,
 environment variables, and diagnostics. Node.js and Deno adapters implement the
 same internal interface. Compiler-core tests run against both adapters.
 
+The adapters also normalize execution-host operating-system and architecture
+facts without selecting a native target. The CLI and test composition layers
+choose a host-native target or reject an unknown or mismatched pair before the
+toolchain runs. Target descriptions contain only immutable artifact and
+sanitizer facts; they do not claim universal executability.
+
 Promises and the ECMAScript job queue precede web APIs that depend on them. M4
 owns promises, reactions, thenable jobs, rejection checkpoints, a timer queue,
 and a deterministic logical clock in the C runtime. Asynchronous functions use
@@ -395,11 +405,14 @@ model.
 Native backend
 --------------
 
-The initial backend emits C11 for `x86_64-linux-gnu`. A separate native
-toolchain adapter invokes pinned `zig cc` by default. This keeps the first
-implementation in TypeScript, produces native functions, and makes generated
-control flow easy to inspect. The compiler supports `--emit-c` and `--dump-mir`
-from the first executable milestone.
+The initial backend emits shared C11 for `x86_64-linux-gnu`, `aarch64-macos`,
+and `aarch64-linux-musl`. A separate native toolchain adapter invokes pinned
+`zig cc` with an explicit target by default. Linux on AMD64 and macOS on
+AArch64 execute their matching artifacts. AArch64 Linux remains compile-link
+and inspection evidence. This keeps the first implementation in TypeScript,
+produces native functions, and makes generated control flow easy to inspect.
+The compiler supports `--emit-c` and `--dump-mir` from the first executable
+milestone.
 
 Zig is a pinned bootstrap tool, not part of the generated program's semantic
 contract. Toolchain selection stays behind an interface so another C compiler
@@ -503,6 +516,8 @@ one structured model. It compares the model with Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled execution
 with collection forced at each safepoint. The ordinary gate runs ten native
 cases; the extended task increases both case count and schedule size.
+Each run records the normalized execution host, exact native target, and
+sanitizer modes in its retained failure context.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of
@@ -525,6 +540,10 @@ under the deterministic native scheduler through the explicit CLI module
 goal. The gate rejects semantic failures, harness failures, or changes from
 the reviewed classification instead of counting unsupported cases as
 passes, and summaries keep raw, path-group, and dependency-tag totals.
+ADR 0014 keeps the Linux spelling as the canonical manifest target and adds a
+digest-pinned parity record. Each supported execution host reruns the complete
+reviewed subset and normalizes only the target spelling before comparing the
+manifest, so target evidence cannot duplicate compatibility counts.
 
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to

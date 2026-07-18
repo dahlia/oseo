@@ -126,7 +126,7 @@ description = "Run package source tests under Deno"
 run = "deno test -A packages"
 
 [tasks."test:native"]
-description = "Build, run, compare, and cross-link the native fixture"
+description = "Run host-native fixtures and cross-target structural checks"
 depends = ["build"]
 run = "node tests/native.ts"
 
@@ -136,7 +136,7 @@ depends = ["build"]
 run = "node --test"
 
 [tasks."test:probes"]
-description = "Run the architecture decision probes as regression tests"
+description = "Run host-native and cross-target architecture probes"
 run = '''
 mise run probe:abi-roots
 mise run probe:host-parser
@@ -177,12 +177,12 @@ with-env {
 '''
 
 [tasks."test:property:native"]
-description = "Run bounded source-to-native M4 schedule properties"
+description = "Run bounded host-native M4 schedule properties"
 depends = ["build"]
 run = "node --test tests/property/*.property.test.ts"
 
 [tasks."test:test262"]
-description = "Run the pinned reviewed test262 subset"
+description = "Run the pinned test262 subset on the matching native target"
 depends = ["build"]
 run = "node tools/test262.ts"
 

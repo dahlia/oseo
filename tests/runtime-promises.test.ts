@@ -9,6 +9,12 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const runtime = join(root, "packages/runtime-c/native");
 const fixture = join(root, "tests/fixtures/runtime-promises.c");
+const nativeTarget =
+  process.platform === "linux" && process.arch === "x64"
+    ? "x86_64-linux-gnu"
+    : process.platform === "darwin" && process.arch === "arm64"
+      ? "aarch64-macos"
+      : undefined;
 
 function run(command: string, args: readonly string[]): void {
   const result = spawnSync(command, args, {
@@ -29,12 +35,9 @@ function run(command: string, args: readonly string[]): void {
 }
 
 test(
-  "runs promise settlement and reaction jobs without a host runtime",
+  "runs promise jobs on the host-native target",
   {
-    skip:
-      process.platform !== "linux" || process.arch !== "x64"
-        ? "requires x86-64 Linux"
-        : false,
+    skip: nativeTarget == null ? "requires a supported native host" : false,
   },
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "oseo-runtime-promises-"));
@@ -44,7 +47,7 @@ test(
       run("zig", [
         "cc",
         "-target",
-        "x86_64-linux-gnu",
+        nativeTarget ?? "x86_64-linux-gnu",
         "-std=c11",
         "-Wall",
         "-Wextra",

@@ -117,6 +117,13 @@ every requested strictness mode, and every executed case compares
 specialization-disabled and specialization-enabled native observations with
 collection forced at every safepoint.
 
+Linux AMD64 and macOS AArch64 execute that same reviewed subset. The canonical
+manifest keeps one counted result per upstream path, while
+*target-parity.yaml* pins its digest and supported execution targets. A
+host-specific run normalizes only the target spelling before comparing the
+complete manifest, so any semantic, harness, graph, scheduler, strictness, or
+specialization disagreement fails without duplicating compatibility totals.
+
 Module and asynchronous cases execute under the deterministic native
 scheduler. Module entries compile through the explicit CLI module goal with
 sibling fixtures loaded from the upstream checkout, and their linked graph

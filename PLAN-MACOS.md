@@ -4,10 +4,17 @@ macOS AArch64 native execution plan
 Status
 ------
 
-Implementation status: planned, not started. Oseo currently executes native
-fixtures only as `x86_64-linux-gnu` programs. It compile-links
-`aarch64-linux-musl` as a portability target, while Node.js and Deno source
-tests already run on Linux, macOS, and Windows in continuous integration.
+Implementation status: complete. Oseo executes native fixtures as
+`x86_64-linux-gnu` on Linux AMD64 and `aarch64-macos` on macOS AArch64. It
+retains `aarch64-linux-musl` as a portability target. Node.js and Deno source
+tests continue to run on Linux, macOS, and Windows in continuous integration.
+
+[ADR 0014](./docs/adr/0014-native-target-support.md) records the accepted
+target, host, value-layout, sanitizer, CLI, and standards-evidence contracts.
+[*docs/native-target-baseline.md*](./docs/native-target-baseline.md) preserves
+the before-state measurements. The CLI, probes, differential fixtures,
+properties, reviewed test262 subset, and native continuous-integration matrix
+use the landed target-aware behavior.
 
 This is a cross-milestone target-expansion plan. It does not replace
 [*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md), or

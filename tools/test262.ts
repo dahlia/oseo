@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop -- Reviewed native cases run in order. */
 
 import { readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -12,6 +13,7 @@ import {
   compileModuleGraph,
   compileSource,
   renderDiagnostic,
+  targetForExecutionHost,
 } from "../packages/compiler/src/index.ts";
 import type {
   Diagnostic,
@@ -50,6 +52,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
 const resultPath = join(repositoryRoot, "tests/test262/results.yaml");
+const parityPath = join(repositoryRoot, "tests/test262/target-parity.yaml");
 const baseHarnessPath = join(repositoryRoot, "tests/test262/harness/base.js");
 const doneHarnessPath = join(
   repositoryRoot,
@@ -72,8 +75,15 @@ const classifications = new Set<Test262Classification>([
   "unsupported-profile-feature",
 ]);
 
-/** The one native target the reviewed manifest currently executes on. */
-const executionTarget = "x86_64-linux-gnu";
+const canonicalTarget = "x86_64-linux-gnu";
+const runnerHost = createNodeHost();
+const executionTarget = targetForExecutionHost(
+  runnerHost.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+)?.name;
+const parityTargets = [canonicalTarget, "aarch64-macos"] as const;
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -122,6 +132,7 @@ export interface Test262ExecutionRequest {
 
 /** Native execution boundary used by the repository runner and unit tests. */
 export interface Test262Executor {
+  readonly target?: string;
   execute(request: Test262ExecutionRequest): Promise<CliResult>;
 }
 
@@ -430,7 +441,7 @@ function harnessIncludeNames(testCase: Test262Case): readonly string[] {
   ];
 }
 
-const moduleHost = createNodeHost();
+const moduleHost = runnerHost;
 
 /** Owned module-graph evidence with host paths relativized for review. */
 interface EntryGraphResult {
@@ -682,7 +693,7 @@ async function executedResult(
       : harnessIncludeNames(testCase),
     ...(moduleGraph == null ? {} : { moduleGraph }),
     ...(scheduled ? { scheduler: "deterministic-logical-clock" as const } : {}),
-    target: executionTarget,
+    target: executor.target ?? canonicalTarget,
     variants,
   });
   const evidence = (): Test262Evidence => ({
@@ -1053,6 +1064,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
 }
 
 const nativeExecutor: Test262Executor = {
+  ...(executionTarget == null ? {} : { target: executionTarget }),
   async execute(request: Test262ExecutionRequest): Promise<CliResult> {
     const entry =
       request.mode === "module" && request.sourcePath != null
@@ -1061,6 +1073,7 @@ const nativeExecutor: Test262Executor = {
     const args = [
       ...(request.mode === "module" ? ["--module"] : []),
       ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
+      ...(executionTarget == null ? [] : ["--target", executionTarget]),
       entry,
     ];
     return await runNativeCli({
@@ -1106,8 +1119,69 @@ export async function createReviewedManifest(
 }
 
 function requireSupportedHost(): void {
-  if (process.platform !== "linux" || process.arch !== "x64") {
-    throw new Error("test262 native execution requires x86-64 Linux.");
+  if (executionTarget == null) {
+    throw new Error("test262 native execution requires a supported host.");
+  }
+}
+
+function canonicalizeManifestTarget(
+  manifest: ReviewedTest262Manifest,
+): ReviewedTest262Manifest {
+  return {
+    ...manifest,
+    results: manifest.results.map((result) => ({
+      ...result,
+      ...(result.execution == null
+        ? {}
+        : {
+            execution: {
+              ...result.execution,
+              target: canonicalTarget,
+            },
+          }),
+    })),
+  };
+}
+
+function manifestDigest(serialized: string): string {
+  return `sha256:${createHash("sha256").update(serialized).digest("hex")}`;
+}
+
+function serializeTargetParity(
+  serializedManifest: string,
+  suiteRevision: string,
+): string {
+  return stringifyYaml(
+    {
+      canonicalDigest: manifestDigest(serializedManifest),
+      canonicalManifest: "results.yaml",
+      suiteRevision,
+      targets: parityTargets,
+    },
+    { lineWidth: 72 },
+  );
+}
+
+function validateTargetParity(
+  text: string,
+  serializedManifest: string,
+  suiteRevision: string,
+): void {
+  const root = record(parseYaml(text) as unknown, "test262 target parity");
+  if (root.canonicalManifest !== "results.yaml") {
+    throw new Error("test262 target parity must name results.yaml.");
+  }
+  if (root.canonicalDigest !== manifestDigest(serializedManifest)) {
+    throw new Error("test262 target parity canonical digest changed.");
+  }
+  if (root.suiteRevision !== suiteRevision) {
+    throw new Error("test262 target parity suite revision changed.");
+  }
+  const targets = stringArray(root.targets, "test262 target parity targets");
+  if (executionTarget == null || !targets.includes(executionTarget)) {
+    throw new Error(
+      `test262 target parity does not admit ${executionTarget ?? "unknown"}.`,
+    );
   }
 }
 
@@ -1129,9 +1203,14 @@ async function main(): Promise<void> {
     if (previousGc == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
     else process.env.OSEO_GC_EVERY_SAFEPOINT = previousGc;
   }
-  const serialized = serializeTest262Manifest(manifest);
+  const canonicalManifest = canonicalizeManifestTarget(manifest);
+  const serialized = serializeTest262Manifest(canonicalManifest);
   if (update[0] === "--update") {
     await writeFile(resultPath, serialized);
+    await writeFile(
+      parityPath,
+      serializeTargetParity(serialized, manifest.suiteRevision),
+    );
   } else {
     const expected = await readFile(resultPath, "utf8");
     if (expected !== serialized) {
@@ -1139,9 +1218,14 @@ async function main(): Promise<void> {
         "Reviewed test262 results changed; run mise run test262:update.",
       );
     }
+    validateTargetParity(
+      await readFile(parityPath, "utf8"),
+      expected,
+      manifest.suiteRevision,
+    );
   }
   console.log(
-    `test262 revision=${manifest.suiteRevision} ` +
+    `test262 revision=${manifest.suiteRevision} target=${executionTarget} ` +
       `pass=${manifest.summary.passes} ` +
       `expected-negative=${manifest.summary.expectedNegatives} ` +
       `unsupported=${manifest.summary.unsupportedProfileFeatures}`,

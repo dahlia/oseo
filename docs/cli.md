@@ -38,6 +38,7 @@ Command syntax
 --------------
 
 ~~~~ text
+oseo [--module] [--no-specialization] [--target TARGET] SOURCE
 oseo [--dump-mir | --emit-c] [--module] [--no-specialization] SOURCE
 oseo --help
 oseo --version
@@ -53,6 +54,7 @@ Options may appear before or after the source path.
 | `--emit-c`            | Print the generated C11 translation unit     |
 | `--module`            | Compile the source as an ECMAScript module   |
 | `--no-specialization` | Compile only the generic native path         |
+| `--target TARGET`     | Select an explicit native execution target   |
 | `--help`              | Print help generated from the CLI grammar    |
 | `--version`           | Print the lockstep Oseo package version      |
 
@@ -91,10 +93,22 @@ Oseo forwards the native program's standard output, standard error, and exit
 status. It removes the temporary directory after both successful and failed
 workflows.
 
-Native execution currently builds the explicit `x86_64-linux-gnu` target with
-undefined-behavior sanitization enabled, then runs the result. It is therefore
-intended for x86-64 Linux hosts at this milestone. MIR and C output modes do
-not invoke Zig and remain useful on other development hosts.
+Native execution selects `x86_64-linux-gnu` on Linux AMD64 and
+`aarch64-macos` on macOS AArch64. Both targets use address and
+undefined-behavior sanitization. Every Zig request names the target explicitly.
+`aarch64-linux-musl` remains a compile-link and inspection target in repository
+tasks; the CLI does not pretend that it can execute on either primary host.
+
+Use `--target` to state the execution target explicitly:
+
+~~~~ sh
+oseo --target aarch64-macos add.ts
+~~~~
+
+The target must match the normalized execution host. Unknown hosts and
+mismatched pairs fail with `OSEO3001` before the toolchain starts. `--dump-mir`
+and `--emit-c` are target-neutral and reject `--target` rather than changing or
+silently ignoring it.
 
 
 Inspect MIR

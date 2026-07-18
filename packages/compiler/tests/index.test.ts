@@ -5,11 +5,13 @@ import {
   buildHir,
   buildMir,
   buildModuleGraph,
+  canExecuteTarget,
   compileModuleGraph,
   describeTarget,
   printHir,
   printMir,
   renderDiagnostic,
+  targetForExecutionHost,
   linkModuleGraph,
 } from "../src/index.ts";
 import type {
@@ -56,8 +58,36 @@ test("renders every owned diagnostic class without a host stack", () => {
 });
 
 test("requires explicit native and cross targets", () => {
-  assert.ok(describeTarget("x86_64-linux-gnu").execute);
-  assert.ok(!describeTarget("aarch64-linux-musl").execute);
+  const linuxHost = {
+    architecture: "x86_64",
+    operatingSystem: "linux",
+  } as const;
+  const macHost = {
+    architecture: "aarch64",
+    operatingSystem: "macos",
+  } as const;
+  assert.equal(targetForExecutionHost(linuxHost)?.name, "x86_64-linux-gnu");
+  assert.equal(targetForExecutionHost(macHost)?.name, "aarch64-macos");
+  assert.ok(canExecuteTarget(linuxHost, describeTarget("x86_64-linux-gnu")));
+  assert.ok(canExecuteTarget(macHost, describeTarget("aarch64-macos")));
+  assert.ok(!canExecuteTarget(macHost, describeTarget("aarch64-linux-musl")));
+  assert.ok(
+    !canExecuteTarget(
+      { architecture: "aarch64", operatingSystem: "linux" },
+      describeTarget("aarch64-linux-musl"),
+    ),
+  );
+  assert.equal(
+    targetForExecutionHost({
+      architecture: "unknown",
+      operatingSystem: "unknown",
+    }),
+    undefined,
+  );
+  assert.throws(
+    () => describeTarget("unknown" as never),
+    /Unsupported native target/u,
+  );
 });
 
 const range: SourceRange = {

@@ -4,7 +4,8 @@ Initial platform and tool versions
 Status
 ------
 
-Accepted.
+Accepted. The execution-target portion is superseded by
+[ADR 0014](./0014-native-target-support.md).
 
 
 Context

@@ -20,7 +20,7 @@ function request(
 /** Pinned Zig C toolchain adapter with explicit target selection. */
 export const zigToolchain: NativeToolchain = {
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan {
-    const suffix = input.target.name === "x86_64-linux-gnu" ? "native" : "arm";
+    const suffix = input.target.name;
     const objectPath = join(input.workingDirectory, `runtime-${suffix}.o`);
     const archivePath = join(
       input.workingDirectory,
@@ -38,9 +38,10 @@ export const zigToolchain: NativeToolchain = {
       "-I",
       input.runtimeDirectory,
     ];
-    const sanitizer = input.target.sanitizeUndefinedBehavior
-      ? ["-fsanitize=undefined"]
-      : [];
+    const sanitizer =
+      input.target.sanitizers.length === 0
+        ? []
+        : [`-fsanitize=${input.target.sanitizers.join(",")}`];
     return {
       executablePath,
       requests: [
