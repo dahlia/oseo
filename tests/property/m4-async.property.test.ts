@@ -223,55 +223,64 @@ async function referenceObservations(source: string): Promise<
   }
 }
 
-test("generated asynchronous schedules match the M4 model", async () => {
-  await assertAsyncProperty(
-    "native asynchronous schedules retain modeled FIFO observations",
-    fc.asyncProperty(scheduleArbitrary, async (schedule) => {
-      const source = printSchedule(schedule);
-      const expected = {
-        exitStatus: 0,
-        stderr: "",
-        stdout: expectedOutput(schedule),
-      };
-      const references = await referenceObservations(source);
-      assertMatchingObservations([expected, ...references]);
-      for (const specialization of ["disabled", "enabled"] as const) {
-        const compiled = compileSource(
-          babelFrontend,
-          { source, sourceId: "generated-m4-schedule.js" },
-          { specialization },
-        );
-        assert.deepEqual(compiled.diagnostics, []);
-        assert.ok(compiled.mir != null);
-        if (specialization === "enabled") {
-          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-        }
-        try {
-          await withNativeFixture(
-            {
-              backend: cBackend,
-              host,
-              input: compiled.mir,
-              runtime: cRuntimeProvider,
-              target: describeTarget("x86_64-linux-gnu"),
-              toolchain: zigToolchain,
-            },
-            (native) => assertMatchingObservations([expected, native]),
+test(
+  "generated asynchronous schedules match the M4 model",
+  {
+    skip:
+      process.platform !== "linux" || process.arch !== "x64"
+        ? "requires x86-64 Linux"
+        : false,
+  },
+  async () => {
+    await assertAsyncProperty(
+      "native asynchronous schedules retain modeled FIFO observations",
+      fc.asyncProperty(scheduleArbitrary, async (schedule) => {
+        const source = printSchedule(schedule);
+        const expected = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expectedOutput(schedule),
+        };
+        const references = await referenceObservations(source);
+        assertMatchingObservations([expected, ...references]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m4-schedule.js" },
+            { specialization },
           );
-        } finally {
-          delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          if (specialization === "enabled") {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          }
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                runtime: cRuntimeProvider,
+                target: describeTarget("x86_64-linux-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) => assertMatchingObservations([expected, native]),
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
         }
-      }
-    }),
-    {
-      domain: "bounded promise commands and deterministic timer schedules",
-      numRuns: 10,
-      profile: "M4 promises, jobs, timers, and shutdown",
-      seed: 0x5eed_0003,
-      sizeLimit: large
-        ? "6 async calls, 12 promises, and 10 timers"
-        : "3 async calls, 6 promises, and 5 timers",
-      timeLimitMilliseconds: 120_000,
-    },
-  );
-});
+      }),
+      {
+        domain: "bounded promise commands and deterministic timer schedules",
+        numRuns: 10,
+        profile: "M4 promises, jobs, timers, and shutdown",
+        seed: 0x5eed_0003,
+        sizeLimit: large
+          ? "6 async calls, 12 promises, and 10 timers"
+          : "3 async calls, 6 promises, and 5 timers",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
