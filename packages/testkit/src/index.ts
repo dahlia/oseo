@@ -6,6 +6,7 @@ import type {
   ProcessObservation,
   ProcessRequest,
   RuntimeInputProvider,
+  SpecializationMode,
   TargetDescription,
 } from "@oseo/compiler";
 
@@ -43,7 +44,7 @@ export interface FixtureObservation extends ProcessObservation {}
 
 /** Classification retained for one reviewed test262 execution. */
 export type Test262Classification =
-  | "expected-parse-failure"
+  | "expected-negative"
   | "harness-failure"
   | "pass"
   | "semantic-failure"
@@ -52,20 +53,73 @@ export type Test262Classification =
 /** Strictness variants requested by test262 frontmatter. */
 export type Test262Strictness = "non-strict" | "strict";
 
+/** Goal symbol one reviewed case compiles under. */
+export type Test262ExecutionMode = "module" | "script";
+
 /**
  * Failure phase declared by test262 metadata. Parse includes early errors.
  */
 export type Test262FailurePhase = "parse" | "resolution" | "runtime";
 
+/**
+ * Reviewed semantic dependency tags frozen by ADR 0013. Any other value is
+ * a validation error until a reviewed change to that record admits it.
+ */
+export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
+  "abrupt-completion",
+  "async-functions",
+  "functions",
+  "lexical-bindings",
+  "module-linking",
+  "object-properties",
+  "promise-settlement",
+  "timers",
+  "top-level-await",
+]);
+
 /** Frontmatter and suite identity needed to reproduce one reviewed case. */
 export interface Test262Case {
+  readonly async: boolean;
   readonly expectedErrorType?: string;
   readonly expectedFailurePhase?: Test262FailurePhase;
   readonly features: readonly string[];
+  readonly flags: readonly string[];
   readonly includes: readonly string[];
+  readonly mode: Test262ExecutionMode;
   readonly path: string;
   readonly strictness: readonly Test262Strictness[];
   readonly suiteRevision: string;
+}
+
+/** One executed strictness and specialization combination. */
+export interface Test262Variant {
+  readonly specialization: SpecializationMode;
+  readonly strictness: Test262Strictness;
+}
+
+/**
+ * Linked-module evidence for one reviewed case. Identities are relative to
+ * the pinned suite root, and the entry records its upstream test path, so a
+ * manifest never contains host-specific canonical URLs.
+ */
+export interface Test262ModuleGraphNode {
+  readonly dependencies: readonly string[];
+  readonly id: string;
+  readonly sourceHash: string;
+}
+
+/**
+ * Evidence about what actually executed for one reviewed case. Omitted when
+ * nothing executed. One observation per case is sound because the runner
+ * rejects any difference between executed variants as a semantic failure
+ * whose detail names the diverging combination.
+ */
+export interface Test262Execution {
+  readonly harnessIncludes: readonly string[];
+  readonly moduleGraph?: readonly Test262ModuleGraphNode[];
+  readonly scheduler?: "deterministic-logical-clock";
+  readonly target: string;
+  readonly variants: readonly Test262Variant[];
 }
 
 /** Host-independent observation produced by the test262 adapter. */
@@ -82,19 +136,37 @@ export interface Test262Observation {
 export interface Test262Result {
   readonly case: Test262Case;
   readonly classification: Test262Classification;
+  readonly dependencies: readonly string[];
+  readonly execution?: Test262Execution;
   readonly observation: Test262Observation;
   readonly unsupportedFeatures: readonly string[];
+}
+
+/** Classification counts shared by raw, group, and dependency totals. */
+export interface Test262Counts {
+  readonly expectedNegatives: number;
+  readonly harnessFailures: number;
+  readonly passes: number;
+  readonly semanticFailures: number;
+  readonly unsupportedProfileFeatures: number;
+}
+
+/** Counts for one dependency-indexed path group. */
+export interface Test262GroupSummary extends Test262Counts {
+  readonly group: string;
+}
+
+/** Counts for one reviewed semantic dependency tag. */
+export interface Test262DependencySummary extends Test262Counts {
+  readonly dependency: string;
 }
 
 /**
  * Counts that never fold unsupported or infrastructure failures into passes.
  */
-export interface Test262Summary {
-  readonly expectedParseFailures: number;
-  readonly harnessFailures: number;
-  readonly passes: number;
-  readonly semanticFailures: number;
-  readonly unsupportedProfileFeatures: number;
+export interface Test262Summary extends Test262Counts {
+  readonly dependencies: readonly Test262DependencySummary[];
+  readonly groups: readonly Test262GroupSummary[];
 }
 
 interface ProcessStepObservation {
@@ -160,11 +232,29 @@ function splitCounters(observation: ProcessObservation): {
   };
 }
 
-/** Classify one test262 observation against the named M3 feature profile. */
+/** Reviewed metadata attached to a classification beyond the observation. */
+export interface Test262Evidence {
+  readonly dependencies: readonly string[];
+  readonly execution?: Test262Execution;
+}
+
+/**
+ * Dependency-indexed path group frozen by ADR 0013: the first two directory
+ * segments of the upstream path under *test/*.
+ */
+export function test262Group(path: string): string {
+  const segments = path.split("/");
+  const start = segments[0] === "test" ? 1 : 0;
+  const directories = segments.slice(start, -1);
+  return directories.slice(0, 2).join("/");
+}
+
+/** Classify one test262 observation against the supported feature profile. */
 export function classifyTest262(
   testCase: Test262Case,
   observation: Test262Observation,
   supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence = { dependencies: [] },
 ): Test262Result {
   const unsupportedFeatures = testCase.features.filter(
     (feature) => !supportedFeatures.has(feature),
@@ -185,45 +275,94 @@ export function classifyTest262(
     observation.unsupportedCapability != null
   ) {
     classification = "unsupported-profile-feature";
-  } else if (testCase.expectedFailurePhase === "parse" && negativeMatches) {
-    classification = "expected-parse-failure";
   } else if (negativeMatches) {
-    classification = "pass";
+    classification = "expected-negative";
   } else if (testCase.expectedFailurePhase == null && observation.passed) {
     classification = "pass";
   } else {
     classification = "semantic-failure";
   }
-  return { case: testCase, classification, observation, unsupportedFeatures };
+  return {
+    case: testCase,
+    classification,
+    dependencies: evidence.dependencies,
+    ...(evidence.execution == null ? {} : { execution: evidence.execution }),
+    observation,
+    unsupportedFeatures,
+  };
 }
 
-/**
- * Summarize reviewed test262 records without changing their classifications.
- */
-export function summarizeTest262(
-  results: readonly Test262Result[],
-): Test262Summary {
-  const summary = {
-    expectedParseFailures: 0,
+interface MutableTest262Counts {
+  expectedNegatives: number;
+  harnessFailures: number;
+  passes: number;
+  semanticFailures: number;
+  unsupportedProfileFeatures: number;
+}
+
+function emptyCounts(): MutableTest262Counts {
+  return {
+    expectedNegatives: 0,
     harnessFailures: 0,
     passes: 0,
     semanticFailures: 0,
     unsupportedProfileFeatures: 0,
   };
+}
+
+function countClassification(
+  counts: MutableTest262Counts,
+  classification: Test262Classification,
+): void {
+  if (classification === "expected-negative") {
+    counts.expectedNegatives += 1;
+  } else if (classification === "harness-failure") {
+    counts.harnessFailures += 1;
+  } else if (classification === "pass") {
+    counts.passes += 1;
+  } else if (classification === "semantic-failure") {
+    counts.semanticFailures += 1;
+  } else {
+    counts.unsupportedProfileFeatures += 1;
+  }
+}
+
+/**
+ * Summarize reviewed test262 records without changing their classifications.
+ * Raw totals, path-group totals, and dependency-tag totals stay separate so
+ * a large group cannot hide a regression in a smaller dependency.
+ */
+export function summarizeTest262(
+  results: readonly Test262Result[],
+): Test262Summary {
+  const raw = emptyCounts();
+  const groups = new Map<string, MutableTest262Counts>();
+  const dependencies = new Map<string, MutableTest262Counts>();
   for (const result of results) {
-    if (result.classification === "expected-parse-failure") {
-      summary.expectedParseFailures += 1;
-    } else if (result.classification === "harness-failure") {
-      summary.harnessFailures += 1;
-    } else if (result.classification === "pass") {
-      summary.passes += 1;
-    } else if (result.classification === "semantic-failure") {
-      summary.semanticFailures += 1;
-    } else {
-      summary.unsupportedProfileFeatures += 1;
+    countClassification(raw, result.classification);
+    const group = test262Group(result.case.path);
+    const groupCounts = groups.get(group) ?? emptyCounts();
+    groups.set(group, groupCounts);
+    countClassification(groupCounts, result.classification);
+    for (const dependency of result.dependencies) {
+      const dependencyCounts = dependencies.get(dependency) ?? emptyCounts();
+      dependencies.set(dependency, dependencyCounts);
+      countClassification(dependencyCounts, result.classification);
     }
   }
-  return summary;
+  const dependencySummaries: Test262DependencySummary[] = [];
+  for (const [dependency, counts] of [...dependencies.entries()].toSorted(
+    ([left], [right]) => (left < right ? -1 : 1),
+  )) {
+    dependencySummaries.push({ dependency, ...counts });
+  }
+  const groupSummaries: Test262GroupSummary[] = [];
+  for (const [group, counts] of [...groups.entries()].toSorted(
+    ([left], [right]) => (left < right ? -1 : 1),
+  )) {
+    groupSummaries.push({ group, ...counts });
+  }
+  return { ...raw, dependencies: dependencySummaries, groups: groupSummaries };
 }
 
 /**

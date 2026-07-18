@@ -1,80 +1,1142 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
+  - async-functions
   - computed-property-names
   - const
   - let
+  - top-level-await
 tests:
   - path: test/built-ins/Object/create/15.2.3.5-1-2.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-1-3.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-1-4.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-1.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/keys/15.2.3.14-1-1.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/keys/15.2.3.14-1-2.js
     expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/Object/keys/15.2.3.14-1-3.js
     expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Promise/all/S25.4.4.1_A4.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/all/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/executor-not-callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/promise.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/catch/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/catch/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/catch/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/catch/this-value-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/is-a-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/species-constructor-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/finally/this-value-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/then/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/then/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/prototype/then/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A3.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/S25.4.4.3_A3.1_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/race/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/reject/S25.4.4.4_A3.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/reject/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/reject/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/reject/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/resolve/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/resolve/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/resolve/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [promise-settlement]
+  - path: test/built-ins/Promise/resolve/resolve-non-obj.js
+    expectedClassification: pass
+    dependencies: [promise-settlement]
+  - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/await-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/await-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/await-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/await-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/await-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-NSPL-with-USD.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-binding-identifier-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-binding-identifier-eval.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-body-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-body-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-eval-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-formals-body-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-formals-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-formals-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/early-errors-expression-not-simple-assignment-target.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/escaped-async.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/name.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-function/named-array-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-await-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-dflt-params-duplicates.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-dflt-params-rest.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-object-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-rest-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-array-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-dflt-params-rest.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-object-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-rest-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/async-function/syntax-expression-is-PrimaryExpression.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/await-BindingIdentifier-in-global.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/await-BindingIdentifier-nested.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/await-in-function.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/await-non-promise-thenable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/early-errors-await-not-simple-assignment-target.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/expressions/await/no-operand.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
   - path: test/language/expressions/function/dflt-params-duplicates.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
   - path: test/language/expressions/function/name-arguments-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/expressions/function/name-arguments-strict.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/expressions/function/name-eval-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/expressions/function/name-eval-strict.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/expressions/function/name.js
     expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/function/param-arguments-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/expressions/function/param-duplicated-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/expressions/function/param-duplicated-strict-1.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/language/module-code/comment-multi-line-html-close.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/comment-single-line-html-close.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/comment-single-line-html-open.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-as-star-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-decl.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-dflt-id.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-dflt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-id-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-id.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-export-star-as-dflt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-lables.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-lex.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-top-function-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-top-function-async.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-top-function-generator.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-dup-top-function.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-export-global.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-export-ill-formed-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-export-unresolvable.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-import-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-import-as-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-import-as-eval.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-import-eval.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-lex-and-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-new-target.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-strict-mode.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-super.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-undef-break.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/early-undef-continue.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/eval-gtbndng-local-bndng-const.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, module-linking]
+  - path: test/language/module-code/eval-gtbndng-local-bndng-let.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, module-linking]
+  - path: test/language/module-code/eval-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-default-asyncfunction-declaration-binding-exists.js
+    expectedClassification: expected-negative
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/export-default-asyncfunction-declaration-binding.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/export-default-asyncgenerator-declaration-binding-exists.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-default-function-declaration-binding-exists.js
+    expectedClassification: expected-negative
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/export-default-function-declaration-binding.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/export-default-generator-declaration-binding-exists.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-binding-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-as-unpaired-surrogate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-binding-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-star-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-star-unpaired-surrogate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-star.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-string-binding.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-string-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-from-unpaired-surrogate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-import-string-binding.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-import-unpaired-surrogate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-string-binding.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/export-expname-unpaired-surrogate.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-const.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-fun.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-let.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-circular-as.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-circular.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-dflt-thru-star-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-dflt-thru-star.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-not-found-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-err-not-found.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-star-cycle.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-trlng-comma.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-const.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-fun-named.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-fun.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-let.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-err-dflt-thru-star-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-err-dflt-thru-star-dflt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-err-not-found-as.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-err-not-found-dflt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-err-not-found.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-star-cycle.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-once.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-empty-export.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-empty-import.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-err-syntax-1.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-err-syntax-2.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-order-depth.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-resolve-order-src.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-as-props-dflt-skip.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-equality.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-err-not-found.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-iee-single-cycle-same-name.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-props-circular.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-props-dflt-keep-indirect.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-props-dflt-keep-local.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-props-dflt-skip.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-props-nrml.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-star-cycle.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/invalid-private-names-call-expression-bad-reference.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/invalid-private-names-call-expression-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/invalid-private-names-member-expression-bad-reference.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/invalid-private-names-member-expression-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-arrow-function.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-block-stmt-list.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-block-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-decl-meth-static.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-decl-meth.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-decl-method-gen-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-decl-method-gen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-gen-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-gen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-static.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-do-while.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-in-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-in-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-in-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-in-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-of-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-of-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-of-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-of-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-for-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-function-decl.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-function-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-generator-decl.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-generator-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-if-else.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-if-if.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-labeled.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-object-gen-method.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-object-getter.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-object-method.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-object-setter.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-switch-case-dflt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-switch-case.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-switch-dftl.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-try-catch-finally.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-try-catch.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-try-finally.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-try-try.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-export-while.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-arrow-function.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-block-stmt-list.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-block-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-decl-meth-static.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-decl-meth.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-decl-method-gen-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-decl-method-gen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-gen-static.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-gen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-static.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-do-while.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-in-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-in-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-in-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-in-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-of-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-of-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-of-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-of-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-for-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-function-decl.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-function-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-generator-decl.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-generator-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-if-else.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-if-if.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-labeled.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-object-gen-method.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-object-getter.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-object-method.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-object-setter.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-switch-case-dflt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-switch-case.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-switch-dftl.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-try-catch-finally.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-try-catch.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-try-finally.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-try-try.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-decl-pos-import-while.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-export-dflt-const.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-export-dflt-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-export-dflt-let.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-export-dflt-var.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-hoist-lex-fun.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-hoist-lex-gen.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-invoke-anon-fun-decl.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-invoke-anon-gen-decl.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-return.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-semi-dflt-expr.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-semi-export-star.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-semi-name-space-export.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-semi-named-export-from.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-semi-named-export.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-syntax-1.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-syntax-2.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-err-yield.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/parse-export-empty.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/private-identifiers-not-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-7.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/privatename-not-valid-earlyerr-module-8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/dfs-invariant.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/early-errors-await-not-simple-assignment-target.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/module-import-resolution.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/new-await.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/no-operand.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/statements/async-function/array-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/await-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/dflt-params-duplicates.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/dflt-params-rest.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-NSPL-with-USD.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-arguments-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-await-in-formals-default.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-await-in-formals.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-binding-identifier-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-binding-identifier-eval.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-body-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-body-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-duplicate-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-eval-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-formals-body-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-formals-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/early-errors-declaration-formals-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/escaped-async.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-body-that-returns-after-await.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-body-that-returns.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-body-that-throws-after-await.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-body-that-throws.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/let-newline-await-in-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/object-destructuring-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/rest-param-strict-body.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/syntax-declaration-no-line-terminator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/syntax-declaration.js
+    expectedClassification: pass
+    dependencies: [async-functions]
+  - path: test/language/statements/async-function/try-reject-finally-reject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-reject-finally-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-reject-finally-throw.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-return-finally-reject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-return-finally-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-return-finally-throw.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-throw-finally-reject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-throw-finally-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/async-function/try-throw-finally-throw.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/function/S13.2.1_A1_T1.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/S13.2_A6_T1.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/S13.2_A6_T2.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/name-arguments-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/name-arguments-strict.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/statements/function/name-eval-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/name-eval-strict.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/statements/function/name.js
     expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/param-arguments-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/param-duplicated-non-strict.js
     expectedClassification: pass
+    dependencies: [functions]
   - path: test/language/statements/function/param-duplicated-strict-1.js
-    expectedClassification: expected-parse-failure
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
+    dependencies: [functions, lexical-bindings]
   - path: test/language/statements/let/syntax/let.js
     expectedClassification: pass
+    dependencies: [lexical-bindings]
   - path: test/language/statements/throw/S12.13_A2_T1.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/throw/S12.13_A2_T2.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/12.14-10.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/12.14-12.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/S12.14_A18_T1.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/S12.14_A18_T2.js
     expectedClassification: pass
+    dependencies: [abrupt-completion]

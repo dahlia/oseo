@@ -25,6 +25,15 @@ function exemptLine(path: string, line: string): boolean {
   ) {
     return true;
   }
+  // Upstream test262 paths are fixed identifiers like URLs: a manifest line
+  // is exempt only when removing that unbreakable token would fit.
+  if (
+    path === "tests/test262/subset.yaml" ||
+    path === "tests/test262/results.yaml"
+  ) {
+    const token = line.match(/\btest\/[^\s"']+/u);
+    if (token != null && line.length - token[0].length <= 80) return true;
+  }
   return false;
 }
 

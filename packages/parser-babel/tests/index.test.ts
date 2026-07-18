@@ -465,6 +465,27 @@ test("converts M4 imports and exports to owned module syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.module), /ImportDeclaration/u);
 });
 
+test("keeps empty indirect exports as requested dependencies", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: 'export {} from "./requested.js";\nimport {} from "./empty.js";',
+    sourceId: "file:///app/empty-clauses.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.module?.exports, []);
+  assert.deepEqual(
+    result.module?.imports.map((entry) => ({
+      imported: entry.importedName,
+      local: entry.localName,
+      specifier: entry.specifier.value,
+    })),
+    [
+      { imported: undefined, local: undefined, specifier: "./requested.js" },
+      { imported: undefined, local: undefined, specifier: "./empty.js" },
+    ],
+  );
+});
+
 test("retains default export order and anonymous function names", () => {
   const result = babelModuleFrontend.parseModule({
     source: `

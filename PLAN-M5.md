@@ -4,16 +4,29 @@ M5 plan for measured ECMAScript compatibility
 Status
 ------
 
-Implementation status: ready, not started. M4 established closed native module
-graphs, live bindings, promises, asynchronous continuations, top-level await,
-and a deterministic native scheduler. M5 expands that documented subset through
+Implementation status: active. M4 established closed native module graphs,
+live bindings, promises, asynchronous continuations, top-level await, and a
+deterministic native scheduler. M5 expands that documented subset through
 measured compatibility work rather than treating ECMAScript as one feature.
+
+The first three delivery items are complete.
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
+edition, optional-section policy, and manifest schema, and
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) is the living
+M5 profile. The test262 harness executes module and asynchronous cases under
+the deterministic native scheduler through the explicit CLI module goal, and
+the dependency-indexed baseline manifest covers module linking and early
+errors, top-level await, asynchronous functions, and the Promise family with
+honest unsupported classifications. Delivery items 4 through 9, from
+foundational expressions through closing the named edition, remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted records
-under *docs/adr/*. Evidence that changes one of these contracts updates the
-affected document in the same change.
+under *docs/adr/*. The runtime componentization in
+[*PLAN-RCR.md*](./PLAN-RCR.md) is the prerequisite for large intrinsic tables
+and built-in families. Evidence that changes one of these contracts updates
+the affected document in the same change.
 
 
 Goal
@@ -81,15 +94,16 @@ decision that owns them.
 Edition and profile boundary
 ----------------------------
 
-The first M5 checkpoint records the candidate ECMA-262 edition and the exact
-normative and optional sections included in the eventual claim. Annex B,
-internationalization, host hooks, realms, agents, shared memory, and embedding
-APIs are classified explicitly rather than being silently included or omitted.
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) records the candidate
+ECMA-262 edition and the exact normative and optional sections included in
+the eventual claim. Annex B, internationalization, host hooks, realms,
+agents, shared memory, and embedding APIs are classified explicitly rather
+than being silently included or omitted.
 
-Until that checkpoint lands, M5 releases describe tested capabilities without
-naming a conformance target. The language profile grows monotonically within a
-release line. Removing an admitted behavior requires evidence, a migration
-note, and an updated compatibility manifest.
+M5 releases describe tested capabilities without using the conformance label
+while known gaps remain inside that boundary. The language profile grows
+monotonically within a release line. Removing an admitted behavior requires
+evidence, a migration note, and an updated compatibility manifest.
 
 
 Semantic dependency streams
@@ -115,7 +129,9 @@ expression, date, and binary-data families in dependency order.
 An intrinsic enters through a table or owned runtime interface whose identity
 and attributes are testable. Generated C must not duplicate mutable singleton
 state accidentally. Generic algorithms remain authoritative when a fast path
-cannot prove its preconditions.
+cannot prove its preconditions. Large intrinsic tables and built-in families
+begin only after the affected runtime component exists under
+[*PLAN-RCR.md*](./PLAN-RCR.md).
 
 ### Functions and executable syntax
 
@@ -260,8 +276,9 @@ M5 is complete only when:
  -  one named ECMA-262 edition and optional-section policy define the claim;
  -  the checked-in manifest covers every applicable test in that boundary at an
     exact upstream revision;
- -  no semantic failure, harness failure, or unexplained unsupported result
-    remains inside the claim;
+ -  no semantic failure, harness failure, or unsupported result, including
+    one caused only by a missing observation capability, remains inside the
+    claim;
  -  every admitted syntax and built-in has generic semantics, negative cases,
     collector coverage, and source-located diagnostics;
  -  module, promise, asynchronous, and scheduler tests exercise the expanded

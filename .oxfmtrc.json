@@ -5,7 +5,8 @@
     "aube-lock.yaml",
     "artifacts/**",
     "mise.toml",
-    "packages/*/dist/**"
+    "packages/*/dist/**",
+    "tests/test262/results.yaml"
   ],
   "printWidth": 80
 }

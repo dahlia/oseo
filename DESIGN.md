@@ -512,11 +512,19 @@ M2 observation-enabled builds emit one private counter record. The testkit
 removes it from process stderr before differential comparison. Ordinary CLI
 builds neither update specialized counters nor print an observation record.
 
-M3 pins a reviewed test262 subset and retains its complete frontmatter and
-native observations in a deterministic manifest. Applicable Script cases run
-in every requested strictness mode with specialization disabled and enabled.
-The gate rejects semantic failures, harness failures, or changes from the
-reviewed classification instead of counting unsupported cases as passes.
+M3 pinned a reviewed test262 subset and retained its complete frontmatter
+and native observations in a deterministic manifest. M5 freezes the
+measurement boundary and manifest schema in
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md): one counted row per
+upstream path with executed variants, execution mode, dependency tags, and
+module-graph evidence recorded inside it, and exactly five classifications
+with expected-negative covering matched parse, resolution, and runtime
+negatives. Applicable Script cases run in every requested strictness mode
+with specialization disabled and enabled; module and asynchronous cases run
+under the deterministic native scheduler through the explicit CLI module
+goal. The gate rejects semantic failures, harness failures, or changes from
+the reviewed classification instead of counting unsupported cases as
+passes, and summaries keep raw, path-group, and dependency-tag totals.
 
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to

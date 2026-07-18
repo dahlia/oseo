@@ -6,8 +6,12 @@ Status
 
 Oseo has completed M4: closed native module graphs, live bindings, promises,
 asynchronous continuations, top-level await, timers, and a deterministic native
-scheduler. The current implementation plan is [*PLAN-M5.md*](./PLAN-M5.md).
-This roadmap uses capability gates rather than calendar dates.
+scheduler. M5 is in progress under [*PLAN-M5.md*](./PLAN-M5.md):
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
+ECMA-262 16th edition boundary and manifest schema, the test262 harness
+executes module and asynchronous cases, and a dependency-indexed baseline
+manifest is published. This roadmap uses capability gates rather than
+calendar dates.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
@@ -458,19 +462,19 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The compiler and runtime capability sequence is complete through M4. M5 follows
-[*PLAN-M5.md*](./PLAN-M5.md):
+The compiler and runtime capability sequence is complete through M4. M5
+follows [*PLAN-M5.md*](./PLAN-M5.md). The first three steps are complete:
+the candidate edition boundary and manifest schema are frozen, the test262
+harness observes module and asynchronous execution, and the
+dependency-indexed baseline is published. The remaining queue is:
 
-1.  Freeze a candidate ECMA-262 edition boundary and compatibility manifest.
-2.  Expand test262 module and asynchronous harness observations for existing M4
-    behavior.
-3.  Publish a dependency-indexed baseline with exact unsupported reasons.
-4.  Complete foundational expressions, coercions, errors, symbols, and
+1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.
-5.  Add built-in families and broader executable syntax in dependency order.
-6.  Resolve ahead-of-time challenge features through decisions or explicit
+2.  Add built-in families and broader executable syntax in dependency order.
+3.  Resolve ahead-of-time challenge features through decisions or explicit
     unsupported classifications.
-7.  Close the named edition with reproducible standards and generated evidence.
+4.  Close the named edition with reproducible standards and generated
+    evidence.
 
 M5 preserves every earlier generic-fallback, forced-collection, sanitizer,
 cross-target, package, standards, and property gate. It expands the same

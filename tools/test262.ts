@@ -7,20 +7,43 @@ import { fileURLToPath } from "node:url";
 
 import { runNativeCli } from "../packages/cli/src/index.ts";
 import type { CliResult } from "../packages/cli/src/index.ts";
-import { compileSource } from "../packages/compiler/src/index.ts";
-import type { SpecializationMode } from "../packages/compiler/src/index.ts";
-import { babelFrontend } from "../packages/parser-babel/src/index.ts";
+import {
+  buildModuleGraph,
+  compileModuleGraph,
+  compileSource,
+  renderDiagnostic,
+} from "../packages/compiler/src/index.ts";
+import type {
+  Diagnostic,
+  SpecializationMode,
+} from "../packages/compiler/src/index.ts";
+import {
+  createFileModuleLoader,
+  createNodeHost,
+  fileModuleResolver,
+  hashModuleSource,
+} from "../packages/host/src/index.ts";
+import {
+  babelFrontend,
+  babelModuleFrontend,
+} from "../packages/parser-babel/src/index.ts";
 import {
   classifyTest262,
   summarizeTest262,
+  test262DependencyVocabulary,
 } from "../packages/testkit/src/index.ts";
 import type {
   Test262Case,
   Test262Classification,
+  Test262Evidence,
+  Test262Execution,
+  Test262ExecutionMode,
   Test262FailurePhase,
+  Test262ModuleGraphNode,
   Test262Result,
   Test262Strictness,
   Test262Summary,
+  Test262Variant,
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
@@ -28,18 +51,29 @@ const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
 const resultPath = join(repositoryRoot, "tests/test262/results.yaml");
 const baseHarnessPath = join(repositoryRoot, "tests/test262/harness/base.js");
+const doneHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/doneprintHandle.js",
+);
 const propertyHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/propertyHelper.js",
 );
+const compareArrayHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/compareArray.js",
+);
 
 const classifications = new Set<Test262Classification>([
-  "expected-parse-failure",
+  "expected-negative",
   "harness-failure",
   "pass",
   "semantic-failure",
   "unsupported-profile-feature",
 ]);
+
+/** The one native target the reviewed manifest currently executes on. */
+const executionTarget = "x86_64-linux-gnu";
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -52,20 +86,24 @@ export interface ParsedTest262Case {
   readonly flags: readonly string[];
 }
 
-/** One reviewed path and the classification it must retain. */
+/**
+ * One reviewed path, the classification it must retain, and the reviewed
+ * semantic dependency tags frozen by ADR 0013.
+ */
 export interface ReviewedTest262Entry {
+  readonly dependencies: readonly string[];
   readonly expectedClassification: Test262Classification;
   readonly path: string;
 }
 
-/** Pinned test262 revision and explicitly reviewed M3 source paths. */
+/** Pinned test262 revision and explicitly reviewed source paths. */
 export interface ReviewedTest262Subset {
   readonly suiteRevision: string;
   readonly supportedFeatures: readonly string[];
   readonly tests: readonly ReviewedTest262Entry[];
 }
 
-/** Deterministic checked-in observation of the reviewed M3 subset. */
+/** Deterministic checked-in observation of the reviewed subset. */
 export interface ReviewedTest262Manifest {
   readonly results: readonly Test262Result[];
   readonly suiteRevision: string;
@@ -74,8 +112,11 @@ export interface ReviewedTest262Manifest {
 
 /** Inputs passed to an injected native executor. */
 export interface Test262ExecutionRequest {
+  readonly mode: Test262ExecutionMode;
   readonly source: string;
   readonly sourceId: string;
+  /** Absolute upstream path; module imports resolve against it. */
+  readonly sourcePath?: string;
   readonly specialization: SpecializationMode;
 }
 
@@ -87,7 +128,27 @@ export interface Test262Executor {
 /** Harness sources available to the reviewed test262 subset. */
 export interface Test262Harnesses {
   readonly base: string;
+  readonly done: string;
   readonly includes: ReadonlyMap<string, string>;
+}
+
+/** Marker the reviewed `$DONE` harness prints on asynchronous completion. */
+export const asyncCompletionMarker = "Test262:AsyncTestComplete";
+
+/** Prefix the reviewed `$DONE` harness prints on asynchronous failure. */
+export const asyncFailureMarker = "Test262:AsyncTestFailure:";
+
+/**
+ * An asynchronous case completes only when the completion marker is the
+ * final line, appears exactly once, and no failure marker was printed.
+ */
+export function asyncObservationCompleted(stdout: string): boolean {
+  const lines = stdout.split("\n");
+  return (
+    stdout.endsWith(`${asyncCompletionMarker}\n`) &&
+    lines.filter((line) => line === asyncCompletionMarker).length === 1 &&
+    !lines.some((line) => line.startsWith(asyncFailureMarker))
+  );
 }
 
 function record(value: unknown, description: string): Record<string, unknown> {
@@ -160,6 +221,7 @@ export function parseTest262Case(
   const expected = negative(metadata.negative);
   return {
     case: {
+      async: flags.includes("async"),
       ...(expected == null
         ? {}
         : {
@@ -167,7 +229,9 @@ export function parseTest262Case(
             expectedFailurePhase: expected.phase,
           }),
       features: stringArray(metadata.features, `${path} features`),
+      flags,
       includes: stringArray(metadata.includes, `${path} includes`),
+      mode: flags.includes("module") ? "module" : "script",
       path,
       strictness: strictness(flags),
       suiteRevision,
@@ -193,7 +257,28 @@ export function parseReviewedSubset(text: string): ReviewedTest262Subset {
   }
   const tests = rawTests.map((value, index) => {
     const item = record(value, `test262 subset test ${index}`);
+    const dependencies = stringArray(
+      item.dependencies,
+      `test262 subset test ${index} dependencies`,
+    );
+    if (dependencies.length === 0) {
+      throw new Error(
+        `test262 subset test ${index} needs at least one dependency tag.`,
+      );
+    }
+    if (new Set(dependencies).size !== dependencies.length) {
+      throw new Error(`test262 subset test ${index} repeats a dependency tag.`);
+    }
+    for (const dependency of dependencies) {
+      if (!test262DependencyVocabulary.has(dependency)) {
+        throw new Error(
+          `test262 subset test ${index} has unreviewed dependency tag ` +
+            `${dependency}.`,
+        );
+      }
+    }
     return {
+      dependencies,
       expectedClassification: classification(item.expectedClassification),
       path: stringValue(item.path, `test262 subset test ${index} path`),
     };
@@ -216,7 +301,13 @@ export function parseReviewedSubset(text: string): ReviewedTest262Subset {
   };
 }
 
-/** Assemble one Script input without changing the upstream test body. */
+/**
+ * Assemble one executable input without changing the upstream test body.
+ * Module sources are inherently strict, so only Script inputs receive the
+ * strict-mode directive; asynchronous cases receive the reviewed `$DONE`
+ * harness immediately after the base assertions, mirroring upstream
+ * doneprintHandle insertion.
+ */
 export function assembleTest262Source(
   source: string,
   strictnessMode: Test262Strictness,
@@ -226,8 +317,11 @@ export function assembleTest262Source(
 ): string {
   if (raw) return source;
   const parts: string[] = [];
-  if (strictnessMode === "strict") parts.push('"use strict";');
+  if (strictnessMode === "strict" && testCase.mode === "script") {
+    parts.push('"use strict";');
+  }
   parts.push(harnesses.base);
+  if (testCase.async) parts.push(harnesses.done);
   for (const include of testCase.includes) {
     const harness = harnesses.includes.get(include);
     if (harness == null) {
@@ -273,16 +367,17 @@ function detail(
 function unsupportedResult(
   testCase: Test262Case,
   supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence,
 ): Test262Result {
   return classifyTest262(
     testCase,
     {
-      detail:
-        "Not executed because frontmatter requires an M3-external feature.",
+      detail: "Not executed: the frontmatter needs an unsupported feature.",
       harnessFailed: false,
       passed: false,
     },
     supportedFeatures,
+    evidence,
   );
 }
 
@@ -290,6 +385,7 @@ function parseNegativeResult(
   source: string,
   testCase: Test262Case,
   supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence,
 ): Test262Result {
   for (const strictnessMode of testCase.strictness) {
     const compiled = compileSource(babelFrontend, {
@@ -309,6 +405,7 @@ function parseNegativeResult(
           passed: diagnostic == null,
         },
         supportedFeatures,
+        evidence,
       );
     }
   }
@@ -321,6 +418,247 @@ function parseNegativeResult(
       passed: false,
     },
     supportedFeatures,
+    evidence,
+  );
+}
+
+function harnessIncludeNames(testCase: Test262Case): readonly string[] {
+  return [
+    "base.js",
+    ...(testCase.async ? ["doneprintHandle.js"] : []),
+    ...testCase.includes,
+  ];
+}
+
+const moduleHost = createNodeHost();
+
+/** Owned module-graph evidence with host paths relativized for review. */
+interface EntryGraphResult {
+  readonly compileDiagnostics: readonly Diagnostic[];
+  /** The entry's upstream test path, matching recorded diagnostics. */
+  readonly entryDisplayId: string;
+  readonly graphDiagnostics: readonly Diagnostic[];
+  readonly nodes?: readonly Test262ModuleGraphNode[];
+}
+
+function relativeModuleId(
+  id: string,
+  entryId: string,
+  entryDisplayId: string,
+  rootUrl: string,
+): string {
+  const prefix = rootUrl.endsWith("/") ? rootUrl : `${rootUrl}/`;
+  if (!id.startsWith(prefix)) {
+    throw new Error(
+      `Module ${id} resolved outside the suite root; the manifest must ` +
+        "not record host-specific identities.",
+    );
+  }
+  return id === entryId ? entryDisplayId : id.slice(prefix.length);
+}
+
+/**
+ * Discover, link, and lower one module case without native execution. The
+ * entry source is supplied in memory so harness assembly never modifies the
+ * upstream checkout; sibling fixtures load from disk. Recorded identities
+ * are relative to the suite root so the manifest stays host-independent.
+ */
+async function buildEntryGraph(
+  source: string,
+  sourcePath: string,
+  entryDisplayId: string,
+  rootPath: string,
+): Promise<EntryGraphResult> {
+  if (moduleHost.canonicalizeFile == null) {
+    throw new Error("The module host cannot canonicalize files.");
+  }
+  const entryId = await moduleHost.canonicalizeFile(sourcePath);
+  const rootUrl = await moduleHost.canonicalizeFile(rootPath);
+  const fileLoader = createFileModuleLoader(moduleHost);
+  // Recorded diagnostics use the same suite-root-relative identities as the
+  // module-graph evidence so the manifest never leaks a host path.
+  const displayDiagnostic = (diagnostic: Diagnostic): Diagnostic => ({
+    ...diagnostic,
+    sourceId: relativeModuleId(
+      diagnostic.sourceId,
+      entryId,
+      entryDisplayId,
+      rootUrl,
+    ),
+  });
+  const result = await buildModuleGraph(
+    babelModuleFrontend,
+    {
+      load(canonicalId, referrer) {
+        return canonicalId === entryId
+          ? Promise.resolve({
+              diagnostics: [],
+              source: {
+                source,
+                sourceHash: hashModuleSource(source),
+                sourceId: entryId,
+              },
+            })
+          : fileLoader.load(canonicalId, referrer);
+      },
+    },
+    fileModuleResolver,
+    entryId,
+  );
+  if (result.graph == null) {
+    return {
+      compileDiagnostics: [],
+      entryDisplayId,
+      graphDiagnostics: result.diagnostics.map(displayDiagnostic),
+    };
+  }
+  const nodes = result.graph.modules.map((module) => ({
+    dependencies: module.dependencies.map((dependency) =>
+      relativeModuleId(
+        dependency.canonicalId,
+        entryId,
+        entryDisplayId,
+        rootUrl,
+      ),
+    ),
+    id: relativeModuleId(module.canonicalId, entryId, entryDisplayId, rootUrl),
+    sourceHash: module.sourceHash,
+  }));
+  const compiled = compileModuleGraph(result.graph, {
+    specialization: "disabled",
+  });
+  return {
+    compileDiagnostics: compiled.diagnostics.map(displayDiagnostic),
+    entryDisplayId,
+    graphDiagnostics: result.diagnostics.map(displayDiagnostic),
+    nodes,
+  };
+}
+
+function diagnosticDetail(diagnostic: Diagnostic): string {
+  return renderDiagnostic(diagnostic);
+}
+
+/**
+ * Map an owned pre-execution diagnostic to the test262 phase it evidences.
+ * An entry parse rejection is a parse failure; a parse rejection in a
+ * requested dependency surfaces while resolving the graph, so the importing
+ * case observes a resolution failure. Link failures (OSEO2001 at this
+ * stage) occur before any evaluation and correspond to the specification's
+ * resolution-phase failures. Among OSEO3001 host diagnostics, only a
+ * missing module source evidences resolution semantics; an unsupported
+ * specifier form is a resolution-profile gap, and any other host failure
+ * stays unmapped so it can never match an expected negative. OSEO1001
+ * means the body uses syntax outside the admitted profile, which is a
+ * profile gap rather than an observed negative.
+ */
+function moduleFailurePhase(
+  diagnostic: Diagnostic,
+  entryId: string,
+): Test262FailurePhase | undefined {
+  if (diagnostic.code === "OSEO0001") {
+    return diagnostic.sourceId === entryId ? "parse" : "resolution";
+  }
+  if (diagnostic.code === "OSEO2001") return "resolution";
+  if (
+    diagnostic.code === "OSEO3001" &&
+    diagnostic.message === "The module source could not be read."
+  ) {
+    return "resolution";
+  }
+  return undefined;
+}
+
+/** An owned diagnostic that names a profile gap rather than a negative. */
+function unsupportedModuleCapability(
+  diagnostic: Diagnostic,
+): string | undefined {
+  if (diagnostic.code === "OSEO1001") return "profile-syntax";
+  if (
+    diagnostic.code === "OSEO3001" &&
+    diagnostic.message.startsWith("Unsupported module specifier")
+  ) {
+    return "module-resolution-profile";
+  }
+  return undefined;
+}
+
+async function moduleNegativeResult(
+  source: string,
+  parsed: ParsedTest262Case,
+  supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence,
+  harnesses: Test262Harnesses,
+  sourcePath: string,
+  rootPath: string,
+): Promise<Test262Result> {
+  const testCase = parsed.case;
+  let assembled: string;
+  try {
+    assembled = assembleTest262Source(
+      source,
+      "strict",
+      testCase,
+      harnesses,
+      parsed.flags.includes("raw"),
+    );
+  } catch (error) {
+    return classifyTest262(
+      testCase,
+      {
+        detail: errorMessage(error),
+        harnessFailed: true,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence,
+    );
+  }
+  const graph = await buildEntryGraph(
+    assembled,
+    sourcePath,
+    testCase.path,
+    rootPath,
+  );
+  const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
+  if (diagnostic == null) {
+    return classifyTest262(
+      testCase,
+      {
+        detail: "Module linking unexpectedly succeeded.",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence,
+    );
+  }
+  const unsupportedCapability = unsupportedModuleCapability(diagnostic);
+  if (unsupportedCapability != null) {
+    return classifyTest262(
+      testCase,
+      {
+        detail: diagnosticDetail(diagnostic),
+        harnessFailed: false,
+        passed: false,
+        unsupportedCapability,
+      },
+      supportedFeatures,
+      evidence,
+    );
+  }
+  const failedPhase = moduleFailurePhase(diagnostic, graph.entryDisplayId);
+  return classifyTest262(
+    testCase,
+    {
+      detail: diagnosticDetail(diagnostic),
+      errorType: "SyntaxError",
+      ...(failedPhase == null ? {} : { failedPhase }),
+      harnessFailed: false,
+      passed: false,
+    },
+    supportedFeatures,
+    evidence,
   );
 }
 
@@ -330,8 +668,95 @@ async function executedResult(
   supportedFeatures: ReadonlySet<string>,
   harnesses: Test262Harnesses,
   executor: Test262Executor,
+  dependencies: readonly string[],
+  sourcePath?: string,
+  rootPath?: string,
 ): Promise<Test262Result> {
   const testCase = parsed.case;
+  const scheduled = testCase.mode === "module" || testCase.async;
+  const variants: Test262Variant[] = [];
+  let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
+  const execution = (): Test262Execution => ({
+    harnessIncludes: parsed.flags.includes("raw")
+      ? []
+      : harnessIncludeNames(testCase),
+    ...(moduleGraph == null ? {} : { moduleGraph }),
+    ...(scheduled ? { scheduler: "deterministic-logical-clock" as const } : {}),
+    target: executionTarget,
+    variants,
+  });
+  const evidence = (): Test262Evidence => ({
+    dependencies,
+    execution: execution(),
+  });
+  if (testCase.mode === "module") {
+    if (sourcePath == null || rootPath == null) {
+      return classifyTest262(
+        testCase,
+        {
+          detail: "Module execution needs the upstream source path.",
+          harnessFailed: true,
+          passed: false,
+        },
+        supportedFeatures,
+        { dependencies },
+      );
+    }
+    let assembled: string;
+    try {
+      assembled = assembleTest262Source(
+        source,
+        "strict",
+        testCase,
+        harnesses,
+        parsed.flags.includes("raw"),
+      );
+    } catch (error) {
+      return classifyTest262(
+        testCase,
+        {
+          detail: errorMessage(error),
+          harnessFailed: true,
+          passed: false,
+        },
+        supportedFeatures,
+        { dependencies },
+      );
+    }
+    const graph = await buildEntryGraph(
+      assembled,
+      sourcePath,
+      testCase.path,
+      rootPath,
+    );
+    moduleGraph = graph.nodes;
+    const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
+    if (diagnostic != null) {
+      const unsupportedCapability = unsupportedModuleCapability(diagnostic);
+      const failedPhase = moduleFailurePhase(diagnostic, graph.entryDisplayId);
+      // No native variant executed, so the result carries no execution
+      // evidence per the ADR 0013 schema.
+      return classifyTest262(
+        testCase,
+        {
+          detail: diagnosticDetail(diagnostic),
+          ...(unsupportedCapability != null ? { unsupportedCapability } : {}),
+          ...(unsupportedCapability == null && failedPhase != null
+            ? { failedPhase }
+            : {}),
+          harnessFailed: false,
+          passed: false,
+        },
+        supportedFeatures,
+        { dependencies },
+      );
+    }
+  }
+  interface VariantObservation {
+    readonly observation: CliResult;
+    readonly variant: Test262Variant;
+  }
+  const observations: VariantObservation[] = [];
   for (const strictnessMode of testCase.strictness) {
     let input: string;
     try {
@@ -351,15 +776,21 @@ async function executedResult(
           passed: false,
         },
         supportedFeatures,
+        { dependencies },
       );
     }
-    const observations: CliResult[] = [];
     for (const specialization of ["disabled", "enabled"] as const) {
+      const variant: Test262Variant = {
+        specialization,
+        strictness: strictnessMode,
+      };
       let observation: CliResult;
       try {
         observation = await executor.execute({
+          mode: testCase.mode,
           source: input,
           sourceId: testCase.path,
+          ...(sourcePath == null ? {} : { sourcePath }),
           specialization,
         });
       } catch (error) {
@@ -371,27 +802,16 @@ async function executedResult(
             passed: false,
           },
           supportedFeatures,
+          evidence(),
         );
       }
-      observations.push(observation);
-      if (observation.exitStatus !== 0 && infrastructureFailure(observation)) {
-        return classifyTest262(
-          testCase,
-          {
-            detail: detail(
-              testCase,
-              strictnessMode,
-              specialization,
-              observation,
-            ),
-            failedPhase: "runtime",
-            harnessFailed: true,
-            passed: false,
-          },
-          supportedFeatures,
-        );
-      }
+      variants.push(variant);
+      observations.push({ observation, variant });
       if (observation.exitStatus !== 0) {
+        const unsupportedSyntax =
+          observation.stderr.includes("error[OSEO1001]");
+        // An OSEO1001 exit is a compile-stage rejection: no native variant
+        // executed, so the result carries no execution evidence.
         return classifyTest262(
           testCase,
           {
@@ -401,40 +821,78 @@ async function executedResult(
               specialization,
               observation,
             ),
-            failedPhase: "runtime",
-            harnessFailed: false,
+            ...(unsupportedSyntax
+              ? { unsupportedCapability: "profile-syntax" }
+              : { failedPhase: "runtime" as const }),
+            harnessFailed:
+              !unsupportedSyntax && infrastructureFailure(observation),
             passed: false,
           },
           supportedFeatures,
+          unsupportedSyntax ? { dependencies } : evidence(),
         );
       }
     }
-    const disabled = observations[0];
-    const enabled = observations[1];
-    if (
-      disabled == null ||
-      enabled == null ||
-      disabled.exitStatus !== enabled.exitStatus ||
-      disabled.stdout !== enabled.stdout ||
-      disabled.stderr !== enabled.stderr
-    ) {
-      return classifyTest262(
-        testCase,
-        {
-          detail: `${testCase.path} specialization observations differ.`,
-          failedPhase: "runtime",
-          harnessFailed: false,
-          passed: false,
-        },
-        supportedFeatures,
-      );
-    }
+  }
+  const baseline = observations[0];
+  const diverging =
+    baseline == null
+      ? undefined
+      : observations.find(
+          (entry) =>
+            entry.observation.exitStatus !== baseline.observation.exitStatus ||
+            entry.observation.stdout !== baseline.observation.stdout ||
+            entry.observation.stderr !== baseline.observation.stderr,
+        );
+  if (baseline != null && diverging != null) {
+    return classifyTest262(
+      testCase,
+      {
+        detail:
+          `${testCase.path} observations diverge between ` +
+          `${baseline.variant.strictness} ${baseline.variant.specialization} ` +
+          `and ${diverging.variant.strictness} ` +
+          `${diverging.variant.specialization}.`,
+        failedPhase: "runtime",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
+  }
+  if (
+    testCase.async &&
+    baseline != null &&
+    !asyncObservationCompleted(baseline.observation.stdout)
+  ) {
+    return classifyTest262(
+      testCase,
+      {
+        detail:
+          `${testCase.path} finished without printing ` +
+          `${asyncCompletionMarker}: ` +
+          `stdout=${JSON.stringify(baseline.observation.stdout)}`,
+        failedPhase: "runtime",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
   }
   return classifyTest262(
     testCase,
     { harnessFailed: false, passed: true },
     supportedFeatures,
+    evidence(),
   );
+}
+
+/** Locations a module case needs beyond its in-memory source. */
+export interface Test262CaseLocation {
+  readonly rootPath: string;
+  readonly sourcePath: string;
 }
 
 /** Execute and classify one parsed upstream case. */
@@ -444,35 +902,72 @@ export async function executeTest262Case(
   supportedFeatures: ReadonlySet<string>,
   harnesses: Test262Harnesses,
   executor: Test262Executor,
+  dependencies: readonly string[] = [],
+  location?: Test262CaseLocation,
 ): Promise<Test262Result> {
+  const evidence: Test262Evidence = { dependencies };
   const unsupported = parsed.case.features.some(
     (feature) => !supportedFeatures.has(feature),
   );
-  if (unsupported) return unsupportedResult(parsed.case, supportedFeatures);
-  if (parsed.flags.includes("module") || parsed.flags.includes("async")) {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail: "The M3 runner supports synchronous Script cases only.",
-        harnessFailed: true,
-        passed: false,
-      },
-      supportedFeatures,
-    );
-  }
-  if (parsed.case.expectedFailurePhase === "parse") {
-    return parseNegativeResult(source, parsed.case, supportedFeatures);
+  if (unsupported) {
+    return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
   if (parsed.case.expectedFailurePhase === "runtime") {
     return classifyTest262(
       parsed.case,
       {
-        detail: "M3 cannot observe the type of an unhandled JavaScript throw.",
+        detail:
+          "The runner cannot observe the type of an unhandled JavaScript " +
+          "throw.",
         harnessFailed: false,
         passed: false,
         unsupportedCapability: "runtime-error-types",
       },
       supportedFeatures,
+      evidence,
+    );
+  }
+  if (parsed.case.mode === "module") {
+    if (location == null) {
+      return classifyTest262(
+        parsed.case,
+        {
+          detail: "Module execution needs the upstream source path.",
+          harnessFailed: true,
+          passed: false,
+        },
+        supportedFeatures,
+        evidence,
+      );
+    }
+    if (parsed.case.expectedFailurePhase != null) {
+      return await moduleNegativeResult(
+        source,
+        parsed,
+        supportedFeatures,
+        evidence,
+        harnesses,
+        location.sourcePath,
+        location.rootPath,
+      );
+    }
+    return await executedResult(
+      source,
+      parsed,
+      supportedFeatures,
+      harnesses,
+      executor,
+      dependencies,
+      location.sourcePath,
+      location.rootPath,
+    );
+  }
+  if (parsed.case.expectedFailurePhase === "parse") {
+    return parseNegativeResult(
+      source,
+      parsed.case,
+      supportedFeatures,
+      evidence,
     );
   }
   return await executedResult(
@@ -481,6 +976,9 @@ export async function executeTest262Case(
     supportedFeatures,
     harnesses,
     executor,
+    dependencies,
+    location?.sourcePath,
+    location?.rootPath,
   );
 }
 
@@ -488,7 +986,10 @@ export async function executeTest262Case(
 export function serializeTest262Manifest(
   manifest: ReviewedTest262Manifest,
 ): string {
-  return stringifyYaml(manifest, { lineWidth: 80 });
+  // The serializer counts a folded line's width without its indentation, so
+  // the limit stays below the repository's 80-column rule by the deepest
+  // indentation a detail string receives.
+  return stringifyYaml(manifest, { lineWidth: 72 });
 }
 
 function validateReviewedResults(
@@ -543,7 +1044,9 @@ async function suiteRoot(revision: string): Promise<string> {
 async function readHarnesses(): Promise<Test262Harnesses> {
   return {
     base: await readFile(baseHarnessPath, "utf8"),
+    done: await readFile(doneHarnessPath, "utf8"),
     includes: new Map([
+      ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
     ]),
   };
@@ -551,10 +1054,15 @@ async function readHarnesses(): Promise<Test262Harnesses> {
 
 const nativeExecutor: Test262Executor = {
   async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-    const args =
-      request.specialization === "disabled"
-        ? ["--no-specialization", request.sourceId]
-        : [request.sourceId];
+    const entry =
+      request.mode === "module" && request.sourcePath != null
+        ? request.sourcePath
+        : request.sourceId;
+    const args = [
+      ...(request.mode === "module" ? ["--module"] : []),
+      ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
+      entry,
+    ];
     return await runNativeCli({
       args,
       source: request.source,
@@ -574,7 +1082,8 @@ export async function createReviewedManifest(
   const supportedFeatures = new Set(subset.supportedFeatures);
   const results: Test262Result[] = [];
   for (const entry of subset.tests) {
-    const source = await readFile(join(root, entry.path), "utf8");
+    const sourcePath = join(root, entry.path);
+    const source = await readFile(sourcePath, "utf8");
     const parsed = parseTest262Case(source, entry.path, subset.suiteRevision);
     results.push(
       await executeTest262Case(
@@ -583,6 +1092,8 @@ export async function createReviewedManifest(
         supportedFeatures,
         harnesses,
         executor,
+        entry.dependencies,
+        { rootPath: root, sourcePath },
       ),
     );
   }
@@ -632,7 +1143,7 @@ async function main(): Promise<void> {
   console.log(
     `test262 revision=${manifest.suiteRevision} ` +
       `pass=${manifest.summary.passes} ` +
-      `expected-parse=${manifest.summary.expectedParseFailures} ` +
+      `expected-negative=${manifest.summary.expectedNegatives} ` +
       `unsupported=${manifest.summary.unsupportedProfileFeatures}`,
   );
 }

@@ -5,6 +5,7 @@ import {
   assertMatchingObservations,
   classifyTest262,
   summarizeTest262,
+  test262Group,
   withNativeFixture,
 } from "../src/index.ts";
 import type { NativeFixtureOptions } from "../src/index.ts";
@@ -197,9 +198,12 @@ test("separates private runtime counters from fixture stderr", async () => {
 
 test("classifies test262 results without inflating passes", () => {
   const base = {
+    async: false,
     features: ["object-spread"],
+    flags: [],
     includes: ["assert.js"],
-    path: "language/expressions/object/basic.js",
+    mode: "script",
+    path: "test/language/expressions/object/basic.js",
     strictness: ["non-strict", "strict"],
     suiteRevision: "test-revision",
   } as const;
@@ -207,19 +211,50 @@ test("classifies test262 results without inflating passes", () => {
     base,
     { harnessFailed: false, passed: true },
     new Set<string>(),
+    { dependencies: ["object-properties"] },
   );
   const harness = classifyTest262(
     { ...base, features: [] },
     { detail: "include missing", harnessFailed: true, passed: false },
     new Set<string>(),
+    { dependencies: ["object-properties"] },
   );
-  const expectedParse = classifyTest262(
+  const expectedNegative = classifyTest262(
     { ...base, expectedFailurePhase: "parse", features: [] },
     { failedPhase: "parse", harnessFailed: false, passed: false },
     new Set<string>(),
+    { dependencies: ["functions"] },
   );
-  assert.deepEqual(summarizeTest262([unsupported, harness, expectedParse]), {
-    expectedParseFailures: 1,
+  assert.deepEqual(summarizeTest262([unsupported, harness, expectedNegative]), {
+    dependencies: [
+      {
+        dependency: "functions",
+        expectedNegatives: 1,
+        harnessFailures: 0,
+        passes: 0,
+        semanticFailures: 0,
+        unsupportedProfileFeatures: 0,
+      },
+      {
+        dependency: "object-properties",
+        expectedNegatives: 0,
+        harnessFailures: 1,
+        passes: 0,
+        semanticFailures: 0,
+        unsupportedProfileFeatures: 1,
+      },
+    ],
+    expectedNegatives: 1,
+    groups: [
+      {
+        expectedNegatives: 1,
+        group: "language/expressions",
+        harnessFailures: 1,
+        passes: 0,
+        semanticFailures: 0,
+        unsupportedProfileFeatures: 1,
+      },
+    ],
     harnessFailures: 1,
     passes: 0,
     semanticFailures: 0,
@@ -227,13 +262,28 @@ test("classifies test262 results without inflating passes", () => {
   });
 });
 
+test("derives dependency-indexed path groups from upstream paths", () => {
+  assert.equal(
+    test262Group("test/built-ins/Object/keys/15.2.3.14-1-1.js"),
+    "built-ins/Object",
+  );
+  assert.equal(
+    test262Group("test/language/module-code/top-level-await/dfs-invariant.js"),
+    "language/module-code",
+  );
+  assert.equal(test262Group("test/language/example.js"), "language");
+});
+
 test("requires the declared phase for negative test262 cases", () => {
   const result = classifyTest262(
     {
+      async: false,
       expectedFailurePhase: "runtime",
       features: [],
+      flags: [],
       includes: [],
-      path: "language/statements/throw/runtime.js",
+      mode: "script",
+      path: "test/language/statements/throw/runtime.js",
       strictness: ["non-strict"],
       suiteRevision: "test-revision",
     },
@@ -246,11 +296,14 @@ test("requires the declared phase for negative test262 cases", () => {
 test("classifies unavailable observation capabilities as unsupported", () => {
   const result = classifyTest262(
     {
+      async: false,
       expectedErrorType: "TypeError",
       expectedFailurePhase: "runtime",
       features: [],
+      flags: [],
       includes: [],
-      path: "language/statements/throw/runtime.js",
+      mode: "script",
+      path: "test/language/statements/throw/runtime.js",
       strictness: ["non-strict"],
       suiteRevision: "test-revision",
     },
@@ -268,8 +321,10 @@ test("classifies unavailable observation capabilities as unsupported", () => {
 
 test("classifies early errors and resolution failures", () => {
   const base = {
+    async: false,
     expectedErrorType: "SyntaxError",
     features: [],
+    flags: [],
     includes: [],
     strictness: ["non-strict"],
     suiteRevision: "test-revision",
@@ -278,7 +333,8 @@ test("classifies early errors and resolution failures", () => {
     {
       ...base,
       expectedFailurePhase: "parse",
-      path: "language/expressions/let/dstr/dup-lexical.js",
+      mode: "script",
+      path: "test/language/expressions/let/dstr/dup-lexical.js",
     },
     {
       errorType: "SyntaxError",
@@ -292,7 +348,8 @@ test("classifies early errors and resolution failures", () => {
     {
       ...base,
       expectedFailurePhase: "resolution",
-      path: "language/module-code/instn-resolve.js",
+      mode: "module",
+      path: "test/language/module-code/instn-resolve.js",
     },
     {
       errorType: "SyntaxError",
@@ -302,17 +359,20 @@ test("classifies early errors and resolution failures", () => {
     },
     new Set<string>(),
   );
-  assert.equal(earlyError.classification, "expected-parse-failure");
-  assert.equal(resolution.classification, "pass");
+  assert.equal(earlyError.classification, "expected-negative");
+  assert.equal(resolution.classification, "expected-negative");
 });
 
 test("requires the declared error type for negative test262 cases", () => {
   const testCase = {
+    async: false,
     expectedErrorType: "TypeError",
     expectedFailurePhase: "runtime",
     features: [],
+    flags: [],
     includes: [],
-    path: "language/expressions/property/runtime.js",
+    mode: "script",
+    path: "test/language/expressions/property/runtime.js",
     strictness: ["non-strict"],
     suiteRevision: "test-revision",
   } as const;
@@ -337,5 +397,5 @@ test("requires the declared error type for negative test262 cases", () => {
     new Set<string>(),
   );
   assert.equal(mismatch.classification, "semantic-failure");
-  assert.equal(match.classification, "pass");
+  assert.equal(match.classification, "expected-negative");
 });
