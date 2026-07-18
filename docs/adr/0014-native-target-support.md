@@ -93,6 +93,26 @@ The AArch64 runs exercise every admitted heap kind under forced collection and
 sanitizers without reaching that failure.
 
 
+Final gate evidence
+-------------------
+
+[GitHub Actions run 29653610576] verified commit `c4b0fac` from clean Ubuntu
+and macOS checkouts. Both native jobs ran `mise run check`, `mise run test`,
+and `mise run test:property:extended` successfully. The step timestamps and
+complete job durations were:
+
+| Native job                 | Check | Aggregate test | Extended properties | Job total |
+| -------------------------- | ----: | -------------: | ------------------: | --------: |
+| Ubuntu, `linux-x86_64-gnu` |  16 s |     4 min 37 s |          3 min 49 s | 9 min 9 s |
+| macOS, `macos-aarch64`     |  21 s |      3 min 2 s |           3 min 4 s | 7 min 9 s |
+
+The job totals include checkout, tool installation, and cleanup. The measured
+times leave more than 35 minutes of headroom under the 45-minute native-job
+limit.
+
+[GitHub Actions run 29653610576]: https://github.com/dahlia/oseo/actions/runs/29653610576
+
+
 Observed results
 ----------------
 
@@ -204,9 +224,9 @@ Reopen this decision if:
 Links
 -----
 
- -  [*PLAN-MACOS.md*](../../PLAN-MACOS.md) defines the delivery and exit
-    criteria implemented by this record.
  -  [*DESIGN.md*](../../DESIGN.md) defines the target-neutral compiler and
     runtime boundaries.
+ -  [ADR 0015](./0015-native-target-identifiers.md) defines stable Oseo target
+    IDs and their toolchain mapping boundary.
  -  [ADR 0013](./0013-m5-edition-and-manifest.md) defines the compatibility
     counting and manifest contracts retained here.

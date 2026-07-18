@@ -13,11 +13,11 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
-The macOS AArch64 native execution work in
-[*PLAN-MACOS.md*](./PLAN-MACOS.md) is complete. Linux on AMD64 and macOS on
-AArch64 execute the same native semantic corpus, while AArch64 Linux retains
-compile-link and inspection evidence. This target expansion does not change the
-current language profile or compatibility counts by itself.
+The macOS AArch64 native execution work accepted by
+[ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
+and macOS on AArch64 execute the same native semantic corpus, while AArch64
+Linux retains compile-link and inspection evidence. This target expansion does
+not change the current language profile or compatibility counts by itself.
 
 This is a living document, not a fixed schedule or a promise that development
 will follow the current sequence unchanged. Milestones, scope, and exit criteria
