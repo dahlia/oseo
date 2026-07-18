@@ -2155,6 +2155,24 @@ assert.match(
   /rejection-location\/dep\.mjs:2:3: error\[OSEO2001\]/u,
 );
 
+const topLevelAwaitRejection = await runNativeCli(
+  {
+    args: ["top-level-await-rejection.mjs"],
+    source: `console.log("before rejection");
+await Promise.reject("bad");
+`,
+    sourceId: "top-level-await-rejection.mjs",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(topLevelAwaitRejection.exitStatus, 1);
+assert.equal(topLevelAwaitRejection.stdout, "before rejection\n");
+assert.match(
+  topLevelAwaitRejection.stderr,
+  /top-level-await-rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
+);
+
 console.log(
   `native fixtures: ${fixtures.length} Node, Deno, and x86-64 outputs match`,
 );

@@ -5186,6 +5186,11 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
         OseoPromise *awaited = promise_object(frame.slots[1]);
         result.value = awaited->result;
         if (awaited->state == OSEO_PROMISE_REJECTED) {
+            context->source_id = awaited->rejection_source_id;
+            context->source_id_length =
+                awaited->rejection_source_id_length;
+            context->line = awaited->rejection_line;
+            context->column = awaited->rejection_column;
             result.status = OSEO_STATUS_THROW;
         }
     }
