@@ -621,6 +621,15 @@ test("classifies module negatives by owned diagnostic phase", async () => {
     );
     assert.equal(missingFile.classification, "expected-negative");
     assert.equal(missingFile.observation.failedPhase, "resolution");
+    const bareSpecifier = await run(
+      'import { gone } from "package-name";\n',
+      "resolution",
+    );
+    assert.equal(bareSpecifier.classification, "unsupported-profile-feature");
+    assert.equal(
+      bareSpecifier.observation.unsupportedCapability,
+      "module-resolution-profile",
+    );
   } finally {
     await rm(directory, { force: true, recursive: true });
   }

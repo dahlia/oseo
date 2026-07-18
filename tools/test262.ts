@@ -543,11 +543,14 @@ function diagnosticDetail(diagnostic: Diagnostic): string {
  * Map an owned pre-execution diagnostic to the test262 phase it evidences.
  * An entry parse rejection is a parse failure; a parse rejection in a
  * requested dependency surfaces while resolving the graph, so the importing
- * case observes a resolution failure. Link and loader failures (OSEO2001
- * and OSEO3001 at this stage) occur before any evaluation and correspond to
- * the specification's resolution-phase failures. OSEO1001 means the body
- * uses syntax outside the admitted profile, which is a profile gap rather
- * than an observed negative.
+ * case observes a resolution failure. Link failures (OSEO2001 at this
+ * stage) occur before any evaluation and correspond to the specification's
+ * resolution-phase failures. Among OSEO3001 host diagnostics, only a
+ * missing module source evidences resolution semantics; an unsupported
+ * specifier form is a resolution-profile gap, and any other host failure
+ * stays unmapped so it can never match an expected negative. OSEO1001
+ * means the body uses syntax outside the admitted profile, which is a
+ * profile gap rather than an observed negative.
  */
 function moduleFailurePhase(
   diagnostic: Diagnostic,
@@ -556,8 +559,26 @@ function moduleFailurePhase(
   if (diagnostic.code === "OSEO0001") {
     return diagnostic.sourceId === entryId ? "parse" : "resolution";
   }
-  if (diagnostic.code === "OSEO2001" || diagnostic.code === "OSEO3001") {
+  if (diagnostic.code === "OSEO2001") return "resolution";
+  if (
+    diagnostic.code === "OSEO3001" &&
+    diagnostic.message === "The module source could not be read."
+  ) {
     return "resolution";
+  }
+  return undefined;
+}
+
+/** An owned diagnostic that names a profile gap rather than a negative. */
+function unsupportedModuleCapability(
+  diagnostic: Diagnostic,
+): string | undefined {
+  if (diagnostic.code === "OSEO1001") return "profile-syntax";
+  if (
+    diagnostic.code === "OSEO3001" &&
+    diagnostic.message.startsWith("Unsupported module specifier")
+  ) {
+    return "module-resolution-profile";
   }
   return undefined;
 }
@@ -612,14 +633,15 @@ async function moduleNegativeResult(
       evidence,
     );
   }
-  if (diagnostic.code === "OSEO1001") {
+  const unsupportedCapability = unsupportedModuleCapability(diagnostic);
+  if (unsupportedCapability != null) {
     return classifyTest262(
       testCase,
       {
         detail: diagnosticDetail(diagnostic),
         harnessFailed: false,
         passed: false,
-        unsupportedCapability: "profile-syntax",
+        unsupportedCapability,
       },
       supportedFeatures,
       evidence,
@@ -710,6 +732,7 @@ async function executedResult(
     moduleGraph = graph.nodes;
     const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
     if (diagnostic != null) {
+      const unsupportedCapability = unsupportedModuleCapability(diagnostic);
       const failedPhase = moduleFailurePhase(diagnostic, graph.entryDisplayId);
       // No native variant executed, so the result carries no execution
       // evidence per the ADR 0013 schema.
@@ -717,10 +740,8 @@ async function executedResult(
         testCase,
         {
           detail: diagnosticDetail(diagnostic),
-          ...(diagnostic.code === "OSEO1001"
-            ? { unsupportedCapability: "profile-syntax" }
-            : {}),
-          ...(diagnostic.code !== "OSEO1001" && failedPhase != null
+          ...(unsupportedCapability != null ? { unsupportedCapability } : {}),
+          ...(unsupportedCapability == null && failedPhase != null
             ? { failedPhase }
             : {}),
           harnessFailed: false,
