@@ -97,7 +97,11 @@ export interface Test262Variant {
   readonly strictness: Test262Strictness;
 }
 
-/** Canonical identity evidence for one linked module. */
+/**
+ * Linked-module evidence for one reviewed case. Identities are relative to
+ * the pinned suite root, and the entry records its upstream test path, so a
+ * manifest never contains host-specific canonical URLs.
+ */
 export interface Test262ModuleGraphNode {
   readonly dependencies: readonly string[];
   readonly id: string;

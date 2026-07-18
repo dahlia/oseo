@@ -127,9 +127,9 @@ results:
       variants:           # every executed combination, in order
         - { strictness: strict, specialization: disabled }
         - { strictness: strict, specialization: enabled }
-      moduleGraph:        # module cases: canonical identity and edges
-        - id: <canonical entry url>
-          dependencies: [<canonical dependency url>]
+      moduleGraph:        # module cases: linked identity and edges
+        - id: test/language/module-code/example.js
+          dependencies: [test/language/module-code/example_FIXTURE.js]
           sourceHash: <hash>
     observation:
       passed: false
@@ -177,6 +177,11 @@ between executed variants as a semantic failure whose recorded detail names
 the diverging strictness and specialization combination, so a recorded
 observation is proven identical across every listed variant. The `variants`
 list is the evidence that each combination executed.
+
+Module-graph identities are recorded relative to the pinned suite root, and
+the entry records its upstream test path, so the checked-in manifest never
+contains host-specific canonical URLs. The entry's `sourceHash` hashes the
+executed input, which includes the assembled harness.
 
 Unsupported and harness results never increase the pass count. Summaries
 keep raw totals, dependency-indexed group totals derived deterministically

@@ -1607,6 +1607,21 @@ function moduleProgram(
         body.push(converted);
         exports.push(exportEntry);
       }
+      if (
+        declarationNode == null &&
+        specifier != null &&
+        nodes(item.specifiers).length === 0
+      ) {
+        // An empty indirect export list contributes no export entry, but
+        // its FromClause still joins the module's requested dependencies.
+        imports.push({
+          ...location(context, item),
+          importedName: undefined,
+          localName: undefined,
+          specifier,
+        });
+        continue;
+      }
       for (const rawSpecifier of nodes(item.specifiers)) {
         if (rawSpecifier.exportKind === "type") {
           unsupported(

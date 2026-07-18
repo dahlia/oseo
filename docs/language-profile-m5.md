@@ -104,10 +104,26 @@ from the expected classifications. `mise run test262:update` regenerates
 *results.yaml* after a reviewed change. Applicable Script cases execute in
 every requested strictness mode, and every executed case compares
 specialization-disabled and specialization-enabled native observations with
-collection forced at every safepoint. The current runner executes
-synchronous Script cases only; executing module and asynchronous cases
-under the deterministic native scheduler is the harness expansion named as
-the second delivery item in [*PLAN-M5.md*](../PLAN-M5.md).
+collection forced at every safepoint.
+
+Module and asynchronous cases execute under the deterministic native
+scheduler. Module entries compile through the explicit CLI module goal with
+sibling fixtures loaded from the upstream checkout, and their linked graph
+is recorded as manifest evidence. Asynchronous cases insert the reviewed
+`$DONE` harness and pass only when the completion marker is the final
+output line, appears exactly once, and no failure marker was printed.
+Module negatives classify by the owned diagnostic phase: an entry parse
+rejection is a parse failure, while dependency parse rejections and link
+and loader failures are resolution failures observed before any
+evaluation.
+
+The reviewed harness deviates from the upstream test262 host contract in
+two documented ways. Harness sources are assembled into the compiled
+source, so in module cases they become module-scoped bindings instead of
+globals; a case whose fixtures need harness globals or whose bindings
+collide with harness names stays out of the reviewed subset. The reviewed
+`$DONE` prints the bare failure marker because the profile has no generic
+string coercion for arbitrary failure values yet.
 
 A newly supported feature moves tests out of `unsupported-profile-feature`
 only after every applicable variant executes. A changed upstream revision is
