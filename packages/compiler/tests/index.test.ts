@@ -1018,6 +1018,38 @@ test("preserves dependency order within a cyclic component", () => {
   ]);
 });
 
+test("links deep module graphs without using the host stack", () => {
+  const moduleCount = 5_000;
+  const modules = Array.from({ length: moduleCount }, (_, index) => {
+    const canonicalId = `file:///${index}.js`;
+    const dependencyId =
+      index + 1 < moduleCount ? `file:///${index + 1}.js` : undefined;
+    const specifier =
+      dependencyId == null ? undefined : graphSpecifier(`./${index + 1}.js`, 0);
+    const dependencies =
+      dependencyId == null || specifier == null
+        ? []
+        : [{ canonicalId: dependencyId, specifier }];
+    return {
+      canonicalId,
+      dependencies,
+      resolutions: dependencies,
+      sourceHash: String(index),
+      syntax: testModule(canonicalId, ""),
+    };
+  });
+  const result = linkModuleGraph({
+    entryId: modules[0]!.canonicalId,
+    kind: "module-graph",
+    modules,
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.equal(result.graph?.components.length, moduleCount);
+  assert.equal(result.graph?.evaluationOrder.length, moduleCount);
+  assert.equal(result.graph?.evaluationOrder[0], modules.at(-1)?.canonicalId);
+  assert.equal(result.graph?.evaluationOrder.at(-1), modules[0]?.canonicalId);
+});
+
 test("reports ambiguous star exports only when a binding requests them", () => {
   const left = graphSpecifier("./left.js", 0);
   const right = graphSpecifier("./right.js", 10);

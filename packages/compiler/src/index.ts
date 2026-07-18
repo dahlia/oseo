@@ -646,13 +646,29 @@ function moduleDepthFirstOrder(graph: ModuleGraph): readonly string[] {
   );
   const visited = new Set<string>();
   const order: string[] = [];
-  const visit = (moduleId: string): void => {
-    if (visited.has(moduleId)) return;
-    visited.add(moduleId);
-    for (const dependency of nodes.get(moduleId)?.dependencies ?? []) {
-      visit(dependency.canonicalId);
+  const visit = (rootId: string): void => {
+    if (visited.has(rootId)) return;
+    visited.add(rootId);
+    const frames: { dependencyIndex: number; moduleId: string }[] = [
+      { dependencyIndex: 0, moduleId: rootId },
+    ];
+    while (frames.length > 0) {
+      const frame = frames.at(-1)!;
+      const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
+      const dependency = dependencies[frame.dependencyIndex];
+      if (dependency != null) {
+        frame.dependencyIndex += 1;
+        if (visited.has(dependency.canonicalId)) continue;
+        visited.add(dependency.canonicalId);
+        frames.push({
+          dependencyIndex: 0,
+          moduleId: dependency.canonicalId,
+        });
+        continue;
+      }
+      order.push(frame.moduleId);
+      frames.pop();
     }
-    order.push(moduleId);
   };
   visit(graph.entryId);
   for (const moduleId of [...nodes.keys()].toSorted(compareCodeUnits)) {
@@ -672,47 +688,68 @@ function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
   const found: string[][] = [];
   let nextIndex = 0;
 
-  const connect = (moduleId: string): void => {
+  const begin = (moduleId: string): void => {
     const index = nextIndex;
     nextIndex += 1;
     indices.set(moduleId, index);
     lowLinks.set(moduleId, index);
     stack.push(moduleId);
     stacked.add(moduleId);
-    const module = nodes.get(moduleId);
-    for (const dependency of module?.dependencies ?? []) {
+  };
+
+  begin(graph.entryId);
+  const frames: { dependencyIndex: number; moduleId: string }[] = [
+    { dependencyIndex: 0, moduleId: graph.entryId },
+  ];
+  while (frames.length > 0) {
+    const frame = frames.at(-1)!;
+    const index = indices.get(frame.moduleId)!;
+    const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
+    const dependency = dependencies[frame.dependencyIndex];
+    if (dependency != null) {
+      frame.dependencyIndex += 1;
       if (!indices.has(dependency.canonicalId)) {
-        connect(dependency.canonicalId);
-        lowLinks.set(
-          moduleId,
-          Math.min(
-            lowLinks.get(moduleId) ?? index,
-            lowLinks.get(dependency.canonicalId) ?? index,
-          ),
-        );
+        begin(dependency.canonicalId);
+        frames.push({
+          dependencyIndex: 0,
+          moduleId: dependency.canonicalId,
+        });
       } else if (stacked.has(dependency.canonicalId)) {
         lowLinks.set(
-          moduleId,
+          frame.moduleId,
           Math.min(
-            lowLinks.get(moduleId) ?? index,
+            lowLinks.get(frame.moduleId) ?? index,
             indices.get(dependency.canonicalId) ?? index,
           ),
         );
       }
+      continue;
     }
-    if (lowLinks.get(moduleId) !== index) return;
-    const component: string[] = [];
-    for (;;) {
-      const member = stack.pop();
-      if (member == null) throw new Error("Module component stack underflow.");
-      stacked.delete(member);
-      component.push(member);
-      if (member === moduleId) break;
+    if (lowLinks.get(frame.moduleId) === index) {
+      const component: string[] = [];
+      for (;;) {
+        const member = stack.pop();
+        if (member == null) {
+          throw new Error("Module component stack underflow.");
+        }
+        stacked.delete(member);
+        component.push(member);
+        if (member === frame.moduleId) break;
+      }
+      found.push(component);
     }
-    found.push(component);
-  };
-
-  connect(graph.entryId);
+    frames.pop();
+    const parent = frames.at(-1);
+    if (parent != null) {
+      lowLinks.set(
+        parent.moduleId,
+        Math.min(
+          lowLinks.get(parent.moduleId) ?? index,
+          lowLinks.get(frame.moduleId) ?? index,
+        ),
+      );
+    }
+  }
   const evaluationOrder = moduleDepthFirstOrder(graph);
   const evaluationIndex = new Map(
     evaluationOrder.map((moduleId, index) => [moduleId, index]),
