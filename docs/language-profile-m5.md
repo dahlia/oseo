@@ -112,8 +112,11 @@ must never shrink by reclassification alone.
  -  `await` is restricted to the M4 positions; asynchronous generators,
     `for await`, and asynchronous module cycles are unsupported. Owner: the
     functions and executable syntax stream.
- -  `eval`, the `Function` constructor, and dynamic import await the
-    ahead-of-time decisions required by [*PLAN-M5.md*](../PLAN-M5.md).
+ -  `eval`, the `Function` constructor, and dynamic import stay explicitly
+    unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
+    Reviewed cases that need them carry the `dynamic-source` dependency
+    tag, and no release uses an unqualified conformance label while this
+    boundary stands.
  -  Realm creation beyond the initial realm, agent clusters, and shared
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.

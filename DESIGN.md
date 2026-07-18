@@ -361,9 +361,13 @@ job or timer can make progress. Asynchronous module cycles remain outside M4.
 
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native
-binary has been built. They remain outside the initial language profile.
-Supporting any of them requires an explicit design that does not quietly
-introduce an interpreter or JIT tier.
+binary has been built.
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps them outside
+the language profile with owned diagnostics and honest manifest
+classifications. Supporting any of them requires an explicit design that
+does not quietly introduce an interpreter or JIT tier; staged compilation
+is the recorded candidate for `eval`, and build-time-resolvable dynamic
+import remains a deferred admission with its own plan.
 
 Package resolution is separate from module semantics. Early milestones use
 explicit files or URLs. *package.json* `exports` and `imports`, CommonJS, and
@@ -560,13 +564,15 @@ Remaining architecture decisions
 --------------------------------
 
 M0 accepted the bootstrap parser, initial C boundary, x86-64 value layout,
-generic call result, and explicit root protocol. The following questions still
-need decision records before the affected implementation becomes a dependency
-of later milestones:
+generic call result, and explicit root protocol. ADR 0016 keeps `eval`, the
+`Function` constructor, and dynamic import explicitly unsupported during M5
+and names staged compilation as the only design-compatible route to
+admitting them later. The following questions still need decision records
+before the affected implementation becomes a dependency of later
+milestones:
 
  -  the long-term native code-generation backend;
  -  the native event-loop and system-library boundary;
- -  the treatment of dynamic source evaluation;
  -  the WebAssembly implementation strategy required by the intended WinterTC
     profile.
 

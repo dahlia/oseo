@@ -17,7 +17,16 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. Delivery items 4 through 9, from
+honest unsupported classifications.
+
+Delivery item 7 is resolved for dynamic source:
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
+`Function` constructor, and dynamic import explicitly unsupported with owned
+diagnostics and the `dynamic-source` manifest tag. Realms, agents, and
+shared memory remain classified through missing harness capabilities.
+Delivery item 4 is in progress: the `typeof`, `void`, and `%` operators are
+admitted with native differential, structural, and reviewed test262
+evidence. Delivery items 4 through 6, 8, and 9, from the remaining
 foundational expressions through closing the named edition, remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),

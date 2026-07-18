@@ -474,14 +474,16 @@ The compiler and runtime capability sequence is complete through M4. M5
 follows [*PLAN-M5.md*](./PLAN-M5.md). The first three steps are complete:
 the candidate edition boundary and manifest schema are frozen, the test262
 harness observes module and asynchronous execution, and the
-dependency-indexed baseline is published. The remaining queue is:
+dependency-indexed baseline is published.
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
+source challenge features through explicit unsupported classifications, and
+the core expression stream has begun with the `typeof`, `void`, and `%`
+operators. The remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.
 2.  Add built-in families and broader executable syntax in dependency order.
-3.  Resolve ahead-of-time challenge features through decisions or explicit
-    unsupported classifications.
-4.  Close the named edition with reproducible standards and generated
+3.  Close the named edition with reproducible standards and generated
     evidence.
 
 M5 preserves every earlier generic-fallback, forced-collection, sanitizer,
