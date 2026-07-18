@@ -50,10 +50,13 @@ throw 1;
   );
   assert.deepEqual(parsed, {
     case: {
+      async: false,
       expectedErrorType: "TypeError",
       expectedFailurePhase: "runtime",
       features: ["const"],
+      flags: ["onlyStrict"],
       includes: ["propertyHelper.js"],
+      mode: "script",
       path: "test/example.js",
       strictness: ["strict"],
       suiteRevision: revision,
@@ -82,8 +85,16 @@ test("requires sorted and unique reviewed paths", () => {
           suiteRevision: revision,
           supportedFeatures: [],
           tests: [
-            { expectedClassification: "pass", path: "test/z.js" },
-            { expectedClassification: "pass", path: "test/a.js" },
+            {
+              dependencies: ["functions"],
+              expectedClassification: "pass",
+              path: "test/z.js",
+            },
+            {
+              dependencies: ["functions"],
+              expectedClassification: "pass",
+              path: "test/a.js",
+            },
           ],
         }),
       ),
@@ -91,10 +102,61 @@ test("requires sorted and unique reviewed paths", () => {
   );
 });
 
+test("requires reviewed dependency tags from the frozen vocabulary", () => {
+  assert.throws(
+    () =>
+      parseReviewedSubset(
+        JSON.stringify({
+          suiteRevision: revision,
+          supportedFeatures: [],
+          tests: [{ expectedClassification: "pass", path: "test/a.js" }],
+        }),
+      ),
+    /at least one dependency tag/u,
+  );
+  assert.throws(
+    () =>
+      parseReviewedSubset(
+        JSON.stringify({
+          suiteRevision: revision,
+          supportedFeatures: [],
+          tests: [
+            {
+              dependencies: ["regular-expressions"],
+              expectedClassification: "pass",
+              path: "test/a.js",
+            },
+          ],
+        }),
+      ),
+    /unreviewed dependency tag/u,
+  );
+  assert.throws(
+    () =>
+      parseReviewedSubset(
+        JSON.stringify({
+          suiteRevision: revision,
+          supportedFeatures: [],
+          tests: [
+            {
+              dependencies: ["functions", "functions"],
+              expectedClassification: "pass",
+              path: "test/a.js",
+            },
+          ],
+        }),
+      ),
+    /repeats a dependency tag/u,
+  );
+});
+
 test("assembles strict source with reviewed includes in order", () => {
   const testCase: Test262Case = {
+    async: false,
     features: [],
+    flags: ["onlyStrict"],
     includes: ["propertyHelper.js"],
+    mode: "script",
     path: "test/example.js",
     strictness: ["strict"],
     suiteRevision: revision,
@@ -206,12 +268,24 @@ test("executes every strictness and specialization variant", async () => {
     new Set<string>(),
     harnesses,
     executor,
+    ["lexical-bindings"],
   );
   assert.equal(result.classification, "pass");
   assert.deepEqual(
     requests.map((request) => request.specialization),
     ["disabled", "enabled", "disabled", "enabled"],
   );
+  assert.deepEqual(result.dependencies, ["lexical-bindings"]);
+  assert.deepEqual(result.execution, {
+    harnessIncludes: ["base.js"],
+    target: "x86_64-linux-gnu",
+    variants: [
+      { specialization: "disabled", strictness: "non-strict" },
+      { specialization: "enabled", strictness: "non-strict" },
+      { specialization: "disabled", strictness: "strict" },
+      { specialization: "enabled", strictness: "strict" },
+    ],
+  });
 });
 
 test("rejects specialization observation differences", async () => {
@@ -239,6 +313,10 @@ test("rejects specialization observation differences", async () => {
     executor,
   );
   assert.equal(result.classification, "semantic-failure");
+  assert.match(
+    result.observation.detail ?? "",
+    /diverge between non-strict disabled and non-strict enabled/u,
+  );
 });
 
 test("keeps unobservable runtime-negative types unsupported", async () => {
@@ -310,7 +388,7 @@ flags: [onlyStrict]
     harnesses,
     executor,
   );
-  assert.equal(result.classification, "expected-parse-failure");
+  assert.equal(result.classification, "expected-negative");
   assert.equal(result.observation.errorType, "SyntaxError");
 });
 
@@ -319,7 +397,9 @@ test("serializes reviewed manifests without volatile metadata", () => {
     results: [],
     suiteRevision: revision,
     summary: {
-      expectedParseFailures: 0,
+      dependencies: [],
+      expectedNegatives: 0,
+      groups: [],
       harnessFailures: 0,
       passes: 0,
       semanticFailures: 0,

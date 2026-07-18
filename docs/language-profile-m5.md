@@ -29,10 +29,12 @@ a known language gap remains inside this boundary.
 The checked-in compatibility manifest under *tests/test262/* is the source
 of truth for progress against this boundary. *subset.yaml* pins the suite
 revision, supported features, and expected classifications; *results.yaml*
-records the reviewed observations. ADR 0013 freezes the accepted manifest
-schema and its five classifications; the checked-in manifest keeps the
-M3-era shape until the first M5 measurement change migrates it. Unsupported
-and harness results never increase the pass count.
+records the reviewed observations. The checked-in manifest implements the
+schema frozen by ADR 0013: five classifications with `expected-negative`
+covering matched negatives in every phase, execution evidence with the
+executed variants and target, reviewed dependency tags, and summaries with
+raw, path-group, and dependency totals. Unsupported and harness results
+never increase the pass count.
 
 
 Capability groups
@@ -43,9 +45,9 @@ the first two directory segments under *test/*, such as
 `language/module-code` or `built-ins/Promise`. The table names the groups
 the M5 measurement work tracks first and the contract that owns each; it
 is not exhaustive, because admitted syntax spans further groups such as
-`language/literals`. Measured coverage per group enters the *results.yaml*
-summary once the M5 manifest migration lands; a group may have an admitted
-subset before its first reviewed test262 cases land.
+`language/literals`. Measured coverage per group lives in the
+*results.yaml* summary; a group may have an admitted subset before its
+first reviewed test262 cases land.
 
 | Group                | Status  | Owning contract      |
 | -------------------- | ------- | -------------------- |

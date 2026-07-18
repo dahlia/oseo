@@ -13,14 +13,18 @@ import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 import {
   classifyTest262,
   summarizeTest262,
+  test262DependencyVocabulary,
 } from "../packages/testkit/src/index.ts";
 import type {
   Test262Case,
   Test262Classification,
+  Test262Evidence,
+  Test262Execution,
   Test262FailurePhase,
   Test262Result,
   Test262Strictness,
   Test262Summary,
+  Test262Variant,
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
@@ -34,12 +38,15 @@ const propertyHarnessPath = join(
 );
 
 const classifications = new Set<Test262Classification>([
-  "expected-parse-failure",
+  "expected-negative",
   "harness-failure",
   "pass",
   "semantic-failure",
   "unsupported-profile-feature",
 ]);
+
+/** The one native target the reviewed manifest currently executes on. */
+const executionTarget = "x86_64-linux-gnu";
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -52,20 +59,24 @@ export interface ParsedTest262Case {
   readonly flags: readonly string[];
 }
 
-/** One reviewed path and the classification it must retain. */
+/**
+ * One reviewed path, the classification it must retain, and the reviewed
+ * semantic dependency tags frozen by ADR 0013.
+ */
 export interface ReviewedTest262Entry {
+  readonly dependencies: readonly string[];
   readonly expectedClassification: Test262Classification;
   readonly path: string;
 }
 
-/** Pinned test262 revision and explicitly reviewed M3 source paths. */
+/** Pinned test262 revision and explicitly reviewed source paths. */
 export interface ReviewedTest262Subset {
   readonly suiteRevision: string;
   readonly supportedFeatures: readonly string[];
   readonly tests: readonly ReviewedTest262Entry[];
 }
 
-/** Deterministic checked-in observation of the reviewed M3 subset. */
+/** Deterministic checked-in observation of the reviewed subset. */
 export interface ReviewedTest262Manifest {
   readonly results: readonly Test262Result[];
   readonly suiteRevision: string;
@@ -160,6 +171,7 @@ export function parseTest262Case(
   const expected = negative(metadata.negative);
   return {
     case: {
+      async: flags.includes("async"),
       ...(expected == null
         ? {}
         : {
@@ -167,7 +179,9 @@ export function parseTest262Case(
             expectedFailurePhase: expected.phase,
           }),
       features: stringArray(metadata.features, `${path} features`),
+      flags,
       includes: stringArray(metadata.includes, `${path} includes`),
+      mode: flags.includes("module") ? "module" : "script",
       path,
       strictness: strictness(flags),
       suiteRevision,
@@ -193,7 +207,28 @@ export function parseReviewedSubset(text: string): ReviewedTest262Subset {
   }
   const tests = rawTests.map((value, index) => {
     const item = record(value, `test262 subset test ${index}`);
+    const dependencies = stringArray(
+      item.dependencies,
+      `test262 subset test ${index} dependencies`,
+    );
+    if (dependencies.length === 0) {
+      throw new Error(
+        `test262 subset test ${index} needs at least one dependency tag.`,
+      );
+    }
+    if (new Set(dependencies).size !== dependencies.length) {
+      throw new Error(`test262 subset test ${index} repeats a dependency tag.`);
+    }
+    for (const dependency of dependencies) {
+      if (!test262DependencyVocabulary.has(dependency)) {
+        throw new Error(
+          `test262 subset test ${index} has unreviewed dependency tag ` +
+            `${dependency}.`,
+        );
+      }
+    }
     return {
+      dependencies,
       expectedClassification: classification(item.expectedClassification),
       path: stringValue(item.path, `test262 subset test ${index} path`),
     };
@@ -273,16 +308,17 @@ function detail(
 function unsupportedResult(
   testCase: Test262Case,
   supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence,
 ): Test262Result {
   return classifyTest262(
     testCase,
     {
-      detail:
-        "Not executed because frontmatter requires an M3-external feature.",
+      detail: "Not executed: the frontmatter needs an unsupported feature.",
       harnessFailed: false,
       passed: false,
     },
     supportedFeatures,
+    evidence,
   );
 }
 
@@ -290,6 +326,7 @@ function parseNegativeResult(
   source: string,
   testCase: Test262Case,
   supportedFeatures: ReadonlySet<string>,
+  evidence: Test262Evidence,
 ): Test262Result {
   for (const strictnessMode of testCase.strictness) {
     const compiled = compileSource(babelFrontend, {
@@ -309,6 +346,7 @@ function parseNegativeResult(
           passed: diagnostic == null,
         },
         supportedFeatures,
+        evidence,
       );
     }
   }
@@ -321,7 +359,12 @@ function parseNegativeResult(
       passed: false,
     },
     supportedFeatures,
+    evidence,
   );
+}
+
+function harnessIncludeNames(testCase: Test262Case): readonly string[] {
+  return ["base.js", ...testCase.includes];
 }
 
 async function executedResult(
@@ -330,8 +373,26 @@ async function executedResult(
   supportedFeatures: ReadonlySet<string>,
   harnesses: Test262Harnesses,
   executor: Test262Executor,
+  dependencies: readonly string[],
 ): Promise<Test262Result> {
   const testCase = parsed.case;
+  const variants: Test262Variant[] = [];
+  const execution = (): Test262Execution => ({
+    harnessIncludes: parsed.flags.includes("raw")
+      ? []
+      : harnessIncludeNames(testCase),
+    target: executionTarget,
+    variants,
+  });
+  const evidence = (): Test262Evidence => ({
+    dependencies,
+    execution: execution(),
+  });
+  interface VariantObservation {
+    readonly observation: CliResult;
+    readonly variant: Test262Variant;
+  }
+  const observations: VariantObservation[] = [];
   for (const strictnessMode of testCase.strictness) {
     let input: string;
     try {
@@ -351,10 +412,14 @@ async function executedResult(
           passed: false,
         },
         supportedFeatures,
+        { dependencies },
       );
     }
-    const observations: CliResult[] = [];
     for (const specialization of ["disabled", "enabled"] as const) {
+      const variant: Test262Variant = {
+        specialization,
+        strictness: strictnessMode,
+      };
       let observation: CliResult;
       try {
         observation = await executor.execute({
@@ -371,26 +436,11 @@ async function executedResult(
             passed: false,
           },
           supportedFeatures,
+          evidence(),
         );
       }
-      observations.push(observation);
-      if (observation.exitStatus !== 0 && infrastructureFailure(observation)) {
-        return classifyTest262(
-          testCase,
-          {
-            detail: detail(
-              testCase,
-              strictnessMode,
-              specialization,
-              observation,
-            ),
-            failedPhase: "runtime",
-            harnessFailed: true,
-            passed: false,
-          },
-          supportedFeatures,
-        );
-      }
+      variants.push(variant);
+      observations.push({ observation, variant });
       if (observation.exitStatus !== 0) {
         return classifyTest262(
           testCase,
@@ -402,38 +452,47 @@ async function executedResult(
               observation,
             ),
             failedPhase: "runtime",
-            harnessFailed: false,
+            harnessFailed: infrastructureFailure(observation),
             passed: false,
           },
           supportedFeatures,
+          evidence(),
         );
       }
     }
-    const disabled = observations[0];
-    const enabled = observations[1];
-    if (
-      disabled == null ||
-      enabled == null ||
-      disabled.exitStatus !== enabled.exitStatus ||
-      disabled.stdout !== enabled.stdout ||
-      disabled.stderr !== enabled.stderr
-    ) {
-      return classifyTest262(
-        testCase,
-        {
-          detail: `${testCase.path} specialization observations differ.`,
-          failedPhase: "runtime",
-          harnessFailed: false,
-          passed: false,
-        },
-        supportedFeatures,
-      );
-    }
+  }
+  const baseline = observations[0];
+  const diverging =
+    baseline == null
+      ? undefined
+      : observations.find(
+          (entry) =>
+            entry.observation.exitStatus !== baseline.observation.exitStatus ||
+            entry.observation.stdout !== baseline.observation.stdout ||
+            entry.observation.stderr !== baseline.observation.stderr,
+        );
+  if (baseline != null && diverging != null) {
+    return classifyTest262(
+      testCase,
+      {
+        detail:
+          `${testCase.path} observations diverge between ` +
+          `${baseline.variant.strictness} ${baseline.variant.specialization} ` +
+          `and ${diverging.variant.strictness} ` +
+          `${diverging.variant.specialization}.`,
+        failedPhase: "runtime",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
   }
   return classifyTest262(
     testCase,
     { harnessFailed: false, passed: true },
     supportedFeatures,
+    evidence(),
   );
 }
 
@@ -444,35 +503,48 @@ export async function executeTest262Case(
   supportedFeatures: ReadonlySet<string>,
   harnesses: Test262Harnesses,
   executor: Test262Executor,
+  dependencies: readonly string[] = [],
 ): Promise<Test262Result> {
+  const evidence: Test262Evidence = { dependencies };
   const unsupported = parsed.case.features.some(
     (feature) => !supportedFeatures.has(feature),
   );
-  if (unsupported) return unsupportedResult(parsed.case, supportedFeatures);
+  if (unsupported) {
+    return unsupportedResult(parsed.case, supportedFeatures, evidence);
+  }
   if (parsed.flags.includes("module") || parsed.flags.includes("async")) {
     return classifyTest262(
       parsed.case,
       {
-        detail: "The M3 runner supports synchronous Script cases only.",
+        detail: "The runner supports synchronous Script cases only.",
         harnessFailed: true,
         passed: false,
       },
       supportedFeatures,
+      evidence,
     );
   }
   if (parsed.case.expectedFailurePhase === "parse") {
-    return parseNegativeResult(source, parsed.case, supportedFeatures);
+    return parseNegativeResult(
+      source,
+      parsed.case,
+      supportedFeatures,
+      evidence,
+    );
   }
   if (parsed.case.expectedFailurePhase === "runtime") {
     return classifyTest262(
       parsed.case,
       {
-        detail: "M3 cannot observe the type of an unhandled JavaScript throw.",
+        detail:
+          "The runner cannot observe the type of an unhandled JavaScript " +
+          "throw.",
         harnessFailed: false,
         passed: false,
         unsupportedCapability: "runtime-error-types",
       },
       supportedFeatures,
+      evidence,
     );
   }
   return await executedResult(
@@ -481,6 +553,7 @@ export async function executeTest262Case(
     supportedFeatures,
     harnesses,
     executor,
+    dependencies,
   );
 }
 
@@ -583,6 +656,7 @@ export async function createReviewedManifest(
         supportedFeatures,
         harnesses,
         executor,
+        entry.dependencies,
       ),
     );
   }
@@ -632,7 +706,7 @@ async function main(): Promise<void> {
   console.log(
     `test262 revision=${manifest.suiteRevision} ` +
       `pass=${manifest.summary.passes} ` +
-      `expected-parse=${manifest.summary.expectedParseFailures} ` +
+      `expected-negative=${manifest.summary.expectedNegatives} ` +
       `unsupported=${manifest.summary.unsupportedProfileFeatures}`,
   );
 }
