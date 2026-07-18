@@ -1641,6 +1641,47 @@ assert.equal(asyncPromiseIdentity.exitStatus, 0);
 assert.equal(asyncPromiseIdentity.stderr, "");
 assert.equal(asyncPromiseIdentity.stdout, "false\n");
 
+const asyncPromiseAssimilation = await runNativeCli(
+  {
+    args: ["async-promise-assimilation.ts"],
+    source: `
+const inner = Promise.resolve(1);
+inner.then = function customThen(onFulfilled) {
+  console.log("custom then");
+  return onFulfilled(2);
+};
+async function wrapper() { return inner; }
+wrapper().then(function show(value) { console.log(value); });
+`,
+    sourceId: "async-promise-assimilation.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(asyncPromiseAssimilation.exitStatus, 0);
+assert.equal(asyncPromiseAssimilation.stderr, "");
+assert.equal(asyncPromiseAssimilation.stdout, "custom then\n2\n");
+
+const rejectionPassThroughLocation = await runNativeCli(
+  {
+    args: ["rejection-pass-through.ts"],
+    source: `async function fail() { throw "failure"; }
+async function wrapper() { return fail(); }
+wrapper();
+console.log("after");
+`,
+    sourceId: "rejection-pass-through.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(rejectionPassThroughLocation.exitStatus, 1);
+assert.equal(rejectionPassThroughLocation.stdout, "after\n");
+assert.match(
+  rejectionPassThroughLocation.stderr,
+  /^rejection-pass-through\.ts:1:\d+: error\[OSEO2001\]/u,
+);
+
 const retargetedArrayTimerDelay = await runNativeCli(
   {
     args: ["retargeted-array-timer-delay.ts"],

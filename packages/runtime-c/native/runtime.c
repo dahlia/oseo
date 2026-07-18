@@ -3134,7 +3134,7 @@ static OseoResult promise_attach_reaction(
         context,
         OSEO_JOB_REACTION,
         reaction_value,
-        oseo_undefined(),
+        promise_value,
         promise->result,
         promise->state == OSEO_PROMISE_FULFILLED
     );
@@ -3153,7 +3153,7 @@ static OseoResult enqueue_reactions(
             context,
             OSEO_JOB_REACTION,
             current,
-            oseo_undefined(),
+            promise_value,
             promise_object(promise_value)->result,
             promise_object(promise_value)->state == OSEO_PROMISE_FULFILLED
         );
@@ -3274,34 +3274,6 @@ static OseoResult resolving_function_create(
     return result;
 }
 
-static OseoResult promise_adopt(
-    OseoContext *context,
-    OseoValue source,
-    OseoValue target
-) {
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = source;
-    frame.slots[1] = target;
-    result = reaction_create(
-        context,
-        oseo_undefined(),
-        oseo_undefined(),
-        frame.slots[1]
-    );
-    frame.slots[2] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = promise_attach_reaction(
-            context,
-            frame.slots[0],
-            frame.slots[2]
-        );
-    }
-    oseo_roots_release(context, &frame);
-    return result;
-}
-
 OseoResult oseo_promise_resolve_into(
     OseoContext *context,
     OseoValue promise_value,
@@ -3321,9 +3293,6 @@ OseoResult oseo_promise_resolve_into(
         }
         oseo_context_clear_language_error(context);
         return oseo_promise_reject_into(context, promise_value, error.value);
-    }
-    if (is_promise(value)) {
-        return promise_adopt(context, value, promise_value);
     }
     if (!is_object(value)) {
         return promise_fulfill(context, promise_value, value);
@@ -4320,6 +4289,17 @@ static OseoResult run_reaction_job(
     frame.slots[1] = reaction->capability;
     frame.slots[2] = job->argument;
     bool fulfilled = job->fulfilled;
+    const char *source_id = context->source_id;
+    size_t source_id_length = context->source_id_length;
+    size_t line = context->line;
+    size_t column = context->column;
+    if (!fulfilled && is_promise(job->secondary)) {
+        OseoPromise *source = promise_object(job->secondary);
+        context->source_id = source->rejection_source_id;
+        context->source_id_length = source->rejection_source_id_length;
+        context->line = source->rejection_line;
+        context->column = source->rejection_column;
+    }
     if (tag_of(frame.slots[0]) == OSEO_TAG_UNDEFINED) {
         result = fulfilled
             ? oseo_promise_resolve_into(
@@ -4332,6 +4312,12 @@ static OseoResult run_reaction_job(
                 frame.slots[1],
                 frame.slots[2]
             );
+        if (!context->has_diagnostic) {
+            context->source_id = source_id;
+            context->source_id_length = source_id_length;
+            context->line = line;
+            context->column = column;
+        }
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -4357,6 +4343,12 @@ static OseoResult run_reaction_job(
             frame.slots[1],
             frame.slots[3]
         );
+    }
+    if (!context->has_diagnostic) {
+        context->source_id = source_id;
+        context->source_id_length = source_id_length;
+        context->line = line;
+        context->column = column;
     }
     oseo_roots_release(context, &frame);
     return result;
