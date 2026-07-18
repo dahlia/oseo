@@ -240,6 +240,70 @@ test("locates unreadable dependencies at their import sites", async () => {
   assert.doesNotMatch(result.stderr, /missing\.js:1:1/u);
 });
 
+test("forces the module goal symbol with --module", async () => {
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/entry.js");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile() {
+      return Promise.reject(new Error("unexpected read"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const ambiguous = "await (0);";
+  const asModule = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "/work/entry.js"],
+      source: ambiguous,
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(asModule.exitStatus, 0, asModule.stderr);
+  assert.match(asModule.stdout, /top-level await/u);
+  const asScript = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/entry.js"],
+      source: ambiguous,
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.doesNotMatch(asScript.stdout, /top-level await/u);
+  const strictModule = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "/work/entry.js"],
+      source: "function duplicate(parameter, parameter) {}",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(strictModule.exitStatus, 1);
+  assert.match(strictModule.stderr, /error\[OSEO0001\]/u);
+});
+
+test("keeps --module outside the synchronous CLI surface", () => {
+  const result = runCli({
+    args: ["--module", "entry.js"],
+    source: "await (0);",
+    sourceId: "entry.js",
+    version: "0.0.0",
+  });
+  assert.equal(result.exitStatus, 1);
+  assert.match(result.stderr, /asynchronous CLI host workflow/u);
+});
+
 test("recognizes top-level await without module declarations", async () => {
   const host: CompilerHost = {
     canonicalizeFile() {

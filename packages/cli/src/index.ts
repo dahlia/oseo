@@ -66,7 +66,18 @@ const specializationParser = withDefault(
   "enabled" as const,
 );
 
+const moduleParser = withDefault(
+  map(
+    flag("--module", {
+      description: message`Compile the source as an ECMAScript module.`,
+    }),
+    () => true,
+  ),
+  false,
+);
+
 const cliParser = object({
+  module: moduleParser,
   mode: modeParser,
   sourceId: argument(stringValue({ metavar: "SOURCE" }), {
     description: message`Source file to compile.`,
@@ -340,6 +351,14 @@ function emitCliMir(mode: CliInvocation["mode"], mir: MirProgram): CliResult {
 export function runCli(request: CliRequest): CliResult {
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
+  if (parsed.value.module) {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        "Module compilation requires the asynchronous CLI host workflow.",
+      ),
+    );
+  }
   return compileCliSource(
     parsed.value.mode,
     request.source ?? "",
@@ -461,7 +480,10 @@ export async function runNativeCli(
     );
   }
   let mir: MirProgram;
-  if (isModuleSource(source, sourceId, parsed.value.sourceId)) {
+  if (
+    parsed.value.module ||
+    isModuleSource(source, sourceId, parsed.value.sourceId)
+  ) {
     const compiled = await compileCliModuleGraph(
       host,
       parsed.value.sourceId,

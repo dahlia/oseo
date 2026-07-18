@@ -5,9 +5,10 @@ Status
 ------
 
 This guide describes the command line implemented by the current Oseo
-checkout. Oseo accepts the M1 source-language profile and enables the M2
-guarded small-integer addition specialization when a function is eligible.
-Planned M3 language features are not available through this command line.
+checkout. Oseo accepts the frozen M3 and M4 source-language profiles and
+enables the implemented specializations when a function is eligible.
+Language features planned for later milestones are not available through
+this command line.
 
 
 Run the CLI from a checkout
@@ -37,19 +38,20 @@ Command syntax
 --------------
 
 ~~~~ text
-oseo [--dump-mir | --emit-c] [--no-specialization] SOURCE
+oseo [--dump-mir | --emit-c] [--module] [--no-specialization] SOURCE
 oseo --help
 oseo --version
 ~~~~
 
-`SOURCE` is the path of one JavaScript or TypeScript script. Oseo reads the
-file from that path; standard input and `-` are not supported. Options may
-appear before or after the source path.
+`SOURCE` is the path of one JavaScript or TypeScript script or module entry.
+Oseo reads the file from that path; standard input and `-` are not supported.
+Options may appear before or after the source path.
 
 | Option                | Behavior                                     |
 | --------------------- | -------------------------------------------- |
 | `--dump-mir`          | Print Oseo's textual MIR without compiling C |
 | `--emit-c`            | Print the generated C11 translation unit     |
+| `--module`            | Compile the source as an ECMAScript module   |
 | `--no-specialization` | Compile only the generic native path         |
 | `--help`              | Print help generated from the CLI grammar    |
 | `--version`           | Print the lockstep Oseo package version      |
@@ -143,7 +145,7 @@ only to a narrow two-parameter addition function whose parameters both have
 compatible `number` hints. Every assumption is checked at run time, and a
 failed guard enters the compiled generic addition block.
 
-Use `--no-specialization` to select the M1 generic graph explicitly:
+Use `--no-specialization` to select the generic graph explicitly:
 
 ~~~~ sh
 oseo --no-specialization add.ts
@@ -157,21 +159,38 @@ JavaScript-visible behavior. The detailed optimization contract is recorded in
 [*specialization-m2.md*](./specialization-m2.md).
 
 
+Module entries
+--------------
+
+The CLI compiles one script or one closed module graph. A source is treated
+as a module when its path ends in *.mjs* or *.mts*, when it contains module
+declarations, or when `--module` is passed. Use `--module` when a *.js*
+module entry has no import or export declaration, such as a module whose
+only module-specific syntax is top-level `await`; goal-symbol sniffing
+cannot distinguish every such source from a script.
+
+Relative `./` and `../` imports resolve against the entry's canonical
+`file:` URL. Bare specifiers, *package.json* resolution, and dynamic import
+remain unsupported.
+
+
 Source-language limits
 ----------------------
 
-Oseo currently compiles one script at a time. The accepted profile includes
-primitive values, lexical `const` bindings, top-level function declarations,
-branches, direct calls, returns, a limited set of operators, and
-`console.log(...)`. TypeScript annotations and JSDoc types are optimization
-hints. Oseo does not run the TypeScript type checker.
+Oseo compiles the language profiles frozen through M4: primitives, objects,
+arrays, closures, exceptions, closed module graphs, promises, restricted
+asynchronous functions, top-level `await`, and timers. The living M5 profile
+grows this surface checkpoint by checkpoint.
+TypeScript annotations and JSDoc types are optimization hints. Oseo does not
+run the TypeScript type checker.
 
-Objects, arrays, closures, exceptions, modules, promises, asynchronous
-functions, web APIs, Node.js APIs, and package resolution are not part of the
-current source profile. See
-[*language-profile-m1.md*](./language-profile-m1.md) for the exact accepted
-syntax and semantics. [*ROADMAP.md*](../ROADMAP.md) describes intended later
-milestones without presenting them as current CLI features.
+Web APIs, Node.js APIs, and package resolution are not part of the current
+source profile. See [*language-profile-m3.md*](./language-profile-m3.md) and
+[*language-profile-m4.md*](./language-profile-m4.md) for the exact accepted
+syntax and semantics, and
+[*language-profile-m5.md*](./language-profile-m5.md) for the boundary the
+current milestone measures against. [*ROADMAP.md*](../ROADMAP.md) describes
+intended later milestones without presenting them as current CLI features.
 
 
 Output and diagnostics
@@ -219,8 +238,11 @@ The `--dump-mir` and `--emit-c` modes can still isolate frontend or backend
 problems because they do not start the toolchain.
 
 If Oseo reports `OSEO1001`, compare the source form with
-[*language-profile-m1.md*](./language-profile-m1.md). A `.ts` filename does not
-imply that Oseo accepts the full TypeScript language or performs type checking.
+[*language-profile-m3.md*](./language-profile-m3.md) and
+[*language-profile-m4.md*](./language-profile-m4.md), and check the known-gap
+list in [*language-profile-m5.md*](./language-profile-m5.md). A `.ts`
+filename does not imply that Oseo accepts the full TypeScript language or
+performs type checking.
 
 Run `oseo --help` when scripting the command. Its usage and option descriptions
 come from the same grammar that parses each invocation.
