@@ -775,6 +775,23 @@ test("validates unreachable async statements", () => {
   assert.match(continuation.diagnostics[0]?.message ?? "", /ForStatement/u);
 });
 
+test("rejects nested async await operands", () => {
+  for (const source of [
+    "async function nested(ready) { return await (await ready); }",
+    "async function nested(ready) { await (await ready); }",
+    "async function nested(ready) { const value = await (await ready); }",
+    "async function nested(ready) { return 1; return await (await ready); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "nested-await.js",
+    });
+    assert.equal(result.mir, undefined);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(result.diagnostics[0]?.message ?? "", /Nested await/u);
+  }
+});
+
 test("lowers timer globals while preserving lexical shadowing", () => {
   const direct = compileSource(babelFrontend, {
     source: [

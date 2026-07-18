@@ -109,8 +109,9 @@ arrow functions, and top-level `await` in modules. Within an asynchronous
 function, `await` may be an expression statement, the complete initializer of
 one `const` or `let` declaration, or the complete operand of `return`. These
 forms may repeat sequentially up to 256 suspension points per function. Await
-inside another asynchronous-function expression or control-flow statement
-remains unsupported.
+operands may not themselves contain another `await`. Await inside another
+asynchronous-function expression or control-flow statement remains
+unsupported.
 
 At module level, `await` may occur in an expression statement or in one
 `const` or `let` initializer, including a nested expression position whose

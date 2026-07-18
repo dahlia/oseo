@@ -1137,6 +1137,14 @@ function validateAsyncStatements(
   for (const value of values) {
     const point = awaitPoint(validationContext, value);
     if (point != null) {
+      if (nodeContainsAwait(point.operand)) {
+        unsupported(
+          validationContext,
+          point.operand,
+          "Nested await operands are outside M4.",
+        );
+        return false;
+      }
       if (expression(validationContext, point.operand) == null) return false;
       continue;
     }
@@ -1167,6 +1175,13 @@ function asyncStatementList(
   for (const [index, value] of values.entries()) {
     const point = awaitPoint(context, value);
     if (point != null) {
+      if (nodeContainsAwait(point.operand)) {
+        return unsupported(
+          context,
+          point.operand,
+          "Nested await operands are outside M4.",
+        );
+      }
       const operand = expression(context, point.operand);
       if (operand == null) return undefined;
       const range = sourceRange(context.locations, value);
