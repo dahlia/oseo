@@ -1135,7 +1135,10 @@ function task(value) {
 }
 function scheduleNested() {
   console.log("timer second");
-  setTimeout(task, 0, "nested");
+  // The nested timer needs a deadline past every other timer: a zero delay
+  // here races the positive-delay timers whenever a reference host stalls
+  // before its first timer tick.
+  setTimeout(task, 200, "nested");
   Promise.resolve("second").then(microtask);
 }
 const objectDelay = {
@@ -1200,20 +1203,23 @@ try {
 } catch (error) {
   console.log("invalid null prototype delay");
 }
+// Timers must register in ascending effective delay: the reference hosts
+// use wall-clock deadlines, so a slow interval between two registrations
+// would otherwise reorder timers whose delays differ by a few milliseconds.
 const canceled = setTimeout(task, 0, "canceled");
 clearTimeout(canceled);
-setTimeout(task, 100, "late");
 setTimeout(task, 0, "first");
 setTimeout(scheduleNested, 0);
 setTimeout(task, [5], "array delay");
-setTimeout(task, [nestedDelay], "nested array delay");
-setTimeout(task, [nestedValueDelay], "nested array valueOf");
-setTimeout(task, [nullPrototypeDelay], "null prototype delay");
 setTimeout(task, inheritedArrayDelay, "inherited array delay");
 setTimeout(task, customJoinDelay, "custom join delay");
 setTimeout(task, inheritedJoinDelay, "inherited join delay");
+setTimeout(task, [nestedDelay], "nested array delay");
+setTimeout(task, [nestedValueDelay], "nested array valueOf");
+setTimeout(task, [nullPrototypeDelay], "null prototype delay");
 setTimeout(task, objectDelay, "object delay");
 setTimeout(task, functionDelay, "function delay");
+setTimeout(task, 100, "late");
 console.log("scheduled");
 `,
   },
