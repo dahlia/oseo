@@ -548,6 +548,53 @@ test("lowers top-level await to an owned scheduler checkpoint", () => {
   assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
 });
 
+test("diagnoses excessive top-level await depth", () => {
+  const sourceId = "file:///app/deep-await.js";
+  const accepted = babelModuleFrontend.parseModule({
+    source: "await 0;\n".repeat(256),
+    sourceId,
+  });
+  assert.ok(accepted.module != null);
+  const acceptedCompilation = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "accepted-await",
+        syntax: accepted.module,
+      },
+    ],
+  });
+  assert.deepEqual(acceptedCompilation.diagnostics, []);
+  assert.ok(acceptedCompilation.mir != null);
+
+  const result = babelModuleFrontend.parseModule({
+    source: "await 0;\n".repeat(15_000),
+    sourceId,
+  });
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "deep-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.match(compiled.diagnostics[0]?.message ?? "", /at most 256/u);
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 257);
+});
+
 test("lowers M4 promise construction and static methods", () => {
   const result = compileSource(babelFrontend, {
     source: [
@@ -641,6 +688,24 @@ test("lowers async functions into owned continuations", () => {
   assert.ok(functionKinds.has("async"));
   assert.ok(functionKinds.has("async-arrow"));
   assert.ok(functionKinds.has("arrow"));
+});
+
+test("diagnoses excessive async continuation depth", () => {
+  const accepted = compileSource(babelFrontend, {
+    source: `async function deep() {\n${"await 0;\n".repeat(256)}}`,
+    sourceId: "accepted-async.js",
+  });
+  assert.deepEqual(accepted.diagnostics, []);
+  assert.ok(accepted.mir != null);
+
+  const result = compileSource(babelFrontend, {
+    source: `async function deep() {\n${"await 0;\n".repeat(1_200)}}`,
+    sourceId: "deep-async.js",
+  });
+  assert.equal(result.mir, undefined);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
+  assert.equal(result.diagnostics[0]?.range.start.line, 258);
 });
 
 test("preserves async returns and bindings across await", () => {

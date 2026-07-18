@@ -992,6 +992,44 @@ function nodeContainsAwait(value: unknown): boolean {
   return Object.values(valueNode).some(nodeContainsAwait);
 }
 
+const maximumAsyncContinuationCount = 256;
+
+function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
+  if (value.type === "ExpressionStatement") {
+    return node(value.expression)?.type === "AwaitExpression";
+  }
+  if (value.type === "ReturnStatement") {
+    return node(value.argument)?.type === "AwaitExpression";
+  }
+  if (value.type !== "VariableDeclaration") return false;
+  if (value.kind !== "const" && value.kind !== "let") return false;
+  const declarations = nodes(value.declarations);
+  return (
+    declarations.length === 1 &&
+    node(declarations[0]?.init)?.type === "AwaitExpression"
+  );
+}
+
+function validateAsyncContinuationCount(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+): boolean {
+  let count = 0;
+  for (const value of values) {
+    if (!isDirectAsyncAwaitPoint(value)) continue;
+    count += 1;
+    if (count <= maximumAsyncContinuationCount) continue;
+    unsupported(
+      context,
+      value,
+      `An async function may contain at most ` +
+        `${maximumAsyncContinuationCount} sequential await points.`,
+    );
+    return false;
+  }
+  return true;
+}
+
 interface AwaitPoint {
   readonly declaration?: {
     readonly hint: Hint | undefined;
@@ -1325,6 +1363,11 @@ function functionDeclaration(
         ]
       : nodes(bodyNode?.body);
   if (value.async === true) {
+    if (!validateAsyncContinuationCount(context, children)) {
+      context.functionStack.pop();
+      context.strictStack.pop();
+      return undefined;
+    }
     const executionBody = asyncStatementList(context, children, "executor");
     if (executionBody != null) {
       const range = location(context, value).range;

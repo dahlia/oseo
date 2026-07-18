@@ -108,14 +108,18 @@ M4 admits asynchronous function declarations and expressions, asynchronous
 arrow functions, and top-level `await` in modules. Within an asynchronous
 function, `await` may be an expression statement, the complete initializer of
 one `const` or `let` declaration, or the complete operand of `return`. These
-forms may repeat sequentially. Await inside another asynchronous-function
-expression or control-flow statement remains unsupported.
+forms may repeat sequentially up to 256 suspension points per function. Await
+inside another asynchronous-function expression or control-flow statement
+remains unsupported.
 
 At module level, `await` may occur in an expression statement or in one
 `const` or `let` initializer, including a nested expression position whose
 left-to-right operands can be retained across suspension. These forms may
-repeat. Await in module control flow and asynchronous module cycles remain
-outside M4. Asynchronous generators and `for await` remain unsupported.
+repeat up to 256 suspension points per module. A larger async function or
+module receives a source-located `OSEO1001` resource diagnostic instead of
+overflowing the bootstrap host stack. Await in module control flow and
+asynchronous module cycles remain outside M4. Asynchronous generators and
+`for await` remain unsupported.
 
 Calling an asynchronous function immediately returns an M4 promise. The
 frontend converts each suspension suffix into a private continuation closure.

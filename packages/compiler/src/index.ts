@@ -4564,6 +4564,7 @@ interface ModuleAwaitPoint {
 }
 
 interface ModuleAsyncLoweringState {
+  awaitCount: number;
   readonly diagnostics: Diagnostic[];
   readonly functions: HirFunction[];
   readonly globalBindings: HirGlobalBinding[];
@@ -4571,6 +4572,8 @@ interface ModuleAsyncLoweringState {
   nextFunctionId: number;
   readonly sourceId: string;
 }
+
+const maximumModuleContinuationCount = 256;
 
 interface ModuleExpressionParts {
   readonly children: readonly HirExpression[];
@@ -4874,6 +4877,18 @@ function lowerModuleEvaluationBody(
       body.push(statement);
       continue;
     }
+    state.awaitCount += 1;
+    if (state.awaitCount > maximumModuleContinuationCount) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `A module may contain at most ` +
+            `${maximumModuleContinuationCount} top-level await points.`,
+        ),
+      );
+      return undefined;
+    }
     const bindingId = state.nextBindingId;
     state.nextBindingId += 1;
     const functionId = state.nextFunctionId;
@@ -5133,6 +5148,7 @@ export function compileModuleGraph(
     const evaluatorId = nextFunctionId;
     nextFunctionId += 1;
     const state: ModuleAsyncLoweringState = {
+      awaitCount: 0,
       diagnostics: [],
       functions,
       globalBindings,
