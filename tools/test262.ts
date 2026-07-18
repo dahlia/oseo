@@ -965,7 +965,10 @@ export async function executeTest262Case(
 export function serializeTest262Manifest(
   manifest: ReviewedTest262Manifest,
 ): string {
-  return stringifyYaml(manifest, { lineWidth: 80 });
+  // The serializer counts a folded line's width without its indentation, so
+  // the limit stays below the repository's 80-column rule by the deepest
+  // indentation a detail string receives.
+  return stringifyYaml(manifest, { lineWidth: 72 });
 }
 
 function validateReviewedResults(

@@ -91,6 +91,17 @@ must never shrink by reclassification alone.
  -  Realm creation beyond the initial realm, agent clusters, and shared
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.
+ -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
+    *compareArray.js*, and *propertyHelper.js* only. Cases that include
+    *asyncHelpers.js* or *promiseHelper.js* stay out of the reviewed subset
+    until those includes have reviewed implementations. Owner: the
+    standards harness expansion in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  The native host fails an executable with an unhandled rejection, as
+    the M4 event-loop profile requires, while the upstream test262 host
+    contract tolerates one. Cases that deliberately leave a rejection
+    unhandled stay out of the reviewed subset until a host-profile
+    decision reconciles the two. Owner: the modules and asynchronous
+    execution stream.
  -  Large intrinsic tables and built-in families additionally wait for the
     runtime componentization in [*PLAN-RCR.md*](../PLAN-RCR.md) so new
     tables have an owned component to land in.
