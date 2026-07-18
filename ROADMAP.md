@@ -348,6 +348,8 @@ ordered by dependency rather than by the order of names in the standard.
 Individual API groups may begin as soon as their engine prerequisites are
 stable, even while M5 continues. Completing M6 and making a conformance claim
 still depend on completing the relevant ECMAScript work.
+[*PLAN-M6.md*](./PLAN-M6.md) records the group prerequisites, standards
+boundary, and exit criteria in detail.
 
 ### Planned order
 
