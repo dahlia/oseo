@@ -149,6 +149,17 @@ must never shrink by reclassification alone.
     graph behind standard constructors are unimplemented. `Promise.all` and
     `Promise.race` accept M4 arrays only. Owner: the intrinsics and
     built-in objects stream.
+ -  `globalThis` and the global object do not exist. Admitting them
+    requires the intrinsic graph to expose standard constructors as real
+    values first, a binding model in which top-level Script `var` and
+    function declarations become global-object properties while Script
+    lexical declarations stay in the declarative record and module
+    bindings remain module-scoped, and an owned
+    architecture decision on how a mutable global object meets
+    closed-world name resolution before any dynamically created global
+    binding is admitted. Owner: the intrinsics and built-in objects
+    stream; the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends
+    on this unit.
  -  `await` is restricted to the M4 positions; asynchronous generators,
     `for await`, and asynchronous module cycles are unsupported. Owner: the
     functions and executable syntax stream.

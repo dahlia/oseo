@@ -147,6 +147,16 @@ profile can already express may instead be self-hosted in the compiled
 subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
 primitive operations in the C runtime.
 
+The global object enters through this stream in dependency order:
+standard constructors become real intrinsic values first, the global
+binding model then connects top-level Script `var` and function
+declarations to global-object properties while Script lexical
+declarations stay declarative and module bindings stay module-scoped, and
+`globalThis` is admitted last, after an architecture decision resolves
+dynamically created global bindings against closed-world name resolution.
+The M6 surface audit in [*PLAN-M6.md*](./PLAN-M6.md) depends on this
+order.
+
 ### Functions and executable syntax
 
 Broaden parameters, arrows, classes, private state, iterators, generators, and

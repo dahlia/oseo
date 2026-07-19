@@ -580,6 +580,8 @@ milestones:
 
  -  the long-term native code-generation backend;
  -  the native event-loop and system-library boundary;
+ -  the global object and dynamic global binding resolution, where a
+    mutable `globalThis` meets closed-world name resolution;
  -  the WebAssembly implementation strategy required by the intended WinterTC
     profile.
 
