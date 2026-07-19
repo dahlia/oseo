@@ -831,6 +831,57 @@ test("lowers conditional expressions into branch arms and a join", () => {
   assert.match(printMir(buildMir(hir)), /join \? bb/u);
 });
 
+test("copies for-head bindings once per iteration", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        body: {
+          body: [
+            {
+              expression: {
+                kind: "binding-set",
+                name: "index",
+                range,
+                value: { kind: "number", range, value: 1 },
+              },
+              kind: "expression",
+              range,
+            },
+          ],
+          kind: "block",
+          range,
+        },
+        declarations: [
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 0 },
+            mutable: true,
+            name: "index",
+            range,
+          },
+        ],
+        kind: "for",
+        range,
+        test: { kind: "boolean", range, value: false },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "for-per-iteration.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const mir = buildMir(hir);
+  const resets = mir.script.blocks
+    .flatMap((block) => block.operations)
+    .filter((operation) => operation.kind === "binding-reset");
+  // One establishing cell, one pre-loop copy, and one per-iteration
+  // copy in the update block.
+  assert.equal(resets.length, 3);
+  const text = printMir(mir);
+  assert.match(text, /join for bb/u);
+});
+
 test("keeps do-while bodies ahead of their condition", () => {
   const syntax: SyntaxProgram = {
     body: [

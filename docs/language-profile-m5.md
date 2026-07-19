@@ -95,6 +95,16 @@ its deliberate boundary and its evidence:
     both async function bodies and module top level, because a
     conditionally evaluated suspension has no owned continuation contract
     yet.
+ -  The classic `for` statement with expression, `var`, `let`, `const`,
+    and empty heads. Mutable lexical head bindings follow
+    `CreatePerIterationEnvironment`: each iteration reads the current
+    values, creates fresh cells through the existing binding-reset
+    machinery, and re-initializes them, so closures created in the body
+    capture one environment per iteration, while a `const` head keeps
+    its single environment as the specification requires. `continue`
+    re-enters through the update clause after the per-iteration copy.
+    `for-in` and `for-of` stay rejected with a source-located
+    diagnostic. The empty statement is also admitted as a no-op block.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly

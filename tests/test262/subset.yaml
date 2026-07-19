@@ -585,10 +585,10 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-not-found-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-star-cycle.js
     expectedClassification: unsupported-profile-feature
@@ -603,10 +603,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-fun-named.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-fun.js
     expectedClassification: unsupported-profile-feature
@@ -621,13 +621,13 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found-dflt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-star-cycle.js
     expectedClassification: unsupported-profile-feature
@@ -651,7 +651,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-resolve-order-src.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-as-props-dflt-skip.js
     expectedClassification: unsupported-profile-feature
@@ -660,7 +660,7 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
     expectedClassification: pass
@@ -1205,6 +1205,12 @@ tests:
   - path: test/language/statements/do-while/decl-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for/let-identifier-with-newline.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for/scope-body-lex-boundary.js
+    expectedClassification: pass
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/function/S13.2.1_A1_T1.js
     expectedClassification: pass
     dependencies: [functions]

@@ -13,6 +13,7 @@ import type {
   SourceRange,
   SyntaxCallTarget,
   SyntaxExpression,
+  SyntaxForDeclaration,
   SyntaxFunction,
   SyntaxImportEntry,
   SyntaxModule,
@@ -954,6 +955,123 @@ function statement(
       ? undefined
       : { ...located, body, kind: "while", test };
   }
+  if (value.type === "EmptyStatement") {
+    return { ...located, body: [], kind: "block" };
+  }
+  if (value.type === "ForInStatement" || value.type === "ForOfStatement") {
+    return unsupported(
+      context,
+      value,
+      "for-in and for-of statements are unsupported.",
+    );
+  }
+  if (value.type === "ForStatement") {
+    const initNode = node(value.init);
+    const testNode = node(value.test);
+    const updateNode = node(value.update);
+    const bodyNode = node(value.body);
+    if (bodyNode == null) return unsupported(context, value);
+    let declarations: SyntaxForDeclaration[] | undefined;
+    let init: SyntaxExpression | undefined;
+    if (initNode != null && initNode.type === "VariableDeclaration") {
+      if (initNode.declare === true) {
+        return unsupported(
+          context,
+          initNode,
+          "Ambient declarations are erased by TypeScript and unsupported.",
+        );
+      }
+      if (initNode.kind === "var") {
+        const assignments: SyntaxExpression[] = [];
+        for (const declarator of nodes(initNode.declarations)) {
+          const identifier = node(declarator.id);
+          const name =
+            identifier == null ? undefined : identifierName(identifier);
+          if (name == null) {
+            return unsupported(
+              context,
+              declarator,
+              "var destructuring is unsupported.",
+            );
+          }
+          const initializerNode = node(declarator.init);
+          if (initializerNode == null) continue;
+          const assigned = expression(context, initializerNode);
+          if (assigned == null) return undefined;
+          assignments.push({
+            ...location(context, declarator),
+            kind: "binding-set",
+            name,
+            value: assigned,
+          });
+        }
+        if (assignments.length === 1) init = assignments[0];
+        else if (assignments.length > 1) {
+          init = { ...located, expressions: assignments, kind: "sequence" };
+        }
+      } else if (initNode.kind === "const" || initNode.kind === "let") {
+        declarations = [];
+        for (const declarator of nodes(initNode.declarations)) {
+          const identifier = node(declarator.id);
+          const name =
+            identifier == null ? undefined : identifierName(identifier);
+          if (identifier == null || name == null) {
+            return unsupported(
+              context,
+              declarator,
+              "for declarations need plain identifiers.",
+            );
+          }
+          const initializerNode = node(declarator.init);
+          if (initNode.kind === "const" && initializerNode == null) {
+            return unsupported(
+              context,
+              declarator,
+              "A const binding needs one identifier and an initializer.",
+            );
+          }
+          const declaratorRange = location(context, declarator);
+          const initializer =
+            initializerNode == null
+              ? { ...declaratorRange, kind: "undefined" as const }
+              : expression(context, initializerNode);
+          if (initializer == null) return undefined;
+          declarations.push({
+            hint: typeHint(context, identifier.typeAnnotation),
+            initializer,
+            mutable: initNode.kind === "let",
+            name,
+            range: declaratorRange.range,
+          });
+        }
+      } else {
+        return unsupported(
+          context,
+          initNode,
+          "Only const, let, and var declarations are supported.",
+        );
+      }
+    } else if (initNode != null) {
+      init = expression(context, initNode);
+      if (init == null) return undefined;
+    }
+    const test = testNode == null ? undefined : expression(context, testNode);
+    if (testNode != null && test == null) return undefined;
+    const update =
+      updateNode == null ? undefined : expression(context, updateNode);
+    if (updateNode != null && update == null) return undefined;
+    const body = statement(context, bodyNode, functionBody);
+    if (body == null) return undefined;
+    return {
+      ...located,
+      body,
+      ...(declarations == null ? {} : { declarations }),
+      ...(init == null ? {} : { init }),
+      kind: "for",
+      ...(test == null ? {} : { test }),
+      ...(update == null ? {} : { update }),
+    };
+  }
   if (value.type === "DoWhileStatement") {
     const bodyNode = node(value.body);
     const testNode = node(value.test);
@@ -1634,6 +1752,40 @@ function collectVarStatement(
         context,
         body,
         lexicalFrames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      )
+    );
+  }
+  if (value.type === "ForStatement") {
+    const initNode = node(value.init);
+    let bodyFrames = lexicalFrames;
+    if (initNode?.type === "VariableDeclaration") {
+      if (initNode.kind === "var") {
+        if (
+          !collectVarStatement(
+            context,
+            initNode,
+            lexicalFrames,
+            catchParameters,
+            collected,
+            blockFunctions,
+          )
+        ) {
+          return false;
+        }
+      } else {
+        bodyFrames = [...lexicalFrames, gatherLexicalNames([initNode], false)];
+      }
+    }
+    const body = node(value.body);
+    return (
+      body == null ||
+      collectVarStatement(
+        context,
+        body,
+        bodyFrames,
         catchParameters,
         collected,
         blockFunctions,

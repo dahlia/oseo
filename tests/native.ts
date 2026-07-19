@@ -663,6 +663,46 @@ console.log(
 `,
   },
   {
+    name: "for-loops",
+    source: `
+for (let i = 0; i < 3; i = i + 1) console.log("let", i);
+const captures = [];
+for (let i = 0; i < 3; i = i + 1) { captures[i] = () => i; }
+console.log(captures[0](), captures[1](), captures[2]());
+for (var counted = 0; counted < 2; counted = counted + 1) {
+  console.log("var", counted);
+}
+console.log("after", counted);
+let total = 0;
+for (;;) { total = total + 1; if (total >= 4) break; }
+console.log(total);
+for (let i = 0, j = 10; i < j; i = i + 1, j = j - 1) {
+  if (i === 2) continue;
+  console.log(i, j);
+}
+let text = "";
+for (let i = 0; i < 3; i = i + 1) {
+  if (i === 1) continue;
+  text = text + i;
+}
+console.log(text);
+for (total = 0; total < 2; total = total + 1) console.log("expr", total);
+for (const fixed = 5; false;) console.log("never");
+let shadow = "outer";
+for (let shadow = 0; shadow < 1; shadow = shadow + 1) {
+  console.log("inner", shadow);
+}
+console.log(shadow);
+function sumTo(limit) {
+  let sum = 0;
+  for (let i = 1; i <= limit; i = i + 1) sum = sum + i;
+  return sum;
+}
+console.log(sumTo(10));
+console.log("done");
+`,
+  },
+  {
     name: "in-and-instanceof",
     source: `
 const box = { present: undefined, value: 1 };

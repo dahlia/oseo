@@ -593,6 +593,38 @@ test("rejects var exports explicitly", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
 
+test("converts classic for statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "for (let i = 0, limit = 3; i < limit; i = i + 1) console.log(i);\n" +
+      "for (var counted = 0; counted < 2; counted = counted + 1);\n" +
+      "let started = 0;\n" +
+      "for (started = 1; started < 2; started = started + 1) {}\n" +
+      "for (;;) break;\n",
+    sourceId: "for-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /for \(let %b/u);
+});
+
+const unsupportedForForms = [
+  ["for-in", "for (const key in {}) console.log(key);"],
+  ["for-of", "for (const item of []) console.log(item);"],
+  ["for const without initializer", "for (const item; ;) break;"],
+] as const;
+
+for (const [name, source] of unsupportedForForms) {
+  test(`rejects ${name} statements`, () => {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.ok(result.diagnostics.length > 0);
+    assert.equal(result.mir, undefined);
+  });
+}
+
 test("converts in and instanceof to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -1146,11 +1178,11 @@ test("preserves async returns and bindings across await", () => {
 
 test("validates unreachable async statements", () => {
   const loop = compileSource(babelFrontend, {
-    source: "async function invalid() { return 1; for (;;) {} }",
+    source: "async function invalid() { return 1; class Later {} }",
     sourceId: "async-unreachable-loop.js",
   });
   assert.equal(loop.mir, undefined);
-  assert.match(loop.diagnostics[0]?.message ?? "", /ForStatement/u);
+  assert.match(loop.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
 
   const awaitValue = compileSource(babelFrontend, {
     source: "async function invalid() { throw 1; if (true) await 0; }",
@@ -1160,11 +1192,11 @@ test("validates unreachable async statements", () => {
   assert.match(awaitValue.diagnostics[0]?.message ?? "", /Await/u);
 
   const continuation = compileSource(babelFrontend, {
-    source: "async function invalid() { await 0; return 1; for (;;) {} }",
+    source: "async function invalid() { await 0; return 1; class Later {} }",
     sourceId: "async-unreachable-continuation.js",
   });
   assert.equal(continuation.mir, undefined);
-  assert.match(continuation.diagnostics[0]?.message ?? "", /ForStatement/u);
+  assert.match(continuation.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
 });
 
 test("rejects nested async await operands", () => {

@@ -2543,8 +2543,8 @@ results:
     observation:
       detail: 'test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:72:1:
-        error[OSEO1001]: ForStatement is outside the M1 profile.\n"'
+        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:72:35:
+        error[OSEO1001]: UpdateExpression is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -4729,16 +4729,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found-empty_FIXTUR\
-        E.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-iee-err-not-found-as.js:78:10:
+        error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4753,16 +4753,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found-empty_FIXTUR\
-        E.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-iee-err-not-found.js:78:10:
+        error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4859,16 +4859,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-fun-anon.js
+          id: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
+          sourceHash: fnv1a64:9865a241b583847d
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-dflt-fun-anon.js:9\
-        9:41: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4881,16 +4892,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-fun-named.js
+          id: test/language/module-code/instn-named-bndng-dflt-fun-named.js
+          sourceHash: fnv1a64:8063f62ebe9e89e3
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-dflt-fun-named.js:\
-        99:47: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4995,16 +5017,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-empty_FIXT\
-        URE.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-named-err-not-found-as.js:83:1\
+        0: error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -5019,16 +5041,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-empty_FIXT\
-        URE.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-named-err-not-found-dflt.js:83\
+        :8: error[OSEO2001]: Module has no export 'default'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -5043,16 +5065,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-empty_FIXT\
-        URE.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-named-err-not-found.js:83:10:
+        error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -5229,16 +5251,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-resolve-order-src-valid_FIXTUR\
-        E.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-resolve-order-src-reference_FI\
+        XTURE.js:4:1: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -5312,16 +5334,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-star-err-not-found-empty_FIXTU\
-        RE.js:4:1: error[OSEO1001]: EmptyStatement is outside the M1
-        profile."
+      detail: "test/language/module-code/instn-star-err-not-found-faulty_FIXT\
+        URE.js:4:10: error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -9819,6 +9841,63 @@ results:
   - case:
       async: false
       features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/for/let-identifier-with-newline.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/for/let-identifier-with-newline.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/for/let-identifier-with-newli\
+        ne.js:64:17: error[OSEO1001]: Unknown binding 'let'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - let
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/scope-body-lex-boundary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
       flags: []
       includes: []
       mode: script
@@ -10438,11 +10517,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 202
+  expectedNegatives: 209
   harnessFailures: 0
-  passes: 62
+  passes: 65
   semanticFailures: 0
-  unsupportedProfileFeatures: 157
+  unsupportedProfileFeatures: 149
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -10459,9 +10538,9 @@ summary:
     - dependency: control-flow
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 1
+      passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
@@ -10485,13 +10564,13 @@ summary:
       harnessFailures: 0
       passes: 4
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: module-linking
-      expectedNegatives: 129
+      expectedNegatives: 136
       harnessFailures: 0
-      passes: 11
+      passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 78
+      unsupportedProfileFeatures: 69
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
@@ -10513,7 +10592,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 2
       harnessFailures: 0
-      passes: 2
+      passes: 3
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
@@ -10536,14 +10615,14 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 28
     - group: language/module-code
-      expectedNegatives: 129
+      expectedNegatives: 136
       harnessFailures: 0
-      passes: 11
+      passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 78
+      unsupportedProfileFeatures: 69
     - group: language/statements
       expectedNegatives: 31
       harnessFailures: 0
-      passes: 24
+      passes: 25
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 16
