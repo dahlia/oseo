@@ -285,6 +285,13 @@ collection, strings, objects, host hooks, and diagnostics needed by generated
 code. It is a private ABI during early development. Native-addon compatibility
 does not constrain it.
 
+The C runtime is not the intended home of every standard built-in. Once the
+language profile can express them, built-in families may be self-hosted in
+the compiled TypeScript subset and compiled by Oseo, with only primitive
+operations remaining native, following the practice of mainstream engines.
+[*ROADMAP.md*](./ROADMAP.md) records this direction under M8; the choice is
+made per family with recorded evidence when the family lands.
+
 An ordinary object is expected to contain a header and indexed storage. The
 header identifies the object's runtime kind, garbage-collector state, and shape.
 Shapes are immutable descriptions of property layout and attributes. Adding a

@@ -142,7 +142,10 @@ and attributes are testable. Generated C must not duplicate mutable singleton
 state accidentally. Generic algorithms remain authoritative when a fast path
 cannot prove its preconditions. Large intrinsic tables and built-in families
 begin only after the affected runtime component exists under
-[*PLAN-RCR.md*](./PLAN-RCR.md).
+[*PLAN-RCR.md*](./PLAN-RCR.md). A family whose semantics the admitted
+profile can already express may instead be self-hosted in the compiled
+subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
+primitive operations in the C runtime.
 
 ### Functions and executable syntax
 

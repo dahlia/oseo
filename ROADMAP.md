@@ -417,6 +417,18 @@ M8: Self-hosting
 M8 removes Node.js and Deno from the trusted execution path of the native Oseo
 compiler while retaining both as supported development hosts.
 
+Self-hosting also names the long-term implementation strategy for standard
+built-ins. Mainstream engines implement much of their built-in surface in
+the engine's own language rather than in the native runtime. Once the M5
+language profile is rich enough, each new built-in family should weigh a
+self-hosted implementation, written in the compiled TypeScript subset and
+compiled by Oseo itself, against a C runtime implementation, keeping only
+primitive operations native. This keeps the C runtime from growing with
+every intrinsic and turns most built-in work into ordinary
+compiled-profile code covered by the same standards and differential
+gates. The per-family choice and its evidence are recorded when the
+family lands.
+
 ### Preparation carried by earlier milestones
 
  -  compiler-core source stays within a tracked TypeScript profile;
