@@ -1862,12 +1862,13 @@ for (const fixture of fixtures) {
   }
 }
 
-// PLAN-RCR multi-source build contract: two runtime translation units
-// compile, archive in input order, and link into an executable whose
-// observation matches the single-source runtime build. The copied
-// runtime translation unit gains an undefined reference to a symbol
-// defined only by the probe unit, so a successful link proves the
-// linker extracted the second archive member.
+// PLAN-RCR multi-source build contract: every reviewed runtime
+// translation unit plus an extra probe unit compiles, archives in
+// input order, and links into an executable whose observation matches
+// the reviewed-runtime build. The copied runtime.c gains an undefined
+// reference to a symbol defined only by the probe unit, so a
+// successful link proves the linker extracted the probe archive
+// member.
 {
   const probeDirectory = await host.makeTemporaryDirectory("oseo-multi-tu-");
   const probeSourcePath = `${probeDirectory}/runtime_probe.c`;
@@ -1930,20 +1931,32 @@ for (const fixture of fixtures) {
     (native) => {
       assert.equal(native.stdout, "multi-source runtime\n");
       assert.equal(native.exitStatus, 0);
+      const reviewedSourceNames = cRuntimeProvider
+        .getRuntimeInput()
+        .assets.filter((asset) => asset.kind === "source")
+        .map((asset) => asset.name);
+      const expectedNames = [...reviewedSourceNames, "runtime_probe.c"];
       const compileLines = native.compilerInvocation.filter((line) =>
         line.includes(" -c "),
       );
-      assert.equal(compileLines.length, 2);
-      assert.match(compileLines[0] ?? "", /runtime\.c/u);
-      assert.match(compileLines[1] ?? "", /runtime_probe\.c/u);
+      assert.equal(compileLines.length, expectedNames.length);
+      expectedNames.forEach((name, index) => {
+        assert.ok(
+          compileLines[index]?.includes(`/${name} `),
+          `compile request ${index} covers ${name}`,
+        );
+      });
       const archiveLine = native.compilerInvocation.find((line) =>
         line.includes("zig ar "),
       );
       assert(archiveLine != null, "archive request recorded");
-      assert.match(
-        archiveLine,
-        /runtime-[a-z0-9_-]+\.o.*runtime_probe-[a-z0-9_-]+\.o/u,
-      );
+      let archiveCursor = 0;
+      for (const [index, name] of expectedNames.entries()) {
+        const member = `${name.replace(/\.c$/u, "")}-${index}-`;
+        const at = archiveLine.indexOf(member, archiveCursor);
+        assert.ok(at >= 0, `archive member ${member} appears in order`);
+        archiveCursor = at + member.length;
+      }
     },
   );
   await host.remove(probeDirectory);
@@ -2453,7 +2466,7 @@ const rootAllocationFailureHost = {
   ...host,
   async readTextFile(path: string | URL): Promise<string> {
     const source = await host.readTextFile(path);
-    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime_core.c")) {
       return source;
     }
     const injected = source.replace(

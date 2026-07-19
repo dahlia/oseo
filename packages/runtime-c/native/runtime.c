@@ -7,432 +7,6 @@
 
 static OseoResult to_number(OseoContext *context, OseoValue value);
 
-static void mark_value(
-    OseoValue value,
-    OseoHeapObject **worklist
-) {
-    if (tag_of(value) != OSEO_TAG_HEAP) return;
-    OseoHeapObject *object = heap_object(value);
-    if (object->marked) return;
-    object->marked = true;
-    object->trace_next = *worklist;
-    *worklist = object;
-}
-
-static void trace_object(
-    OseoHeapObject *object,
-    OseoHeapObject **worklist
-) {
-    if (object->kind == OSEO_HEAP_ENVIRONMENT) {
-        OseoEnvironment *environment = (OseoEnvironment *)object;
-        for (size_t index = 0u; index < environment->slot_count; index += 1u) {
-            mark_value(environment->slots[index], worklist);
-        }
-    } else if (object->kind == OSEO_HEAP_CELL) {
-        mark_value(((OseoCell *)object)->value, worklist);
-    } else if (object->kind == OSEO_HEAP_OBJECT ||
-               object->kind == OSEO_HEAP_ARRAY ||
-               object->kind == OSEO_HEAP_FUNCTION ||
-               object->kind == OSEO_HEAP_PROMISE) {
-        OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
-        mark_value(ordinary->prototype, worklist);
-        for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
-            mark_value(ordinary->properties[index].key, worklist);
-            mark_value(ordinary->properties[index].value, worklist);
-        }
-        if (object->kind == OSEO_HEAP_FUNCTION) {
-            OseoFunction *function = (OseoFunction *)object;
-            mark_value(function->environment, worklist);
-            mark_value(function->lexical_this, worklist);
-            mark_value(function->prototype_object, worklist);
-        } else if (object->kind == OSEO_HEAP_PROMISE) {
-            OseoPromise *promise = (OseoPromise *)object;
-            mark_value(promise->result, worklist);
-            mark_value(promise->reaction_head, worklist);
-            mark_value(promise->reaction_tail, worklist);
-            mark_value(promise->unhandled_next, worklist);
-        }
-    } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
-        OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
-        mark_value(reaction->next, worklist);
-        mark_value(reaction->on_fulfilled, worklist);
-        mark_value(reaction->on_rejected, worklist);
-        mark_value(reaction->capability, worklist);
-        mark_value(reaction->aggregate, worklist);
-    } else if (object->kind == OSEO_HEAP_JOB) {
-        OseoJob *job = (OseoJob *)object;
-        mark_value(job->next, worklist);
-        mark_value(job->primary, worklist);
-        mark_value(job->secondary, worklist);
-        mark_value(job->argument, worklist);
-    } else if (object->kind == OSEO_HEAP_PROMISE_AGGREGATE) {
-        OseoPromiseAggregate *aggregate = (OseoPromiseAggregate *)object;
-        mark_value(aggregate->capability, worklist);
-        mark_value(aggregate->values, worklist);
-    } else if (object->kind == OSEO_HEAP_TIMER) {
-        OseoTimer *timer = (OseoTimer *)object;
-        mark_value(timer->next, worklist);
-        mark_value(timer->callback, worklist);
-        mark_value(timer->arguments, worklist);
-    }
-}
-
-static void destroy_heap_object(OseoHeapObject *object) {
-    if (object->kind == OSEO_HEAP_OBJECT ||
-        object->kind == OSEO_HEAP_ARRAY ||
-        object->kind == OSEO_HEAP_FUNCTION ||
-        object->kind == OSEO_HEAP_PROMISE) {
-        OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
-        free(ordinary->properties);
-    }
-    free(object);
-}
-
-void oseo_collect(OseoContext *context) {
-    if (context->observe_specialization) context->collections += 1u;
-    OseoHeapObject *worklist = NULL;
-    for (OseoRootFrame *frame = context->roots;
-         frame != NULL;
-         frame = frame->previous) {
-        for (size_t index = 0u; index < frame->slot_count; index += 1u) {
-            mark_value(frame->slots[index], &worklist);
-        }
-    }
-    mark_value(context->microtask_head, &worklist);
-    mark_value(context->async_call_capability, &worklist);
-    mark_value(context->microtask_tail, &worklist);
-    mark_value(context->pending_rejections, &worklist);
-    mark_value(context->pending_rejection_tail, &worklist);
-    mark_value(context->promise_catch_function, &worklist);
-    mark_value(context->promise_finally_function, &worklist);
-    mark_value(context->promise_then_function, &worklist);
-    mark_value(context->timer_head, &worklist);
-    while (worklist != NULL) {
-        OseoHeapObject *object = worklist;
-        worklist = object->trace_next;
-        object->trace_next = NULL;
-        trace_object(object, &worklist);
-    }
-    OseoHeapObject **link = &context->objects;
-    while (*link != NULL) {
-        OseoHeapObject *object = *link;
-        if (object->marked) {
-            object->marked = false;
-            link = &object->next;
-        } else {
-            *link = object->next;
-            destroy_heap_object(object);
-        }
-    }
-}
-
-void oseo_context_init(
-    OseoContext *context,
-    const char *source_id,
-    size_t source_id_length
-) {
-    context->roots = NULL;
-    context->objects = NULL;
-    context->function_dispatcher = NULL;
-    context->async_call_capability = oseo_undefined();
-    context->microtask_head = oseo_undefined();
-    context->microtask_tail = oseo_undefined();
-    context->pending_rejections = oseo_undefined();
-    context->pending_rejection_tail = oseo_undefined();
-    context->promise_catch_function = oseo_undefined();
-    context->promise_finally_function = oseo_undefined();
-    context->promise_then_function = oseo_undefined();
-    context->timer_head = oseo_undefined();
-    context->source_id = source_id;
-    context->source_id_length = source_id_length;
-    oseo_context_clear_language_error(context);
-    context->active_frame_slots = 0u;
-    context->call_depth = 0u;
-    context->line = 1u;
-    context->column = 1u;
-    context->guard_hits = 0u;
-    context->guard_misses = 0u;
-    context->overflow_misses = 0u;
-    context->generic_addition_calls = 0u;
-    context->next_shape_id = 1u;
-    context->allocations = 0u;
-    context->allocation_attempts = 0u;
-    context->collections = 0u;
-    context->rejection_handled_count = 0u;
-    context->unhandled_rejection_count = 0u;
-    context->clock_milliseconds = 0u;
-    context->next_timer_id = 1u;
-    context->next_timer_order = 0u;
-    context->fail_allocation_at = 0u;
-    context->observe_specialization = false;
-    context->collect_every_safepoint =
-        getenv("OSEO_GC_EVERY_SAFEPOINT") != NULL;
-}
-
-void oseo_context_set_function_dispatcher(
-    OseoContext *context,
-    OseoFunctionDispatcher dispatcher
-) {
-    context->function_dispatcher = dispatcher;
-}
-
-void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt) {
-    context->allocation_attempts = 0u;
-    context->fail_allocation_at = attempt;
-}
-
-void oseo_context_clear_language_error(OseoContext *context) {
-    context->error_code = "OSEO2001";
-    context->error_message = OSEO_UNHANDLED_THROW_MESSAGE;
-    context->has_diagnostic = false;
-}
-
-void oseo_context_destroy(OseoContext *context) {
-    context->roots = NULL;
-    context->async_call_capability = oseo_undefined();
-    context->microtask_head = oseo_undefined();
-    context->microtask_tail = oseo_undefined();
-    context->pending_rejections = oseo_undefined();
-    context->pending_rejection_tail = oseo_undefined();
-    context->promise_catch_function = oseo_undefined();
-    context->promise_finally_function = oseo_undefined();
-    context->promise_then_function = oseo_undefined();
-    context->timer_head = oseo_undefined();
-    oseo_collect(context);
-}
-
-void oseo_context_location(
-    OseoContext *context,
-    size_t line,
-    size_t column
-) {
-    context->line = line;
-    context->column = column;
-}
-
-void oseo_context_source_location(
-    OseoContext *context,
-    const char *source_id,
-    size_t source_id_length,
-    size_t line,
-    size_t column
-) {
-    context->source_id = source_id;
-    context->source_id_length = source_id_length;
-    context->line = line;
-    context->column = column;
-}
-
-void oseo_context_print_error(const OseoContext *context) {
-    (void)fwrite(
-        context->source_id,
-        1u,
-        context->source_id_length,
-        stderr
-    );
-    (void)fprintf(
-        stderr,
-        ":%zu:%zu: error[%s]: %s\n",
-        context->line,
-        context->column,
-        context->error_code,
-        context->error_message
-    );
-}
-
-void oseo_context_print_observations(const OseoContext *context) {
-    (void)fprintf(
-        stderr,
-        "OSEO_OBSERVATIONS "
-        "{\"guardHits\":%zu,\"guardMisses\":%zu,"
-        "\"overflowMisses\":%zu,\"genericAdditionCalls\":%zu,"
-        "\"allocations\":%zu,\"collections\":%zu}\n",
-        context->guard_hits,
-        context->guard_misses,
-        context->overflow_misses,
-        context->generic_addition_calls,
-        context->allocations,
-        context->collections
-    );
-}
-
-OseoResult oseo_call_enter(OseoContext *context) {
-    if (context->call_depth >= OSEO_MAX_CALL_DEPTH) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Maximum call depth exceeded."
-        );
-    }
-    context->call_depth += 1u;
-    return normal(oseo_undefined());
-}
-
-void oseo_call_leave(OseoContext *context) {
-    if (context->call_depth > 0u) context->call_depth -= 1u;
-}
-
-OseoResult oseo_frame_enter(OseoContext *context, size_t slot_count) {
-    if (slot_count >
-        OSEO_MAX_ACTIVE_FRAME_SLOTS - context->active_frame_slots) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Maximum active native frame budget exceeded."
-        );
-    }
-    context->active_frame_slots += slot_count;
-    return normal(oseo_undefined());
-}
-
-void oseo_frame_leave(OseoContext *context, size_t slot_count) {
-    if (slot_count <= context->active_frame_slots) {
-        context->active_frame_slots -= slot_count;
-    } else {
-        context->active_frame_slots = 0u;
-    }
-}
-
-void oseo_roots_push(OseoContext *context, OseoRootFrame *frame) {
-    frame->previous = context->roots;
-    context->roots = frame;
-}
-
-void oseo_roots_pop(OseoContext *context, OseoRootFrame *frame) {
-    if (context->roots == frame) context->roots = frame->previous;
-}
-
-OseoResult oseo_roots_allocate(
-    OseoContext *context,
-    OseoRootFrame *frame,
-    size_t slot_count
-) {
-    OseoValue *slots = NULL;
-    if (slot_count > 0u) {
-        if (slot_count > SIZE_MAX / sizeof(OseoValue)) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Root frame allocation is too large."
-            );
-        }
-        slots = calloc(slot_count, sizeof(OseoValue));
-        if (slots == NULL) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Root frame allocation failed."
-            );
-        }
-    }
-    frame->previous = NULL;
-    frame->slots = slots;
-    frame->slot_count = slot_count;
-    oseo_roots_push(context, frame);
-    return normal(oseo_undefined());
-}
-
-void oseo_roots_release(OseoContext *context, OseoRootFrame *frame) {
-    oseo_roots_pop(context, frame);
-    free(frame->slots);
-    frame->previous = NULL;
-    frame->slots = NULL;
-    frame->slot_count = 0u;
-}
-
-OseoValue oseo_undefined(void) {
-    return tagged(OSEO_TAG_UNDEFINED, 0u);
-}
-
-OseoValue oseo_uninitialized(void) {
-    return tagged(OSEO_TAG_UNINITIALIZED, 0u);
-}
-
-OseoResult oseo_read_binding(OseoContext *context, OseoValue value) {
-    if (tag_of(value) == OSEO_TAG_UNINITIALIZED) {
-        return language_failure_message(
-            context,
-            "Binding is read before initialization."
-        );
-    }
-    return normal(value);
-}
-
-OseoResult oseo_write_immutable_binding(OseoContext *context) {
-    return language_failure_message(
-        context,
-        "Cannot assign to an immutable binding."
-    );
-}
-
-OseoValue oseo_null(void) {
-    return tagged(OSEO_TAG_NULL, 0u);
-}
-
-OseoValue oseo_boolean(bool value) {
-    return tagged(OSEO_TAG_BOOLEAN, value ? 1u : 0u);
-}
-
-OseoValue oseo_number(double value) {
-    if (isnan(value)) return OSEO_CANONICAL_NAN;
-    if (value == 0.0 && signbit(value)) return double_bits(value);
-    if (isfinite(value) && trunc(value) == value &&
-        value >= (double)OSEO_SMI_MIN && value <= (double)OSEO_SMI_MAX) {
-        int64_t integer = (int64_t)value;
-        return tagged(OSEO_TAG_SMI, (uint64_t)integer);
-    }
-    return double_bits(value);
-}
-
-bool oseo_to_boolean(OseoValue value) {
-    uint64_t tag = tag_of(value);
-    if (tag == OSEO_TAG_UNDEFINED || tag == OSEO_TAG_NULL) return false;
-    if (tag == OSEO_TAG_BOOLEAN) return (value & 1u) != 0u;
-    if (is_number(value)) {
-        double number = number_value(value);
-        return number != 0.0 && !isnan(number);
-    }
-    if (is_string(value)) return string_object(value)->length != 0u;
-    return tag == OSEO_TAG_HEAP;
-}
-
-static void *allocate_heap_bytes(OseoContext *context, size_t size) {
-    if (context->collect_every_safepoint) oseo_collect(context);
-    context->allocation_attempts += 1u;
-    if (context->fail_allocation_at != 0u &&
-        context->allocation_attempts == context->fail_allocation_at) {
-        return NULL;
-    }
-    return malloc(size);
-}
-
-static OseoResult publish_heap(
-    OseoContext *context,
-    OseoHeapObject *object,
-    OseoHeapKind kind
-) {
-    uintptr_t address = (uintptr_t)object;
-    if (address == 0u || address > OSEO_PAYLOAD_MASK) {
-        free(object);
-        return failure(
-            context,
-            "OSEO3001",
-            "The host cannot represent a heap address in 48 bits."
-        );
-    }
-    object->next = context->objects;
-    object->trace_next = NULL;
-    object->kind = kind;
-    object->marked = false;
-    context->objects = object;
-    if (context->observe_specialization &&
-        kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&
-        kind != OSEO_HEAP_FUNCTION) {
-        context->allocations += 1u;
-    }
-    return normal(tagged(OSEO_TAG_HEAP, (uint64_t)address));
-}
-
 static OseoResult allocate_string(
     OseoContext *context,
     const uint16_t *units,
@@ -442,13 +16,14 @@ static OseoResult allocate_string(
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
     size_t size = sizeof(OseoString) + length * sizeof(uint16_t);
-    OseoString *object = allocate_heap_bytes(context, size);
+    OseoString *object = oseo_internal_allocate_heap_bytes(context, size);
     if (object == NULL) {
         return failure(context, "OSEO2001", "String allocation failed.");
     }
     object->length = length;
     if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
-    return publish_heap(context, &object->header, OSEO_HEAP_STRING);
+    return oseo_internal_publish_heap(
+        context, &object->header, OSEO_HEAP_STRING);
 }
 
 OseoResult oseo_string_from_units(
@@ -470,7 +45,8 @@ OseoResult oseo_environment_create(OseoContext *context, size_t slot_count) {
     }
     size_t size = sizeof(OseoEnvironment) +
         slot_count * sizeof(OseoValue);
-    OseoEnvironment *environment = allocate_heap_bytes(context, size);
+    OseoEnvironment *environment =
+        oseo_internal_allocate_heap_bytes(context, size);
     if (environment == NULL) {
         return failure(context, "OSEO2001", "Environment allocation failed.");
     }
@@ -478,7 +54,7 @@ OseoResult oseo_environment_create(OseoContext *context, size_t slot_count) {
     for (size_t index = 0u; index < slot_count; index += 1u) {
         environment->slots[index] = oseo_undefined();
     }
-    return publish_heap(
+    return oseo_internal_publish_heap(
         context,
         &environment->header,
         OSEO_HEAP_ENVIRONMENT
@@ -540,12 +116,12 @@ OseoResult oseo_environment_clone(
 }
 
 OseoResult oseo_cell_create(OseoContext *context, OseoValue value) {
-    OseoCell *cell = allocate_heap_bytes(context, sizeof(*cell));
+    OseoCell *cell = oseo_internal_allocate_heap_bytes(context, sizeof(*cell));
     if (cell == NULL) {
         return failure(context, "OSEO2001", "Binding cell allocation failed.");
     }
     cell->value = value;
-    return publish_heap(context, &cell->header, OSEO_HEAP_CELL);
+    return oseo_internal_publish_heap(context, &cell->header, OSEO_HEAP_CELL);
 }
 
 OseoResult oseo_cell_get(OseoContext *context, OseoValue cell_value) {
@@ -688,7 +264,8 @@ OseoResult oseo_function_create(
         oseo_roots_release(context, &frame);
         return result;
     }
-    OseoFunction *function = allocate_heap_bytes(context, sizeof(*function));
+    OseoFunction *function =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*function));
     if (function == NULL) {
         oseo_roots_release(context, &frame);
         return failure(context, "OSEO2001", "Function allocation failed.");
@@ -710,7 +287,7 @@ OseoResult oseo_function_create(
     function->code_id = code_id;
     function->function_kind = function_kind;
     function->prototype_writable = true;
-    result = publish_heap(
+    result = oseo_internal_publish_heap(
         context,
         &function->ordinary.header,
         OSEO_HEAP_FUNCTION
@@ -1043,7 +620,8 @@ static OseoResult object_create(
     if (tag_of(prototype) != OSEO_TAG_NULL && !is_object(prototype)) {
         return language_failure(context);
     }
-    OseoOrdinaryObject *object = allocate_heap_bytes(context, sizeof(*object));
+    OseoOrdinaryObject *object =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*object));
     if (object == NULL) {
         return failure(context, "OSEO2001", "Object allocation failed.");
     }
@@ -1058,7 +636,8 @@ static OseoResult object_create(
     object->length_writable = false;
     object->module_namespace = false;
     object->default_intrinsics = default_intrinsics;
-    return publish_heap(context, &object->header, OSEO_HEAP_OBJECT);
+    return oseo_internal_publish_heap(
+        context, &object->header, OSEO_HEAP_OBJECT);
 }
 
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype) {
@@ -1073,7 +652,8 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     if (length > UINT32_MAX) {
         return failure(context, "OSEO2001", "Array length is too large.");
     }
-    OseoOrdinaryObject *array = allocate_heap_bytes(context, sizeof(*array));
+    OseoOrdinaryObject *array =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*array));
     if (array == NULL) {
         return failure(context, "OSEO2001", "Array allocation failed.");
     }
@@ -1088,7 +668,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->length_writable = true;
     array->module_namespace = false;
     array->default_intrinsics = true;
-    return publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
+    return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
 static OseoResult grow_properties(
@@ -2943,7 +2523,8 @@ OseoResult oseo_console_log(
 }
 
 static OseoResult promise_create(OseoContext *context) {
-    OseoPromise *promise = allocate_heap_bytes(context, sizeof(*promise));
+    OseoPromise *promise =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*promise));
     if (promise == NULL) {
         return failure(context, "OSEO2001", "Promise allocation failed.");
     }
@@ -2970,7 +2551,7 @@ static OseoResult promise_create(OseoContext *context) {
     promise->handled = false;
     promise->pending_report = false;
     promise->reported = false;
-    return publish_heap(
+    return oseo_internal_publish_heap(
         context,
         &promise->ordinary.header,
         OSEO_HEAP_PROMISE
@@ -3039,7 +2620,7 @@ static OseoResult reaction_create(
     OseoValue capability
 ) {
     OseoPromiseReaction *reaction =
-        allocate_heap_bytes(context, sizeof(*reaction));
+        oseo_internal_allocate_heap_bytes(context, sizeof(*reaction));
     if (reaction == NULL) {
         return failure(
             context,
@@ -3054,7 +2635,7 @@ static OseoResult reaction_create(
     reaction->aggregate = oseo_undefined();
     reaction->index = 0u;
     reaction->kind = OSEO_REACTION_NORMAL;
-    return publish_heap(
+    return oseo_internal_publish_heap(
         context,
         &reaction->header,
         OSEO_HEAP_PROMISE_REACTION
@@ -3069,7 +2650,7 @@ static OseoResult enqueue_job(
     OseoValue argument,
     bool fulfilled
 ) {
-    OseoJob *job = allocate_heap_bytes(context, sizeof(*job));
+    OseoJob *job = oseo_internal_allocate_heap_bytes(context, sizeof(*job));
     if (job == NULL) {
         return failure(context, "OSEO2001", "Promise job allocation failed.");
     }
@@ -3079,7 +2660,8 @@ static OseoResult enqueue_job(
     job->argument = argument;
     job->kind = kind;
     job->fulfilled = fulfilled;
-    OseoResult published = publish_heap(context, &job->header, OSEO_HEAP_JOB);
+    OseoResult published =
+        oseo_internal_publish_heap(context, &job->header, OSEO_HEAP_JOB);
     if (published.status != OSEO_STATUS_NORMAL) return published;
     if (tag_of(context->microtask_tail) == OSEO_TAG_UNDEFINED) {
         context->microtask_head = published.value;
@@ -3370,7 +2952,7 @@ static OseoResult promise_aggregate_create(
     size_t remaining
 ) {
     OseoPromiseAggregate *aggregate =
-        allocate_heap_bytes(context, sizeof(*aggregate));
+        oseo_internal_allocate_heap_bytes(context, sizeof(*aggregate));
     if (aggregate == NULL) {
         return failure(
             context,
@@ -3381,7 +2963,7 @@ static OseoResult promise_aggregate_create(
     aggregate->capability = capability;
     aggregate->values = values;
     aggregate->remaining = remaining;
-    return publish_heap(
+    return oseo_internal_publish_heap(
         context,
         &aggregate->header,
         OSEO_HEAP_PROMISE_AGGREGATE
@@ -4507,6 +4089,7 @@ typedef struct TimerArrayAncestor {
     const struct TimerArrayAncestor *previous;
 } TimerArrayAncestor;
 
+
 static bool timer_has_default_array_string(OseoValue value) {
     OseoValue current = value;
     while (is_object(current)) {
@@ -4991,7 +4574,7 @@ OseoResult oseo_set_timeout(
     }
     OseoTimer *timer = NULL;
     if (result.status == OSEO_STATUS_NORMAL) {
-        timer = allocate_heap_bytes(context, sizeof(*timer));
+        timer = oseo_internal_allocate_heap_bytes(context, sizeof(*timer));
         if (timer == NULL) {
             result = failure(
                 context,
@@ -5013,7 +4596,8 @@ OseoResult oseo_set_timeout(
         context->next_timer_order += 1u;
         timer->argument_count = callback_argument_count;
         timer->canceled = false;
-        result = publish_heap(context, &timer->header, OSEO_HEAP_TIMER);
+        result = oseo_internal_publish_heap(
+            context, &timer->header, OSEO_HEAP_TIMER);
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {

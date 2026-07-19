@@ -74,6 +74,8 @@ test("keeps the reviewed ordered runtime asset list", () => {
     [
       ["header", "oseo_runtime.h"],
       ["header", "runtime_internal.h"],
+      ["source", "runtime_core.c"],
+      ["source", "runtime_memory.c"],
       ["source", "runtime.c"],
     ],
   );

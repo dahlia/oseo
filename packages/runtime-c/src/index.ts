@@ -15,6 +15,16 @@ const runtimeInput: RuntimeInput = {
     },
     {
       kind: "source",
+      name: "runtime_core.c",
+      url: new URL("../native/runtime_core.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_memory.c",
+      url: new URL("../native/runtime_memory.c", import.meta.url),
+    },
+    {
+      kind: "source",
       name: "runtime.c",
       url: new URL("../native/runtime.c", import.meta.url),
     },

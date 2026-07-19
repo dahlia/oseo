@@ -317,4 +317,15 @@ static inline bool is_nullish(OseoValue value) {
     uint64_t tag = tag_of(value);
     return tag == OSEO_TAG_NULL || tag == OSEO_TAG_UNDEFINED;
 }
+/*
+ * Cross-component helpers. Each is defined in exactly one
+ * runtime translation unit.
+ */
+void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
+OseoResult oseo_internal_publish_heap(
+    OseoContext *context,
+    OseoHeapObject *object,
+    OseoHeapKind kind
+);
+
 #endif
