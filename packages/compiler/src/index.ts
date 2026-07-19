@@ -293,14 +293,21 @@ export type SyntaxStatement =
     })
   | (LocatedSyntax & {
       readonly kind: "break";
+      readonly label?: string;
     })
   | (LocatedSyntax & {
       readonly kind: "continue";
+      readonly label?: string;
     })
   | (LocatedSyntax & {
       readonly body: SyntaxStatement;
       readonly kind: "do-while";
       readonly test: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly body: SyntaxStatement;
+      readonly kind: "labeled";
+      readonly label: string;
     })
   | (LocatedSyntax & {
       readonly body: SyntaxStatement;
@@ -1316,14 +1323,21 @@ export type HirStatement =
     })
   | (LocatedSyntax & {
       readonly kind: "break";
+      readonly label?: string;
     })
   | (LocatedSyntax & {
       readonly kind: "continue";
+      readonly label?: string;
     })
   | (LocatedSyntax & {
       readonly body: HirStatement;
       readonly kind: "do-while";
       readonly test: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly body: HirStatement;
+      readonly kind: "labeled";
+      readonly label: string;
     })
   | (LocatedSyntax & {
       readonly body: HirStatement;
@@ -1464,6 +1478,8 @@ interface ResolveState {
     { readonly bindingId?: number; readonly id: number }
   >;
   readonly hirFunctions: HirFunction[];
+  /** Active labels of the function being resolved; loops accept continue. */
+  readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;
   readonly sourceId: string;
 }
@@ -1975,6 +1991,8 @@ function resolveFunction(
   }
   const bodyScope = new Map<string, Binding>();
   predeclareBindings(functionValue.body, bodyScope, state);
+  // Labels never cross a function boundary.
+  const outerLabels = state.labels.splice(0);
   const body = resolveStatementList(
     functionValue.body,
     [
@@ -1988,6 +2006,7 @@ function resolveFunction(
     true,
     bodyScope,
   );
+  state.labels.push(...outerLabels);
   const resolved: HirFunction = {
     ...functionValue,
     body,
@@ -2027,7 +2046,11 @@ function declaredHirBindingIds(
       if (statement.alternate != null) {
         result.push(...declaredHirBindingIds([statement.alternate]));
       }
-    } else if (statement.kind === "while" || statement.kind === "do-while") {
+    } else if (
+      statement.kind === "while" ||
+      statement.kind === "do-while" ||
+      statement.kind === "labeled"
+    ) {
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {
@@ -2197,6 +2220,25 @@ function resolveStatement(
     return { ...statement, block, finalizer, handler };
   }
   if (statement.kind === "break" || statement.kind === "continue") {
+    if (statement.label != null) {
+      const label = state.labels.findLast(
+        (entry) => entry.name === statement.label,
+      );
+      const valid = label != null && (statement.kind === "break" || label.loop);
+      if (!valid) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement,
+            label == null
+              ? `Undefined label '${statement.label}'.`
+              : `A continue label must reference an enclosing loop.`,
+          ),
+        );
+        return undefined;
+      }
+      return statement;
+    }
     const valid = statement.kind === "break" ? breakDepth > 0 : loopDepth > 0;
     if (!valid) {
       state.diagnostics.push(
@@ -2253,6 +2295,35 @@ function resolveStatement(
     return body == null || test == null
       ? undefined
       : { ...statement, body, test };
+  }
+  if (statement.kind === "labeled") {
+    if (state.labels.some((entry) => entry.name === statement.label)) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          statement,
+          `Duplicate label '${statement.label}'.`,
+        ),
+      );
+      return undefined;
+    }
+    let terminal: SyntaxStatement = statement.body;
+    while (terminal.kind === "labeled") terminal = terminal.body;
+    const loop =
+      terminal.kind === "while" ||
+      terminal.kind === "do-while" ||
+      terminal.kind === "for";
+    state.labels.push({ loop, name: statement.label });
+    const body = resolveStatement(
+      statement.body,
+      scopes,
+      state,
+      functionBody,
+      loopDepth,
+      breakDepth,
+    );
+    state.labels.pop();
+    return body == null ? undefined : { ...statement, body };
   }
   if (statement.kind === "for") {
     const forScope = new Map<string, Binding>();
@@ -2435,6 +2506,7 @@ function buildSeededHir(
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],
+    labels: [],
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
@@ -2674,7 +2746,11 @@ function appendHirStatement(
       appendHirStatement(lines, child, `${indent}  `);
     }
   } else if (statement.kind === "break" || statement.kind === "continue") {
-    lines.push(`${indent}${statement.kind}${location}`);
+    const label = statement.label == null ? "" : ` ${statement.label}`;
+    lines.push(`${indent}${statement.kind}${label}${location}`);
+  } else if (statement.kind === "labeled") {
+    lines.push(`${indent}${statement.label}:${location}`);
+    appendHirStatement(lines, statement.body, `${indent}  `);
   } else if (statement.kind === "while") {
     lines.push(
       `${indent}while ${printHirExpression(statement.test)}${location}`,
@@ -2975,6 +3051,13 @@ interface MirBuilder {
     readonly breakTarget: number;
     readonly continueTarget: number;
   }[];
+  readonly labels: {
+    readonly breakTarget: number;
+    readonly continueTarget?: number;
+    readonly name: string;
+  }[];
+  /** Labels waiting for the next loop lowering to claim their targets. */
+  readonly pendingLabels: string[];
   readonly finalizers: number[];
   current: MutableMirBlock;
   nextValue: number;
@@ -4338,10 +4421,27 @@ function lowerStatements(
       resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;
     } else if (statement.kind === "break" || statement.kind === "continue") {
-      const loop = builder.loops.at(-1);
-      if (loop == null) throw new Error(`${statement.kind} has no MIR loop.`);
-      const target =
-        statement.kind === "break" ? loop.breakTarget : loop.continueTarget;
+      let target: number;
+      if (statement.label != null) {
+        const label = builder.labels.findLast(
+          (entry) => entry.name === statement.label,
+        );
+        const labelTarget =
+          statement.kind === "break"
+            ? label?.breakTarget
+            : label?.continueTarget;
+        if (labelTarget == null) {
+          throw new Error(`${statement.kind} has no MIR label target.`);
+        }
+        target = labelTarget;
+      } else {
+        const loop = builder.loops.at(-1);
+        if (loop == null) {
+          throw new Error(`${statement.kind} has no MIR loop.`);
+        }
+        target =
+          statement.kind === "break" ? loop.breakTarget : loop.continueTarget;
+      }
       if (
         !enterFinalizer(builder, "jump", statement.range, undefined, target)
       ) {
@@ -4368,9 +4468,18 @@ function lowerStatements(
         breakTarget: exitBlock.id,
         continueTarget: conditionBlock.id,
       });
+      const claimed = builder.pendingLabels.splice(0);
+      for (const name of claimed) {
+        builder.labels.push({
+          breakTarget: exitBlock.id,
+          continueTarget: conditionBlock.id,
+          name,
+        });
+      }
       builder.current = bodyBlock;
       const terminated = lowerStatementBody(statement.body, builder);
       builder.loops.pop();
+      builder.labels.length -= claimed.length;
       if (!terminated) {
         builder.current.terminator = {
           kind: "jump",
@@ -4385,6 +4494,44 @@ function lowerStatements(
         [],
         statement.range,
       );
+    } else if (statement.kind === "labeled") {
+      const names: string[] = [];
+      let inner: HirStatement = statement;
+      while (inner.kind === "labeled") {
+        names.push(inner.label);
+        inner = inner.body;
+      }
+      if (
+        inner.kind === "while" ||
+        inner.kind === "do-while" ||
+        inner.kind === "for"
+      ) {
+        // The loop lowering claims these names and binds them to its
+        // own break and continue targets.
+        builder.pendingLabels.push(...names);
+        if (lowerStatements([inner], builder)) return true;
+      } else {
+        const exitBlock = createMirBlock(builder);
+        for (const name of names) {
+          builder.labels.push({ breakTarget: exitBlock.id, name });
+        }
+        const terminated = lowerStatements([inner], builder);
+        builder.labels.length -= names.length;
+        if (!terminated) {
+          builder.current.terminator = {
+            kind: "jump",
+            target: exitBlock.id,
+          };
+        }
+        builder.current = exitBlock;
+        appendMirMetadata(
+          builder,
+          "join",
+          `label ${names.join(" ")}`,
+          [],
+          statement.range,
+        );
+      }
     } else if (statement.kind === "switch") {
       const discriminant = lowerExpression(statement.discriminant, builder);
       resetBlockBindings(
@@ -4557,9 +4704,18 @@ function lowerStatements(
         breakTarget: exitBlock.id,
         continueTarget: updateBlock.id,
       });
+      const claimed = builder.pendingLabels.splice(0);
+      for (const name of claimed) {
+        builder.labels.push({
+          breakTarget: exitBlock.id,
+          continueTarget: updateBlock.id,
+          name,
+        });
+      }
       builder.current = bodyBlock;
       const terminated = lowerStatementBody(statement.body, builder);
       builder.loops.pop();
+      builder.labels.length -= claimed.length;
       if (!terminated) {
         builder.current.terminator = {
           kind: "jump",
@@ -4592,9 +4748,18 @@ function lowerStatements(
         breakTarget: exitBlock.id,
         continueTarget: conditionBlock.id,
       });
+      const claimed = builder.pendingLabels.splice(0);
+      for (const name of claimed) {
+        builder.labels.push({
+          breakTarget: exitBlock.id,
+          continueTarget: conditionBlock.id,
+          name,
+        });
+      }
       builder.current = bodyBlock;
       const terminated = lowerStatementBody(statement.body, builder);
       builder.loops.pop();
+      builder.labels.length -= claimed.length;
       if (!terminated) {
         builder.current.terminator = {
           kind: "jump",
@@ -4712,9 +4877,11 @@ function buildMirFunction(
     abruptTargets: [],
     blocks: [entry],
     current: entry,
+    labels: [],
     loops: [],
     finalizers: [],
     nextValue: 0,
+    pendingLabels: [],
     specialization,
   };
   const returned = lowerStatements(body, builder);
@@ -5363,6 +5530,9 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       (statement.finalizer != null && hirStatementHasAwait(statement.finalizer))
     );
   }
+  if (statement.kind === "labeled") {
+    return hirStatementHasAwait(statement.body);
+  }
   if (statement.kind === "switch") {
     return (
       hirExpressionHasAwait(statement.discriminant) ||
@@ -5421,7 +5591,11 @@ function collectHirBindings(
         collect(statement.handler.body);
       }
       if (statement.finalizer != null) collect(statement.finalizer);
-    } else if (statement.kind === "while" || statement.kind === "do-while") {
+    } else if (
+      statement.kind === "while" ||
+      statement.kind === "do-while" ||
+      statement.kind === "labeled"
+    ) {
       collect(statement.body);
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {

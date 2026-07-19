@@ -95,6 +95,13 @@ its deliberate boundary and its evidence:
     both async function bodies and module top level, because a
     conditionally evaluated suspension has no owned continuation contract
     yet.
+ -  Labeled statements with labeled `break` and `continue`. Labels on
+    loops bind to the loop's break and continue targets, labels on any
+    other statement are break-only, chained labels share one target, and
+    labeled completions cross `finally` blocks through the existing
+    completion machinery. The bootstrap parser validates label
+    references, so undefined labels, duplicate nested labels, and
+    `continue` against a non-loop label stay parse failures.
  -  The `switch` statement with lazy, source-ordered strict-equality case
     tests, fallthrough across clauses including a default clause in any
     position, and one case-block scope shared by every clause, so a

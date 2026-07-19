@@ -23,6 +23,7 @@ import type {
   SyntaxModule,
   SyntaxModuleSpecifier,
   SyntaxProgram,
+  SyntaxStatement,
 } from "../src/index.ts";
 
 const diagnostic: Diagnostic = {
@@ -829,6 +830,71 @@ test("lowers conditional expressions into branch arms and a join", () => {
   );
   assert.equal(armJumps.length, 2);
   assert.match(printMir(buildMir(hir)), /join \? bb/u);
+});
+
+test("validates label references during resolution", () => {
+  const labeled = (label: string, body: SyntaxStatement): SyntaxStatement => ({
+    body,
+    kind: "labeled",
+    label,
+    range,
+  });
+  const cases: readonly [SyntaxStatement, RegExp][] = [
+    [
+      labeled("known", {
+        body: [{ kind: "break", label: "missing", range }],
+        kind: "block",
+        range,
+      }),
+      /Undefined label 'missing'/u,
+    ],
+    [
+      labeled("target", {
+        body: [{ kind: "continue", label: "target", range }],
+        kind: "block",
+        range,
+      }),
+      /continue label must reference an enclosing loop/u,
+    ],
+    [
+      labeled(
+        "outer",
+        labeled("outer", {
+          body: [],
+          kind: "block",
+          range,
+        }),
+      ),
+      /Duplicate label 'outer'/u,
+    ],
+    [
+      labeled("outer", {
+        body: [
+          {
+            body: [{ kind: "break", label: "outer", range }],
+            kind: "function",
+            name: "inner",
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+        ],
+        kind: "block",
+        range,
+      }),
+      /Undefined label 'outer'/u,
+    ],
+  ];
+  for (const [statement, message] of cases) {
+    const result = buildHir({
+      body: [statement],
+      kind: "program",
+      range,
+      sourceId: "labels.ts",
+    });
+    assert.equal(result.program, undefined);
+    assert.match(result.diagnostics[0]?.message ?? "", message);
+  }
 });
 
 test("evaluates switch case tests lazily in separate blocks", () => {

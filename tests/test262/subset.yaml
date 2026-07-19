@@ -1244,6 +1244,15 @@ tests:
   - path: test/language/statements/function/param-duplicated-strict-1.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/language/statements/labeled/continue.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/labeled/decl-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/labeled/value-await-module.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, module-linking]
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]

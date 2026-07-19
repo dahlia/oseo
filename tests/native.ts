@@ -663,6 +663,51 @@ console.log(
 `,
   },
   {
+    name: "labeled-statements",
+    source: `
+outer: for (let i = 0; i < 3; i = i + 1) {
+  for (let j = 0; j < 3; j = j + 1) {
+    if (j === 2) continue outer;
+    if (i === 2) break outer;
+    console.log(i, j);
+  }
+}
+console.log("after nested");
+block: {
+  console.log("in block");
+  if (true) break block;
+  console.log("skipped");
+}
+console.log("after block");
+let path = "";
+walk: while (true) {
+  path = path + "a";
+  inner: do {
+    path = path + "b";
+    if (path.length > 4) break walk;
+    continue inner;
+  } while (false);
+  path = path + "c";
+}
+console.log(path);
+labeledSwitch: switch (1) {
+  case 1: break labeledSwitch;
+}
+console.log("switch label ok");
+chain: chained: while (true) { break chain; }
+console.log("chained labels");
+finallyOrder: for (let i = 0; i < 2; i = i + 1) {
+  try {
+    if (i === 0) continue finallyOrder;
+    break finallyOrder;
+  } finally {
+    console.log("finally", i);
+  }
+}
+console.log("after finally");
+`,
+  },
+  {
     name: "switch-statements",
     source: `
 function pick(value) {

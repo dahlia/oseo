@@ -593,6 +593,39 @@ test("rejects var exports explicitly", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
 
+test("converts labeled statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "outer: for (let i = 0; i < 3; i = i + 1) {\n" +
+      "  inner: while (true) { if (i === 1) continue outer; break inner; }\n" +
+      "}\n" +
+      "block: { break block; }\n",
+    sourceId: "labeled-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /outer:/u);
+  assert.match(hirText, /continue outer/u);
+  assert.match(hirText, /break block/u);
+});
+
+// The bootstrap parser validates label references, so undefined labels
+// and continue targets that are not loops stay parse failures.
+test("keeps invalid label references as parse failures", () => {
+  for (const source of [
+    "a: { break b; }",
+    "a: { continue a; }",
+    "a: a: while (true) break a;",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "invalid-label.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  }
+});
+
 test("converts switch statements to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:

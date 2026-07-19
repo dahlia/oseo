@@ -933,17 +933,28 @@ function statement(
     return { ...located, hint, initializer, kind: value.kind, name };
   }
   if (value.type === "BreakStatement" || value.type === "ContinueStatement") {
-    if (value.label != null) {
-      return unsupported(
-        context,
-        value,
-        "Labeled control flow is unsupported.",
-      );
+    const labelNode = node(value.label);
+    const label = labelNode == null ? undefined : identifierName(labelNode);
+    if (value.label != null && label == null) {
+      return unsupported(context, value);
     }
     return {
       ...located,
       kind: value.type === "BreakStatement" ? "break" : "continue",
+      ...(label == null ? {} : { label }),
     };
+  }
+  if (value.type === "LabeledStatement") {
+    const labelNode = node(value.label);
+    const label = labelNode == null ? undefined : identifierName(labelNode);
+    const bodyNode = node(value.body);
+    if (label == null || bodyNode == null) {
+      return unsupported(context, value);
+    }
+    const body = statement(context, bodyNode, functionBody);
+    return body == null
+      ? undefined
+      : { ...located, body, kind: "labeled", label };
   }
   if (value.type === "WhileStatement") {
     const testNode = node(value.test);
@@ -1776,7 +1787,11 @@ function collectVarStatement(
     }
     return true;
   }
-  if (value.type === "WhileStatement" || value.type === "DoWhileStatement") {
+  if (
+    value.type === "WhileStatement" ||
+    value.type === "DoWhileStatement" ||
+    value.type === "LabeledStatement"
+  ) {
     const body = node(value.body);
     return (
       body == null ||

@@ -10190,6 +10190,76 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/labeled/continue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/labeled/decl-let.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/statements/labeled/value-await-module.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - module-linking
+    observation:
+      detail: "test/language/statements/labeled/value-await-module.js:69:6:
+        error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes:
@@ -10573,7 +10643,7 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 210
+  expectedNegatives: 213
   harnessFailures: 0
   passes: 66
   semanticFailures: 0
@@ -10592,7 +10662,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 26
     - dependency: control-flow
-      expectedNegatives: 5
+      expectedNegatives: 8
       harnessFailures: 0
       passes: 3
       semanticFailures: 0
@@ -10616,13 +10686,13 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: lexical-bindings
-      expectedNegatives: 2
+      expectedNegatives: 3
       harnessFailures: 0
       passes: 5
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: module-linking
-      expectedNegatives: 136
+      expectedNegatives: 137
       harnessFailures: 0
       passes: 13
       semanticFailures: 0
@@ -10677,7 +10747,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 69
     - group: language/statements
-      expectedNegatives: 32
+      expectedNegatives: 35
       harnessFailures: 0
       passes: 26
       semanticFailures: 0
