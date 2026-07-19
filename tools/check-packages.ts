@@ -213,6 +213,7 @@ async function main(): Promise<void> {
       }
       if (packed.name === "@oseo/runtime-c") {
         requireFile(files, "native/oseo_runtime.h", packed.name);
+        requireFile(files, "native/runtime_internal.h", packed.name);
         requireFile(files, "native/runtime.c", packed.name);
       }
       const manifestBytes = await run(

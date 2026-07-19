@@ -9,6 +9,11 @@ const runtimeInput: RuntimeInput = {
       url: new URL("../native/oseo_runtime.h", import.meta.url),
     },
     {
+      kind: "header",
+      name: "runtime_internal.h",
+      url: new URL("../native/runtime_internal.h", import.meta.url),
+    },
+    {
       kind: "source",
       name: "runtime.c",
       url: new URL("../native/runtime.c", import.meta.url),
