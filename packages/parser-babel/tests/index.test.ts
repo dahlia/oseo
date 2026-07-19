@@ -84,13 +84,29 @@ test("rejects top-level this until script receivers exist", () => {
     sourceId: "script-this.ts",
   });
   assert.equal(script.diagnostics[0]?.code, "OSEO1001");
-  assert.match(script.diagnostics[0]?.message ?? "", /function bodies/u);
+  assert.match(script.diagnostics[0]?.message ?? "", /non-arrow function/u);
+
+  const topLevelArrow = compileSource(babelFrontend, {
+    source: "const read = () => this;",
+    sourceId: "arrow-this.ts",
+  });
+  assert.equal(topLevelArrow.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    topLevelArrow.diagnostics[0]?.message ?? "",
+    /non-arrow function/u,
+  );
 
   const functionBody = compileSource(babelFrontend, {
     source: "function receiver() { return this; }",
     sourceId: "function-this.ts",
   });
   assert.deepEqual(functionBody.diagnostics, []);
+
+  const nestedArrow = compileSource(babelFrontend, {
+    source: "function receiver() { return (() => this)(); }",
+    sourceId: "nested-arrow-this.ts",
+  });
+  assert.deepEqual(nestedArrow.diagnostics, []);
 });
 
 test("ignores tag-shaped text outside JSDoc comments", () => {
@@ -324,10 +340,10 @@ test("rejects only noncomputed __proto__ literals", () => {
   assert.deepEqual(accepted.diagnostics, []);
 });
 
-test("rejects the smallest syntax form outside the M3 profile", () => {
+test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = () => 1;",
-    sourceId: "arrow.ts",
+    source: "const value = class {};",
+    sourceId: "class.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
@@ -336,6 +352,19 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
     column: 15,
     line: 1,
   });
+});
+
+test("converts synchronous arrow functions to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const double = (value) => value * 2;\n" +
+      "const add = (left, right) => { return left + right; };\n" +
+      "const chain = (a) => (b) => a + b;\n" +
+      "console.log(double(21), add(1, 2), chain(1)(2));\n",
+    sourceId: "sync-arrows.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
 });
 
 test("converts typeof, void, and remainder to owned syntax", () => {
@@ -386,6 +415,335 @@ test("converts logical, conditional, and do-while to owned syntax", () => {
   assert.match(hirText, /&&/u);
   assert.match(hirText, /\|\|/u);
   assert.match(hirText, /\? "three" : "other"/u);
+});
+
+test("hoists var declarations to initialized bindings", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof hoisted);\n" +
+      "var hoisted = 1;\n" +
+      "if (hoisted) { var nested = 2, second; }\n" +
+      "console.log(hoisted, nested, second);\n",
+    sourceId: "var-hoisting.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  const hoistedIndex = hirText.indexOf("let %b");
+  const useIndex = hirText.indexOf("typeof");
+  assert.ok(hoistedIndex >= 0 && hoistedIndex < useIndex);
+});
+
+test("keeps var assignments on parameters and declared functions", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function keep(value) { var value; return value; }\n" +
+      "function pick() { var chosen; function chosen() {} " +
+      "return typeof chosen; }\n" +
+      "console.log(keep(1), pick());\n",
+    sourceId: "var-existing.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("supports awaited var initializers in async functions", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function wait(input) {\n" +
+      "  var value = await input;\n" +
+      "  if (value) { var flag = 1; }\n" +
+      "  return value + flag;\n" +
+      "}\n",
+    sourceId: "var-async.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("supports awaited top-level var initializers in modules", () => {
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "var ready = await Promise.resolve(41);\n" +
+      "export const value = ready + 1;\n",
+    sourceId: "file:///app/var-await.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-await.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-await.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+const varConflicts = [
+  ["var after let", "let value = 1; var value = 2;"],
+  ["var before let", "var value = 1; let value = 2;"],
+  ["var under enclosing let", "let value = 1; { var value = 2; }"],
+  ["var beside block let", "{ let value = 1; var value = 2; }"],
+] as const;
+
+// The bootstrap parser reports var and lexical redeclarations as parse
+// failures, which the frontend converts to owned OSEO0001 diagnostics.
+for (const [name, source] of varConflicts) {
+  test(`rejects ${name}`, () => {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  });
+}
+
+test("rejects var sharing a block-level function name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function outer() { { function inner() {} } var inner; }",
+    sourceId: "var-block-function.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /block-level function name/u,
+  );
+});
+
+test("keeps block-scoped let clear of later var declarations", () => {
+  const result = compileSource(babelFrontend, {
+    source: "{ let value = 1; console.log(value); } var value = 2;",
+    sourceId: "var-disjoint.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("rejects var declarations sharing a catch parameter name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "try { console.log(1); } catch (caught) { var caught; }",
+    sourceId: "var-catch.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
+});
+
+test("rejects var destructuring explicitly", () => {
+  const result = compileSource(babelFrontend, {
+    source: "var { value } = { value: 1 };",
+    sourceId: "var-destructuring.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /var destructuring/u);
+});
+
+test("rejects ambient declare declarations", () => {
+  const result = compileSource(babelFrontend, {
+    source: "declare var ambient: number;",
+    sourceId: "declare-var.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Ambient declarations/u);
+});
+
+test("keeps module var hoisting ahead of earlier assignments", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "x = 1;\nvar x;\nexport const done = x;\n",
+    sourceId: "file:///app/var-order.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-order.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-order.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-order",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+test("reports duplicate exports as entry parse failures", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "var x;\nexport { x };\nexport { x };\n",
+    sourceId: "file:///app/dup-export.js",
+  });
+  assert.ok(!result.parsed);
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Duplicate export/u);
+});
+
+test("rejects var exports explicitly", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export var value = 1;",
+    sourceId: "file:///app/export-var.js",
+  });
+  assert.ok(!result.parsed);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+});
+
+test("converts labeled statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "outer: for (let i = 0; i < 3; i = i + 1) {\n" +
+      "  inner: while (true) { if (i === 1) continue outer; break inner; }\n" +
+      "}\n" +
+      "block: { break block; }\n",
+    sourceId: "labeled-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /outer:/u);
+  assert.match(hirText, /continue outer/u);
+  assert.match(hirText, /break block/u);
+});
+
+// The bootstrap parser validates label references, so undefined labels
+// and continue targets that are not loops stay parse failures.
+test("keeps invalid label references as parse failures", () => {
+  for (const source of [
+    "a: { break b; }",
+    "a: { continue a; }",
+    "a: a: while (true) break a;",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "invalid-label.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  }
+});
+
+test("converts switch statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "switch (1 + 1) {\n" +
+      '  case 1: console.log("one"); break;\n' +
+      '  default: console.log("other");\n' +
+      '  case 2: console.log("two");\n' +
+      "}\n",
+    sourceId: "switch-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /switch /u);
+  assert.match(hirText, /default:/u);
+});
+
+test("keeps break valid inside if consequents", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "while (true) { if (1) break; }\n" +
+      "switch (1) { case 1: if (1) break; }\n" +
+      "do { if (1) continue; } while (false);\n",
+    sourceId: "guarded-break.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+// The bootstrap parser already rejects continue outside a loop, so the
+// rejection arrives as an owned OSEO0001 parse diagnostic.
+test("rejects continue without an enclosing loop", () => {
+  const result = compileSource(babelFrontend, {
+    source: "switch (1) { case 1: continue; }",
+    sourceId: "switch-continue.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+});
+
+test("rejects function declarations in switch clauses", () => {
+  const result = compileSource(babelFrontend, {
+    source: "switch (1) { case 1: function inner() {} }",
+    sourceId: "switch-function.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Function declarations in switch/u,
+  );
+});
+
+test("converts classic for statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "for (let i = 0, limit = 3; i < limit; i = i + 1) console.log(i);\n" +
+      "for (var counted = 0; counted < 2; counted = counted + 1);\n" +
+      "let started = 0;\n" +
+      "for (started = 1; started < 2; started = started + 1) {}\n" +
+      "for (;;) break;\n",
+    sourceId: "for-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /for \(let %b/u);
+});
+
+const unsupportedForForms = [
+  ["for-in", "for (const key in {}) console.log(key);"],
+  ["for-of", "for (const item of []) console.log(item);"],
+  ["for const without initializer", "for (const item; ;) break;"],
+] as const;
+
+for (const [name, source] of unsupportedForForms) {
+  test(`rejects ${name} statements`, () => {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.ok(result.diagnostics.length > 0);
+    assert.equal(result.mir, undefined);
+  });
+}
+
+test("converts in and instanceof to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function Box(value) { this.value = value; }\n" +
+      "const box = new Box(1);\n" +
+      'console.log("value" in box, box instanceof Box);\n',
+    sourceId: "relational-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, / in /u);
+  assert.match(hirText, / instanceof /u);
+});
+
+test("converts untagged template literals to concatenation", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const name = "world";\n' +
+      "console.log(`hello ${name}${1 + 1}!`, ``, `plain`);\n",
+    sourceId: "templates.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /"hello " \+/u);
+  assert.match(hirText, /\+ "!"/u);
+});
+
+test("rejects tagged template expressions", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function tag(parts) { return parts; } console.log(tag`x`);",
+    sourceId: "tagged.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Tagged template/u);
 });
 
 test("converts loose equality to owned syntax", () => {
@@ -469,7 +827,7 @@ const unsupportedForms = [
   ["logical assignment", "let value = null; value ||= 1;"],
   ["nullish assignment", "let value = null; value ??= 1;"],
   ["property", "console.error(1);"],
-  ["in operator", 'console.log("key" in {});'],
+  ["with statement", "with ({}) { console.log(1); }"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],
@@ -903,11 +1261,11 @@ test("preserves async returns and bindings across await", () => {
 
 test("validates unreachable async statements", () => {
   const loop = compileSource(babelFrontend, {
-    source: "async function invalid() { return 1; for (;;) {} }",
+    source: "async function invalid() { return 1; class Later {} }",
     sourceId: "async-unreachable-loop.js",
   });
   assert.equal(loop.mir, undefined);
-  assert.match(loop.diagnostics[0]?.message ?? "", /ForStatement/u);
+  assert.match(loop.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
 
   const awaitValue = compileSource(babelFrontend, {
     source: "async function invalid() { throw 1; if (true) await 0; }",
@@ -917,11 +1275,11 @@ test("validates unreachable async statements", () => {
   assert.match(awaitValue.diagnostics[0]?.message ?? "", /Await/u);
 
   const continuation = compileSource(babelFrontend, {
-    source: "async function invalid() { await 0; return 1; for (;;) {} }",
+    source: "async function invalid() { await 0; return 1; class Later {} }",
     sourceId: "async-unreachable-continuation.js",
   });
   assert.equal(continuation.mir, undefined);
-  assert.match(continuation.diagnostics[0]?.message ?? "", /ForStatement/u);
+  assert.match(continuation.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
 });
 
 test("rejects nested async await operands", () => {

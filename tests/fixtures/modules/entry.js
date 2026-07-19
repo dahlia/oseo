@@ -1,3 +1,4 @@
+import "./var-order.js";
 import * as values from "./values.js";
 import defaultFunction from "./cycle-a.js";
 import defaultExpression from "./default-expression.js";

@@ -23,6 +23,7 @@ import type {
   SyntaxModule,
   SyntaxModuleSpecifier,
   SyntaxProgram,
+  SyntaxStatement,
 } from "../src/index.ts";
 
 const diagnostic: Diagnostic = {
@@ -612,6 +613,40 @@ test("checks the status of coercing unary operators", () => {
   }
 });
 
+test("marks relational operators as allocation safepoints", () => {
+  for (const operator of ["in", "instanceof"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "string", range, value: "key" },
+            operator,
+            range,
+            right: { kind: "object", properties: [], range },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `${operator}-safepoint.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+  }
+});
+
 test("lowers void to an operand evaluation without a status check", () => {
   const syntax: SyntaxProgram = {
     body: [
@@ -795,6 +830,160 @@ test("lowers conditional expressions into branch arms and a join", () => {
   );
   assert.equal(armJumps.length, 2);
   assert.match(printMir(buildMir(hir)), /join \? bb/u);
+});
+
+test("validates label references during resolution", () => {
+  const labeled = (label: string, body: SyntaxStatement): SyntaxStatement => ({
+    body,
+    kind: "labeled",
+    label,
+    range,
+  });
+  const cases: readonly [SyntaxStatement, RegExp][] = [
+    [
+      labeled("known", {
+        body: [{ kind: "break", label: "missing", range }],
+        kind: "block",
+        range,
+      }),
+      /Undefined label 'missing'/u,
+    ],
+    [
+      labeled("target", {
+        body: [{ kind: "continue", label: "target", range }],
+        kind: "block",
+        range,
+      }),
+      /continue label must reference an enclosing loop/u,
+    ],
+    [
+      labeled(
+        "outer",
+        labeled("outer", {
+          body: [],
+          kind: "block",
+          range,
+        }),
+      ),
+      /Duplicate label 'outer'/u,
+    ],
+    [
+      labeled("outer", {
+        body: [
+          {
+            body: [{ kind: "break", label: "outer", range }],
+            kind: "function",
+            name: "inner",
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+        ],
+        kind: "block",
+        range,
+      }),
+      /Undefined label 'outer'/u,
+    ],
+  ];
+  for (const [statement, message] of cases) {
+    const result = buildHir({
+      body: [statement],
+      kind: "program",
+      range,
+      sourceId: "labels.ts",
+    });
+    assert.equal(result.program, undefined);
+    assert.match(result.diagnostics[0]?.message ?? "", message);
+  }
+});
+
+test("evaluates switch case tests lazily in separate blocks", () => {
+  const switchCase = (value: number): SyntaxProgram["body"][number] => ({
+    cases: [
+      {
+        body: [],
+        range,
+        test: { kind: "number", range, value: 1 },
+      },
+      {
+        body: [],
+        range,
+        test: { kind: "number", range, value: 2 },
+      },
+    ],
+    discriminant: { kind: "number", range, value },
+    kind: "switch",
+    range,
+  });
+  const syntax: SyntaxProgram = {
+    body: [switchCase(2)],
+    kind: "program",
+    range,
+    sourceId: "switch-lazy.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const testBlocks = script.blocks.filter((block) =>
+    block.operations.some(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    ),
+  );
+  assert.equal(testBlocks.length, 2);
+  assert.notEqual(testBlocks[0]?.id, testBlocks[1]?.id);
+  assert.match(printMir(buildMir(hir)), /join switch bb/u);
+});
+
+test("copies for-head bindings once per iteration", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        body: {
+          body: [
+            {
+              expression: {
+                kind: "binding-set",
+                name: "index",
+                range,
+                value: { kind: "number", range, value: 1 },
+              },
+              kind: "expression",
+              range,
+            },
+          ],
+          kind: "block",
+          range,
+        },
+        declarations: [
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 0 },
+            mutable: true,
+            name: "index",
+            range,
+          },
+        ],
+        kind: "for",
+        range,
+        test: { kind: "boolean", range, value: false },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "for-per-iteration.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const mir = buildMir(hir);
+  const resets = mir.script.blocks
+    .flatMap((block) => block.operations)
+    .filter((operation) => operation.kind === "binding-reset");
+  // One establishing cell, one pre-loop copy, and one per-iteration
+  // copy in the update block.
+  assert.equal(resets.length, 3);
+  const text = printMir(mir);
+  assert.match(text, /join for bb/u);
 });
 
 test("keeps do-while bodies ahead of their condition", () => {

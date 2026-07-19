@@ -3042,6 +3042,86 @@ OseoResult oseo_not_loose_equal(
     return normal(oseo_boolean(!equal));
 }
 
+OseoResult oseo_has_property(
+    OseoContext *context,
+    OseoValue key,
+    OseoValue object_value
+) {
+    if (!is_object(object_value)) {
+        return language_failure_message(
+            context,
+            "The in operator requires an object."
+        );
+    }
+    OseoValue slots[2] = {key, object_value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult converted = oseo_property_key(context, slots[0]);
+    oseo_roots_pop(context, &frame);
+    if (converted.status != OSEO_STATUS_NORMAL) return converted;
+    OseoValue property = converted.value;
+    OseoValue current = slots[1];
+    while (is_object(current)) {
+        OseoValue value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false};
+        if (own_descriptor(current, property, &value, &attributes)) {
+            return normal(oseo_boolean(true));
+        }
+        if (is_promise(current) &&
+            ordinary_object(current)->default_intrinsics &&
+            (string_is_ascii(property, "then") ||
+             string_is_ascii(property, "catch") ||
+             string_is_ascii(property, "finally"))) {
+            return normal(oseo_boolean(true));
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    return normal(oseo_boolean(false));
+}
+
+OseoResult oseo_instanceof(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    if (!is_function(right)) {
+        return language_failure_message(
+            context,
+            "The instanceof right operand must be callable."
+        );
+    }
+    if (!is_object(left)) return normal(oseo_boolean(false));
+    OseoValue slots[3] = {left, right, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    const char *name = "prototype";
+    uint16_t units[9];
+    for (size_t index = 0u; index < 9u; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoResult key = allocate_string(context, units, 9u);
+    if (key.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return key;
+    }
+    slots[2] = key.value;
+    OseoResult prototype = oseo_object_get(context, slots[1], slots[2]);
+    oseo_roots_pop(context, &frame);
+    if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
+    if (!is_object(prototype.value)) {
+        return language_failure_message(
+            context,
+            "The instanceof prototype must be an object."
+        );
+    }
+    OseoValue current = ordinary_object(slots[0])->prototype;
+    while (is_object(current)) {
+        if (current == prototype.value) return normal(oseo_boolean(true));
+        current = ordinary_object(current)->prototype;
+    }
+    return normal(oseo_boolean(false));
+}
+
 OseoResult oseo_not_strict_equal(
     OseoContext *context,
     OseoValue left,

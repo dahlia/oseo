@@ -663,6 +663,291 @@ console.log(
 `,
   },
   {
+    name: "labeled-statements",
+    source: `
+outer: for (let i = 0; i < 3; i = i + 1) {
+  for (let j = 0; j < 3; j = j + 1) {
+    if (j === 2) continue outer;
+    if (i === 2) break outer;
+    console.log(i, j);
+  }
+}
+console.log("after nested");
+block: {
+  console.log("in block");
+  if (true) break block;
+  console.log("skipped");
+}
+console.log("after block");
+let path = "";
+walk: while (true) {
+  path = path + "a";
+  inner: do {
+    path = path + "b";
+    if (path.length > 4) break walk;
+    continue inner;
+  } while (false);
+  path = path + "c";
+}
+console.log(path);
+labeledSwitch: switch (1) {
+  case 1: break labeledSwitch;
+}
+console.log("switch label ok");
+chain: chained: while (true) { break chain; }
+console.log("chained labels");
+finallyOrder: for (let i = 0; i < 2; i = i + 1) {
+  try {
+    if (i === 0) continue finallyOrder;
+    break finallyOrder;
+  } finally {
+    console.log("finally", i);
+  }
+}
+console.log("after finally");
+`,
+  },
+  {
+    name: "switch-statements",
+    source: `
+function pick(value) {
+  switch (value) {
+    case 1: return "one";
+    case 1 + 1: return "two";
+    default: return "other";
+  }
+}
+console.log(pick(1), pick(2), pick(3));
+function fall(value) {
+  let out = "";
+  switch (value) {
+    case "a": out = out + "a";
+    case "b": out = out + "b"; break;
+    case "c": out = out + "c";
+    default: out = out + "d";
+    case "e": out = out + "e";
+  }
+  return out;
+}
+console.log(fall("a"), fall("b"), fall("c"), fall("x"), fall("e"));
+const logging = (label, value) => { console.log("test", label); return value; };
+switch (2) {
+  case logging("first", 1): console.log("body1"); break;
+  case logging("second", 2): console.log("body2"); break;
+  case logging("third", 3): console.log("body3"); break;
+}
+switch (0) { }
+console.log("empty ok");
+let shared;
+switch (1) {
+  case 1: { let scoped = "case1"; shared = scoped; break; }
+  case 2: { let scoped = "case2"; shared = scoped; }
+}
+console.log(shared);
+function readClause(value) {
+  switch (value) {
+    case 2: let later = "set"; return later;
+  }
+  return "none";
+}
+console.log(readClause(2), readClause(3));
+let collected = "";
+for (let i = 0; i < 4; i = i + 1) {
+  switch (i) {
+    case 1: continue;
+    case 3: break;
+    default: collected = collected + i;
+  }
+  collected = collected + "-";
+}
+console.log(collected);
+const nanCase = () => {
+  switch (NaN) { case NaN: return "hit"; }
+  return "miss";
+};
+console.log(NaN === NaN, nanCase());
+`,
+  },
+  {
+    name: "for-loops",
+    source: `
+for (let i = 0; i < 3; i = i + 1) console.log("let", i);
+const captures = [];
+for (let i = 0; i < 3; i = i + 1) { captures[i] = () => i; }
+console.log(captures[0](), captures[1](), captures[2]());
+for (var counted = 0; counted < 2; counted = counted + 1) {
+  console.log("var", counted);
+}
+console.log("after", counted);
+let total = 0;
+for (;;) { total = total + 1; if (total >= 4) break; }
+console.log(total);
+for (let i = 0, j = 10; i < j; i = i + 1, j = j - 1) {
+  if (i === 2) continue;
+  console.log(i, j);
+}
+let text = "";
+for (let i = 0; i < 3; i = i + 1) {
+  if (i === 1) continue;
+  text = text + i;
+}
+console.log(text);
+for (total = 0; total < 2; total = total + 1) console.log("expr", total);
+for (const fixed = 5; false;) console.log("never");
+let shadow = "outer";
+for (let shadow = 0; shadow < 1; shadow = shadow + 1) {
+  console.log("inner", shadow);
+}
+console.log(shadow);
+function sumTo(limit) {
+  let sum = 0;
+  for (let i = 1; i <= limit; i = i + 1) sum = sum + i;
+  return sum;
+}
+console.log(sumTo(10));
+console.log("done");
+`,
+  },
+  {
+    name: "in-and-instanceof",
+    source: `
+const box = { present: undefined, value: 1 };
+console.log("present" in box, "value" in box, "missing" in box);
+const parent = { inherited: 1 };
+const child = Object.create(parent);
+console.log("inherited" in child, "own" in child);
+child.own = 2;
+console.log("own" in child);
+console.log(0 in [10, 20], 1 in [10, 20], 2 in [10, 20]);
+console.log("length" in [1], 1 in [1, , 3], 1 in { "1": true });
+console.log("prototype" in function named() {});
+try {
+  console.log("x" in "text");
+} catch (caught) {
+  console.log("in-requires-object");
+}
+function Base(value) { this.value = value; }
+const base = new Base(1);
+console.log(base instanceof Base, ({}) instanceof Base);
+function Derived() {}
+Derived.prototype = Object.create(Base.prototype);
+const derived = new Derived();
+console.log(derived instanceof Derived, derived instanceof Base);
+console.log(1 instanceof Base, "s" instanceof Base, null instanceof Base);
+try {
+  console.log(base instanceof 1);
+} catch (caught) {
+  console.log("callable-required");
+}
+const arrow = () => 1;
+try {
+  console.log(base instanceof arrow);
+} catch (caught) {
+  console.log("prototype-required");
+}
+`,
+  },
+  {
+    name: "template-literals",
+    source: `
+const name = "world";
+console.log(\`hello \${name}!\`);
+console.log(\`\${1}\${2}\`, \`a\${null}b\${undefined}\`);
+console.log(\`\${NaN} \${-0} \${1e21} \${0.1 + 0.2}\`);
+console.log(\`multi
+line\`, \`escaped\\n\\t\${"x"}\`, \`\\u{1F600}\`);
+console.log(\`\${1 + 2} and \${\`nested \${name}\`}\`);
+const empty = \`\`;
+console.log(empty === "", \`\${true}\${false}\`, typeof \`\${1}\`);
+const logging = (value) => { console.log("evaluated", value); return value; };
+console.log(\`\${logging("first")}-\${logging("second")}\`);
+`,
+  },
+  {
+    name: "sync-arrows",
+    source: `
+const double = (value) => value * 2;
+const add = (left, right) => { return left + right; };
+console.log(double(21), add(1, 2));
+console.log(double.name, double.length, add.length);
+const outer = {
+  value: "captured",
+  read: function () { return (() => this.value)(); },
+};
+console.log(outer.read());
+const chain = (a) => (b) => a + b;
+console.log(chain("first-")("second"));
+try {
+  new double(1);
+} catch (caught) {
+  console.log("not constructible");
+}
+const noParen = value => value + "!";
+console.log(noParen("bang"));
+console.log(typeof double, (() => 7)());
+let counter = 0;
+const touch = () => { counter = counter + 1; return counter; };
+touch();
+touch();
+console.log(counter);
+const picky = (first) => typeof first;
+console.log(picky(double), picky(undefined));
+`,
+  },
+  {
+    name: "var-declarations",
+    source: `
+console.log(typeof hoisted, hoisted);
+var hoisted = 1;
+console.log(hoisted);
+var hoisted = 2;
+console.log(hoisted);
+function scoped() {
+  var value = "function";
+  if (true) { var value = "block"; }
+  while (false) { var loop = 1; }
+  console.log(value, typeof loop, loop);
+  return value;
+}
+console.log(scoped());
+function paramShadow(a) { var a; console.log(a); var a = 2; return a; }
+console.log(paramShadow(1), paramShadow(undefined));
+function fnVar() { var g; function g() {} return typeof g; }
+console.log(fnVar());
+function fnVarAssigned() { var g = 1; function g() {} return typeof g; }
+console.log(fnVarAssigned());
+function bare() { var missing; return missing; }
+console.log(bare());
+let outer = "let-outer";
+{ var shadowless = outer; }
+console.log(shadowless);
+var chain = 1, second = chain + 1, third;
+console.log(chain, second, third);
+console.log(before());
+function before() { return "function hoisted"; }
+do { var doVar = "do"; } while (false);
+console.log(doVar);
+function readsLate() { return late; var late; }
+console.log(readsLate());
+try { console.log("try"); } catch (caught) { var inCatch = 1; }
+console.log(typeof inCatch);
+`,
+  },
+  {
+    name: "var-async",
+    source: `
+async function accumulate(start) {
+  var total = start;
+  var next = await Promise.resolve(total + 1);
+  if (next > 0) { var flag = "set"; }
+  var reused = await Promise.resolve(next + 1);
+  return reused + " " + flag + " " + typeof trailing;
+  var trailing;
+}
+accumulate(1).then(function (result) { console.log(result); });
+`,
+  },
+  {
     name: "loose-equality",
     source: `
 console.log(1 == "1", "" == 0, "0" == false, true == 1, false == "");
@@ -1472,7 +1757,10 @@ for (const fixture of fixtures) {
     fixture.name === "async-continuations" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
-    fixture.name === "timer-event-loop"
+    fixture.name === "timer-event-loop" ||
+    fixture.name === "in-and-instanceof" ||
+    fixture.name === "typeof-void-remainder" ||
+    fixture.name === "template-literals"
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
@@ -2165,6 +2453,19 @@ assert.equal(allocationFailure.exitStatus, 1);
 assert.equal(allocationFailure.stdout, "");
 assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
 
+// The switch-tdz fixture explains why this check bypasses the Deno
+// reference: Deno's TypeScript transpile loses the case-level TDZ.
+const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;
+const nativeSwitchTdz = await runNativeCli(
+  {
+    args: [switchTdzEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
+assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
+
 const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
 const nativeModule = await runNativeCli(
   {
@@ -2177,7 +2478,8 @@ assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
 assert.equal(nativeModule.stderr, "");
 assert.equal(
   nativeModule.stdout,
-  "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+  "var order 1 2 undefined\n" +
+    "cycle b ready default ready\ncycle c ready\ncycle a\n" +
     "default first\ndefault second\nidentity once\n" +
     "answer increment 41\n" +
     "42\ntrue true false\n" +

@@ -95,10 +95,70 @@ its deliberate boundary and its evidence:
     both async function bodies and module top level, because a
     conditionally evaluated suspension has no owned continuation contract
     yet.
+ -  Labeled statements with labeled `break` and `continue`. Labels on
+    loops bind to the loop's break and continue targets, labels on any
+    other statement are break-only, chained labels share one target, and
+    labeled completions cross `finally` blocks through the existing
+    completion machinery. The bootstrap parser validates label
+    references, so undefined labels, duplicate nested labels, and
+    `continue` against a non-loop label stay parse failures.
+ -  The `switch` statement with lazy, source-ordered strict-equality case
+    tests, fallthrough across clauses including a default clause in any
+    position, and one case-block scope shared by every clause, so a
+    lexical clause binding read before its clause runs stays a runtime
+    TDZ error. `break` targets the switch while `continue` passes
+    through to the enclosing loop. Function declarations inside switch
+    clauses stay rejected with a source-located diagnostic.
+ -  The classic `for` statement with expression, `var`, `let`, `const`,
+    and empty heads. Mutable lexical head bindings follow
+    `CreatePerIterationEnvironment`: each iteration reads the current
+    values, creates fresh cells through the existing binding-reset
+    machinery, and re-initializes them, so closures created in the body
+    capture one environment per iteration, while a `const` head keeps
+    its single environment as the specification requires. `continue`
+    re-enters through the update clause after the per-iteration copy.
+    `for-in` and `for-of` stay rejected with a source-located
+    diagnostic. The empty statement is also admitted as a no-op block.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  The `in` and `instanceof` relational operators. `in` converts its key
+    through the shared property-key conversion and walks the prototype
+    chain with the same visibility as generic property reads, and
+    `instanceof` implements `OrdinaryHasInstance` without well-known
+    symbols, which the profile does not admit yet. Non-object `in` right
+    operands, non-callable `instanceof` right operands, and non-object
+    `prototype` values throw the shared catchable opaque errors.
+ -  Untagged template literals, normalized by the frontend into string
+    concatenation. Substitutions evaluate left to right interleaved with
+    the cooked template pieces, every substitution converts through the
+    shared string conversion, and object substitutions keep the shared
+    unsupported coercion boundary. Tagged template expressions stay
+    rejected with a source-located diagnostic.
+ -  Synchronous arrow functions with block and expression bodies,
+    reusing the arrow function kind, lexical receiver, and
+    non-constructibility the runtime already owns for asynchronous
+    arrows. `this` stays admitted only where an enclosing non-arrow
+    function provides it, so a top-level arrow reading `this` is
+    rejected with a source-located diagnostic instead of approximating
+    the script receiver.
+ -  `var` declarations with function-scope hoisting, multiple
+    declarators, redeclaration, parameter and declared-function name
+    sharing, and awaited initializers in async functions and module top
+    level. The frontend normalizes each function, script, or module body
+    into hoisted bindings initialized to `undefined` plus in-place
+    assignments, so no separate binding kind reaches HIR or the runtime.
+    Deliberate boundaries, each rejected with a source-located
+    diagnostic: `var` destructuring, `export var`, ambient `declare`
+    declarations, a `var` sharing a catch parameter name (ECMAScript
+    allows it), a `var` sharing a block-level function declaration name,
+    because Annex B function hoisting would make the difference
+    observable, and an awaited initializer in a declaration list with
+    more than one declarator. Top-level Script
+    `var` creates a script binding rather than a global-object property;
+    the difference is unobservable while `globalThis` remains outside
+    the profile, and the `globalThis` gap entry owns the revisit.
  -  The `==` and `!=` loose equality operators, implementing
     `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
     nullish operand compared with anything else is unequal without
@@ -133,11 +193,10 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  `var` declarations, destructuring, spread, default parameters, template
-    literals, synchronous arrow functions, classes, generators, symbols,
-    big integers, regular expressions, and the remaining expression grammar
-    are outside the admitted syntax. Owner: the core expressions and
-    bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Destructuring, spread, default parameters, classes, generators,
+    symbols, big integers, regular expressions, and the remaining
+    expression grammar are outside the admitted syntax. Owner: the core
+    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  Named error intrinsics such as `TypeError` do not exist. Runtime
     semantic errors are catchable opaque values without ECMAScript error
     identity, and only resource limits and host failures surface as owned

@@ -490,10 +490,12 @@ the candidate edition boundary and manifest schema are frozen, the test262
 harness observes module and asynchronous execution, and the
 dependency-indexed baseline is published.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
-source challenge features through explicit unsupported classifications, and
-the core expression stream has begun with the `typeof`, `void`, and `%`
-operators, short-circuit and conditional expressions, and the `do-while`
-statement. The remaining queue is:
+source challenge features through explicit unsupported classifications.
+The core expression and control-flow stream now covers the scalar
+operator families, `var`, synchronous arrows, template literals, and the
+`do-while`, `for`, `switch`, and labeled statements;
+[*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The
+remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.

@@ -140,6 +140,15 @@ tests:
   - path: test/built-ins/Promise/resolve/resolve-non-obj.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/params-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/prototype-rules.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -276,8 +285,8 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/coalesce/follows-null.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [expression-operators]
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/comma/S11.14_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
@@ -350,6 +359,12 @@ tests:
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/in/rhs-yield-absent-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/instanceof/S11.8.6_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
@@ -362,6 +377,12 @@ tests:
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/typeof/boolean.js
     expectedClassification: pass
     dependencies: [expression-operators]
@@ -402,16 +423,16 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-dflt-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-dflt.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-id-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-star-as-dflt.js
     expectedClassification: unsupported-profile-feature
@@ -558,16 +579,16 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-dflt-thru-star-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-dflt-thru-star.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-not-found-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-star-cycle.js
     expectedClassification: unsupported-profile-feature
@@ -582,10 +603,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-fun-named.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-fun.js
     expectedClassification: unsupported-profile-feature
@@ -594,19 +615,19 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-dflt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found-dflt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-star-cycle.js
     expectedClassification: unsupported-profile-feature
@@ -630,7 +651,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-resolve-order-src.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-as-props-dflt-skip.js
     expectedClassification: unsupported-profile-feature
@@ -639,7 +660,7 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-err-not-found.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
     expectedClassification: pass
@@ -651,11 +672,11 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-props-dflt-keep-indirect.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [module-linking]
+    expectedClassification: pass
+    dependencies: [expression-operators, module-linking]
   - path: test/language/module-code/instn-star-props-dflt-keep-local.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [module-linking]
+    expectedClassification: pass
+    dependencies: [expression-operators, module-linking]
   - path: test/language/module-code/instn-star-props-dflt-skip.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
@@ -1184,6 +1205,12 @@ tests:
   - path: test/language/statements/do-while/decl-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for/let-identifier-with-newline.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for/scope-body-lex-boundary.js
+    expectedClassification: pass
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/function/S13.2.1_A1_T1.js
     expectedClassification: pass
     dependencies: [functions]
@@ -1217,12 +1244,27 @@ tests:
   - path: test/language/statements/function/param-duplicated-strict-1.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/language/statements/labeled/continue.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/labeled/decl-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/labeled/value-await-module.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, module-linking]
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]
   - path: test/language/statements/let/syntax/let.js
     expectedClassification: pass
     dependencies: [lexical-bindings]
+  - path: test/language/statements/switch/S12.11_A3_T3.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/switch/scope-lex-open-case.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
@@ -1241,3 +1283,12 @@ tests:
   - path: test/language/statements/try/S12.14_A18_T2.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/variable/S12.2_A12.js
+    expectedClassification: pass
+    dependencies: [control-flow, var-bindings]
+  - path: test/language/statements/variable/S12.2_A8_T1.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/statements/variable/S12.2_A8_T4.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]

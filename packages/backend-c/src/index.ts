@@ -100,6 +100,8 @@ function operatorHelper(operator: BinaryOperator): string {
     ">>": "oseo_shift_right",
     ">>>": "oseo_shift_right_unsigned",
     "^": "oseo_bitwise_xor",
+    in: "oseo_has_property",
+    instanceof: "oseo_instanceof",
     "|": "oseo_bitwise_or",
   };
   return helpers[operator];
