@@ -76,6 +76,10 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["header", "runtime_internal.h"],
       ["source", "runtime_core.c"],
       ["source", "runtime_memory.c"],
+      ["source", "runtime_binding.c"],
+      ["source", "runtime_object.c"],
+      ["source", "runtime_function.c"],
+      ["source", "runtime_primitive.c"],
       ["source", "runtime.c"],
     ],
   );

@@ -25,6 +25,26 @@ const runtimeInput: RuntimeInput = {
     },
     {
       kind: "source",
+      name: "runtime_binding.c",
+      url: new URL("../native/runtime_binding.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_object.c",
+      url: new URL("../native/runtime_object.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_function.c",
+      url: new URL("../native/runtime_function.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_primitive.c",
+      url: new URL("../native/runtime_primitive.c", import.meta.url),
+    },
+    {
+      kind: "source",
       name: "runtime.c",
       url: new URL("../native/runtime.c", import.meta.url),
     },

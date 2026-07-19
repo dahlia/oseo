@@ -2497,7 +2497,10 @@ const concatenationOverflowHost = {
   ...host,
   async readTextFile(path: string | URL): Promise<string> {
     const source = await host.readTextFile(path);
-    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+    if (
+      !(path instanceof URL) ||
+      !path.pathname.endsWith("/runtime_primitive.c")
+    ) {
       return source;
     }
     const injected = source.replace(
@@ -2529,7 +2532,10 @@ const allocationFailureHost = {
   ...host,
   async readTextFile(path: string | URL): Promise<string> {
     const source = await host.readTextFile(path);
-    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+    if (
+      !(path instanceof URL) ||
+      !path.pathname.endsWith("/runtime_primitive.c")
+    ) {
       return source;
     }
     const injected = source.replace(

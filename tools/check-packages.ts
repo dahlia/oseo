@@ -216,6 +216,10 @@ async function main(): Promise<void> {
         requireFile(files, "native/runtime_internal.h", packed.name);
         requireFile(files, "native/runtime_core.c", packed.name);
         requireFile(files, "native/runtime_memory.c", packed.name);
+        requireFile(files, "native/runtime_binding.c", packed.name);
+        requireFile(files, "native/runtime_object.c", packed.name);
+        requireFile(files, "native/runtime_function.c", packed.name);
+        requireFile(files, "native/runtime_primitive.c", packed.name);
         requireFile(files, "native/runtime.c", packed.name);
       }
       const manifestBytes = await run(

@@ -327,5 +327,45 @@ OseoResult oseo_internal_publish_heap(
     OseoHeapObject *object,
     OseoHeapKind kind
 );
+OseoResult oseo_internal_allocate_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+);
+bool oseo_internal_own_descriptor(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+);
+OseoResult oseo_internal_promise_aggregate_settle(
+    OseoContext *context,
+    OseoValue reaction_value,
+    OseoValue argument,
+    bool fulfilled
+);
+OseoResult oseo_internal_promise_finally_continuation_create(
+    OseoContext *context,
+    OseoValue preserved,
+    bool fulfilled
+);
+OseoResult oseo_internal_promise_finally_invoke(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_finally
+);
+OseoResult oseo_internal_promise_invoke_then(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+);
+OseoResult oseo_internal_promise_method_function(
+    OseoContext *context,
+    const char *name
+);
+bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
+OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 
 #endif
