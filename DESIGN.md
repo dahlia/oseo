@@ -457,10 +457,9 @@ sources or archive layout. The runtime implementation is split across
 component translation units for context lifecycle, memory, bindings,
 objects, functions, primitives, promises, and the event loop, sharing the
 package-private *runtime\_internal.h* that is never included by generated
-C; [*PLAN-RCR.md*](./PLAN-RCR.md) and
-[*docs/runtime-components.md*](./docs/runtime-components.md) record that
-componentization and its ownership rules. Generated programs may still
-depend on
+C; [*docs/runtime-components.md*](./docs/runtime-components.md) records
+that componentization and its ownership rules. Generated programs may
+still depend on
 selected system libraries. Those dependencies must be listed as part of
 the target definition and must not be confused with Node-API addon
 support.

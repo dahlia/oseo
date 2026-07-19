@@ -37,17 +37,18 @@ recorded in [*docs/language-profile-m5.md*](./docs/language-profile-m5.md).
 The remaining item 4 work is the semantic groundwork that needs owned
 runtime surfaces: named error intrinsics, generic `ToPrimitive`,
 symbols, and the iterator protocol. The runtime component boundaries
-from [*PLAN-RCR.md*](./PLAN-RCR.md) are implemented, so that work is no
-longer blocked on them. Delivery items 5, 6, 8, and 9 remain open.
+recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
+are implemented, so that work is no longer blocked on them. Delivery
+items 5, 6, 8, and 9 remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted records
-under *docs/adr/*. The runtime componentization in
-[*PLAN-RCR.md*](./PLAN-RCR.md) provides the component boundaries that
-large intrinsic tables and built-in families build on. Evidence that
-changes one of these contracts updates the affected document in the same
-change.
+under *docs/adr/*. The completed runtime componentization recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md) provides
+the component boundaries that large intrinsic tables and built-in
+families build on. Evidence that changes one of these contracts updates
+the affected document in the same change.
 
 
 Goal
@@ -152,8 +153,9 @@ An intrinsic enters through a table or owned runtime interface whose identity
 and attributes are testable. Generated C must not duplicate mutable singleton
 state accidentally. Generic algorithms remain authoritative when a fast path
 cannot prove its preconditions. Large intrinsic tables and built-in
-families extend the runtime components established by
-[*PLAN-RCR.md*](./PLAN-RCR.md). A family whose semantics the admitted
+families extend the runtime components recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md). A family
+whose semantics the admitted
 profile can already express may instead be self-hosted in the compiled
 subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
 primitive operations in the C runtime.

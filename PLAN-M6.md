@@ -14,11 +14,13 @@ named by the targeted standard edition.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The runtime
-componentization in [*PLAN-RCR.md*](./PLAN-RCR.md) is the prerequisite for
-every large web API family: a new API lands in an owned runtime component,
-not in a catch-all translation unit. Evidence that changes one of these
-contracts updates the affected document in the same change.
+language profiles, and accepted records under *docs/adr/*. The completed
+runtime componentization recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
+the prerequisite for every large web API family: a new API lands in an
+owned runtime component, not in a catch-all translation unit. Evidence
+that changes one of these contracts updates the affected document in the
+same change.
 
 [Minimum common web API]: https://min-common-api.proposal.wintertc.org/
 
@@ -147,7 +149,8 @@ Compiler and runtime invariants
 Web APIs are runtime capabilities, not language semantics. The compiler
 core stays free of web-platform knowledge; API surfaces enter through the
 same intrinsic and host interfaces the M5 built-in streams use, inside
-components owned under [*PLAN-RCR.md*](./PLAN-RCR.md).
+the components recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md).
 
 Every new heap kind defines tracing before allocation can collect it.
 Callbacks, listeners, stream queues, and in-flight operations are rooted

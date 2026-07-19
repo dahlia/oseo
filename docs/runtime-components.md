@@ -4,12 +4,14 @@ C runtime componentization evidence
 Status
 ------
 
-This document records the evidence required by
-[*PLAN-RCR.md*](../PLAN-RCR.md). The baseline section below is the
-comparison point taken before the first extraction; the ownership section
-records the completed component layout. The baseline is not a promise of
-byte-identical object files; it exists so that behavior, symbol, and size
-differences introduced by the migration remain explainable.
+This document is the durable record of the completed C runtime
+componentization delivered by the retired *PLAN-RCR.md* plan. The
+baseline section below is the comparison point taken before the first
+extraction; the ownership section records the completed component layout
+and is the reference for where new runtime work lands. The baseline is
+not a promise of byte-identical object files; it exists so that behavior,
+symbol, and size differences introduced by the migration remain
+explainable.
 
 
 Component ownership after extraction
@@ -26,7 +28,7 @@ exactly this order. The symbols test in
 *packages/runtime-c/tests/symbols.test.ts* enforces the reviewed list,
 the include boundaries, and the one-definition rule on every change.
 
-Ownership follows the target layout in [*PLAN-RCR.md*](../PLAN-RCR.md):
+Ownership follows the plan's target layout:
 
  -  *runtime\_core.c*: results, context lifecycle, diagnostics, call
     limits, frames, root-stack operations, and immediate value
@@ -136,7 +138,19 @@ In the compared symbol and size metrics, the only differences from the
 recorded baseline are the ones explained above: the fourteen intended
 `oseo_internal_` symbols, and the archive and fixture growth from
 per-unit duplication of `static inline` value helpers and sanitizer
-metadata. This closes [*PLAN-RCR.md*](../PLAN-RCR.md).
+metadata.
+
+Continuous integration then confirmed the same result on both supported
+execution targets:
+[run 29688299958]
+at commit `918535a` passed the repository check job, all six
+bootstrap-host test jobs, and both native jobs, with
+`test-native (ubuntu-latest, linux-x86_64-gnu)` and
+`test-native (macos-15, macos-aarch64)` each running `mise run check`,
+`mise run test`, and `mise run test:property:extended` green. This
+closes the plan.
+
+[run 29688299958]: https://github.com/dahlia/oseo/actions/runs/29688299958
 
 
 Baseline before extraction
@@ -218,7 +232,7 @@ large size with seeds 1592590337, 1592590338, and 1592590339.
 ### Dependency inventory
 
 The single translation unit groups its 220 function definitions into the
-responsibilities named by [*PLAN-RCR.md*](../PLAN-RCR.md). The observed
+responsibilities named by the plan. The observed
 cross-responsibility dependencies that shape the internal header are:
 
  -  Value tagging, kind predicates, and heap-object casts are used by every

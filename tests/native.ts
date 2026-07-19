@@ -1862,7 +1862,7 @@ for (const fixture of fixtures) {
   }
 }
 
-// PLAN-RCR multi-source build contract: every reviewed runtime
+// Multi-source runtime build contract: every reviewed runtime
 // translation unit plus an extra probe unit compiles, archives in
 // input order, and links into an executable whose observation matches
 // the reviewed-runtime build. The copied runtime_core.c gains an
