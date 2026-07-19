@@ -388,6 +388,182 @@ test("converts logical, conditional, and do-while to owned syntax", () => {
   assert.match(hirText, /\? "three" : "other"/u);
 });
 
+test("hoists var declarations to initialized bindings", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof hoisted);\n" +
+      "var hoisted = 1;\n" +
+      "if (hoisted) { var nested = 2, second; }\n" +
+      "console.log(hoisted, nested, second);\n",
+    sourceId: "var-hoisting.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  const hoistedIndex = hirText.indexOf("let %b");
+  const useIndex = hirText.indexOf("typeof");
+  assert.ok(hoistedIndex >= 0 && hoistedIndex < useIndex);
+});
+
+test("keeps var assignments on parameters and declared functions", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function keep(value) { var value; return value; }\n" +
+      "function pick() { var chosen; function chosen() {} " +
+      "return typeof chosen; }\n" +
+      "console.log(keep(1), pick());\n",
+    sourceId: "var-existing.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("supports awaited var initializers in async functions", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function wait(input) {\n" +
+      "  var value = await input;\n" +
+      "  if (value) { var flag = 1; }\n" +
+      "  return value + flag;\n" +
+      "}\n",
+    sourceId: "var-async.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("supports awaited top-level var initializers in modules", () => {
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "var ready = await Promise.resolve(41);\n" +
+      "export const value = ready + 1;\n",
+    sourceId: "file:///app/var-await.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-await.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-await.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+const varConflicts = [
+  ["var after let", "let value = 1; var value = 2;"],
+  ["var before let", "var value = 1; let value = 2;"],
+  ["var under enclosing let", "let value = 1; { var value = 2; }"],
+  ["var beside block let", "{ let value = 1; var value = 2; }"],
+] as const;
+
+// The bootstrap parser reports var and lexical redeclarations as parse
+// failures, which the frontend converts to owned OSEO0001 diagnostics.
+for (const [name, source] of varConflicts) {
+  test(`rejects ${name}`, () => {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  });
+}
+
+test("rejects var sharing a block-level function name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function outer() { { function inner() {} } var inner; }",
+    sourceId: "var-block-function.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /block-level function name/u,
+  );
+});
+
+test("keeps block-scoped let clear of later var declarations", () => {
+  const result = compileSource(babelFrontend, {
+    source: "{ let value = 1; console.log(value); } var value = 2;",
+    sourceId: "var-disjoint.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("rejects var declarations sharing a catch parameter name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "try { console.log(1); } catch (caught) { var caught; }",
+    sourceId: "var-catch.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
+});
+
+test("rejects var destructuring explicitly", () => {
+  const result = compileSource(babelFrontend, {
+    source: "var { value } = { value: 1 };",
+    sourceId: "var-destructuring.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /var destructuring/u);
+});
+
+test("rejects ambient declare declarations", () => {
+  const result = compileSource(babelFrontend, {
+    source: "declare var ambient: number;",
+    sourceId: "declare-var.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Ambient declarations/u);
+});
+
+test("keeps module var hoisting ahead of earlier assignments", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "x = 1;\nvar x;\nexport const done = x;\n",
+    sourceId: "file:///app/var-order.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-order.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-order.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-order",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+test("reports duplicate exports as entry parse failures", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "var x;\nexport { x };\nexport { x };\n",
+    sourceId: "file:///app/dup-export.js",
+  });
+  assert.ok(!result.parsed);
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Duplicate export/u);
+});
+
+test("rejects var exports explicitly", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export var value = 1;",
+    sourceId: "file:///app/export-var.js",
+  });
+  assert.ok(!result.parsed);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+});
+
 test("converts loose equality to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source: 'console.log(1 == "1", null != undefined);',

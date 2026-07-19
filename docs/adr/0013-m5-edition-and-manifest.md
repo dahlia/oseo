@@ -197,12 +197,13 @@ vocabulary is `abrupt-completion`, `async-functions`, `functions`,
 `promise-settlement`, `timers`, and `top-level-await`; any other value is
 a validation error until a reviewed change to this record admits it.
 
-The M5 core expression work extends the vocabulary with three reviewed
+The M5 core expression work extends the vocabulary with four reviewed
 tags: `expression-operators` for scalar operator cases such as `typeof`,
 `void`, the remainder operator, logical operators, and the conditional
 operator; `control-flow` for statement-level control-flow cases such as
-`do-while`; and `dynamic-source` for cases that need `eval`, the
-`Function` constructor, or dynamic import, as decided by
+`do-while`; `var-bindings` for `var` declaration and hoisting cases; and
+`dynamic-source` for cases that need `eval`, the `Function` constructor,
+or dynamic import, as decided by
 [ADR 0016](./0016-dynamic-source-boundary.md).
 
 

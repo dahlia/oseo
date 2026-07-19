@@ -2192,18 +2192,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/coalesce/follows-null.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/language/expressions/coalesce/follows-null.js:86:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -2220,11 +2228,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/comma/S11.14_A2.1_T1.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/language/expressions/comma/S11.14_A2.1_T1.js:65:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/comma/S11.14_A2.1_T1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/comma/S11.14_A2.1_T1.js:90:1\
+        9: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2244,11 +2251,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/conditional/S11.12_A2.1_T1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/conditional/S11.12_A2.1_T1.js:70:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/conditional/S11.12_A2.1_T1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/conditional/S11.12_A2.1_T1.j\
+        s:70:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2463,9 +2469,8 @@ results:
     observation:
       detail: 'test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:59:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:72:1:
+        error[OSEO1001]: ForStatement is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2845,11 +2850,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/logical-and/S11.11.1_A2.1_T1.js:70:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/logical-and/S11.11.1_A2.1_T1\
+        .js:76:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2869,11 +2873,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/logical-or/S11.11.2_A3_T1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/logical-or/S11.11.2_A3_T1.js:72:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/logical-or/S11.11.2_A3_T1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/logical-or/S11.11.2_A3_T1.js\
+        :72:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2893,11 +2896,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/modulus/S11.5.3_A2.1_T1.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/language/expressions/modulus/S11.5.3_A2.1_T1.js:65:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/modulus/S11.5.3_A2.1_T1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/modulus/S11.5.3_A2.1_T1.js:8\
+        4:19: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3128,11 +3130,10 @@ results:
     dependencies:
       - expression-operators
     observation:
-      detail: 'test/language/expressions/void/S11.4.2_A2_T1.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/language/expressions/void/S11.4.2_A2_T1.js:65:1:
-        error[OSEO1001]: Only const and let declarations are
-        supported.\n"'
+      detail: "test/language/expressions/void/S11.4.2_A2_T1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/void/S11.4.2_A2_T1.js:71:13:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3268,15 +3269,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-dflt-id.js:66:1:
-        error[OSEO1001]: Only const and let declarations are supported."
+      detail: "test/language/module-code/early-dup-export-dflt-id.js:68:10:
+        error[OSEO0001]: Duplicate export 'default'."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -3315,15 +3317,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id-as.js:66:1:
-        error[OSEO1001]: Only const and let declarations are supported."
+      detail: "test/language/module-code/early-dup-export-id-as.js:68:10:
+        error[OSEO0001]: Duplicate export 'z'."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -3338,15 +3341,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id.js:65:1:
-        error[OSEO1001]: Only const and let declarations are supported."
+      detail: "test/language/module-code/early-dup-export-id.js:67:10:
+        error[OSEO0001]: Duplicate export 'x'."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4513,16 +4517,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-dflt_FI\
-        XTURE.js:4:1: error[OSEO1001]: Only const and let declarations
-        are supported."
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-as.js:7\
+        8:10: error[OSEO2001]: Module has no export 'default'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4537,16 +4541,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-dflt_FI\
-        XTURE.js:4:1: error[OSEO1001]: Only const and let declarations
-        are supported."
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star.js:78:1\
+        0: error[OSEO2001]: Module has no export 'default'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4612,8 +4616,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-iee-star-cycle-indirect-x_FIXT\
-        URE.js:8:8: error[OSEO1001]: Only const and let declarations are
-        supported."
+        URE.js:8:8: error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -4634,7 +4637,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-iee-trlng-comma_FIXTURE.js:4:8:
-        error[OSEO1001]: Only const and let declarations are supported."
+        error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -4780,16 +4783,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-dflt-thru-star-dflt_\
-        FIXTURE.js:4:1: error[OSEO1001]: Only const and let declarations
-        are supported."
+      detail: "test/language/module-code/instn-named-err-dflt-thru-star-as.js\
+        :83:10: error[OSEO2001]: Module has no export 'default'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4804,16 +4807,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-dflt-thru-star-dflt_\
-        FIXTURE.js:4:1: error[OSEO1001]: Only const and let declarations
-        are supported."
+      detail: "test/language/module-code/instn-named-err-dflt-thru-star-dflt.\
+        js:83:8: error[OSEO2001]: Module has no export 'default'."
+      errorType: SyntaxError
+      failedPhase: resolution
       harnessFailed: false
       passed: false
-      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -4903,8 +4906,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-star-cycle-indirect-x_FI\
-        XTURE.js:8:8: error[OSEO1001]: Only const and let declarations
-        are supported."
+        XTURE.js:8:8: error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -5373,8 +5375,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-star-star-cycle-indirect-x_FIX\
-        TURE.js:8:8: error[OSEO1001]: Only const and let declarations
-        are supported."
+        TURE.js:8:8: error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -10153,13 +10154,89 @@ results:
       harnessFailed: false
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/variable/S12.2_A12.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/variable/S12.2_A8_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/variable/S12.2_A8_T4.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 189
+  expectedNegatives: 198
   harnessFailures: 0
-  passes: 57
+  passes: 59
   semanticFailures: 0
-  unsupportedProfileFeatures: 165
+  unsupportedProfileFeatures: 157
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -10176,7 +10253,7 @@ summary:
     - dependency: control-flow
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 0
+      passes: 1
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: dynamic-source
@@ -10188,9 +10265,9 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 7
       harnessFailures: 0
-      passes: 7
+      passes: 8
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 13
     - dependency: functions
       expectedNegatives: 8
       harnessFailures: 0
@@ -10204,11 +10281,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: module-linking
-      expectedNegatives: 122
+      expectedNegatives: 129
       harnessFailures: 0
       passes: 9
       semanticFailures: 0
-      unsupportedProfileFeatures: 87
+      unsupportedProfileFeatures: 80
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
@@ -10227,6 +10304,12 @@ summary:
       passes: 1
       semanticFailures: 0
       unsupportedProfileFeatures: 4
+    - dependency: var-bindings
+      expectedNegatives: 2
+      harnessFailures: 0
+      passes: 2
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
   groups:
     - group: built-ins/Object
       expectedNegatives: 0
@@ -10243,18 +10326,18 @@ summary:
     - group: language/expressions
       expectedNegatives: 38
       harnessFailures: 0
-      passes: 17
+      passes: 18
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 26
     - group: language/module-code
-      expectedNegatives: 122
+      expectedNegatives: 129
       harnessFailures: 0
       passes: 9
       semanticFailures: 0
-      unsupportedProfileFeatures: 87
+      unsupportedProfileFeatures: 80
     - group: language/statements
-      expectedNegatives: 29
+      expectedNegatives: 31
       harnessFailures: 0
-      passes: 23
+      passes: 24
       semanticFailures: 0
       unsupportedProfileFeatures: 15

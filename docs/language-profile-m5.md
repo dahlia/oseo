@@ -99,6 +99,22 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  `var` declarations with function-scope hoisting, multiple
+    declarators, redeclaration, parameter and declared-function name
+    sharing, and awaited initializers in async functions and module top
+    level. The frontend normalizes each function, script, or module body
+    into hoisted bindings initialized to `undefined` plus in-place
+    assignments, so no separate binding kind reaches HIR or the runtime.
+    Deliberate boundaries, each rejected with a source-located
+    diagnostic: `var` destructuring, `export var`, ambient `declare`
+    declarations, a `var` sharing a catch parameter name (ECMAScript
+    allows it), a `var` sharing a block-level function declaration name,
+    because Annex B function hoisting would make the difference
+    observable, and an awaited initializer in a declaration list with
+    more than one declarator. Top-level Script
+    `var` creates a script binding rather than a global-object property;
+    the difference is unobservable while `globalThis` remains outside
+    the profile, and the `globalThis` gap entry owns the revisit.
  -  The `==` and `!=` loose equality operators, implementing
     `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
     nullish operand compared with anything else is unequal without
@@ -133,9 +149,9 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  `var` declarations, destructuring, spread, default parameters, template
-    literals, synchronous arrow functions, classes, generators, symbols,
-    big integers, regular expressions, and the remaining expression grammar
+ -  Destructuring, spread, default parameters, template literals,
+    synchronous arrow functions, classes, generators, symbols, big
+    integers, regular expressions, and the remaining expression grammar
     are outside the admitted syntax. Owner: the core expressions and
     bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  Named error intrinsics such as `TypeError` do not exist. Runtime

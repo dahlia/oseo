@@ -794,11 +794,51 @@ function statement(
       : { ...located, expression: converted, kind: "expression" };
   }
   if (value.type === "VariableDeclaration") {
+    if (value.declare === true) {
+      return unsupported(
+        context,
+        value,
+        "Ambient declarations are erased by TypeScript and unsupported.",
+      );
+    }
+    if (value.kind === "var") {
+      const assignments: SyntaxStatement[] = [];
+      for (const declarator of nodes(value.declarations)) {
+        const identifier = node(declarator.id);
+        const name =
+          identifier == null ? undefined : identifierName(identifier);
+        if (name == null) {
+          return unsupported(
+            context,
+            declarator,
+            "var destructuring is unsupported.",
+          );
+        }
+        const initializerNode = node(declarator.init);
+        if (initializerNode == null) continue;
+        const assigned = expression(context, initializerNode);
+        if (assigned == null) return undefined;
+        const declaratorRange = location(context, declarator);
+        assignments.push({
+          ...declaratorRange,
+          expression: {
+            ...declaratorRange,
+            kind: "binding-set",
+            name,
+            value: assigned,
+          },
+          kind: "expression",
+        });
+      }
+      const single = assignments.length === 1 ? assignments[0] : undefined;
+      if (single != null) return single;
+      return { ...located, body: assignments, kind: "block" };
+    }
     if (value.kind !== "const" && value.kind !== "let") {
       return unsupported(
         context,
         value,
-        "Only const and let declarations are supported.",
+        "Only const, let, and var declarations are supported.",
       );
     }
     const declarations = nodes(value.declarations);
@@ -1073,7 +1113,9 @@ function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
     return node(value.argument)?.type === "AwaitExpression";
   }
   if (value.type !== "VariableDeclaration") return false;
-  if (value.kind !== "const" && value.kind !== "let") return false;
+  if (value.kind !== "const" && value.kind !== "let" && value.kind !== "var") {
+    return false;
+  }
   const declarations = nodes(value.declarations);
   return (
     declarations.length === 1 &&
@@ -1104,7 +1146,7 @@ function validateAsyncContinuationCount(
 interface AwaitPoint {
   readonly declaration?: {
     readonly hint: Hint | undefined;
-    readonly kind: "const" | "let";
+    readonly kind: "const" | "let" | "var";
     readonly name: string;
   };
   readonly operand: BabelNode;
@@ -1128,7 +1170,9 @@ function awaitPoint(
     return operand == null ? undefined : { operand, returnValue: true };
   }
   if (value.type !== "VariableDeclaration") return undefined;
-  if (value.kind !== "const" && value.kind !== "let") return undefined;
+  if (value.kind !== "const" && value.kind !== "let" && value.kind !== "var") {
+    return undefined;
+  }
   const declarations = nodes(value.declarations);
   const declaration = declarations.length === 1 ? declarations[0] : undefined;
   const identifier = declaration == null ? undefined : node(declaration.id);
@@ -1275,16 +1319,26 @@ function asyncStatementList(
           "continuation",
         );
         if (continuationBody != null && point.declaration != null) {
-          continuationBody = [
-            {
-              hint: point.declaration.hint,
-              initializer: identifierExpression(valueName, range),
-              kind: "binding-init",
-              name: point.declaration.name,
-              range,
-            },
-            ...continuationBody,
-          ];
+          const received: SyntaxStatement =
+            point.declaration.kind === "var"
+              ? {
+                  expression: {
+                    kind: "binding-set",
+                    name: point.declaration.name,
+                    range,
+                    value: identifierExpression(valueName, range),
+                  },
+                  kind: "expression",
+                  range,
+                }
+              : {
+                  hint: point.declaration.hint,
+                  initializer: identifierExpression(valueName, range),
+                  kind: "binding-init",
+                  name: point.declaration.name,
+                  range,
+                };
+          continuationBody = [received, ...continuationBody];
         }
       }
       if (continuationBody == null) return undefined;
@@ -1369,6 +1423,271 @@ function asyncStatementList(
   return body;
 }
 
+interface HoistedVar {
+  readonly declarator: BabelNode;
+  readonly hint: Hint | undefined;
+  readonly range: SourceRange;
+  readonly byteRange: ByteRange;
+}
+
+function unwrapExportDeclaration(value: BabelNode): BabelNode {
+  if (
+    value.type !== "ExportNamedDeclaration" &&
+    value.type !== "ExportDefaultDeclaration"
+  ) {
+    return value;
+  }
+  return node(value.declaration) ?? value;
+}
+
+function gatherLexicalNames(
+  values: readonly BabelNode[],
+  includeFunctions: boolean,
+): ReadonlySet<string> {
+  const names = new Set<string>();
+  for (const value of values) {
+    const declaration = unwrapExportDeclaration(value);
+    if (
+      declaration.type === "VariableDeclaration" &&
+      (declaration.kind === "const" || declaration.kind === "let")
+    ) {
+      for (const declarator of nodes(declaration.declarations)) {
+        const identifier = node(declarator.id);
+        const name =
+          identifier == null ? undefined : identifierName(identifier);
+        if (name != null) names.add(name);
+      }
+    } else if (includeFunctions && declaration.type === "FunctionDeclaration") {
+      const identifier = node(declaration.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (name != null) names.add(name);
+    }
+  }
+  return names;
+}
+
+function varScopedFunctionNames(
+  values: readonly BabelNode[],
+): ReadonlySet<string> {
+  const names = new Set<string>();
+  for (const value of values) {
+    const declaration = unwrapExportDeclaration(value);
+    if (declaration.type !== "FunctionDeclaration") continue;
+    const identifier = node(declaration.id);
+    const name = identifier == null ? undefined : identifierName(identifier);
+    if (name != null) names.add(name);
+  }
+  return names;
+}
+
+function collectVarStatement(
+  context: ConvertContext,
+  value: BabelNode,
+  lexicalFrames: readonly ReadonlySet<string>[],
+  catchParameters: ReadonlySet<string>,
+  collected: Map<string, HoistedVar>,
+  blockFunctions: Set<string>,
+): boolean {
+  if (value.type === "VariableDeclaration" && value.kind === "var") {
+    if (value.declare === true) return true;
+    for (const declarator of nodes(value.declarations)) {
+      const identifier = node(declarator.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (identifier == null || name == null) {
+        unsupported(context, declarator, "var destructuring is unsupported.");
+        return false;
+      }
+      if (catchParameters.has(name)) {
+        unsupported(
+          context,
+          declarator,
+          "A var declaration sharing a catch parameter name is outside " +
+            "the admitted profile.",
+        );
+        return false;
+      }
+      if (lexicalFrames.some((frame) => frame.has(name))) {
+        unsupported(
+          context,
+          declarator,
+          `Cannot redeclare lexical binding '${name}' with var.`,
+        );
+        return false;
+      }
+      if (!collected.has(name)) {
+        collected.set(name, {
+          ...location(context, declarator),
+          declarator,
+          hint: typeHint(context, identifier.typeAnnotation),
+        });
+      }
+    }
+    return true;
+  }
+  if (value.type === "BlockStatement") {
+    const children = nodes(value.body);
+    for (const name of varScopedFunctionNames(children)) {
+      blockFunctions.add(name);
+    }
+    const frames = [...lexicalFrames, gatherLexicalNames(children, true)];
+    return children.every((child) =>
+      collectVarStatement(
+        context,
+        child,
+        frames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      ),
+    );
+  }
+  if (value.type === "IfStatement") {
+    const consequent = node(value.consequent);
+    const alternate = node(value.alternate);
+    for (const branch of [consequent, alternate]) {
+      if (
+        branch != null &&
+        !collectVarStatement(
+          context,
+          branch,
+          lexicalFrames,
+          catchParameters,
+          collected,
+          blockFunctions,
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (value.type === "WhileStatement" || value.type === "DoWhileStatement") {
+    const body = node(value.body);
+    return (
+      body == null ||
+      collectVarStatement(
+        context,
+        body,
+        lexicalFrames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      )
+    );
+  }
+  if (value.type === "TryStatement") {
+    const block = node(value.block);
+    if (
+      block != null &&
+      !collectVarStatement(
+        context,
+        block,
+        lexicalFrames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      )
+    ) {
+      return false;
+    }
+    const handler = node(value.handler);
+    if (handler != null) {
+      const parameter = node(handler.param);
+      const parameterName =
+        parameter == null ? undefined : identifierName(parameter);
+      const handlerBody = node(handler.body);
+      const handlerCatch =
+        parameterName == null
+          ? catchParameters
+          : new Set([...catchParameters, parameterName]);
+      if (
+        handlerBody != null &&
+        !collectVarStatement(
+          context,
+          handlerBody,
+          lexicalFrames,
+          handlerCatch,
+          collected,
+          blockFunctions,
+        )
+      ) {
+        return false;
+      }
+    }
+    const finalizer = node(value.finalizer);
+    if (
+      finalizer != null &&
+      !collectVarStatement(
+        context,
+        finalizer,
+        lexicalFrames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      )
+    ) {
+      return false;
+    }
+    return true;
+  }
+  return true;
+}
+
+/**
+ * Hoist the function-scoped var declarations of one function, script, or
+ * module body into initialized bindings. In-place var statements become
+ * ordinary assignments, so the pair preserves var semantics for the
+ * admitted profile without a separate binding kind. Names owned by
+ * parameters or var-scoped function declarations are skipped so bare
+ * redeclarations do not reset them.
+ */
+function hoistedVarDeclarations(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+  skipNames: ReadonlySet<string>,
+): SyntaxStatement[] | undefined {
+  const collected = new Map<string, HoistedVar>();
+  const blockFunctions = new Set<string>();
+  const rootLexical = gatherLexicalNames(values, false);
+  const complete = values.every((value) =>
+    collectVarStatement(
+      context,
+      unwrapExportDeclaration(value),
+      [rootLexical],
+      new Set<string>(),
+      collected,
+      blockFunctions,
+    ),
+  );
+  if (!complete) return undefined;
+  const hoisted: SyntaxStatement[] = [];
+  for (const [name, info] of collected) {
+    if (blockFunctions.has(name)) {
+      // Annex B function hoisting would make this observable; reject it
+      // instead of silently diverging from web-engine behavior.
+      return unsupported(
+        context,
+        info.declarator,
+        `A var declaration sharing the block-level function name ` +
+          `'${name}' is outside the admitted profile.`,
+      );
+    }
+    if (skipNames.has(name)) continue;
+    hoisted.push({
+      // A zero-width leading byte range keeps hoisted bindings ahead of
+      // every source-ordered statement when module lowering sorts by
+      // byte offset.
+      byteRange: { end: 0, start: 0 },
+      hint: info.hint,
+      initializer: undefinedExpression(info.range),
+      kind: "let",
+      name,
+      range: info.range,
+    });
+  }
+  return hoisted;
+}
+
 function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
@@ -1448,6 +1767,19 @@ function functionDeclaration(
           } satisfies BabelNode,
         ]
       : nodes(bodyNode?.body);
+  const hoisted = hoistedVarDeclarations(
+    context,
+    children,
+    new Set([
+      ...parameters.map((parameter) => parameter.name),
+      ...varScopedFunctionNames(children),
+    ]),
+  );
+  if (hoisted == null) {
+    context.functionStack.pop();
+    context.strictStack.pop();
+    return undefined;
+  }
   if (value.async === true) {
     if (!validateAsyncContinuationCount(context, children)) {
       context.functionStack.pop();
@@ -1457,7 +1789,12 @@ function functionDeclaration(
     const executionBody = asyncStatementList(context, children, "executor");
     if (executionBody != null) {
       const range = location(context, value).range;
-      const execution = syntheticFunction(context, range, [], executionBody);
+      const execution = syntheticFunction(
+        context,
+        range,
+        [],
+        [...hoisted, ...executionBody],
+      );
       body.push({
         expression: asyncCall(execution, range),
         kind: "return",
@@ -1470,6 +1807,7 @@ function functionDeclaration(
       return undefined;
     }
   } else {
+    body.push(...hoisted);
     for (const child of children) {
       const converted =
         child.type === "FunctionDeclaration"
@@ -1513,7 +1851,18 @@ function program(
   const strict = hasUseStrictDirective(programNode);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
-  for (const item of nodes(programNode.body)) {
+  const items = nodes(programNode.body);
+  const hoisted = hoistedVarDeclarations(
+    context,
+    items,
+    varScopedFunctionNames(items),
+  );
+  if (hoisted == null) {
+    context.strictStack.pop();
+    return undefined;
+  }
+  body.push(...hoisted);
+  for (const item of items) {
     const converted =
       item.type === "FunctionDeclaration"
         ? functionDeclaration(context, item)
@@ -1580,6 +1929,17 @@ function moduleProgram(
   const exports: SyntaxExportEntry[] = [];
   const imports: SyntaxImportEntry[] = [];
   context.strictStack.push(true);
+  const moduleItems = nodes(programNode.body);
+  const hoisted = hoistedVarDeclarations(
+    context,
+    moduleItems,
+    varScopedFunctionNames(moduleItems),
+  );
+  if (hoisted == null) {
+    context.strictStack.pop();
+    return undefined;
+  }
+  body.push(...hoisted);
   for (const item of nodes(programNode.body)) {
     if (item.type === "ImportDeclaration") {
       if (hasModuleAttributes(context, item)) {
@@ -1785,6 +2145,23 @@ function moduleProgram(
   }
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
+  // Duplicate exported names are an ECMAScript early error, so they are
+  // reported as an entry parse failure rather than a link failure.
+  const seenExports = new Set<string>();
+  for (const entry of exports) {
+    if (entry.kind === "star") continue;
+    if (seenExports.has(entry.exportedName)) {
+      context.diagnostics.push({
+        byteRange: entry.byteRange ?? { end: 0, start: 0 },
+        code: "OSEO0001",
+        message: `Duplicate export '${entry.exportedName}'.`,
+        range: entry.range,
+        sourceId: context.input.sourceId,
+      });
+      return undefined;
+    }
+    seenExports.add(entry.exportedName);
+  }
   return {
     ...location(context, programNode),
     body,

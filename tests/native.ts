@@ -663,6 +663,59 @@ console.log(
 `,
   },
   {
+    name: "var-declarations",
+    source: `
+console.log(typeof hoisted, hoisted);
+var hoisted = 1;
+console.log(hoisted);
+var hoisted = 2;
+console.log(hoisted);
+function scoped() {
+  var value = "function";
+  if (true) { var value = "block"; }
+  while (false) { var loop = 1; }
+  console.log(value, typeof loop, loop);
+  return value;
+}
+console.log(scoped());
+function paramShadow(a) { var a; console.log(a); var a = 2; return a; }
+console.log(paramShadow(1), paramShadow(undefined));
+function fnVar() { var g; function g() {} return typeof g; }
+console.log(fnVar());
+function fnVarAssigned() { var g = 1; function g() {} return typeof g; }
+console.log(fnVarAssigned());
+function bare() { var missing; return missing; }
+console.log(bare());
+let outer = "let-outer";
+{ var shadowless = outer; }
+console.log(shadowless);
+var chain = 1, second = chain + 1, third;
+console.log(chain, second, third);
+console.log(before());
+function before() { return "function hoisted"; }
+do { var doVar = "do"; } while (false);
+console.log(doVar);
+function readsLate() { return late; var late; }
+console.log(readsLate());
+try { console.log("try"); } catch (caught) { var inCatch = 1; }
+console.log(typeof inCatch);
+`,
+  },
+  {
+    name: "var-async",
+    source: `
+async function accumulate(start) {
+  var total = start;
+  var next = await Promise.resolve(total + 1);
+  if (next > 0) { var flag = "set"; }
+  var reused = await Promise.resolve(next + 1);
+  return reused + " " + flag + " " + typeof trailing;
+  var trailing;
+}
+accumulate(1).then(function (result) { console.log(result); });
+`,
+  },
+  {
     name: "loose-equality",
     source: `
 console.log(1 == "1", "" == 0, "0" == false, true == 1, false == "");
@@ -2177,7 +2230,8 @@ assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
 assert.equal(nativeModule.stderr, "");
 assert.equal(
   nativeModule.stdout,
-  "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+  "var order 1 2 undefined\n" +
+    "cycle b ready default ready\ncycle c ready\ncycle a\n" +
     "default first\ndefault second\nidentity once\n" +
     "answer increment 41\n" +
     "42\ntrue true false\n" +

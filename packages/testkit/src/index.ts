@@ -85,6 +85,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "promise-settlement",
   "timers",
   "top-level-await",
+  "var-bindings",
 ]);
 
 /** Frontmatter and suite identity needed to reproduce one reviewed case. */

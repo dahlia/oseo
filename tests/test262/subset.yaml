@@ -276,8 +276,8 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/coalesce/follows-null.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [expression-operators]
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/comma/S11.14_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
@@ -402,16 +402,16 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-dflt-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-dflt.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-id-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-star-as-dflt.js
     expectedClassification: unsupported-profile-feature
@@ -558,10 +558,10 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-dflt-thru-star-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-dflt-thru-star.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-err-not-found-as.js
     expectedClassification: unsupported-profile-feature
@@ -594,10 +594,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-as.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-dflt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-not-found-as.js
     expectedClassification: unsupported-profile-feature
@@ -1241,3 +1241,12 @@ tests:
   - path: test/language/statements/try/S12.14_A18_T2.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/variable/S12.2_A12.js
+    expectedClassification: pass
+    dependencies: [control-flow, var-bindings]
+  - path: test/language/statements/variable/S12.2_A8_T1.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/statements/variable/S12.2_A8_T4.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
