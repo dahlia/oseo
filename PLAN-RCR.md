@@ -4,11 +4,24 @@ C runtime componentization plan
 Status
 ------
 
-Implementation status: ready, not started. M4 left the native runtime with
-4,714 lines in *runtime.c*, 476 lines in *oseo\_runtime.h*, and roughly 149 C
-functions. The implementation is still testable, but M5 will add enough
-intrinsics and generic semantics that continuing in one translation unit would
-make ownership and review harder to sustain.
+Implementation status: extractions complete; the closing clean-checkout
+verification is the remaining step. The runtime now ships ten reviewed
+ordered assets: the generated-code header, the package-private
+*runtime\_internal.h*, and eight component translation units matching the
+target layout below, with no catch-all *runtime.c* and no temporary
+forwarding helpers. Fourteen cross-component helpers use `oseo_internal_`
+names with one declaration each in the internal header.
+[*docs/runtime-components.md*](./docs/runtime-components.md) records the
+pre-extraction baseline, the resulting ownership rules, the documented
+component cycles, and the before-and-after evidence. The clean-checkout
+ordinary and extended verification closes the plan; its record lands in
+the same document, and the plan remains active until then.
+
+This plan was written when M4 left the runtime with 4,714 lines in
+*runtime.c*, 476 lines in *oseo\_runtime.h*, and roughly 149 C functions.
+Immediately before the first extraction, continued M5 work had grown that
+single translation unit to 5,566 lines, 550 header lines, and 220 C
+function definitions.
 
 This is a cross-milestone refactoring plan. It does not replace
 [*PLAN-M5.md*](./PLAN-M5.md) or [*PLAN-PT.md*](./PLAN-PT.md), and it does not

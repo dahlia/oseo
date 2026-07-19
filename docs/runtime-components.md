@@ -6,10 +6,115 @@ Status
 
 This document records the evidence required by
 [*PLAN-RCR.md*](../PLAN-RCR.md). The baseline section below is the
-comparison point taken before the first extraction. Later sections record
-the component ownership rules as the migration lands. The baseline is not a
-promise of byte-identical object files; it exists so that behavior, symbol,
-and size differences introduced by the migration remain explainable.
+comparison point taken before the first extraction; the ownership section
+records the completed component layout. The baseline is not a promise of
+byte-identical object files; it exists so that behavior, symbol, and size
+differences introduced by the migration remain explainable.
+
+
+Component ownership after extraction
+------------------------------------
+
+The runtime input now lists ten reviewed assets in this order:
+*oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
+*runtime\_memory.c*, *runtime\_binding.c*, *runtime\_object.c*,
+*runtime\_function.c*, *runtime\_primitive.c*, *runtime\_promise.c*, and
+*runtime\_event\_loop.c*. No catch-all *runtime.c* remains, and no
+temporary forwarding helper was needed at any point in the migration.
+Each source compiles as its own translation unit and is archived in
+exactly this order. The symbols test in
+*packages/runtime-c/tests/symbols.test.ts* enforces the reviewed list,
+the include boundaries, and the one-definition rule on every change.
+
+Ownership follows the target layout in [*PLAN-RCR.md*](../PLAN-RCR.md):
+
+ -  *runtime\_core.c*: results, context lifecycle, diagnostics, call
+    limits, frames, root-stack operations, and immediate value
+    constructors;
+ -  *runtime\_memory.c*: GC-managed heap allocation, publication,
+    tracing, collection, and destruction;
+ -  *runtime\_binding.c*: environments, binding cells, and module
+    namespaces;
+ -  *runtime\_object.c*: strings used as property keys, arrays, ordinary
+    objects, descriptors, prototypes, property caches, and the `Object`
+    built-ins;
+ -  *runtime\_function.c*: function creation, callable metadata,
+    construction, and generic dispatch;
+ -  *runtime\_primitive.c*: coercions, arithmetic, comparison, string
+    conversion, and console output;
+ -  *runtime\_promise.c*: promises, capabilities, reactions, thenable
+    jobs, combinators, rejection tracking, and job draining;
+ -  *runtime\_event\_loop.c*: timer conversion, timer queues, task
+    checkpoints, top-level await progress, and shutdown.
+
+### Internal helpers
+
+Fourteen helpers cross a translation-unit boundary. Each uses the
+`oseo_internal_` prefix, has exactly one declaration in
+*runtime\_internal.h*, and is defined in its owning unit:
+
+| Internal helper                                     | Defined in             |
+| --------------------------------------------------- | ---------------------- |
+| `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*    |
+| `oseo_internal_publish_heap`                        | *runtime\_memory.c*    |
+| `oseo_internal_allocate_string`                     | *runtime\_object.c*    |
+| `oseo_internal_string_is_ascii`                     | *runtime\_object.c*    |
+| `oseo_internal_own_descriptor`                      | *runtime\_object.c*    |
+| `oseo_internal_to_number`                           | *runtime\_primitive.c* |
+| `oseo_internal_value_string`                        | *runtime\_primitive.c* |
+| `oseo_internal_promise_method_function`             | *runtime\_promise.c*   |
+| `oseo_internal_promise_invoke_then`                 | *runtime\_promise.c*   |
+| `oseo_internal_promise_aggregate_settle`            | *runtime\_promise.c*   |
+| `oseo_internal_promise_finally_continuation_create` | *runtime\_promise.c*   |
+| `oseo_internal_promise_finally_invoke`              | *runtime\_promise.c*   |
+| `oseo_internal_jobs_drain_until`                    | *runtime\_promise.c*   |
+| `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*   |
+
+### Documented component cycles
+
+The extraction confirmed these irreducible cycles. Each is accepted as a
+pair of named interfaces rather than removed, because both directions
+express observable language semantics:
+
+ -  object to promise: `oseo_object_get` materializes `then`, `catch`,
+    and `finally` through `oseo_internal_promise_method_function`, while
+    promise code builds ordinary objects through public object
+    operations;
+ -  function to promise: generic dispatch executes the internal promise
+    built-in code IDs through the promoted `oseo_internal_promise_*`
+    helpers, while promise code re-enters callables through
+    `oseo_call_function`;
+ -  object and primitive: array-length and descriptor semantics call
+    `oseo_internal_to_number`, while coercions and operators use public
+    object reads and `oseo_internal_own_descriptor`;
+ -  binding and object: module-namespace creation builds its backing
+    object through public object operations, while object property reads
+    resolve module-namespace entries through `oseo_cell_get`.
+
+The event-loop component is a one-way dependent: timer turns drain jobs
+through `oseo_internal_jobs_drain_until` and
+`oseo_internal_jobs_reached_promise`, and `await` and timers construct
+promises through promise-owned entry points, while no promise code calls
+into the event loop.
+
+### Evidence compared with the baseline
+
+With the same pinned Zig, strict C11 warnings, and sanitizer
+configuration on `macos-aarch64`:
+
+ -  external text symbols grew from 110 to 124: the 110 public
+    declarations are unchanged, and the 14 `oseo_internal_` helpers are
+    the intended cross-component mechanism;
+ -  the sanitized runtime archive is 994 KiB across eight objects,
+    against the 876 KiB single baseline object; the growth is the
+    expected duplication of `static inline` value helpers and sanitizer
+    metadata across translation units;
+ -  the `console.log("hello")` fixture executable is 1.2 MiB against the
+    1.1 MiB baseline, with identical observable output;
+ -  JavaScript observations are unchanged: the complete differential
+    fixture corpus, the pinned test262 manifest with canonical digest
+    `sha256:d4345fd27f1f2c4099197b28b2249e0c2943d42ffd8f2a8dedcb36ccc367ac34`,
+    and the target parity record all pass unmodified.
 
 
 Baseline before extraction

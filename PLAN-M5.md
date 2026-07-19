@@ -36,17 +36,18 @@ native differential, structural, and reviewed test262 evidence
 recorded in [*docs/language-profile-m5.md*](./docs/language-profile-m5.md).
 The remaining item 4 work is the semantic groundwork that needs owned
 runtime surfaces: named error intrinsics, generic `ToPrimitive`,
-symbols, and the iterator protocol, which wait on
-[*PLAN-RCR.md*](./PLAN-RCR.md). Delivery items 5, 6, 8, and 9 remain
-open.
+symbols, and the iterator protocol. The runtime component boundaries
+from [*PLAN-RCR.md*](./PLAN-RCR.md) are implemented, so that work is no
+longer blocked on them. Delivery items 5, 6, 8, and 9 remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted records
 under *docs/adr/*. The runtime componentization in
-[*PLAN-RCR.md*](./PLAN-RCR.md) is the prerequisite for large intrinsic tables
-and built-in families. Evidence that changes one of these contracts updates
-the affected document in the same change.
+[*PLAN-RCR.md*](./PLAN-RCR.md) provides the component boundaries that
+large intrinsic tables and built-in families build on. Evidence that
+changes one of these contracts updates the affected document in the same
+change.
 
 
 Goal
@@ -150,8 +151,8 @@ expression, date, and binary-data families in dependency order.
 An intrinsic enters through a table or owned runtime interface whose identity
 and attributes are testable. Generated C must not duplicate mutable singleton
 state accidentally. Generic algorithms remain authoritative when a fast path
-cannot prove its preconditions. Large intrinsic tables and built-in families
-begin only after the affected runtime component exists under
+cannot prove its preconditions. Large intrinsic tables and built-in
+families extend the runtime components established by
 [*PLAN-RCR.md*](./PLAN-RCR.md). A family whose semantics the admitted
 profile can already express may instead be self-hosted in the compiled
 subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
