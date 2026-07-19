@@ -3,6 +3,7 @@ supportedFeatures:
   - async-functions
   - computed-property-names
   - const
+  - exponentiation
   - let
   - top-level-await
 tests:
@@ -275,6 +276,21 @@ tests:
     dependencies: [expression-operators]
   - path: test/language/expressions/conditional/in-condition.js
     expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-negate-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-typeof-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/int32_min-exponent.js
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/function/dflt-params-duplicates.js
     expectedClassification: unsupported-profile-feature

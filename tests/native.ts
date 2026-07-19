@@ -663,6 +663,23 @@ console.log(
 `,
   },
   {
+    name: "numeric-bitwise-exponent",
+    source: `
+console.log(2 ** 10, 2 ** 0.5, (-2) ** 2, 2 ** -2, 9 ** 0.5);
+console.log(1 ** Infinity, (-1) ** Infinity, NaN ** 0, 0 ** 0, 2 ** NaN);
+console.log((-0) ** -1, 0 ** -1, (-0) ** 3, 2 ** 3 ** 2, 2 ** -1074);
+console.log(5 & 3, 5 | 3, 5 ^ 3, ~5, ~-1, ~~3.7);
+console.log(-1 & 255, -5 | 0, 4294967295 & 1, 2147483647 & -1);
+console.log(1 << 31, 1 << 32, 2 << 33, -8 >> 2, 7 >> 1, -1 >> 31);
+console.log(-1 >>> 0, -8 >>> 2, 1 >>> 32, 4294967296 >>> 0, NaN >>> 0);
+console.log("8" >> 1, "16" ** "0.5", true | false, null ^ 5, undefined & 1);
+console.log(1.9 << 1, -1.9 << 1, Infinity >> 1, -Infinity >>> 0, NaN << 3);
+console.log(2147483647 << 1, -2147483648 >> 31, 1073741824 << 1);
+console.log(+true, +"42", +"", +null, +undefined, +"nan");
+console.log(+"0x10", ~"2", -0 >>> 0, (-0) ** 2, +"1e3");
+`,
+  },
+  {
     name: "short-circuit-and-conditional",
     source: `
 function logging(label, value) { console.log(label); return value; }

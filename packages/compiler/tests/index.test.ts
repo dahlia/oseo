@@ -579,6 +579,39 @@ test("lowers typeof and remainder through checked runtime calls", () => {
   assert.equal(operations[remainderIndex + 1]?.kind, "check-status");
 });
 
+test("checks the status of coercing unary operators", () => {
+  for (const operator of ["+", "~"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "string", range, value: "2" },
+            kind: "unary",
+            operator,
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `unary-${operator}.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "unary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
 test("lowers void to an operand evaluation without a status check", () => {
   const syntax: SyntaxProgram = {
     body: [

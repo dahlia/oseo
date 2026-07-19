@@ -105,18 +105,25 @@ export type SyntaxCallTarget =
 export type BinaryOperator =
   | "!=="
   | "%"
+  | "&"
   | "*"
+  | "**"
   | "+"
   | "-"
   | "/"
   | "<"
+  | "<<"
   | "<="
   | "==="
   | ">"
-  | ">=";
+  | ">="
+  | ">>"
+  | ">>>"
+  | "^"
+  | "|";
 
 /** Unary operations selected before native backend lowering. */
-export type UnaryOperator = "!" | "-" | "typeof" | "void";
+export type UnaryOperator = "!" | "+" | "-" | "typeof" | "void" | "~";
 
 /** Short-circuit operators lowered through explicit control flow. */
 export type LogicalOperator = "&&" | "||";
@@ -3187,7 +3194,7 @@ function lowerExpression(
       operator: expression.operator,
       range: expression.range,
     });
-    if (expression.operator === "-" || expression.operator === "typeof") {
+    if (expression.operator !== "!" && expression.operator !== "void") {
       appendMirMetadata(
         builder,
         "check-status",

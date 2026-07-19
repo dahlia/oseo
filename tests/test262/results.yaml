@@ -2204,6 +2204,132 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:59:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/exp-operator-syntax-error-negate-unary-expression-base.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/exp-operator-syntax-error-typeof-unary-expression-base.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/int32_min-exponent.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -9786,11 +9912,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 184
+  expectedNegatives: 187
   harnessFailures: 0
-  passes: 52
+  passes: 53
   semanticFailures: 0
-  unsupportedProfileFeatures: 161
+  unsupportedProfileFeatures: 162
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -9817,11 +9943,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: expression-operators
-      expectedNegatives: 2
+      expectedNegatives: 5
       harnessFailures: 0
-      passes: 2
+      passes: 3
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 11
     - dependency: functions
       expectedNegatives: 8
       harnessFailures: 0
@@ -9872,11 +9998,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 33
+      expectedNegatives: 36
       harnessFailures: 0
-      passes: 12
+      passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 24
     - group: language/module-code
       expectedNegatives: 122
       harnessFailures: 0

@@ -99,6 +99,15 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
+    `>>>` bitwise and shift operators, and the `+` and `~` unary
+    operators. All apply the shared primitive numeric coercion; the
+    32-bit operations wrap through explicit modular unsigned arithmetic,
+    shifts mask their count to five bits, and exponentiation follows
+    `Number::exponentiate` where C `pow` differs, covering `NaN`
+    exponents and unit bases with infinite exponents. Object operands
+    keep the shared unsupported coercion boundary. The `exponentiation`
+    test262 feature is now a supported feature of the reviewed subset.
 
 
 Known gaps inside the claim

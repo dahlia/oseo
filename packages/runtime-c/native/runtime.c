@@ -2798,6 +2798,135 @@ OseoResult oseo_remainder(
     return numeric_binary(context, left, right, '%');
 }
 
+OseoResult oseo_to_number(OseoContext *context, OseoValue value) {
+    return to_number(context, value);
+}
+
+OseoResult oseo_exponentiate(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    OseoResult base = to_number(context, left);
+    if (base.status != OSEO_STATUS_NORMAL) return base;
+    OseoResult exponent = to_number(context, right);
+    if (exponent.status != OSEO_STATUS_NORMAL) return exponent;
+    double base_value = number_value(base.value);
+    double exponent_value = number_value(exponent.value);
+    double value;
+    if (isnan(exponent_value)) {
+        value = NAN;
+    } else if (fabs(base_value) == 1.0 && isinf(exponent_value)) {
+        value = NAN;
+    } else {
+        value = pow(base_value, exponent_value);
+    }
+    return normal(oseo_number(value));
+}
+
+/* The modular 32-bit patterns shared by ToInt32 and ToUint32. */
+static uint32_t uint32_bits(double number) {
+    if (!isfinite(number) || number == 0.0) return 0u;
+    double wrapped = fmod(trunc(number), 4294967296.0);
+    if (wrapped < 0.0) wrapped += 4294967296.0;
+    return (uint32_t)wrapped;
+}
+
+static double int32_number(uint32_t bits) {
+    return bits >= 2147483648u
+        ? (double)((int64_t)bits - INT64_C(4294967296))
+        : (double)bits;
+}
+
+static OseoResult int32_binary(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    char operator
+) {
+    OseoResult left_number = to_number(context, left);
+    if (left_number.status != OSEO_STATUS_NORMAL) return left_number;
+    OseoResult right_number = to_number(context, right);
+    if (right_number.status != OSEO_STATUS_NORMAL) return right_number;
+    uint32_t left_bits = uint32_bits(number_value(left_number.value));
+    uint32_t right_bits = uint32_bits(number_value(right_number.value));
+    if (operator == '&') {
+        return normal(oseo_number(int32_number(left_bits & right_bits)));
+    }
+    if (operator == '|') {
+        return normal(oseo_number(int32_number(left_bits | right_bits)));
+    }
+    if (operator == '^') {
+        return normal(oseo_number(int32_number(left_bits ^ right_bits)));
+    }
+    uint32_t shift = right_bits & 31u;
+    if (operator == '<') {
+        return normal(oseo_number(int32_number(left_bits << shift)));
+    }
+    if (operator == '>') {
+        uint32_t shifted = (left_bits & 2147483648u) != 0u
+            ? ~(~left_bits >> shift)
+            : left_bits >> shift;
+        return normal(oseo_number(int32_number(shifted)));
+    }
+    return normal(oseo_number((double)(left_bits >> shift)));
+}
+
+OseoResult oseo_bitwise_and(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '&');
+}
+
+OseoResult oseo_bitwise_or(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '|');
+}
+
+OseoResult oseo_bitwise_xor(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '^');
+}
+
+OseoResult oseo_shift_left(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '<');
+}
+
+OseoResult oseo_shift_right(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '>');
+}
+
+OseoResult oseo_shift_right_unsigned(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, 'u');
+}
+
+OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value) {
+    OseoResult number = to_number(context, value);
+    if (number.status != OSEO_STATUS_NORMAL) return number;
+    uint32_t bits = ~uint32_bits(number_value(number.value));
+    return normal(oseo_number(int32_number(bits)));
+}
+
 static bool strict_equal_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);

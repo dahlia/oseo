@@ -356,6 +356,8 @@ OseoResult oseo_object_builtin_set_prototype_of(
 );
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
+OseoResult oseo_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
     OseoContext *context,
     OseoValue left,
@@ -377,6 +379,41 @@ OseoResult oseo_divide(
     OseoValue right
 );
 OseoResult oseo_remainder(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_exponentiate(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_bitwise_and(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_bitwise_or(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_bitwise_xor(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_shift_left(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_shift_right(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_shift_right_unsigned(
     OseoContext *context,
     OseoValue left,
     OseoValue right

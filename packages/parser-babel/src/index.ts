@@ -540,8 +540,10 @@ function expression(
     if (
       value.operator !== "-" &&
       value.operator !== "!" &&
+      value.operator !== "+" &&
       value.operator !== "typeof" &&
-      value.operator !== "void"
+      value.operator !== "void" &&
+      value.operator !== "~"
     ) {
       return unsupported(context, value, "This unary operator is unsupported.");
     }
@@ -675,15 +677,22 @@ function expression(
     const accepted = new Set<unknown>([
       "!==",
       "%",
+      "&",
       "*",
+      "**",
       "+",
       "-",
       "/",
       "<",
+      "<<",
       "<=",
       "===",
       ">",
       ">=",
+      ">>",
+      ">>>",
+      "^",
+      "|",
     ]);
     if (!accepted.has(operator)) {
       return unsupported(

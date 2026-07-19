@@ -34,6 +34,13 @@ The `m5-1` ABI adds the `oseo_typeof` and `oseo_remainder` helpers.
 `oseo_typeof` allocates its result string and can trigger collection, so
 lowering declares it a safepoint; `oseo_remainder` applies the shared
 primitive numeric coercion and IEEE 754 remainder semantics.
+The `m5-2` ABI adds `oseo_to_number`, `oseo_bitwise_not`,
+`oseo_exponentiate`, and the six bitwise and shift helpers. All apply the
+shared primitive numeric coercion. The 32-bit operations wrap through
+explicit modular unsigned arithmetic instead of implementation-defined
+casts, shifts mask their count to five bits, and exponentiation follows
+`Number::exponentiate`, including the `NaN` exponent and unit-base
+infinite-exponent cases where C `pow` differs.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

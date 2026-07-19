@@ -353,6 +353,23 @@ test("converts typeof, void, and remainder to owned syntax", () => {
   assert.match(hirText, /% 2/u);
 });
 
+test("converts numeric, bitwise, and exponent operators", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = 6;\n" +
+      "console.log(value ** 2, value & 3, value | 8, value ^ 1);\n" +
+      "console.log(value << 1, value >> 1, value >>> 1, ~value, +value);\n",
+    sourceId: "numeric-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\*\*/u);
+  assert.match(hirText, />>>/u);
+  assert.match(hirText, /\(~/u);
+  assert.match(hirText, /\(\+/u);
+});
+
 test("converts logical, conditional, and do-while to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -421,9 +438,8 @@ test("rejects typeof with an unresolved name explicitly", () => {
 
 const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
-  ["bitwise complement", "console.log(~1);"],
   ["update expression", "let value = 1; value++;"],
-  ["bitwise and", "console.log(1 & 1);"],
+  ["exponent assignment", "let value = 2; value **= 2;"],
   ["nullish coalescing", "console.log(null ?? 1);"],
   ["logical assignment", "let value = null; value ||= 1;"],
   ["comma sequence", "console.log((1, 2));"],

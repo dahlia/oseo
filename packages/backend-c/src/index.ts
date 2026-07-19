@@ -83,15 +83,22 @@ function operatorHelper(operator: BinaryOperator): string {
   const helpers: Readonly<Record<BinaryOperator, string>> = {
     "!==": "oseo_not_strict_equal",
     "%": "oseo_remainder",
+    "&": "oseo_bitwise_and",
     "*": "oseo_multiply",
+    "**": "oseo_exponentiate",
     "+": "oseo_add",
     "-": "oseo_subtract",
     "/": "oseo_divide",
     "<": "oseo_less_than",
+    "<<": "oseo_shift_left",
     "<=": "oseo_less_equal",
     "===": "oseo_strict_equal",
     ">": "oseo_greater_than",
     ">=": "oseo_greater_equal",
+    ">>": "oseo_shift_right",
+    ">>>": "oseo_shift_right_unsigned",
+    "^": "oseo_bitwise_xor",
+    "|": "oseo_bitwise_or",
   };
   return helpers[operator];
 }
@@ -273,10 +280,17 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
     line(state, `roots[${operation.id}] = oseo_undefined();`);
     return;
   }
-  if (operation.operator !== "-" && operation.operator !== "typeof") {
+  const helpers = {
+    "+": "oseo_to_number",
+    "-": "oseo_negate",
+    typeof: "oseo_typeof",
+    "~": "oseo_bitwise_not",
+  } as const;
+  const operator = operation.operator;
+  if (operator == null || !(operator in helpers)) {
     throw new Error(`MIR unary %${operation.id} has no valid operator.`);
   }
-  const helper = operation.operator === "-" ? "oseo_negate" : "oseo_typeof";
+  const helper = helpers[operator as keyof typeof helpers];
   location(state, operation.range);
   state.usesAbrupt = true;
   line(state, `result = ${helper}(context, roots[${argument}]);`);
@@ -290,7 +304,8 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
     operator === "!" ||
     operator === "typeof" ||
     operator === "void" ||
-    (operator === "-" && operation.arguments.length !== 2)
+    operator === "~" ||
+    ((operator === "-" || operator === "+") && operation.arguments.length !== 2)
   ) {
     throw new Error(`MIR binary %${operation.id} has no valid operator.`);
   }
