@@ -517,7 +517,6 @@ test("normalizes process spawn failures into host diagnostics", async () => {
 
 test("cleans temporary artifacts after native execution fails", async () => {
   let cleanupCount = 0;
-  let processCount = 0;
   const host: CompilerHost = {
     executionHost: {
       architecture: "x86_64",
@@ -533,11 +532,12 @@ test("cleans temporary artifacts after native execution fails", async () => {
       cleanupCount += 1;
       return Promise.resolve();
     },
-    run() {
-      processCount += 1;
+    run(request) {
+      // The fixture executable is the only non-toolchain process.
+      const isExecution = request.command !== "zig";
       return Promise.resolve({
-        exitStatus: processCount === 4 ? 1 : 0,
-        stderr: processCount === 4 ? "runtime failure\n" : "",
+        exitStatus: isExecution ? 1 : 0,
+        stderr: isExecution ? "runtime failure\n" : "",
         stdout: "",
       });
     },
@@ -576,7 +576,7 @@ test("waits for pending runtime asset writes before cleanup", async () => {
       return Promise.resolve("/temporary/oseo-cli");
     },
     readTextFile(path) {
-      if (String(path).endsWith("/runtime.c")) {
+      if (String(path).endsWith("/runtime_core.c")) {
         return headerWriteStarted.then(() =>
           Promise.reject(new Error("runtime read failed")),
         );

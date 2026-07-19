@@ -241,9 +241,9 @@ must never shrink by reclassification alone.
     unhandled stay out of the reviewed subset until a host-profile
     decision reconciles the two. Owner: the modules and asynchronous
     execution stream.
- -  Large intrinsic tables and built-in families additionally wait for the
-    runtime componentization in [*PLAN-RCR.md*](../PLAN-RCR.md) so new
-    tables have an owned component to land in.
+ -  Large intrinsic tables and built-in families land in the owned
+    runtime components recorded in
+    [*runtime-components.md*](./runtime-components.md).
 
 
 Measurement workflow

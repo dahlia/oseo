@@ -189,6 +189,15 @@ function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
 }
 
+/**
+ * Require a runtime asset name to be a portable leaf file name so a
+ * copied asset can neither escape the fixture directory nor alias
+ * another destination through separators or relative segments.
+ */
+function isPortableAssetName(name: string): boolean {
+  return name !== "." && name !== ".." && /^[A-Za-z0-9._-]+$/u.test(name);
+}
+
 function displayRequest(request: ProcessRequest): string {
   return [request.command, ...request.args].join(" ");
 }
@@ -400,6 +409,24 @@ export async function withNativeFixture<T>(
       );
     }
   }
+  const runtimeInput = options.runtime.getRuntimeInput();
+  const assetNames = new Set<string>();
+  for (const asset of runtimeInput.assets) {
+    if (!isPortableAssetName(asset.name)) {
+      throw new Error(
+        `Runtime input lists an invalid asset name: ${asset.name}.`,
+      );
+    }
+    // Case-folded so one destination on a case-insensitive filesystem
+    // cannot silently drop a copied asset.
+    const folded = asset.name.toLowerCase();
+    if (assetNames.has(folded)) {
+      throw new Error(
+        `Runtime input lists a duplicate asset name: ${asset.name}.`,
+      );
+    }
+    assetNames.add(folded);
+  }
   const directory = await options.host.makeTemporaryDirectory("oseo-native-");
   let compilerInvocation: readonly string[] = [];
   let emittedC: string | undefined;
@@ -409,10 +436,15 @@ export async function withNativeFixture<T>(
   try {
     const emitted = options.backend.emit(options.input);
     emittedC = emitted.source;
+    if (assetNames.has(emitted.sourceName.toLowerCase())) {
+      throw new Error(
+        "Runtime input lists an asset that collides with the " +
+          `generated source name: ${emitted.sourceName}.`,
+      );
+    }
     const generatedSourcePath = join(directory, emitted.sourceName);
     await options.host.writeTextFile(generatedSourcePath, emitted.source);
 
-    const runtimeInput = options.runtime.getRuntimeInput();
     const copiedAssets = await Promise.all(
       runtimeInput.assets.map(async (asset) => {
         const destination = join(directory, asset.name);
@@ -423,17 +455,17 @@ export async function withNativeFixture<T>(
         return { asset, destination };
       }),
     );
-    const runtimeSourcePath = copiedAssets.find(
-      (entry) => entry.asset.kind === "source",
-    )?.destination;
-    if (runtimeSourcePath == null) {
+    const runtimeSourcePaths = copiedAssets
+      .filter((entry) => entry.asset.kind === "source")
+      .map((entry) => entry.destination);
+    if (runtimeSourcePaths.length === 0) {
       throw new Error("Runtime input did not contain a C source asset.");
     }
 
     const plan = options.toolchain.createBuildPlan({
       generatedSourcePath,
       runtimeDirectory: directory,
-      runtimeSourcePath,
+      runtimeSourcePaths,
       target: options.target,
       workingDirectory: directory,
     });

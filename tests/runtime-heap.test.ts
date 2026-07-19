@@ -6,8 +6,14 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
+
 const root = fileURLToPath(new URL("..", import.meta.url));
 const runtime = join(root, "packages/runtime-c/native");
+const runtimeSources = cRuntimeProvider
+  .getRuntimeInput()
+  .assets.filter((asset) => asset.kind === "source")
+  .map((asset) => fileURLToPath(asset.url));
 const fixture = join(root, "tests/fixtures/runtime-heap.c");
 const zigNativeTarget =
   process.platform === "linux" && process.arch === "x64"
@@ -43,7 +49,7 @@ test(
     const directory = await mkdtemp(join(tmpdir(), "oseo-runtime-heap-"));
     try {
       const executable = join(directory, "runtime-heap");
-      const sources = [fixture, join(runtime, "runtime.c")];
+      const sources = [fixture, ...runtimeSources];
       run("zig", [
         "cc",
         "-target",

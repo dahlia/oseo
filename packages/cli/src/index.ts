@@ -399,6 +399,15 @@ function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
 }
 
+/**
+ * Require a runtime asset name to be a portable leaf file name so a
+ * copied asset can neither escape the build directory nor alias another
+ * destination through separators or relative segments.
+ */
+function isPortableAssetName(name: string): boolean {
+  return name !== "." && name !== ".." && /^[A-Za-z0-9._-]+$/u.test(name);
+}
+
 function sourceReadLocation(sourceId: string): string | URL {
   try {
     const url = new URL(sourceId);
@@ -430,6 +439,38 @@ async function executeNativeWorkflow(
   const generatedSourcePath = join(directory, emitted.sourceName);
   await host.writeTextFile(generatedSourcePath, emitted.source);
   const runtime = defaultComponents.runtime.getRuntimeInput();
+  const assetNames = new Set<string>();
+  for (const asset of runtime.assets) {
+    if (!isPortableAssetName(asset.name)) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          `The C runtime lists an invalid asset name: ${asset.name}.`,
+        ),
+      );
+    }
+    // Case-folded so one destination on a case-insensitive filesystem
+    // cannot silently drop a copied asset.
+    const folded = asset.name.toLowerCase();
+    if (folded === emitted.sourceName.toLowerCase()) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          "The C runtime lists an asset that collides with the " +
+            `generated source name: ${asset.name}.`,
+        ),
+      );
+    }
+    if (assetNames.has(folded)) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          `The C runtime lists a duplicate asset name: ${asset.name}.`,
+        ),
+      );
+    }
+    assetNames.add(folded);
+  }
   const copiedAssets = [];
   for (const asset of runtime.assets) {
     const destination = join(directory, asset.name);
@@ -439,10 +480,10 @@ async function executeNativeWorkflow(
     await host.writeTextFile(destination, contents);
     copiedAssets.push({ asset, destination });
   }
-  const runtimeSourcePath = copiedAssets.find(
-    (entry) => entry.asset.kind === "source",
-  )?.destination;
-  if (runtimeSourcePath == null) {
+  const runtimeSourcePaths = copiedAssets
+    .filter((entry) => entry.asset.kind === "source")
+    .map((entry) => entry.destination);
+  if (runtimeSourcePaths.length === 0) {
     return diagnosticResult(
       hostDiagnostic(sourceId, "The C runtime source is unavailable."),
     );
@@ -450,7 +491,7 @@ async function executeNativeWorkflow(
   const plan = defaultComponents.toolchain.createBuildPlan({
     generatedSourcePath,
     runtimeDirectory: directory,
-    runtimeSourcePath,
+    runtimeSourcePaths,
     target,
     workingDirectory: directory,
   });

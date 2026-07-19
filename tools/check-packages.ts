@@ -213,7 +213,15 @@ async function main(): Promise<void> {
       }
       if (packed.name === "@oseo/runtime-c") {
         requireFile(files, "native/oseo_runtime.h", packed.name);
-        requireFile(files, "native/runtime.c", packed.name);
+        requireFile(files, "native/runtime_internal.h", packed.name);
+        requireFile(files, "native/runtime_core.c", packed.name);
+        requireFile(files, "native/runtime_memory.c", packed.name);
+        requireFile(files, "native/runtime_binding.c", packed.name);
+        requireFile(files, "native/runtime_object.c", packed.name);
+        requireFile(files, "native/runtime_function.c", packed.name);
+        requireFile(files, "native/runtime_primitive.c", packed.name);
+        requireFile(files, "native/runtime_promise.c", packed.name);
+        requireFile(files, "native/runtime_event_loop.c", packed.name);
       }
       const manifestBytes = await run(
         "tar",

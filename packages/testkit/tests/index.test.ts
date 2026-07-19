@@ -225,6 +225,188 @@ test("separates private runtime counters from fixture stderr", async () => {
   });
 });
 
+test("passes runtime sources to the toolchain in asset order", async () => {
+  const state = memoryHost([
+    { exitStatus: 0, stderr: "", stdout: "compiler output" },
+    { exitStatus: 0, stderr: "", stdout: "native output" },
+  ]);
+  const options = fixtureOptions(state.host, ["compile"]);
+  const received: (readonly string[])[] = [];
+  await withNativeFixture(
+    {
+      ...options,
+      runtime: {
+        getRuntimeInput() {
+          return {
+            abiVersion: "m0",
+            assets: [
+              {
+                kind: "header",
+                name: "oseo_runtime.h",
+                url: new URL("file:///oseo_runtime.h"),
+              },
+              {
+                kind: "source",
+                name: "runtime_core.c",
+                url: new URL("file:///runtime_core.c"),
+              },
+              {
+                kind: "source",
+                name: "runtime_memory.c",
+                url: new URL("file:///runtime_memory.c"),
+              },
+            ],
+          };
+        },
+      },
+      toolchain: {
+        createBuildPlan(input) {
+          received.push(input.runtimeSourcePaths);
+          return options.toolchain.createBuildPlan(input);
+        },
+      },
+    },
+    () => {},
+  );
+  assert.deepEqual(received, [
+    [
+      "/tmp/oseo-native-test/runtime_core.c",
+      "/tmp/oseo-native-test/runtime_memory.c",
+    ],
+  ]);
+});
+
+test("rejects a runtime input with duplicate asset names", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        runtime: {
+          getRuntimeInput() {
+            return {
+              abiVersion: "m0",
+              assets: [
+                {
+                  kind: "source",
+                  name: "runtime.c",
+                  url: new URL("file:///a/runtime.c"),
+                },
+                {
+                  kind: "source",
+                  name: "runtime.c",
+                  url: new URL("file:///b/runtime.c"),
+                },
+              ],
+            };
+          },
+        },
+      },
+      () => assert.fail("A duplicate asset name must not reach the build."),
+    ),
+    /duplicate asset name: runtime\.c/u,
+  );
+  assert.deepEqual(state.temporaryDirectoryRequests, []);
+});
+
+test("rejects asset names that differ only by letter case", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        runtime: {
+          getRuntimeInput() {
+            return {
+              abiVersion: "m0",
+              assets: [
+                {
+                  kind: "source",
+                  name: "runtime.c",
+                  url: new URL("file:///a/runtime.c"),
+                },
+                {
+                  kind: "source",
+                  name: "RUNTIME.c",
+                  url: new URL("file:///b/RUNTIME.c"),
+                },
+              ],
+            };
+          },
+        },
+      },
+      () => assert.fail("A case-folded duplicate must not reach the build."),
+    ),
+    /duplicate asset name: RUNTIME\.c/u,
+  );
+  assert.deepEqual(state.temporaryDirectoryRequests, []);
+});
+
+test("rejects runtime asset names that are not leaf names", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        runtime: {
+          getRuntimeInput() {
+            return {
+              abiVersion: "m0",
+              assets: [
+                {
+                  kind: "source",
+                  name: "../runtime.c",
+                  url: new URL("file:///runtime.c"),
+                },
+              ],
+            };
+          },
+        },
+      },
+      () => assert.fail("A non-leaf asset name must not reach the build."),
+    ),
+    /invalid asset name: \.\.\/runtime\.c/u,
+  );
+  assert.deepEqual(state.temporaryDirectoryRequests, []);
+});
+
+test("rejects assets that collide with the generated name", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        runtime: {
+          getRuntimeInput() {
+            return {
+              abiVersion: "m0",
+              assets: [
+                {
+                  kind: "source",
+                  name: "generated.c",
+                  url: new URL("file:///generated.c"),
+                },
+              ],
+            };
+          },
+        },
+      },
+      () => assert.fail("A colliding asset name must not reach the build."),
+    ),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.match(error.message, /Native artifacts retained/u);
+      assert.ok(error.cause instanceof Error);
+      assert.match(error.cause.message, /generated source name: generated\.c/u);
+      return true;
+    },
+  );
+});
+
 test("classifies test262 results without inflating passes", () => {
   const base = {
     async: false,

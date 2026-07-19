@@ -6459,11 +6459,16 @@ export interface NativeBuildPlan {
   readonly target: TargetDescription;
 }
 
-/** Explicit inputs used to construct a native build plan. */
+/**
+ * Explicit inputs used to construct a native build plan. Runtime source
+ * paths are an ordered collection: the toolchain compiles every listed
+ * translation unit and archives the objects in exactly this order, so
+ * filesystem enumeration never selects sources or archive layout.
+ */
 export interface NativeBuildInput {
   readonly generatedSourcePath: string;
   readonly runtimeDirectory: string;
-  readonly runtimeSourcePath: string;
+  readonly runtimeSourcePaths: readonly string[];
   readonly target: TargetDescription;
   readonly workingDirectory: string;
 }

@@ -7,6 +7,12 @@ results, explicit root frames, mark-and-sweep collection, ordinary objects,
 arrays, environments, binding cells, function objects, and the deterministic
 `console.log` intrinsic. Native assets remain separate files and are included
 in npm and JSR packages.
+The reviewed asset list is ordered: *oseo\_runtime.h* stays the only header
+included by generated C and direct native fixtures, while
+*runtime\_internal.h* is package-private and owns the shared heap layouts,
+tag masks, and inline value helpers used across the runtime translation
+units. Every listed C source compiles as its own translation unit and is
+archived in asset order.
 The shared NaN-boxed layout admits allocator-provided data pointers only after
 an explicit low-48-bit payload check. Linux AMD64 and macOS AArch64 execution
 exercise that boundary under the target's address and undefined-behavior

@@ -202,9 +202,10 @@ execution requirement. Property failures and native fixture metadata record
 the normalized host, target, and sanitizer modes.
 
 The native continuous-integration job is a Linux and macOS matrix. Node.js and
-Deno operating-system jobs remain bootstrap-host evidence. Runtime
-componentization under [*PLAN-RCR.md*](../../PLAN-RCR.md) must preserve all
-three build targets and both execution environments.
+Deno operating-system jobs remain bootstrap-host evidence. The runtime
+componentization recorded in
+[*runtime-components.md*](../runtime-components.md) preserved all three
+build targets and both execution environments.
 
 
 Failure modes and replacement triggers
