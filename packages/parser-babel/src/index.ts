@@ -641,7 +641,7 @@ function expression(
   }
   if (value.type === "LogicalExpression") {
     const operator = value.operator;
-    if (operator !== "&&" && operator !== "||") {
+    if (operator !== "&&" && operator !== "||" && operator !== "??") {
       return unsupported(
         context,
         value,
@@ -656,6 +656,16 @@ function expression(
     const right = expression(context, rightNode);
     if (left == null || right == null) return undefined;
     return { ...located, kind: "logical", left, operator, right };
+  }
+  if (value.type === "SequenceExpression") {
+    const expressions: SyntaxExpression[] = [];
+    for (const element of nodes(value.expressions)) {
+      const converted = expression(context, element);
+      if (converted == null) return undefined;
+      expressions.push(converted);
+    }
+    if (expressions.length < 2) return unsupported(context, value);
+    return { ...located, expressions, kind: "sequence" };
   }
   if (value.type === "ConditionalExpression") {
     const testNode = node(value.test);

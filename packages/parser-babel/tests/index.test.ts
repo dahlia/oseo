@@ -388,6 +388,20 @@ test("converts logical, conditional, and do-while to owned syntax", () => {
   assert.match(hirText, /\? "three" : "other"/u);
 });
 
+test("converts comma sequences and nullish coalescing", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const chosen = null ?? (1, 2);\n" +
+      "console.log(chosen ?? 0, (chosen, chosen + 1));\n",
+    sourceId: "sequence-nullish.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\?\?/u);
+  assert.match(hirText, /\(1, 2\)/u);
+});
+
 test("rejects await inside logical operands of async functions", () => {
   const result = compileSource(babelFrontend, {
     source: "async function first(input) { return input && (await input); }",
@@ -440,9 +454,8 @@ const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
   ["update expression", "let value = 1; value++;"],
   ["exponent assignment", "let value = 2; value **= 2;"],
-  ["nullish coalescing", "console.log(null ?? 1);"],
   ["logical assignment", "let value = null; value ||= 1;"],
-  ["comma sequence", "console.log((1, 2));"],
+  ["nullish assignment", "let value = null; value ??= 1;"],
   ["property", "console.error(1);"],
   ["loose equality", "console.log(1 == true);"],
   ["module", 'import "fixture";'],

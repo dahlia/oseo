@@ -663,6 +663,23 @@ console.log(
 `,
   },
   {
+    name: "sequence-and-nullish",
+    source: `
+function logging(label, value) { console.log(label); return value; }
+console.log((1, 2), (1, 2, "third"));
+console.log((logging("first", 1), logging("second", 2)));
+console.log(null ?? "null-fallback", undefined ?? "undefined-fallback");
+console.log(0 ?? "kept-zero", "" ?? "kept-empty", false ?? "kept-false");
+console.log(NaN ?? "kept-nan", null ?? undefined, undefined ?? null);
+console.log(false ?? logging("skipped", 1));
+console.log(null ?? logging("taken", "value"));
+console.log((null ?? 0) || "or-after", (1 ?? 2) && "and-after");
+let effects = 0;
+const touch = function () { effects = effects + 1; return null; };
+console.log(touch() ?? "was-null", effects);
+`,
+  },
+  {
     name: "numeric-bitwise-exponent",
     source: `
 console.log(2 ** 10, 2 ** 0.5, (-2) ** 2, 2 ** -2, 9 ** 0.5);

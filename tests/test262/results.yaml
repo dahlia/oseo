@@ -2136,6 +2136,101 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - coalesce-expression
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - coalesce-expression
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/coalesce/cannot-chain-tail-with-logical-or.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - coalesce-expression
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/coalesce/follows-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/coalesce/follows-null.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/coalesce/follows-null.js:86:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/comma/S11.14_A2.1_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/comma/S11.14_A2.1_T1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/comma/S11.14_A2.1_T1.js:65:1:
+        error[OSEO1001]: Only const and let declarations are
+        supported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -9912,11 +10007,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 187
+  expectedNegatives: 189
   harnessFailures: 0
   passes: 53
   semanticFailures: 0
-  unsupportedProfileFeatures: 162
+  unsupportedProfileFeatures: 164
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -9943,11 +10038,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: expression-operators
-      expectedNegatives: 5
+      expectedNegatives: 7
       harnessFailures: 0
       passes: 3
       semanticFailures: 0
-      unsupportedProfileFeatures: 11
+      unsupportedProfileFeatures: 13
     - dependency: functions
       expectedNegatives: 8
       harnessFailures: 0
@@ -9998,11 +10093,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 36
+      expectedNegatives: 38
       harnessFailures: 0
       passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 24
+      unsupportedProfileFeatures: 26
     - group: language/module-code
       expectedNegatives: 122
       harnessFailures: 0

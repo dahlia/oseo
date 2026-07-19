@@ -687,6 +687,80 @@ test("lowers short-circuit logic through a parameterized join", () => {
   );
 });
 
+test("lowers nullish coalescing through null and undefined checks", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          kind: "logical",
+          left: { kind: "null", range },
+          operator: "??",
+          range,
+          right: { kind: "number", range, value: 2 },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "nullish-join.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const join = script.blocks.find(
+    (block) => (block.parameters?.length ?? 0) === 1,
+  );
+  assert.ok(join != null);
+  const equalityChecks = script.blocks
+    .flatMap((block) => block.operations)
+    .filter(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    );
+  assert.equal(equalityChecks.length, 2);
+  const jumps = script.blocks.filter(
+    (block) =>
+      block.terminator.kind === "jump" &&
+      block.terminator.target === join.id &&
+      block.terminator.values?.length === 1,
+  );
+  assert.equal(jumps.length, 2);
+});
+
+test("lowers comma sequences to their final operand", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          expressions: [
+            { kind: "number", range, value: 1 },
+            { kind: "string", range, value: "last" },
+          ],
+          kind: "sequence",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "sequence.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const constants = operations.filter(
+    (operation) => operation.kind === "constant",
+  );
+  assert.equal(constants[0]?.constant?.kind, "number");
+  assert.equal(constants[1]?.constant?.kind, "string");
+});
+
 test("lowers conditional expressions into branch arms and a join", () => {
   const syntax: SyntaxProgram = {
     body: [

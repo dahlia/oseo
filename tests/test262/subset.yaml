@@ -1,6 +1,7 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - async-functions
+  - coalesce-expression
   - computed-property-names
   - const
   - exponentiation
@@ -268,6 +269,18 @@ tests:
   - path: test/language/expressions/await/no-operand.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/coalesce/cannot-chain-tail-with-logical-or.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/coalesce/follows-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/comma/S11.14_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/expressions/conditional/S11.12_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]

@@ -99,6 +99,15 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  The `??` nullish coalescing operator and the comma sequence operator.
+    `??` lowers through explicit strict null and undefined checks into
+    the same parameterized join structure as the other short-circuit
+    operators, so the right operand evaluates only for a nullish left
+    value. Sequences evaluate left to right and produce their final
+    operand. Logical assignment operators, including `??=`, remain
+    rejected, and `await` inside these operands keeps the shared
+    rejection. The `coalesce-expression` test262 feature is a supported
+    feature of the reviewed subset.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the

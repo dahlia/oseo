@@ -126,7 +126,7 @@ export type BinaryOperator =
 export type UnaryOperator = "!" | "+" | "-" | "typeof" | "void" | "~";
 
 /** Short-circuit operators lowered through explicit control flow. */
-export type LogicalOperator = "&&" | "||";
+export type LogicalOperator = "&&" | "??" | "||";
 
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
@@ -169,6 +169,10 @@ export type SyntaxExpression =
       readonly left: SyntaxExpression;
       readonly operator: LogicalOperator;
       readonly right: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly expressions: readonly SyntaxExpression[];
+      readonly kind: "sequence";
     })
   | (LocatedSyntax & {
       readonly functionValue: SyntaxFunction;
@@ -1177,6 +1181,10 @@ export type HirExpression =
       readonly right: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly expressions: readonly HirExpression[];
+      readonly kind: "sequence";
+    })
+  | (LocatedSyntax & {
       readonly functionId: number;
       readonly functionKind: FunctionKind;
       readonly kind: "function";
@@ -1583,6 +1591,15 @@ function resolveExpression(
       return undefined;
     }
     return { ...expression, alternate, consequent, test };
+  }
+  if (expression.kind === "sequence") {
+    const expressions: HirExpression[] = [];
+    for (const element of expression.expressions) {
+      const resolved = resolveExpression(element, scopes, state);
+      if (resolved == null) return undefined;
+      expressions.push(resolved);
+    }
+    return { ...expression, expressions };
   }
   if (expression.kind === "object") {
     const properties: {
@@ -2304,6 +2321,9 @@ function printHirExpression(expression: HirExpression): string {
     const consequent = printHirExpression(expression.consequent);
     const alternate = printHirExpression(expression.alternate);
     return `(${test} ? ${consequent} : ${alternate})`;
+  }
+  if (expression.kind === "sequence") {
+    return `(${expression.expressions.map(printHirExpression).join(", ")})`;
   }
   if (expression.kind === "object") {
     return (
@@ -3213,24 +3233,87 @@ function lowerExpression(
     const result = builder.nextValue;
     builder.nextValue += 1;
     joinBlock.parameters = [result];
-    const takenBlock =
-      expression.operator === "&&" ? rightBlock.id : shortBlock.id;
-    const skippedBlock =
-      expression.operator === "&&" ? shortBlock.id : rightBlock.id;
-    appendMirMetadata(
-      builder,
-      "branch",
-      `${expression.operator} true -> bb${takenBlock}, ` +
-        `false -> bb${skippedBlock}`,
-      [left],
-      expression.range,
-    );
-    builder.current.terminator = {
-      kind: "branch",
-      test: left,
-      whenFalse: skippedBlock,
-      whenTrue: takenBlock,
-    };
+    if (expression.operator === "??") {
+      const nullishTest = (constant: MirConstant): number => {
+        const constantId = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [],
+          constant,
+          detail: constant.kind,
+          id: constantId,
+          kind: "constant",
+          range: expression.range,
+        });
+        const testId = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [left, constantId],
+          detail: "===",
+          id: testId,
+          kind: "binary",
+          operator: "===",
+          range: expression.range,
+        });
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [testId],
+          expression.range,
+        );
+        return testId;
+      };
+      const undefinedBlock = createMirBlock(builder);
+      const isNull = nullishTest({ kind: "null" });
+      appendMirMetadata(
+        builder,
+        "branch",
+        `?? null -> bb${rightBlock.id}, other -> bb${undefinedBlock.id}`,
+        [isNull],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: isNull,
+        whenFalse: undefinedBlock.id,
+        whenTrue: rightBlock.id,
+      };
+      builder.current = undefinedBlock;
+      const isUndefined = nullishTest({ kind: "undefined" });
+      appendMirMetadata(
+        builder,
+        "branch",
+        `?? undefined -> bb${rightBlock.id}, other -> bb${shortBlock.id}`,
+        [isUndefined],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: isUndefined,
+        whenFalse: shortBlock.id,
+        whenTrue: rightBlock.id,
+      };
+    } else {
+      const takenBlock =
+        expression.operator === "&&" ? rightBlock.id : shortBlock.id;
+      const skippedBlock =
+        expression.operator === "&&" ? shortBlock.id : rightBlock.id;
+      appendMirMetadata(
+        builder,
+        "branch",
+        `${expression.operator} true -> bb${takenBlock}, ` +
+          `false -> bb${skippedBlock}`,
+        [left],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: left,
+        whenFalse: skippedBlock,
+        whenTrue: takenBlock,
+      };
+    }
     builder.current = shortBlock;
     shortBlock.terminator = {
       kind: "jump",
@@ -3253,6 +3336,16 @@ function lowerExpression(
       expression.range,
     );
     return recordRoot(builder, result, expression.range);
+  }
+  if (expression.kind === "sequence") {
+    let last: number | undefined;
+    for (const element of expression.expressions) {
+      last = lowerExpression(element, builder);
+    }
+    if (last == null) {
+      throw new Error("A sequence expression has no expressions.");
+    }
+    return last;
   }
   if (expression.kind === "conditional") {
     const test = lowerExpression(expression.test, builder);
@@ -4759,6 +4852,9 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
       hirExpressionHasAwait(expression.consequent) ||
       hirExpressionHasAwait(expression.alternate)
     );
+  }
+  if (expression.kind === "sequence") {
+    return expression.expressions.some(hirExpressionHasAwait);
   }
   return (
     expression.kind === "unary" && hirExpressionHasAwait(expression.argument)
