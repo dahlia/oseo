@@ -99,6 +99,12 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  Untagged template literals, normalized by the frontend into string
+    concatenation. Substitutions evaluate left to right interleaved with
+    the cooked template pieces, every substitution converts through the
+    shared string conversion, and object substitutions keep the shared
+    unsupported coercion boundary. Tagged template expressions stay
+    rejected with a source-located diagnostic.
  -  Synchronous arrow functions with block and expression bodies,
     reusing the arrow function kind, lexical receiver, and
     non-constructibility the runtime already owns for asynchronous
@@ -156,11 +162,10 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring, spread, default parameters, template literals,
-    classes, generators, symbols, big integers, regular expressions, and
-    the remaining expression grammar are outside the admitted syntax.
-    Owner: the core expressions and bindings stream in
-    [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Destructuring, spread, default parameters, classes, generators,
+    symbols, big integers, regular expressions, and the remaining
+    expression grammar are outside the admitted syntax. Owner: the core
+    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  Named error intrinsics such as `TypeError` do not exist. Runtime
     semantic errors are catchable opaque values without ECMAScript error
     identity, and only resource limits and host failures surface as owned

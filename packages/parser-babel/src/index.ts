@@ -658,6 +658,59 @@ function expression(
     if (left == null || right == null) return undefined;
     return { ...located, kind: "logical", left, operator, right };
   }
+  if (value.type === "TaggedTemplateExpression") {
+    return unsupported(
+      context,
+      value,
+      "Tagged template expressions are unsupported.",
+    );
+  }
+  if (value.type === "TemplateLiteral") {
+    const quasis = nodes(value.quasis);
+    const expressions = nodes(value.expressions);
+    if (quasis.length !== expressions.length + 1) {
+      return unsupported(context, value);
+    }
+    const first = cookedTemplateText(quasis[0]!);
+    if (first == null) return unsupported(context, value);
+    // An untagged template is observationally string concatenation for
+    // the admitted values: every piece converts through ToString, and a
+    // leading string operand keeps + on the string branch.
+    let result: SyntaxExpression = {
+      ...location(context, quasis[0]!),
+      kind: "string",
+      value: first,
+    };
+    for (const [index, expressionNode] of expressions.entries()) {
+      const quasi = quasis[index + 1];
+      if (quasi == null) return unsupported(context, value);
+      const piece = cookedTemplateText(quasi);
+      if (piece == null) return unsupported(context, value);
+      const substitution = expression(context, expressionNode);
+      if (substitution == null) return undefined;
+      result = {
+        ...located,
+        kind: "binary",
+        left: result,
+        operator: "+",
+        right: substitution,
+      };
+      if (piece !== "") {
+        result = {
+          ...located,
+          kind: "binary",
+          left: result,
+          operator: "+",
+          right: {
+            ...location(context, quasi),
+            kind: "string",
+            value: piece,
+          },
+        };
+      }
+    }
+    return result;
+  }
   if (value.type === "SequenceExpression") {
     const expressions: SyntaxExpression[] = [];
     for (const element of nodes(value.expressions)) {
@@ -1039,6 +1092,15 @@ function syntheticFunction(
 
 function undefinedExpression(range: SourceRange): SyntaxExpression {
   return { kind: "undefined", range };
+}
+
+function cookedTemplateText(element: BabelNode): string | undefined {
+  const elementValue = element.value as
+    | { readonly cooked?: unknown }
+    | undefined;
+  return typeof elementValue?.cooked === "string"
+    ? elementValue.cooked
+    : undefined;
 }
 
 function identifierExpression(

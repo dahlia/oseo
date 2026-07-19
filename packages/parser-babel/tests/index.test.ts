@@ -593,6 +593,29 @@ test("rejects var exports explicitly", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
 
+test("converts untagged template literals to concatenation", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const name = "world";\n' +
+      "console.log(`hello ${name}${1 + 1}!`, ``, `plain`);\n",
+    sourceId: "templates.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /"hello " \+/u);
+  assert.match(hirText, /\+ "!"/u);
+});
+
+test("rejects tagged template expressions", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function tag(parts) { return parts; } console.log(tag`x`);",
+    sourceId: "tagged.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Tagged template/u);
+});
+
 test("converts loose equality to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source: 'console.log(1 == "1", null != undefined);',

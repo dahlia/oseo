@@ -371,6 +371,12 @@ tests:
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/typeof/boolean.js
     expectedClassification: pass
     dependencies: [expression-operators]

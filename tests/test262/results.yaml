@@ -3010,6 +3010,50 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -10306,7 +10350,7 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 199
+  expectedNegatives: 201
   harnessFailures: 0
   passes: 60
   semanticFailures: 0
@@ -10337,7 +10381,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: expression-operators
-      expectedNegatives: 7
+      expectedNegatives: 9
       harnessFailures: 0
       passes: 8
       semanticFailures: 0
@@ -10398,7 +10442,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 39
+      expectedNegatives: 41
       harnessFailures: 0
       passes: 19
       semanticFailures: 0

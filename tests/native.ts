@@ -663,6 +663,22 @@ console.log(
 `,
   },
   {
+    name: "template-literals",
+    source: `
+const name = "world";
+console.log(\`hello \${name}!\`);
+console.log(\`\${1}\${2}\`, \`a\${null}b\${undefined}\`);
+console.log(\`\${NaN} \${-0} \${1e21} \${0.1 + 0.2}\`);
+console.log(\`multi
+line\`, \`escaped\\n\\t\${"x"}\`, \`\\u{1F600}\`);
+console.log(\`\${1 + 2} and \${\`nested \${name}\`}\`);
+const empty = \`\`;
+console.log(empty === "", \`\${true}\${false}\`, typeof \`\${1}\`);
+const logging = (value) => { console.log("evaluated", value); return value; };
+console.log(\`\${logging("first")}-\${logging("second")}\`);
+`,
+  },
+  {
     name: "sync-arrows",
     source: `
 const double = (value) => value * 2;
