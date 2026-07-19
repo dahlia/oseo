@@ -116,6 +116,28 @@ configuration on `macos-aarch64`:
     `sha256:d4345fd27f1f2c4099197b28b2249e0c2943d42ffd8f2a8dedcb36ccc367ac34`,
     and the target parity record all pass unmodified.
 
+### Closing verification
+
+The clean-checkout verification ran on macOS AArch64 from a fresh
+detached Git worktree of the commit that recorded the ownership rules,
+with dependencies installed by `mise deps` into the fresh tree. All of
+the following passed in order with no failure or interruption:
+
+1.  `mise run check`;
+2.  `mise run test`, covering the Node.js and Deno package tests, the
+    host-native differential fixtures with the AArch64 Linux cross-link
+    and strict-warning and sanitizer policies, the architecture probes,
+    and the pinned test262 subset;
+3.  `mise run test:property:native`;
+4.  `mise run test:property:extended` at ten times the ordinary case
+    budget under both hosts.
+
+In the compared symbol and size metrics, the only differences from the
+recorded baseline are the ones explained above: the fourteen intended
+`oseo_internal_` symbols, and the archive and fixture growth from
+per-unit duplication of `static inline` value helpers and sanitizer
+metadata. This closes [*PLAN-RCR.md*](../PLAN-RCR.md).
+
 
 Baseline before extraction
 --------------------------

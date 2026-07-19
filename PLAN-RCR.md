@@ -4,8 +4,7 @@ C runtime componentization plan
 Status
 ------
 
-Implementation status: extractions complete; the closing clean-checkout
-verification is the remaining step. The runtime now ships ten reviewed
+Implementation status: complete. The runtime now ships ten reviewed
 ordered assets: the generated-code header, the package-private
 *runtime\_internal.h*, and eight component translation units matching the
 target layout below, with no catch-all *runtime.c* and no temporary
@@ -13,9 +12,8 @@ forwarding helpers. Fourteen cross-component helpers use `oseo_internal_`
 names with one declaration each in the internal header.
 [*docs/runtime-components.md*](./docs/runtime-components.md) records the
 pre-extraction baseline, the resulting ownership rules, the documented
-component cycles, and the before-and-after evidence. The clean-checkout
-ordinary and extended verification closes the plan; its record lands in
-the same document, and the plan remains active until then.
+component cycles, the before-and-after evidence, and the closing
+clean-checkout ordinary and extended verification.
 
 This plan was written when M4 left the runtime with 4,714 lines in
 *runtime.c*, 476 lines in *oseo\_runtime.h*, and roughly 149 C functions.
