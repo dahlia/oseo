@@ -685,6 +685,7 @@ function expression(
   if (value.type === "BinaryExpression") {
     const operator = value.operator;
     const accepted = new Set<unknown>([
+      "!=",
       "!==",
       "%",
       "&",
@@ -696,6 +697,7 @@ function expression(
       "<",
       "<<",
       "<=",
+      "==",
       "===",
       ">",
       ">=",

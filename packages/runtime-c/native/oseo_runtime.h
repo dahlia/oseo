@@ -423,6 +423,16 @@ OseoResult oseo_strict_equal(
     OseoValue left,
     OseoValue right
 );
+OseoResult oseo_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
+OseoResult oseo_not_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
 OseoResult oseo_not_strict_equal(
     OseoContext *context,
     OseoValue left,

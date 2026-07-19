@@ -99,6 +99,14 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  The `==` and `!=` loose equality operators, implementing
+    `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
+    nullish operand compared with anything else is unequal without
+    coercion, booleans and numeric strings coerce through the shared
+    numeric conversion, and objects compare by identity. Comparing an
+    object with a number or string, including a boolean after its
+    numeric conversion, keeps the shared unsupported
+    object-to-primitive boundary until generic `ToPrimitive` lands.
  -  The `??` nullish coalescing operator and the comma sequence operator.
     `??` lowers through explicit strict null and undefined checks into
     the same parameterized join structure as the other short-circuit

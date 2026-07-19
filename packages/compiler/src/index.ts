@@ -103,6 +103,7 @@ export type SyntaxCallTarget =
 
 /** Binary operations selected before native backend lowering. */
 export type BinaryOperator =
+  | "!="
   | "!=="
   | "%"
   | "&"
@@ -114,6 +115,7 @@ export type BinaryOperator =
   | "<"
   | "<<"
   | "<="
+  | "=="
   | "==="
   | ">"
   | ">="

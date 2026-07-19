@@ -81,6 +81,7 @@ function operationArgument(operation: MirOperation, index: number): number {
 
 function operatorHelper(operator: BinaryOperator): string {
   const helpers: Readonly<Record<BinaryOperator, string>> = {
+    "!=": "oseo_not_loose_equal",
     "!==": "oseo_not_strict_equal",
     "%": "oseo_remainder",
     "&": "oseo_bitwise_and",
@@ -92,6 +93,7 @@ function operatorHelper(operator: BinaryOperator): string {
     "<": "oseo_less_than",
     "<<": "oseo_shift_left",
     "<=": "oseo_less_equal",
+    "==": "oseo_loose_equal",
     "===": "oseo_strict_equal",
     ">": "oseo_greater_than",
     ">=": "oseo_greater_equal",

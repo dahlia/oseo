@@ -663,6 +663,24 @@ console.log(
 `,
   },
   {
+    name: "loose-equality",
+    source: `
+console.log(1 == "1", "" == 0, "0" == false, true == 1, false == "");
+console.log(null == undefined, undefined == null, null == null);
+console.log(null == 0, undefined == 0, null == false, undefined == "");
+console.log(NaN == NaN, NaN == "NaN", -0 == 0, -0 == "0");
+console.log("1e2" == 100, "0x10" == 16, "  2  " == 2, "2a" == 2);
+console.log(1 != "1", null != undefined, NaN != NaN, "a" != "b");
+const box = { value: 1 };
+const same = box;
+const other = { value: 1 };
+console.log(box == same, box == other, box != other);
+console.log(box == null, null == box, box == undefined, undefined != box);
+console.log(true == "1", false == "0", true == "true", false == "1");
+console.log(Infinity == "Infinity", -Infinity == "-Infinity");
+`,
+  },
+  {
     name: "sequence-and-nullish",
     source: `
 function logging(label, value) { console.log(label); return value; }

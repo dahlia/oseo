@@ -41,6 +41,13 @@ explicit modular unsigned arithmetic instead of implementation-defined
 casts, shifts mask their count to five bits, and exponentiation follows
 `Number::exponentiate`, including the `NaN` exponent and unit-base
 infinite-exponent cases where C `pow` differs.
+The `m5-3` ABI adds `oseo_loose_equal` and `oseo_not_loose_equal`,
+implementing `IsLooselyEqual` for the admitted values: nullish pairs are
+equal, a nullish operand compared with anything else is unequal without
+coercion, booleans and numeric strings coerce through the shared numeric
+conversion, objects compare by identity, and comparing an object with a
+number or string keeps the shared unsupported object-to-primitive
+boundary.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

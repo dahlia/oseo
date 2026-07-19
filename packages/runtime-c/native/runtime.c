@@ -2963,6 +2963,85 @@ OseoResult oseo_strict_equal(
     return normal(oseo_boolean(strict_equal_value(left, right)));
 }
 
+/* IsLooselyEqual for the admitted values; objects compare by identity and
+ * object-to-primitive coercion keeps the shared unsupported boundary. */
+static OseoResult loose_equal_value(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    bool *equal
+) {
+    if (is_number(left) && is_number(right)) {
+        *equal = strict_equal_value(left, right);
+        return normal(oseo_undefined());
+    }
+    uint64_t left_tag = tag_of(left);
+    uint64_t right_tag = tag_of(right);
+    bool left_nullish =
+        left_tag == OSEO_TAG_UNDEFINED || left_tag == OSEO_TAG_NULL;
+    bool right_nullish =
+        right_tag == OSEO_TAG_UNDEFINED || right_tag == OSEO_TAG_NULL;
+    if (left_nullish || right_nullish) {
+        *equal = left_nullish && right_nullish;
+        return normal(oseo_undefined());
+    }
+    if (left_tag == OSEO_TAG_BOOLEAN) {
+        OseoResult number = to_number(context, left);
+        if (number.status != OSEO_STATUS_NORMAL) return number;
+        return loose_equal_value(context, number.value, right, equal);
+    }
+    if (right_tag == OSEO_TAG_BOOLEAN) {
+        OseoResult number = to_number(context, right);
+        if (number.status != OSEO_STATUS_NORMAL) return number;
+        return loose_equal_value(context, left, number.value, equal);
+    }
+    if (is_string(left) && is_string(right)) {
+        *equal = strict_equal_value(left, right);
+        return normal(oseo_undefined());
+    }
+    if (is_number(left) && is_string(right)) {
+        OseoResult converted = string_number(context, string_object(right));
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, left, converted.value, equal);
+    }
+    if (is_string(left) && is_number(right)) {
+        OseoResult converted = string_number(context, string_object(left));
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, converted.value, right, equal);
+    }
+    if (is_object(left) && is_object(right)) {
+        *equal = left == right;
+        return normal(oseo_undefined());
+    }
+    return failure(
+        context,
+        "OSEO2001",
+        "Object-to-primitive conversion is unsupported."
+    );
+}
+
+OseoResult oseo_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    bool equal = false;
+    OseoResult status = loose_equal_value(context, left, right, &equal);
+    if (status.status != OSEO_STATUS_NORMAL) return status;
+    return normal(oseo_boolean(equal));
+}
+
+OseoResult oseo_not_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    bool equal = false;
+    OseoResult status = loose_equal_value(context, left, right, &equal);
+    if (status.status != OSEO_STATUS_NORMAL) return status;
+    return normal(oseo_boolean(!equal));
+}
+
 OseoResult oseo_not_strict_equal(
     OseoContext *context,
     OseoValue left,

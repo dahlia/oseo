@@ -388,6 +388,18 @@ test("converts logical, conditional, and do-while to owned syntax", () => {
   assert.match(hirText, /\? "three" : "other"/u);
 });
 
+test("converts loose equality to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'console.log(1 == "1", null != undefined);',
+    sourceId: "loose-equality.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /==/u);
+  assert.match(hirText, /!=/u);
+});
+
 test("converts comma sequences and nullish coalescing", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -457,7 +469,7 @@ const unsupportedForms = [
   ["logical assignment", "let value = null; value ||= 1;"],
   ["nullish assignment", "let value = null; value ??= 1;"],
   ["property", "console.error(1);"],
-  ["loose equality", "console.log(1 == true);"],
+  ["in operator", 'console.log("key" in {});'],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],

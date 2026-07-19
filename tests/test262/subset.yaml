@@ -290,6 +290,21 @@ tests:
   - path: test/language/expressions/conditional/in-condition.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/does-not-equals/S11.9.2_A3.1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.3.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
   - path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
