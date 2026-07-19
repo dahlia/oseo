@@ -576,7 +576,7 @@ test("waits for pending runtime asset writes before cleanup", async () => {
       return Promise.resolve("/temporary/oseo-cli");
     },
     readTextFile(path) {
-      if (String(path).endsWith("/runtime.c")) {
+      if (String(path).endsWith("/runtime_core.c")) {
         return headerWriteStarted.then(() =>
           Promise.reject(new Error("runtime read failed")),
         );

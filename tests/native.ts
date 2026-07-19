@@ -1865,9 +1865,9 @@ for (const fixture of fixtures) {
 // PLAN-RCR multi-source build contract: every reviewed runtime
 // translation unit plus an extra probe unit compiles, archives in
 // input order, and links into an executable whose observation matches
-// the reviewed-runtime build. The copied runtime.c gains an undefined
-// reference to a symbol defined only by the probe unit, so a
-// successful link proves the linker extracted the probe archive
+// the reviewed-runtime build. The copied runtime_core.c gains an
+// undefined reference to a symbol defined only by the probe unit, so
+// a successful link proves the linker extracted the probe archive
 // member.
 {
   const probeDirectory = await host.makeTemporaryDirectory("oseo-multi-tu-");
@@ -1897,7 +1897,10 @@ for (const fixture of fixtures) {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {
       const source = await host.readTextFile(path);
-      if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_core.c")
+      ) {
         return source;
       }
       return (

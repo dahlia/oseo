@@ -367,5 +367,10 @@ OseoResult oseo_internal_promise_method_function(
 bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_jobs_drain_until(
+    OseoContext *context,
+    OseoValue promise
+);
+bool oseo_internal_jobs_reached_promise(OseoValue promise);
 
 #endif
