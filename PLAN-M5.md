@@ -24,11 +24,21 @@ Delivery item 7 is resolved for dynamic source:
 `Function` constructor, and dynamic import explicitly unsupported with owned
 diagnostics and the `dynamic-source` manifest tag. Realms, agents, and
 shared memory remain classified through missing harness capabilities.
-Delivery item 4 is in progress: the `typeof`, `void`, and `%` operators,
-the `&&`, `||`, and conditional `?:` operators, and the `do-while`
-statement are admitted with native differential, structural, and reviewed
-test262 evidence. Delivery items 4 through 6, 8, and 9, from the remaining
-foundational expressions through closing the named edition, remain open.
+Delivery item 4 is substantially in progress. The admitted syntax now
+covers every scalar operator family (`typeof`, `void`, `%`, `**`,
+bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
+conditional and comma operators, loose equality, `in`, and
+`instanceof`), `var` declarations with function-scope hoisting,
+synchronous arrow functions, untagged template literals, and the
+control-flow statements `do-while`, classic `for` with per-iteration
+lexical environments, `switch`, and labeled statements, each with
+native differential, structural, and reviewed test262 evidence
+recorded in [*docs/language-profile-m5.md*](./docs/language-profile-m5.md).
+The remaining item 4 work is the semantic groundwork that needs owned
+runtime surfaces: named error intrinsics, generic `ToPrimitive`,
+symbols, and the iterator protocol, which wait on
+[*PLAN-RCR.md*](./PLAN-RCR.md). Delivery items 5, 6, 8, and 9 remain
+open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
