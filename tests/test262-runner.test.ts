@@ -323,30 +323,84 @@ test("rejects specialization observation differences", async () => {
   );
 });
 
-test("keeps unobservable runtime-negative types unsupported", async () => {
+function respondStderr(stderr: string): Test262Executor {
+  return {
+    execute(): Promise<CliResult> {
+      return Promise.resolve({ exitStatus: 1, stderr, stdout: "" });
+    },
+  };
+}
+
+test("executes runtime negatives and compares the thrown type", async () => {
   const source = `/*---
 negative:
   phase: runtime
   type: TypeError
 flags: [noStrict]
 ---*/
-throw 1;
+null.item;
 `;
   const parsed = parseTest262Case(source, "test/runtime-negative.js", revision);
-  const executor: Test262Executor = {
-    execute(): Promise<CliResult> {
-      throw new Error("must not execute");
-    },
-  };
-  const result = await executeTest262Case(
+  const matched = await executeTest262Case(
     source,
     parsed,
     new Set<string>(),
     harnesses,
-    executor,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: TypeError: " +
+        "Cannot read properties of a nullish value.\n",
+    ),
+    ["error-intrinsics"],
   );
-  assert.equal(result.classification, "unsupported-profile-feature");
-  assert.equal(result.observation.unsupportedCapability, "runtime-error-types");
+  assert.equal(matched.classification, "expected-negative");
+  assert.equal(matched.observation.errorType, "TypeError");
+  assert.equal(matched.observation.failedPhase, "runtime");
+  assert.deepEqual(
+    matched.execution?.variants.map((variant) => variant.specialization),
+    ["disabled", "enabled"],
+  );
+  const mismatched = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: RangeError: bad.\n",
+    ),
+  );
+  assert.equal(mismatched.classification, "semantic-failure");
+  assert.equal(mismatched.observation.errorType, "RangeError");
+  const unobservable = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "Unhandled JavaScript throw.\n",
+    ),
+  );
+  assert.equal(unobservable.classification, "unsupported-profile-feature");
+  assert.equal(
+    unobservable.observation.unsupportedCapability,
+    "runtime-error-observation",
+  );
+  const completed = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      execute(): Promise<CliResult> {
+        return Promise.resolve(successfulResult());
+      },
+    },
+  );
+  assert.equal(completed.classification, "semantic-failure");
+  assert.match(
+    completed.observation.detail ?? "",
+    /completed without the expected runtime error/u,
+  );
 });
 
 test("classifies unsupported features without native execution", async () => {

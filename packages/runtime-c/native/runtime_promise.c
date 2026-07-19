@@ -221,7 +221,13 @@ static OseoResult promise_fulfill(
     OseoValue promise_value,
     OseoValue value
 ) {
-    if (!is_promise(promise_value)) return language_failure(context);
+    if (!is_promise(promise_value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The settled value is not a promise."
+        );
+    }
     OseoPromise *promise = promise_object(promise_value);
     if (promise->state != OSEO_PROMISE_PENDING) {
         return normal(oseo_undefined());
@@ -236,7 +242,11 @@ OseoResult oseo_promise_reject_into(
     OseoValue promise_value,
     OseoValue reason
 ) {
-    if (!is_promise(promise_value)) return language_failure(context);
+    if (!is_promise(promise_value)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The settled value is not a promise."
+    );
     OseoPromise *promise = promise_object(promise_value);
     if (promise->state != OSEO_PROMISE_PENDING) {
         return normal(oseo_undefined());
@@ -329,13 +339,18 @@ OseoResult oseo_promise_resolve_into(
     OseoValue promise_value,
     OseoValue value
 ) {
-    if (!is_promise(promise_value)) return language_failure(context);
+    if (!is_promise(promise_value)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The settled value is not a promise."
+    );
     if (promise_object(promise_value)->state != OSEO_PROMISE_PENDING) {
         return normal(oseo_undefined());
     }
     if (promise_value == value) {
-        OseoResult error = language_failure_message(
+        OseoResult error = oseo_internal_throw_error(
             context,
+            OSEO_ERROR_TYPE,
             "A promise cannot resolve to itself."
         );
         if (error.status != OSEO_STATUS_THROW || context->has_diagnostic) {
@@ -585,7 +600,11 @@ static OseoResult promise_combine(
     result = promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_array(frame.slots[0])) {
-        result = language_failure(context);
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The aggregate iterable must be an M4 array."
+        );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
             oseo_context_clear_language_error(context);
@@ -861,7 +880,11 @@ OseoResult oseo_internal_promise_finally_invoke(
     OseoValue promise_value,
     OseoValue on_finally
 ) {
-    if (!is_object(promise_value)) return language_failure(context);
+    if (!is_object(promise_value)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "Promise.prototype.finally requires an object."
+    );
     if (!is_function(on_finally)) {
         return oseo_internal_promise_invoke_then(
             context,
@@ -905,7 +928,11 @@ OseoResult oseo_promise_construct(
     OseoContext *context,
     OseoValue executor
 ) {
-    if (!is_function(executor)) return language_failure(context);
+    if (!is_function(executor)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The promise executor is not a function."
+    );
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -966,7 +993,11 @@ static OseoResult promise_then_with_capability(
     OseoValue on_rejected,
     OseoValue capability
 ) {
-    if (!is_promise(promise_value)) return language_failure(context);
+    if (!is_promise(promise_value)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The receiver is not a promise."
+    );
     if (tag_of(on_fulfilled) != OSEO_TAG_UNDEFINED &&
         !is_function(on_fulfilled)) {
         on_fulfilled = oseo_undefined();
@@ -1048,7 +1079,11 @@ OseoResult oseo_promise_async_call(
     OseoContext *context,
     OseoValue execution
 ) {
-    if (!is_function(execution)) return language_failure(context);
+    if (!is_function(execution)) return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The asynchronous execution is not a function."
+    );
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -1114,7 +1149,11 @@ OseoResult oseo_promise_result(
 ) {
     if (!is_promise(promise) ||
         promise_object(promise)->state == OSEO_PROMISE_PENDING) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The promise has no settled result."
+        );
     }
     return normal(promise_object(promise)->result);
 }

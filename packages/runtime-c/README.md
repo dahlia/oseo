@@ -62,10 +62,21 @@ catchable error for non-object right operands. `oseo_instanceof`
 implements `OrdinaryHasInstance`: a non-callable right operand and a
 non-object `prototype` property throw catchable errors, a primitive left
 operand is false, and the walk compares prototype identity.
+The `m5-5` ABI adds `oseo_error_intrinsic` and
+`oseo_context_print_thrown`, and the *runtime\_error.c* component that
+owns the named error intrinsics. `oseo_error_intrinsic` returns the
+lazily created constructor for one `OseoErrorKind`; each constructor is
+callable and constructible, builds an instance with an own hidden
+`message` property, honors the ES2022 `cause` option, and shares one
+`Error.prototype.toString`. `oseo_context_print_thrown` renders an
+unhandled thrown error instance as `Name: message` in the owned
+diagnostic format and falls back to the stored diagnostic for every
+other value.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
-Catchable runtime-generated language errors carry distinct opaque ordinary
-objects. Catching one clears its transient diagnostic message, while resource
+Catchable runtime-generated language errors are instances of the named
+error intrinsics with the applicable `TypeError`, `RangeError`, or
+`ReferenceError` identity and an own `message` property. Resource
 and host failures retain non-catchable diagnostics.
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.

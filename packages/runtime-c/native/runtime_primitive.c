@@ -785,8 +785,9 @@ OseoResult oseo_has_property(
     OseoValue object_value
 ) {
     if (!is_object(object_value)) {
-        return language_failure_message(
+        return oseo_internal_throw_error(
             context,
+            OSEO_ERROR_TYPE,
             "The in operator requires an object."
         );
     }
@@ -823,8 +824,9 @@ OseoResult oseo_instanceof(
     OseoValue right
 ) {
     if (!is_function(right)) {
-        return language_failure_message(
+        return oseo_internal_throw_error(
             context,
+            OSEO_ERROR_TYPE,
             "The instanceof right operand must be callable."
         );
     }
@@ -847,8 +849,9 @@ OseoResult oseo_instanceof(
     oseo_roots_pop(context, &frame);
     if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
     if (!is_object(prototype.value)) {
-        return language_failure_message(
+        return oseo_internal_throw_error(
             context,
+            OSEO_ERROR_TYPE,
             "The instanceof prototype must be an object."
         );
     }

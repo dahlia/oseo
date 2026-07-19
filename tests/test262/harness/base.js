@@ -28,6 +28,26 @@ assert.notSameValue = function (actual, unexpected, message) {
   throw new Test262Error(message);
 };
 
+assert.throws = function (expectedErrorConstructor, func, message) {
+  if (typeof func !== "function") {
+    throw new Test262Error(
+      "assert.throws requires a function to run as its second argument.",
+    );
+  }
+  try {
+    func();
+  } catch (thrown) {
+    if (typeof thrown !== "object" || thrown === null) {
+      throw new Test262Error(message);
+    }
+    if (thrown.constructor !== expectedErrorConstructor) {
+      throw new Test262Error(message);
+    }
+    return;
+  }
+  throw new Test262Error(message);
+};
+
 function compareArray(actual, expected) {
   if (actual.length !== expected.length) return false;
   let index = 0;

@@ -172,11 +172,19 @@ static OseoResult timer_string_hint_primitive(
             break;
         }
         if (result.status == OSEO_STATUS_NORMAL && index == 1u) {
-            result = language_failure(context);
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Cannot convert an object to a primitive value."
+            );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL && !converted) {
-        result = language_failure(context);
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert an object to a primitive value."
+        );
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -439,7 +447,11 @@ static OseoResult timer_delay_number(
                     frame.slots[3] = result.value;
                     if (result.status == OSEO_STATUS_NORMAL) {
                         result = is_object(frame.slots[3])
-                            ? language_failure(context)
+                            ? oseo_internal_throw_error(
+                                context,
+                                OSEO_ERROR_TYPE,
+                                "Cannot convert an object to a primitive value."
+                            )
                             : oseo_internal_to_number(context, frame.slots[3]);
                     }
                 } else if (timer_has_default_object_conversion(
@@ -447,7 +459,11 @@ static OseoResult timer_delay_number(
                            )) {
                     result = normal(oseo_number(NAN));
                 } else {
-                    result = language_failure(context);
+                    result = oseo_internal_throw_error(
+                        context,
+                        OSEO_ERROR_TYPE,
+                        "Cannot convert an object to a primitive value."
+                    );
                 }
                 oseo_roots_release(context, &frame);
                 return result;
@@ -482,11 +498,19 @@ static OseoResult timer_delay_number(
             return result;
         }
         if (result.status == OSEO_STATUS_NORMAL && index == 1u) {
-            result = language_failure(context);
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Cannot convert an object to a primitive value."
+            );
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = language_failure(context);
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert an object to a primitive value."
+        );
     }
     oseo_roots_release(context, &frame);
     return result;
@@ -498,7 +522,11 @@ OseoResult oseo_set_timeout(
     const OseoValue *arguments
 ) {
     if (argument_count == 0u || !is_function(arguments[0])) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The timer callback is not a function."
+        );
     }
     OseoValue delay_value = argument_count > 1u
         ? arguments[1]

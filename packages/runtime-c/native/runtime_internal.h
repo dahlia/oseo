@@ -36,6 +36,16 @@
 #define OSEO_PROMISE_FINALLY_FULFILL_CODE_ID (SIZE_MAX - 7u)
 #define OSEO_PROMISE_FINALLY_REJECT_CODE_ID (SIZE_MAX - 8u)
 #define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID (SIZE_MAX - 9u)
+/*
+ * Error constructor code IDs occupy one contiguous block indexed by
+ * OseoErrorKind: SIZE_MAX - 10u - kind.
+ */
+#define OSEO_ERROR_KIND_COUNT ((size_t)7u)
+#define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID (SIZE_MAX - 10u)
+#define OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID \
+    (SIZE_MAX - 9u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ERROR_TO_STRING_CODE_ID \
+    (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -231,24 +241,6 @@ static inline OseoResult failure(
     OseoResult result = {OSEO_STATUS_THROW, oseo_undefined()};
     return result;
 }
-static inline OseoResult create_language_failure(OseoContext *context) {
-    OseoResult result = oseo_object_create(context, oseo_null());
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result.status = OSEO_STATUS_THROW;
-    return result;
-}
-static inline OseoResult language_failure(OseoContext *context) {
-    oseo_context_clear_language_error(context);
-    return create_language_failure(context);
-}
-static inline OseoResult language_failure_message(
-    OseoContext *context,
-    const char *message
-) {
-    oseo_context_clear_language_error(context);
-    context->error_message = message;
-    return create_language_failure(context);
-}
 static inline uint64_t double_bits(double value) {
     uint64_t bits;
     memcpy(&bits, &value, sizeof(bits));
@@ -322,6 +314,26 @@ static inline bool is_nullish(OseoValue value) {
  * runtime translation unit.
  */
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
+OseoResult oseo_internal_error_construct(
+    OseoContext *context,
+    OseoValue callee,
+    size_t code_id,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_internal_error_prototype(
+    OseoContext *context,
+    OseoErrorKind kind
+);
+OseoResult oseo_internal_error_to_string(
+    OseoContext *context,
+    OseoValue receiver
+);
+OseoResult oseo_internal_throw_error(
+    OseoContext *context,
+    OseoErrorKind kind,
+    const char *message
+);
 OseoResult oseo_internal_publish_heap(
     OseoContext *context,
     OseoHeapObject *object,

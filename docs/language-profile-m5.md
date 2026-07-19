@@ -185,6 +185,33 @@ its deliberate boundary and its evidence:
     exponents and unit bases with infinite exponents. Object operands
     keep the shared unsupported coercion boundary. The `exponentiation`
     test262 feature is now a supported feature of the reviewed subset.
+ -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
+    `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
+    runtime-owned constructor values. An unshadowed reference to one of
+    these names resolves to the lazily created intrinsic; a lexical,
+    `var`, parameter, or imported binding shadows it as ECMAScript
+    requires. Each constructor is callable and constructible, installs
+    the hidden own `message` property from a present message argument,
+    honors the ES2022 `cause` option, and exposes `name`, `message`, and
+    `constructor` on its prototype, with one shared
+    `Error.prototype.toString`. Runtime semantic errors, TDZ reads and
+    writes, immutable-binding assignment, nullish property access,
+    calling non-functions, invalid array lengths, and the other
+    catchable language errors are now instances of the applicable
+    `TypeError`, `RangeError`, or `ReferenceError` intrinsic with an own
+    `message`, and an unhandled thrown error instance renders as
+    `Name: message` inside the owned diagnostic line. Deliberate
+    boundaries: assigning to an unshadowed error intrinsic name stays a
+    compile-time unresolved-binding rejection, object-valued messages
+    keep the shared unsupported coercion boundary until generic
+    `ToPrimitive` lands, and instance `stack` properties do not exist.
+    Native differential fixtures, runtime C fixtures, MIR structural
+    tests, and reviewed test262 cases cover the family, and the runner
+    now executes runtime negatives by comparing the rendered error name
+    against the expected type, replacing the former blanket
+    `runtime-error-types` capability gap with the narrower
+    `runtime-error-observation` classification for thrown values without
+    error identity.
 
 
 Known gaps inside the claim
@@ -197,17 +224,14 @@ must never shrink by reclassification alone.
     symbols, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
- -  Named error intrinsics such as `TypeError` do not exist. Runtime
-    semantic errors are catchable opaque values without ECMAScript error
-    identity, and only resource limits and host failures surface as owned
-    `OSEO2001` and `OSEO3001` diagnostics. test262 runtime negatives that
-    assert an error type are classified unsupported with the
-    `runtime-error-types` capability named. Owner: the intrinsics and
-    built-in objects stream.
  -  The general iterator protocol, well-known symbols, and the intrinsic
-    graph behind standard constructors are unimplemented. `Promise.all` and
-    `Promise.race` accept M4 arrays only. Owner: the intrinsics and
-    built-in objects stream.
+    graph behind standard constructors other than the error family are
+    unimplemented. `Promise.all` and
+    `Promise.race` accept M4 arrays only. test262 runtime negatives whose
+    thrown value has no error identity, such as a thrown
+    `Test262Error`, classify as unsupported with the
+    `runtime-error-observation` capability named. Owner: the intrinsics
+    and built-in objects stream.
  -  `globalThis` and the global object do not exist. Admitting them
     requires the intrinsic graph to expose standard constructors as real
     values first, a binding model in which top-level Script `var` and

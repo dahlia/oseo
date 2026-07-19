@@ -362,6 +362,18 @@ function infrastructureFailure(result: CliResult): boolean {
   return result.stderr.includes("error[OSEO3001]");
 }
 
+/**
+ * Extract the thrown error name from an unhandled-throw diagnostic. The
+ * native host renders an unhandled error instance as
+ * `error[OSEO2001]: Name: message` or `error[OSEO2001]: Name`; a thrown
+ * value without error identity keeps the generic diagnostic and yields
+ * no observable type.
+ */
+export function unhandledErrorType(stderr: string): string | undefined {
+  const match = /error\[OSEO2001\]: ([A-Za-z_$][\w$]*)(?::.*)?$/mu.exec(stderr);
+  return match?.[1];
+}
+
 function detail(
   testCase: Test262Case,
   strictnessMode: Test262Strictness,
@@ -685,6 +697,7 @@ async function executedResult(
 ): Promise<Test262Result> {
   const testCase = parsed.case;
   const scheduled = testCase.mode === "module" || testCase.async;
+  const expectRuntimeNegative = testCase.expectedFailurePhase === "runtime";
   const variants: Test262Variant[] = [];
   let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
   const execution = (): Test262Execution => ({
@@ -821,6 +834,16 @@ async function executedResult(
       if (observation.exitStatus !== 0) {
         const unsupportedSyntax =
           observation.stderr.includes("error[OSEO1001]");
+        if (
+          expectRuntimeNegative &&
+          !unsupportedSyntax &&
+          !infrastructureFailure(observation)
+        ) {
+          // A failing exit is the expected observation for a runtime
+          // negative; every variant must still agree before the thrown
+          // error type is compared.
+          continue;
+        }
         // An OSEO1001 exit is a compile-stage rejection: no native variant
         // executed, so the result carries no execution evidence.
         return classifyTest262(
@@ -842,10 +865,30 @@ async function executedResult(
           supportedFeatures,
           unsupportedSyntax ? { dependencies } : evidence(),
         );
+      } else if (expectRuntimeNegative) {
+        return classifyTest262(
+          testCase,
+          {
+            detail:
+              `${testCase.path} ${strictnessMode} ${specialization} ` +
+              "completed without the expected runtime error.",
+            harnessFailed: false,
+            passed: false,
+          },
+          supportedFeatures,
+          evidence(),
+        );
       }
     }
   }
   const baseline = observations[0];
+  // A strict variant shifts source lines by its added directive, so a
+  // runtime negative compares its diagnostics without the location
+  // prefix while every other case compares stderr verbatim.
+  const comparableStderr = (stderr: string): string =>
+    expectRuntimeNegative
+      ? stderr.replace(/^(.*):\d+:\d+: error\[/gmu, "$1: error[")
+      : stderr;
   const diverging =
     baseline == null
       ? undefined
@@ -853,7 +896,8 @@ async function executedResult(
           (entry) =>
             entry.observation.exitStatus !== baseline.observation.exitStatus ||
             entry.observation.stdout !== baseline.observation.stdout ||
-            entry.observation.stderr !== baseline.observation.stderr,
+            comparableStderr(entry.observation.stderr) !==
+              comparableStderr(baseline.observation.stderr),
         );
   if (baseline != null && diverging != null) {
     return classifyTest262(
@@ -874,6 +918,7 @@ async function executedResult(
   }
   if (
     testCase.async &&
+    !expectRuntimeNegative &&
     baseline != null &&
     !asyncObservationCompleted(baseline.observation.stdout)
   ) {
@@ -884,6 +929,38 @@ async function executedResult(
           `${testCase.path} finished without printing ` +
           `${asyncCompletionMarker}: ` +
           `stdout=${JSON.stringify(baseline.observation.stdout)}`,
+        failedPhase: "runtime",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
+  }
+  if (expectRuntimeNegative) {
+    const errorType =
+      baseline == null
+        ? undefined
+        : unhandledErrorType(baseline.observation.stderr);
+    if (errorType == null) {
+      return classifyTest262(
+        testCase,
+        {
+          detail:
+            "The thrown value carries no observable error identity: " +
+            `stderr=${JSON.stringify(baseline?.observation.stderr ?? "")}`,
+          harnessFailed: false,
+          passed: false,
+          unsupportedCapability: "runtime-error-observation",
+        },
+        supportedFeatures,
+        evidence(),
+      );
+    }
+    return classifyTest262(
+      testCase,
+      {
+        errorType,
         failedPhase: "runtime",
         harnessFailed: false,
         passed: false,
@@ -923,21 +1000,6 @@ export async function executeTest262Case(
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
-  if (parsed.case.expectedFailurePhase === "runtime") {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail:
-          "The runner cannot observe the type of an unhandled JavaScript " +
-          "throw.",
-        harnessFailed: false,
-        passed: false,
-        unsupportedCapability: "runtime-error-types",
-      },
-      supportedFeatures,
-      evidence,
-    );
-  }
   if (parsed.case.mode === "module") {
     if (location == null) {
       return classifyTest262(
@@ -951,7 +1013,10 @@ export async function executeTest262Case(
         evidence,
       );
     }
-    if (parsed.case.expectedFailurePhase != null) {
+    if (
+      parsed.case.expectedFailurePhase != null &&
+      parsed.case.expectedFailurePhase !== "runtime"
+    ) {
       return await moduleNegativeResult(
         source,
         parsed,

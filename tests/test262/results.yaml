@@ -5,6 +5,1261 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Error/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/S15.11.4_A3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/S15.11.4_A4.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Error/prototype/constructor/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Error/prototype/message/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Error/prototype/name/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-10-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-6-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-6-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-8-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-8-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/15.11.4.4-9-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Error/prototype/toString/S15.11.4.4_A2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Error/prototype/toString/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Error/prototype/toString/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/EvalError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/EvalError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/EvalError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/EvalError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/RangeError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/RangeError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/RangeError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/RangeError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/ReferenceError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/ReferenceError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/ReferenceError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/ReferenceError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/SyntaxError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/SyntaxError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/SyntaxError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/SyntaxError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/TypeError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/TypeError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/TypeError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/TypeError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/NativeErrors/URIError/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/URIError/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/URIError/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/NativeErrors/URIError/prototype/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Object/create/15.2.3.5-1-2.js
       strictness:
         - non-strict
@@ -233,8 +1488,8 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/S25.4.4.1_A4.1_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/S25.4.4.1_A4.1_T1.js:63:15:
-        error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
+        stderr=\"test/built-ins/Promise/all/S25.4.4.1_A4.1_T1.js:84:3:
+        error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -257,7 +1512,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/length.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/length.js:109:16:
+        stderr=\"test/built-ins/Promise/all/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -281,7 +1536,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/name.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/name.js:110:16:
+        stderr=\"test/built-ins/Promise/all/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -305,7 +1560,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/prop-desc.js:105:16:
+        stderr=\"test/built-ins/Promise/all/prop-desc.js:125:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -328,7 +1583,7 @@ results:
     observation:
       detail: 'test/built-ins/Promise/constructor.js non-strict disabled
         failed (1): stdout=""
-        stderr="test/built-ins/Promise/constructor.js:58:18:
+        stderr="test/built-ins/Promise/constructor.js:78:18:
         error[OSEO1001]: typeof with an unresolved name is outside the
         admitted profile; ECMAScript would evaluate it to
         \"undefined\".\n"'
@@ -347,17 +1602,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/built-ins/Promise/executor-not-callable.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/executor-not-callable.js:64:15:
-        error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -377,7 +1640,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/length.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/length.js:109:16:
+        stderr=\"test/built-ins/Promise/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -400,7 +1663,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/built-ins/Promise/name.js non-strict disabled failed (1):
-        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:110:16:
+        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -423,7 +1686,7 @@ results:
       - promise-settlement
     observation:
       detail: 'test/built-ins/Promise/promise.js non-strict disabled failed
-        (1): stdout="" stderr="test/built-ins/Promise/promise.js:108:16:
+        (1): stdout="" stderr="test/built-ins/Promise/promise.js:128:16:
         error[OSEO1001]: The profile admits this only where an enclosing
         non-arrow function provides it.\n"'
       unsupportedCapability: profile-syntax
@@ -448,7 +1711,7 @@ results:
       detail: "test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_\
-        T1.js:61:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
+        T1.js:81:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -471,7 +1734,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/length.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/length.js:109:1\
+        stderr=\"test/built-ins/Promise/prototype/catch/length.js:129:1\
         6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -495,7 +1758,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/name.js:110:16:
+        stderr=\"test/built-ins/Promise/prototype/catch/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -519,7 +1782,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:10\
+        stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:12\
         1:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -543,8 +1806,8 @@ results:
       detail: "test/built-ins/Promise/prototype/catch/this-value-non-object.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Promise/prototype/catch/this-value-non-\
-        object.js:73:15: error[OSEO1001]: Unknown binding
-        'TypeError'.\\n\""
+        object.js:94:3: error[OSEO1001]: Unknown binding
+        'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -698,7 +1961,7 @@ results:
       detail: "test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T\
-        1.js:61:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
+        1.js:81:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -721,7 +1984,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/length.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/length.js:109:16:
+        stderr=\"test/built-ins/Promise/prototype/then/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -745,7 +2008,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/name.js:110:16:
+        stderr=\"test/built-ins/Promise/prototype/then/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -769,7 +2032,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/prop-desc.js:101\
+        stderr=\"test/built-ins/Promise/prototype/then/prop-desc.js:121\
         :25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -792,8 +2055,8 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/S25.4.4.3_A3.1_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/S25.4.4.3_A3.1_T1.js:65:15:
-        error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
+        stderr=\"test/built-ins/Promise/race/S25.4.4.3_A3.1_T1.js:86:3:
+        error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -815,8 +2078,8 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/S25.4.4.3_A3.1_T2.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/S25.4.4.3_A3.1_T2.js:67:15:
-        error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
+        stderr=\"test/built-ins/Promise/race/S25.4.4.3_A3.1_T2.js:88:3:
+        error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -839,7 +2102,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/length.js:109:16:
+        stderr=\"test/built-ins/Promise/race/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -863,7 +2126,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/name.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/name.js:110:16:
+        stderr=\"test/built-ins/Promise/race/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -887,7 +2150,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/prop-desc.js:105:16:
+        stderr=\"test/built-ins/Promise/race/prop-desc.js:125:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -910,8 +2173,8 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/S25.4.4.4_A3.1_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/S25.4.4.4_A3.1_T1.js:63:\
-        15: error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
+        stderr=\"test/built-ins/Promise/reject/S25.4.4.4_A3.1_T1.js:84:\
+        3: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -934,7 +2197,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/length.js:109:16:
+        stderr=\"test/built-ins/Promise/reject/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -958,7 +2221,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/name.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/name.js:110:16:
+        stderr=\"test/built-ins/Promise/reject/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -982,7 +2245,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/prop-desc.js:105:16:
+        stderr=\"test/built-ins/Promise/reject/prop-desc.js:125:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1006,7 +2269,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/length.js:109:16:
+        stderr=\"test/built-ins/Promise/resolve/length.js:129:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1030,7 +2293,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/name.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/name.js:110:16:
+        stderr=\"test/built-ins/Promise/resolve/name.js:130:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1054,7 +2317,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/prop-desc.js:105:16:
+        stderr=\"test/built-ins/Promise/resolve/prop-desc.js:125:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1162,7 +2425,7 @@ results:
       detail: "test/language/expressions/arrow-function/prototype-rules.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/arrow-function/prototype-rul\
-        es.js:60:18: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        es.js:80:18: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2079,7 +3342,7 @@ results:
       detail: "test/language/expressions/await/await-BindingIdentifier-in-glo\
         bal.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/await/await-BindingIdentifie\
-        r-in-global.js:61:25: error[OSEO1001]: Unknown binding
+        r-in-global.js:81:25: error[OSEO1001]: Unknown binding
         'Function'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2158,7 +3421,7 @@ results:
     observation:
       detail: 'test/language/expressions/await/await-non-promise-thenable.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/await/await-non-promise-thenable.js:100:3:
+        stderr="test/language/expressions/await/await-non-promise-thenable.js:120:3:
         error[OSEO1001]: UpdateExpression is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2304,8 +3567,8 @@ results:
     observation:
       detail: "test/language/expressions/comma/S11.14_A2.1_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/comma/S11.14_A2.1_T1.js:90:1\
-        9: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        stderr=\"test/language/expressions/comma/S11.14_A2.1_T1.js:110:\
+        19: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2328,7 +3591,7 @@ results:
       detail: "test/language/expressions/conditional/S11.12_A2.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/conditional/S11.12_A2.1_T1.j\
-        s:70:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        s:90:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2426,7 +3689,7 @@ results:
     observation:
       detail: "test/language/expressions/equals/S11.9.1_A1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/equals/S11.9.1_A1.js:62:5:
+        stderr=\"test/language/expressions/equals/S11.9.1_A1.js:82:5:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2543,7 +3806,7 @@ results:
     observation:
       detail: 'test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:72:35:
+        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:92:35:
         error[OSEO1001]: UpdateExpression is outside the M1 profile.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2942,17 +4205,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/instanceof/S11.8.6_A3.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/instanceof/S11.8.6_A3.js:65:\
-        20: error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -2972,7 +4243,7 @@ results:
       detail: "test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/logical-and/S11.11.1_A2.1_T1\
-        .js:76:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        .js:96:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2995,7 +4266,7 @@ results:
       detail: "test/language/expressions/logical-or/S11.11.2_A3_T1.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/logical-or/S11.11.2_A3_T1.js\
-        :72:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+        :92:13: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3017,8 +4288,8 @@ results:
     observation:
       detail: "test/language/expressions/modulus/S11.5.3_A2.1_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/modulus/S11.5.3_A2.1_T1.js:8\
-        4:19: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        stderr=\"test/language/expressions/modulus/S11.5.3_A2.1_T1.js:1\
+        04:19: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -3146,7 +4417,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/null.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/null.js:77:10:
+        stderr=\"test/language/expressions/typeof/null.js:97:10:
         error[OSEO1001]: Unknown binding 'RegExp'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -3169,7 +4440,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/number.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/number.js:95:10:
+        stderr=\"test/language/expressions/typeof/number.js:115:10:
         error[OSEO1001]: Unknown binding 'Math'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -3192,7 +4463,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/string.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/string.js:101:10:
+        stderr=\"test/language/expressions/typeof/string.js:121:10:
         error[OSEO1001]: Unknown binding 'Date'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -3216,7 +4487,7 @@ results:
     observation:
       detail: "test/language/expressions/typeof/syntax.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/typeof/syntax.js:63:3:
+        stderr=\"test/language/expressions/typeof/syntax.js:83:3:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -3270,7 +4541,7 @@ results:
     observation:
       detail: 'test/language/expressions/typeof/unresolvable-reference.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/typeof/unresolvable-reference.js:69:3:
+        stderr="test/language/expressions/typeof/unresolvable-reference.js:89:3:
         error[OSEO1001]: typeof with an unresolved name is outside the
         admitted profile; ECMAScript would evaluate it to
         \"undefined\".\n"'
@@ -3295,7 +4566,7 @@ results:
     observation:
       detail: "test/language/expressions/void/S11.4.2_A2_T1.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/void/S11.4.2_A2_T1.js:71:13:
+        stderr=\"test/language/expressions/void/S11.4.2_A2_T1.js:91:13:
         error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -3318,7 +4589,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-multi-line-html-close.js:66:\
+      detail: "test/language/module-code/comment-multi-line-html-close.js:86:\
         5: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3342,7 +4613,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-single-line-html-close.js:65\
+      detail: "test/language/module-code/comment-single-line-html-close.js:85\
         :3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3366,7 +4637,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-single-line-html-open.js:65:\
+      detail: "test/language/module-code/comment-single-line-html-open.js:85:\
         2: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3436,7 +4707,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-dflt-id.js:68:10:
+      detail: "test/language/module-code/early-dup-export-dflt-id.js:88:10:
         error[OSEO0001]: Duplicate export 'default'."
       errorType: SyntaxError
       failedPhase: parse
@@ -3460,7 +4731,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-dflt.js:65:16:
+      detail: "test/language/module-code/early-dup-export-dflt.js:85:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3484,7 +4755,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id-as.js:68:10:
+      detail: "test/language/module-code/early-dup-export-id-as.js:88:10:
         error[OSEO0001]: Duplicate export 'z'."
       errorType: SyntaxError
       failedPhase: parse
@@ -3508,7 +4779,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-id.js:67:10:
+      detail: "test/language/module-code/early-dup-export-id.js:87:10:
         error[OSEO0001]: Duplicate export 'x'."
       errorType: SyntaxError
       failedPhase: parse
@@ -3555,7 +4826,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-lables.js:66:3:
+      detail: "test/language/module-code/early-dup-lables.js:86:3:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3581,7 +4852,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-lex.js:67:7:
+      detail: "test/language/module-code/early-dup-lex.js:87:7:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3606,7 +4877,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/early-dup-top-function-async-generat\
-        or.js:69:17: error[OSEO0001]: Source could not be parsed."
+        or.js:89:17: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -3629,7 +4900,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-top-function-async.js:69:1\
+      detail: "test/language/module-code/early-dup-top-function-async.js:89:1\
         6: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3654,7 +4925,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/early-dup-top-function-generator.js:\
-        69:11: error[OSEO0001]: Source could not be parsed."
+        89:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -3677,7 +4948,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-top-function.js:69:10:
+      detail: "test/language/module-code/early-dup-top-function.js:89:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3701,7 +4972,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-export-global.js:68:10:
+      detail: "test/language/module-code/early-export-global.js:88:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3748,7 +5019,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-export-unresolvable.js:66:10:
+      detail: "test/language/module-code/early-export-unresolvable.js:86:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3772,7 +5043,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-arguments.js:84:10:
+      detail: "test/language/module-code/early-import-arguments.js:104:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3796,7 +5067,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-as-arguments.js:84:15:
+      detail: "test/language/module-code/early-import-as-arguments.js:104:15:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3820,7 +5091,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-as-eval.js:84:15:
+      detail: "test/language/module-code/early-import-as-eval.js:104:15:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3844,7 +5115,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-eval.js:84:10:
+      detail: "test/language/module-code/early-import-eval.js:104:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3869,7 +5140,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-lex-and-var.js:67:5:
+      detail: "test/language/module-code/early-lex-and-var.js:87:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3916,7 +5187,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-strict-mode.js:64:5:
+      detail: "test/language/module-code/early-strict-mode.js:84:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3940,7 +5211,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-super.js:64:1: error[OSEO0001]:
+      detail: "test/language/module-code/early-super.js:84:1: error[OSEO0001]:
         Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3964,7 +5235,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-undef-break.js:66:3:
+      detail: "test/language/module-code/early-undef-break.js:86:3:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -3988,7 +5259,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-undef-continue.js:66:3:
+      detail: "test/language/module-code/early-undef-continue.js:86:3:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -4016,7 +5287,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-const.js
-          sourceHash: fnv1a64:5dcb2a067ecf477c
+          sourceHash: fnv1a64:1ac07fa732b7d10d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4049,7 +5320,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-let.js
-          sourceHash: fnv1a64:7339e32b0ea0921b
+          sourceHash: fnv1a64:b04c43d8f92ff73a
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4076,7 +5347,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/eval-this.js:94:18: error[OSEO1001]:
+      detail: "test/language/module-code/eval-this.js:114:18: error[OSEO1001]:
         The profile admits this only where an enclosing non-arrow
         function provides it."
       unsupportedCapability: profile-syntax
@@ -4102,7 +5373,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-asyncfunction-declara\
-        tion-binding-exists.js:72:31: error[OSEO0001]: Source could not
+        tion-binding-exists.js:92:31: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -4130,7 +5401,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-asyncfunction-declaration-binding.js
-          sourceHash: fnv1a64:4e0ba7dadeb3f229
+          sourceHash: fnv1a64:30abacfffc34127c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4160,7 +5431,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-asyncgenerator-declar\
-        ation-binding-exists.js:72:33: error[OSEO0001]: Source could not
+        ation-binding-exists.js:92:33: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -4186,7 +5457,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-function-declaration-\
-        binding-exists.js:72:25: error[OSEO0001]: Source could not be
+        binding-exists.js:92:25: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -4214,7 +5485,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-function-declaration-binding.js
-          sourceHash: fnv1a64:6324898041c476db
+          sourceHash: fnv1a64:056129c7bd3ae95e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4244,7 +5515,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-generator-declaration\
-        -binding-exists.js:72:27: error[OSEO0001]: Source could not be
+        -binding-exists.js:92:27: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -4637,7 +5908,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-circular-as.js:79:10:
+      detail: "test/language/module-code/instn-iee-err-circular-as.js:99:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4661,7 +5932,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-circular.js:79:10:
+      detail: "test/language/module-code/instn-iee-err-circular.js:99:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4685,7 +5956,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-as.js:7\
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star-as.js:9\
         8:10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4709,7 +5980,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-dflt-thru-star.js:78:1\
+      detail: "test/language/module-code/instn-iee-err-dflt-thru-star.js:98:1\
         0: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4733,7 +6004,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found-as.js:78:10:
+      detail: "test/language/module-code/instn-iee-err-not-found-as.js:98:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4757,7 +6028,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found.js:78:10:
+      detail: "test/language/module-code/instn-iee-err-not-found.js:98:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -4817,15 +6088,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-const.js
+          id: test/language/module-code/instn-named-bndng-const.js
+          sourceHash: fnv1a64:1725fd825057f915
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-const.js:90:15:
-        error[OSEO1001]: Unknown binding 'ReferenceError'."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4838,15 +6121,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-expr.js
+          id: test/language/module-code/instn-named-bndng-dflt-expr.js
+          sourceHash: fnv1a64:89d5c9c52083872c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-dflt-expr.js:81:15:
-        error[OSEO1001]: Unknown binding 'ReferenceError'."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4869,7 +6164,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-fun-anon.js
           id: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
-          sourceHash: fnv1a64:9865a241b583847d
+          sourceHash: fnv1a64:911975994bbe85b2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4902,7 +6197,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-fun-named.js
           id: test/language/module-code/instn-named-bndng-dflt-fun-named.js
-          sourceHash: fnv1a64:8063f62ebe9e89e3
+          sourceHash: fnv1a64:a1d5023739a6581e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -4925,15 +6220,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-fun.js
+          id: test/language/module-code/instn-named-bndng-fun.js
+          sourceHash: fnv1a64:4ef8a2236c33ab5e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-fun.js:99:15:
-        error[OSEO1001]: Unknown binding 'TypeError'."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4946,15 +6253,27 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-let.js
+          id: test/language/module-code/instn-named-bndng-let.js
+          sourceHash: fnv1a64:59174677e0d06ee1
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-bndng-let.js:90:15:
-        error[OSEO1001]: Unknown binding 'ReferenceError'."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -4974,7 +6293,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-dflt-thru-star-as.js\
-        :83:10: error[OSEO2001]: Module has no export 'default'."
+        :103:10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       harnessFailed: false
@@ -4998,7 +6317,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-dflt-thru-star-dflt.\
-        js:83:8: error[OSEO2001]: Module has no export 'default'."
+        js:103:8: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       harnessFailed: false
@@ -5021,8 +6340,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-as.js:83:1\
-        0: error[OSEO2001]: Module has no export 'x'."
+      detail: "test/language/module-code/instn-named-err-not-found-as.js:103:\
+        10: error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
       harnessFailed: false
@@ -5045,8 +6364,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-dflt.js:83\
-        :8: error[OSEO2001]: Module has no export 'default'."
+      detail: "test/language/module-code/instn-named-err-not-found-dflt.js:10\
+        3:8: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       harnessFailed: false
@@ -5069,7 +6388,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found.js:83:10:
+      detail: "test/language/module-code/instn-named-err-not-found.js:103:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -5305,7 +6624,7 @@ results:
             - test/language/module-code/instn-star-equality.js
             - test/language/module-code/instn-star-equality-other_FIXTURE.js
           id: test/language/module-code/instn-star-equality.js
-          sourceHash: fnv1a64:b0f4866cd94a6999
+          sourceHash: fnv1a64:7603a7601dd53c56
         - dependencies:
             - test/language/module-code/instn-star-equality.js
           id: test/language/module-code/instn-star-equality-other_FIXTURE.js
@@ -5366,7 +6685,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-a_FIXTURE.js
           id: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
-          sourceHash: fnv1a64:c6b635e4a74dae84
+          sourceHash: fnv1a64:da5351dad31217ad
         - dependencies:
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-b_FIXTURE.js
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-c_FIXTURE.js
@@ -5416,7 +6735,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-iee-single-cycle-same-name-a_FIXTURE.js
           id: test/language/module-code/instn-star-iee-single-cycle-same-name.js
-          sourceHash: fnv1a64:5fe4b5cd26f9d06f
+          sourceHash: fnv1a64:c4e98e846bdd1b70
         - dependencies:
             - test/language/module-code/instn-star-iee-single-cycle-same-name-b_FIXTURE.js
             - test/language/module-code/instn-star-iee-single-cycle-same-name-c_FIXTURE.js
@@ -5483,7 +6802,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-indirect.js
-          sourceHash: fnv1a64:082c87d4e9ddc457
+          sourceHash: fnv1a64:09657aac44986b34
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-keep-indirect-def_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js
@@ -5525,7 +6844,7 @@ results:
             - test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
             - test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-keep-local.js
-          sourceHash: fnv1a64:a5b8b36c3b13aa25
+          sourceHash: fnv1a64:393da841b28c21e4
         - dependencies: []
           id: test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
           sourceHash: fnv1a64:08410762af497b31
@@ -5720,7 +7039,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-arrow-func\
-        tion.js:63:9: error[OSEO0001]: Source could not be parsed."
+        tion.js:83:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -5744,7 +7063,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-block-stmt\
-        -list.js:63:11: error[OSEO0001]: Source could not be parsed."
+        -list.js:83:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -5768,7 +7087,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-block-stmt\
-        .js:63:3: error[OSEO0001]: Source could not be parsed."
+        .js:83:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -5792,7 +7111,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-decl\
-        -meth-static.js:63:29: error[OSEO0001]: Source could not be
+        -meth-static.js:83:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -5817,7 +7136,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-decl\
-        -meth.js:63:22: error[OSEO0001]: Source could not be parsed."
+        -meth.js:83:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -5933,7 +7252,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth-static.js:63:28: error[OSEO0001]: Source could not be
+        -meth-static.js:83:28: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -5958,7 +7277,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth.js:63:21: error[OSEO0001]: Source could not be parsed."
+        -meth.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -5982,7 +7301,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-do-while.j\
-        s:63:4: error[OSEO0001]: Source could not be parsed."
+        s:83:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6006,7 +7325,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-const.\
-        js:64:3: error[OSEO0001]: Source could not be parsed."
+        js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6030,7 +7349,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-con\
-        st.js:64:3: error[OSEO0001]: Source could not be parsed."
+        st.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6054,7 +7373,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-let\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6078,7 +7397,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-lhs\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6102,7 +7421,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-var\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6126,7 +7445,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-let.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6150,7 +7469,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-lhs.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6174,7 +7493,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-con\
-        st.js:64:3: error[OSEO0001]: Source could not be parsed."
+        st.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6198,7 +7517,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-let\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6222,7 +7541,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-lhs\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6246,7 +7565,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-var\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6270,7 +7589,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-var.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6294,7 +7613,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-function-d\
-        ecl.js:63:16: error[OSEO0001]: Source could not be parsed."
+        ecl.js:83:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6318,7 +7637,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-function-e\
-        xpr.js:63:15: error[OSEO0001]: Source could not be parsed."
+        xpr.js:83:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6365,7 +7684,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-generator-\
-        expr.js:63:16: error[OSEO0001]: Source could not be parsed."
+        expr.js:83:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6389,7 +7708,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-if-else.js\
-        :63:20: error[OSEO0001]: Source could not be parsed."
+        :83:20: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6412,7 +7731,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-export-if-if.js:6\
+      detail: "test/language/module-code/parse-err-decl-pos-export-if-if.js:8\
         3:12: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -6437,7 +7756,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-labeled.js\
-        :63:10: error[OSEO0001]: Source could not be parsed."
+        :83:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6484,7 +7803,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-get\
-        ter.js:63:14: error[OSEO0001]: Source could not be parsed."
+        ter.js:83:14: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6508,7 +7827,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-met\
-        hod.js:63:10: error[OSEO0001]: Source could not be parsed."
+        hod.js:83:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6532,7 +7851,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-set\
-        ter.js:63:15: error[OSEO0001]: Source could not be parsed."
+        ter.js:83:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6556,7 +7875,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-cas\
-        e-dflt.js:63:21: error[OSEO0001]: Source could not be parsed."
+        e-dflt.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6580,7 +7899,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-cas\
-        e.js:63:21: error[OSEO0001]: Source could not be parsed."
+        e.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6604,7 +7923,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-dft\
-        l.js:63:22: error[OSEO0001]: Source could not be parsed."
+        l.js:83:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6628,7 +7947,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-catch-\
-        finally.js:64:3: error[OSEO0001]: Source could not be parsed."
+        finally.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6652,7 +7971,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-catch.\
-        js:64:3: error[OSEO0001]: Source could not be parsed."
+        js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6676,7 +7995,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-finall\
-        y.js:64:3: error[OSEO0001]: Source could not be parsed."
+        y.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6700,7 +8019,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-try.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6723,7 +8042,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-export-while.js:6\
+      detail: "test/language/module-code/parse-err-decl-pos-export-while.js:8\
         3:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -6748,7 +8067,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-arrow-func\
-        tion.js:63:9: error[OSEO0001]: Source could not be parsed."
+        tion.js:83:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6772,7 +8091,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-block-stmt\
-        -list.js:63:11: error[OSEO0001]: Source could not be parsed."
+        -list.js:83:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6796,7 +8115,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-block-stmt\
-        .js:63:3: error[OSEO0001]: Source could not be parsed."
+        .js:83:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6820,7 +8139,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth-static.js:63:29: error[OSEO0001]: Source could not be
+        -meth-static.js:83:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -6845,7 +8164,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth.js:63:22: error[OSEO0001]: Source could not be parsed."
+        -meth.js:83:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -6961,7 +8280,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth-static.js:63:28: error[OSEO0001]: Source could not be
+        -meth-static.js:83:28: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -6986,7 +8305,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth.js:63:21: error[OSEO0001]: Source could not be parsed."
+        -meth.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7010,7 +8329,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-do-while.j\
-        s:63:4: error[OSEO0001]: Source could not be parsed."
+        s:83:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7034,7 +8353,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-const.\
-        js:64:3: error[OSEO0001]: Source could not be parsed."
+        js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7058,7 +8377,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-con\
-        st.js:64:3: error[OSEO0001]: Source could not be parsed."
+        st.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7082,7 +8401,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-let\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7106,7 +8425,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-lhs\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7130,7 +8449,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-var\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7154,7 +8473,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-let.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7178,7 +8497,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-lhs.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7202,7 +8521,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-con\
-        st.js:64:3: error[OSEO0001]: Source could not be parsed."
+        st.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7226,7 +8545,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-let\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7250,7 +8569,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-lhs\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7274,7 +8593,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-var\
-        .js:64:3: error[OSEO0001]: Source could not be parsed."
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7298,7 +8617,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-var.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7322,7 +8641,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-function-d\
-        ecl.js:63:16: error[OSEO0001]: Source could not be parsed."
+        ecl.js:83:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7346,7 +8665,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-function-e\
-        xpr.js:63:15: error[OSEO0001]: Source could not be parsed."
+        xpr.js:83:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7393,7 +8712,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-generator-\
-        expr.js:63:16: error[OSEO0001]: Source could not be parsed."
+        expr.js:83:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7417,7 +8736,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-if-else.js\
-        :63:20: error[OSEO0001]: Source could not be parsed."
+        :83:20: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7440,7 +8759,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-import-if-if.js:6\
+      detail: "test/language/module-code/parse-err-decl-pos-import-if-if.js:8\
         3:12: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7465,7 +8784,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-labeled.js\
-        :63:10: error[OSEO0001]: Source could not be parsed."
+        :83:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7512,7 +8831,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-get\
-        ter.js:63:14: error[OSEO0001]: Source could not be parsed."
+        ter.js:83:14: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7536,7 +8855,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-met\
-        hod.js:63:10: error[OSEO0001]: Source could not be parsed."
+        hod.js:83:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7560,7 +8879,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-set\
-        ter.js:63:15: error[OSEO0001]: Source could not be parsed."
+        ter.js:83:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7584,7 +8903,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-cas\
-        e-dflt.js:63:21: error[OSEO0001]: Source could not be parsed."
+        e-dflt.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7608,7 +8927,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-cas\
-        e.js:63:21: error[OSEO0001]: Source could not be parsed."
+        e.js:83:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7632,7 +8951,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-dft\
-        l.js:63:22: error[OSEO0001]: Source could not be parsed."
+        l.js:83:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7656,7 +8975,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-try-catch-\
-        finally.js:64:3: error[OSEO0001]: Source could not be parsed."
+        finally.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7680,7 +8999,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-try-catch.\
-        js:64:3: error[OSEO0001]: Source could not be parsed."
+        js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7704,7 +9023,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-try-finall\
-        y.js:64:3: error[OSEO0001]: Source could not be parsed."
+        y.js:84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7728,7 +9047,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-try-try.js\
-        :64:3: error[OSEO0001]: Source could not be parsed."
+        :84:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -7751,7 +9070,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-import-while.js:6\
+      detail: "test/language/module-code/parse-err-decl-pos-import-while.js:8\
         3:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7775,7 +9094,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-const.js:64:16:
+      detail: "test/language/module-code/parse-err-export-dflt-const.js:84:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7799,7 +9118,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-expr.js:75:20:
+      detail: "test/language/module-code/parse-err-export-dflt-expr.js:95:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7823,7 +9142,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-let.js:64:16:
+      detail: "test/language/module-code/parse-err-export-dflt-let.js:84:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7847,7 +9166,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-var.js:64:16:
+      detail: "test/language/module-code/parse-err-export-dflt-var.js:84:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7871,7 +9190,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-hoist-lex-fun.js:74:10:
+      detail: "test/language/module-code/parse-err-hoist-lex-fun.js:94:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7918,7 +9237,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:75\
+      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:95\
         :30: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7965,7 +9284,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-return.js:81:1:
+      detail: "test/language/module-code/parse-err-return.js:101:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -7989,7 +9308,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:76:20:
+      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:96:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8060,7 +9379,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-semi-named-export-from.js:\
-        76:56: error[OSEO0001]: Source could not be parsed."
+        96:56: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       harnessFailed: false
@@ -8083,7 +9402,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-named-export.js:76:10:
+      detail: "test/language/module-code/parse-err-semi-named-export.js:96:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8107,7 +9426,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-syntax-1.js:70:1:
+      detail: "test/language/module-code/parse-err-syntax-1.js:90:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8131,7 +9450,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-syntax-2.js:70:1:
+      detail: "test/language/module-code/parse-err-syntax-2.js:90:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8155,7 +9474,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-yield.js:81:1:
+      detail: "test/language/module-code/parse-err-yield.js:101:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8182,7 +9501,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/parse-export-empty.js
-          sourceHash: fnv1a64:3551b19fff3fdbbd
+          sourceHash: fnv1a64:4e98631d596ca52c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -8464,7 +9783,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-func-expression.js
-          sourceHash: fnv1a64:f5ac6e05d4d1a081
+          sourceHash: fnv1a64:389c9a0d0584453a
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -8519,7 +9838,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/early-errors-await-n\
-        ot-simple-assignment-target.js:66:1: error[OSEO0001]: Source
+        ot-simple-assignment-target.js:86:1: error[OSEO0001]: Source
         could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8570,7 +9889,7 @@ results:
       - module-linking
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/new-await.js:66:5:
+      detail: "test/language/module-code/top-level-await/new-await.js:86:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -8596,7 +9915,7 @@ results:
       - module-linking
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/no-operand.js:66:6:
+      detail: "test/language/module-code/top-level-await/no-operand.js:86:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -9408,7 +10727,7 @@ results:
         e-terminators-allowed.js non-strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/statements/async-function/syntax-declara\
-        tion-line-terminators-allowed.js:66:23: error[OSEO1001]: Unknown
+        tion-line-terminators-allowed.js:86:23: error[OSEO1001]: Unknown
         binding 'Function'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -9432,8 +10751,8 @@ results:
       detail: "test/language/statements/async-function/syntax-declaration-no-\
         line-terminator.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-function/syntax-declara\
-        tion-no-line-terminator.js:59:15: error[OSEO1001]: Unknown
-        binding 'ReferenceError'.\\n\""
+        tion-no-line-terminator.js:80:3: error[OSEO1001]: Unknown
+        binding 'async'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -9491,7 +10810,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-reject-finally-reject.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-reject.js:77:3:
+        stderr="test/language/statements/async-function/try-reject-finally-reject.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9517,7 +10836,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-reject-finally-return.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-return.js:77:3:
+        stderr="test/language/statements/async-function/try-reject-finally-return.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9543,7 +10862,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-reject-finally-throw.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-throw.js:77:3:
+        stderr="test/language/statements/async-function/try-reject-finally-throw.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9569,7 +10888,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-return-finally-reject.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-return-finally-reject.js:77:3:
+        stderr="test/language/statements/async-function/try-return-finally-reject.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9595,7 +10914,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-return-finally-return.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-return-finally-return.js:77:3:
+        stderr="test/language/statements/async-function/try-return-finally-return.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9656,7 +10975,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-throw-finally-reject.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-throw-finally-reject.js:77:3:
+        stderr="test/language/statements/async-function/try-throw-finally-reject.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9682,7 +11001,7 @@ results:
     observation:
       detail: 'test/language/statements/async-function/try-throw-finally-return.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-throw-finally-return.js:77:3:
+        stderr="test/language/statements/async-function/try-throw-finally-return.js:97:3:
         error[OSEO1001]: Await is supported in declarations, expression
         statements, and returns.\n"'
       unsupportedCapability: profile-syntax
@@ -9723,6 +11042,78 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/const/global-use-before-initialization-in-declaration-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - error-intrinsics
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: ReferenceError
+      failedPhase: runtime
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/const/global-use-before-initialization-in-prior-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - error-intrinsics
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: ReferenceError
+      failedPhase: runtime
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -9786,7 +11177,7 @@ results:
     observation:
       detail: "test/language/statements/do-while/cptn-normal.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/do-while/cptn-normal.js:71:18:
+        stderr=\"test/language/statements/do-while/cptn-normal.js:91:18:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -9857,7 +11248,7 @@ results:
       detail: "test/language/statements/for/let-identifier-with-newline.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for/let-identifier-with-newli\
-        ne.js:64:17: error[OSEO1001]: Unknown binding 'let'.\\n\""
+        ne.js:84:17: error[OSEO1001]: Unknown binding 'let'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -10251,7 +11642,7 @@ results:
       - control-flow
       - module-linking
     observation:
-      detail: "test/language/statements/labeled/value-await-module.js:69:6:
+      detail: "test/language/statements/labeled/value-await-module.js:89:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -10291,6 +11682,78 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/let/global-use-before-initialization-in-declaration-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - error-intrinsics
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: ReferenceError
+      failedPhase: runtime
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/let/global-use-before-initialization-in-prior-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - error-intrinsics
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: ReferenceError
+      failedPhase: runtime
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -10643,11 +12106,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 213
+  expectedNegatives: 217
   harnessFailures: 0
-  passes: 66
+  passes: 111
   semanticFailures: 0
-  unsupportedProfileFeatures: 149
+  unsupportedProfileFeatures: 143
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -10673,12 +12136,18 @@ summary:
       passes: 0
       semanticFailures: 0
       unsupportedProfileFeatures: 3
+    - dependency: error-intrinsics
+      expectedNegatives: 4
+      harnessFailures: 0
+      passes: 39
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: expression-operators
       expectedNegatives: 10
       harnessFailures: 0
-      passes: 10
+      passes: 11
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 13
     - dependency: functions
       expectedNegatives: 9
       harnessFailures: 0
@@ -10686,7 +12155,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: lexical-bindings
-      expectedNegatives: 3
+      expectedNegatives: 7
       harnessFailures: 0
       passes: 5
       semanticFailures: 0
@@ -10694,9 +12163,9 @@ summary:
     - dependency: module-linking
       expectedNegatives: 137
       harnessFailures: 0
-      passes: 13
+      passes: 17
       semanticFailures: 0
-      unsupportedProfileFeatures: 69
+      unsupportedProfileFeatures: 65
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
@@ -10706,9 +12175,9 @@ summary:
     - dependency: promise-settlement
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 1
+      passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 35
     - dependency: top-level-await
       expectedNegatives: 3
       harnessFailures: 0
@@ -10722,6 +12191,18 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
+    - group: built-ins/Error
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 15
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
+    - group: built-ins/NativeErrors
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 24
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/Object
       expectedNegatives: 0
       harnessFailures: 0
@@ -10731,23 +12212,23 @@ summary:
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 1
+      passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 35
     - group: language/expressions
       expectedNegatives: 42
       harnessFailures: 0
-      passes: 19
+      passes: 20
       semanticFailures: 0
-      unsupportedProfileFeatures: 28
+      unsupportedProfileFeatures: 27
     - group: language/module-code
       expectedNegatives: 136
       harnessFailures: 0
-      passes: 13
+      passes: 17
       semanticFailures: 0
-      unsupportedProfileFeatures: 69
+      unsupportedProfileFeatures: 65
     - group: language/statements
-      expectedNegatives: 35
+      expectedNegatives: 39
       harnessFailures: 0
       passes: 26
       semanticFailures: 0

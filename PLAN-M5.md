@@ -34,8 +34,13 @@ control-flow statements `do-while`, classic `for` with per-iteration
 lexical environments, `switch`, and labeled statements, each with
 native differential, structural, and reviewed test262 evidence
 recorded in [*docs/language-profile-m5.md*](./docs/language-profile-m5.md).
+The named error intrinsics, the first intrinsics-and-built-ins unit,
+are implemented: `Error` and the six NativeError constructors are
+runtime-owned values, runtime semantic errors are typed catchable
+instances, and the test262 runner executes runtime negatives against
+the rendered error identity.
 The remaining item 4 work is the semantic groundwork that needs owned
-runtime surfaces: named error intrinsics, generic `ToPrimitive`,
+runtime surfaces: generic `ToPrimitive`,
 symbols, and the iterator protocol. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery

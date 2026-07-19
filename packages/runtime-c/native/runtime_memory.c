@@ -109,6 +109,10 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->promise_catch_function, &worklist);
     mark_value(context->promise_finally_function, &worklist);
     mark_value(context->promise_then_function, &worklist);
+    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
+        mark_value(context->error_constructors[kind], &worklist);
+        mark_value(context->error_prototypes[kind], &worklist);
+    }
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;

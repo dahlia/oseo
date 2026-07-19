@@ -426,6 +426,60 @@ static void test_loose_equality_boundary(
     }
 }
 
+static void test_error_intrinsics(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_TYPE)
+    );
+    assert(
+        require_normal(oseo_error_intrinsic(context, OSEO_ERROR_TYPE)) ==
+        roots[0]
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_error_intrinsic(context, OSEO_ERROR_TYPE)) ==
+        roots[0]
+    );
+    roots[1] = make_text(context, "boom");
+    roots[2] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[0])) ==
+        oseo_boolean(true)
+    );
+    roots[3] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_ERROR)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[3])) ==
+        oseo_boolean(true)
+    );
+    roots[4] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_RANGE)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[4])) ==
+        oseo_boolean(false)
+    );
+    OseoResult uninitialized_read =
+        oseo_read_binding(context, oseo_uninitialized());
+    assert(uninitialized_read.status == OSEO_STATUS_THROW);
+    assert(!context->has_diagnostic);
+    roots[5] = uninitialized_read.value;
+    roots[6] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_REFERENCE)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[5], roots[6])) ==
+        oseo_boolean(true)
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -440,6 +494,7 @@ int main(void) {
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);
+    test_error_intrinsics(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

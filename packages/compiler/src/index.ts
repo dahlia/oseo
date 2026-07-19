@@ -1153,6 +1153,34 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
   };
 }
 
+/**
+ * The named error constructors the profile admits as intrinsic values.
+ * An unshadowed reference to one of these names resolves to the
+ * runtime-owned constructor instead of an unknown-binding diagnostic.
+ */
+export type ErrorIntrinsicName =
+  | "Error"
+  | "EvalError"
+  | "RangeError"
+  | "ReferenceError"
+  | "SyntaxError"
+  | "TypeError"
+  | "URIError";
+
+const errorIntrinsicNames: readonly ErrorIntrinsicName[] = [
+  "Error",
+  "EvalError",
+  "RangeError",
+  "ReferenceError",
+  "SyntaxError",
+  "TypeError",
+  "URIError",
+];
+
+function errorIntrinsicName(name: string): ErrorIntrinsicName | undefined {
+  return errorIntrinsicNames.find((candidate) => candidate === name);
+}
+
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
@@ -1252,6 +1280,10 @@ export type HirExpression =
       readonly bindingId: number;
       readonly kind: "binding";
       readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly errorName: ErrorIntrinsicName;
+      readonly kind: "error-intrinsic";
     })
   | (LocatedSyntax & {
       readonly kind: "null";
@@ -1613,6 +1645,14 @@ function resolveExpression(
           value: expression.name === "NaN" ? NaN : Infinity,
         };
       }
+      const errorName = errorIntrinsicName(expression.name);
+      if (errorName != null) {
+        return {
+          errorName,
+          kind: "error-intrinsic",
+          range: expression.range,
+        };
+      }
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -1636,7 +1676,8 @@ function resolveExpression(
       findBinding(scopes, expression.argument.name) == null &&
       expression.argument.name !== "undefined" &&
       expression.argument.name !== "NaN" &&
-      expression.argument.name !== "Infinity"
+      expression.argument.name !== "Infinity" &&
+      errorIntrinsicName(expression.argument.name) == null
     ) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -2587,6 +2628,9 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
   }
+  if (expression.kind === "error-intrinsic") {
+    return `intrinsic ${expression.errorName}`;
+  }
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }
@@ -2924,6 +2968,7 @@ export interface MirOperation {
     | "completion-set"
     | "construct"
     | "construct-receiver"
+    | "error-intrinsic"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
@@ -2956,6 +3001,7 @@ export interface MirOperation {
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
   readonly completionSlot?: number;
   readonly completionTarget?: number;
+  readonly errorName?: ErrorIntrinsicName;
   readonly functionId?: number;
   readonly functionKind?: FunctionKind;
   readonly functionLength?: number;
@@ -3440,6 +3486,33 @@ function lowerExpression(
       kind: "call",
       range: expression.range,
       target: { kind: "await" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "error-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "error intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `intrinsic ${expression.errorName}`,
+      errorName: expression.errorName,
+      id,
+      kind: "error-intrinsic",
+      range: expression.range,
     });
     appendMirMetadata(
       builder,

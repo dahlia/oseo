@@ -8,6 +8,123 @@ supportedFeatures:
   - let
   - top-level-await
 tests:
+  - path: test/built-ins/Error/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/S15.11.4_A3.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/S15.11.4_A4.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/constructor/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/message/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/name/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-10-1.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-6-1.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-6-2.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-8-1.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-8-2.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/15.11.4.4-9-1.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/S15.11.4.4_A2.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/prototype/toString/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/EvalError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/EvalError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/EvalError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/EvalError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/RangeError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/RangeError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/RangeError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/RangeError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/ReferenceError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/ReferenceError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/ReferenceError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/ReferenceError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/SyntaxError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/SyntaxError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/SyntaxError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/SyntaxError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/TypeError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/TypeError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/TypeError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/TypeError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/URIError/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/URIError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/URIError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/URIError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
   - path: test/built-ins/Object/create/15.2.3.5-1-2.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -45,7 +162,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/executor-not-callable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/length.js
     expectedClassification: unsupported-profile-feature
@@ -363,7 +480,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/instanceof/S11.8.6_A3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
@@ -597,10 +714,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-const.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-expr.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
     expectedClassification: pass
@@ -609,10 +726,10 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-fun.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-let.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-as.js
     expectedClassification: expected-negative
@@ -1190,6 +1307,12 @@ tests:
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/const/global-use-before-initialization-in-declaration-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/statements/const/global-use-before-initialization-in-prior-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
   - path: test/language/statements/do-while/S12.6.1_A15.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -1256,6 +1379,12 @@ tests:
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]
+  - path: test/language/statements/let/global-use-before-initialization-in-declaration-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/statements/let/global-use-before-initialization-in-prior-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
   - path: test/language/statements/let/syntax/let.js
     expectedClassification: pass
     dependencies: [lexical-bindings]

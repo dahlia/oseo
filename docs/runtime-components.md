@@ -17,11 +17,15 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists ten reviewed assets in this order:
+The runtime input now lists eleven reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_object.c*,
-*runtime\_function.c*, *runtime\_primitive.c*, *runtime\_promise.c*, and
-*runtime\_event\_loop.c*. No catch-all *runtime.c* remains, and no
+*runtime\_function.c*, *runtime\_error.c*, *runtime\_primitive.c*,
+*runtime\_promise.c*, and
+*runtime\_event\_loop.c*. The M5 named-error-intrinsics unit added
+*runtime\_error.c* as the first post-componentization component,
+following the same ownership, include, and one-definition rules. No
+catch-all *runtime.c* remains, and no
 temporary forwarding helper was needed at any point in the migration.
 Each source compiles as its own translation unit and is archived in
 exactly this order. The symbols test in
@@ -42,6 +46,9 @@ Ownership follows the plan's target layout:
     built-ins;
  -  *runtime\_function.c*: function creation, callable metadata,
     construction, and generic dispatch;
+ -  *runtime\_error.c*: the named error intrinsics, their lazily created
+    constructor and prototype pairs, typed runtime error creation, the
+    shared `Error.prototype.toString`, and unhandled-throw rendering;
  -  *runtime\_primitive.c*: coercions, arithmetic, comparison, string
     conversion, and console output;
  -  *runtime\_promise.c*: promises, capabilities, reactions, thenable
@@ -51,13 +58,17 @@ Ownership follows the plan's target layout:
 
 ### Internal helpers
 
-Fourteen helpers cross a translation-unit boundary. Each uses the
+Eighteen helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
 | Internal helper                                     | Defined in             |
 | --------------------------------------------------- | ---------------------- |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*    |
+| `oseo_internal_error_construct`                     | *runtime\_error.c*     |
+| `oseo_internal_error_prototype`                     | *runtime\_error.c*     |
+| `oseo_internal_error_to_string`                     | *runtime\_error.c*     |
+| `oseo_internal_throw_error`                         | *runtime\_error.c*     |
 | `oseo_internal_publish_heap`                        | *runtime\_memory.c*    |
 | `oseo_internal_allocate_string`                     | *runtime\_object.c*    |
 | `oseo_internal_string_is_ascii`                     | *runtime\_object.c*    |
@@ -91,7 +102,12 @@ express observable language semantics:
     object reads and `oseo_internal_own_descriptor`;
  -  binding and object: module-namespace creation builds its backing
     object through public object operations, while object property reads
-    resolve module-namespace entries through `oseo_cell_get`.
+    resolve module-namespace entries through `oseo_cell_get`;
+ -  error and the throwing components: core, binding, object, function,
+    primitive, promise, and event-loop semantics create typed catchable
+    errors through `oseo_internal_throw_error`, while error-intrinsic
+    construction builds ordinary objects, strings, and internal
+    functions through the public object and function operations.
 
 The event-loop component is a one-way dependent: timer turns drain jobs
 through `oseo_internal_jobs_drain_until` and

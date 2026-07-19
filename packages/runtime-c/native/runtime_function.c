@@ -185,7 +185,11 @@ OseoResult oseo_function_environment(
     OseoValue function_value
 ) {
     if (!is_function(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Called value is not a function."
+        );
     }
     return normal(function_object(function_value)->environment);
 }
@@ -196,7 +200,11 @@ OseoResult oseo_function_code_id(
     size_t *code_id
 ) {
     if (!is_function(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Called value is not a function."
+        );
     }
     *code_id = function_object(function_value)->code_id;
     return normal(function_value);
@@ -212,7 +220,11 @@ OseoResult oseo_function_prototype(
     OseoValue function_value
 ) {
     if (!function_is_constructible(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Constructed value is not a constructor."
+        );
     }
     return normal(function_object(function_value)->prototype_object);
 }
@@ -254,7 +266,18 @@ OseoResult oseo_call_function(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
+    if (code_id >= OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID &&
+        code_id <= OSEO_ERROR_CONSTRUCT_LAST_CODE_ID) {
+        result = oseo_internal_error_construct(
+            context,
+            callee,
+            code_id,
+            argument_count,
+            arguments
+        );
+    } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
+        result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
         code_id == OSEO_PROMISE_REJECT_CODE_ID) {
         result = oseo_function_environment(context, callee);
         OseoValue environment = result.value;

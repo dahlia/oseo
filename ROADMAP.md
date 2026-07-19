@@ -493,13 +493,16 @@ dependency-indexed baseline is published.
 source challenge features through explicit unsupported classifications.
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
-`do-while`, `for`, `switch`, and labeled statements;
+`do-while`, `for`, `switch`, and labeled statements, and the intrinsics
+stream has landed the named error family as runtime-owned constructor
+values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is
-complete: the runtime ships eight component translation units behind a
+complete: the runtime ships nine component translation units behind a
 package-private internal header, an M5-enabling refactor that changes
-no compatibility counts. The remaining queue is:
+no compatibility counts; the ninth, the error component, landed with
+the named error intrinsics. The remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.

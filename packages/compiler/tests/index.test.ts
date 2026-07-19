@@ -647,6 +647,87 @@ test("marks relational operators as allocation safepoints", () => {
   }
 });
 
+test("resolves unshadowed error names to intrinsic references", () => {
+  const errorNames = [
+    "Error",
+    "EvalError",
+    "RangeError",
+    "ReferenceError",
+    "SyntaxError",
+    "TypeError",
+    "URIError",
+  ] as const;
+  for (const name of errorNames) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "identifier", name, range },
+            kind: "unary",
+            operator: "typeof",
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+        {
+          expression: { kind: "identifier", name, range },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `error-intrinsic-${name}.ts`,
+    };
+    const hirResult = buildHir(syntax);
+    assert.deepEqual(hirResult.diagnostics, []);
+    assert.ok(hirResult.program != null);
+    assert.match(
+      printHir(hirResult.program),
+      new RegExp(`intrinsic ${name}`, "u"),
+    );
+    const operations = buildMir(hirResult.program).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "error-intrinsic" && operation.errorName === name,
+    );
+    assert.ok(index >= 0, `${name} lowers to an error-intrinsic operation`);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps shadowed error names ordinary bindings", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "const",
+        name: "TypeError",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "TypeError", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "shadowed-error-intrinsic.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const printed = printHir(hirResult.program);
+  assert.doesNotMatch(printed, /intrinsic TypeError/u);
+  assert.match(printed, /%b\d+\(TypeError\)/u);
+});
+
 test("lowers void to an operand evaluation without a status check", () => {
   const syntax: SyntaxProgram = {
     body: [

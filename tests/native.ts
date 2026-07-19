@@ -615,6 +615,65 @@ console.log(immutable);
 `,
   },
   {
+    name: "error-intrinsics",
+    source: `
+try { const callee = 1; callee(); } catch (error) {
+  console.log("call", error instanceof TypeError, error.name);
+}
+try { null.item; } catch (error) {
+  console.log("nullish", error instanceof TypeError,
+    error.constructor === TypeError);
+}
+try { tdz; } catch (error) {
+  console.log("tdz", error instanceof ReferenceError, error.name);
+}
+let tdz;
+const frozen = 1;
+try { frozen = 2; } catch (error) { console.log("const", error.name); }
+const numbers = [1];
+try { numbers.length = -1; } catch (error) {
+  console.log("length", error instanceof RangeError, error.name);
+}
+console.log(numbers.length);
+try { 1 instanceof 2; } catch (error) { console.log("io", error.name); }
+try { "x" in 5; } catch (error) { console.log("in", error.name); }
+const plain = new Error("plain message");
+console.log(plain.message, plain.name, plain.toString());
+console.log(plain instanceof Error, plain instanceof TypeError);
+const typed = TypeError("typed message");
+console.log(typed instanceof TypeError, typed instanceof Error);
+console.log(typed.toString(), typeof typed);
+const withCause = new RangeError("ranged", { cause: "why" });
+console.log(withCause.cause, withCause.message, withCause.toString());
+const causeless = new Error("bare options", {});
+console.log(causeless.cause, "cause" in causeless);
+const bare = new ReferenceError();
+console.log(bare.message === "", bare.name, bare.toString());
+const numbered = new SyntaxError(123);
+console.log(numbered.message, numbered.toString());
+const evalish = new EvalError("e");
+const uriish = new URIError("u");
+console.log(evalish.name, uriish.name);
+console.log(evalish instanceof Error, uriish instanceof Error);
+console.log(typeof Error, typeof TypeError, Error.name, TypeError.name);
+console.log(Error.length, TypeError.length);
+console.log(Error.prototype.name, Error.prototype.message);
+console.log(TypeError.prototype.name, TypeError.prototype.message);
+console.log(TypeError.prototype instanceof Error);
+console.log(Error.prototype.constructor === Error);
+console.log(TypeError.prototype.constructor === TypeError);
+console.log(new TypeError("t") instanceof RangeError);
+function shadowed() { const TypeError = "local"; return typeof TypeError; }
+console.log(shadowed());
+try { throw new TypeError("rethrown"); } catch (error) {
+  console.log(error.message, error.name);
+}
+const renamed = new Error("custom");
+renamed.name = "Custom";
+console.log(renamed.toString(), renamed.name, renamed instanceof Error);
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
@@ -2139,7 +2198,7 @@ assert.equal(finallyTdz.exitStatus, 1);
 assert.equal(finallyTdz.stdout, "cleanup\n");
 assert.match(
   finallyTdz.stderr,
-  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: Binding is read/u,
+  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: ReferenceError: Binding/u,
 );
 
 const objectCoercion = await runNativeCli(
@@ -2442,6 +2501,55 @@ assert.match(
   thrownEntry.stderr,
   /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
 );
+
+const thrownTypedEntry = await runNativeCli(
+  {
+    args: ["thrown-typed-entry.ts"],
+    source: 'throw new TypeError("typed unhandled");',
+    sourceId: "thrown-typed-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownTypedEntry.exitStatus, 1);
+assert.equal(thrownTypedEntry.stdout, "");
+assert.match(
+  thrownTypedEntry.stderr,
+  /^thrown-typed-entry\.ts:1:\d+: error\[OSEO2001\]: TypeError: typed/u,
+);
+
+const thrownRuntimeTyped = await runNativeCli(
+  {
+    args: ["thrown-runtime-typed.ts"],
+    source: "const target = null; target.item;",
+    sourceId: "thrown-runtime-typed.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownRuntimeTyped.exitStatus, 1);
+assert.equal(thrownRuntimeTyped.stdout, "");
+assert.match(
+  thrownRuntimeTyped.stderr,
+  /error\[OSEO2001\]: TypeError: Cannot read properties of a nullish value\./u,
+);
+
+const thrownRenamedEntry = await runNativeCli(
+  {
+    args: ["thrown-renamed-entry.ts"],
+    source: `
+const renamed = new Error("body");
+renamed.name = "한글이름";
+throw renamed;
+`,
+    sourceId: "thrown-renamed-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownRenamedEntry.exitStatus, 1);
+assert.equal(thrownRenamedEntry.stdout, "");
+assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
 
 const wideBindings = Array.from(
   { length: 3_000 },
