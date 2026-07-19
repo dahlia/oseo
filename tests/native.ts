@@ -663,6 +663,67 @@ console.log(
 `,
   },
   {
+    name: "switch-statements",
+    source: `
+function pick(value) {
+  switch (value) {
+    case 1: return "one";
+    case 1 + 1: return "two";
+    default: return "other";
+  }
+}
+console.log(pick(1), pick(2), pick(3));
+function fall(value) {
+  let out = "";
+  switch (value) {
+    case "a": out = out + "a";
+    case "b": out = out + "b"; break;
+    case "c": out = out + "c";
+    default: out = out + "d";
+    case "e": out = out + "e";
+  }
+  return out;
+}
+console.log(fall("a"), fall("b"), fall("c"), fall("x"), fall("e"));
+const logging = (label, value) => { console.log("test", label); return value; };
+switch (2) {
+  case logging("first", 1): console.log("body1"); break;
+  case logging("second", 2): console.log("body2"); break;
+  case logging("third", 3): console.log("body3"); break;
+}
+switch (0) { }
+console.log("empty ok");
+let shared;
+switch (1) {
+  case 1: { let scoped = "case1"; shared = scoped; break; }
+  case 2: { let scoped = "case2"; shared = scoped; }
+}
+console.log(shared);
+function readClause(value) {
+  switch (value) {
+    case 2: let later = "set"; return later;
+  }
+  return "none";
+}
+console.log(readClause(2), readClause(3));
+let collected = "";
+for (let i = 0; i < 4; i = i + 1) {
+  switch (i) {
+    case 1: continue;
+    case 3: break;
+    default: collected = collected + i;
+  }
+  collected = collected + "-";
+}
+console.log(collected);
+const nanCase = () => {
+  switch (NaN) { case NaN: return "hit"; }
+  return "miss";
+};
+console.log(NaN === NaN, nanCase());
+`,
+  },
+  {
     name: "for-loops",
     source: `
 for (let i = 0; i < 3; i = i + 1) console.log("let", i);
@@ -2346,6 +2407,19 @@ const allocationFailure = await runNativeCli(
 assert.equal(allocationFailure.exitStatus, 1);
 assert.equal(allocationFailure.stdout, "");
 assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+
+// The switch-tdz fixture explains why this check bypasses the Deno
+// reference: Deno's TypeScript transpile loses the case-level TDZ.
+const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;
+const nativeSwitchTdz = await runNativeCli(
+  {
+    args: [switchTdzEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
+assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
 
 const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
 const nativeModule = await runNativeCli(

@@ -831,6 +831,44 @@ test("lowers conditional expressions into branch arms and a join", () => {
   assert.match(printMir(buildMir(hir)), /join \? bb/u);
 });
 
+test("evaluates switch case tests lazily in separate blocks", () => {
+  const switchCase = (value: number): SyntaxProgram["body"][number] => ({
+    cases: [
+      {
+        body: [],
+        range,
+        test: { kind: "number", range, value: 1 },
+      },
+      {
+        body: [],
+        range,
+        test: { kind: "number", range, value: 2 },
+      },
+    ],
+    discriminant: { kind: "number", range, value },
+    kind: "switch",
+    range,
+  });
+  const syntax: SyntaxProgram = {
+    body: [switchCase(2)],
+    kind: "program",
+    range,
+    sourceId: "switch-lazy.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const testBlocks = script.blocks.filter((block) =>
+    block.operations.some(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    ),
+  );
+  assert.equal(testBlocks.length, 2);
+  assert.notEqual(testBlocks[0]?.id, testBlocks[1]?.id);
+  assert.match(printMir(buildMir(hir)), /join switch bb/u);
+});
+
 test("copies for-head bindings once per iteration", () => {
   const syntax: SyntaxProgram = {
     body: [

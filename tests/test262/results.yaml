@@ -10255,6 +10255,62 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/S12.11_A3_T3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - let
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/scope-lex-open-case.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - lexical-bindings
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -10517,9 +10573,9 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 209
+  expectedNegatives: 210
   harnessFailures: 0
-  passes: 65
+  passes: 66
   semanticFailures: 0
   unsupportedProfileFeatures: 149
   dependencies:
@@ -10536,9 +10592,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 26
     - dependency: control-flow
-      expectedNegatives: 4
+      expectedNegatives: 5
       harnessFailures: 0
-      passes: 2
+      passes: 3
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: dynamic-source
@@ -10562,7 +10618,7 @@ summary:
     - dependency: lexical-bindings
       expectedNegatives: 2
       harnessFailures: 0
-      passes: 4
+      passes: 5
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: module-linking
@@ -10592,7 +10648,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 2
       harnessFailures: 0
-      passes: 3
+      passes: 4
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
@@ -10621,8 +10677,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 69
     - group: language/statements
-      expectedNegatives: 31
+      expectedNegatives: 32
       harnessFailures: 0
-      passes: 25
+      passes: 26
       semanticFailures: 0
       unsupportedProfileFeatures: 16

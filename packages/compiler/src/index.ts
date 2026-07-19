@@ -249,6 +249,20 @@ export interface SyntaxParameter extends LocatedSyntax {
   readonly name: string;
 }
 
+/** One switch clause; a missing test marks the default clause. */
+export interface SyntaxSwitchCase {
+  readonly body: readonly SyntaxStatement[];
+  readonly range: SourceRange;
+  readonly test?: SyntaxExpression;
+}
+
+/** One resolved switch clause sharing the case-block scope. */
+export interface HirSwitchCase {
+  readonly body: readonly HirStatement[];
+  readonly range: SourceRange;
+  readonly test?: HirExpression;
+}
+
 /** One lexical binding declared by a classic for statement head. */
 export interface SyntaxForDeclaration {
   readonly hint: Hint | undefined;
@@ -295,6 +309,11 @@ export type SyntaxStatement =
       readonly kind: "for";
       readonly test?: SyntaxExpression;
       readonly update?: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly cases: readonly SyntaxSwitchCase[];
+      readonly discriminant: SyntaxExpression;
+      readonly kind: "switch";
     })
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
@@ -1315,6 +1334,11 @@ export type HirStatement =
       readonly update?: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly cases: readonly HirSwitchCase[];
+      readonly discriminant: HirExpression;
+      readonly kind: "switch";
+    })
+  | (LocatedSyntax & {
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
@@ -1888,6 +1912,7 @@ function resolveStatementList(
   functionBody: boolean,
   existingLocal?: Map<string, Binding>,
   loopDepth = 0,
+  breakDepth = 0,
 ): readonly HirStatement[] {
   const local = existingLocal ?? new Map<string, Binding>();
   if (existingLocal == null) predeclareBindings(statements, local, state);
@@ -1919,6 +1944,7 @@ function resolveStatementList(
       state,
       functionBody,
       loopDepth,
+      breakDepth,
     );
     if (resolved != null) result.push(resolved);
   }
@@ -2008,6 +2034,10 @@ function declaredHirBindingIds(
         result.push(declaration.bindingId);
       }
       result.push(...declaredHirBindingIds([statement.body]));
+    } else if (statement.kind === "switch") {
+      for (const switchCase of statement.cases) {
+        result.push(...declaredHirBindingIds(switchCase.body));
+      }
     } else if (statement.kind === "try") {
       result.push(...declaredHirBindingIds([statement.block]));
       if (statement.handler != null) {
@@ -2064,6 +2094,7 @@ function resolveStatement(
   state: ResolveState,
   functionBody: boolean,
   loopDepth = 0,
+  breakDepth = 0,
 ): HirStatement | undefined {
   if (
     statement.kind === "binding-init" ||
@@ -2115,6 +2146,7 @@ function resolveStatement(
       state,
       functionBody,
       loopDepth,
+      breakDepth,
     );
     let handler:
       | {
@@ -2138,6 +2170,7 @@ function resolveStatement(
         state,
         functionBody,
         loopDepth,
+        breakDepth,
       );
       if (body == null) return undefined;
       handler = {
@@ -2156,6 +2189,7 @@ function resolveStatement(
             state,
             functionBody,
             loopDepth,
+            breakDepth,
           );
     if (block == null || (statement.finalizer != null && finalizer == null)) {
       return undefined;
@@ -2163,12 +2197,15 @@ function resolveStatement(
     return { ...statement, block, finalizer, handler };
   }
   if (statement.kind === "break" || statement.kind === "continue") {
-    if (loopDepth === 0) {
+    const valid = statement.kind === "break" ? breakDepth > 0 : loopDepth > 0;
+    if (!valid) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
           statement,
-          `A ${statement.kind} statement requires an enclosing loop.`,
+          statement.kind === "break"
+            ? "A break statement requires an enclosing loop or switch."
+            : "A continue statement requires an enclosing loop.",
         ),
       );
       return undefined;
@@ -2185,6 +2222,7 @@ function resolveStatement(
         functionBody,
         undefined,
         loopDepth,
+        breakDepth,
       ),
     };
   }
@@ -2196,6 +2234,7 @@ function resolveStatement(
       state,
       functionBody,
       loopDepth + 1,
+      breakDepth + 1,
     );
     return test == null || body == null
       ? undefined
@@ -2208,6 +2247,7 @@ function resolveStatement(
       state,
       functionBody,
       loopDepth + 1,
+      breakDepth + 1,
     );
     const test = resolveExpression(statement.test, scopes, state);
     return body == null || test == null
@@ -2276,6 +2316,7 @@ function resolveStatement(
       state,
       functionBody,
       loopDepth + 1,
+      breakDepth + 1,
     );
     if (body == null) return undefined;
     return {
@@ -2291,6 +2332,64 @@ function resolveStatement(
       ...(update == null ? {} : { update }),
     };
   }
+  if (statement.kind === "switch") {
+    const discriminant = resolveExpression(
+      statement.discriminant,
+      scopes,
+      state,
+    );
+    if (discriminant == null) return undefined;
+    // One case-block scope covers every clause, so lexical declarations
+    // are shared across clauses and read before their clause runs stay
+    // runtime TDZ errors.
+    const caseScope = new Map<string, Binding>();
+    const caseStatements = statement.cases.flatMap(
+      (switchCase) => switchCase.body,
+    );
+    predeclareBindings(caseStatements, caseScope, state);
+    const caseScopes = [...scopes, caseScope];
+    let sawDefault = false;
+    const cases: HirSwitchCase[] = [];
+    for (const switchCase of statement.cases) {
+      if (switchCase.test == null) {
+        if (sawDefault) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement,
+              "A switch statement allows one default clause.",
+            ),
+          );
+          return undefined;
+        }
+        sawDefault = true;
+      }
+      const test =
+        switchCase.test == null
+          ? undefined
+          : resolveExpression(switchCase.test, caseScopes, state);
+      if (switchCase.test != null && test == null) return undefined;
+      const body: HirStatement[] = [];
+      for (const child of switchCase.body) {
+        const resolved = resolveStatement(
+          child,
+          caseScopes,
+          state,
+          functionBody,
+          loopDepth,
+          breakDepth + 1,
+        );
+        if (resolved == null) return undefined;
+        body.push(resolved);
+      }
+      cases.push({
+        body,
+        range: switchCase.range,
+        ...(test == null ? {} : { test }),
+      });
+    }
+    return { ...statement, cases, discriminant };
+  }
   const test = resolveExpression(statement.test, scopes, state);
   const consequent = resolveStatement(
     statement.consequent,
@@ -2298,6 +2397,7 @@ function resolveStatement(
     state,
     functionBody,
     loopDepth,
+    breakDepth,
   );
   const alternate =
     statement.alternate == null
@@ -2308,6 +2408,7 @@ function resolveStatement(
           state,
           functionBody,
           loopDepth,
+          breakDepth,
         );
   if (test == null || consequent == null) return undefined;
   if (statement.alternate != null && alternate == null) return undefined;
@@ -2602,6 +2703,21 @@ function appendHirStatement(
     ].join("; ");
     lines.push(`${indent}for (${head})${location}`);
     appendHirStatement(lines, statement.body, `${indent}  `);
+  } else if (statement.kind === "switch") {
+    lines.push(
+      `${indent}switch ${printHirExpression(statement.discriminant)}` +
+        location,
+    );
+    for (const switchCase of statement.cases) {
+      lines.push(
+        switchCase.test == null
+          ? `${indent}  default:`
+          : `${indent}  case ${printHirExpression(switchCase.test)}:`,
+      );
+      for (const child of switchCase.body) {
+        appendHirStatement(lines, child, `${indent}    `);
+      }
+    }
   } else {
     lines.push(`${indent}if ${printHirExpression(statement.test)}${location}`);
     appendHirStatement(lines, statement.consequent, `${indent}  `);
@@ -4269,6 +4385,85 @@ function lowerStatements(
         [],
         statement.range,
       );
+    } else if (statement.kind === "switch") {
+      const discriminant = lowerExpression(statement.discriminant, builder);
+      resetBlockBindings(
+        statement.cases.flatMap((switchCase) => switchCase.body),
+        builder,
+      );
+      const testedCases = statement.cases
+        .map((switchCase, index) => ({ index, switchCase }))
+        .filter((entry) => entry.switchCase.test != null);
+      const bodyBlocks = statement.cases.map(() => createMirBlock(builder));
+      const exitBlock = createMirBlock(builder);
+      const defaultIndex = statement.cases.findIndex(
+        (switchCase) => switchCase.test == null,
+      );
+      const unmatchedTarget =
+        defaultIndex >= 0 ? bodyBlocks[defaultIndex]!.id : exitBlock.id;
+      // Case tests evaluate lazily in source order; the matched clause
+      // enters its body and later clauses run through fallthrough.
+      for (const [position, entry] of testedCases.entries()) {
+        const test = lowerExpression(entry.switchCase.test!, builder);
+        const equal = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [discriminant, test],
+          detail: "===",
+          id: equal,
+          kind: "binary",
+          operator: "===",
+          range: entry.switchCase.range,
+        });
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [equal],
+          entry.switchCase.range,
+        );
+        const next = testedCases[position + 1];
+        const nextBlock = next == null ? undefined : createMirBlock(builder);
+        builder.current.terminator = {
+          kind: "branch",
+          test: equal,
+          whenFalse: nextBlock?.id ?? unmatchedTarget,
+          whenTrue: bodyBlocks[entry.index]!.id,
+        };
+        if (nextBlock != null) builder.current = nextBlock;
+      }
+      if (testedCases.length === 0) {
+        builder.current.terminator = {
+          kind: "jump",
+          target: unmatchedTarget,
+        };
+      }
+      const enclosingLoop = builder.loops.at(-1);
+      builder.loops.push({
+        breakTarget: exitBlock.id,
+        // A continue inside a switch body still targets the enclosing
+        // loop; resolution rejects a continue without one.
+        continueTarget: enclosingLoop?.continueTarget ?? -1,
+      });
+      for (const [index, switchCase] of statement.cases.entries()) {
+        builder.current = bodyBlocks[index]!;
+        const caseTerminated = lowerStatements(switchCase.body, builder);
+        if (!caseTerminated) {
+          builder.current.terminator = {
+            kind: "jump",
+            target: bodyBlocks[index + 1]?.id ?? exitBlock.id,
+          };
+        }
+      }
+      builder.loops.pop();
+      builder.current = exitBlock;
+      appendMirMetadata(
+        builder,
+        "join",
+        `switch bb${exitBlock.id}`,
+        [],
+        statement.range,
+      );
     } else if (statement.kind === "for") {
       const declarations = statement.declarations ?? [];
       const initializeBinding = (
@@ -5168,6 +5363,16 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       (statement.finalizer != null && hirStatementHasAwait(statement.finalizer))
     );
   }
+  if (statement.kind === "switch") {
+    return (
+      hirExpressionHasAwait(statement.discriminant) ||
+      statement.cases.some(
+        (switchCase) =>
+          (switchCase.test != null && hirExpressionHasAwait(switchCase.test)) ||
+          switchCase.body.some(hirStatementHasAwait),
+      )
+    );
+  }
   if (statement.kind === "for") {
     return (
       (statement.declarations ?? []).some((declaration) =>
@@ -5223,6 +5428,10 @@ function collectHirBindings(
         bindings.push({ id: declaration.bindingId, name: declaration.name });
       }
       collect(statement.body);
+    } else if (statement.kind === "switch") {
+      for (const switchCase of statement.cases) {
+        switchCase.body.forEach(collect);
+      }
     }
   };
   statements.forEach(collect);

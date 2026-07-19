@@ -95,6 +95,13 @@ its deliberate boundary and its evidence:
     both async function bodies and module top level, because a
     conditionally evaluated suspension has no owned continuation contract
     yet.
+ -  The `switch` statement with lazy, source-ordered strict-equality case
+    tests, fallthrough across clauses including a default clause in any
+    position, and one case-block scope shared by every clause, so a
+    lexical clause binding read before its clause runs stays a runtime
+    TDZ error. `break` targets the switch while `continue` passes
+    through to the enclosing loop. Function declarations inside switch
+    clauses stay rejected with a source-located diagnostic.
  -  The classic `for` statement with expression, `var`, `let`, `const`,
     and empty heads. Mutable lexical head bindings follow
     `CreatePerIterationEnvironment`: each iteration reads the current

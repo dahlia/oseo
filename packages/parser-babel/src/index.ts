@@ -15,6 +15,7 @@ import type {
   SyntaxExpression,
   SyntaxForDeclaration,
   SyntaxFunction,
+  SyntaxSwitchCase,
   SyntaxImportEntry,
   SyntaxModule,
   SyntaxModuleSpecifier,
@@ -958,6 +959,37 @@ function statement(
   if (value.type === "EmptyStatement") {
     return { ...located, body: [], kind: "block" };
   }
+  if (value.type === "SwitchStatement") {
+    const discriminantNode = node(value.discriminant);
+    if (discriminantNode == null) return unsupported(context, value);
+    const discriminant = expression(context, discriminantNode);
+    if (discriminant == null) return undefined;
+    const cases: SyntaxSwitchCase[] = [];
+    for (const caseNode of nodes(value.cases)) {
+      const testNode = node(caseNode.test);
+      const test = testNode == null ? undefined : expression(context, testNode);
+      if (testNode != null && test == null) return undefined;
+      const body: SyntaxStatement[] = [];
+      for (const child of nodes(caseNode.consequent)) {
+        if (child.type === "FunctionDeclaration") {
+          return unsupported(
+            context,
+            child,
+            "Function declarations in switch clauses are unsupported.",
+          );
+        }
+        const converted = statement(context, child, functionBody);
+        if (converted == null) return undefined;
+        body.push(converted);
+      }
+      cases.push({
+        body,
+        range: location(context, caseNode).range,
+        ...(test == null ? {} : { test }),
+      });
+    }
+    return { ...located, cases, discriminant, kind: "switch" };
+  }
   if (value.type === "ForInStatement" || value.type === "ForOfStatement") {
     return unsupported(
       context,
@@ -1790,6 +1822,22 @@ function collectVarStatement(
         collected,
         blockFunctions,
       )
+    );
+  }
+  if (value.type === "SwitchStatement") {
+    const caseBodies = nodes(value.cases).flatMap((caseNode) =>
+      nodes(caseNode.consequent),
+    );
+    const frames = [...lexicalFrames, gatherLexicalNames(caseBodies, true)];
+    return caseBodies.every((child) =>
+      collectVarStatement(
+        context,
+        child,
+        frames,
+        catchParameters,
+        collected,
+        blockFunctions,
+      ),
     );
   }
   if (value.type === "TryStatement") {

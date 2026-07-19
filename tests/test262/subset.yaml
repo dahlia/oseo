@@ -1250,6 +1250,12 @@ tests:
   - path: test/language/statements/let/syntax/let.js
     expectedClassification: pass
     dependencies: [lexical-bindings]
+  - path: test/language/statements/switch/S12.11_A3_T3.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/switch/scope-lex-open-case.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion]

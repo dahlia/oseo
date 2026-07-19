@@ -593,6 +593,56 @@ test("rejects var exports explicitly", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
 
+test("converts switch statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "switch (1 + 1) {\n" +
+      '  case 1: console.log("one"); break;\n' +
+      '  default: console.log("other");\n' +
+      '  case 2: console.log("two");\n' +
+      "}\n",
+    sourceId: "switch-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /switch /u);
+  assert.match(hirText, /default:/u);
+});
+
+test("keeps break valid inside if consequents", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "while (true) { if (1) break; }\n" +
+      "switch (1) { case 1: if (1) break; }\n" +
+      "do { if (1) continue; } while (false);\n",
+    sourceId: "guarded-break.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+// The bootstrap parser already rejects continue outside a loop, so the
+// rejection arrives as an owned OSEO0001 parse diagnostic.
+test("rejects continue without an enclosing loop", () => {
+  const result = compileSource(babelFrontend, {
+    source: "switch (1) { case 1: continue; }",
+    sourceId: "switch-continue.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+});
+
+test("rejects function declarations in switch clauses", () => {
+  const result = compileSource(babelFrontend, {
+    source: "switch (1) { case 1: function inner() {} }",
+    sourceId: "switch-function.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Function declarations in switch/u,
+  );
+});
+
 test("converts classic for statements to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
