@@ -758,6 +758,8 @@ function expression(
       ">>",
       ">>>",
       "^",
+      "in",
+      "instanceof",
       "|",
     ]);
     if (!accepted.has(operator)) {

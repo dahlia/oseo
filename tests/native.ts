@@ -663,6 +663,45 @@ console.log(
 `,
   },
   {
+    name: "in-and-instanceof",
+    source: `
+const box = { present: undefined, value: 1 };
+console.log("present" in box, "value" in box, "missing" in box);
+const parent = { inherited: 1 };
+const child = Object.create(parent);
+console.log("inherited" in child, "own" in child);
+child.own = 2;
+console.log("own" in child);
+console.log(0 in [10, 20], 1 in [10, 20], 2 in [10, 20]);
+console.log("length" in [1], 1 in [1, , 3], 1 in { "1": true });
+console.log("prototype" in function named() {});
+try {
+  console.log("x" in "text");
+} catch (caught) {
+  console.log("in-requires-object");
+}
+function Base(value) { this.value = value; }
+const base = new Base(1);
+console.log(base instanceof Base, ({}) instanceof Base);
+function Derived() {}
+Derived.prototype = Object.create(Base.prototype);
+const derived = new Derived();
+console.log(derived instanceof Derived, derived instanceof Base);
+console.log(1 instanceof Base, "s" instanceof Base, null instanceof Base);
+try {
+  console.log(base instanceof 1);
+} catch (caught) {
+  console.log("callable-required");
+}
+const arrow = () => 1;
+try {
+  console.log(base instanceof arrow);
+} catch (caught) {
+  console.log("prototype-required");
+}
+`,
+  },
+  {
     name: "template-literals",
     source: `
 const name = "world";
@@ -1572,7 +1611,10 @@ for (const fixture of fixtures) {
     fixture.name === "async-continuations" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
-    fixture.name === "timer-event-loop"
+    fixture.name === "timer-event-loop" ||
+    fixture.name === "in-and-instanceof" ||
+    fixture.name === "typeof-void-remainder" ||
+    fixture.name === "template-literals"
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }

@@ -593,6 +593,21 @@ test("rejects var exports explicitly", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
 
+test("converts in and instanceof to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function Box(value) { this.value = value; }\n" +
+      "const box = new Box(1);\n" +
+      'console.log("value" in box, box instanceof Box);\n',
+    sourceId: "relational-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, / in /u);
+  assert.match(hirText, / instanceof /u);
+});
+
 test("converts untagged template literals to concatenation", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -697,7 +712,7 @@ const unsupportedForms = [
   ["logical assignment", "let value = null; value ||= 1;"],
   ["nullish assignment", "let value = null; value ??= 1;"],
   ["property", "console.error(1);"],
-  ["in operator", 'console.log("key" in {});'],
+  ["with statement", "with ({}) { console.log(1); }"],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],

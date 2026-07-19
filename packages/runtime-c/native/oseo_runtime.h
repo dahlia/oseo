@@ -433,6 +433,16 @@ OseoResult oseo_not_loose_equal(
     OseoValue left,
     OseoValue right
 );
+OseoResult oseo_has_property(
+    OseoContext *context,
+    OseoValue key,
+    OseoValue object_value
+);
+OseoResult oseo_instanceof(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+);
 OseoResult oseo_not_strict_equal(
     OseoContext *context,
     OseoValue left,

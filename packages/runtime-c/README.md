@@ -48,6 +48,14 @@ coercion, booleans and numeric strings coerce through the shared numeric
 conversion, objects compare by identity, and comparing an object with a
 number or string keeps the shared unsupported object-to-primitive
 boundary.
+The `m5-4` ABI adds `oseo_has_property` and `oseo_instanceof`.
+`oseo_has_property` converts its key through the shared property-key
+conversion and walks the prototype chain with the same own-descriptor
+and promise-method visibility as generic property reads, throwing a
+catchable error for non-object right operands. `oseo_instanceof`
+implements `OrdinaryHasInstance`: a non-callable right operand and a
+non-object `prototype` property throw catchable errors, a primitive left
+operand is false, and the walk compares prototype identity.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

@@ -612,6 +612,40 @@ test("checks the status of coercing unary operators", () => {
   }
 });
 
+test("marks relational operators as allocation safepoints", () => {
+  for (const operator of ["in", "instanceof"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "string", range, value: "key" },
+            operator,
+            range,
+            right: { kind: "object", properties: [], range },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `${operator}-safepoint.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+  }
+});
+
 test("lowers void to an operand evaluation without a status check", () => {
   const syntax: SyntaxProgram = {
     body: [

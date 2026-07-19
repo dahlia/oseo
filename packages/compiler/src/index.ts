@@ -122,6 +122,8 @@ export type BinaryOperator =
   | ">>"
   | ">>>"
   | "^"
+  | "in"
+  | "instanceof"
   | "|";
 
 /** Unary operations selected before native backend lowering. */
@@ -3402,6 +3404,19 @@ function lowerExpression(
         builder,
         "safepoint",
         "string addition fallback",
+        [left, right],
+        expression.range,
+      );
+    } else if (
+      expression.operator === "in" ||
+      expression.operator === "instanceof"
+    ) {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        expression.operator === "in"
+          ? "property key allocation"
+          : "prototype key allocation",
         [left, right],
         expression.range,
       );

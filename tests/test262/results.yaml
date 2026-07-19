@@ -445,10 +445,10 @@ results:
     dependencies:
       - promise-settlement
     observation:
-      detail: 'test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js:61:6:
-        error[OSEO1001]: This binary operator is unsupported.\n"'
+      detail: "test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_T1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/prototype/catch/S25.4.5.1_A1.1_\
+        T1.js:61:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -695,10 +695,10 @@ results:
     dependencies:
       - promise-settlement
     observation:
-      detail: 'test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T1.js:61:6:
-        error[OSEO1001]: This binary operator is unsupported.\n"'
+      detail: "test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T1.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/prototype/then/S25.4.5.3_A1.1_T\
+        1.js:61:6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -1159,10 +1159,10 @@ results:
       - functions
       - object-properties
     observation:
-      detail: 'test/language/expressions/arrow-function/prototype-rules.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/arrow-function/prototype-rules.js:61:18:
-        error[OSEO1001]: This binary operator is unsupported.\n"'
+      detail: "test/language/expressions/arrow-function/prototype-rules.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/arrow-function/prototype-rul\
+        es.js:60:18: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2076,10 +2076,11 @@ results:
     dependencies:
       - async-functions
     observation:
-      detail: 'test/language/expressions/await/await-BindingIdentifier-in-global.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/await/await-BindingIdentifier-in-global.js:61:8:
-        error[OSEO1001]: This binary operator is unsupported.\n"'
+      detail: "test/language/expressions/await/await-BindingIdentifier-in-glo\
+        bal.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/await/await-BindingIdentifie\
+        r-in-global.js:61:25: error[OSEO1001]: Unknown binding
+        'Function'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -2907,6 +2908,51 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/in/rhs-yield-absent-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/instanceof/S11.8.6_A3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/instanceof/S11.8.6_A3.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/instanceof/S11.8.6_A3.js:65:\
+        20: error[OSEO1001]: Unknown binding 'TypeError'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -5387,8 +5433,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-star-props-circular.js:85:8:
-        error[OSEO1001]: This binary operator is unsupported."
+      detail: "test/language/module-code/instn-star-props-circular-a_FIXTURE.\
+        js:5:8: error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -5404,15 +5450,35 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
+      - expression-operators
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-keep-indirect.js
+          sourceHash: fnv1a64:082c87d4e9ddc457
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-keep-indirect-def_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-keep-indirect-reexport_FIXTURE.js
+          sourceHash: fnv1a64:5754517633bcf087
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-keep-indirect-def_FIXTURE.js
+          sourceHash: fnv1a64:5baa408a1d7b1a0c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-star-props-dflt-keep-indirect.\
-        js:84:18: error[OSEO1001]: This binary operator is unsupported."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -5425,15 +5491,35 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
+      - expression-operators
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
+            - test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-keep-local.js
+          sourceHash: fnv1a64:a5b8b36c3b13aa25
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
+          sourceHash: fnv1a64:08410762af497b31
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
+          sourceHash: fnv1a64:5baa408a1d7b1a0c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-star-props-dflt-keep-local.js:\
-        85:18: error[OSEO1001]: This binary operator is unsupported."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -5450,8 +5536,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-star-props-dflt-skip.js:86:8:
-        error[OSEO1001]: This binary operator is unsupported."
+      detail: "test/language/module-code/instn-star-props-dflt-skip-named_FIX\
+        TURE.js:5:8: error[OSEO1001]: This export is unsupported."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -9296,10 +9382,12 @@ results:
     dependencies:
       - async-functions
     observation:
-      detail: 'test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js:66:8:
-        error[OSEO1001]: This binary operator is unsupported.\n"'
+      detail: "test/language/statements/async-function/syntax-declaration-lin\
+        e-terminators-allowed.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/statements/async-function/syntax-declara\
+        tion-line-terminators-allowed.js:66:23: error[OSEO1001]: Unknown
+        binding 'Function'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -10350,11 +10438,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 201
+  expectedNegatives: 202
   harnessFailures: 0
-  passes: 60
+  passes: 62
   semanticFailures: 0
-  unsupportedProfileFeatures: 158
+  unsupportedProfileFeatures: 157
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -10381,11 +10469,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: expression-operators
-      expectedNegatives: 9
+      expectedNegatives: 10
       harnessFailures: 0
-      passes: 8
+      passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 14
     - dependency: functions
       expectedNegatives: 9
       harnessFailures: 0
@@ -10401,9 +10489,9 @@ summary:
     - dependency: module-linking
       expectedNegatives: 129
       harnessFailures: 0
-      passes: 9
+      passes: 11
       semanticFailures: 0
-      unsupportedProfileFeatures: 80
+      unsupportedProfileFeatures: 78
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
@@ -10442,17 +10530,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 41
+      expectedNegatives: 42
       harnessFailures: 0
       passes: 19
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 28
     - group: language/module-code
       expectedNegatives: 129
       harnessFailures: 0
-      passes: 9
+      passes: 11
       semanticFailures: 0
-      unsupportedProfileFeatures: 80
+      unsupportedProfileFeatures: 78
     - group: language/statements
       expectedNegatives: 31
       harnessFailures: 0

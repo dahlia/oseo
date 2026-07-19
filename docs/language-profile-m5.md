@@ -99,6 +99,13 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  The `in` and `instanceof` relational operators. `in` converts its key
+    through the shared property-key conversion and walks the prototype
+    chain with the same visibility as generic property reads, and
+    `instanceof` implements `OrdinaryHasInstance` without well-known
+    symbols, which the profile does not admit yet. Non-object `in` right
+    operands, non-callable `instanceof` right operands, and non-object
+    `prototype` values throw the shared catchable opaque errors.
  -  Untagged template literals, normalized by the frontend into string
     concatenation. Substitutions evaluate left to right interleaved with
     the cooked template pieces, every substitution converts through the
