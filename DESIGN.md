@@ -445,10 +445,21 @@ retained in `MirFunction`, and changing a MIR operation changes emitted C. This
 keeps `--dump-mir`, specialization passes, and native execution on one semantic
 path.
 
-Runtime code is linked as a static library in the initial design. Generated
-programs may still depend on selected system libraries. Those dependencies must
-be listed as part of the target definition and must not be confused with
-Node-API addon support.
+Runtime code is linked as a static library in the initial design. The
+runtime package lists its headers and C sources as an ordered collection of
+reviewed assets, and the build contract carries every runtime source path
+in that order. The toolchain adapter compiles each runtime translation
+unit separately with the same target, C11 mode, warning, sanitizer, and
+include policy, gives each object a deterministic collision-free name, and
+archives the objects in input order before linking generated C against the
+complete archive. Filesystem enumeration and shell glob order never select
+sources or archive layout. [*PLAN-RCR.md*](./PLAN-RCR.md) governs the
+componentization that splits the runtime implementation across those
+translation units, including the package-private internal header that is
+never included by generated C. Generated programs may still depend on
+selected system libraries. Those dependencies must be listed as part of
+the target definition and must not be confused with Node-API addon
+support.
 
 
 Self-hosting

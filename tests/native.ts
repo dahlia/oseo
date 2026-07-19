@@ -1862,6 +1862,93 @@ for (const fixture of fixtures) {
   }
 }
 
+// PLAN-RCR multi-source build contract: two runtime translation units
+// compile, archive in input order, and link into an executable whose
+// observation matches the single-source runtime build. The copied
+// runtime translation unit gains an undefined reference to a symbol
+// defined only by the probe unit, so a successful link proves the
+// linker extracted the second archive member.
+{
+  const probeDirectory = await host.makeTemporaryDirectory("oseo-multi-tu-");
+  const probeSourcePath = `${probeDirectory}/runtime_probe.c`;
+  await host.writeTextFile(
+    probeSourcePath,
+    "int oseo_probe_second_translation_unit(void);\n" +
+      "int oseo_probe_second_translation_unit(void) { return 1; }\n",
+  );
+  const multiSourceRuntime = {
+    getRuntimeInput() {
+      const base = cRuntimeProvider.getRuntimeInput();
+      return {
+        abiVersion: base.abiVersion,
+        assets: [
+          ...base.assets,
+          {
+            kind: "source" as const,
+            name: "runtime_probe.c",
+            url: new URL(`file://${probeSourcePath}`),
+          },
+        ],
+      };
+    },
+  };
+  const probeReferenceHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (!(path instanceof URL) || !path.pathname.endsWith("/runtime.c")) {
+        return source;
+      }
+      return (
+        source +
+        "\nint oseo_probe_second_translation_unit(void);\n" +
+        "int oseo_probe_link_participation(void);\n" +
+        "int oseo_probe_link_participation(void) {\n" +
+        "    return oseo_probe_second_translation_unit();\n" +
+        "}\n"
+      );
+    },
+  };
+  const multiSourceCompilation = compileSource(
+    babelFrontend,
+    { source: 'console.log("multi-source runtime");', sourceId: "multi.ts" },
+    { observeSpecialization: false, specialization: "disabled" },
+  );
+  assert.deepEqual(multiSourceCompilation.diagnostics, []);
+  assert(multiSourceCompilation.mir != null, "multi-source MIR");
+  await withNativeFixture(
+    {
+      backend: cBackend,
+      host: probeReferenceHost,
+      input: multiSourceCompilation.mir,
+      keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+      operation: "execute",
+      runtime: multiSourceRuntime,
+      target: nativeTarget,
+      toolchain: zigToolchain,
+    },
+    (native) => {
+      assert.equal(native.stdout, "multi-source runtime\n");
+      assert.equal(native.exitStatus, 0);
+      const compileLines = native.compilerInvocation.filter((line) =>
+        line.includes(" -c "),
+      );
+      assert.equal(compileLines.length, 2);
+      assert.match(compileLines[0] ?? "", /runtime\.c/u);
+      assert.match(compileLines[1] ?? "", /runtime_probe\.c/u);
+      const archiveLine = native.compilerInvocation.find((line) =>
+        line.includes("zig ar "),
+      );
+      assert(archiveLine != null, "archive request recorded");
+      assert.match(
+        archiveLine,
+        /runtime-[a-z0-9_-]+\.o.*runtime_probe-[a-z0-9_-]+\.o/u,
+      );
+    },
+  );
+  await host.remove(probeDirectory);
+}
+
 const assemblyCompilation = compileSource(
   babelFrontend,
   {

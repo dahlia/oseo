@@ -24,12 +24,40 @@ function request(
   return { args, command, cwd };
 }
 
+/**
+ * Derive a deterministic collision-free object name from one runtime
+ * source path and its position in the ordered source list. The name
+ * depends only on the source file name, the explicit input order, and
+ * the explicit target, never on filesystem enumeration order, so
+ * distinct sources sharing a base name still receive distinct objects.
+ */
+function objectName(
+  sourcePath: string,
+  index: number,
+  targetSuffix: string,
+): string {
+  const baseName = sourcePath.slice(sourcePath.lastIndexOf("/") + 1);
+  const stem = baseName.replace(/\.c$/u, "");
+  return `${stem}-${index}-${targetSuffix}.o`;
+}
+
 /** Pinned Zig C toolchain adapter with explicit target selection. */
 export const zigToolchain: NativeToolchain = {
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan {
+    if (input.runtimeSourcePaths.length === 0) {
+      throw new Error("A native build requires at least one runtime source.");
+    }
     const suffix = input.target.name;
     const zigTargetName = zigTargetNames[input.target.name];
-    const objectPath = join(input.workingDirectory, `runtime-${suffix}.o`);
+    const runtimeSources = input.runtimeSourcePaths.map(
+      (sourcePath, index) => ({
+        objectPath: join(
+          input.workingDirectory,
+          objectName(sourcePath, index, suffix),
+        ),
+        sourcePath,
+      }),
+    );
     const archivePath = join(
       input.workingDirectory,
       `liboseo_runtime-${suffix}.a`,
@@ -53,20 +81,22 @@ export const zigToolchain: NativeToolchain = {
     return {
       executablePath,
       requests: [
-        request(input.workingDirectory, "zig", [
-          "cc",
-          ...common,
-          ...sanitizer,
-          "-c",
-          input.runtimeSourcePath,
-          "-o",
-          objectPath,
-        ]),
+        ...runtimeSources.map((source) =>
+          request(input.workingDirectory, "zig", [
+            "cc",
+            ...common,
+            ...sanitizer,
+            "-c",
+            source.sourcePath,
+            "-o",
+            source.objectPath,
+          ]),
+        ),
         request(input.workingDirectory, "zig", [
           "ar",
           "rcs",
           archivePath,
-          objectPath,
+          ...runtimeSources.map((source) => source.objectPath),
         ]),
         request(input.workingDirectory, "zig", [
           "cc",
