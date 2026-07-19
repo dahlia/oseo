@@ -338,10 +338,138 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
   });
 });
 
+test("converts typeof, void, and remainder to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = 1;\n" +
+      "console.log(typeof value, void value, value % 2);\n",
+    sourceId: "m5-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\(typeof /u);
+  assert.match(hirText, /\(void /u);
+  assert.match(hirText, /% 2/u);
+});
+
+test("converts numeric, bitwise, and exponent operators", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const value = 6;\n" +
+      "console.log(value ** 2, value & 3, value | 8, value ^ 1);\n" +
+      "console.log(value << 1, value >> 1, value >>> 1, ~value, +value);\n",
+    sourceId: "numeric-operators.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\*\*/u);
+  assert.match(hirText, />>>/u);
+  assert.match(hirText, /\(~/u);
+  assert.match(hirText, /\(\+/u);
+});
+
+test("converts logical, conditional, and do-while to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let value = 0;\n" +
+      "do { value = value + 1; } while (value < 3);\n" +
+      'console.log(value && "kept", value || "fallback");\n' +
+      'console.log(value === 3 ? "three" : "other");\n',
+    sourceId: "control-flow.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /do @/u);
+  assert.match(hirText, /&&/u);
+  assert.match(hirText, /\|\|/u);
+  assert.match(hirText, /\? "three" : "other"/u);
+});
+
+test("converts loose equality to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'console.log(1 == "1", null != undefined);',
+    sourceId: "loose-equality.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /==/u);
+  assert.match(hirText, /!=/u);
+});
+
+test("converts comma sequences and nullish coalescing", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const chosen = null ?? (1, 2);\n" +
+      "console.log(chosen ?? 0, (chosen, chosen + 1));\n",
+    sourceId: "sequence-nullish.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /\?\?/u);
+  assert.match(hirText, /\(1, 2\)/u);
+});
+
+test("rejects await inside logical operands of async functions", () => {
+  const result = compileSource(babelFrontend, {
+    source: "async function first(input) { return input && (await input); }",
+    sourceId: "async-logical.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /Await is supported/u);
+});
+
+test("rejects top-level await inside logical operands", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export const ready = (await Promise.resolve(1)) && 2;",
+    sourceId: "file:///app/logical-await.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/logical-await.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/logical-await.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "logical-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.match(
+    compiled.diagnostics[0]?.message ?? "",
+    /control-flow position/u,
+  );
+});
+
+test("rejects typeof with an unresolved name explicitly", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof missing);",
+    sourceId: "typeof-unresolved.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /typeof with an unresolved name/u,
+  );
+});
+
 const unsupportedForms = [
   ["compound assignment", "let value = 1; value += 1;"],
+  ["update expression", "let value = 1; value++;"],
+  ["exponent assignment", "let value = 2; value **= 2;"],
+  ["logical assignment", "let value = null; value ||= 1;"],
+  ["nullish assignment", "let value = null; value ??= 1;"],
   ["property", "console.error(1);"],
-  ["loose equality", "console.log(1 == true);"],
+  ["in operator", 'console.log("key" in {});'],
   ["module", 'import "fixture";'],
   ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],

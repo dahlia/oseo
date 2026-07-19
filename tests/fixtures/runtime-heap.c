@@ -387,6 +387,45 @@ static void test_cell_initialization(
     );
 }
 
+static void test_loose_equality_boundary(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_object_create(context, oseo_null()));
+    assert(
+        require_normal(oseo_loose_equal(context, roots[0], oseo_null())) ==
+        oseo_boolean(false)
+    );
+    assert(
+        require_normal(
+            oseo_loose_equal(context, oseo_undefined(), roots[0])
+        ) == oseo_boolean(false)
+    );
+    assert(
+        require_normal(
+            oseo_not_loose_equal(context, roots[0], oseo_null())
+        ) == oseo_boolean(true)
+    );
+    roots[1] = make_text(context, "text");
+    OseoValue operands[3] = {
+        oseo_number(0.0),
+        roots[1],
+        oseo_boolean(false),
+    };
+    for (size_t index = 0u; index < 3u; index += 1u) {
+        assert(
+            oseo_loose_equal(context, roots[0], operands[index]).status ==
+            OSEO_STATUS_THROW
+        );
+        assert(strcmp(context->error_code, "OSEO2001") == 0);
+        assert(
+            oseo_loose_equal(context, operands[index], roots[0]).status ==
+            OSEO_STATUS_THROW
+        );
+        assert(strcmp(context->error_code, "OSEO2001") == 0);
+    }
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -400,6 +439,7 @@ int main(void) {
     test_arrays(&context, frame.slots);
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
+    test_loose_equality_boundary(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

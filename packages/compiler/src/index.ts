@@ -103,16 +103,32 @@ export type SyntaxCallTarget =
 
 /** Binary operations selected before native backend lowering. */
 export type BinaryOperator =
+  | "!="
   | "!=="
+  | "%"
+  | "&"
   | "*"
+  | "**"
   | "+"
   | "-"
   | "/"
   | "<"
+  | "<<"
   | "<="
+  | "=="
   | "==="
   | ">"
-  | ">=";
+  | ">="
+  | ">>"
+  | ">>>"
+  | "^"
+  | "|";
+
+/** Unary operations selected before native backend lowering. */
+export type UnaryOperator = "!" | "+" | "-" | "typeof" | "void" | "~";
+
+/** Short-circuit operators lowered through explicit control flow. */
+export type LogicalOperator = "&&" | "??" | "||";
 
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
@@ -143,6 +159,22 @@ export type SyntaxExpression =
       readonly arguments: readonly SyntaxExpression[];
       readonly kind: "call";
       readonly target: SyntaxCallTarget;
+    })
+  | (LocatedSyntax & {
+      readonly alternate: SyntaxExpression;
+      readonly consequent: SyntaxExpression;
+      readonly kind: "conditional";
+      readonly test: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "logical";
+      readonly left: SyntaxExpression;
+      readonly operator: LogicalOperator;
+      readonly right: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly expressions: readonly SyntaxExpression[];
+      readonly kind: "sequence";
     })
   | (LocatedSyntax & {
       readonly functionValue: SyntaxFunction;
@@ -203,7 +235,7 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly argument: SyntaxExpression;
       readonly kind: "unary";
-      readonly operator: "!" | "-";
+      readonly operator: UnaryOperator;
     })
   | (LocatedSyntax & {
       readonly kind: "undefined";
@@ -229,6 +261,11 @@ export type SyntaxStatement =
     })
   | (LocatedSyntax & {
       readonly kind: "continue";
+    })
+  | (LocatedSyntax & {
+      readonly body: SyntaxStatement;
+      readonly kind: "do-while";
+      readonly test: SyntaxExpression;
     })
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
@@ -1134,6 +1171,22 @@ export type HirExpression =
       readonly target: HirCallTarget;
     })
   | (LocatedSyntax & {
+      readonly alternate: HirExpression;
+      readonly consequent: HirExpression;
+      readonly kind: "conditional";
+      readonly test: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "logical";
+      readonly left: HirExpression;
+      readonly operator: LogicalOperator;
+      readonly right: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly expressions: readonly HirExpression[];
+      readonly kind: "sequence";
+    })
+  | (LocatedSyntax & {
       readonly functionId: number;
       readonly functionKind: FunctionKind;
       readonly kind: "function";
@@ -1201,7 +1254,7 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly argument: HirExpression;
       readonly kind: "unary";
-      readonly operator: "!" | "-";
+      readonly operator: UnaryOperator;
     })
   | (LocatedSyntax & {
       readonly kind: "undefined";
@@ -1218,6 +1271,11 @@ export type HirStatement =
     })
   | (LocatedSyntax & {
       readonly kind: "continue";
+    })
+  | (LocatedSyntax & {
+      readonly body: HirStatement;
+      readonly kind: "do-while";
+      readonly test: HirExpression;
     })
   | (LocatedSyntax & {
       readonly bindingId: number;
@@ -1495,11 +1553,29 @@ function resolveExpression(
     };
   }
   if (expression.kind === "unary") {
+    if (
+      expression.operator === "typeof" &&
+      expression.argument.kind === "identifier" &&
+      findBinding(scopes, expression.argument.name) == null &&
+      expression.argument.name !== "undefined" &&
+      expression.argument.name !== "NaN" &&
+      expression.argument.name !== "Infinity"
+    ) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          "typeof with an unresolved name is outside the admitted " +
+            'profile; ECMAScript would evaluate it to "undefined".',
+        ),
+      );
+      return undefined;
+    }
     const argument = resolveExpression(expression.argument, scopes, state);
     if (argument == null) return undefined;
     return { ...expression, argument };
   }
-  if (expression.kind === "binary") {
+  if (expression.kind === "binary" || expression.kind === "logical") {
     const left = resolveExpression(expression.left, scopes, state);
     const right = resolveExpression(expression.right, scopes, state);
     if (left == null || right == null) return undefined;
@@ -1508,6 +1584,24 @@ function resolveExpression(
       left,
       right,
     };
+  }
+  if (expression.kind === "conditional") {
+    const test = resolveExpression(expression.test, scopes, state);
+    const consequent = resolveExpression(expression.consequent, scopes, state);
+    const alternate = resolveExpression(expression.alternate, scopes, state);
+    if (test == null || consequent == null || alternate == null) {
+      return undefined;
+    }
+    return { ...expression, alternate, consequent, test };
+  }
+  if (expression.kind === "sequence") {
+    const expressions: HirExpression[] = [];
+    for (const element of expression.expressions) {
+      const resolved = resolveExpression(element, scopes, state);
+      if (resolved == null) return undefined;
+      expressions.push(resolved);
+    }
+    return { ...expression, expressions };
   }
   if (expression.kind === "object") {
     const properties: {
@@ -1870,7 +1964,7 @@ function declaredHirBindingIds(
       if (statement.alternate != null) {
         result.push(...declaredHirBindingIds([statement.alternate]));
       }
-    } else if (statement.kind === "while") {
+    } else if (statement.kind === "while" || statement.kind === "do-while") {
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "try") {
       result.push(...declaredHirBindingIds([statement.block]));
@@ -2065,6 +2159,19 @@ function resolveStatement(
       ? undefined
       : { ...statement, body, test };
   }
+  if (statement.kind === "do-while") {
+    const body = resolveStatement(
+      statement.body,
+      scopes,
+      state,
+      functionBody,
+      loopDepth + 1,
+    );
+    const test = resolveExpression(statement.test, scopes, state);
+    return body == null || test == null
+      ? undefined
+      : { ...statement, body, test };
+  }
   const test = resolveExpression(statement.test, scopes, state);
   const consequent = resolveStatement(
     statement.consequent,
@@ -2199,13 +2306,26 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "number") return numberText(expression.value);
   if (expression.kind === "boolean") return String(expression.value);
   if (expression.kind === "unary") {
-    return `(${expression.operator}${printHirExpression(expression.argument)})`;
+    const spacing = expression.operator.length > 1 ? " " : "";
+    return (
+      `(${expression.operator}${spacing}` +
+      `${printHirExpression(expression.argument)})`
+    );
   }
-  if (expression.kind === "binary") {
+  if (expression.kind === "binary" || expression.kind === "logical") {
     const left = printHirExpression(expression.left);
     const operator = String(expression.operator);
     const right = printHirExpression(expression.right);
     return `(${left} ${operator} ${right})`;
+  }
+  if (expression.kind === "conditional") {
+    const test = printHirExpression(expression.test);
+    const consequent = printHirExpression(expression.consequent);
+    const alternate = printHirExpression(expression.alternate);
+    return `(${test} ? ${consequent} : ${alternate})`;
+  }
+  if (expression.kind === "sequence") {
+    return `(${expression.expressions.map(printHirExpression).join(", ")})`;
   }
   if (expression.kind === "object") {
     return (
@@ -2340,6 +2460,10 @@ function appendHirStatement(
       `${indent}while ${printHirExpression(statement.test)}${location}`,
     );
     appendHirStatement(lines, statement.body, `${indent}  `);
+  } else if (statement.kind === "do-while") {
+    lines.push(`${indent}do${location}`);
+    appendHirStatement(lines, statement.body, `${indent}  `);
+    lines.push(`${indent}while ${printHirExpression(statement.test)}`);
   } else {
     lines.push(`${indent}if ${printHirExpression(statement.test)}${location}`);
     appendHirStatement(lines, statement.consequent, `${indent}  `);
@@ -2508,7 +2632,7 @@ export interface MirOperation {
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
-  readonly operator?: BinaryOperator | "!" | "-";
+  readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
   readonly target?: MirCallTarget;
 }
@@ -3073,6 +3197,15 @@ function lowerExpression(
   }
   if (expression.kind === "unary") {
     const argument = lowerExpression(expression.argument, builder);
+    if (expression.operator === "typeof") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "typeof string allocation",
+        [argument],
+        expression.range,
+      );
+    }
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -3083,7 +3216,7 @@ function lowerExpression(
       operator: expression.operator,
       range: expression.range,
     });
-    if (expression.operator === "-") {
+    if (expression.operator !== "!" && expression.operator !== "void") {
       appendMirMetadata(
         builder,
         "check-status",
@@ -3093,6 +3226,173 @@ function lowerExpression(
       );
     }
     return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "logical") {
+    const left = lowerExpression(expression.left, builder);
+    const rightBlock = createMirBlock(builder);
+    const shortBlock = createMirBlock(builder);
+    const joinBlock = createMirBlock(builder);
+    const result = builder.nextValue;
+    builder.nextValue += 1;
+    joinBlock.parameters = [result];
+    if (expression.operator === "??") {
+      const nullishTest = (constant: MirConstant): number => {
+        const constantId = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [],
+          constant,
+          detail: constant.kind,
+          id: constantId,
+          kind: "constant",
+          range: expression.range,
+        });
+        const testId = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [left, constantId],
+          detail: "===",
+          id: testId,
+          kind: "binary",
+          operator: "===",
+          range: expression.range,
+        });
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [testId],
+          expression.range,
+        );
+        return testId;
+      };
+      const undefinedBlock = createMirBlock(builder);
+      const isNull = nullishTest({ kind: "null" });
+      appendMirMetadata(
+        builder,
+        "branch",
+        `?? null -> bb${rightBlock.id}, other -> bb${undefinedBlock.id}`,
+        [isNull],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: isNull,
+        whenFalse: undefinedBlock.id,
+        whenTrue: rightBlock.id,
+      };
+      builder.current = undefinedBlock;
+      const isUndefined = nullishTest({ kind: "undefined" });
+      appendMirMetadata(
+        builder,
+        "branch",
+        `?? undefined -> bb${rightBlock.id}, other -> bb${shortBlock.id}`,
+        [isUndefined],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: isUndefined,
+        whenFalse: shortBlock.id,
+        whenTrue: rightBlock.id,
+      };
+    } else {
+      const takenBlock =
+        expression.operator === "&&" ? rightBlock.id : shortBlock.id;
+      const skippedBlock =
+        expression.operator === "&&" ? shortBlock.id : rightBlock.id;
+      appendMirMetadata(
+        builder,
+        "branch",
+        `${expression.operator} true -> bb${takenBlock}, ` +
+          `false -> bb${skippedBlock}`,
+        [left],
+        expression.range,
+      );
+      builder.current.terminator = {
+        kind: "branch",
+        test: left,
+        whenFalse: skippedBlock,
+        whenTrue: takenBlock,
+      };
+    }
+    builder.current = shortBlock;
+    shortBlock.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [left],
+    };
+    builder.current = rightBlock;
+    const right = lowerExpression(expression.right, builder);
+    builder.current.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [right],
+    };
+    builder.current = joinBlock;
+    appendMirMetadata(
+      builder,
+      "join",
+      `${expression.operator} bb${shortBlock.id} + bb${rightBlock.id}`,
+      [],
+      expression.range,
+    );
+    return recordRoot(builder, result, expression.range);
+  }
+  if (expression.kind === "sequence") {
+    let last: number | undefined;
+    for (const element of expression.expressions) {
+      last = lowerExpression(element, builder);
+    }
+    if (last == null) {
+      throw new Error("A sequence expression has no expressions.");
+    }
+    return last;
+  }
+  if (expression.kind === "conditional") {
+    const test = lowerExpression(expression.test, builder);
+    const consequentBlock = createMirBlock(builder);
+    const alternateBlock = createMirBlock(builder);
+    const joinBlock = createMirBlock(builder);
+    const result = builder.nextValue;
+    builder.nextValue += 1;
+    joinBlock.parameters = [result];
+    appendMirMetadata(
+      builder,
+      "branch",
+      `? true -> bb${consequentBlock.id}, false -> bb${alternateBlock.id}`,
+      [test],
+      expression.range,
+    );
+    builder.current.terminator = {
+      kind: "branch",
+      test,
+      whenFalse: alternateBlock.id,
+      whenTrue: consequentBlock.id,
+    };
+    builder.current = consequentBlock;
+    const consequent = lowerExpression(expression.consequent, builder);
+    builder.current.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [consequent],
+    };
+    builder.current = alternateBlock;
+    const alternate = lowerExpression(expression.alternate, builder);
+    builder.current.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [alternate],
+    };
+    builder.current = joinBlock;
+    appendMirMetadata(
+      builder,
+      "join",
+      `? bb${consequentBlock.id} + bb${alternateBlock.id}`,
+      [],
+      expression.range,
+    );
+    return recordRoot(builder, result, expression.range);
   }
   if (expression.kind === "binary") {
     const left = lowerExpression(expression.left, builder);
@@ -3818,6 +4118,40 @@ function lowerStatements(
         [],
         statement.range,
       );
+    } else if (statement.kind === "do-while") {
+      const bodyBlock = createMirBlock(builder);
+      const conditionBlock = createMirBlock(builder);
+      const exitBlock = createMirBlock(builder);
+      builder.current.terminator = { kind: "jump", target: bodyBlock.id };
+      builder.loops.push({
+        breakTarget: exitBlock.id,
+        continueTarget: conditionBlock.id,
+      });
+      builder.current = bodyBlock;
+      const terminated = lowerStatementBody(statement.body, builder);
+      builder.loops.pop();
+      if (!terminated) {
+        builder.current.terminator = {
+          kind: "jump",
+          target: conditionBlock.id,
+        };
+      }
+      builder.current = conditionBlock;
+      const test = lowerExpression(statement.test, builder);
+      builder.current.terminator = {
+        kind: "branch",
+        test,
+        whenFalse: exitBlock.id,
+        whenTrue: bodyBlock.id,
+      };
+      builder.current = exitBlock;
+      appendMirMetadata(
+        builder,
+        "join",
+        `do-while bb${conditionBlock.id}`,
+        [],
+        statement.range,
+      );
     } else {
       const test = lowerExpression(statement.test, builder);
       const consequentBlock = createMirBlock(builder);
@@ -4508,6 +4842,22 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
       hirExpressionHasAwait(expression.value)
     );
   }
+  if (expression.kind === "logical") {
+    return (
+      hirExpressionHasAwait(expression.left) ||
+      hirExpressionHasAwait(expression.right)
+    );
+  }
+  if (expression.kind === "conditional") {
+    return (
+      hirExpressionHasAwait(expression.test) ||
+      hirExpressionHasAwait(expression.consequent) ||
+      hirExpressionHasAwait(expression.alternate)
+    );
+  }
+  if (expression.kind === "sequence") {
+    return expression.expressions.some(hirExpressionHasAwait);
+  }
   return (
     expression.kind === "unary" && hirExpressionHasAwait(expression.argument)
   );
@@ -4549,7 +4899,7 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
     );
   }
   return (
-    statement.kind === "while" &&
+    (statement.kind === "while" || statement.kind === "do-while") &&
     (hirExpressionHasAwait(statement.test) ||
       hirStatementHasAwait(statement.body))
   );
@@ -4585,7 +4935,7 @@ function collectHirBindings(
         collect(statement.handler.body);
       }
       if (statement.finalizer != null) collect(statement.finalizer);
-    } else if (statement.kind === "while") {
+    } else if (statement.kind === "while" || statement.kind === "do-while") {
       collect(statement.body);
     }
   };

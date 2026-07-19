@@ -523,6 +523,347 @@ test("marks generic addition as an allocation safepoint", () => {
   assert.match(printMir(buildMir(hir)), /safepoint string addition/u);
 });
 
+test("lowers typeof and remainder through checked runtime calls", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 7 },
+        kind: "const",
+        name: "value",
+        range,
+      },
+      {
+        expression: {
+          argument: { kind: "identifier", name: "value", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: {
+          kind: "binary",
+          left: { kind: "identifier", name: "value", range },
+          operator: "%",
+          range,
+          right: { kind: "number", range, value: 2 },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "typeof-remainder.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const typeofIndex = operations.findIndex(
+    (operation) =>
+      operation.kind === "unary" && operation.operator === "typeof",
+  );
+  assert.ok(typeofIndex >= 0);
+  assert.equal(operations[typeofIndex - 1]?.kind, "safepoint");
+  assert.match(operations[typeofIndex - 1]?.detail ?? "", /typeof string/u);
+  assert.equal(operations[typeofIndex + 1]?.kind, "check-status");
+  const remainderIndex = operations.findIndex(
+    (operation) => operation.kind === "binary" && operation.operator === "%",
+  );
+  assert.ok(remainderIndex >= 0);
+  assert.equal(operations[remainderIndex + 1]?.kind, "check-status");
+});
+
+test("checks the status of coercing unary operators", () => {
+  for (const operator of ["+", "~"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "string", range, value: "2" },
+            kind: "unary",
+            operator,
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `unary-${operator}.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "unary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("lowers void to an operand evaluation without a status check", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "number", range, value: 1 },
+          kind: "unary",
+          operator: "void",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "void-operand.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const voidIndex = operations.findIndex(
+    (operation) => operation.kind === "unary" && operation.operator === "void",
+  );
+  assert.ok(voidIndex >= 0);
+  assert.notEqual(operations[voidIndex + 1]?.kind, "check-status");
+});
+
+test("lowers short-circuit logic through a parameterized join", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          kind: "logical",
+          left: { kind: "boolean", range, value: false },
+          operator: "&&",
+          range,
+          right: { kind: "number", range, value: 2 },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "logical-join.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const join = script.blocks.find(
+    (block) => (block.parameters?.length ?? 0) === 1,
+  );
+  assert.ok(join != null);
+  const jumps = script.blocks.filter(
+    (block) =>
+      block.terminator.kind === "jump" &&
+      block.terminator.target === join.id &&
+      block.terminator.values?.length === 1,
+  );
+  assert.equal(jumps.length, 2);
+  const entry = script.blocks[0];
+  assert.ok(entry != null);
+  assert.equal(entry.terminator.kind, "branch");
+  assert.ok(
+    !entry.operations.some(
+      (operation) =>
+        operation.kind === "constant" && operation.constant?.kind === "number",
+    ),
+    "the right operand must not evaluate before the guard",
+  );
+});
+
+test("lowers nullish coalescing through null and undefined checks", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          kind: "logical",
+          left: { kind: "null", range },
+          operator: "??",
+          range,
+          right: { kind: "number", range, value: 2 },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "nullish-join.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const join = script.blocks.find(
+    (block) => (block.parameters?.length ?? 0) === 1,
+  );
+  assert.ok(join != null);
+  const equalityChecks = script.blocks
+    .flatMap((block) => block.operations)
+    .filter(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    );
+  assert.equal(equalityChecks.length, 2);
+  const jumps = script.blocks.filter(
+    (block) =>
+      block.terminator.kind === "jump" &&
+      block.terminator.target === join.id &&
+      block.terminator.values?.length === 1,
+  );
+  assert.equal(jumps.length, 2);
+});
+
+test("lowers comma sequences to their final operand", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          expressions: [
+            { kind: "number", range, value: 1 },
+            { kind: "string", range, value: "last" },
+          ],
+          kind: "sequence",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "sequence.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const constants = operations.filter(
+    (operation) => operation.kind === "constant",
+  );
+  assert.equal(constants[0]?.constant?.kind, "number");
+  assert.equal(constants[1]?.constant?.kind, "string");
+});
+
+test("lowers conditional expressions into branch arms and a join", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          alternate: { kind: "string", range, value: "alternate" },
+          consequent: { kind: "string", range, value: "consequent" },
+          kind: "conditional",
+          range,
+          test: { kind: "boolean", range, value: true },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "conditional-join.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const join = script.blocks.find(
+    (block) => (block.parameters?.length ?? 0) === 1,
+  );
+  assert.ok(join != null);
+  const armJumps = script.blocks.filter(
+    (block) =>
+      block.terminator.kind === "jump" &&
+      block.terminator.target === join.id &&
+      block.terminator.values?.length === 1,
+  );
+  assert.equal(armJumps.length, 2);
+  assert.match(printMir(buildMir(hir)), /join \? bb/u);
+});
+
+test("keeps do-while bodies ahead of their condition", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        body: {
+          body: [
+            {
+              expression: { kind: "number", range, value: 1 },
+              kind: "expression",
+              range,
+            },
+          ],
+          kind: "block",
+          range,
+        },
+        kind: "do-while",
+        range,
+        test: { kind: "boolean", range, value: false },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "do-while.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const entry = script.blocks[0];
+  assert.ok(entry != null);
+  assert.equal(entry.terminator.kind, "jump");
+  const bodyId =
+    entry.terminator.kind === "jump" ? entry.terminator.target : -1;
+  const backEdge = script.blocks.find(
+    (block) =>
+      block.terminator.kind === "branch" &&
+      block.terminator.whenTrue === bodyId,
+  );
+  assert.ok(backEdge != null, "the condition must branch back to the body");
+  assert.match(printMir(buildMir(hir)), /join do-while bb/u);
+});
+
+test("rejects typeof with an unresolved name during resolution", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "missing", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "typeof-unresolved.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /typeof with an unresolved name/u,
+  );
+});
+
 test("copies parameters into a MIR-owned representation", () => {
   const syntax: SyntaxProgram = {
     body: [

@@ -61,6 +61,72 @@ first reviewed test262 cases land.
 every other form rejected by a source-located diagnostic.
 
 
+Admitted M5 syntax
+------------------
+
+M5 admits these forms beyond the frozen M3 and M4 profiles. Each entry names
+its deliberate boundary and its evidence:
+
+ -  The `typeof` and `void` unary operators and the `%` remainder operator.
+    `typeof` distinguishes `undefined`, `null`, booleans, numbers, strings,
+    callable objects, and other objects; reading a binding before
+    initialization throws the same catchable completion as any other read,
+    and the allocating result string is a declared MIR safepoint. `void`
+    evaluates its operand and produces `undefined`. `%` applies primitive
+    numeric coercion and IEEE 754 remainder semantics, including negative
+    zero, infinite, and `NaN` operands; object operands keep the same
+    unsupported object-to-primitive coercion boundary as the existing
+    arithmetic operators until generic `ToPrimitive` lands. Native
+    differential fixtures, MIR structural tests, and reviewed test262
+    cases cover the three operators.
+ -  `typeof` applied to a name that does not resolve to a binding is
+    rejected with a source-located diagnostic instead of evaluating to
+    `"undefined"`. The closed ahead-of-time profile rejects every other
+    unresolved reference, and this deviation is explicit rather than a
+    silent approximation. The affected test262 case remains classified
+    unsupported until an owned decision admits unresolved references.
+ -  The `&&` and `||` logical operators and the conditional `?:` operator,
+    lowered through explicit MIR branches and a parameterized join block.
+    The untaken operand never evaluates, the produced value is the operand
+    value rather than a coerced boolean, and evaluation order and abrupt
+    completion follow the lowered control flow. `??` and the logical
+    assignment operators remain rejected. `await` inside a logical or
+    conditional operand is rejected with a source-located diagnostic in
+    both async function bodies and module top level, because a
+    conditionally evaluated suspension has no owned continuation contract
+    yet.
+ -  The `do-while` statement, lowered body-first with the same loop, join,
+    `break`, and `continue` structure as `while`. `continue` re-enters the
+    loop through the condition, and a body that always completes abruptly
+    leaves the condition unreachable rather than approximated.
+ -  The `==` and `!=` loose equality operators, implementing
+    `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
+    nullish operand compared with anything else is unequal without
+    coercion, booleans and numeric strings coerce through the shared
+    numeric conversion, and objects compare by identity. Comparing an
+    object with a number or string, including a boolean after its
+    numeric conversion, keeps the shared unsupported
+    object-to-primitive boundary until generic `ToPrimitive` lands.
+ -  The `??` nullish coalescing operator and the comma sequence operator.
+    `??` lowers through explicit strict null and undefined checks into
+    the same parameterized join structure as the other short-circuit
+    operators, so the right operand evaluates only for a nullish left
+    value. Sequences evaluate left to right and produce their final
+    operand. Logical assignment operators, including `??=`, remain
+    rejected, and `await` inside these operands keeps the shared
+    rejection. The `coalesce-expression` test262 feature is a supported
+    feature of the reviewed subset.
+ -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
+    `>>>` bitwise and shift operators, and the `+` and `~` unary
+    operators. All apply the shared primitive numeric coercion; the
+    32-bit operations wrap through explicit modular unsigned arithmetic,
+    shifts mask their count to five bits, and exponentiation follows
+    `Number::exponentiate` where C `pow` differs, covering `NaN`
+    exponents and unit bases with infinite exponents. Object operands
+    keep the shared unsupported coercion boundary. The `exponentiation`
+    test262 feature is now a supported feature of the reviewed subset.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -86,8 +152,11 @@ must never shrink by reclassification alone.
  -  `await` is restricted to the M4 positions; asynchronous generators,
     `for await`, and asynchronous module cycles are unsupported. Owner: the
     functions and executable syntax stream.
- -  `eval`, the `Function` constructor, and dynamic import await the
-    ahead-of-time decisions required by [*PLAN-M5.md*](../PLAN-M5.md).
+ -  `eval`, the `Function` constructor, and dynamic import stay explicitly
+    unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
+    Reviewed cases that need them carry the `dynamic-source` dependency
+    tag, and no release uses an unqualified conformance label while this
+    boundary stands.
  -  Realm creation beyond the initial realm, agent clusters, and shared
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.

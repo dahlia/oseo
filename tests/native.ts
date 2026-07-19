@@ -663,6 +663,141 @@ console.log(
 `,
   },
   {
+    name: "loose-equality",
+    source: `
+console.log(1 == "1", "" == 0, "0" == false, true == 1, false == "");
+console.log(null == undefined, undefined == null, null == null);
+console.log(null == 0, undefined == 0, null == false, undefined == "");
+console.log(NaN == NaN, NaN == "NaN", -0 == 0, -0 == "0");
+console.log("1e2" == 100, "0x10" == 16, "  2  " == 2, "2a" == 2);
+console.log(1 != "1", null != undefined, NaN != NaN, "a" != "b");
+const box = { value: 1 };
+const same = box;
+const other = { value: 1 };
+console.log(box == same, box == other, box != other);
+console.log(box == null, null == box, box == undefined, undefined != box);
+console.log(true == "1", false == "0", true == "true", false == "1");
+console.log(Infinity == "Infinity", -Infinity == "-Infinity");
+`,
+  },
+  {
+    name: "sequence-and-nullish",
+    source: `
+function logging(label, value) { console.log(label); return value; }
+console.log((1, 2), (1, 2, "third"));
+console.log((logging("first", 1), logging("second", 2)));
+console.log(null ?? "null-fallback", undefined ?? "undefined-fallback");
+console.log(0 ?? "kept-zero", "" ?? "kept-empty", false ?? "kept-false");
+console.log(NaN ?? "kept-nan", null ?? undefined, undefined ?? null);
+console.log(false ?? logging("skipped", 1));
+console.log(null ?? logging("taken", "value"));
+console.log((null ?? 0) || "or-after", (1 ?? 2) && "and-after");
+let effects = 0;
+const touch = function () { effects = effects + 1; return null; };
+console.log(touch() ?? "was-null", effects);
+`,
+  },
+  {
+    name: "numeric-bitwise-exponent",
+    source: `
+console.log(2 ** 10, 2 ** 0.5, (-2) ** 2, 2 ** -2, 9 ** 0.5);
+console.log(1 ** Infinity, (-1) ** Infinity, NaN ** 0, 0 ** 0, 2 ** NaN);
+console.log((-0) ** -1, 0 ** -1, (-0) ** 3, 2 ** 3 ** 2, 2 ** -1074);
+console.log(5 & 3, 5 | 3, 5 ^ 3, ~5, ~-1, ~~3.7);
+console.log(-1 & 255, -5 | 0, 4294967295 & 1, 2147483647 & -1);
+console.log(1 << 31, 1 << 32, 2 << 33, -8 >> 2, 7 >> 1, -1 >> 31);
+console.log(-1 >>> 0, -8 >>> 2, 1 >>> 32, 4294967296 >>> 0, NaN >>> 0);
+console.log("8" >> 1, "16" ** "0.5", true | false, null ^ 5, undefined & 1);
+console.log(1.9 << 1, -1.9 << 1, Infinity >> 1, -Infinity >>> 0, NaN << 3);
+console.log(2147483647 << 1, -2147483648 >> 31, 1073741824 << 1);
+console.log(+true, +"42", +"", +null, +undefined, +"nan");
+console.log(+"0x10", ~"2", -0 >>> 0, (-0) ** 2, +"1e3");
+`,
+  },
+  {
+    name: "short-circuit-and-conditional",
+    source: `
+function logging(label, value) { console.log(label); return value; }
+console.log(true && "right", 0 || "fallback", "left" || "unused");
+console.log(false && logging("skipped-and", 1));
+console.log("" || logging("or-right", "reached"));
+console.log(logging("first", null) && logging("skipped-chain", 2));
+console.log(logging("second", 1) && logging("third", "kept"));
+console.log(null || undefined, "" && 0, NaN || "nan-fallback");
+console.log(1 && 0 || "chain", 0 && 1 || "short");
+console.log(1 ? logging("taken", "yes") : logging("skipped-else", "no"));
+console.log("" ? logging("skipped-then", 1) : logging("else", "no"));
+console.log(1 ? 2 ? "both" : "first-only" : "neither");
+console.log((0 ? "a" : "b") + (1 && "c") + (undefined || "d"));
+let effects = 0;
+const touch = function () { effects = effects + 1; return effects; };
+console.log(touch() && touch(), effects);
+console.log(false && touch(), effects);
+`,
+  },
+  {
+    name: "do-while-loops",
+    source: `
+let count = 0;
+do { count = count + 1; } while (count < 3);
+console.log(count);
+let once = 0;
+do { once = once + 1; } while (false);
+console.log(once);
+let controlled = 0;
+do {
+  controlled = controlled + 1;
+  if (controlled === 2) continue;
+  if (controlled >= 4) break;
+  console.log("body", controlled);
+} while (true);
+console.log("after", controlled);
+function returning(limit) {
+  let steps = 0;
+  do {
+    steps = steps + 1;
+    if (steps >= limit) return steps;
+  } while (true);
+}
+console.log(returning(5));
+function alwaysReturns() {
+  do { return "immediate"; } while (true);
+}
+console.log(alwaysReturns());
+let text = "";
+do text = text + "x"; while (text !== "xxx");
+console.log(text);
+`,
+  },
+  {
+    name: "typeof-void-remainder",
+    source: `
+const numberBinding = 1;
+let uninitializedBinding;
+const objectBinding = { key: 1 };
+const arrayBinding = [1, 2];
+const promiseBinding = Promise.resolve(1);
+function chosen() { return 2; }
+console.log(typeof undefined, typeof null, typeof true, typeof 1.5);
+console.log(typeof numberBinding, typeof "text", typeof chosen);
+console.log(typeof objectBinding, typeof arrayBinding, typeof promiseBinding);
+console.log(typeof uninitializedBinding, typeof NaN, typeof (1 === 1));
+function readBeforeInitialization() {
+  try {
+    return typeof shadowed;
+  } catch (caught) {
+    return "temporal dead zone";
+  }
+  let shadowed;
+}
+console.log(readBeforeInitialization());
+console.log(void 0, void "operand", void chosen());
+console.log(7 % 3, -7 % 3, 7 % -3, 7.25 % 0.5, -5 % 5);
+console.log(0 % 5, 5 % 0, 5 % Infinity, Infinity % 5, NaN % 1);
+console.log("10" % "3", true % 2, null % 2, undefined % 2);
+`,
+  },
+  {
     name: "generic-addition",
     source: `
 function show(left, right) { console.log(left + right); }

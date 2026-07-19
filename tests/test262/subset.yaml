@@ -1,8 +1,10 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - async-functions
+  - coalesce-expression
   - computed-property-names
   - const
+  - exponentiation
   - let
   - top-level-await
 tests:
@@ -267,6 +269,57 @@ tests:
   - path: test/language/expressions/await/no-operand.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/coalesce/cannot-chain-tail-with-logical-or.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/coalesce/follows-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/comma/S11.14_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/conditional/in-branch-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/conditional/in-condition.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/does-not-equals/S11.9.2_A3.1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.2.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/equals/S11.9.1_A3.3.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-negate-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/exp-operator-syntax-error-typeof-unary-expression-base.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/int32_min-exponent.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
   - path: test/language/expressions/function/dflt-params-duplicates.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
@@ -297,9 +350,42 @@ tests:
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/logical-or/S11.11.2_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/typeof/boolean.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/syntax.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/typeof/undefined.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/typeof/unresolvable-reference.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/void/S11.4.2_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -1083,6 +1169,21 @@ tests:
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/do-while/S12.6.1_A15.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/do-while/S12.6.1_A6_T1.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/do-while/cptn-normal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source]
+  - path: test/language/statements/do-while/decl-const.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/do-while/decl-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/function/S13.2.1_A1_T1.js
     expectedClassification: pass
     dependencies: [functions]

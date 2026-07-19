@@ -348,6 +348,8 @@ ordered by dependency rather than by the order of names in the standard.
 Individual API groups may begin as soon as their engine prerequisites are
 stable, even while M5 continues. Completing M6 and making a conformance claim
 still depend on completing the relevant ECMAScript work.
+[*PLAN-M6.md*](./PLAN-M6.md) records the group prerequisites, standards
+boundary, and exit criteria in detail.
 
 ### Planned order
 
@@ -415,6 +417,18 @@ M8: Self-hosting
 M8 removes Node.js and Deno from the trusted execution path of the native Oseo
 compiler while retaining both as supported development hosts.
 
+Self-hosting also names the long-term implementation strategy for standard
+built-ins. Mainstream engines implement much of their built-in surface in
+the engine's own language rather than in the native runtime. Once the M5
+language profile is rich enough, each new built-in family should weigh a
+self-hosted implementation, written in the compiled TypeScript subset and
+compiled by Oseo itself, against a C runtime implementation, keeping only
+primitive operations native. This keeps the C runtime from growing with
+every intrinsic and turns most built-in work into ordinary
+compiled-profile code covered by the same standards and differential
+gates. The per-family choice and its evidence are recorded when the
+family lands.
+
 ### Preparation carried by earlier milestones
 
  -  compiler-core source stays within a tracked TypeScript profile;
@@ -474,14 +488,17 @@ The compiler and runtime capability sequence is complete through M4. M5
 follows [*PLAN-M5.md*](./PLAN-M5.md). The first three steps are complete:
 the candidate edition boundary and manifest schema are frozen, the test262
 harness observes module and asynchronous execution, and the
-dependency-indexed baseline is published. The remaining queue is:
+dependency-indexed baseline is published.
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
+source challenge features through explicit unsupported classifications, and
+the core expression stream has begun with the `typeof`, `void`, and `%`
+operators, short-circuit and conditional expressions, and the `do-while`
+statement. The remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.
 2.  Add built-in families and broader executable syntax in dependency order.
-3.  Resolve ahead-of-time challenge features through decisions or explicit
-    unsupported classifications.
-4.  Close the named edition with reproducible standards and generated
+3.  Close the named edition with reproducible standards and generated
     evidence.
 
 M5 preserves every earlier generic-fallback, forced-collection, sanitizer,

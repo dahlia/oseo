@@ -30,6 +30,24 @@ The `m4-3` ABI adds a top-level await scheduler checkpoint. It normalizes an
 awaited value through the promise job queue and advances timer turns only until
 that value settles. A pending value with no owned work reports `OSEO3001`
 instead of leaving the native executable blocked.
+The `m5-1` ABI adds the `oseo_typeof` and `oseo_remainder` helpers.
+`oseo_typeof` allocates its result string and can trigger collection, so
+lowering declares it a safepoint; `oseo_remainder` applies the shared
+primitive numeric coercion and IEEE 754 remainder semantics.
+The `m5-2` ABI adds `oseo_to_number`, `oseo_bitwise_not`,
+`oseo_exponentiate`, and the six bitwise and shift helpers. All apply the
+shared primitive numeric coercion. The 32-bit operations wrap through
+explicit modular unsigned arithmetic instead of implementation-defined
+casts, shifts mask their count to five bits, and exponentiation follows
+`Number::exponentiate`, including the `NaN` exponent and unit-base
+infinite-exponent cases where C `pow` differs.
+The `m5-3` ABI adds `oseo_loose_equal` and `oseo_not_loose_equal`,
+implementing `IsLooselyEqual` for the admitted values: nullish pairs are
+equal, a nullish operand compared with anything else is unequal without
+coercion, booleans and numeric strings coerce through the shared numeric
+conversion, objects compare by identity, and comparing an object with a
+number or string keeps the shared unsupported object-to-primitive
+boundary.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors carry distinct opaque ordinary

@@ -2657,6 +2657,27 @@ OseoResult oseo_negate(OseoContext *context, OseoValue value) {
     return normal(oseo_number(-number_value(number.value)));
 }
 
+OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
+    const char *constant = NULL;
+    uint64_t tag = tag_of(value);
+    if (tag == OSEO_TAG_UNDEFINED) constant = "undefined";
+    else if (tag == OSEO_TAG_NULL) constant = "object";
+    else if (tag == OSEO_TAG_BOOLEAN) constant = "boolean";
+    else if (is_number(value)) constant = "number";
+    else if (is_string(value)) constant = "string";
+    else if (is_function(value)) constant = "function";
+    else if (is_object(value)) constant = "object";
+    if (constant == NULL) {
+        return failure(context, "OSEO2001", "Value has no typeof text.");
+    }
+    size_t length = strlen(constant);
+    uint16_t units[16];
+    for (size_t index = 0u; index < length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)constant[index];
+    }
+    return allocate_string(context, units, length);
+}
+
 static OseoResult numeric_binary(
     OseoContext *context,
     OseoValue left,
@@ -2673,6 +2694,7 @@ static OseoResult numeric_binary(
     if (operator == '+') value = left_value + right_value;
     else if (operator == '-') value = left_value - right_value;
     else if (operator == '*') value = left_value * right_value;
+    else if (operator == '%') value = fmod(left_value, right_value);
     else value = left_value / right_value;
     return normal(oseo_number(value));
 }
@@ -2768,6 +2790,143 @@ OseoResult oseo_divide(
     return numeric_binary(context, left, right, '/');
 }
 
+OseoResult oseo_remainder(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return numeric_binary(context, left, right, '%');
+}
+
+OseoResult oseo_to_number(OseoContext *context, OseoValue value) {
+    return to_number(context, value);
+}
+
+OseoResult oseo_exponentiate(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    OseoResult base = to_number(context, left);
+    if (base.status != OSEO_STATUS_NORMAL) return base;
+    OseoResult exponent = to_number(context, right);
+    if (exponent.status != OSEO_STATUS_NORMAL) return exponent;
+    double base_value = number_value(base.value);
+    double exponent_value = number_value(exponent.value);
+    double value;
+    if (isnan(exponent_value)) {
+        value = NAN;
+    } else if (fabs(base_value) == 1.0 && isinf(exponent_value)) {
+        value = NAN;
+    } else {
+        value = pow(base_value, exponent_value);
+    }
+    return normal(oseo_number(value));
+}
+
+/* The modular 32-bit patterns shared by ToInt32 and ToUint32. */
+static uint32_t uint32_bits(double number) {
+    if (!isfinite(number) || number == 0.0) return 0u;
+    double wrapped = fmod(trunc(number), 4294967296.0);
+    if (wrapped < 0.0) wrapped += 4294967296.0;
+    return (uint32_t)wrapped;
+}
+
+static double int32_number(uint32_t bits) {
+    return bits >= 2147483648u
+        ? (double)((int64_t)bits - INT64_C(4294967296))
+        : (double)bits;
+}
+
+static OseoResult int32_binary(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    char operator
+) {
+    OseoResult left_number = to_number(context, left);
+    if (left_number.status != OSEO_STATUS_NORMAL) return left_number;
+    OseoResult right_number = to_number(context, right);
+    if (right_number.status != OSEO_STATUS_NORMAL) return right_number;
+    uint32_t left_bits = uint32_bits(number_value(left_number.value));
+    uint32_t right_bits = uint32_bits(number_value(right_number.value));
+    if (operator == '&') {
+        return normal(oseo_number(int32_number(left_bits & right_bits)));
+    }
+    if (operator == '|') {
+        return normal(oseo_number(int32_number(left_bits | right_bits)));
+    }
+    if (operator == '^') {
+        return normal(oseo_number(int32_number(left_bits ^ right_bits)));
+    }
+    uint32_t shift = right_bits & 31u;
+    if (operator == '<') {
+        return normal(oseo_number(int32_number(left_bits << shift)));
+    }
+    if (operator == '>') {
+        uint32_t shifted = (left_bits & 2147483648u) != 0u
+            ? ~(~left_bits >> shift)
+            : left_bits >> shift;
+        return normal(oseo_number(int32_number(shifted)));
+    }
+    return normal(oseo_number((double)(left_bits >> shift)));
+}
+
+OseoResult oseo_bitwise_and(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '&');
+}
+
+OseoResult oseo_bitwise_or(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '|');
+}
+
+OseoResult oseo_bitwise_xor(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '^');
+}
+
+OseoResult oseo_shift_left(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '<');
+}
+
+OseoResult oseo_shift_right(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, '>');
+}
+
+OseoResult oseo_shift_right_unsigned(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    return int32_binary(context, left, right, 'u');
+}
+
+OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value) {
+    OseoResult number = to_number(context, value);
+    if (number.status != OSEO_STATUS_NORMAL) return number;
+    uint32_t bits = ~uint32_bits(number_value(number.value));
+    return normal(oseo_number(int32_number(bits)));
+}
+
 static bool strict_equal_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -2802,6 +2961,85 @@ OseoResult oseo_strict_equal(
 ) {
     (void)context;
     return normal(oseo_boolean(strict_equal_value(left, right)));
+}
+
+/* IsLooselyEqual for the admitted values; objects compare by identity and
+ * object-to-primitive coercion keeps the shared unsupported boundary. */
+static OseoResult loose_equal_value(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    bool *equal
+) {
+    if (is_number(left) && is_number(right)) {
+        *equal = strict_equal_value(left, right);
+        return normal(oseo_undefined());
+    }
+    uint64_t left_tag = tag_of(left);
+    uint64_t right_tag = tag_of(right);
+    bool left_nullish =
+        left_tag == OSEO_TAG_UNDEFINED || left_tag == OSEO_TAG_NULL;
+    bool right_nullish =
+        right_tag == OSEO_TAG_UNDEFINED || right_tag == OSEO_TAG_NULL;
+    if (left_nullish || right_nullish) {
+        *equal = left_nullish && right_nullish;
+        return normal(oseo_undefined());
+    }
+    if (left_tag == OSEO_TAG_BOOLEAN) {
+        OseoResult number = to_number(context, left);
+        if (number.status != OSEO_STATUS_NORMAL) return number;
+        return loose_equal_value(context, number.value, right, equal);
+    }
+    if (right_tag == OSEO_TAG_BOOLEAN) {
+        OseoResult number = to_number(context, right);
+        if (number.status != OSEO_STATUS_NORMAL) return number;
+        return loose_equal_value(context, left, number.value, equal);
+    }
+    if (is_string(left) && is_string(right)) {
+        *equal = strict_equal_value(left, right);
+        return normal(oseo_undefined());
+    }
+    if (is_number(left) && is_string(right)) {
+        OseoResult converted = string_number(context, string_object(right));
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, left, converted.value, equal);
+    }
+    if (is_string(left) && is_number(right)) {
+        OseoResult converted = string_number(context, string_object(left));
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, converted.value, right, equal);
+    }
+    if (is_object(left) && is_object(right)) {
+        *equal = left == right;
+        return normal(oseo_undefined());
+    }
+    return failure(
+        context,
+        "OSEO2001",
+        "Object-to-primitive conversion is unsupported."
+    );
+}
+
+OseoResult oseo_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    bool equal = false;
+    OseoResult status = loose_equal_value(context, left, right, &equal);
+    if (status.status != OSEO_STATUS_NORMAL) return status;
+    return normal(oseo_boolean(equal));
+}
+
+OseoResult oseo_not_loose_equal(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right
+) {
+    bool equal = false;
+    OseoResult status = loose_equal_value(context, left, right, &equal);
+    if (status.status != OSEO_STATUS_NORMAL) return status;
+    return normal(oseo_boolean(!equal));
 }
 
 OseoResult oseo_not_strict_equal(

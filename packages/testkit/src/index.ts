@@ -75,6 +75,9 @@ export type Test262FailurePhase = "parse" | "resolution" | "runtime";
 export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "abrupt-completion",
   "async-functions",
+  "control-flow",
+  "dynamic-source",
+  "expression-operators",
   "functions",
   "lexical-bindings",
   "module-linking",
