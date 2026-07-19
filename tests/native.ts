@@ -663,6 +663,37 @@ console.log(
 `,
   },
   {
+    name: "sync-arrows",
+    source: `
+const double = (value) => value * 2;
+const add = (left, right) => { return left + right; };
+console.log(double(21), add(1, 2));
+console.log(double.name, double.length, add.length);
+const outer = {
+  value: "captured",
+  read: function () { return (() => this.value)(); },
+};
+console.log(outer.read());
+const chain = (a) => (b) => a + b;
+console.log(chain("first-")("second"));
+try {
+  new double(1);
+} catch (caught) {
+  console.log("not constructible");
+}
+const noParen = value => value + "!";
+console.log(noParen("bang"));
+console.log(typeof double, (() => 7)());
+let counter = 0;
+const touch = () => { counter = counter + 1; return counter; };
+touch();
+touch();
+console.log(counter);
+const picky = (first) => typeof first;
+console.log(picky(double), picky(undefined));
+`,
+  },
+  {
     name: "var-declarations",
     source: `
 console.log(typeof hoisted, hoisted);

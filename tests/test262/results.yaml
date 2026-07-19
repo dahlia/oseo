@@ -424,8 +424,8 @@ results:
     observation:
       detail: 'test/built-ins/Promise/promise.js non-strict disabled failed
         (1): stdout="" stderr="test/built-ins/Promise/promise.js:108:16:
-        error[OSEO1001]: The M3 profile admits this only in function
-        bodies.\n"'
+        error[OSEO1001]: The profile admits this only where an enclosing
+        non-arrow function provides it.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -1093,6 +1093,79 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/params-duplicate.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/prototype-rules.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/arrow-function/prototype-rules.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/arrow-function/prototype-rules.js:61:18:
+        error[OSEO1001]: This binary operator is unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -3914,7 +3987,8 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/eval-this.js:94:18: error[OSEO1001]:
-        The M3 profile admits this only in function bodies."
+        The profile admits this only where an enclosing non-arrow
+        function provides it."
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -10232,11 +10306,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 198
+  expectedNegatives: 199
   harnessFailures: 0
-  passes: 59
+  passes: 60
   semanticFailures: 0
-  unsupportedProfileFeatures: 157
+  unsupportedProfileFeatures: 158
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -10269,11 +10343,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - dependency: functions
-      expectedNegatives: 8
+      expectedNegatives: 9
       harnessFailures: 0
-      passes: 18
+      passes: 19
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
     - dependency: lexical-bindings
       expectedNegatives: 2
       harnessFailures: 0
@@ -10291,7 +10365,7 @@ summary:
       harnessFailures: 0
       passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: promise-settlement
       expectedNegatives: 0
       harnessFailures: 0
@@ -10324,11 +10398,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/expressions
-      expectedNegatives: 38
+      expectedNegatives: 39
       harnessFailures: 0
-      passes: 18
+      passes: 19
       semanticFailures: 0
-      unsupportedProfileFeatures: 26
+      unsupportedProfileFeatures: 27
     - group: language/module-code
       expectedNegatives: 129
       harnessFailures: 0

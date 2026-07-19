@@ -99,6 +99,13 @@ its deliberate boundary and its evidence:
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
     leaves the condition unreachable rather than approximated.
+ -  Synchronous arrow functions with block and expression bodies,
+    reusing the arrow function kind, lexical receiver, and
+    non-constructibility the runtime already owns for asynchronous
+    arrows. `this` stays admitted only where an enclosing non-arrow
+    function provides it, so a top-level arrow reading `this` is
+    rejected with a source-located diagnostic instead of approximating
+    the script receiver.
  -  `var` declarations with function-scope hoisting, multiple
     declarators, redeclaration, parameter and declared-function name
     sharing, and awaited initializers in async functions and module top
@@ -150,10 +157,10 @@ Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
  -  Destructuring, spread, default parameters, template literals,
-    synchronous arrow functions, classes, generators, symbols, big
-    integers, regular expressions, and the remaining expression grammar
-    are outside the admitted syntax. Owner: the core expressions and
-    bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
+    classes, generators, symbols, big integers, regular expressions, and
+    the remaining expression grammar are outside the admitted syntax.
+    Owner: the core expressions and bindings stream in
+    [*PLAN-M5.md*](../PLAN-M5.md).
  -  Named error intrinsics such as `TypeError` do not exist. Runtime
     semantic errors are catchable opaque values without ECMAScript error
     identity, and only resource limits and host failures surface as owned

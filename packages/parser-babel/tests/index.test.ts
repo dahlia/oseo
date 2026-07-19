@@ -84,13 +84,29 @@ test("rejects top-level this until script receivers exist", () => {
     sourceId: "script-this.ts",
   });
   assert.equal(script.diagnostics[0]?.code, "OSEO1001");
-  assert.match(script.diagnostics[0]?.message ?? "", /function bodies/u);
+  assert.match(script.diagnostics[0]?.message ?? "", /non-arrow function/u);
+
+  const topLevelArrow = compileSource(babelFrontend, {
+    source: "const read = () => this;",
+    sourceId: "arrow-this.ts",
+  });
+  assert.equal(topLevelArrow.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    topLevelArrow.diagnostics[0]?.message ?? "",
+    /non-arrow function/u,
+  );
 
   const functionBody = compileSource(babelFrontend, {
     source: "function receiver() { return this; }",
     sourceId: "function-this.ts",
   });
   assert.deepEqual(functionBody.diagnostics, []);
+
+  const nestedArrow = compileSource(babelFrontend, {
+    source: "function receiver() { return (() => this)(); }",
+    sourceId: "nested-arrow-this.ts",
+  });
+  assert.deepEqual(nestedArrow.diagnostics, []);
 });
 
 test("ignores tag-shaped text outside JSDoc comments", () => {
@@ -324,10 +340,10 @@ test("rejects only noncomputed __proto__ literals", () => {
   assert.deepEqual(accepted.diagnostics, []);
 });
 
-test("rejects the smallest syntax form outside the M3 profile", () => {
+test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = () => 1;",
-    sourceId: "arrow.ts",
+    source: "const value = class {};",
+    sourceId: "class.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
@@ -336,6 +352,19 @@ test("rejects the smallest syntax form outside the M3 profile", () => {
     column: 15,
     line: 1,
   });
+});
+
+test("converts synchronous arrow functions to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const double = (value) => value * 2;\n" +
+      "const add = (left, right) => { return left + right; };\n" +
+      "const chain = (a) => (b) => a + b;\n" +
+      "console.log(double(21), add(1, 2), chain(1)(2));\n",
+    sourceId: "sync-arrows.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
 });
 
 test("converts typeof, void, and remainder to owned syntax", () => {

@@ -510,11 +510,12 @@ function expression(
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
   if (value.type === "ThisExpression") {
-    return context.functionStack.length === 0
+    return context.functionStack.at(-1) !== true
       ? unsupported(
           context,
           value,
-          "The M3 profile admits this only in function bodies.",
+          "The profile admits this only where an enclosing non-arrow " +
+            "function provides it.",
         )
       : { ...located, kind: "this" };
   }
@@ -606,7 +607,7 @@ function expression(
   }
   if (
     value.type === "FunctionExpression" ||
-    (value.type === "ArrowFunctionExpression" && value.async === true)
+    value.type === "ArrowFunctionExpression"
   ) {
     const functionValue = functionDeclaration(context, value, false);
     return functionValue == null
@@ -1706,13 +1707,12 @@ function functionDeclaration(
   const identifier = node(value.id);
   const name = identifier == null ? undefined : identifierName(identifier);
   const bodyNode = node(value.body);
-  const asyncArrowExpression =
+  const arrowExpressionBody =
     value.type === "ArrowFunctionExpression" &&
-    value.async === true &&
     bodyNode?.type !== "BlockStatement";
   if (
     (requireName && name == null) ||
-    (bodyNode?.type !== "BlockStatement" && !asyncArrowExpression)
+    (bodyNode?.type !== "BlockStatement" && !arrowExpressionBody)
   ) {
     return unsupported(
       context,
@@ -1755,9 +1755,15 @@ function functionDeclaration(
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
-  context.functionStack.push(true);
+  // Arrows do not provide their own receiver, so this stays admitted
+  // inside one only when an enclosing non-arrow function provides it.
+  context.functionStack.push(
+    value.type === "ArrowFunctionExpression"
+      ? context.functionStack.at(-1) === true
+      : true,
+  );
   const children =
-    asyncArrowExpression && bodyNode != null
+    arrowExpressionBody && bodyNode != null
       ? [
           {
             argument: bodyNode,
