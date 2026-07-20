@@ -205,6 +205,20 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        /*
+         * Symbol is non-constructible, so the object layer does not
+         * synthesize its prototype property. The prototype object still
+         * exists and is exposed here as a fixed own property; only its
+         * methods are the deferred boundary.
+         */
+        result = define_symbol_property(
+            context,
+            frame.slots[1],
+            "prototype",
+            function_object(frame.slots[1])->prototype_object
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         context->symbol_constructor = frame.slots[1];
         result.value = frame.slots[1];
         if (context->observe_specialization) {

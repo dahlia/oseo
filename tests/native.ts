@@ -797,6 +797,9 @@ console.log(typeof first, first === second, first === first);
 console.log(first, Symbol(), Symbol(42));
 console.log(typeof Symbol, typeof Symbol.iterator, typeof Symbol.toPrimitive);
 console.log(typeof Symbol.toStringTag, Symbol.iterator === Symbol.iterator);
+console.log(typeof Symbol.prototype, Symbol.prototype === Symbol.prototype);
+const protoDesc = Object.getOwnPropertyDescriptor(Symbol, "prototype");
+console.log(protoDesc.writable, protoDesc.enumerable, protoDesc.configurable);
 try {
   new Symbol();
 } catch (error) {
