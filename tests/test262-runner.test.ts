@@ -348,7 +348,7 @@ null.item;
     harnesses,
     respondStderr(
       "test/runtime-negative.js:8:1: error[OSEO2001]: TypeError: " +
-        "Cannot read properties of a nullish value.\n",
+        "Cannot read properties of a nullish value.\nOSEO_THROWN TypeError\n",
     ),
     ["error-intrinsics"],
   );
@@ -359,17 +359,49 @@ null.item;
     matched.execution?.variants.map((variant) => variant.specialization),
     ["disabled", "enabled"],
   );
+  // The type comes from the stable marker, not the rendered name, so a
+  // mutated empty name whose diagnostic is just the message still
+  // reports the intrinsic TypeError identity.
+  const mutatedName = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: body\n" +
+        "OSEO_THROWN TypeError\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(mutatedName.classification, "expected-negative");
+  assert.equal(mutatedName.observation.errorType, "TypeError");
   const mismatched = await executeTest262Case(
     source,
     parsed,
     new Set<string>(),
     harnesses,
     respondStderr(
-      "test/runtime-negative.js:8:1: error[OSEO2001]: RangeError: bad.\n",
+      "test/runtime-negative.js:8:1: error[OSEO2001]: RangeError: bad.\n" +
+        "OSEO_THROWN RangeError\n",
     ),
   );
   assert.equal(mismatched.classification, "semantic-failure");
   assert.equal(mismatched.observation.errorType, "RangeError");
+  // A thrown message that embeds an owned diagnostic code must not be
+  // mistaken for a compile-stage rejection.
+  const embeddedCode = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: TypeError: " +
+        "error[OSEO1001] in message\nOSEO_THROWN TypeError\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(embeddedCode.classification, "expected-negative");
+  assert.equal(embeddedCode.observation.errorType, "TypeError");
   const unobservable = await executeTest262Case(
     source,
     parsed,
@@ -402,8 +434,9 @@ null.item;
     /completed without the expected runtime error/u,
   );
   // A parse-phase OSEO0001 rejection is not an unhandled throw, so a
-  // runtime negative that is rejected before execution is a phase
-  // mismatch rather than an unsupported runtime observation.
+  // runtime negative rejected before execution is a phase mismatch
+  // recorded as a parse phase with no execution evidence, not an
+  // unsupported runtime observation.
   const parseRejected = await executeTest262Case(
     source,
     parsed,
@@ -415,9 +448,30 @@ null.item;
     ),
   );
   assert.equal(parseRejected.classification, "semantic-failure");
+  assert.equal(parseRejected.observation.failedPhase, "parse");
   assert.equal(parseRejected.observation.errorType, undefined);
+  assert.equal(parseRejected.execution, undefined);
   assert.notEqual(
     parseRejected.observation.unsupportedCapability,
+    "runtime-error-observation",
+  );
+  // A non-catchable resource diagnostic is OSEO2001 but not a thrown
+  // value, so it stays a semantic failure rather than disappearing as an
+  // unsupported runtime observation.
+  const resourceLimit = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO2001]: " +
+        "Maximum call depth exceeded.\n",
+    ),
+  );
+  assert.equal(resourceLimit.classification, "semantic-failure");
+  assert.equal(resourceLimit.observation.failedPhase, "runtime");
+  assert.notEqual(
+    resourceLimit.observation.unsupportedCapability,
     "runtime-error-observation",
   );
 });

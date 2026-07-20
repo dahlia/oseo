@@ -2818,6 +2818,8 @@ assert.match(
   thrownTypedEntry.stderr,
   /^thrown-typed-entry\.ts:1:\d+: error\[OSEO2001\]: TypeError: typed/u,
 );
+// The stable machine-readable marker records the intrinsic error kind.
+assert.match(thrownTypedEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
 
 const thrownRuntimeTyped = await runNativeCli(
   {
@@ -2851,6 +2853,49 @@ throw renamed;
 assert.equal(thrownRenamedEntry.exitStatus, 1);
 assert.equal(thrownRenamedEntry.stdout, "");
 assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
+// The marker keeps the intrinsic Error identity even though the human
+// diagnostic shows the mutated non-identifier name.
+assert.match(thrownRenamedEntry.stderr, /\nOSEO_THROWN Error\n$/u);
+
+const thrownEmptyEntry = await runNativeCli(
+  {
+    args: ["thrown-empty-entry.ts"],
+    source: `
+const blank = new TypeError("");
+blank.name = "";
+throw blank;
+`,
+    sourceId: "thrown-empty-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownEmptyEntry.exitStatus, 1);
+assert.equal(thrownEmptyEntry.stdout, "");
+// With no renderable name or message the human diagnostic falls back to the
+// generic throw text, yet the marker still exposes the intrinsic identity.
+assert.match(
+  thrownEmptyEntry.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+assert.match(thrownEmptyEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+
+const thrownPrototypeEntry = await runNativeCli(
+  {
+    args: ["thrown-prototype-entry.ts"],
+    source: `
+throw TypeError.prototype;
+`,
+    sourceId: "thrown-prototype-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownPrototypeEntry.exitStatus, 1);
+assert.equal(thrownPrototypeEntry.stdout, "");
+// Throwing the intrinsic prototype object itself keeps its exact identity,
+// because the kind walk starts at the thrown value rather than its prototype.
+assert.match(thrownPrototypeEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
 
 const thrownConvertedMessage = await runNativeCli(
   {

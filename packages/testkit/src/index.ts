@@ -228,10 +228,24 @@ function splitCounters(observation: ProcessObservation): {
 } {
   const prefix = "OSEO_OBSERVATIONS ";
   const lines = observation.stderr.split(/(?<=\n)/u);
+  // The machine-readable thrown-error marker is appended as the final
+  // line; only that runtime-appended marker is removed before comparing
+  // observable output, so a marker-shaped line inside a rendered message
+  // is preserved.
+  const markerIndex = lines.findLastIndex((line) =>
+    /^OSEO_THROWN [A-Za-z]+\n?$/u.test(line),
+  );
+  if (markerIndex >= 0) lines.splice(markerIndex, 1);
+  const strippedStderr = lines.join("");
   const index = lines.findLastIndex((line) => line.startsWith(prefix));
-  if (index < 0) return { observation };
+  if (index < 0) {
+    return strippedStderr === observation.stderr
+      ? { observation }
+      : { observation: { ...observation, stderr: strippedStderr } };
+  }
   const line = lines[index];
-  if (line == null) return { observation };
+  if (line == null)
+    return { observation: { ...observation, stderr: strippedStderr } };
   const parsed = JSON.parse(
     line.slice(prefix.length),
   ) as Partial<RuntimeObservationCounters>;

@@ -358,20 +358,34 @@ function errorMessage(error: unknown): string {
     : `${error}`;
 }
 
-function infrastructureFailure(result: CliResult): boolean {
-  return result.stderr.includes("error[OSEO3001]");
+/**
+ * The owned diagnostic code from the outer, source-located diagnostic
+ * line, such as `OSEO2001`. Parsing the structured prefix avoids
+ * matching an `error[OSEO...]` substring embedded in a thrown message.
+ */
+export function diagnosticCode(stderr: string): string | undefined {
+  const match = /^.+?:\d+:\d+: error\[(OSEO\d{4})\]/mu.exec(stderr);
+  return match?.[1];
 }
 
+function infrastructureFailure(result: CliResult): boolean {
+  return diagnosticCode(result.stderr) === "OSEO3001";
+}
+
+/** The exact untyped-throw diagnostic the native host renders. */
+const untypedThrowMessage = "error[OSEO2001]: Unhandled JavaScript throw.";
+
 /**
- * Extract the thrown error name from an unhandled-throw diagnostic. The
- * native host renders an unhandled error instance as
- * `error[OSEO2001]: Name: message` or `error[OSEO2001]: Name`; a thrown
- * value without error identity keeps the generic diagnostic and yields
- * no observable type.
+ * The intrinsic error kind of an unhandled thrown value, read from the
+ * stable machine-readable marker the native host prints for an error
+ * instance. This is independent of the mutable name and message the
+ * human diagnostic renders. A thrown non-error value has no marker.
  */
 export function unhandledErrorType(stderr: string): string | undefined {
-  const match = /error\[OSEO2001\]: ([A-Za-z_$][\w$]*)(?::.*)?$/mu.exec(stderr);
-  return match?.[1];
+  // The runtime appends the marker as the final line, so a marker-shaped
+  // line injected earlier by a rendered message is ignored.
+  const matches = [...stderr.matchAll(/^OSEO_THROWN ([A-Za-z]+)$/gmu)];
+  return matches.at(-1)?.[1];
 }
 
 function detail(
@@ -832,22 +846,34 @@ async function executedResult(
       variants.push(variant);
       observations.push({ observation, variant });
       if (observation.exitStatus !== 0) {
-        const unsupportedSyntax =
-          observation.stderr.includes("error[OSEO1001]");
-        // An unhandled runtime throw renders an owned OSEO2001
-        // diagnostic; a compile-stage OSEO0001 parse or early-error
-        // rejection does not.
-        const unhandledThrow = observation.stderr.includes("error[OSEO2001]");
-        if (expectRuntimeNegative && unhandledThrow) {
+        // The owned diagnostic code is read from the outer source-located
+        // line, not any substring of a thrown message.
+        const code = diagnosticCode(observation.stderr);
+        const unsupportedSyntax = code === "OSEO1001";
+        // A compile-stage OSEO0001 parse or early-error rejection means
+        // no native program executed.
+        const parseRejected = code === "OSEO0001";
+        const compileStage = unsupportedSyntax || parseRejected;
+        // A genuine unhandled JavaScript throw is either a typed error
+        // instance, identified by the stable thrown marker, or the exact
+        // untyped-throw diagnostic. A non-catchable resource diagnostic
+        // such as a call depth or frame-budget limit is also OSEO2001 but
+        // is not a thrown value, so it must not be mistaken for the
+        // expected negative observation.
+        const isJavaScriptThrow =
+          unhandledErrorType(observation.stderr) != null ||
+          observation.stderr.includes(untypedThrowMessage);
+        if (expectRuntimeNegative && !compileStage && isJavaScriptThrow) {
           // The unhandled throw is the expected observation for a
           // runtime negative; every variant must still agree before the
-          // thrown error type is compared. A compile-stage or
+          // thrown error type is compared. A compile-stage, resource, or
           // infrastructure diagnostic instead falls through to the
           // phase-mismatch and harness handling below.
           continue;
         }
-        // An OSEO1001 exit is a compile-stage rejection: no native variant
-        // executed, so the result carries no execution evidence.
+        // A compile-stage rejection ran no native variant, so the result
+        // carries no execution evidence and keeps its owned diagnostic
+        // phase.
         return classifyTest262(
           testCase,
           {
@@ -859,13 +885,14 @@ async function executedResult(
             ),
             ...(unsupportedSyntax
               ? { unsupportedCapability: "profile-syntax" }
-              : { failedPhase: "runtime" as const }),
-            harnessFailed:
-              !unsupportedSyntax && infrastructureFailure(observation),
+              : parseRejected
+                ? { failedPhase: "parse" as const }
+                : { failedPhase: "runtime" as const }),
+            harnessFailed: !compileStage && infrastructureFailure(observation),
             passed: false,
           },
           supportedFeatures,
-          unsupportedSyntax ? { dependencies } : evidence(),
+          compileStage ? { dependencies } : evidence(),
         );
       } else if (expectRuntimeNegative) {
         return classifyTest262(

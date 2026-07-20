@@ -471,20 +471,33 @@ static void write_stderr_string(OseoValue value) {
     }
 }
 
-static bool is_error_instance(OseoContext *context, OseoValue thrown) {
-    if (!is_object(thrown)) return false;
-    OseoValue current = ordinary_object(thrown)->prototype;
+/*
+ * The intrinsic error kind of a thrown value, taken from the first
+ * intrinsic error prototype on its chain, or OSEO_ERROR_KIND_COUNT for
+ * a value that is not an error instance. This is the stable identity
+ * used for the machine-readable throw marker, independent of the
+ * mutable name property.
+ */
+static size_t error_instance_kind(OseoContext *context, OseoValue thrown) {
+    if (!is_object(thrown)) return OSEO_ERROR_KIND_COUNT;
+    /*
+     * The walk starts at the thrown value itself so a thrown intrinsic
+     * prototype object, such as TypeError.prototype, keeps its exact
+     * identity rather than reporting its own prototype's kind.
+     */
+    OseoValue current = thrown;
     while (is_object(current)) {
         for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-            if (context->error_prototypes[kind] == current) return true;
+            if (context->error_prototypes[kind] == current) return kind;
         }
         current = ordinary_object(current)->prototype;
     }
-    return false;
+    return OSEO_ERROR_KIND_COUNT;
 }
 
 void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
-    if (context->has_diagnostic || !is_error_instance(context, thrown)) {
+    size_t kind = error_instance_kind(context, thrown);
+    if (context->has_diagnostic || kind >= OSEO_ERROR_KIND_COUNT) {
         oseo_context_print_error(context);
         return;
     }
@@ -515,22 +528,35 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
     context->has_diagnostic = false;
     if (result.status != OSEO_STATUS_NORMAL || !is_string(slots[1]) ||
         string_object(slots[1])->length == 0u) {
+        /*
+         * An empty or failed rendering falls back to the stored
+         * diagnostic, but the error is still a typed instance, so the
+         * marker is printed either way.
+         */
         oseo_context_print_error(context);
-        return;
+    } else {
+        (void)fwrite(
+            context->source_id,
+            1u,
+            context->source_id_length,
+            stderr
+        );
+        (void)fprintf(
+            stderr,
+            ":%zu:%zu: error[%s]: ",
+            context->line,
+            context->column,
+            context->error_code
+        );
+        write_stderr_string(slots[1]);
+        (void)fprintf(stderr, "\n");
     }
-    (void)fwrite(
-        context->source_id,
-        1u,
-        context->source_id_length,
-        stderr
-    );
-    (void)fprintf(
-        stderr,
-        ":%zu:%zu: error[%s]: ",
-        context->line,
-        context->column,
-        context->error_code
-    );
-    write_stderr_string(slots[1]);
-    (void)fprintf(stderr, "\n");
+    /*
+     * A stable machine-readable marker records the intrinsic error kind
+     * separately from the human diagnostic, whose name and message can
+     * be mutated to arbitrary or non-identifier values. Tooling reads
+     * this for throw detection and type comparison and strips it before
+     * comparing observable output.
+     */
+    (void)fprintf(stderr, "OSEO_THROWN %s\n", error_names[kind]);
 }
