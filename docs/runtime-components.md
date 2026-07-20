@@ -17,11 +17,18 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists ten reviewed assets in this order:
+The runtime input now lists thirteen reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_object.c*,
-*runtime\_function.c*, *runtime\_primitive.c*, *runtime\_promise.c*, and
-*runtime\_event\_loop.c*. No catch-all *runtime.c* remains, and no
+*runtime\_function.c*, *runtime\_error.c*, *runtime\_symbol.c*,
+*runtime\_iterator.c*, *runtime\_primitive.c*,
+*runtime\_promise.c*, and
+*runtime\_event\_loop.c*. The M5 named-error-intrinsics unit added
+*runtime\_error.c* as the first post-componentization component, the
+symbols unit added *runtime\_symbol.c*, and the iterator-protocol unit
+added *runtime\_iterator.c*, each
+following the same ownership, include, and one-definition rules. No
+catch-all *runtime.c* remains, and no
 temporary forwarding helper was needed at any point in the migration.
 Each source compiles as its own translation unit and is archived in
 exactly this order. The symbols test in
@@ -42,27 +49,53 @@ Ownership follows the plan's target layout:
     built-ins;
  -  *runtime\_function.c*: function creation, callable metadata,
     construction, and generic dispatch;
- -  *runtime\_primitive.c*: coercions, arithmetic, comparison, string
+ -  *runtime\_error.c*: the named error intrinsics, their lazily created
+    constructor and prototype pairs, typed runtime error creation, the
+    shared `Error.prototype.toString`, and unhandled-throw rendering;
+ -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol`
+    intrinsic, the well-known symbols, and descriptive symbol text;
+ -  *runtime\_iterator.c*: the synchronous iterator protocol
+    (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
+    first-class array iterator, and its cached virtualized methods;
+ -  *runtime\_primitive.c*: coercions including the generic
+    `ToPrimitive`, arithmetic, comparison, string
     conversion, and console output;
  -  *runtime\_promise.c*: promises, capabilities, reactions, thenable
     jobs, combinators, rejection tracking, and job draining;
- -  *runtime\_event\_loop.c*: timer conversion, timer queues, task
-    checkpoints, top-level await progress, and shutdown.
+ -  *runtime\_event\_loop.c*: timer queues, task
+    checkpoints, top-level await progress, and shutdown; timer delay
+    coercion goes through the shared primitive conversions.
 
 ### Internal helpers
 
-Fourteen helpers cross a translation-unit boundary. Each uses the
+Thirty helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
 | Internal helper                                     | Defined in             |
 | --------------------------------------------------- | ---------------------- |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*    |
+| `oseo_internal_error_construct`                     | *runtime\_error.c*     |
+| `oseo_internal_error_prototype`                     | *runtime\_error.c*     |
+| `oseo_internal_error_to_string`                     | *runtime\_error.c*     |
+| `oseo_internal_throw_error`                         | *runtime\_error.c*     |
 | `oseo_internal_publish_heap`                        | *runtime\_memory.c*    |
 | `oseo_internal_allocate_string`                     | *runtime\_object.c*    |
 | `oseo_internal_string_is_ascii`                     | *runtime\_object.c*    |
 | `oseo_internal_own_descriptor`                      | *runtime\_object.c*    |
+| `oseo_internal_symbol_create`                       | *runtime\_symbol.c*    |
+| `oseo_internal_symbol_text`                         | *runtime\_symbol.c*    |
+| `oseo_internal_symbol_name`                         | *runtime\_symbol.c*    |
+| `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*    |
+| `oseo_internal_iterator_get`                        | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_next`                       | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_close`                      | *runtime\_iterator.c*  |
+| `oseo_internal_array_values`                        | *runtime\_iterator.c*  |
+| `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_method`                     | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_key_matches`                | *runtime\_iterator.c*  |
 | `oseo_internal_to_number`                           | *runtime\_primitive.c* |
+| `oseo_internal_to_primitive`                        | *runtime\_primitive.c* |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c* |
 | `oseo_internal_promise_method_function`             | *runtime\_promise.c*   |
 | `oseo_internal_promise_invoke_then`                 | *runtime\_promise.c*   |
@@ -91,7 +124,22 @@ express observable language semantics:
     object reads and `oseo_internal_own_descriptor`;
  -  binding and object: module-namespace creation builds its backing
     object through public object operations, while object property reads
-    resolve module-namespace entries through `oseo_cell_get`.
+    resolve module-namespace entries through `oseo_cell_get`;
+ -  error and the throwing components: core, binding, object, function,
+    primitive, promise, and event-loop semantics create typed catchable
+    errors through `oseo_internal_throw_error`, while error-intrinsic
+    construction builds ordinary objects, strings, and internal
+    functions through the public object and function operations;
+ -  function and symbol: function creation applies `SetFunctionName`
+    to a symbol key through `oseo_internal_symbol_name`, while the
+    `Symbol` intrinsic and its well-known symbols are built through the
+    public function and object operations;
+ -  object and iterator: `oseo_object_get` materializes an array's
+    `Symbol.iterator` and an array iterator's `next` through
+    `oseo_internal_iterator_method`, while the iterator component reads
+    elements, reads and calls `next` and `return`, and reads the
+    well-known iterator symbol through public object, symbol, and
+    function operations.
 
 The event-loop component is a one-way dependent: timer turns drain jobs
 through `oseo_internal_jobs_drain_until` and

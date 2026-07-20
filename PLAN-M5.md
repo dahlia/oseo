@@ -34,9 +34,23 @@ control-flow statements `do-while`, classic `for` with per-iteration
 lexical environments, `switch`, and labeled statements, each with
 native differential, structural, and reviewed test262 evidence
 recorded in [*docs/language-profile-m5.md*](./docs/language-profile-m5.md).
-The remaining item 4 work is the semantic groundwork that needs owned
-runtime surfaces: named error intrinsics, generic `ToPrimitive`,
-symbols, and the iterator protocol. The runtime component boundaries
+The named error intrinsics, the first intrinsics-and-built-ins unit,
+are implemented: `Error` and the six NativeError constructors are
+runtime-owned values, runtime semantic errors are typed catchable
+instances, and the test262 runner executes runtime negatives against
+the rendered error identity. Generic `ToPrimitive` is implemented as
+one shared runtime conversion behind every coercing operator,
+template substitutions, property keys, error messages, and timer
+delays, with `@@toPrimitive` dispatch deferred to the symbols unit.
+Symbol values, the `Symbol` intrinsic, symbol property keys, and the
+well-known symbols are implemented, with `Symbol.toPrimitive`
+dispatched by the generic conversion. The synchronous iterator
+protocol is implemented as an owned runtime surface with a first-class
+array iterator, and `Promise.all` and `Promise.race` consume any
+object iterable through it, closing the iterator when a combinator
+rejects after a step, completing the delivery item 4 groundwork; the
+`for-of` statement and spread iteration remain later syntax work. The runtime
+component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.

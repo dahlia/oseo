@@ -580,8 +580,8 @@ test("lowers typeof and remainder through checked runtime calls", () => {
   assert.equal(operations[remainderIndex + 1]?.kind, "check-status");
 });
 
-test("checks the status of coercing unary operators", () => {
-  for (const operator of ["+", "~"] as const) {
+test("marks coercing unary operators as allocation safepoints", () => {
+  for (const operator of ["+", "-", "~"] as const) {
     const syntax: SyntaxProgram = {
       body: [
         {
@@ -609,7 +609,131 @@ test("checks the status of coercing unary operators", () => {
         operation.kind === "unary" && operation.operator === operator,
     );
     assert.ok(index >= 0);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.match(operations[index - 1]?.detail ?? "", /operand coercion/u);
     assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps non-coercing unary operators without a coercion safepoint", () => {
+  for (const operator of ["!", "void"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "boolean", range, value: true },
+            kind: "unary",
+            operator,
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `unary-${operator}.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "unary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.notEqual(operations[index - 1]?.detail, "operand coercion");
+  }
+});
+
+test("marks every coercing binary operator as an allocation safepoint", () => {
+  const coercing = [
+    "-",
+    "*",
+    "/",
+    "%",
+    "**",
+    "&",
+    "|",
+    "^",
+    "<<",
+    ">>",
+    ">>>",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "==",
+    "!=",
+  ] as const;
+  for (const operator of coercing) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "number", range, value: 1 },
+            operator,
+            range,
+            right: { kind: "number", range, value: 2 },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `binary-safepoint.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0, `${operator} lowers to a binary operation`);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.match(operations[index - 1]?.detail ?? "", /operand coercion/u);
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps strict equality without a coercion safepoint", () => {
+  for (const operator of ["===", "!=="] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "number", range, value: 1 },
+            operator,
+            range,
+            right: { kind: "number", range, value: 2 },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `strict-equality.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.notEqual(operations[index - 1]?.detail, "operand coercion");
   }
 });
 
@@ -645,6 +769,153 @@ test("marks relational operators as allocation safepoints", () => {
     assert.ok(index >= 0);
     assert.equal(operations[index - 1]?.kind, "safepoint");
   }
+});
+
+test("resolves unshadowed error names to intrinsic references", () => {
+  const errorNames = [
+    "Error",
+    "EvalError",
+    "RangeError",
+    "ReferenceError",
+    "SyntaxError",
+    "TypeError",
+    "URIError",
+  ] as const;
+  for (const name of errorNames) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "identifier", name, range },
+            kind: "unary",
+            operator: "typeof",
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+        {
+          expression: { kind: "identifier", name, range },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `error-intrinsic-${name}.ts`,
+    };
+    const hirResult = buildHir(syntax);
+    assert.deepEqual(hirResult.diagnostics, []);
+    assert.ok(hirResult.program != null);
+    assert.match(
+      printHir(hirResult.program),
+      new RegExp(`intrinsic ${name}`, "u"),
+    );
+    const operations = buildMir(hirResult.program).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "error-intrinsic" && operation.errorName === name,
+    );
+    assert.ok(index >= 0, `${name} lowers to an error-intrinsic operation`);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps shadowed error names ordinary bindings", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "const",
+        name: "TypeError",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "TypeError", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "shadowed-error-intrinsic.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const printed = printHir(hirResult.program);
+  assert.doesNotMatch(printed, /intrinsic TypeError/u);
+  assert.match(printed, /%b\d+\(TypeError\)/u);
+});
+
+test("resolves the unshadowed Symbol intrinsic", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "Symbol", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "symbol-intrinsic.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  assert.match(printHir(hirResult.program), /intrinsic Symbol/u);
+  const operations = buildMir(hirResult.program).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const index = operations.findIndex(
+    (operation) => operation.kind === "symbol-intrinsic",
+  );
+  assert.ok(index >= 0);
+  assert.equal(operations[index - 1]?.kind, "safepoint");
+  assert.equal(operations[index + 1]?.kind, "check-status");
+});
+
+test("keeps a shadowed Symbol an ordinary binding", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "const",
+        name: "Symbol",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "shadowed-symbol.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const printed = printHir(hirResult.program);
+  assert.doesNotMatch(printed, /intrinsic Symbol/u);
+  assert.match(printed, /%b\d+\(Symbol\)/u);
 });
 
 test("lowers void to an operand evaluation without a status check", () => {

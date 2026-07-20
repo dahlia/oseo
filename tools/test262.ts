@@ -358,8 +358,34 @@ function errorMessage(error: unknown): string {
     : `${error}`;
 }
 
+/**
+ * The owned diagnostic code from the outer, source-located diagnostic
+ * line, such as `OSEO2001`. Parsing the structured prefix avoids
+ * matching an `error[OSEO...]` substring embedded in a thrown message.
+ */
+export function diagnosticCode(stderr: string): string | undefined {
+  const match = /^.+?:\d+:\d+: error\[(OSEO\d{4})\]/mu.exec(stderr);
+  return match?.[1];
+}
+
 function infrastructureFailure(result: CliResult): boolean {
-  return result.stderr.includes("error[OSEO3001]");
+  return diagnosticCode(result.stderr) === "OSEO3001";
+}
+
+/** The exact untyped-throw diagnostic the native host renders. */
+const untypedThrowMessage = "error[OSEO2001]: Unhandled JavaScript throw.";
+
+/**
+ * The intrinsic error kind of an unhandled thrown value, read from the
+ * stable machine-readable marker the native host prints for an error
+ * instance. This is independent of the mutable name and message the
+ * human diagnostic renders. A thrown non-error value has no marker.
+ */
+export function unhandledErrorType(stderr: string): string | undefined {
+  // The runtime appends the marker as the final line, so a marker-shaped
+  // line injected earlier by a rendered message is ignored.
+  const matches = [...stderr.matchAll(/^OSEO_THROWN ([A-Za-z]+)$/gmu)];
+  return matches.at(-1)?.[1];
 }
 
 function detail(
@@ -685,6 +711,7 @@ async function executedResult(
 ): Promise<Test262Result> {
   const testCase = parsed.case;
   const scheduled = testCase.mode === "module" || testCase.async;
+  const expectRuntimeNegative = testCase.expectedFailurePhase === "runtime";
   const variants: Test262Variant[] = [];
   let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
   const execution = (): Test262Execution => ({
@@ -819,10 +846,34 @@ async function executedResult(
       variants.push(variant);
       observations.push({ observation, variant });
       if (observation.exitStatus !== 0) {
-        const unsupportedSyntax =
-          observation.stderr.includes("error[OSEO1001]");
-        // An OSEO1001 exit is a compile-stage rejection: no native variant
-        // executed, so the result carries no execution evidence.
+        // The owned diagnostic code is read from the outer source-located
+        // line, not any substring of a thrown message.
+        const code = diagnosticCode(observation.stderr);
+        const unsupportedSyntax = code === "OSEO1001";
+        // A compile-stage OSEO0001 parse or early-error rejection means
+        // no native program executed.
+        const parseRejected = code === "OSEO0001";
+        const compileStage = unsupportedSyntax || parseRejected;
+        // A genuine unhandled JavaScript throw is either a typed error
+        // instance, identified by the stable thrown marker, or the exact
+        // untyped-throw diagnostic. A non-catchable resource diagnostic
+        // such as a call depth or frame-budget limit is also OSEO2001 but
+        // is not a thrown value, so it must not be mistaken for the
+        // expected negative observation.
+        const isJavaScriptThrow =
+          unhandledErrorType(observation.stderr) != null ||
+          observation.stderr.includes(untypedThrowMessage);
+        if (expectRuntimeNegative && !compileStage && isJavaScriptThrow) {
+          // The unhandled throw is the expected observation for a
+          // runtime negative; every variant must still agree before the
+          // thrown error type is compared. A compile-stage, resource, or
+          // infrastructure diagnostic instead falls through to the
+          // phase-mismatch and harness handling below.
+          continue;
+        }
+        // A compile-stage rejection ran no native variant, so the result
+        // carries no execution evidence and keeps its owned diagnostic
+        // phase.
         return classifyTest262(
           testCase,
           {
@@ -834,18 +885,39 @@ async function executedResult(
             ),
             ...(unsupportedSyntax
               ? { unsupportedCapability: "profile-syntax" }
-              : { failedPhase: "runtime" as const }),
-            harnessFailed:
-              !unsupportedSyntax && infrastructureFailure(observation),
+              : parseRejected
+                ? { failedPhase: "parse" as const }
+                : { failedPhase: "runtime" as const }),
+            harnessFailed: !compileStage && infrastructureFailure(observation),
             passed: false,
           },
           supportedFeatures,
-          unsupportedSyntax ? { dependencies } : evidence(),
+          compileStage ? { dependencies } : evidence(),
+        );
+      } else if (expectRuntimeNegative) {
+        return classifyTest262(
+          testCase,
+          {
+            detail:
+              `${testCase.path} ${strictnessMode} ${specialization} ` +
+              "completed without the expected runtime error.",
+            harnessFailed: false,
+            passed: false,
+          },
+          supportedFeatures,
+          evidence(),
         );
       }
     }
   }
   const baseline = observations[0];
+  // A strict variant shifts source lines by its added directive, so a
+  // runtime negative compares its diagnostics without the location
+  // prefix while every other case compares stderr verbatim.
+  const comparableStderr = (stderr: string): string =>
+    expectRuntimeNegative
+      ? stderr.replace(/^(.*):\d+:\d+: error\[/gmu, "$1: error[")
+      : stderr;
   const diverging =
     baseline == null
       ? undefined
@@ -853,7 +925,8 @@ async function executedResult(
           (entry) =>
             entry.observation.exitStatus !== baseline.observation.exitStatus ||
             entry.observation.stdout !== baseline.observation.stdout ||
-            entry.observation.stderr !== baseline.observation.stderr,
+            comparableStderr(entry.observation.stderr) !==
+              comparableStderr(baseline.observation.stderr),
         );
   if (baseline != null && diverging != null) {
     return classifyTest262(
@@ -874,6 +947,7 @@ async function executedResult(
   }
   if (
     testCase.async &&
+    !expectRuntimeNegative &&
     baseline != null &&
     !asyncObservationCompleted(baseline.observation.stdout)
   ) {
@@ -884,6 +958,38 @@ async function executedResult(
           `${testCase.path} finished without printing ` +
           `${asyncCompletionMarker}: ` +
           `stdout=${JSON.stringify(baseline.observation.stdout)}`,
+        failedPhase: "runtime",
+        harnessFailed: false,
+        passed: false,
+      },
+      supportedFeatures,
+      evidence(),
+    );
+  }
+  if (expectRuntimeNegative) {
+    const errorType =
+      baseline == null
+        ? undefined
+        : unhandledErrorType(baseline.observation.stderr);
+    if (errorType == null) {
+      return classifyTest262(
+        testCase,
+        {
+          detail:
+            "The thrown value carries no observable error identity: " +
+            `stderr=${JSON.stringify(baseline?.observation.stderr ?? "")}`,
+          harnessFailed: false,
+          passed: false,
+          unsupportedCapability: "runtime-error-observation",
+        },
+        supportedFeatures,
+        evidence(),
+      );
+    }
+    return classifyTest262(
+      testCase,
+      {
+        errorType,
         failedPhase: "runtime",
         harnessFailed: false,
         passed: false,
@@ -923,21 +1029,6 @@ export async function executeTest262Case(
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
-  if (parsed.case.expectedFailurePhase === "runtime") {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail:
-          "The runner cannot observe the type of an unhandled JavaScript " +
-          "throw.",
-        harnessFailed: false,
-        passed: false,
-        unsupportedCapability: "runtime-error-types",
-      },
-      supportedFeatures,
-      evidence,
-    );
-  }
   if (parsed.case.mode === "module") {
     if (location == null) {
       return classifyTest262(
@@ -951,7 +1042,10 @@ export async function executeTest262Case(
         evidence,
       );
     }
-    if (parsed.case.expectedFailurePhase != null) {
+    if (
+      parsed.case.expectedFailurePhase != null &&
+      parsed.case.expectedFailurePhase !== "runtime"
+    ) {
       return await moduleNegativeResult(
         source,
         parsed,

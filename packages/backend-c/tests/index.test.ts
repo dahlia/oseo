@@ -71,6 +71,63 @@ test("emits deterministic generic C without executing a toolchain", () => {
   assert.equal(emitted.sourceName, "generated.c");
 });
 
+test("emits error intrinsic loads and thrown-value rendering", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "errors.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "intrinsic TypeError",
+              errorName: "TypeError",
+              id: 0,
+              kind: "error-intrinsic",
+              range,
+            },
+            {
+              arguments: [0],
+              detail: "normal -> continue, abrupt -> return",
+              id: 1,
+              kind: "check-status",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "errors.ts",
+    specialization: "disabled",
+  });
+  assert.ok(
+    emitted.source.includes("oseo_error_intrinsic(context, OSEO_ERROR_TYPE)"),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_context_print_thrown(&context, result.value)",
+    ),
+  );
+  assert.ok(!emitted.source.includes("oseo_context_print_error(&context)"));
+});
+
 test("scans large MIR argument lists without spreading them", () => {
   const range = {
     end: { column: 1, line: 1 },

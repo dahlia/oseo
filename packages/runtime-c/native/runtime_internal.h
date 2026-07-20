@@ -36,6 +36,42 @@
 #define OSEO_PROMISE_FINALLY_FULFILL_CODE_ID (SIZE_MAX - 7u)
 #define OSEO_PROMISE_FINALLY_REJECT_CODE_ID (SIZE_MAX - 8u)
 #define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID (SIZE_MAX - 9u)
+/*
+ * Error constructor code IDs occupy one contiguous block indexed by
+ * OseoErrorKind: SIZE_MAX - 10u - kind.
+ */
+#define OSEO_ERROR_KIND_COUNT ((size_t)7u)
+#define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID (SIZE_MAX - 10u)
+#define OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID \
+    (SIZE_MAX - 9u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ERROR_TO_STRING_CODE_ID \
+    (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_SYMBOL_CONSTRUCT_CODE_ID \
+    (SIZE_MAX - 11u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ARRAY_VALUES_CODE_ID \
+    (SIZE_MAX - 12u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ARRAY_ITERATOR_NEXT_CODE_ID \
+    (SIZE_MAX - 13u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ITERATOR_SELF_CODE_ID \
+    (SIZE_MAX - 14u - OSEO_ERROR_KIND_COUNT)
+/* Well-known symbol table indexes shared with the public context. */
+#define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
+#define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
+#define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)2u)
+#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)3u)
+
+/*
+ * The preferred-type hint passed to the generic ToPrimitive. The
+ * numeric variant orders methods like the number hint but belongs to
+ * consumers that immediately apply ToNumber, so unsupported function
+ * and promise text degrades to NaN instead of a diagnostic.
+ */
+typedef enum {
+    OSEO_TO_PRIMITIVE_DEFAULT = 0,
+    OSEO_TO_PRIMITIVE_NUMBER = 1,
+    OSEO_TO_PRIMITIVE_STRING = 2,
+    OSEO_TO_PRIMITIVE_NUMERIC = 3,
+} OseoToPrimitiveHint;
 
 typedef enum {
     OSEO_HEAP_STRING = 1,
@@ -49,6 +85,7 @@ typedef enum {
     OSEO_HEAP_JOB = 9,
     OSEO_HEAP_PROMISE_AGGREGATE = 10,
     OSEO_HEAP_TIMER = 11,
+    OSEO_HEAP_SYMBOL = 12,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -76,6 +113,12 @@ typedef struct {
 } OseoCell;
 
 typedef struct {
+    OseoHeapObject header;
+    /* The description string, or undefined for a bare Symbol(). */
+    OseoValue description;
+} OseoSymbol;
+
+typedef struct {
     OseoPropertyAttributes attributes;
     OseoValue key;
     OseoValue value;
@@ -93,6 +136,13 @@ typedef struct {
     bool length_writable;
     bool module_namespace;
     bool default_intrinsics;
+    /* The [[ErrorData]] brand Object.prototype.toString observes. */
+    bool error_data;
+    /* Array iterator state: a flagged object backs a default array's
+     * values iterator, tracing the array and stepping the index. */
+    bool array_iterator;
+    OseoValue iterator_array;
+    size_t iterator_index;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -198,6 +248,9 @@ static inline OseoOrdinaryObject *ordinary_object(OseoValue value) {
 static inline OseoCell *cell_object(OseoValue value) {
     return (OseoCell *)heap_object(value);
 }
+static inline OseoSymbol *symbol_object(OseoValue value) {
+    return (OseoSymbol *)heap_object(value);
+}
 static inline OseoFunction *function_object(OseoValue value) {
     return (OseoFunction *)heap_object(value);
 }
@@ -231,24 +284,6 @@ static inline OseoResult failure(
     OseoResult result = {OSEO_STATUS_THROW, oseo_undefined()};
     return result;
 }
-static inline OseoResult create_language_failure(OseoContext *context) {
-    OseoResult result = oseo_object_create(context, oseo_null());
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    result.status = OSEO_STATUS_THROW;
-    return result;
-}
-static inline OseoResult language_failure(OseoContext *context) {
-    oseo_context_clear_language_error(context);
-    return create_language_failure(context);
-}
-static inline OseoResult language_failure_message(
-    OseoContext *context,
-    const char *message
-) {
-    oseo_context_clear_language_error(context);
-    context->error_message = message;
-    return create_language_failure(context);
-}
 static inline uint64_t double_bits(double value) {
     uint64_t bits;
     memcpy(&bits, &value, sizeof(bits));
@@ -273,6 +308,15 @@ static inline bool is_environment(OseoValue value) {
 static inline bool is_cell(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_CELL;
+}
+static inline bool is_symbol(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_SYMBOL;
+}
+static inline bool is_array_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->array_iterator;
 }
 static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -322,6 +366,26 @@ static inline bool is_nullish(OseoValue value) {
  * runtime translation unit.
  */
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
+OseoResult oseo_internal_error_construct(
+    OseoContext *context,
+    OseoValue callee,
+    size_t code_id,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+OseoResult oseo_internal_error_prototype(
+    OseoContext *context,
+    OseoErrorKind kind
+);
+OseoResult oseo_internal_error_to_string(
+    OseoContext *context,
+    OseoValue receiver
+);
+OseoResult oseo_internal_throw_error(
+    OseoContext *context,
+    OseoErrorKind kind,
+    const char *message
+);
 OseoResult oseo_internal_publish_heap(
     OseoContext *context,
     OseoHeapObject *object,
@@ -366,6 +430,60 @@ OseoResult oseo_internal_promise_method_function(
 );
 bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_to_primitive(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint
+);
+OseoResult oseo_internal_symbol_create(
+    OseoContext *context,
+    OseoValue description
+);
+OseoResult oseo_internal_symbol_text(
+    OseoContext *context,
+    OseoValue symbol
+);
+OseoResult oseo_internal_symbol_name(
+    OseoContext *context,
+    OseoValue symbol
+);
+OseoResult oseo_internal_well_known_symbol(
+    OseoContext *context,
+    size_t index
+);
+OseoResult oseo_internal_iterator_get(
+    OseoContext *context,
+    OseoValue iterable,
+    OseoValue *next_method
+);
+OseoResult oseo_internal_iterator_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_internal_iterator_close(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error
+);
+OseoResult oseo_internal_array_values(
+    OseoContext *context,
+    OseoValue array
+);
+OseoResult oseo_internal_array_iterator_next(
+    OseoContext *context,
+    OseoValue iterator
+);
+bool oseo_internal_iterator_key_matches(
+    OseoContext *context,
+    OseoValue key
+);
+OseoResult oseo_internal_iterator_method(
+    OseoContext *context,
+    size_t code_id
+);
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_jobs_drain_until(
     OseoContext *context,

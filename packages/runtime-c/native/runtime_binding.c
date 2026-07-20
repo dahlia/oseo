@@ -115,8 +115,9 @@ OseoResult oseo_cell_set(
         return failure(context, "OSEO2001", "Value is not a binding cell.");
     }
     if (tag_of(cell_object(cell_value)->value) == OSEO_TAG_UNINITIALIZED) {
-        return language_failure_message(
+        return oseo_internal_throw_error(
             context,
+            OSEO_ERROR_REFERENCE,
             "Binding was assigned before initialization."
         );
     }

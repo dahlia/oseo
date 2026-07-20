@@ -74,9 +74,8 @@ its deliberate boundary and its evidence:
     and the allocating result string is a declared MIR safepoint. `void`
     evaluates its operand and produces `undefined`. `%` applies primitive
     numeric coercion and IEEE 754 remainder semantics, including negative
-    zero, infinite, and `NaN` operands; object operands keep the same
-    unsupported object-to-primitive coercion boundary as the existing
-    arithmetic operators until generic `ToPrimitive` lands. Native
+    zero, infinite, and `NaN` operands; object operands convert through
+    the shared generic `ToPrimitive`. Native
     differential fixtures, MIR structural tests, and reviewed test262
     cases cover the three operators.
  -  `typeof` applied to a name that does not resolve to a binding is
@@ -129,12 +128,14 @@ its deliberate boundary and its evidence:
     `instanceof` implements `OrdinaryHasInstance` without well-known
     symbols, which the profile does not admit yet. Non-object `in` right
     operands, non-callable `instanceof` right operands, and non-object
-    `prototype` values throw the shared catchable opaque errors.
+    `prototype` values throw catchable `TypeError` instances.
  -  Untagged template literals, normalized by the frontend into string
     concatenation. Substitutions evaluate left to right interleaved with
-    the cooked template pieces, every substitution converts through the
-    shared string conversion, and object substitutions keep the shared
-    unsupported coercion boundary. Tagged template expressions stay
+    the cooked template pieces, and every substitution converts through
+    the frontend-synthesized `to-string` conversion, so an object
+    substitution applies generic `ToPrimitive` with the string
+    preference `ToString` requires rather than the addition operator's
+    default hint. Tagged template expressions stay
     rejected with a source-located diagnostic.
  -  Synchronous arrow functions with block and expression bodies,
     reusing the arrow function kind, lexical receiver, and
@@ -165,8 +166,8 @@ its deliberate boundary and its evidence:
     coercion, booleans and numeric strings coerce through the shared
     numeric conversion, and objects compare by identity. Comparing an
     object with a number or string, including a boolean after its
-    numeric conversion, keeps the shared unsupported
-    object-to-primitive boundary until generic `ToPrimitive` lands.
+    numeric conversion, converts the object through generic
+    `ToPrimitive` with the default hint before comparing again.
  -  The `??` nullish coalescing operator and the comma sequence operator.
     `??` lowers through explicit strict null and undefined checks into
     the same parameterized join structure as the other short-circuit
@@ -183,8 +184,123 @@ its deliberate boundary and its evidence:
     shifts mask their count to five bits, and exponentiation follows
     `Number::exponentiate` where C `pow` differs, covering `NaN`
     exponents and unit bases with infinite exponents. Object operands
-    keep the shared unsupported coercion boundary. The `exponentiation`
+    convert through generic `ToPrimitive`. The `exponentiation`
     test262 feature is now a supported feature of the reviewed subset.
+ -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
+    `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
+    runtime-owned constructor values. An unshadowed reference to one of
+    these names resolves to the lazily created intrinsic; a lexical,
+    `var`, parameter, or imported binding shadows it as ECMAScript
+    requires. Each constructor is callable and constructible, installs
+    the hidden own `message` property from a present message argument,
+    honors the ES2022 `cause` option, and exposes `name`, `message`, and
+    `constructor` on its prototype, with one shared
+    `Error.prototype.toString`. Runtime semantic errors, TDZ reads and
+    writes, immutable-binding assignment, nullish property access,
+    calling non-functions, invalid array lengths, and the other
+    catchable language errors are now instances of the applicable
+    `TypeError`, `RangeError`, or `ReferenceError` intrinsic with an own
+    `message`, and an unhandled thrown error instance renders as
+    `Name: message` inside the owned diagnostic line. Deliberate
+    boundaries: assigning to an unshadowed error intrinsic name stays a
+    compile-time unresolved-binding rejection, object-valued messages
+    convert through generic `ToPrimitive`, and instance `stack`
+    properties do not exist.
+    Native differential fixtures, runtime C fixtures, MIR structural
+    tests, and reviewed test262 cases cover the family, and the runner
+    now executes runtime negatives by comparing the rendered error name
+    against the expected type, replacing the former blanket
+    `runtime-error-types` capability gap with the narrower
+    `runtime-error-observation` classification for thrown values without
+    error identity.
+ -  Generic `ToPrimitive` for object operands, implementing
+    `OrdinaryToPrimitive` without well-known symbols: user-reachable
+    `valueOf` and `toString` run in hint order with the receiver, an
+    object result falls through to the next method, and an object with
+    neither convertible method throws a catchable `TypeError`. Objects
+    on a default-intrinsics prototype chain use the virtualized
+    `Object.prototype` and `Array.prototype` conversions selected by
+    the first default-intrinsics provider on the chain: the
+    receiver-sensitive `Object.prototype.toString` tags
+    (`"[object Array]"`, `"[object Function]"`, `"[object Error]"`
+    through the internal error brand, and `"[object Object]"`,
+    including promises whose well-known-symbol tag is unreachable) and
+    the `join`-based array
+    text with element `ToString`, nullish holes as empty elements,
+    honored user `join` overrides, cyclic references rendered as empty
+    elements, and nesting bounded by the deterministic call-depth
+    budget. An object inheriting the virtual function conversion
+    without being callable throws the catchable `TypeError` that
+    `Function.prototype.toString` requires. A user `Symbol.toPrimitive`
+    method, reachable once the program has touched the `Symbol`
+    intrinsic, is dispatched first with the specification hint string;
+    a non-callable non-nullish method and an object result throw
+    catchable `TypeError` instances. The conversion feeds numeric
+    coercion, string conversion, addition with the default hint on both
+    operands before the string test, relational comparison with the number hint
+    in source order, loose equality, property keys, `console.log`, error
+    message and `Error.prototype.toString` conversion, and `setTimeout` delays
+    through one shared implementation, replacing both the former unsupported
+    object-coercion boundary and the timer-only ad-hoc conversion. Deliberate
+    boundary: converting a function or promise without a user-supplied method
+    to text stays an owned unsupported diagnostic, because faithful text needs
+    `Function.prototype.toString` or well-known symbols; a purely numeric
+    conversion of such a value produces `NaN` without materializing the text,
+    because every function source and promise tag string is non-numeric.
+    `@@toPrimitive` dispatch is implemented by the symbols unit. Native
+    differential fixtures,
+    runtime C fixtures, and reviewed test262 cases cover the conversion.
+ -  Symbol values and the `Symbol` intrinsic. `Symbol([description])`
+    creates a unique, GC-traced symbol primitive whose description
+    converts through the shared `ToString`; `typeof` reports
+    `"symbol"`, symbols are truthy, strict and loose equality compare
+    identity, and `new Symbol()` throws the catchable `TypeError` a
+    non-constructor requires. Symbols are admitted property keys
+    end to end: computed access, assignment, `delete`, `in`,
+    `Object.getOwnPropertyDescriptor`, and property definition treat
+    them as identity-compared keys, while `Object.keys` reports only
+    string keys. `ToPropertyKey` passes symbols through and converts
+    everything else to a string. Converting a symbol to a number or
+    string throws a catchable `TypeError`, and `console.log` renders a
+    symbol as `Symbol(description)` the way the host console does. The
+    well-known `Symbol.iterator`, `Symbol.toPrimitive`, and
+    `Symbol.toStringTag` are fixed non-writable properties of the
+    intrinsic, and `Symbol.toPrimitive` methods participate in generic
+    `ToPrimitive`. Deliberate boundaries: `Symbol.for`, `Symbol.keyFor`,
+    `Symbol.prototype` methods including `toString` and the
+    `description` accessor, `Symbol.hasInstance` dispatch in
+    `instanceof`, and `Symbol.toStringTag` observation in
+    `Object.prototype.toString` remain outside the profile until their
+    prerequisites land.
+ -  The synchronous iterator protocol. `GetIterator` reads a value's
+    `Symbol.iterator` method and calls it, throwing a catchable
+    `TypeError` for a non-iterable, a non-callable method, or a
+    non-object iterator. `IteratorStep` calls the iterator's `next`
+    method, validates the result is an object, and reads its `done` and
+    `value` fields; `IteratorClose` calls a present `return` method,
+    preserving an in-flight error over a throwing or non-object return
+    result. A default array exposes a first-class array iterator
+    through its virtualized `Symbol.iterator`: the iterator is an
+    ordinary object whose `next` steps the array by re-reading its
+    length each call and whose `Symbol.iterator` returns itself, so
+    `array[Symbol.iterator]().next()` and user-defined iterables with a
+    `Symbol.iterator` method and a `next` method both drive iteration.
+    The iterator's next method is captured once by `GetIterator` and
+    reused for every step, as the iterator record requires.
+    `Promise.all` and `Promise.race` now consume any object iterable
+    through this protocol, replacing the former M4-array-only
+    restriction. Deliberate
+    boundaries: string and other primitive iteration, which the
+    specification reaches by boxing, is unsupported and the combinators
+    accept only object iterables; the array iterator methods are
+    array-specific rather than the generic `%Array.prototype.values%`;
+    and the `for-of` and
+    `for-await-of` statements, spread and destructuring iteration,
+    array and string iterator prototype identity, and generator-based
+    iterators remain outside the admitted syntax. The protocol is the
+    owned runtime surface those later consumers build on. Native
+    differential fixtures and runtime C fixtures with forced collection
+    cover the protocol.
 
 
 Known gaps inside the claim
@@ -197,17 +313,16 @@ must never shrink by reclassification alone.
     symbols, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
- -  Named error intrinsics such as `TypeError` do not exist. Runtime
-    semantic errors are catchable opaque values without ECMAScript error
-    identity, and only resource limits and host failures surface as owned
-    `OSEO2001` and `OSEO3001` diagnostics. test262 runtime negatives that
-    assert an error type are classified unsupported with the
-    `runtime-error-types` capability named. Owner: the intrinsics and
-    built-in objects stream.
- -  The general iterator protocol, well-known symbols, and the intrinsic
-    graph behind standard constructors are unimplemented. `Promise.all` and
-    `Promise.race` accept M4 arrays only. Owner: the intrinsics and
-    built-in objects stream.
+ -  The intrinsic
+    graph behind standard constructors other than the error and symbol
+    families is
+    unimplemented, and no built-in dispatches through
+    `Symbol.hasInstance` or `Symbol.toStringTag` yet. test262 runtime
+    negatives whose
+    thrown value has no error identity, such as a thrown
+    `Test262Error`, classify as unsupported with the
+    `runtime-error-observation` capability named. Owner: the intrinsics
+    and built-in objects stream.
  -  `globalThis` and the global object do not exist. Admitting them
     requires the intrinsic graph to expose standard constructors as real
     values first, a binding model in which top-level Script `var` and

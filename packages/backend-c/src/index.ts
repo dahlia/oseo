@@ -287,6 +287,7 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   const helpers = {
     "+": "oseo_to_number",
     "-": "oseo_negate",
+    "to-string": "oseo_to_string",
     typeof: "oseo_typeof",
     "~": "oseo_bitwise_not",
   } as const;
@@ -306,6 +307,7 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   if (
     operator == null ||
     operator === "!" ||
+    operator === "to-string" ||
     operator === "typeof" ||
     operator === "void" ||
     operator === "~" ||
@@ -666,6 +668,29 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+function emitErrorIntrinsic(state: EmitState, operation: MirOperation): void {
+  const errorKinds = {
+    Error: "OSEO_ERROR_ERROR",
+    EvalError: "OSEO_ERROR_EVAL",
+    RangeError: "OSEO_ERROR_RANGE",
+    ReferenceError: "OSEO_ERROR_REFERENCE",
+    SyntaxError: "OSEO_ERROR_SYNTAX",
+    TypeError: "OSEO_ERROR_TYPE",
+    URIError: "OSEO_ERROR_URI",
+  } as const;
+  if (operation.errorName == null) {
+    throw new Error(`MIR error-intrinsic %${operation.id} has no name.`);
+  }
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_error_intrinsic(context, ` +
+      `${errorKinds[operation.errorName]});`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitConstructReceiver(
   state: EmitState,
   operation: MirOperation,
@@ -761,6 +786,13 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitFunctionCreate(state, operation);
   } else if (operation.kind === "construct-receiver") {
     emitConstructReceiver(state, operation);
+  } else if (operation.kind === "error-intrinsic") {
+    emitErrorIntrinsic(state, operation);
+  } else if (operation.kind === "symbol-intrinsic") {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(state, "result = oseo_symbol_intrinsic(context);");
+    line(state, `roots[${operation.id}] = result.value;`);
   } else if (operation.kind === "module-namespace-create") {
     emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {
@@ -1532,7 +1564,7 @@ export const cBackend: NativeBackend = {
         "        result = oseo_entry_task_checkpoint(&context, result);\n" +
         "    }\n" +
         "    if (result.status != OSEO_STATUS_NORMAL) {\n" +
-        "        oseo_context_print_error(&context);\n" +
+        "        oseo_context_print_thrown(&context, result.value);\n" +
         "        oseo_context_destroy(&context);\n" +
         "        return 1;\n" +
         "    }\n" +

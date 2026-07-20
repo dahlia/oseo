@@ -45,6 +45,21 @@ typedef enum {
     OSEO_PROMISE_INVALID = 3,
 } OseoPromiseState;
 
+/*
+ * The named error intrinsics owned by the runtime. The enumerators
+ * index the per-context constructor and prototype tables, so they
+ * must stay contiguous from zero.
+ */
+typedef enum {
+    OSEO_ERROR_ERROR = 0,
+    OSEO_ERROR_EVAL = 1,
+    OSEO_ERROR_RANGE = 2,
+    OSEO_ERROR_REFERENCE = 3,
+    OSEO_ERROR_SYNTAX = 4,
+    OSEO_ERROR_TYPE = 5,
+    OSEO_ERROR_URI = 6,
+} OseoErrorKind;
+
 typedef struct {
     bool configurable;
     bool enumerable;
@@ -74,6 +89,16 @@ struct OseoContext {
     OseoValue promise_catch_function;
     OseoValue promise_finally_function;
     OseoValue promise_then_function;
+    /* Lazily created error intrinsics indexed by OseoErrorKind. */
+    OseoValue error_constructors[7];
+    OseoValue error_prototypes[7];
+    /* The lazily created Symbol intrinsic and well-known symbols. */
+    OseoValue symbol_constructor;
+    OseoValue well_known_symbols[3];
+    /* Cached virtualized iterator methods, permanently rooted. */
+    OseoValue iterator_values_function;
+    OseoValue iterator_next_function;
+    OseoValue iterator_self_function;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
@@ -163,6 +188,7 @@ void oseo_context_source_location(
     size_t column
 );
 void oseo_context_print_error(const OseoContext *context);
+void oseo_context_print_thrown(OseoContext *context, OseoValue thrown);
 void oseo_context_print_observations(const OseoContext *context);
 void oseo_context_set_function_dispatcher(
     OseoContext *context,
@@ -354,9 +380,12 @@ OseoResult oseo_object_builtin_set_prototype_of(
     size_t argument_count,
     const OseoValue *arguments
 );
+OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
+OseoResult oseo_symbol_intrinsic(OseoContext *context);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
 OseoResult oseo_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_to_string(OseoContext *context, OseoValue value);
 OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
     OseoContext *context,

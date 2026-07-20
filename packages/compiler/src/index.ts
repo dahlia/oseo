@@ -127,7 +127,19 @@ export type BinaryOperator =
   | "|";
 
 /** Unary operations selected before native backend lowering. */
-export type UnaryOperator = "!" | "+" | "-" | "typeof" | "void" | "~";
+/**
+ * `to-string` is a frontend-synthesized conversion with ToString's
+ * string preference; it has no source spelling and normalized template
+ * substitutions are its only producer.
+ */
+export type UnaryOperator =
+  | "!"
+  | "+"
+  | "-"
+  | "to-string"
+  | "typeof"
+  | "void"
+  | "~";
 
 /** Short-circuit operators lowered through explicit control flow. */
 export type LogicalOperator = "&&" | "??" | "||";
@@ -1153,6 +1165,34 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
   };
 }
 
+/**
+ * The named error constructors the profile admits as intrinsic values.
+ * An unshadowed reference to one of these names resolves to the
+ * runtime-owned constructor instead of an unknown-binding diagnostic.
+ */
+export type ErrorIntrinsicName =
+  | "Error"
+  | "EvalError"
+  | "RangeError"
+  | "ReferenceError"
+  | "SyntaxError"
+  | "TypeError"
+  | "URIError";
+
+const errorIntrinsicNames: readonly ErrorIntrinsicName[] = [
+  "Error",
+  "EvalError",
+  "RangeError",
+  "ReferenceError",
+  "SyntaxError",
+  "TypeError",
+  "URIError",
+];
+
+function errorIntrinsicName(name: string): ErrorIntrinsicName | undefined {
+  return errorIntrinsicNames.find((candidate) => candidate === name);
+}
+
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
@@ -1252,6 +1292,13 @@ export type HirExpression =
       readonly bindingId: number;
       readonly kind: "binding";
       readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly errorName: ErrorIntrinsicName;
+      readonly kind: "error-intrinsic";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "symbol-intrinsic";
     })
   | (LocatedSyntax & {
       readonly kind: "null";
@@ -1613,6 +1660,17 @@ function resolveExpression(
           value: expression.name === "NaN" ? NaN : Infinity,
         };
       }
+      const errorName = errorIntrinsicName(expression.name);
+      if (errorName != null) {
+        return {
+          errorName,
+          kind: "error-intrinsic",
+          range: expression.range,
+        };
+      }
+      if (expression.name === "Symbol") {
+        return { kind: "symbol-intrinsic", range: expression.range };
+      }
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -1636,7 +1694,9 @@ function resolveExpression(
       findBinding(scopes, expression.argument.name) == null &&
       expression.argument.name !== "undefined" &&
       expression.argument.name !== "NaN" &&
-      expression.argument.name !== "Infinity"
+      expression.argument.name !== "Infinity" &&
+      expression.argument.name !== "Symbol" &&
+      errorIntrinsicName(expression.argument.name) == null
     ) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -2587,6 +2647,12 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
   }
+  if (expression.kind === "error-intrinsic") {
+    return `intrinsic ${expression.errorName}`;
+  }
+  if (expression.kind === "symbol-intrinsic") {
+    return "intrinsic Symbol";
+  }
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }
@@ -2924,6 +2990,8 @@ export interface MirOperation {
     | "completion-set"
     | "construct"
     | "construct-receiver"
+    | "error-intrinsic"
+    | "symbol-intrinsic"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
@@ -2956,6 +3024,7 @@ export interface MirOperation {
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
   readonly completionSlot?: number;
   readonly completionTarget?: number;
+  readonly errorName?: ErrorIntrinsicName;
   readonly functionId?: number;
   readonly functionKind?: FunctionKind;
   readonly functionLength?: number;
@@ -3450,6 +3519,59 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "error-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "error intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `intrinsic ${expression.errorName}`,
+      errorName: expression.errorName,
+      id,
+      kind: "error-intrinsic",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "symbol-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "symbol intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "intrinsic Symbol",
+      id,
+      kind: "symbol-intrinsic",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "binding") {
     appendMirMetadata(
       builder,
@@ -3539,6 +3661,31 @@ function lowerExpression(
         builder,
         "safepoint",
         "typeof string allocation",
+        [argument],
+        expression.range,
+      );
+    }
+    if (expression.operator === "to-string") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "string conversion allocation",
+        [argument],
+        expression.range,
+      );
+    }
+    if (
+      expression.operator === "+" ||
+      expression.operator === "-" ||
+      expression.operator === "~"
+    ) {
+      // Numeric and bitwise unary operators coerce their operand through
+      // generic ToPrimitive, which allocates and can call user
+      // functions, so they declare a collection safepoint.
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "operand coercion",
         [argument],
         expression.range,
       );
@@ -3752,6 +3899,18 @@ function lowerExpression(
         expression.operator === "in"
           ? "property key allocation"
           : "prototype key allocation",
+        [left, right],
+        expression.range,
+      );
+    } else if (expression.operator !== "===" && expression.operator !== "!==") {
+      // Strict equality never coerces, but every other binary operator
+      // may reach generic ToPrimitive for an object operand, which
+      // allocates strings and typed errors and can call user functions,
+      // so it is a declared collection safepoint.
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "operand coercion",
         [left, right],
         expression.range,
       );

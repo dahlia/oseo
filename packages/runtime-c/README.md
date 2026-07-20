@@ -62,10 +62,51 @@ catchable error for non-object right operands. `oseo_instanceof`
 implements `OrdinaryHasInstance`: a non-callable right operand and a
 non-object `prototype` property throw catchable errors, a primitive left
 operand is false, and the walk compares prototype identity.
+The `m5-5` ABI adds `oseo_error_intrinsic` and
+`oseo_context_print_thrown`, and the *runtime\_error.c* component that
+owns the named error intrinsics. `oseo_error_intrinsic` returns the
+lazily created constructor for one `OseoErrorKind`; each constructor is
+callable and constructible, builds an instance with an own hidden
+`message` property, honors the ES2022 `cause` option, and shares one
+`Error.prototype.toString`. `oseo_context_print_thrown` renders an
+unhandled thrown error instance as `Name: message` in the owned
+diagnostic format and falls back to the stored diagnostic for every
+other value.
+The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive`
+behind the numeric, string, addition, relational, loose-equality,
+property-key, console, error-message, and timer-delay conversions.
+`OrdinaryToPrimitive` runs user-reachable `valueOf` and `toString` in
+hint order; objects on a default-intrinsics chain use the virtualized
+`Object.prototype` and `Array.prototype` conversions with cycle-safe,
+call-depth-bounded array joins, and an object with no convertible
+method throws a catchable `TypeError`. Function and promise text
+conversion remains an owned unsupported diagnostic.
+The `m5-7` ABI adds `oseo_symbol_intrinsic` and the *runtime\_symbol.c*
+component: unique GC-traced symbol primitives with descriptions, the
+lazily created non-constructible `Symbol` intrinsic carrying the
+well-known `iterator`, `toPrimitive`, and `toStringTag` symbols, and
+`Symbol(description)` creation. Symbols are identity-compared property
+keys, `typeof` reports `symbol`, numeric and string conversion throw
+catchable `TypeError` instances, console output renders
+`Symbol(description)`, and a reachable `Symbol.toPrimitive` method is
+dispatched by the generic `ToPrimitive`.
+The `m5-8` ABI adds the *runtime\_iterator.c* component and the
+synchronous iterator protocol: `oseo_internal_iterator_get`, `_next`, `_close`,
+over `Symbol.iterator`, `next`, and `return`, plus a first-class array iterator
+exposed through a default array's virtualized `Symbol.iterator`. The array
+iterator is an ordinary object that steps by re-reading the array length, and
+its virtualized `next` and `Symbol.iterator` methods are cached on the context
+so they stay rooted. The next method is captured once by `GetIterator` and
+reused each step, and `IteratorClose` invokes a present `return` method when a
+combinator rejects after a step. `Promise.all` and `Promise.race` consume any
+object iterable through this protocol. String and other primitive iteration and
+the generic array-like `%Array.prototype.values%` remain boundaries for later
+consumers.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
-Catchable runtime-generated language errors carry distinct opaque ordinary
-objects. Catching one clears its transient diagnostic message, while resource
+Catchable runtime-generated language errors are instances of the named
+error intrinsics with the applicable `TypeError`, `RangeError`, or
+`ReferenceError` identity and an own `message` property. Resource
 and host failures retain non-catchable diagnostics.
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.

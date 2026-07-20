@@ -426,6 +426,244 @@ static void test_loose_equality_boundary(
     }
 }
 
+static void test_to_primitive_conversion(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_object_literal_create(context));
+    roots[1] = make_text(context, "[object Object]");
+    assert(
+        require_normal(oseo_loose_equal(context, roots[0], roots[1])) ==
+        oseo_boolean(true)
+    );
+    assert(
+        require_normal(
+            oseo_loose_equal(context, roots[0], oseo_number(0.0))
+        ) == oseo_boolean(false)
+    );
+    roots[2] = require_normal(oseo_to_string(context, roots[0]));
+    assert(
+        require_normal(oseo_strict_equal(context, roots[1], roots[2])) ==
+        oseo_boolean(true)
+    );
+    OseoResult numeric = oseo_to_number(context, roots[0]);
+    assert(numeric.status == OSEO_STATUS_NORMAL);
+    /* A default object converts to "[object Object]", so its number
+     * is NaN, the one value that is not loosely equal to itself. */
+    assert(
+        require_normal(
+            oseo_loose_equal(context, numeric.value, numeric.value)
+        ) == oseo_boolean(false)
+    );
+    roots[3] = require_normal(oseo_array_create(context, 1u));
+    roots[4] = make_text(context, "0");
+    (void)require_normal(oseo_object_set(
+        context,
+        roots[3],
+        roots[4],
+        oseo_number(2.0),
+        true
+    ));
+    numeric = oseo_to_number(context, roots[3]);
+    assert(numeric.status == OSEO_STATUS_NORMAL);
+    assert(
+        require_normal(
+            oseo_strict_equal(context, numeric.value, oseo_number(2.0))
+        ) == oseo_boolean(true)
+    );
+}
+
+static void test_error_intrinsics(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_TYPE)
+    );
+    assert(
+        require_normal(oseo_error_intrinsic(context, OSEO_ERROR_TYPE)) ==
+        roots[0]
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_error_intrinsic(context, OSEO_ERROR_TYPE)) ==
+        roots[0]
+    );
+    roots[1] = make_text(context, "boom");
+    roots[2] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[0])) ==
+        oseo_boolean(true)
+    );
+    roots[3] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_ERROR)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[3])) ==
+        oseo_boolean(true)
+    );
+    roots[4] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_RANGE)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[2], roots[4])) ==
+        oseo_boolean(false)
+    );
+    OseoResult uninitialized_read =
+        oseo_read_binding(context, oseo_uninitialized());
+    assert(uninitialized_read.status == OSEO_STATUS_THROW);
+    assert(!context->has_diagnostic);
+    roots[5] = uninitialized_read.value;
+    roots[6] = require_normal(
+        oseo_error_intrinsic(context, OSEO_ERROR_REFERENCE)
+    );
+    assert(
+        require_normal(oseo_instanceof(context, roots[5], roots[6])) ==
+        oseo_boolean(true)
+    );
+}
+
+static void test_symbols(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_symbol_intrinsic(context));
+    assert(
+        require_normal(oseo_symbol_intrinsic(context)) == roots[0]
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_symbol_intrinsic(context)) == roots[0]
+    );
+    roots[1] = make_text(context, "mark");
+    roots[2] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    roots[3] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    assert(roots[2] != roots[3]);
+    roots[5] = require_normal(oseo_typeof(context, roots[2]));
+    roots[6] = require_normal(oseo_typeof(context, roots[3]));
+    assert(
+        require_normal(
+            oseo_strict_equal(context, roots[5], roots[6])
+        ) == oseo_boolean(true)
+    );
+    roots[4] = require_normal(oseo_object_literal_create(context));
+    (void)require_normal(oseo_object_set(
+        context,
+        roots[4],
+        roots[2],
+        oseo_number(1.0),
+        true
+    ));
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_object_get(context, roots[4], roots[2])) ==
+        oseo_number(1.0)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[4], roots[3])) ==
+        oseo_undefined()
+    );
+    OseoResult numeric = oseo_to_number(context, roots[2]);
+    assert(numeric.status == OSEO_STATUS_THROW);
+    assert(!context->has_diagnostic);
+}
+
+/* Read a property named by ASCII text through the public surface. */
+static OseoValue property_by_name(
+    OseoContext *context,
+    OseoValue object,
+    const char *name
+) {
+    OseoValue key = make_text(context, name);
+    OseoValue slots[2] = {object, key};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoValue value =
+        require_normal(oseo_object_get(context, slots[0], slots[1]));
+    oseo_roots_pop(context, &frame);
+    return value;
+}
+
+static OseoValue call_method(
+    OseoContext *context,
+    OseoValue receiver,
+    const char *name
+) {
+    OseoValue method = property_by_name(context, receiver, name);
+    OseoValue slots[2] = {receiver, method};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoValue result = require_normal(oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        0u,
+        NULL,
+        oseo_undefined()
+    ));
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Drive array iteration through the public surface so forced
+ * collection exercises the array iterator's traced backing array.
+ */
+static void test_iterators(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_array_create(context, 2u));
+    roots[1] = make_text(context, "0");
+    roots[2] = make_text(context, "1");
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[1], oseo_number(7.0), true)
+    );
+    (void)require_normal(
+        oseo_object_set(context, roots[0], roots[2], oseo_number(8.0), true)
+    );
+    roots[3] = require_normal(oseo_symbol_intrinsic(context));
+    roots[3] = property_by_name(context, roots[3], "iterator");
+    roots[4] = require_normal(oseo_object_get(context, roots[0], roots[3]));
+    roots[3] = require_normal(oseo_call_function(
+        context,
+        roots[4],
+        roots[0],
+        0u,
+        NULL,
+        oseo_undefined()
+    ));
+    assert(oseo_value_is_object(roots[3]));
+    context->collect_every_safepoint = true;
+    oseo_collect(context);
+    roots[5] = call_method(context, roots[3], "next");
+    assert(property_by_name(context, roots[5], "done") == oseo_boolean(false));
+    assert(property_by_name(context, roots[5], "value") == oseo_number(7.0));
+    roots[5] = call_method(context, roots[3], "next");
+    assert(
+        property_by_name(context, roots[5], "value") == oseo_number(8.0)
+    );
+    roots[5] = call_method(context, roots[3], "next");
+    assert(property_by_name(context, roots[5], "done") == oseo_boolean(true));
+    /* A self-returning Symbol.iterator keeps the array iterator usable
+     * as its own iterable. */
+    roots[6] = call_method(context, roots[3], "next");
+    assert(property_by_name(context, roots[6], "done") == oseo_boolean(true));
+    context->collect_every_safepoint = false;
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -440,6 +678,10 @@ int main(void) {
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);
+    test_to_primitive_conversion(&context, frame.slots);
+    test_error_intrinsics(&context, frame.slots);
+    test_symbols(&context, frame.slots);
+    test_iterators(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

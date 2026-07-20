@@ -33,12 +33,17 @@ static void trace_object(
         }
     } else if (object->kind == OSEO_HEAP_CELL) {
         mark_value(((OseoCell *)object)->value, worklist);
+    } else if (object->kind == OSEO_HEAP_SYMBOL) {
+        mark_value(((OseoSymbol *)object)->description, worklist);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||
                object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
+        if (ordinary->array_iterator) {
+            mark_value(ordinary->iterator_array, worklist);
+        }
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
             mark_value(ordinary->properties[index].key, worklist);
             mark_value(ordinary->properties[index].value, worklist);
@@ -109,6 +114,19 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->promise_catch_function, &worklist);
     mark_value(context->promise_finally_function, &worklist);
     mark_value(context->promise_then_function, &worklist);
+    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
+        mark_value(context->error_constructors[kind], &worklist);
+        mark_value(context->error_prototypes[kind], &worklist);
+    }
+    mark_value(context->symbol_constructor, &worklist);
+    for (size_t index = 0u;
+         index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        mark_value(context->well_known_symbols[index], &worklist);
+    }
+    mark_value(context->iterator_values_function, &worklist);
+    mark_value(context->iterator_next_function, &worklist);
+    mark_value(context->iterator_self_function, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;

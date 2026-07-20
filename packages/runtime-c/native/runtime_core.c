@@ -26,6 +26,19 @@ void oseo_context_init(
     context->promise_catch_function = oseo_undefined();
     context->promise_finally_function = oseo_undefined();
     context->promise_then_function = oseo_undefined();
+    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
+        context->error_constructors[kind] = oseo_undefined();
+        context->error_prototypes[kind] = oseo_undefined();
+    }
+    context->symbol_constructor = oseo_undefined();
+    for (size_t index = 0u;
+         index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        context->well_known_symbols[index] = oseo_undefined();
+    }
+    context->iterator_values_function = oseo_undefined();
+    context->iterator_next_function = oseo_undefined();
+    context->iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -81,6 +94,19 @@ void oseo_context_destroy(OseoContext *context) {
     context->promise_catch_function = oseo_undefined();
     context->promise_finally_function = oseo_undefined();
     context->promise_then_function = oseo_undefined();
+    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
+        context->error_constructors[kind] = oseo_undefined();
+        context->error_prototypes[kind] = oseo_undefined();
+    }
+    context->symbol_constructor = oseo_undefined();
+    for (size_t index = 0u;
+         index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        context->well_known_symbols[index] = oseo_undefined();
+    }
+    context->iterator_values_function = oseo_undefined();
+    context->iterator_next_function = oseo_undefined();
+    context->iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     oseo_collect(context);
 }
@@ -234,8 +260,9 @@ OseoValue oseo_uninitialized(void) {
 
 OseoResult oseo_read_binding(OseoContext *context, OseoValue value) {
     if (tag_of(value) == OSEO_TAG_UNINITIALIZED) {
-        return language_failure_message(
+        return oseo_internal_throw_error(
             context,
+            OSEO_ERROR_REFERENCE,
             "Binding is read before initialization."
         );
     }
@@ -243,8 +270,9 @@ OseoResult oseo_read_binding(OseoContext *context, OseoValue value) {
 }
 
 OseoResult oseo_write_immutable_binding(OseoContext *context) {
-    return language_failure_message(
+    return oseo_internal_throw_error(
         context,
+        OSEO_ERROR_TYPE,
         "Cannot assign to an immutable binding."
     );
 }

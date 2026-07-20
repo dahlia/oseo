@@ -74,6 +74,10 @@ OseoResult oseo_function_create(
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
     function->ordinary.module_namespace = false;
+    function->ordinary.error_data = false;
+    function->ordinary.array_iterator = false;
+    function->ordinary.iterator_array = oseo_undefined();
+    function->ordinary.iterator_index = 0u;
     function->ordinary.default_intrinsics = true;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
@@ -135,6 +139,17 @@ OseoResult oseo_function_create(
             context->allocations -= 1u;
         }
     }
+    /* SetFunctionName wraps a symbol key's description in brackets,
+     * producing "[description]", or an empty name for a
+     * descriptionless symbol. */
+    if (result.status == OSEO_STATUS_NORMAL && is_symbol(frame.slots[5])) {
+        result = oseo_internal_symbol_name(context, frame.slots[5]);
+        frame.slots[5] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && !is_string(frame.slots[5])) {
         result = failure(context, "OSEO2001", "Invalid function name.");
     }
@@ -185,7 +200,11 @@ OseoResult oseo_function_environment(
     OseoValue function_value
 ) {
     if (!is_function(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Called value is not a function."
+        );
     }
     return normal(function_object(function_value)->environment);
 }
@@ -196,7 +215,11 @@ OseoResult oseo_function_code_id(
     size_t *code_id
 ) {
     if (!is_function(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Called value is not a function."
+        );
     }
     *code_id = function_object(function_value)->code_id;
     return normal(function_value);
@@ -212,7 +235,11 @@ OseoResult oseo_function_prototype(
     OseoValue function_value
 ) {
     if (!function_is_constructible(function_value)) {
-        return language_failure(context);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Constructed value is not a constructor."
+        );
     }
     return normal(function_object(function_value)->prototype_object);
 }
@@ -254,7 +281,36 @@ OseoResult oseo_call_function(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
+    if (code_id >= OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID &&
+        code_id <= OSEO_ERROR_CONSTRUCT_LAST_CODE_ID) {
+        result = oseo_internal_error_construct(
+            context,
+            callee,
+            code_id,
+            argument_count,
+            arguments
+        );
+    } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
+        result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
+        result = oseo_internal_array_values(context, receiver);
+    } else if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
+        result = oseo_internal_array_iterator_next(context, receiver);
+    } else if (code_id == OSEO_ITERATOR_SELF_CODE_ID) {
+        result = normal(receiver);
+    } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
+        OseoValue description_input = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
+            result = oseo_internal_symbol_create(context, oseo_undefined());
+        } else {
+            result = oseo_internal_value_string(context, description_input);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_symbol_create(context, result.value);
+            }
+        }
+    } else if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
         code_id == OSEO_PROMISE_REJECT_CODE_ID) {
         result = oseo_function_environment(context, callee);
         OseoValue environment = result.value;

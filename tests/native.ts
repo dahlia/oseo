@@ -615,6 +615,366 @@ console.log(immutable);
 `,
   },
   {
+    name: "error-intrinsics",
+    source: `
+try { const callee = 1; callee(); } catch (error) {
+  console.log("call", error instanceof TypeError, error.name);
+}
+try { null.item; } catch (error) {
+  console.log("nullish", error instanceof TypeError,
+    error.constructor === TypeError);
+}
+try { tdz; } catch (error) {
+  console.log("tdz", error instanceof ReferenceError, error.name);
+}
+let tdz;
+const frozen = 1;
+try { frozen = 2; } catch (error) { console.log("const", error.name); }
+const numbers = [1];
+try { numbers.length = -1; } catch (error) {
+  console.log("length", error instanceof RangeError, error.name);
+}
+console.log(numbers.length);
+try { 1 instanceof 2; } catch (error) { console.log("io", error.name); }
+try { "x" in 5; } catch (error) { console.log("in", error.name); }
+const plain = new Error("plain message");
+console.log(plain.message, plain.name, plain.toString());
+console.log(plain instanceof Error, plain instanceof TypeError);
+const typed = TypeError("typed message");
+console.log(typed instanceof TypeError, typed instanceof Error);
+console.log(typed.toString(), typeof typed);
+const withCause = new RangeError("ranged", { cause: "why" });
+console.log(withCause.cause, withCause.message, withCause.toString());
+const causeless = new Error("bare options", {});
+console.log(causeless.cause, "cause" in causeless);
+const bare = new ReferenceError();
+console.log(bare.message === "", bare.name, bare.toString());
+const numbered = new SyntaxError(123);
+console.log(numbered.message, numbered.toString());
+const evalish = new EvalError("e");
+const uriish = new URIError("u");
+console.log(evalish.name, uriish.name);
+console.log(evalish instanceof Error, uriish instanceof Error);
+console.log(typeof Error, typeof TypeError, Error.name, TypeError.name);
+console.log(Error.length, TypeError.length);
+console.log(Error.prototype.name, Error.prototype.message);
+console.log(TypeError.prototype.name, TypeError.prototype.message);
+console.log(TypeError.prototype instanceof Error);
+console.log(Error.prototype.constructor === Error);
+console.log(TypeError.prototype.constructor === TypeError);
+console.log(new TypeError("t") instanceof RangeError);
+function shadowed() { const TypeError = "local"; return typeof TypeError; }
+console.log(shadowed());
+try { throw new TypeError("rethrown"); } catch (error) {
+  console.log(error.message, error.name);
+}
+const renamed = new Error("custom");
+renamed.name = "Custom";
+console.log(renamed.toString(), renamed.name, renamed instanceof Error);
+`,
+  },
+  {
+    name: "iterators",
+    source: `
+const nums = [11, 22, 33];
+const iter = nums[Symbol.iterator]();
+console.log(typeof iter, typeof iter.next);
+console.log(iter.next().value, iter.next().value);
+console.log(iter.next().value, iter.next().done, iter.next().value);
+console.log(nums[Symbol.iterator]() === nums[Symbol.iterator]());
+const selfIter = nums[Symbol.iterator]();
+console.log(selfIter[Symbol.iterator]() === selfIter);
+iter.extra = 5;
+console.log(iter.extra, typeof iter);
+const overridden = [1, 2];
+overridden[Symbol.iterator] = function () {
+  return { next: function () { return { value: 9, done: true }; } };
+};
+const oi = overridden[Symbol.iterator]();
+console.log(oi.next().done, oi.next().value);
+const ownNext = nums[Symbol.iterator]();
+ownNext.next = function () { return { value: 99, done: true }; };
+console.log(ownNext.next().value, ownNext.next().done);
+const ownIterable = {
+  [Symbol.iterator]: function () {
+    let calls = 0;
+    return {
+      next: function () {
+        calls = calls + 1;
+        this.next = function () { return { value: -1, done: false }; };
+        return { value: calls, done: calls > 2 };
+      },
+    };
+  },
+};
+Promise.all(ownIterable).then(function (values) {
+  console.log("captured", values, values.length);
+});
+console.log("next" in iter, Symbol.iterator in iter, "value" in iter);
+console.log(Symbol.iterator in nums, "length" in nums);
+console.log("next" in ({}), Symbol.iterator in ({}));
+function report(label) {
+  return function (value) { console.log(label, value, value.length); };
+}
+Promise.all([1, 2, 3]).then(report("all"));
+Promise.all([]).then(report("empty"));
+Promise.race([Promise.resolve("fast"), 2]).then(function (v) {
+  console.log("race", v);
+});
+let step = 0;
+const iterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        step = step + 1;
+        return { value: step * 10, done: step > 2 };
+      },
+    };
+  },
+};
+Promise.all(iterable).then(report("iterable"));
+Promise.all(5).then(null, function (error) {
+  console.log("bad", error instanceof TypeError);
+});
+const throwingNext = {
+  [Symbol.iterator]: function () {
+    return { next: function () { throw new RangeError("boom"); } };
+  },
+};
+Promise.all(throwingNext).then(null, function (error) {
+  console.log("throw", error instanceof RangeError);
+});
+let releaseCount = 0;
+const badThen = Promise.resolve(1);
+badThen.then = function () { throw new RangeError("bad then"); };
+const closeIterable = {
+  [Symbol.iterator]: function () {
+    let step = 0;
+    return {
+      next: function () {
+        step = step + 1;
+        return { value: step === 1 ? badThen : step, done: step > 2 };
+      },
+      return: function () { releaseCount = releaseCount + 1; return {}; },
+    };
+  },
+};
+Promise.all(closeIterable).then(null, function (error) {
+  console.log("close", error instanceof RangeError, releaseCount);
+});
+function abruptCloseIterable(makeReturn) {
+  return {
+    [Symbol.iterator]: function () {
+      let step = 0;
+      return {
+        next: function () {
+          step = step + 1;
+          return { value: step === 1 ? badThen : step, done: step > 2 };
+        },
+        return: makeReturn,
+      };
+    },
+  };
+}
+const throwingReturn = abruptCloseIterable(function () {
+  throw new TypeError("return threw");
+});
+Promise.all(throwingReturn).then(null, function (error) {
+  console.log("throw-return", error instanceof RangeError, error.message);
+});
+const primitiveReturn = abruptCloseIterable(function () { return 5; });
+Promise.all(primitiveReturn).then(null, function (error) {
+  console.log("primitive-return", error instanceof RangeError, error.message);
+});
+`,
+  },
+  {
+    name: "symbols",
+    source: `
+const first = Symbol("mark");
+const second = Symbol("mark");
+console.log(typeof first, first === second, first === first);
+console.log(first, Symbol(), Symbol(42));
+console.log(typeof Symbol, typeof Symbol.iterator, typeof Symbol.toPrimitive);
+console.log(typeof Symbol.toStringTag, Symbol.iterator === Symbol.iterator);
+console.log(typeof Symbol.prototype, Symbol.prototype === Symbol.prototype);
+const protoDesc = Object.getOwnPropertyDescriptor(Symbol, "prototype");
+console.log(protoDesc.writable, protoDesc.enumerable, protoDesc.configurable);
+try {
+  new Symbol();
+} catch (error) {
+  console.log("construct", error instanceof TypeError);
+}
+try {
+  \`\${first}\`;
+} catch (error) {
+  console.log("template", error instanceof TypeError);
+}
+try {
+  first + 1;
+} catch (error) {
+  console.log("add", error instanceof TypeError);
+}
+try {
+  first * 2;
+} catch (error) {
+  console.log("multiply", error instanceof TypeError);
+}
+const store = {};
+store[first] = "symbol keyed";
+console.log(store[first], store[second], first in store);
+console.log(Object.keys(store).length);
+store.visible = 1;
+console.log(Object.keys(store).length, Object.keys(store)[0]);
+const reported = Object.getOwnPropertyDescriptor(store, first);
+console.log(reported.value, reported.enumerable);
+console.log(delete store[first], store[first], first in store);
+const custom = {};
+custom[Symbol.toPrimitive] = function (hint) { return hint; };
+console.log(custom + "", \`\${custom}\`, custom * 1, custom == "default");
+const poisonedHint = {};
+poisonedHint[Symbol.toPrimitive] = 5;
+try {
+  poisonedHint + 1;
+} catch (error) {
+  console.log("uncallable", error instanceof TypeError);
+}
+const objectHint = {};
+objectHint[Symbol.toPrimitive] = function () { return {}; };
+try {
+  objectHint + 1;
+} catch (error) {
+  console.log("object result", error instanceof TypeError);
+}
+console.log(first == second, first == first, first == "Symbol(mark)");
+console.log(!first, first ? "truthy" : "falsy");
+const boxed = { inner: Symbol("inner") };
+console.log(boxed.inner === boxed.inner, typeof boxed.inner);
+const namedKey = Symbol("named");
+const named = { [namedKey]: function () {} };
+console.log(named[namedKey].name);
+const bareKey = Symbol();
+const bare = { [bareKey]: function () {} };
+console.log(named[namedKey].name.length, bare[bareKey].name.length);
+`,
+  },
+  {
+    name: "to-primitive",
+    source: `
+const box = { valueOf: function () { return 7; } };
+console.log(box * 3, box + 1, box + "", box < 10, box == 7);
+const speaker = { toString: function () { return "spoken"; } };
+console.log(speaker + "!", speaker == "spoken");
+console.log(\`template \${speaker}\`);
+const both = {
+  toString: function () { return "text"; },
+  valueOf: function () { return 5; },
+};
+console.log(both + 1, both * 2, \`\${both}\`, both < 6, both == 5);
+const ordered = [];
+const noisy = {
+  toString: function () {
+    ordered[ordered.length] = "toString";
+    return {};
+  },
+  valueOf: function () {
+    ordered[ordered.length] = "valueOf";
+    return 2;
+  },
+};
+console.log(noisy + 0);
+console.log(\`\${noisy}\`);
+console.log(ordered + "");
+console.log({} + 1, {} * 1, "" + {});
+console.log([1, 2] + "", [] + 1, [[1, [2, 3]], 4] + "");
+console.log([null, undefined, 1] + "");
+const cycle = [1];
+cycle[1] = cycle;
+console.log(cycle + "");
+console.log(\`\${new TypeError("boom")}\`);
+const fallback = {
+  toString: function () { return "fb"; },
+  valueOf: function () { return {}; },
+};
+console.log(fallback + 1);
+const opaque = {
+  toString: function () { return {}; },
+  valueOf: function () { return {}; },
+};
+try {
+  opaque + 1;
+} catch (error) {
+  console.log("opaque", error instanceof TypeError);
+}
+const bare = Object.create(null);
+try {
+  bare + 1;
+} catch (error) {
+  console.log("bare", error instanceof TypeError);
+}
+const thrower = {
+  valueOf: function () { throw new RangeError("inside valueOf"); },
+};
+try {
+  thrower * 2;
+} catch (error) {
+  console.log(error.name, error.message);
+}
+console.log([2] == 2, {} == "[object Object]", 2 < [3], [10] >= 9);
+const store = {};
+store[[1, 2]] = "keyed";
+console.log(store["1,2"]);
+console.log(-{}, +[], ~[], [2] ** 2, [8] >> [1], [6] % [4]);
+const joiner = [1, 2];
+joiner.join = function () { return "custom-join"; };
+console.log(joiner + "");
+function probe() {}
+console.log(probe * 2);
+const described = function () {};
+described.toString = function () { return "described"; };
+console.log(described + "!", described * 1);
+function poisoned() {}
+poisoned.valueOf = function () { return {}; };
+console.log(+poisoned, poisoned * 3);
+const arrayHeir = Object.create([1, 2]);
+arrayHeir.join = 5;
+console.log(arrayHeir + "");
+const numberJoin = [1, 2];
+numberJoin.join = 5;
+console.log(numberJoin + "");
+const functionHeir = Object.create(probe);
+try {
+  functionHeir + "";
+} catch (error) {
+  console.log("function heir", error instanceof TypeError);
+}
+try {
+  +functionHeir;
+} catch (error) {
+  console.log("numeric function heir", error instanceof TypeError);
+}
+const plainHeir = Object.create({ answer: 42 });
+console.log(plainHeir + "", +plainHeir);
+const retagged = [1, 2];
+Object.setPrototypeOf(retagged, {});
+console.log(retagged + "", +retagged);
+const shifted = function () {};
+Object.setPrototypeOf(shifted, {});
+console.log(shifted + "", +shifted);
+const rebased = new Error("x");
+Object.setPrototypeOf(rebased, {});
+console.log(rebased + "", +rebased);
+console.log(Error.prototype + "");
+const arrayedFunction = function () {};
+Object.setPrototypeOf(arrayedFunction, [1, 2]);
+arrayedFunction.join = 5;
+console.log(arrayedFunction + "");
+const arrayedError = new Error("x");
+Object.setPrototypeOf(arrayedError, [7, 8]);
+console.log(arrayedError + "");
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
@@ -2139,23 +2499,23 @@ assert.equal(finallyTdz.exitStatus, 1);
 assert.equal(finallyTdz.stdout, "cleanup\n");
 assert.match(
   finallyTdz.stderr,
-  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: Binding is read/u,
+  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: ReferenceError: Binding/u,
 );
 
-const objectCoercion = await runNativeCli(
+const functionCoercion = await runNativeCli(
   {
-    args: ["object-coercion.ts"],
-    source: "console.log([2] * 3);",
-    sourceId: "object-coercion.ts",
+    args: ["function-coercion.ts"],
+    source: "function probe() {}\nconsole.log(probe + 1);",
+    sourceId: "function-coercion.ts",
     version: "0.1.0",
   },
   host,
 );
-assert.equal(objectCoercion.exitStatus, 1);
-assert.equal(objectCoercion.stdout, "");
+assert.equal(functionCoercion.exitStatus, 1);
+assert.equal(functionCoercion.stdout, "");
 assert.match(
-  objectCoercion.stderr,
-  /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
+  functionCoercion.stderr,
+  /error\[OSEO2001\].*Function and promise text conversion is unsupported/u,
 );
 
 const objectTimerDelay = await runNativeCli(
@@ -2441,6 +2801,122 @@ assert.equal(thrownEntry.stdout, "microtask after entry throw\n");
 assert.match(
   thrownEntry.stderr,
   /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+
+const thrownTypedEntry = await runNativeCli(
+  {
+    args: ["thrown-typed-entry.ts"],
+    source: 'throw new TypeError("typed unhandled");',
+    sourceId: "thrown-typed-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownTypedEntry.exitStatus, 1);
+assert.equal(thrownTypedEntry.stdout, "");
+assert.match(
+  thrownTypedEntry.stderr,
+  /^thrown-typed-entry\.ts:1:\d+: error\[OSEO2001\]: TypeError: typed/u,
+);
+// The stable machine-readable marker records the intrinsic error kind.
+assert.match(thrownTypedEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+
+const thrownRuntimeTyped = await runNativeCli(
+  {
+    args: ["thrown-runtime-typed.ts"],
+    source: "const target = null; target.item;",
+    sourceId: "thrown-runtime-typed.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownRuntimeTyped.exitStatus, 1);
+assert.equal(thrownRuntimeTyped.stdout, "");
+assert.match(
+  thrownRuntimeTyped.stderr,
+  /error\[OSEO2001\]: TypeError: Cannot read properties of a nullish value\./u,
+);
+
+const thrownRenamedEntry = await runNativeCli(
+  {
+    args: ["thrown-renamed-entry.ts"],
+    source: `
+const renamed = new Error("body");
+renamed.name = "한글이름";
+throw renamed;
+`,
+    sourceId: "thrown-renamed-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownRenamedEntry.exitStatus, 1);
+assert.equal(thrownRenamedEntry.stdout, "");
+assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
+// The marker keeps the intrinsic Error identity even though the human
+// diagnostic shows the mutated non-identifier name.
+assert.match(thrownRenamedEntry.stderr, /\nOSEO_THROWN Error\n$/u);
+
+const thrownEmptyEntry = await runNativeCli(
+  {
+    args: ["thrown-empty-entry.ts"],
+    source: `
+const blank = new TypeError("");
+blank.name = "";
+throw blank;
+`,
+    sourceId: "thrown-empty-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownEmptyEntry.exitStatus, 1);
+assert.equal(thrownEmptyEntry.stdout, "");
+// With no renderable name or message the human diagnostic falls back to the
+// generic throw text, yet the marker still exposes the intrinsic identity.
+assert.match(
+  thrownEmptyEntry.stderr,
+  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+);
+assert.match(thrownEmptyEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+
+const thrownPrototypeEntry = await runNativeCli(
+  {
+    args: ["thrown-prototype-entry.ts"],
+    source: `
+throw TypeError.prototype;
+`,
+    sourceId: "thrown-prototype-entry.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownPrototypeEntry.exitStatus, 1);
+assert.equal(thrownPrototypeEntry.stdout, "");
+// Throwing the intrinsic prototype object itself keeps its exact identity,
+// because the kind walk starts at the thrown value rather than its prototype.
+assert.match(thrownPrototypeEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+
+const thrownConvertedMessage = await runNativeCli(
+  {
+    args: ["thrown-converted-message.ts"],
+    source: `
+const boom = new Error("original");
+boom.message = { toString: function () { return "converted"; } };
+throw boom;
+`,
+    sourceId: "thrown-converted-message.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownConvertedMessage.exitStatus, 1);
+assert.equal(thrownConvertedMessage.stdout, "");
+// The diagnostic points at the throw site (line 4), not the toString
+// method whose conversion moved the context source location.
+assert.match(
+  thrownConvertedMessage.stderr,
+  /^thrown-converted-message\.ts:4:1: error\[OSEO2001\]: Error: converted/u,
 );
 
 const wideBindings = Array.from(
