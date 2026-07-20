@@ -375,6 +375,58 @@ function emitBoxSmi(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = oseo_value_box_smi(fast_${argument});`);
 }
 
+function emitIteratorOperation(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  if (operation.kind === "iterator-get") {
+    const iterable = operationArgument(operation, 0);
+    const nextMethod = operation.iteratorNextMethodResult;
+    if (nextMethod == null) {
+      throw new Error(`MIR iterator get %${operation.id} has no next method.`);
+    }
+    line(
+      state,
+      `result = oseo_iterator_get(context, roots[${iterable}], ` +
+        `&roots[${nextMethod}]);`,
+    );
+    line(state, `roots[${operation.id}] = result.value;`);
+    return;
+  }
+  if (operation.kind === "iterator-next") {
+    const iterator = operationArgument(operation, 0);
+    const nextMethod = operationArgument(operation, 1);
+    const value = operation.iteratorValueResult;
+    if (value == null) {
+      throw new Error(`MIR iterator next %${operation.id} has no value.`);
+    }
+    state.scalarKinds.set(operation.id, "boolean");
+    line(state, `bool iterator_done_${operation.id} = true;`);
+    line(
+      state,
+      `result = oseo_iterator_next(context, roots[${iterator}], ` +
+        `roots[${nextMethod}], &roots[${value}], ` +
+        `&iterator_done_${operation.id});`,
+    );
+    line(state, `bool fast_${operation.id} = !iterator_done_${operation.id};`);
+    return;
+  }
+  const iterator = operationArgument(operation, 0);
+  const slot = operation.completionSlot;
+  if (slot == null) {
+    throw new Error(`MIR iterator close %${operation.id} has no completion.`);
+  }
+  state.usesCompletion = true;
+  line(
+    state,
+    `result = oseo_iterator_close(context, roots[${iterator}], ` +
+      `completion_kind[${slot}u] == 2);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitCall(state: EmitState, operation: MirOperation): void {
   const target = operation.target;
   if (target == null) {
@@ -879,6 +931,12 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitCheckedAdd(state, operation);
   } else if (operation.kind === "box-smi") {
     emitBoxSmi(state, operation);
+  } else if (
+    operation.kind === "iterator-get" ||
+    operation.kind === "iterator-next" ||
+    operation.kind === "iterator-close"
+  ) {
+    emitIteratorOperation(state, operation);
   } else if (operation.kind === "load-fixed-slot") {
     emitLoadFixedSlot(state, operation);
   } else if (operation.kind === "update-property-cache") {
@@ -1093,6 +1151,12 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       if (operation.checkedResult != null) {
         maximum = Math.max(maximum, operation.checkedResult);
       }
+      if (operation.iteratorNextMethodResult != null) {
+        maximum = Math.max(maximum, operation.iteratorNextMethodResult);
+      }
+      if (operation.iteratorValueResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueResult);
+      }
       for (const argument of operation.arguments) {
         maximum = Math.max(maximum, argument);
       }
@@ -1149,6 +1213,8 @@ function completionSlotCount(blocks: readonly MirBlock[]): number {
         (operation) =>
           operation.kind === "caught" ||
           operation.kind === "completion-set" ||
+          (operation.kind === "iterator-close" &&
+            operation.completionSlot != null) ||
           (operation.kind === "check-status" && operation.abruptTarget != null),
       ),
   );

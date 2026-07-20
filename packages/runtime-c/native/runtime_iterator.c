@@ -205,7 +205,7 @@ OseoResult oseo_internal_array_iterator_next(
  * specification's iterator record requires. A default array with no
  * user-overridden Symbol.iterator uses the native array iterator.
  */
-OseoResult oseo_internal_iterator_get(
+OseoResult oseo_iterator_get(
     OseoContext *context,
     OseoValue iterable,
     OseoValue *next_method
@@ -285,7 +285,7 @@ OseoResult oseo_internal_iterator_get(
  * an object, and read its done and value fields. A truthy done reports
  * exhaustion.
  */
-OseoResult oseo_internal_iterator_next(
+OseoResult oseo_iterator_next(
     OseoContext *context,
     OseoValue iterator,
     OseoValue next_method,
@@ -346,7 +346,7 @@ OseoResult oseo_internal_iterator_next(
  * discarded, but a non-catchable resource or host diagnostic still
  * propagates.
  */
-OseoResult oseo_internal_iterator_close(
+OseoResult oseo_iterator_close(
     OseoContext *context,
     OseoValue iterator,
     bool from_error

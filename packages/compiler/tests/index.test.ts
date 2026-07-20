@@ -18,6 +18,7 @@ import type {
   Diagnostic,
   DiagnosticCode,
   Hint,
+  MirProgram,
   ModuleGraph,
   SourceRange,
   SyntaxModule,
@@ -102,6 +103,53 @@ const range: SourceRange = {
   end: { column: 2, line: 1 },
   start: { column: 1, line: 1 },
 };
+
+test("prints iterator operations with their rooted secondary results", () => {
+  const mir: MirProgram = {
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [0],
+              detail: "get iterator",
+              id: 1,
+              iteratorNextMethodResult: 2,
+              kind: "iterator-get",
+              range,
+            },
+            {
+              arguments: [1, 2],
+              detail: "step iterator",
+              id: 3,
+              iteratorValueResult: 4,
+              kind: "iterator-next",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 4 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 5,
+    },
+    sourceId: "iterator.ts",
+    specialization: "disabled",
+  };
+  const text = printMir(mir);
+  assert.match(text, /%1, %2 = iterator-get get iterator %0/u);
+  assert.match(text, /%3, %4 = iterator-next step iterator %1, %2/u);
+});
 
 test("resolves owned syntax and prints deterministic generic IR", () => {
   const syntax: SyntaxProgram = {

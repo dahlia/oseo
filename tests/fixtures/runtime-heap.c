@@ -583,46 +583,9 @@ static void test_symbols(OseoContext *context, OseoValue *roots) {
     assert(!context->has_diagnostic);
 }
 
-/* Read a property named by ASCII text through the public surface. */
-static OseoValue property_by_name(
-    OseoContext *context,
-    OseoValue object,
-    const char *name
-) {
-    OseoValue key = make_text(context, name);
-    OseoValue slots[2] = {object, key};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoValue value =
-        require_normal(oseo_object_get(context, slots[0], slots[1]));
-    oseo_roots_pop(context, &frame);
-    return value;
-}
-
-static OseoValue call_method(
-    OseoContext *context,
-    OseoValue receiver,
-    const char *name
-) {
-    OseoValue method = property_by_name(context, receiver, name);
-    OseoValue slots[2] = {receiver, method};
-    OseoRootFrame frame = {NULL, slots, 2u};
-    oseo_roots_push(context, &frame);
-    OseoValue result = require_normal(oseo_call_function(
-        context,
-        slots[1],
-        slots[0],
-        0u,
-        NULL,
-        oseo_undefined()
-    ));
-    oseo_roots_pop(context, &frame);
-    return result;
-}
-
 /*
- * Drive array iteration through the public surface so forced
- * collection exercises the array iterator's traced backing array.
+ * Drive array iteration through the generated-code ABI so forced
+ * collection exercises every rooted iterator-record value.
  */
 static void test_iterators(OseoContext *context, OseoValue *roots) {
     roots[0] = require_normal(oseo_array_create(context, 2u));
@@ -634,33 +597,37 @@ static void test_iterators(OseoContext *context, OseoValue *roots) {
     (void)require_normal(
         oseo_object_set(context, roots[0], roots[2], oseo_number(8.0), true)
     );
-    roots[3] = require_normal(oseo_symbol_intrinsic(context));
-    roots[3] = property_by_name(context, roots[3], "iterator");
-    roots[4] = require_normal(oseo_object_get(context, roots[0], roots[3]));
-    roots[3] = require_normal(oseo_call_function(
-        context,
-        roots[4],
-        roots[0],
-        0u,
-        NULL,
-        oseo_undefined()
-    ));
+    OseoValue next_method = oseo_undefined();
+    roots[3] = require_normal(
+        oseo_iterator_get(context, roots[0], &next_method)
+    );
+    roots[4] = next_method;
     assert(oseo_value_is_object(roots[3]));
     context->collect_every_safepoint = true;
     oseo_collect(context);
-    roots[5] = call_method(context, roots[3], "next");
-    assert(property_by_name(context, roots[5], "done") == oseo_boolean(false));
-    assert(property_by_name(context, roots[5], "value") == oseo_number(7.0));
-    roots[5] = call_method(context, roots[3], "next");
-    assert(
-        property_by_name(context, roots[5], "value") == oseo_number(8.0)
-    );
-    roots[5] = call_method(context, roots[3], "next");
-    assert(property_by_name(context, roots[5], "done") == oseo_boolean(true));
-    /* A self-returning Symbol.iterator keeps the array iterator usable
-     * as its own iterable. */
-    roots[6] = call_method(context, roots[3], "next");
-    assert(property_by_name(context, roots[6], "done") == oseo_boolean(true));
+    OseoValue value = oseo_undefined();
+    bool done = true;
+    OseoValue has_value = require_normal(oseo_iterator_next(
+        context, roots[3], roots[4], &value, &done
+    ));
+    roots[5] = value;
+    assert(has_value == oseo_boolean(true));
+    assert(!done);
+    assert(roots[5] == oseo_number(7.0));
+    has_value = require_normal(oseo_iterator_next(
+        context, roots[3], roots[4], &value, &done
+    ));
+    roots[5] = value;
+    assert(has_value == oseo_boolean(true));
+    assert(!done);
+    assert(roots[5] == oseo_number(8.0));
+    has_value = require_normal(oseo_iterator_next(
+        context, roots[3], roots[4], &value, &done
+    ));
+    roots[5] = value;
+    assert(has_value == oseo_boolean(false));
+    assert(done);
+    (void)require_normal(oseo_iterator_close(context, roots[3], false));
     context->collect_every_safepoint = false;
 }
 

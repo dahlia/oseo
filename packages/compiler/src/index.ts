@@ -3006,6 +3006,9 @@ export interface MirOperation {
     | "guard-shape"
     | "guard-smi"
     | "initialize"
+    | "iterator-close"
+    | "iterator-get"
+    | "iterator-next"
     | "join"
     | "load-fixed-slot"
     | "module-namespace-create"
@@ -3037,6 +3040,8 @@ export interface MirOperation {
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
+  readonly iteratorNextMethodResult?: number;
+  readonly iteratorValueResult?: number;
   readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
   readonly target?: MirCallTarget;
@@ -5126,6 +5131,12 @@ function maximumMirValue(functionValue: MirFunction): number {
       if (operation.checkedResult != null) {
         maximum = Math.max(maximum, operation.checkedResult);
       }
+      if (operation.iteratorNextMethodResult != null) {
+        maximum = Math.max(maximum, operation.iteratorNextMethodResult);
+      }
+      if (operation.iteratorValueResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueResult);
+      }
     }
   }
   return maximum;
@@ -5495,9 +5506,13 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
         .map((argument) => `%${argument}`)
         .join(", ");
       const resultText =
-        operation.checkedResult == null
-          ? `%${operation.id}`
-          : `%${operation.id}, %${operation.checkedResult}`;
+        operation.checkedResult != null
+          ? `%${operation.id}, %${operation.checkedResult}`
+          : operation.iteratorNextMethodResult != null
+            ? `%${operation.id}, %${operation.iteratorNextMethodResult}`
+            : operation.iteratorValueResult != null
+              ? `%${operation.id}, %${operation.iteratorValueResult}`
+              : `%${operation.id}`;
       const hintTextValue =
         operation.hint == null
           ? ""

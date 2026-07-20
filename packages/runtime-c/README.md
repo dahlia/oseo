@@ -102,6 +102,11 @@ combinator rejects after a step. `Promise.all` and `Promise.race` consume any
 object iterable through this protocol. String and other primitive iteration and
 the generic array-like `%Array.prototype.values%` remain boundaries for later
 consumers.
+The `m5-9` ABI promotes that iterator record surface to the generated-code
+entry points `oseo_iterator_get`, `oseo_iterator_next`, and
+`oseo_iterator_close`. Generated C keeps the iterator, captured next method,
+and yielded value in separate root slots instead of allocating a hidden
+iterator-record object. Promise combinators use the same entry points.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
