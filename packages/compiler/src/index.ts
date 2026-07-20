@@ -3674,6 +3674,22 @@ function lowerExpression(
         expression.range,
       );
     }
+    if (
+      expression.operator === "+" ||
+      expression.operator === "-" ||
+      expression.operator === "~"
+    ) {
+      // Numeric and bitwise unary operators coerce their operand through
+      // generic ToPrimitive, which allocates and can call user
+      // functions, so they declare a collection safepoint.
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "operand coercion",
+        [argument],
+        expression.range,
+      );
+    }
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
@@ -3883,6 +3899,18 @@ function lowerExpression(
         expression.operator === "in"
           ? "property key allocation"
           : "prototype key allocation",
+        [left, right],
+        expression.range,
+      );
+    } else if (expression.operator !== "===" && expression.operator !== "!==") {
+      // Strict equality never coerces, but every other binary operator
+      // may reach generic ToPrimitive for an object operand, which
+      // allocates strings and typed errors and can call user functions,
+      // so it is a declared collection safepoint.
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "operand coercion",
         [left, right],
         expression.range,
       );

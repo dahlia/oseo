@@ -580,8 +580,8 @@ test("lowers typeof and remainder through checked runtime calls", () => {
   assert.equal(operations[remainderIndex + 1]?.kind, "check-status");
 });
 
-test("checks the status of coercing unary operators", () => {
-  for (const operator of ["+", "~"] as const) {
+test("marks coercing unary operators as allocation safepoints", () => {
+  for (const operator of ["+", "-", "~"] as const) {
     const syntax: SyntaxProgram = {
       body: [
         {
@@ -609,7 +609,131 @@ test("checks the status of coercing unary operators", () => {
         operation.kind === "unary" && operation.operator === operator,
     );
     assert.ok(index >= 0);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.match(operations[index - 1]?.detail ?? "", /operand coercion/u);
     assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps non-coercing unary operators without a coercion safepoint", () => {
+  for (const operator of ["!", "void"] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            argument: { kind: "boolean", range, value: true },
+            kind: "unary",
+            operator,
+            range,
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `unary-${operator}.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "unary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.notEqual(operations[index - 1]?.detail, "operand coercion");
+  }
+});
+
+test("marks every coercing binary operator as an allocation safepoint", () => {
+  const coercing = [
+    "-",
+    "*",
+    "/",
+    "%",
+    "**",
+    "&",
+    "|",
+    "^",
+    "<<",
+    ">>",
+    ">>>",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "==",
+    "!=",
+  ] as const;
+  for (const operator of coercing) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "number", range, value: 1 },
+            operator,
+            range,
+            right: { kind: "number", range, value: 2 },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `binary-safepoint.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0, `${operator} lowers to a binary operation`);
+    assert.equal(operations[index - 1]?.kind, "safepoint");
+    assert.match(operations[index - 1]?.detail ?? "", /operand coercion/u);
+    assert.equal(operations[index + 1]?.kind, "check-status");
+  }
+});
+
+test("keeps strict equality without a coercion safepoint", () => {
+  for (const operator of ["===", "!=="] as const) {
+    const syntax: SyntaxProgram = {
+      body: [
+        {
+          expression: {
+            kind: "binary",
+            left: { kind: "number", range, value: 1 },
+            operator,
+            range,
+            right: { kind: "number", range, value: 2 },
+          },
+          kind: "expression",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `strict-equality.ts`,
+    };
+    const hir = buildHir(syntax).program;
+    assert.ok(hir != null);
+    const operations = buildMir(hir).script.blocks.flatMap(
+      (block) => block.operations,
+    );
+    const index = operations.findIndex(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === operator,
+    );
+    assert.ok(index >= 0);
+    assert.notEqual(operations[index - 1]?.detail, "operand coercion");
   }
 });
 
