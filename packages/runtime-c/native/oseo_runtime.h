@@ -95,6 +95,10 @@ struct OseoContext {
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
     OseoValue well_known_symbols[3];
+    /* Cached virtualized iterator methods, permanently rooted. */
+    OseoValue iterator_values_function;
+    OseoValue iterator_next_function;
+    OseoValue iterator_self_function;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;

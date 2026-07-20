@@ -272,6 +272,35 @@ its deliberate boundary and its evidence:
     `instanceof`, and `Symbol.toStringTag` observation in
     `Object.prototype.toString` remain outside the profile until their
     prerequisites land.
+ -  The synchronous iterator protocol. `GetIterator` reads a value's
+    `Symbol.iterator` method and calls it, throwing a catchable
+    `TypeError` for a non-iterable, a non-callable method, or a
+    non-object iterator. `IteratorStep` calls the iterator's `next`
+    method, validates the result is an object, and reads its `done` and
+    `value` fields; `IteratorClose` calls a present `return` method,
+    preserving an in-flight error over a throwing or non-object return
+    result. A default array exposes a first-class array iterator
+    through its virtualized `Symbol.iterator`: the iterator is an
+    ordinary object whose `next` steps the array by re-reading its
+    length each call and whose `Symbol.iterator` returns itself, so
+    `array[Symbol.iterator]().next()` and user-defined iterables with a
+    `Symbol.iterator` method and a `next` method both drive iteration.
+    The iterator's next method is captured once by `GetIterator` and
+    reused for every step, as the iterator record requires.
+    `Promise.all` and `Promise.race` now consume any object iterable
+    through this protocol, replacing the former M4-array-only
+    restriction. Deliberate
+    boundaries: string and other primitive iteration, which the
+    specification reaches by boxing, is unsupported and the combinators
+    accept only object iterables; the array iterator methods are
+    array-specific rather than the generic `%Array.prototype.values%`;
+    and the `for-of` and
+    `for-await-of` statements, spread and destructuring iteration,
+    array and string iterator prototype identity, and generator-based
+    iterators remain outside the admitted syntax. The protocol is the
+    owned runtime surface those later consumers build on. Native
+    differential fixtures and runtime C fixtures with forced collection
+    cover the protocol.
 
 
 Known gaps inside the claim
@@ -284,13 +313,12 @@ must never shrink by reclassification alone.
     symbols, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
- -  The general iterator protocol and the intrinsic
+ -  The intrinsic
     graph behind standard constructors other than the error and symbol
-    families are
-    unimplemented. The well-known symbols exist as values, but no
-    built-in dispatches through `Symbol.iterator`,
-    `Symbol.hasInstance`, or `Symbol.toStringTag` yet. `Promise.all` and
-    `Promise.race` accept M4 arrays only. test262 runtime negatives whose
+    families is
+    unimplemented, and no built-in dispatches through
+    `Symbol.hasInstance` or `Symbol.toStringTag` yet. test262 runtime
+    negatives whose
     thrown value has no error identity, such as a thrown
     `Test262Error`, classify as unsupported with the
     `runtime-error-observation` capability named. Owner: the intrinsics

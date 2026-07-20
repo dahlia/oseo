@@ -41,6 +41,9 @@ static void trace_object(
                object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
+        if (ordinary->array_iterator) {
+            mark_value(ordinary->iterator_array, worklist);
+        }
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
             mark_value(ordinary->properties[index].key, worklist);
             mark_value(ordinary->properties[index].value, worklist);
@@ -121,6 +124,9 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
+    mark_value(context->iterator_values_function, &worklist);
+    mark_value(context->iterator_next_function, &worklist);
+    mark_value(context->iterator_self_function, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;

@@ -80,6 +80,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "error-intrinsics",
   "expression-operators",
   "functions",
+  "iterator-protocol",
   "lexical-bindings",
   "module-linking",
   "object-properties",

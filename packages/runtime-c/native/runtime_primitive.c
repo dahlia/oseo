@@ -1410,14 +1410,23 @@ OseoResult oseo_has_property(
             current, property, &value, &attributes)) {
             return normal(oseo_boolean(true));
         }
-        if (is_promise(current) &&
-            ordinary_object(current)->default_intrinsics &&
+        OseoOrdinaryObject *object = ordinary_object(current);
+        if (is_promise(current) && object->default_intrinsics &&
             (oseo_internal_string_is_ascii(property, "then") ||
              oseo_internal_string_is_ascii(property, "catch") ||
              oseo_internal_string_is_ascii(property, "finally"))) {
             return normal(oseo_boolean(true));
         }
-        current = ordinary_object(current)->prototype;
+        if (object->array_iterator && object->default_intrinsics &&
+            (oseo_internal_string_is_ascii(property, "next") ||
+             oseo_internal_iterator_key_matches(context, property))) {
+            return normal(oseo_boolean(true));
+        }
+        if (is_array(current) && object->default_intrinsics &&
+            oseo_internal_iterator_key_matches(context, property)) {
+            return normal(oseo_boolean(true));
+        }
+        current = object->prototype;
     }
     return normal(oseo_boolean(false));
 }

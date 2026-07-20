@@ -90,6 +90,18 @@ keys, `typeof` reports `symbol`, numeric and string conversion throw
 catchable `TypeError` instances, console output renders
 `Symbol(description)`, and a reachable `Symbol.toPrimitive` method is
 dispatched by the generic `ToPrimitive`.
+The `m5-8` ABI adds the *runtime\_iterator.c* component and the
+synchronous iterator protocol: `oseo_internal_iterator_get`, `_next`, `_close`,
+over `Symbol.iterator`, `next`, and `return`, plus a first-class array iterator
+exposed through a default array's virtualized `Symbol.iterator`. The array
+iterator is an ordinary object that steps by re-reading the array length, and
+its virtualized `next` and `Symbol.iterator` methods are cached on the context
+so they stay rooted. The next method is captured once by `GetIterator` and
+reused each step, and `IteratorClose` invokes a present `return` method when a
+combinator rejects after a step. `Promise.all` and `Promise.race` consume any
+object iterable through this protocol. String and other primitive iteration and
+the generic array-like `%Array.prototype.values%` remain boundaries for later
+consumers.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

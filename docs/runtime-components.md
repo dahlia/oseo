@@ -17,15 +17,16 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists twelve reviewed assets in this order:
+The runtime input now lists thirteen reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
 *runtime\_memory.c*, *runtime\_binding.c*, *runtime\_object.c*,
 *runtime\_function.c*, *runtime\_error.c*, *runtime\_symbol.c*,
-*runtime\_primitive.c*,
+*runtime\_iterator.c*, *runtime\_primitive.c*,
 *runtime\_promise.c*, and
 *runtime\_event\_loop.c*. The M5 named-error-intrinsics unit added
-*runtime\_error.c* as the first post-componentization component, and
-the symbols unit added *runtime\_symbol.c*, each
+*runtime\_error.c* as the first post-componentization component, the
+symbols unit added *runtime\_symbol.c*, and the iterator-protocol unit
+added *runtime\_iterator.c*, each
 following the same ownership, include, and one-definition rules. No
 catch-all *runtime.c* remains, and no
 temporary forwarding helper was needed at any point in the migration.
@@ -53,6 +54,9 @@ Ownership follows the plan's target layout:
     shared `Error.prototype.toString`, and unhandled-throw rendering;
  -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol`
     intrinsic, the well-known symbols, and descriptive symbol text;
+ -  *runtime\_iterator.c*: the synchronous iterator protocol
+    (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
+    first-class array iterator, and its cached virtualized methods;
  -  *runtime\_primitive.c*: coercions including the generic
     `ToPrimitive`, arithmetic, comparison, string
     conversion, and console output;
@@ -64,7 +68,7 @@ Ownership follows the plan's target layout:
 
 ### Internal helpers
 
-Twenty-three helpers cross a translation-unit boundary. Each uses the
+Thirty helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -83,6 +87,13 @@ Twenty-three helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_symbol_text`                         | *runtime\_symbol.c*    |
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*    |
 | `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*    |
+| `oseo_internal_iterator_get`                        | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_next`                       | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_close`                      | *runtime\_iterator.c*  |
+| `oseo_internal_array_values`                        | *runtime\_iterator.c*  |
+| `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_method`                     | *runtime\_iterator.c*  |
+| `oseo_internal_iterator_key_matches`                | *runtime\_iterator.c*  |
 | `oseo_internal_to_number`                           | *runtime\_primitive.c* |
 | `oseo_internal_to_primitive`                        | *runtime\_primitive.c* |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c* |
@@ -122,7 +133,13 @@ express observable language semantics:
  -  function and symbol: function creation applies `SetFunctionName`
     to a symbol key through `oseo_internal_symbol_name`, while the
     `Symbol` intrinsic and its well-known symbols are built through the
-    public function and object operations.
+    public function and object operations;
+ -  object and iterator: `oseo_object_get` materializes an array's
+    `Symbol.iterator` and an array iterator's `next` through
+    `oseo_internal_iterator_method`, while the iterator component reads
+    elements, reads and calls `next` and `return`, and reads the
+    well-known iterator symbol through public object, symbol, and
+    function operations.
 
 The event-loop component is a one-way dependent: timer turns drain jobs
 through `oseo_internal_jobs_drain_until` and

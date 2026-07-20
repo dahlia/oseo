@@ -266,6 +266,9 @@ static OseoResult object_create(
     object->length_writable = false;
     object->module_namespace = false;
     object->error_data = false;
+    object->array_iterator = false;
+    object->iterator_array = oseo_undefined();
+    object->iterator_index = 0u;
     object->default_intrinsics = default_intrinsics;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
@@ -299,6 +302,9 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->length_writable = true;
     array->module_namespace = false;
     array->error_data = false;
+    array->array_iterator = false;
+    array->iterator_array = oseo_undefined();
+    array->iterator_index = 0u;
     array->default_intrinsics = true;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
@@ -389,6 +395,27 @@ OseoResult oseo_object_get(
                 return oseo_internal_promise_method_function(
                     context, "finally");
             }
+        }
+        if (object->array_iterator && object->default_intrinsics) {
+            if (oseo_internal_string_is_ascii(key, "next")) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_ARRAY_ITERATOR_NEXT_CODE_ID
+                );
+            }
+            if (oseo_internal_iterator_key_matches(context, key)) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_ITERATOR_SELF_CODE_ID
+                );
+            }
+        }
+        if (is_array(current) && object->default_intrinsics &&
+            oseo_internal_iterator_key_matches(context, key)) {
+            return oseo_internal_iterator_method(
+                context,
+                OSEO_ARRAY_VALUES_CODE_ID
+            );
         }
         current = object->prototype;
     }

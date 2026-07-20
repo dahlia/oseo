@@ -674,6 +674,121 @@ console.log(renamed.toString(), renamed.name, renamed instanceof Error);
 `,
   },
   {
+    name: "iterators",
+    source: `
+const nums = [11, 22, 33];
+const iter = nums[Symbol.iterator]();
+console.log(typeof iter, typeof iter.next);
+console.log(iter.next().value, iter.next().value);
+console.log(iter.next().value, iter.next().done, iter.next().value);
+console.log(nums[Symbol.iterator]() === nums[Symbol.iterator]());
+const selfIter = nums[Symbol.iterator]();
+console.log(selfIter[Symbol.iterator]() === selfIter);
+iter.extra = 5;
+console.log(iter.extra, typeof iter);
+const overridden = [1, 2];
+overridden[Symbol.iterator] = function () {
+  return { next: function () { return { value: 9, done: true }; } };
+};
+const oi = overridden[Symbol.iterator]();
+console.log(oi.next().done, oi.next().value);
+const ownNext = nums[Symbol.iterator]();
+ownNext.next = function () { return { value: 99, done: true }; };
+console.log(ownNext.next().value, ownNext.next().done);
+const ownIterable = {
+  [Symbol.iterator]: function () {
+    let calls = 0;
+    return {
+      next: function () {
+        calls = calls + 1;
+        this.next = function () { return { value: -1, done: false }; };
+        return { value: calls, done: calls > 2 };
+      },
+    };
+  },
+};
+Promise.all(ownIterable).then(function (values) {
+  console.log("captured", values, values.length);
+});
+console.log("next" in iter, Symbol.iterator in iter, "value" in iter);
+console.log(Symbol.iterator in nums, "length" in nums);
+console.log("next" in ({}), Symbol.iterator in ({}));
+function report(label) {
+  return function (value) { console.log(label, value, value.length); };
+}
+Promise.all([1, 2, 3]).then(report("all"));
+Promise.all([]).then(report("empty"));
+Promise.race([Promise.resolve("fast"), 2]).then(function (v) {
+  console.log("race", v);
+});
+let step = 0;
+const iterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        step = step + 1;
+        return { value: step * 10, done: step > 2 };
+      },
+    };
+  },
+};
+Promise.all(iterable).then(report("iterable"));
+Promise.all(5).then(null, function (error) {
+  console.log("bad", error instanceof TypeError);
+});
+const throwingNext = {
+  [Symbol.iterator]: function () {
+    return { next: function () { throw new RangeError("boom"); } };
+  },
+};
+Promise.all(throwingNext).then(null, function (error) {
+  console.log("throw", error instanceof RangeError);
+});
+let releaseCount = 0;
+const badThen = Promise.resolve(1);
+badThen.then = function () { throw new RangeError("bad then"); };
+const closeIterable = {
+  [Symbol.iterator]: function () {
+    let step = 0;
+    return {
+      next: function () {
+        step = step + 1;
+        return { value: step === 1 ? badThen : step, done: step > 2 };
+      },
+      return: function () { releaseCount = releaseCount + 1; return {}; },
+    };
+  },
+};
+Promise.all(closeIterable).then(null, function (error) {
+  console.log("close", error instanceof RangeError, releaseCount);
+});
+function abruptCloseIterable(makeReturn) {
+  return {
+    [Symbol.iterator]: function () {
+      let step = 0;
+      return {
+        next: function () {
+          step = step + 1;
+          return { value: step === 1 ? badThen : step, done: step > 2 };
+        },
+        return: makeReturn,
+      };
+    },
+  };
+}
+const throwingReturn = abruptCloseIterable(function () {
+  throw new TypeError("return threw");
+});
+Promise.all(throwingReturn).then(null, function (error) {
+  console.log("throw-return", error instanceof RangeError, error.message);
+});
+const primitiveReturn = abruptCloseIterable(function () { return 5; });
+Promise.all(primitiveReturn).then(null, function (error) {
+  console.log("primitive-return", error instanceof RangeError, error.message);
+});
+`,
+  },
+  {
     name: "symbols",
     source: `
 const first = Symbol("mark");

@@ -48,6 +48,12 @@
     (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_SYMBOL_CONSTRUCT_CODE_ID \
     (SIZE_MAX - 11u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ARRAY_VALUES_CODE_ID \
+    (SIZE_MAX - 12u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ARRAY_ITERATOR_NEXT_CODE_ID \
+    (SIZE_MAX - 13u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ITERATOR_SELF_CODE_ID \
+    (SIZE_MAX - 14u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -132,6 +138,11 @@ typedef struct {
     bool default_intrinsics;
     /* The [[ErrorData]] brand Object.prototype.toString observes. */
     bool error_data;
+    /* Array iterator state: a flagged object backs a default array's
+     * values iterator, tracing the array and stepping the index. */
+    bool array_iterator;
+    OseoValue iterator_array;
+    size_t iterator_index;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -302,6 +313,11 @@ static inline bool is_symbol(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_SYMBOL;
 }
+static inline bool is_array_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->array_iterator;
+}
 static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
@@ -434,6 +450,39 @@ OseoResult oseo_internal_symbol_name(
 OseoResult oseo_internal_well_known_symbol(
     OseoContext *context,
     size_t index
+);
+OseoResult oseo_internal_iterator_get(
+    OseoContext *context,
+    OseoValue iterable,
+    OseoValue *next_method
+);
+OseoResult oseo_internal_iterator_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_internal_iterator_close(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error
+);
+OseoResult oseo_internal_array_values(
+    OseoContext *context,
+    OseoValue array
+);
+OseoResult oseo_internal_array_iterator_next(
+    OseoContext *context,
+    OseoValue iterator
+);
+bool oseo_internal_iterator_key_matches(
+    OseoContext *context,
+    OseoValue key
+);
+OseoResult oseo_internal_iterator_method(
+    OseoContext *context,
+    size_t code_id
 );
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_jobs_drain_until(

@@ -499,10 +499,10 @@ values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is
-complete: the runtime ships ten component translation units behind a
+complete: the runtime ships eleven component translation units behind a
 package-private internal header, an M5-enabling refactor that changes
-no compatibility counts; the error and symbol components landed with
-the M5 intrinsics units. The remaining queue is:
+no compatibility counts; the error, symbol, and iterator components
+landed with the M5 intrinsics units. The remaining queue is:
 
 1.  Complete foundational expressions, coercions, errors, symbols, and
     iterator protocols.

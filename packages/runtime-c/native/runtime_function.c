@@ -75,6 +75,9 @@ OseoResult oseo_function_create(
     function->ordinary.length_writable = false;
     function->ordinary.module_namespace = false;
     function->ordinary.error_data = false;
+    function->ordinary.array_iterator = false;
+    function->ordinary.iterator_array = oseo_undefined();
+    function->ordinary.iterator_index = 0u;
     function->ordinary.default_intrinsics = true;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
@@ -289,6 +292,12 @@ OseoResult oseo_call_function(
         );
     } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
         result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
+        result = oseo_internal_array_values(context, receiver);
+    } else if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
+        result = oseo_internal_array_iterator_next(context, receiver);
+    } else if (code_id == OSEO_ITERATOR_SELF_CODE_ID) {
+        result = normal(receiver);
     } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
         OseoValue description_input = argument_count > 0u
             ? arguments[0]

@@ -27,6 +27,9 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.length_writable = false;
     promise->ordinary.module_namespace = false;
     promise->ordinary.error_data = false;
+    promise->ordinary.array_iterator = false;
+    promise->ordinary.iterator_array = oseo_undefined();
+    promise->ordinary.iterator_index = 0u;
     promise->ordinary.default_intrinsics = true;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
@@ -595,33 +598,37 @@ static OseoResult promise_combine(
     bool race
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 12u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 14u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = iterable;
     result = promise_create(context);
     frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL && !is_array(frame.slots[0])) {
-        result = oseo_internal_throw_error(
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue captured_next = oseo_undefined();
+        result = oseo_internal_iterator_get(
             context,
-            OSEO_ERROR_TYPE,
-            "The aggregate iterable must be an M4 array."
+            frame.slots[0],
+            &captured_next
         );
-        frame.slots[2] = result.value;
+        frame.slots[12] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            frame.slots[13] = captured_next;
+        }
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            frame.slots[2] = result.value;
             oseo_context_clear_language_error(context);
             result = oseo_promise_reject_into(
                 context,
                 frame.slots[1],
                 frame.slots[2]
             );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result.value = frame.slots[1];
+            }
+            oseo_roots_release(context, &frame);
+            return result;
         }
-        if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
-        oseo_roots_release(context, &frame);
-        return result;
     }
-    size_t initial_length = result.status == OSEO_STATUS_NORMAL
-        ? ordinary_object(frame.slots[0])->array_length
-        : 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = race
             ? normal(oseo_undefined())
@@ -638,26 +645,39 @@ static OseoResult promise_combine(
         frame.slots[3] = result.value;
     }
     static const uint16_t then_units[] = {'t', 'h', 'e', 'n'};
-    if (result.status == OSEO_STATUS_NORMAL && initial_length > 0u) {
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_string_from_units(context, then_units, 4u);
         frame.slots[7] = result.value;
     }
-    for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL &&
-             index < ordinary_object(frame.slots[0])->array_length;
-         index += 1u) {
-        if (!race) aggregate_object(frame.slots[3])->remaining += 1u;
-        result = oseo_property_key(context, oseo_number((double)index));
-        frame.slots[11] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_object_get(
-                context,
-                frame.slots[0],
-                frame.slots[11]
-            );
+    size_t index = 0u;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue element = oseo_undefined();
+        bool done = false;
+        result = oseo_internal_iterator_next(
+            context,
+            frame.slots[12],
+            frame.slots[13],
+            &element,
+            &done
+        );
+        /*
+         * A throw from IteratorStep leaves the iterator record done, so
+         * the specification rejects without calling IteratorClose.
+         */
+        if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
             frame.slots[4] = result.value;
+            oseo_context_clear_language_error(context);
+            result = oseo_promise_reject_into(
+                context,
+                frame.slots[1],
+                frame.slots[4]
+            );
+            break;
         }
-        if (result.status == OSEO_STATUS_NORMAL) {
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        frame.slots[4] = element;
+        if (!race) aggregate_object(frame.slots[3])->remaining += 1u;
+        {
             result = oseo_promise_resolve(context, frame.slots[4]);
             frame.slots[5] = result.value;
         }
@@ -719,8 +739,23 @@ static OseoResult promise_combine(
             );
         }
         if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
+            /*
+             * A throw after a successful step, such as calling a
+             * yielded promise's own throwing then, closes the iterator
+             * before rejecting. A non-catchable diagnostic from the
+             * return method propagates.
+             */
             frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
+            OseoResult closed = oseo_internal_iterator_close(
+                context,
+                frame.slots[12],
+                true
+            );
+            if (closed.status != OSEO_STATUS_NORMAL) {
+                result = closed;
+                break;
+            }
             result = oseo_promise_reject_into(
                 context,
                 frame.slots[1],
@@ -728,6 +763,7 @@ static OseoResult promise_combine(
             );
             if (result.status == OSEO_STATUS_NORMAL) break;
         }
+        index += 1u;
     }
     if (result.status == OSEO_STATUS_NORMAL && !race) {
         OseoPromiseAggregate *aggregate = aggregate_object(frame.slots[3]);

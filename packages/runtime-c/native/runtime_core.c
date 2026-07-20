@@ -36,6 +36,9 @@ void oseo_context_init(
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
+    context->iterator_values_function = oseo_undefined();
+    context->iterator_next_function = oseo_undefined();
+    context->iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -101,6 +104,9 @@ void oseo_context_destroy(OseoContext *context) {
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
+    context->iterator_values_function = oseo_undefined();
+    context->iterator_next_function = oseo_undefined();
+    context->iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     oseo_collect(context);
 }
