@@ -693,7 +693,8 @@ test("converts classic for statements to owned syntax", () => {
 
 const unsupportedForForms = [
   ["for-in", "for (const key in {}) console.log(key);"],
-  ["for-of", "for (const item of []) console.log(item);"],
+  ["for-await-of", "async function f() { for await (const x of []) {} }"],
+  ["for-of destructuring", "for (const [item] of []) console.log(item);"],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;
 
@@ -707,6 +708,33 @@ for (const [name, source] of unsupportedForForms) {
     assert.equal(result.mir, undefined);
   });
 }
+
+test("converts synchronous for-of heads to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let assigned; const target = {}; const key = 'value';\n" +
+      "for (const item of []) console.log(item);\n" +
+      "for (let item of []) console.log(item);\n" +
+      "for (var item of []) console.log(item);\n" +
+      "for (assigned of []) console.log(assigned);\n" +
+      "for (target.value of []) {}\n" +
+      "for (target[key] of []) {}\n",
+    sourceId: "for-of-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /for \(const %b\d+ item of \[\]\)/u);
+});
+
+test("keeps a lexical for-of binding in the iterable TDZ", () => {
+  const result = compileSource(babelFrontend, {
+    source: "for (let item of item) {}",
+    sourceId: "for-of-tdz.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /read item/u);
+});
 
 test("converts in and instanceof to owned syntax", () => {
   const result = compileSource(babelFrontend, {

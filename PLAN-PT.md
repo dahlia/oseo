@@ -372,6 +372,24 @@ and pending promises. The model decides whether the executable should make
 progress, remain alive, or exit.
 
 
+M5 synchronous iterator properties
+----------------------------------
+
+The first M5 source-to-native grammar property generates bounded integer
+iterables, every admitted `for-of` head form, early-transfer positions, and
+normal or throwing `return` methods. Its independent model predicts the result
+or error, accumulated values, iterator-step count, and close count. Each case
+compares Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0004`, ten successful cases, at most five
+values, and no filtering. The extended tier raises the reviewed size to nine
+values and runs ten times the ordinary budget through the shared replay
+controls. Fixed native fixtures retain the non-generated boundaries: lexical
+TDZ, fresh closure cells, assignment failure, nested outward transfer, step
+failure without close, and close-completion precedence.
+
+
 Test placement and package boundaries
 -------------------------------------
 

@@ -116,8 +116,8 @@ its deliberate boundary and its evidence:
     capture one environment per iteration, while a `const` head keeps
     its single environment as the specification requires. `continue`
     re-enters through the update clause after the per-iteration copy.
-    `for-in` and `for-of` stay rejected with a source-located
-    diagnostic. The empty statement is also admitted as a no-op block.
+    `for-in` stays rejected with a source-located diagnostic. The empty
+    statement is also admitted as a no-op block.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
@@ -287,20 +287,27 @@ its deliberate boundary and its evidence:
     `Symbol.iterator` method and a `next` method both drive iteration.
     The iterator's next method is captured once by `GetIterator` and
     reused for every step, as the iterator record requires.
-    `Promise.all` and `Promise.race` now consume any object iterable
-    through this protocol, replacing the former M4-array-only
-    restriction. Deliberate
+    `Promise.all`, `Promise.race`, and synchronous `for-of` consume object
+    iterables through this protocol. A `for-of` head admits one `const`,
+    `let`, or `var` identifier declaration, an existing binding, or a
+    static or computed member target. Lexical declarations create their
+    TDZ before the iterable expression and receive a fresh cell for each
+    iteration. Normal exhaustion and a failing iterator step do not
+    close the iterator; head assignment failures, `break`, `return`,
+    `throw`, and transfers to an outer label do. A `continue` targeting
+    the same loop keeps the iterator open. Close-time completion follows
+    `IteratorClose`: a close failure replaces `break` or `return`, while
+    an in-flight throw stays authoritative. Native differential fixtures,
+    generated Node, Deno, and native properties under both specialization
+    policies and forced collection, MIR structural tests, and reviewed
+    test262 cases cover the consumer. Deliberate
     boundaries: string and other primitive iteration, which the
     specification reaches by boxing, is unsupported and the combinators
-    accept only object iterables; the array iterator methods are
+    and `for-of` accept only object iterables; the array iterator methods are
     array-specific rather than the generic `%Array.prototype.values%`;
-    and the `for-of` and
-    `for-await-of` statements, spread and destructuring iteration,
-    array and string iterator prototype identity, and generator-based
-    iterators remain outside the admitted syntax. The protocol is the
-    owned runtime surface those later consumers build on. Native
-    differential fixtures and runtime C fixtures with forced collection
-    cover the protocol.
+    and `for-await-of`, spread and destructuring iteration, array and string
+    iterator prototype identity, and generator-based iterators remain outside
+    the admitted syntax.
 
 
 Known gaps inside the claim

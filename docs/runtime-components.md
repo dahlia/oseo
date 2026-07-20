@@ -66,9 +66,13 @@ Ownership follows the plan's target layout:
     checkpoints, top-level await progress, and shutdown; timer delay
     coercion goes through the shared primitive conversions.
 
+The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
+and `oseo_iterator_close` are generated-code ABI entry points declared in
+*oseo\_runtime.h*. Promise combinators share those public operations.
+
 ### Internal helpers
 
-Thirty helpers cross a translation-unit boundary. Each uses the
+Twenty-seven helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -87,9 +91,6 @@ Thirty helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_symbol_text`                         | *runtime\_symbol.c*    |
 | `oseo_internal_symbol_name`                         | *runtime\_symbol.c*    |
 | `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*    |
-| `oseo_internal_iterator_get`                        | *runtime\_iterator.c*  |
-| `oseo_internal_iterator_next`                       | *runtime\_iterator.c*  |
-| `oseo_internal_iterator_close`                      | *runtime\_iterator.c*  |
 | `oseo_internal_array_values`                        | *runtime\_iterator.c*  |
 | `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*  |
 | `oseo_internal_iterator_method`                     | *runtime\_iterator.c*  |

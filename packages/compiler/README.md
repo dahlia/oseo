@@ -23,6 +23,9 @@ dynamic calls, receiver and constructor operations, ordinary properties,
 arrays, and explicit completion state for `catch` and `finally`.
 Binding reads retain runtime temporal-dead-zone checks, and every collecting
 operation has an explicit safepoint.
+Synchronous `for-of` adds backend-neutral iterator get, next, and close
+operations with separately rooted results. Cleanup-depth targets distinguish
+same-loop continuation from transfers that must close the iterator.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

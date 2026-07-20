@@ -605,7 +605,7 @@ static OseoResult promise_combine(
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoValue captured_next = oseo_undefined();
-        result = oseo_internal_iterator_get(
+        result = oseo_iterator_get(
             context,
             frame.slots[0],
             &captured_next
@@ -653,7 +653,7 @@ static OseoResult promise_combine(
     while (result.status == OSEO_STATUS_NORMAL) {
         OseoValue element = oseo_undefined();
         bool done = false;
-        result = oseo_internal_iterator_next(
+        result = oseo_iterator_next(
             context,
             frame.slots[12],
             frame.slots[13],
@@ -747,7 +747,7 @@ static OseoResult promise_combine(
              */
             frame.slots[4] = result.value;
             oseo_context_clear_language_error(context);
-            OseoResult closed = oseo_internal_iterator_close(
+            OseoResult closed = oseo_iterator_close(
                 context,
                 frame.slots[12],
                 true

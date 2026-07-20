@@ -451,23 +451,6 @@ OseoResult oseo_internal_well_known_symbol(
     OseoContext *context,
     size_t index
 );
-OseoResult oseo_internal_iterator_get(
-    OseoContext *context,
-    OseoValue iterable,
-    OseoValue *next_method
-);
-OseoResult oseo_internal_iterator_next(
-    OseoContext *context,
-    OseoValue iterator,
-    OseoValue next_method,
-    OseoValue *value,
-    bool *done
-);
-OseoResult oseo_internal_iterator_close(
-    OseoContext *context,
-    OseoValue iterator,
-    bool from_error
-);
 OseoResult oseo_internal_array_values(
     OseoContext *context,
     OseoValue array

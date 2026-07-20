@@ -128,6 +128,109 @@ test("emits error intrinsic loads and thrown-value rendering", () => {
   assert.ok(!emitted.source.includes("oseo_context_print_error(&context)"));
 });
 
+test("emits rooted iterator protocol operations", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "iterator.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              constant: { kind: "undefined" },
+              detail: "iterable",
+              id: 0,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0],
+              detail: "get iterator",
+              id: 1,
+              iteratorNextMethodResult: 2,
+              kind: "iterator-get",
+              range,
+            },
+            {
+              arguments: [1],
+              checkedResult: 1,
+              detail: "check get iterator",
+              id: 3,
+              kind: "check-status",
+              range,
+            },
+            {
+              arguments: [1, 2],
+              detail: "step iterator",
+              id: 4,
+              iteratorValueResult: 5,
+              kind: "iterator-next",
+              range,
+            },
+            {
+              arguments: [4],
+              checkedResult: 4,
+              detail: "check iterator step",
+              id: 6,
+              kind: "check-status",
+              range,
+            },
+            {
+              arguments: [1],
+              completionSlot: 0,
+              detail: "close iterator",
+              id: 7,
+              kind: "iterator-close",
+              range,
+            },
+            {
+              arguments: [7],
+              checkedResult: 7,
+              detail: "check iterator close",
+              id: 8,
+              kind: "check-status",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 5 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 9,
+    },
+    sourceId: "iterator.ts",
+    specialization: "disabled",
+  });
+  assert.ok(
+    emitted.source.includes("oseo_iterator_get(context, roots[0], &roots[2])"),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_iterator_next(context, roots[1], roots[2], &roots[5],",
+    ),
+  );
+  assert.ok(emitted.source.includes("bool fast_4 = !iterator_done_4;"));
+  assert.ok(
+    emitted.source.includes(
+      "oseo_iterator_close(context, roots[1], completion_kind[0u] == 2)",
+    ),
+  );
+});
+
 test("scans large MIR argument lists without spreading them", () => {
   const range = {
     end: { column: 1, line: 1 },

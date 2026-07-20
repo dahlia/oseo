@@ -513,7 +513,8 @@ dependency-indexed baseline is published.
 source challenge features through explicit unsupported classifications.
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
-`do-while`, `for`, `switch`, and labeled statements, and the intrinsics
+`do-while`, `for`, `for-of`, `switch`, and labeled statements, and the
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
@@ -524,8 +525,8 @@ package-private internal header, an M5-enabling refactor that changes
 no compatibility counts; the error, symbol, and iterator components
 landed with the M5 intrinsics units. The remaining queue is:
 
-1.  Complete foundational expressions, coercions, errors, symbols, and
-    iterator protocols.
+1.  Complete the remaining foundational expressions and coercions after the
+    landed errors, symbols, and synchronous iterator consumers.
 2.  Add built-in families and broader executable syntax in dependency order.
 3.  Close the named edition with reproducible standards and generated
     evidence.

@@ -294,6 +294,53 @@ export interface HirForDeclaration {
   readonly range: SourceRange;
 }
 
+/** One source-level assignment or declaration target in a for-of head. */
+export type SyntaxForOfTarget =
+  | {
+      readonly declarationKind: "const" | "let" | "var";
+      readonly hint: Hint | undefined;
+      readonly kind: "declaration";
+      readonly name: string;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly kind: "binding";
+      readonly name: string;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly key: SyntaxExpression;
+      readonly kind: "property";
+      readonly object: SyntaxExpression;
+      readonly range: SourceRange;
+    };
+
+/** One resolved for-of target with explicit binding identity. */
+export type HirForOfTarget =
+  | {
+      readonly bindingId: number;
+      readonly declarationKind: "const" | "let" | "var";
+      readonly hint: Hint | undefined;
+      readonly kind: "declaration";
+      readonly mutable: boolean;
+      readonly name: string;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly bindingId: number;
+      readonly functionNameBinding?: true;
+      readonly kind: "binding";
+      readonly mutable: boolean;
+      readonly name: string;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly key: HirExpression;
+      readonly kind: "property";
+      readonly object: HirExpression;
+      readonly range: SourceRange;
+    };
+
 /** Runtime call and construction identity retained for every function. */
 export type FunctionKind = "arrow" | "async" | "async-arrow" | "ordinary";
 
@@ -328,6 +375,12 @@ export type SyntaxStatement =
       readonly kind: "for";
       readonly test?: SyntaxExpression;
       readonly update?: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly body: SyntaxStatement;
+      readonly iterable: SyntaxExpression;
+      readonly kind: "for-of";
+      readonly target: SyntaxForOfTarget;
     })
   | (LocatedSyntax & {
       readonly cases: readonly SyntaxSwitchCase[];
@@ -1395,6 +1448,12 @@ export type HirStatement =
       readonly update?: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly body: HirStatement;
+      readonly iterable: HirExpression;
+      readonly kind: "for-of";
+      readonly target: HirForOfTarget;
+    })
+  | (LocatedSyntax & {
       readonly cases: readonly HirSwitchCase[];
       readonly discriminant: HirExpression;
       readonly kind: "switch";
@@ -2117,6 +2176,14 @@ function declaredHirBindingIds(
         result.push(declaration.bindingId);
       }
       result.push(...declaredHirBindingIds([statement.body]));
+    } else if (statement.kind === "for-of") {
+      if (
+        statement.target.kind === "declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        result.push(statement.target.bindingId);
+      }
+      result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "switch") {
       for (const switchCase of statement.cases) {
         result.push(...declaredHirBindingIds(switchCase.body));
@@ -2372,7 +2439,8 @@ function resolveStatement(
     const loop =
       terminal.kind === "while" ||
       terminal.kind === "do-while" ||
-      terminal.kind === "for";
+      terminal.kind === "for" ||
+      terminal.kind === "for-of";
     state.labels.push({ loop, name: statement.label });
     const body = resolveStatement(
       statement.body,
@@ -2462,6 +2530,82 @@ function resolveStatement(
       ...(test == null ? {} : { test }),
       ...(update == null ? {} : { update }),
     };
+  }
+  if (statement.kind === "for-of") {
+    let forScopes = scopes;
+    let declaredBinding: Binding | undefined;
+    if (
+      statement.target.kind === "declaration" &&
+      statement.target.declarationKind !== "var"
+    ) {
+      declaredBinding = {
+        id: state.nextBindingId,
+        mutable: statement.target.declarationKind === "let",
+        name: statement.target.name,
+      };
+      state.nextBindingId += 1;
+      forScopes = [
+        ...scopes,
+        new Map([[statement.target.name, declaredBinding]]),
+      ];
+    }
+    const iterable = resolveExpression(statement.iterable, forScopes, state);
+    let target: HirForOfTarget | undefined;
+    if (statement.target.kind === "declaration") {
+      const binding =
+        declaredBinding ?? findBinding(scopes, statement.target.name);
+      if (binding == null) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement.target,
+            `Unknown binding '${statement.target.name}'.`,
+          ),
+        );
+      } else {
+        target = {
+          ...statement.target,
+          bindingId: binding.id,
+          mutable: binding.mutable,
+        };
+      }
+    } else if (statement.target.kind === "binding") {
+      const binding = findBinding(scopes, statement.target.name);
+      if (binding == null) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement.target,
+            `Unknown binding '${statement.target.name}'.`,
+          ),
+        );
+      } else {
+        target = {
+          ...statement.target,
+          bindingId: binding.id,
+          ...(binding.functionNameBinding === true
+            ? { functionNameBinding: true as const }
+            : {}),
+          mutable: binding.mutable,
+        };
+      }
+    } else {
+      const object = resolveExpression(statement.target.object, scopes, state);
+      const key = resolveExpression(statement.target.key, scopes, state);
+      if (object != null && key != null) {
+        target = { ...statement.target, key, object };
+      }
+    }
+    const body = resolveStatement(
+      statement.body,
+      forScopes,
+      state,
+      functionBody,
+      loopDepth + 1,
+      breakDepth + 1,
+    );
+    if (iterable == null || target == null || body == null) return undefined;
+    return { ...statement, body, iterable, target };
   }
   if (statement.kind === "switch") {
     const discriminant = resolveExpression(
@@ -2845,6 +2989,20 @@ function appendHirStatement(
     ].join("; ");
     lines.push(`${indent}for (${head})${location}`);
     appendHirStatement(lines, statement.body, `${indent}  `);
+  } else if (statement.kind === "for-of") {
+    const target =
+      statement.target.kind === "declaration"
+        ? `${statement.target.declarationKind} ` +
+          `%b${statement.target.bindingId} ${statement.target.name}`
+        : statement.target.kind === "binding"
+          ? `%b${statement.target.bindingId} ${statement.target.name}`
+          : `${printHirExpression(statement.target.object)}[` +
+            `${printHirExpression(statement.target.key)}]`;
+    lines.push(
+      `${indent}for (${target} of ` +
+        `${printHirExpression(statement.iterable)})${location}`,
+    );
+    appendHirStatement(lines, statement.body, `${indent}  `);
   } else if (statement.kind === "switch") {
     lines.push(
       `${indent}switch ${printHirExpression(statement.discriminant)}` +
@@ -2967,6 +3125,12 @@ export interface MirGlobalBinding {
   readonly name: string;
 }
 
+/** One control destination and the cleanup nesting active at that point. */
+export interface MirControlTarget {
+  readonly blockId: number;
+  readonly cleanupDepth: number;
+}
+
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
   readonly arguments: readonly number[];
@@ -3000,6 +3164,9 @@ export interface MirOperation {
     | "guard-shape"
     | "guard-smi"
     | "initialize"
+    | "iterator-close"
+    | "iterator-get"
+    | "iterator-next"
     | "join"
     | "load-fixed-slot"
     | "module-namespace-create"
@@ -3020,10 +3187,10 @@ export interface MirOperation {
   readonly namespaceBindingIds?: readonly number[];
   readonly namespaceNames?: readonly string[];
   readonly checkedResult?: number;
-  readonly abruptTarget?: number;
+  readonly abruptTarget?: MirControlTarget;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
   readonly completionSlot?: number;
-  readonly completionTarget?: number;
+  readonly completionTarget?: MirControlTarget;
   readonly errorName?: ErrorIntrinsicName;
   readonly functionId?: number;
   readonly functionKind?: FunctionKind;
@@ -3031,6 +3198,8 @@ export interface MirOperation {
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
   readonly hint?: MirHint;
+  readonly iteratorNextMethodResult?: number;
+  readonly iteratorValueResult?: number;
   readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
   readonly target?: MirCallTarget;
@@ -3056,8 +3225,8 @@ export type MirTerminator =
   | {
       readonly completionSlot: number;
       readonly kind: "resume-completion";
-      readonly outerAbrupt?: number;
-      readonly outerFinalizer?: number;
+      readonly outerAbrupt?: MirControlTarget;
+      readonly outerFinalizer?: MirControlTarget;
     }
   | {
       readonly kind: "unreachable";
@@ -3114,23 +3283,27 @@ interface MutableMirBlock {
 }
 
 interface MirBuilder {
-  readonly abruptTargets: number[];
+  readonly abruptTargets: MirControlTarget[];
   readonly blocks: MutableMirBlock[];
   readonly loops: {
-    readonly breakTarget: number;
-    readonly continueTarget: number;
+    readonly breakTarget: MirControlTarget;
+    readonly continueTarget: MirControlTarget;
   }[];
   readonly labels: {
-    readonly breakTarget: number;
-    readonly continueTarget?: number;
+    readonly breakTarget: MirControlTarget;
+    readonly continueTarget?: MirControlTarget;
     readonly name: string;
   }[];
   /** Labels waiting for the next loop lowering to claim their targets. */
   readonly pendingLabels: string[];
-  readonly finalizers: number[];
+  readonly finalizers: MirControlTarget[];
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;
+}
+
+function controlTarget(builder: MirBuilder, blockId: number): MirControlTarget {
+  return { blockId, cleanupDepth: builder.finalizers.length };
 }
 
 function appendMirMetadata(
@@ -4354,7 +4527,7 @@ function setCompletion(
   slot: number,
   range: SourceRange,
   value?: number,
-  target?: number,
+  target?: MirControlTarget,
 ): void {
   appendMirMetadata(
     builder,
@@ -4375,12 +4548,19 @@ function enterFinalizer(
   kind: NonNullable<MirOperation["completionKind"]>,
   range: SourceRange,
   value?: number,
-  target?: number,
+  target?: MirControlTarget,
 ): boolean {
   const finalizer = builder.finalizers.at(-1);
   if (finalizer == null) return false;
-  setCompletion(builder, kind, finalizer, range, value, target);
-  builder.current.terminator = { kind: "jump", target: finalizer };
+  if (target != null && target.cleanupDepth > finalizer.cleanupDepth) {
+    return false;
+  }
+  const destination = target ?? { blockId: 0, cleanupDepth: 0 };
+  setCompletion(builder, kind, finalizer.blockId, range, value, destination);
+  builder.current.terminator = {
+    kind: "jump",
+    target: finalizer.blockId,
+  };
   return true;
 }
 
@@ -4394,9 +4574,14 @@ function lowerTryStatement(
     statement.finalizer == null ? undefined : createMirBlock(builder);
   const afterBlock = createMirBlock(builder);
   const outerAbrupt = builder.abruptTargets.at(-1);
-  const tryAbrupt = catchBlock?.id ?? finallyBlock?.id ?? outerAbrupt;
+  const finallyTarget =
+    finallyBlock == null ? undefined : controlTarget(builder, finallyBlock.id);
+  if (finallyTarget != null) builder.finalizers.push(finallyTarget);
+  const tryAbrupt =
+    catchBlock == null
+      ? (finallyTarget ?? outerAbrupt)
+      : controlTarget(builder, catchBlock.id);
   if (tryAbrupt != null) builder.abruptTargets.push(tryAbrupt);
-  if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
   const tryTerminated = lowerStatementBody(statement.block, builder);
   if (finallyBlock != null) builder.finalizers.pop();
   if (tryAbrupt != null) builder.abruptTargets.pop();
@@ -4410,7 +4595,7 @@ function lowerTryStatement(
         finallyBlock.id,
         statement.range,
         undefined,
-        afterBlock.id,
+        controlTarget(builder, afterBlock.id),
       );
       builder.current.terminator = {
         kind: "jump",
@@ -4449,9 +4634,9 @@ function lowerTryStatement(
       range: statement.handler.range,
     });
     recordRoot(builder, written, statement.handler.range);
-    const catchAbrupt = finallyBlock?.id ?? outerAbrupt;
+    const catchAbrupt = finallyTarget ?? outerAbrupt;
     if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
-    if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
+    if (finallyTarget != null) builder.finalizers.push(finallyTarget);
     const catchTerminated = lowerStatementBody(statement.handler.body, builder);
     if (finallyBlock != null) builder.finalizers.pop();
     if (catchAbrupt != null) builder.abruptTargets.pop();
@@ -4465,7 +4650,7 @@ function lowerTryStatement(
           finallyBlock.id,
           statement.range,
           undefined,
-          afterBlock.id,
+          controlTarget(builder, afterBlock.id),
         );
         builder.current.terminator = {
           kind: "jump",
@@ -4493,7 +4678,7 @@ function lowerTryStatement(
           const operation = block.operations[index];
           if (
             operation?.completionSlot === finallyBlock.id &&
-            operation.completionTarget === afterBlock.id
+            operation.completionTarget?.blockId === afterBlock.id
           ) {
             const replacement = { ...operation };
             delete replacement.completionTarget;
@@ -4507,6 +4692,244 @@ function lowerTryStatement(
   }
   builder.current = afterBlock;
   return false;
+}
+
+function lowerForOfTarget(
+  target: HirForOfTarget,
+  value: number,
+  builder: MirBuilder,
+): void {
+  if (target.kind === "declaration" && target.declarationKind !== "var") {
+    resetBinding(target.bindingId, target.name, target.range, builder);
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [value],
+      bindingId: target.bindingId,
+      detail: `%b${target.bindingId} ${target.name}`,
+      id,
+      kind: "initialize",
+      range: target.range,
+    });
+    recordRoot(builder, id, target.range);
+    return;
+  }
+  if (target.kind === "binding" || target.kind === "declaration") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "for-of binding assignment error",
+      [value],
+      target.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [value],
+      bindingId: target.bindingId,
+      detail: `%b${target.bindingId} ${target.name}`,
+      ...(target.kind === "binding" && target.functionNameBinding === true
+        ? { functionNameBinding: true }
+        : {}),
+      id,
+      kind: "write",
+      mutable: target.mutable,
+      range: target.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> close iterator",
+      [id],
+      target.range,
+    );
+    recordRoot(builder, id, target.range);
+    return;
+  }
+  const object = lowerExpression(target.object, builder);
+  const key = lowerPropertyKey(target.key, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "for-of property storage growth",
+    [object, key, value],
+    target.range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, key, value],
+    detail: "for-of property target",
+    id,
+    kind: "property-set",
+    range: target.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> close iterator",
+    [id],
+    target.range,
+  );
+  recordRoot(builder, id, target.range);
+}
+
+function lowerForOfStatement(
+  statement: HirStatement & { readonly kind: "for-of" },
+  builder: MirBuilder,
+): void {
+  if (
+    statement.target.kind === "declaration" &&
+    statement.target.declarationKind !== "var"
+  ) {
+    // ForIn/OfHeadEvaluation creates the lexical environment before
+    // evaluating the iterable, so a same-name read observes the TDZ.
+    resetBinding(
+      statement.target.bindingId,
+      statement.target.name,
+      statement.target.range,
+      builder,
+    );
+  }
+  const iterable = lowerExpression(statement.iterable, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "get synchronous iterator",
+    [iterable],
+    statement.iterable.range,
+  );
+  const iterator = builder.nextValue;
+  builder.nextValue += 1;
+  const nextMethod = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterable],
+    detail: "GetIterator sync",
+    id: iterator,
+    iteratorNextMethodResult: nextMethod,
+    kind: "iterator-get",
+    range: statement.iterable.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> step, abrupt -> return without close",
+    [iterator],
+    statement.iterable.range,
+  );
+  recordRoot(builder, iterator, statement.iterable.range);
+  recordRoot(builder, nextMethod, statement.iterable.range);
+
+  const stepBlock = createMirBlock(builder);
+  const bodyBlock = createMirBlock(builder);
+  const closeBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  const closeTarget = controlTarget(builder, closeBlock.id);
+  const exitTarget = controlTarget(builder, exitBlock.id);
+  builder.current.terminator = { kind: "jump", target: stepBlock.id };
+
+  builder.current = stepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "step synchronous iterator",
+    [iterator, nextMethod],
+    statement.range,
+  );
+  const hasValue = builder.nextValue;
+  builder.nextValue += 1;
+  const value = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator, nextMethod],
+    detail: "IteratorStep and IteratorValue",
+    id: hasValue,
+    iteratorValueResult: value,
+    kind: "iterator-next",
+    range: statement.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> return without close",
+    [hasValue],
+    statement.range,
+  );
+  recordRoot(builder, value, statement.range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: hasValue,
+    whenFalse: exitBlock.id,
+    whenTrue: bodyBlock.id,
+  };
+
+  builder.finalizers.push(closeTarget);
+  builder.abruptTargets.push(closeTarget);
+  const continueTarget = controlTarget(builder, stepBlock.id);
+  builder.loops.push({ breakTarget: exitTarget, continueTarget });
+  const claimed = builder.pendingLabels.splice(0);
+  for (const name of claimed) {
+    builder.labels.push({
+      breakTarget: exitTarget,
+      continueTarget,
+      name,
+    });
+  }
+  builder.current = bodyBlock;
+  lowerForOfTarget(statement.target, value, builder);
+  const terminated = lowerStatementBody(statement.body, builder);
+  builder.labels.length -= claimed.length;
+  builder.loops.pop();
+  builder.abruptTargets.pop();
+  builder.finalizers.pop();
+  if (!terminated) {
+    builder.current.terminator = { kind: "jump", target: stepBlock.id };
+  }
+
+  const outerAbrupt = builder.abruptTargets.at(-1);
+  const outerFinalizer = builder.finalizers.at(-1);
+  builder.current = closeBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "close synchronous iterator",
+    [iterator],
+    statement.range,
+  );
+  const closed = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator],
+    completionSlot: closeBlock.id,
+    detail: "IteratorClose",
+    id: closed,
+    kind: "iterator-close",
+    range: statement.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> resume completion, abrupt -> override completion",
+    [closed],
+    statement.range,
+  );
+  recordRoot(builder, closed, statement.range);
+  builder.current.terminator = {
+    completionSlot: closeBlock.id,
+    kind: "resume-completion",
+    ...(outerAbrupt == null ? {} : { outerAbrupt }),
+    ...(outerFinalizer == null ? {} : { outerFinalizer }),
+  };
+
+  builder.current = exitBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `for-of bb${stepBlock.id}`,
+    [],
+    statement.range,
+  );
 }
 
 function lowerStatements(
@@ -4568,11 +4991,17 @@ function lowerStatements(
     } else if (statement.kind === "throw") {
       const value = lowerExpression(statement.expression, builder);
       const target = builder.abruptTargets.at(-1);
-      setCompletion(builder, "throw", target ?? 0, statement.range, value);
+      setCompletion(
+        builder,
+        "throw",
+        target?.blockId ?? 0,
+        statement.range,
+        value,
+      );
       builder.current.terminator =
         target == null
           ? { completionSlot: 0, kind: "resume-completion" }
-          : { kind: "jump", target };
+          : { kind: "jump", target: target.blockId };
       return true;
     } else if (statement.kind === "try") {
       if (lowerTryStatement(statement, builder)) return true;
@@ -4580,7 +5009,7 @@ function lowerStatements(
       resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;
     } else if (statement.kind === "break" || statement.kind === "continue") {
-      let target: number;
+      let target: MirControlTarget;
       if (statement.label != null) {
         const label = builder.labels.findLast(
           (entry) => entry.name === statement.label,
@@ -4604,7 +5033,7 @@ function lowerStatements(
       if (
         !enterFinalizer(builder, "jump", statement.range, undefined, target)
       ) {
-        builder.current.terminator = { kind: "jump", target };
+        builder.current.terminator = { kind: "jump", target: target.blockId };
       }
       return true;
     } else if (statement.kind === "while") {
@@ -4624,14 +5053,14 @@ function lowerStatements(
         whenTrue: bodyBlock.id,
       };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: conditionBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, conditionBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: conditionBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, conditionBlock.id),
           name,
         });
       }
@@ -4663,7 +5092,8 @@ function lowerStatements(
       if (
         inner.kind === "while" ||
         inner.kind === "do-while" ||
-        inner.kind === "for"
+        inner.kind === "for" ||
+        inner.kind === "for-of"
       ) {
         // The loop lowering claims these names and binds them to its
         // own break and continue targets.
@@ -4672,7 +5102,10 @@ function lowerStatements(
       } else {
         const exitBlock = createMirBlock(builder);
         for (const name of names) {
-          builder.labels.push({ breakTarget: exitBlock.id, name });
+          builder.labels.push({
+            breakTarget: controlTarget(builder, exitBlock.id),
+            name,
+          });
         }
         const terminated = lowerStatements([inner], builder);
         builder.labels.length -= names.length;
@@ -4746,10 +5179,11 @@ function lowerStatements(
       }
       const enclosingLoop = builder.loops.at(-1);
       builder.loops.push({
-        breakTarget: exitBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
         // A continue inside a switch body still targets the enclosing
         // loop; resolution rejects a continue without one.
-        continueTarget: enclosingLoop?.continueTarget ?? -1,
+        continueTarget:
+          enclosingLoop?.continueTarget ?? controlTarget(builder, -1),
       });
       for (const [index, switchCase] of statement.cases.entries()) {
         builder.current = bodyBlocks[index]!;
@@ -4770,6 +5204,8 @@ function lowerStatements(
         [],
         statement.range,
       );
+    } else if (statement.kind === "for-of") {
+      lowerForOfStatement(statement, builder);
     } else if (statement.kind === "for") {
       const declarations = statement.declarations ?? [];
       const initializeBinding = (
@@ -4860,14 +5296,14 @@ function lowerStatements(
         whenTrue: bodyBlock.id,
       };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: updateBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, updateBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: updateBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, updateBlock.id),
           name,
         });
       }
@@ -4904,14 +5340,14 @@ function lowerStatements(
       const exitBlock = createMirBlock(builder);
       builder.current.terminator = { kind: "jump", target: bodyBlock.id };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: conditionBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, conditionBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: conditionBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, conditionBlock.id),
           name,
         });
       }
@@ -5093,6 +5529,12 @@ function maximumMirValue(functionValue: MirFunction): number {
       maximum = Math.max(maximum, operation.id);
       if (operation.checkedResult != null) {
         maximum = Math.max(maximum, operation.checkedResult);
+      }
+      if (operation.iteratorNextMethodResult != null) {
+        maximum = Math.max(maximum, operation.iteratorNextMethodResult);
+      }
+      if (operation.iteratorValueResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueResult);
       }
     }
   }
@@ -5425,10 +5867,10 @@ function printTerminator(terminator: MirTerminator): string {
     const destinations = [
       terminator.outerAbrupt == null
         ? undefined
-        : `throw bb${terminator.outerAbrupt}`,
+        : `throw bb${terminator.outerAbrupt.blockId}`,
       terminator.outerFinalizer == null
         ? undefined
-        : `finally bb${terminator.outerFinalizer}`,
+        : `finally bb${terminator.outerFinalizer.blockId}`,
     ].filter((destination) => destination != null);
     return destinations.length === 0
       ? completion
@@ -5463,9 +5905,13 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
         .map((argument) => `%${argument}`)
         .join(", ");
       const resultText =
-        operation.checkedResult == null
-          ? `%${operation.id}`
-          : `%${operation.id}, %${operation.checkedResult}`;
+        operation.checkedResult != null
+          ? `%${operation.id}, %${operation.checkedResult}`
+          : operation.iteratorNextMethodResult != null
+            ? `%${operation.id}, %${operation.iteratorNextMethodResult}`
+            : operation.iteratorValueResult != null
+              ? `%${operation.id}, %${operation.iteratorValueResult}`
+              : `%${operation.id}`;
       const hintTextValue =
         operation.hint == null
           ? ""
@@ -5713,6 +6159,15 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       hirStatementHasAwait(statement.body)
     );
   }
+  if (statement.kind === "for-of") {
+    return (
+      hirExpressionHasAwait(statement.iterable) ||
+      (statement.target.kind === "property" &&
+        (hirExpressionHasAwait(statement.target.object) ||
+          hirExpressionHasAwait(statement.target.key))) ||
+      hirStatementHasAwait(statement.body)
+    );
+  }
   return (
     (statement.kind === "while" || statement.kind === "do-while") &&
     (hirExpressionHasAwait(statement.test) ||
@@ -5759,6 +6214,17 @@ function collectHirBindings(
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {
         bindings.push({ id: declaration.bindingId, name: declaration.name });
+      }
+      collect(statement.body);
+    } else if (statement.kind === "for-of") {
+      if (
+        statement.target.kind === "declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        bindings.push({
+          id: statement.target.bindingId,
+          name: statement.target.name,
+        });
       }
       collect(statement.body);
     } else if (statement.kind === "switch") {

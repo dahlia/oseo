@@ -14,6 +14,7 @@ import type {
   SyntaxCallTarget,
   SyntaxExpression,
   SyntaxForDeclaration,
+  SyntaxForOfTarget,
   SyntaxFunction,
   SyntaxSwitchCase,
   SyntaxImportEntry,
@@ -1006,12 +1007,91 @@ function statement(
     }
     return { ...located, cases, discriminant, kind: "switch" };
   }
-  if (value.type === "ForInStatement" || value.type === "ForOfStatement") {
-    return unsupported(
-      context,
-      value,
-      "for-in and for-of statements are unsupported.",
-    );
+  if (value.type === "ForInStatement") {
+    return unsupported(context, value, "for-in statements are unsupported.");
+  }
+  if (value.type === "ForOfStatement") {
+    if (value.await === true) {
+      return unsupported(context, value, "for-await-of is unsupported.");
+    }
+    const left = node(value.left);
+    const rightNode = node(value.right);
+    const bodyNode = node(value.body);
+    if (left == null || rightNode == null || bodyNode == null) {
+      return unsupported(context, value);
+    }
+    let target: SyntaxForOfTarget | undefined;
+    if (left.type === "VariableDeclaration") {
+      if (left.declare === true) {
+        return unsupported(
+          context,
+          left,
+          "Ambient declarations are erased by TypeScript and unsupported.",
+        );
+      }
+      if (left.kind !== "const" && left.kind !== "let" && left.kind !== "var") {
+        return unsupported(
+          context,
+          left,
+          "A for-of declaration uses const, let, or var.",
+        );
+      }
+      const declarations = nodes(left.declarations);
+      const declaration = declarations[0];
+      const identifier = declaration == null ? undefined : node(declaration.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (
+        declarations.length !== 1 ||
+        declaration == null ||
+        identifier == null ||
+        name == null ||
+        declaration.init != null
+      ) {
+        return unsupported(
+          context,
+          left,
+          "A for-of declaration needs one uninitialized identifier.",
+        );
+      }
+      target = {
+        declarationKind: left.kind,
+        hint: typeHint(context, identifier.typeAnnotation),
+        kind: "declaration",
+        name,
+        range: location(context, declaration).range,
+      };
+    } else {
+      const name = identifierName(left);
+      if (name != null) {
+        target = {
+          kind: "binding",
+          name,
+          range: location(context, left).range,
+        };
+      } else {
+        const member = memberParts(context, left);
+        if (member != null) {
+          target = {
+            key: member.key,
+            kind: "property",
+            object: member.object,
+            range: location(context, left).range,
+          };
+        }
+      }
+    }
+    if (target == null) {
+      return unsupported(
+        context,
+        left,
+        "A for-of head needs an identifier or member assignment target.",
+      );
+    }
+    const iterable = expression(context, rightNode);
+    const body = statement(context, bodyNode, functionBody);
+    return iterable == null || body == null
+      ? undefined
+      : { ...located, body, iterable, kind: "for-of", target };
   }
   if (value.type === "ForStatement") {
     const initNode = node(value.init);
@@ -1810,8 +1890,10 @@ function collectVarStatement(
       )
     );
   }
-  if (value.type === "ForStatement") {
-    const initNode = node(value.init);
+  if (value.type === "ForStatement" || value.type === "ForOfStatement") {
+    const initNode = node(
+      value.type === "ForStatement" ? value.init : value.left,
+    );
     let bodyFrames = lexicalFrames;
     if (initNode?.type === "VariableDeclaration") {
       if (initNode.kind === "var") {

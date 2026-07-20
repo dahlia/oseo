@@ -5,6 +5,7 @@ supportedFeatures:
   - computed-property-names
   - const
   - exponentiation
+  - for-of
   - let
   - Symbol
   - Symbol.iterator
@@ -1363,6 +1364,47 @@ tests:
   - path: test/language/statements/do-while/decl-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-const-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, error-intrinsics, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/for-of/head-const-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-const-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-decl-no-expr.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/for-of/head-expr-no-expr.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/for-of/head-expr-obj-iterator-method.js
+    expectedClassification: pass
+    dependencies: [control-flow, error-intrinsics, iterator-protocol]
+  - path: test/language/statements/for-of/head-expr-to-obj.js
+    expectedClassification: pass
+    dependencies: [control-flow, error-intrinsics, iterator-protocol]
+  - path: test/language/statements/for-of/head-let-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, error-intrinsics, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/for-of/head-let-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-let-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-lhs-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-var-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, var-bindings]
+  - path: test/language/statements/for-of/head-var-no-expr.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/let-identifier-with-newline.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, lexical-bindings]

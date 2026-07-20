@@ -380,6 +380,23 @@ OseoResult oseo_object_builtin_set_prototype_of(
     size_t argument_count,
     const OseoValue *arguments
 );
+OseoResult oseo_iterator_get(
+    OseoContext *context,
+    OseoValue iterable,
+    OseoValue *next_method
+);
+OseoResult oseo_iterator_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_iterator_close(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error
+);
 OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_symbol_intrinsic(OseoContext *context);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
