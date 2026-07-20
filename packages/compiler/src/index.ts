@@ -127,7 +127,19 @@ export type BinaryOperator =
   | "|";
 
 /** Unary operations selected before native backend lowering. */
-export type UnaryOperator = "!" | "+" | "-" | "typeof" | "void" | "~";
+/**
+ * `to-string` is a frontend-synthesized conversion with ToString's
+ * string preference; it has no source spelling and normalized template
+ * substitutions are its only producer.
+ */
+export type UnaryOperator =
+  | "!"
+  | "+"
+  | "-"
+  | "to-string"
+  | "typeof"
+  | "void"
+  | "~";
 
 /** Short-circuit operators lowered through explicit control flow. */
 export type LogicalOperator = "&&" | "??" | "||";
@@ -3612,6 +3624,15 @@ function lowerExpression(
         builder,
         "safepoint",
         "typeof string allocation",
+        [argument],
+        expression.range,
+      );
+    }
+    if (expression.operator === "to-string") {
+      appendMirMetadata(
+        builder,
+        "safepoint",
+        "string conversion allocation",
         [argument],
         expression.range,
       );

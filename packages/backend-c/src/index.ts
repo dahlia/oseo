@@ -287,6 +287,7 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   const helpers = {
     "+": "oseo_to_number",
     "-": "oseo_negate",
+    "to-string": "oseo_to_string",
     typeof: "oseo_typeof",
     "~": "oseo_bitwise_not",
   } as const;
@@ -306,6 +307,7 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   if (
     operator == null ||
     operator === "!" ||
+    operator === "to-string" ||
     operator === "typeof" ||
     operator === "void" ||
     operator === "~" ||

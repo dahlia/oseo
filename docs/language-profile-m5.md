@@ -74,9 +74,8 @@ its deliberate boundary and its evidence:
     and the allocating result string is a declared MIR safepoint. `void`
     evaluates its operand and produces `undefined`. `%` applies primitive
     numeric coercion and IEEE 754 remainder semantics, including negative
-    zero, infinite, and `NaN` operands; object operands keep the same
-    unsupported object-to-primitive coercion boundary as the existing
-    arithmetic operators until generic `ToPrimitive` lands. Native
+    zero, infinite, and `NaN` operands; object operands convert through
+    the shared generic `ToPrimitive`. Native
     differential fixtures, MIR structural tests, and reviewed test262
     cases cover the three operators.
  -  `typeof` applied to a name that does not resolve to a binding is
@@ -129,12 +128,14 @@ its deliberate boundary and its evidence:
     `instanceof` implements `OrdinaryHasInstance` without well-known
     symbols, which the profile does not admit yet. Non-object `in` right
     operands, non-callable `instanceof` right operands, and non-object
-    `prototype` values throw the shared catchable opaque errors.
+    `prototype` values throw catchable `TypeError` instances.
  -  Untagged template literals, normalized by the frontend into string
     concatenation. Substitutions evaluate left to right interleaved with
-    the cooked template pieces, every substitution converts through the
-    shared string conversion, and object substitutions keep the shared
-    unsupported coercion boundary. Tagged template expressions stay
+    the cooked template pieces, and every substitution converts through
+    the frontend-synthesized `to-string` conversion, so an object
+    substitution applies generic `ToPrimitive` with the string
+    preference `ToString` requires rather than the addition operator's
+    default hint. Tagged template expressions stay
     rejected with a source-located diagnostic.
  -  Synchronous arrow functions with block and expression bodies,
     reusing the arrow function kind, lexical receiver, and
@@ -165,8 +166,8 @@ its deliberate boundary and its evidence:
     coercion, booleans and numeric strings coerce through the shared
     numeric conversion, and objects compare by identity. Comparing an
     object with a number or string, including a boolean after its
-    numeric conversion, keeps the shared unsupported
-    object-to-primitive boundary until generic `ToPrimitive` lands.
+    numeric conversion, converts the object through generic
+    `ToPrimitive` with the default hint before comparing again.
  -  The `??` nullish coalescing operator and the comma sequence operator.
     `??` lowers through explicit strict null and undefined checks into
     the same parameterized join structure as the other short-circuit
@@ -183,7 +184,7 @@ its deliberate boundary and its evidence:
     shifts mask their count to five bits, and exponentiation follows
     `Number::exponentiate` where C `pow` differs, covering `NaN`
     exponents and unit bases with infinite exponents. Object operands
-    keep the shared unsupported coercion boundary. The `exponentiation`
+    convert through generic `ToPrimitive`. The `exponentiation`
     test262 feature is now a supported feature of the reviewed subset.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
     `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
@@ -203,8 +204,8 @@ its deliberate boundary and its evidence:
     `Name: message` inside the owned diagnostic line. Deliberate
     boundaries: assigning to an unshadowed error intrinsic name stays a
     compile-time unresolved-binding rejection, object-valued messages
-    keep the shared unsupported coercion boundary until generic
-    `ToPrimitive` lands, and instance `stack` properties do not exist.
+    convert through generic `ToPrimitive`, and instance `stack`
+    properties do not exist.
     Native differential fixtures, runtime C fixtures, MIR structural
     tests, and reviewed test262 cases cover the family, and the runner
     now executes runtime negatives by comparing the rendered error name
@@ -212,6 +213,38 @@ its deliberate boundary and its evidence:
     `runtime-error-types` capability gap with the narrower
     `runtime-error-observation` classification for thrown values without
     error identity.
+ -  Generic `ToPrimitive` for object operands, implementing
+    `OrdinaryToPrimitive` without well-known symbols: user-reachable
+    `valueOf` and `toString` run in hint order with the receiver, an
+    object result falls through to the next method, and an object with
+    neither convertible method throws a catchable `TypeError`. Objects
+    on a default-intrinsics prototype chain use the virtualized
+    `Object.prototype` and `Array.prototype` conversions selected by
+    the first default-intrinsics provider on the chain: the
+    receiver-sensitive `Object.prototype.toString` tags
+    (`"[object Array]"`, `"[object Function]"`, `"[object Error]"`
+    through the internal error brand, and `"[object Object]"`,
+    including promises whose well-known-symbol tag is unreachable) and
+    the `join`-based array
+    text with element `ToString`, nullish holes as empty elements,
+    honored user `join` overrides, cyclic references rendered as empty
+    elements, and nesting bounded by the deterministic call-depth
+    budget. An object inheriting the virtual function conversion
+    without being callable throws the catchable `TypeError` that
+    `Function.prototype.toString` requires. The conversion feeds numeric
+    coercion, string conversion, addition with the default hint on both
+    operands before the string test, relational comparison with the number hint
+    in source order, loose equality, property keys, `console.log`, error
+    message and `Error.prototype.toString` conversion, and `setTimeout` delays
+    through one shared implementation, replacing both the former unsupported
+    object-coercion boundary and the timer-only ad-hoc conversion. Deliberate
+    boundary: converting a function or promise without a user-supplied method
+    to text stays an owned unsupported diagnostic, because faithful text needs
+    `Function.prototype.toString` or well-known symbols; a purely numeric
+    conversion of such a value produces `NaN` without materializing the text,
+    because every function source and promise tag string is non-numeric.
+    `@@toPrimitive` dispatch enters with symbols. Native differential fixtures,
+    runtime C fixtures, and reviewed test262 cases cover the conversion.
 
 
 Known gaps inside the claim

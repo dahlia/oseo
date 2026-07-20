@@ -695,7 +695,12 @@ function expression(
         kind: "binary",
         left: result,
         operator: "+",
-        right: substitution,
+        right: {
+          ...location(context, expressionNode),
+          argument: substitution,
+          kind: "unary",
+          operator: "to-string",
+        },
       };
       if (piece !== "") {
         result = {

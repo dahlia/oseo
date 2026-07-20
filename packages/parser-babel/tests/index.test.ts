@@ -735,6 +735,10 @@ test("converts untagged template literals to concatenation", () => {
   const hirText = printHir(result.hir);
   assert.match(hirText, /"hello " \+/u);
   assert.match(hirText, /\+ "!"/u);
+  // Substitutions convert with ToString's string preference instead of
+  // the addition operator's default ToPrimitive hint.
+  assert.match(hirText, /to-string %b\d+\(name\)/u);
+  assert.match(hirText, /to-string \(1 \+ 1\)/u);
 });
 
 test("rejects tagged template expressions", () => {

@@ -377,6 +377,7 @@ OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
 OseoResult oseo_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_to_string(OseoContext *context, OseoValue value);
 OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
     OseoContext *context,

@@ -183,6 +183,29 @@ static OseoResult string_number(
     return normal(oseo_number(result));
 }
 
+/*
+ * Nested default array conversion tracks the arrays already being
+ * joined so a cyclic membership renders as an empty element instead of
+ * recursing forever, matching Array.prototype.join cycle handling.
+ */
+typedef struct ConversionAncestor {
+    OseoValue value;
+    const struct ConversionAncestor *previous;
+} ConversionAncestor;
+
+static OseoResult to_primitive_value(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint,
+    const ConversionAncestor *previous
+);
+
+static OseoResult value_text(
+    OseoContext *context,
+    OseoValue value,
+    const ConversionAncestor *previous
+);
+
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
     uint64_t tag = tag_of(value);
     if (is_number(value)) return normal(value);
@@ -194,6 +217,16 @@ OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
     }
     if (is_string(value)) {
         return string_number(context, string_object(value));
+    }
+    if (is_object(value)) {
+        OseoResult primitive = to_primitive_value(
+            context,
+            value,
+            OSEO_TO_PRIMITIVE_NUMERIC,
+            NULL
+        );
+        if (primitive.status != OSEO_STATUS_NORMAL) return primitive;
+        return oseo_internal_to_number(context, primitive.value);
     }
     return failure(
         context,
@@ -357,8 +390,22 @@ static size_t number_text(double value, char *output, size_t capacity) {
     return format_shortest_decimal(fallback, output, capacity);
 }
 
-OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value) {
+static OseoResult value_text(
+    OseoContext *context,
+    OseoValue value,
+    const ConversionAncestor *previous
+) {
     if (is_string(value)) return normal(value);
+    if (is_object(value)) {
+        OseoResult primitive = to_primitive_value(
+            context,
+            value,
+            OSEO_TO_PRIMITIVE_STRING,
+            previous
+        );
+        if (primitive.status != OSEO_STATUS_NORMAL) return primitive;
+        return value_text(context, primitive.value, previous);
+    }
     const char *constant = NULL;
     uint64_t tag = tag_of(value);
     char number[64];
@@ -382,6 +429,418 @@ OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value) {
         units[index] = (uint16_t)(unsigned char)constant[index];
     }
     return oseo_internal_allocate_string(context, units, length);
+}
+
+OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value) {
+    return value_text(context, value, NULL);
+}
+
+static bool conversion_property_exists(
+    OseoValue object_value,
+    OseoValue key
+) {
+    OseoValue current = object_value;
+    while (is_object(current)) {
+        OseoValue property_value = oseo_undefined();
+        OseoPropertyAttributes attributes = {false, false, false};
+        if (oseo_internal_own_descriptor(
+                current,
+                key,
+                &property_value,
+                &attributes
+            )) {
+            return true;
+        }
+        current = ordinary_object(current)->prototype;
+    }
+    return false;
+}
+
+/*
+ * The virtualized default toString is selected by the first
+ * default-intrinsics object on the prototype chain, mirroring which
+ * prototype's method an ordinary lookup would reach first.
+ */
+typedef enum {
+    OSEO_CONVERSION_NONE = 0,
+    OSEO_CONVERSION_OBJECT = 1,
+    OSEO_CONVERSION_ARRAY = 2,
+    OSEO_CONVERSION_FUNCTION = 3,
+    OSEO_CONVERSION_PROMISE = 4,
+} DefaultConversionKind;
+
+static DefaultConversionKind default_conversion_kind(OseoValue value) {
+    OseoValue current = value;
+    while (is_object(current)) {
+        OseoOrdinaryObject *object = ordinary_object(current);
+        if (!object->default_intrinsics) {
+            current = object->prototype;
+            continue;
+        }
+        if (is_array(current)) return OSEO_CONVERSION_ARRAY;
+        if (is_function(current)) return OSEO_CONVERSION_FUNCTION;
+        if (is_promise(current)) return OSEO_CONVERSION_PROMISE;
+        return OSEO_CONVERSION_OBJECT;
+    }
+    return OSEO_CONVERSION_NONE;
+}
+
+/*
+ * The virtual Object.prototype.toString is receiver sensitive: arrays
+ * and callables keep their built-in tags, a branded error renders as
+ * an Error, and a promise without a reachable well-known-symbol tag
+ * renders as an ordinary object.
+ */
+static OseoResult default_object_tag_text(
+    OseoContext *context,
+    OseoValue value
+) {
+    static const uint16_t object_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'O', 'b', 'j', 'e', 'c', 't', ']'
+    };
+    static const uint16_t array_tag_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'A', 'r', 'r', 'a', 'y', ']'
+    };
+    static const uint16_t function_tag_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'F', 'u', 'n', 'c', 't', 'i', 'o', 'n', ']'
+    };
+    static const uint16_t error_tag_units[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' ',
+        'E', 'r', 'r', 'o', 'r', ']'
+    };
+    if (is_array(value)) {
+        return oseo_string_from_units(context, array_tag_units, 14u);
+    }
+    if (is_function(value)) {
+        return oseo_string_from_units(context, function_tag_units, 17u);
+    }
+    if (ordinary_object(value)->error_data) {
+        return oseo_string_from_units(context, error_tag_units, 14u);
+    }
+    return oseo_string_from_units(context, object_units, 15u);
+}
+
+static bool conversion_is_ancestor(
+    OseoValue value,
+    const ConversionAncestor *ancestor
+) {
+    for (const ConversionAncestor *current = ancestor;
+         current != NULL;
+         current = current->previous) {
+        if (current->value == value) return true;
+    }
+    return false;
+}
+
+static OseoResult array_join_text(
+    OseoContext *context,
+    OseoValue array_value,
+    const ConversionAncestor *previous
+) {
+    if (conversion_is_ancestor(array_value, previous)) {
+        return oseo_string_from_units(context, NULL, 0u);
+    }
+    /* Nested array conversion recurses in C, so it consumes the same
+     * deterministic call-depth budget as a JavaScript call. */
+    OseoResult result = oseo_call_enter(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_call_leave(context);
+        return result;
+    }
+    frame.slots[0] = array_value;
+    ConversionAncestor current = {frame.slots[0], previous};
+    uint16_t *units = NULL;
+    size_t length = 0u;
+    static const uint16_t length_units[] = {
+        'l', 'e', 'n', 'g', 't', 'h'
+    };
+    result = oseo_string_from_units(context, length_units, 6u);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_number(context, frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    uint32_t array_length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        double numeric_length = number_value(frame.slots[2]);
+        if (isfinite(numeric_length) && numeric_length > 0.0) {
+            array_length = numeric_length >= (double)UINT32_MAX
+                ? UINT32_MAX
+                : (uint32_t)floor(numeric_length);
+        }
+    }
+    for (uint32_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < array_length;
+         index += 1u) {
+        if (index > 0u) {
+            if (length == SIZE_MAX / sizeof(uint16_t)) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "String allocation is too large."
+                );
+                break;
+            }
+            uint16_t *grown = realloc(
+                units,
+                (length + 1u) * sizeof(uint16_t)
+            );
+            if (grown == NULL) {
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "String allocation failed."
+                );
+                break;
+            }
+            units = grown;
+            units[length] = ',';
+            length += 1u;
+        }
+        result = oseo_property_key(context, oseo_number((double)index));
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[0],
+                frame.slots[1]
+            );
+            frame.slots[2] = result.value;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (is_nullish(frame.slots[2])) {
+            continue;
+        }
+        result = value_text(context, frame.slots[2], &current);
+        frame.slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoString *element = string_object(frame.slots[3]);
+        if (element->length > SIZE_MAX - length ||
+            length + element->length >
+                SIZE_MAX / sizeof(uint16_t)) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "String allocation is too large."
+            );
+            break;
+        }
+        size_t next_length = length + element->length;
+        uint16_t *grown = realloc(
+            units,
+            next_length * sizeof(uint16_t)
+        );
+        if (grown == NULL && next_length > 0u) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "String allocation failed."
+            );
+            break;
+        }
+        units = grown;
+        if (element->length > 0u) {
+            memcpy(
+                units + length,
+                element->units,
+                element->length * sizeof(uint16_t)
+            );
+        }
+        length = next_length;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_string_from_units(context, units, length);
+    }
+    free(units);
+    oseo_roots_release(context, &frame);
+    oseo_call_leave(context);
+    return result;
+}
+
+/* The virtualized Array.prototype.toString: a user join is honored. */
+static OseoResult default_array_text(
+    OseoContext *context,
+    OseoValue array_value,
+    const ConversionAncestor *previous
+) {
+    static const uint16_t join_units[] = {'j', 'o', 'i', 'n'};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = array_value;
+    result = oseo_string_from_units(context, join_units, 4u);
+    frame.slots[1] = result.value;
+    bool property_exists = result.status == OSEO_STATUS_NORMAL &&
+        conversion_property_exists(frame.slots[0], frame.slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL && property_exists) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            is_function(frame.slots[2])) {
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                frame.slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = default_object_tag_text(context, frame.slots[0]);
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = array_join_text(context, frame.slots[0], previous);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * The generic ToPrimitive over OrdinaryToPrimitive: user-reachable
+ * valueOf and toString run in hint order, and objects on a
+ * default-intrinsics chain fall back to the virtualized
+ * Object.prototype and Array.prototype conversions. Function and
+ * promise text needs Function.prototype.toString or well-known
+ * symbols, so it stays an owned unsupported boundary.
+ */
+static OseoResult to_primitive_value(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint,
+    const ConversionAncestor *previous
+) {
+    if (!is_object(value)) return normal(value);
+    static const uint16_t to_string_units[] = {
+        't', 'o', 'S', 't', 'r', 'i', 'n', 'g'
+    };
+    static const uint16_t value_of_units[] = {
+        'v', 'a', 'l', 'u', 'e', 'O', 'f'
+    };
+    bool string_first = hint == OSEO_TO_PRIMITIVE_STRING;
+    const uint16_t *names[2];
+    size_t lengths[2];
+    names[0] = string_first ? to_string_units : value_of_units;
+    lengths[0] = string_first ? 8u : 7u;
+    names[1] = string_first ? value_of_units : to_string_units;
+    lengths[1] = string_first ? 7u : 8u;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    bool converted = false;
+    for (size_t index = 0u; index < 2u; index += 1u) {
+        bool trying_to_string = names[index] == to_string_units;
+        result = oseo_string_from_units(
+            context,
+            names[index],
+            lengths[index]
+        );
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!conversion_property_exists(frame.slots[0], frame.slots[1])) {
+            /* The virtualized Object.prototype.valueOf returns the
+             * object, so a missing valueOf falls through to the next
+             * method. */
+            if (!trying_to_string) continue;
+            DefaultConversionKind kind =
+                default_conversion_kind(frame.slots[0]);
+            if (kind == OSEO_CONVERSION_NONE) continue;
+            if (kind == OSEO_CONVERSION_ARRAY) {
+                result = default_array_text(
+                    context,
+                    frame.slots[0],
+                    previous
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (is_object(result.value)) continue;
+                converted = true;
+                break;
+            }
+            if (kind == OSEO_CONVERSION_FUNCTION &&
+                !is_function(frame.slots[0])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Function.prototype.toString requires a function "
+                    "receiver."
+                );
+                break;
+            }
+            if (kind == OSEO_CONVERSION_FUNCTION ||
+                kind == OSEO_CONVERSION_PROMISE) {
+                if (hint == OSEO_TO_PRIMITIVE_NUMERIC) {
+                    /* Every function source and promise tag string is
+                     * non-numeric, so a consumer that immediately
+                     * applies ToNumber observes only NaN. */
+                    result = normal(oseo_number(NAN));
+                    converted = true;
+                    break;
+                }
+                result = failure(
+                    context,
+                    "OSEO2001",
+                    "Function and promise text conversion is unsupported."
+                );
+                break;
+            }
+            result = default_object_tag_text(context, frame.slots[0]);
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            converted = true;
+            break;
+        }
+        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_function(frame.slots[2])) continue;
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_object(result.value)) {
+            converted = true;
+            break;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !converted) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert an object to a primitive value."
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_to_primitive(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint
+) {
+    return to_primitive_value(context, value, hint, NULL);
 }
 
 OseoResult oseo_property_key(OseoContext *context, OseoValue value) {
@@ -444,12 +903,41 @@ OseoResult oseo_add(
     if (context->observe_specialization) {
         context->generic_addition_calls += 1u;
     }
-    if (!is_string(left) && !is_string(right)) {
-        return numeric_binary(context, left, right, '+');
-    }
     OseoValue slots[2] = {left, right};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
+    if (is_object(slots[0])) {
+        OseoResult converted = to_primitive_value(
+            context,
+            slots[0],
+            OSEO_TO_PRIMITIVE_DEFAULT,
+            NULL
+        );
+        if (converted.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_pop(context, &frame);
+            return converted;
+        }
+        slots[0] = converted.value;
+    }
+    if (is_object(slots[1])) {
+        OseoResult converted = to_primitive_value(
+            context,
+            slots[1],
+            OSEO_TO_PRIMITIVE_DEFAULT,
+            NULL
+        );
+        if (converted.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_pop(context, &frame);
+            return converted;
+        }
+        slots[1] = converted.value;
+    }
+    if (!is_string(slots[0]) && !is_string(slots[1])) {
+        OseoResult numeric =
+            numeric_binary(context, slots[0], slots[1], '+');
+        oseo_roots_pop(context, &frame);
+        return numeric;
+    }
     OseoResult left_string = oseo_internal_value_string(context, slots[0]);
     if (left_string.status != OSEO_STATUS_NORMAL) {
         oseo_roots_pop(context, &frame);
@@ -537,6 +1025,10 @@ OseoResult oseo_remainder(
 
 OseoResult oseo_to_number(OseoContext *context, OseoValue value) {
     return oseo_internal_to_number(context, value);
+}
+
+OseoResult oseo_to_string(OseoContext *context, OseoValue value) {
+    return value_text(context, value, NULL);
 }
 
 OseoResult oseo_exponentiate(
@@ -750,6 +1242,26 @@ static OseoResult loose_equal_value(
         *equal = left == right;
         return normal(oseo_undefined());
     }
+    if (is_object(left)) {
+        OseoResult converted = to_primitive_value(
+            context,
+            left,
+            OSEO_TO_PRIMITIVE_DEFAULT,
+            NULL
+        );
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, converted.value, right, equal);
+    }
+    if (is_object(right)) {
+        OseoResult converted = to_primitive_value(
+            context,
+            right,
+            OSEO_TO_PRIMITIVE_DEFAULT,
+            NULL
+        );
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return loose_equal_value(context, left, converted.value, equal);
+    }
     return failure(
         context,
         "OSEO2001",
@@ -894,6 +1406,30 @@ static OseoResult relational(
     OseoValue right,
     char operator
 ) {
+    if (is_object(left) || is_object(right)) {
+        OseoValue slots[2] = {left, right};
+        OseoRootFrame frame = {NULL, slots, 2u};
+        oseo_roots_push(context, &frame);
+        OseoResult converted = to_primitive_value(
+            context,
+            slots[0],
+            OSEO_TO_PRIMITIVE_NUMBER,
+            NULL
+        );
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            slots[0] = converted.value;
+            converted = to_primitive_value(
+                context,
+                slots[1],
+                OSEO_TO_PRIMITIVE_NUMBER,
+                NULL
+            );
+            slots[1] = converted.value;
+        }
+        oseo_roots_pop(context, &frame);
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
+        return relational(context, slots[0], slots[1], operator);
+    }
     if (is_string(left) && is_string(right)) {
         int order = compare_strings(string_object(left), string_object(right));
         bool result;

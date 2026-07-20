@@ -72,6 +72,15 @@ callable and constructible, builds an instance with an own hidden
 unhandled thrown error instance as `Name: message` in the owned
 diagnostic format and falls back to the stored diagnostic for every
 other value.
+The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive`
+behind the numeric, string, addition, relational, loose-equality,
+property-key, console, error-message, and timer-delay conversions.
+`OrdinaryToPrimitive` runs user-reachable `valueOf` and `toString` in
+hint order; objects on a default-intrinsics chain use the virtualized
+`Object.prototype` and `Array.prototype` conversions with cycle-safe,
+call-depth-bounded array joins, and an object with no convertible
+method throws a catchable `TypeError`. Function and promise text
+conversion remains an owned unsupported diagnostic.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

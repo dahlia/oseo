@@ -26,6 +26,7 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.dictionary = false;
     promise->ordinary.length_writable = false;
     promise->ordinary.module_namespace = false;
+    promise->ordinary.error_data = false;
     promise->ordinary.default_intrinsics = true;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();

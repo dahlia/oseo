@@ -426,6 +426,53 @@ static void test_loose_equality_boundary(
     }
 }
 
+static void test_to_primitive_conversion(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_object_literal_create(context));
+    roots[1] = make_text(context, "[object Object]");
+    assert(
+        require_normal(oseo_loose_equal(context, roots[0], roots[1])) ==
+        oseo_boolean(true)
+    );
+    assert(
+        require_normal(
+            oseo_loose_equal(context, roots[0], oseo_number(0.0))
+        ) == oseo_boolean(false)
+    );
+    roots[2] = require_normal(oseo_to_string(context, roots[0]));
+    assert(
+        require_normal(oseo_strict_equal(context, roots[1], roots[2])) ==
+        oseo_boolean(true)
+    );
+    OseoResult numeric = oseo_to_number(context, roots[0]);
+    assert(numeric.status == OSEO_STATUS_NORMAL);
+    /* A default object converts to "[object Object]", so its number
+     * is NaN, the one value that is not loosely equal to itself. */
+    assert(
+        require_normal(
+            oseo_loose_equal(context, numeric.value, numeric.value)
+        ) == oseo_boolean(false)
+    );
+    roots[3] = require_normal(oseo_array_create(context, 1u));
+    roots[4] = make_text(context, "0");
+    (void)require_normal(oseo_object_set(
+        context,
+        roots[3],
+        roots[4],
+        oseo_number(2.0),
+        true
+    ));
+    numeric = oseo_to_number(context, roots[3]);
+    assert(numeric.status == OSEO_STATUS_NORMAL);
+    assert(
+        require_normal(
+            oseo_strict_equal(context, numeric.value, oseo_number(2.0))
+        ) == oseo_boolean(true)
+    );
+}
+
 static void test_error_intrinsics(OseoContext *context, OseoValue *roots) {
     roots[0] = require_normal(
         oseo_error_intrinsic(context, OSEO_ERROR_TYPE)
@@ -494,6 +541,7 @@ int main(void) {
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);
+    test_to_primitive_conversion(&context, frame.slots);
     test_error_intrinsics(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);

@@ -74,6 +74,7 @@ OseoResult oseo_function_create(
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
     function->ordinary.module_namespace = false;
+    function->ordinary.error_data = false;
     function->ordinary.default_intrinsics = true;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];

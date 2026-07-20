@@ -674,6 +674,122 @@ console.log(renamed.toString(), renamed.name, renamed instanceof Error);
 `,
   },
   {
+    name: "to-primitive",
+    source: `
+const box = { valueOf: function () { return 7; } };
+console.log(box * 3, box + 1, box + "", box < 10, box == 7);
+const speaker = { toString: function () { return "spoken"; } };
+console.log(speaker + "!", speaker == "spoken");
+console.log(\`template \${speaker}\`);
+const both = {
+  toString: function () { return "text"; },
+  valueOf: function () { return 5; },
+};
+console.log(both + 1, both * 2, \`\${both}\`, both < 6, both == 5);
+const ordered = [];
+const noisy = {
+  toString: function () {
+    ordered[ordered.length] = "toString";
+    return {};
+  },
+  valueOf: function () {
+    ordered[ordered.length] = "valueOf";
+    return 2;
+  },
+};
+console.log(noisy + 0);
+console.log(\`\${noisy}\`);
+console.log(ordered + "");
+console.log({} + 1, {} * 1, "" + {});
+console.log([1, 2] + "", [] + 1, [[1, [2, 3]], 4] + "");
+console.log([null, undefined, 1] + "");
+const cycle = [1];
+cycle[1] = cycle;
+console.log(cycle + "");
+console.log(\`\${new TypeError("boom")}\`);
+const fallback = {
+  toString: function () { return "fb"; },
+  valueOf: function () { return {}; },
+};
+console.log(fallback + 1);
+const opaque = {
+  toString: function () { return {}; },
+  valueOf: function () { return {}; },
+};
+try {
+  opaque + 1;
+} catch (error) {
+  console.log("opaque", error instanceof TypeError);
+}
+const bare = Object.create(null);
+try {
+  bare + 1;
+} catch (error) {
+  console.log("bare", error instanceof TypeError);
+}
+const thrower = {
+  valueOf: function () { throw new RangeError("inside valueOf"); },
+};
+try {
+  thrower * 2;
+} catch (error) {
+  console.log(error.name, error.message);
+}
+console.log([2] == 2, {} == "[object Object]", 2 < [3], [10] >= 9);
+const store = {};
+store[[1, 2]] = "keyed";
+console.log(store["1,2"]);
+console.log(-{}, +[], ~[], [2] ** 2, [8] >> [1], [6] % [4]);
+const joiner = [1, 2];
+joiner.join = function () { return "custom-join"; };
+console.log(joiner + "");
+function probe() {}
+console.log(probe * 2);
+const described = function () {};
+described.toString = function () { return "described"; };
+console.log(described + "!", described * 1);
+function poisoned() {}
+poisoned.valueOf = function () { return {}; };
+console.log(+poisoned, poisoned * 3);
+const arrayHeir = Object.create([1, 2]);
+arrayHeir.join = 5;
+console.log(arrayHeir + "");
+const numberJoin = [1, 2];
+numberJoin.join = 5;
+console.log(numberJoin + "");
+const functionHeir = Object.create(probe);
+try {
+  functionHeir + "";
+} catch (error) {
+  console.log("function heir", error instanceof TypeError);
+}
+try {
+  +functionHeir;
+} catch (error) {
+  console.log("numeric function heir", error instanceof TypeError);
+}
+const plainHeir = Object.create({ answer: 42 });
+console.log(plainHeir + "", +plainHeir);
+const retagged = [1, 2];
+Object.setPrototypeOf(retagged, {});
+console.log(retagged + "", +retagged);
+const shifted = function () {};
+Object.setPrototypeOf(shifted, {});
+console.log(shifted + "", +shifted);
+const rebased = new Error("x");
+Object.setPrototypeOf(rebased, {});
+console.log(rebased + "", +rebased);
+console.log(Error.prototype + "");
+const arrayedFunction = function () {};
+Object.setPrototypeOf(arrayedFunction, [1, 2]);
+arrayedFunction.join = 5;
+console.log(arrayedFunction + "");
+const arrayedError = new Error("x");
+Object.setPrototypeOf(arrayedError, [7, 8]);
+console.log(arrayedError + "");
+`,
+  },
+  {
     name: "ordinary-objects",
     source: `
 const value = { first: 1, ["missing"]: undefined };
@@ -2201,20 +2317,20 @@ assert.match(
   /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: ReferenceError: Binding/u,
 );
 
-const objectCoercion = await runNativeCli(
+const functionCoercion = await runNativeCli(
   {
-    args: ["object-coercion.ts"],
-    source: "console.log([2] * 3);",
-    sourceId: "object-coercion.ts",
+    args: ["function-coercion.ts"],
+    source: "function probe() {}\nconsole.log(probe + 1);",
+    sourceId: "function-coercion.ts",
     version: "0.1.0",
   },
   host,
 );
-assert.equal(objectCoercion.exitStatus, 1);
-assert.equal(objectCoercion.stdout, "");
+assert.equal(functionCoercion.exitStatus, 1);
+assert.equal(functionCoercion.stdout, "");
 assert.match(
-  objectCoercion.stderr,
-  /error\[OSEO2001\].*Object-to-primitive conversion is unsupported/u,
+  functionCoercion.stderr,
+  /error\[OSEO2001\].*Function and promise text conversion is unsupported/u,
 );
 
 const objectTimerDelay = await runNativeCli(

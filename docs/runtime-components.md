@@ -49,16 +49,18 @@ Ownership follows the plan's target layout:
  -  *runtime\_error.c*: the named error intrinsics, their lazily created
     constructor and prototype pairs, typed runtime error creation, the
     shared `Error.prototype.toString`, and unhandled-throw rendering;
- -  *runtime\_primitive.c*: coercions, arithmetic, comparison, string
+ -  *runtime\_primitive.c*: coercions including the generic
+    `ToPrimitive`, arithmetic, comparison, string
     conversion, and console output;
  -  *runtime\_promise.c*: promises, capabilities, reactions, thenable
     jobs, combinators, rejection tracking, and job draining;
- -  *runtime\_event\_loop.c*: timer conversion, timer queues, task
-    checkpoints, top-level await progress, and shutdown.
+ -  *runtime\_event\_loop.c*: timer queues, task
+    checkpoints, top-level await progress, and shutdown; timer delay
+    coercion goes through the shared primitive conversions.
 
 ### Internal helpers
 
-Eighteen helpers cross a translation-unit boundary. Each uses the
+Nineteen helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -74,6 +76,7 @@ Eighteen helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_string_is_ascii`                     | *runtime\_object.c*    |
 | `oseo_internal_own_descriptor`                      | *runtime\_object.c*    |
 | `oseo_internal_to_number`                           | *runtime\_primitive.c* |
+| `oseo_internal_to_primitive`                        | *runtime\_primitive.c* |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c* |
 | `oseo_internal_promise_method_function`             | *runtime\_promise.c*   |
 | `oseo_internal_promise_invoke_then`                 | *runtime\_promise.c*   |

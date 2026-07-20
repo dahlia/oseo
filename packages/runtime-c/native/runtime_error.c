@@ -232,6 +232,7 @@ OseoResult oseo_internal_throw_error(
     if (result.status == OSEO_STATUS_NORMAL) {
         slots[1] = result.value;
         ordinary_object(slots[1])->default_intrinsics = true;
+        ordinary_object(slots[1])->error_data = true;
         result = ascii_runtime_string(context, message);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -283,6 +284,7 @@ OseoResult oseo_internal_error_construct(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         ordinary_object(frame.slots[2])->default_intrinsics = true;
+        ordinary_object(frame.slots[2])->error_data = true;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         tag_of(frame.slots[0]) != OSEO_TAG_UNDEFINED) {

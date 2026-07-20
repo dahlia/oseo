@@ -47,6 +47,19 @@
 #define OSEO_ERROR_TO_STRING_CODE_ID \
     (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
 
+/*
+ * The preferred-type hint passed to the generic ToPrimitive. The
+ * numeric variant orders methods like the number hint but belongs to
+ * consumers that immediately apply ToNumber, so unsupported function
+ * and promise text degrades to NaN instead of a diagnostic.
+ */
+typedef enum {
+    OSEO_TO_PRIMITIVE_DEFAULT = 0,
+    OSEO_TO_PRIMITIVE_NUMBER = 1,
+    OSEO_TO_PRIMITIVE_STRING = 2,
+    OSEO_TO_PRIMITIVE_NUMERIC = 3,
+} OseoToPrimitiveHint;
+
 typedef enum {
     OSEO_HEAP_STRING = 1,
     OSEO_HEAP_ENVIRONMENT = 2,
@@ -103,6 +116,8 @@ typedef struct {
     bool length_writable;
     bool module_namespace;
     bool default_intrinsics;
+    /* The [[ErrorData]] brand Object.prototype.toString observes. */
+    bool error_data;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -378,6 +393,11 @@ OseoResult oseo_internal_promise_method_function(
 );
 bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_internal_to_primitive(
+    OseoContext *context,
+    OseoValue value,
+    OseoToPrimitiveHint hint
+);
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_jobs_drain_until(
     OseoContext *context,

@@ -253,6 +253,7 @@ static OseoResult object_create(
     object->dictionary = false;
     object->length_writable = false;
     object->module_namespace = false;
+    object->error_data = false;
     object->default_intrinsics = default_intrinsics;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
@@ -285,6 +286,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->dictionary = false;
     array->length_writable = true;
     array->module_namespace = false;
+    array->error_data = false;
     array->default_intrinsics = true;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
