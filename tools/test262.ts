@@ -834,14 +834,16 @@ async function executedResult(
       if (observation.exitStatus !== 0) {
         const unsupportedSyntax =
           observation.stderr.includes("error[OSEO1001]");
-        if (
-          expectRuntimeNegative &&
-          !unsupportedSyntax &&
-          !infrastructureFailure(observation)
-        ) {
-          // A failing exit is the expected observation for a runtime
-          // negative; every variant must still agree before the thrown
-          // error type is compared.
+        // An unhandled runtime throw renders an owned OSEO2001
+        // diagnostic; a compile-stage OSEO0001 parse or early-error
+        // rejection does not.
+        const unhandledThrow = observation.stderr.includes("error[OSEO2001]");
+        if (expectRuntimeNegative && unhandledThrow) {
+          // The unhandled throw is the expected observation for a
+          // runtime negative; every variant must still agree before the
+          // thrown error type is compared. A compile-stage or
+          // infrastructure diagnostic instead falls through to the
+          // phase-mismatch and harness handling below.
           continue;
         }
         // An OSEO1001 exit is a compile-stage rejection: no native variant

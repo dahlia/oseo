@@ -401,6 +401,25 @@ null.item;
     completed.observation.detail ?? "",
     /completed without the expected runtime error/u,
   );
+  // A parse-phase OSEO0001 rejection is not an unhandled throw, so a
+  // runtime negative that is rejected before execution is a phase
+  // mismatch rather than an unsupported runtime observation.
+  const parseRejected = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/runtime-negative.js:8:1: error[OSEO0001]: " +
+        "Unsupported syntax.\n",
+    ),
+  );
+  assert.equal(parseRejected.classification, "semantic-failure");
+  assert.equal(parseRejected.observation.errorType, undefined);
+  assert.notEqual(
+    parseRejected.observation.unsupportedCapability,
+    "runtime-error-observation",
+  );
 });
 
 test("classifies unsupported features without native execution", async () => {

@@ -488,8 +488,18 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
         oseo_context_print_error(context);
         return;
     }
+    /*
+     * Converting an object-valued name or message runs user JavaScript,
+     * which moves the context's source location. The original throw or
+     * rejection site is restored so the diagnostic points there rather
+     * than into the conversion method.
+     */
     const char *error_code = context->error_code;
     const char *error_message = context->error_message;
+    const char *source_id = context->source_id;
+    size_t source_id_length = context->source_id_length;
+    size_t line = context->line;
+    size_t column = context->column;
     OseoValue slots[2] = {thrown, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -498,6 +508,10 @@ void oseo_context_print_thrown(OseoContext *context, OseoValue thrown) {
     oseo_roots_pop(context, &frame);
     context->error_code = error_code;
     context->error_message = error_message;
+    context->source_id = source_id;
+    context->source_id_length = source_id_length;
+    context->line = line;
+    context->column = column;
     context->has_diagnostic = false;
     if (result.status != OSEO_STATUS_NORMAL || !is_string(slots[1]) ||
         string_object(slots[1])->length == 0u) {

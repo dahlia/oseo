@@ -2849,6 +2849,28 @@ assert.equal(thrownRenamedEntry.exitStatus, 1);
 assert.equal(thrownRenamedEntry.stdout, "");
 assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
 
+const thrownConvertedMessage = await runNativeCli(
+  {
+    args: ["thrown-converted-message.ts"],
+    source: `
+const boom = new Error("original");
+boom.message = { toString: function () { return "converted"; } };
+throw boom;
+`,
+    sourceId: "thrown-converted-message.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(thrownConvertedMessage.exitStatus, 1);
+assert.equal(thrownConvertedMessage.stdout, "");
+// The diagnostic points at the throw site (line 4), not the toString
+// method whose conversion moved the context source location.
+assert.match(
+  thrownConvertedMessage.stderr,
+  /^thrown-converted-message\.ts:4:1: error\[OSEO2001\]: Error: converted/u,
+);
+
 const wideBindings = Array.from(
   { length: 3_000 },
   (_, index) => `const value${index} = ${index};`,
