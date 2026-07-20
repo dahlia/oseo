@@ -376,6 +376,14 @@ does not quietly introduce an interpreter or JIT tier; staged compilation
 is the recorded candidate for `eval`, and build-time-resolvable dynamic
 import remains a deferred admission with its own plan.
 
+Interactive compilation is a separate tool boundary. A future REPL may accept
+source between submissions and ask a supported compiler host to produce a new
+native unit, but that does not expose source compilation to an executing Oseo
+program or admit `eval`. [*PLAN-REPL.md*](./PLAN-REPL.md) requires a persistent
+session, explicit incremental artifacts, and owned code lifetime before such a
+unit can join a running process. Replaying earlier submissions is not a valid
+substitute because it would repeat visible effects and lose object identity.
+
 Package resolution is separate from module semantics. Early milestones use
 explicit files or URLs. *package.json* `exports` and `imports`, CommonJS, and
 the long tail of Node.js resolution belong to later compatibility work.
@@ -597,6 +605,9 @@ milestones:
  -  the native event-loop and system-library boundary;
  -  the global object and dynamic global binding resolution, where a
     mutable `globalThis` meets closed-world name resolution;
+ -  the interactive session and incremental artifact boundary, including
+    cross-unit bindings, code lifetime, reclamation, and target support, as
+    scoped by [*PLAN-REPL.md*](./PLAN-REPL.md);
  -  the WebAssembly implementation strategy required by the intended WinterTC
     profile.
 

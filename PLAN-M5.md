@@ -182,7 +182,9 @@ declarations stay declarative and module bindings stay module-scoped, and
 `globalThis` is admitted last, after an architecture decision resolves
 dynamically created global bindings against closed-world name resolution.
 The M6 surface audit in [*PLAN-M6.md*](./PLAN-M6.md) depends on this
-order.
+order. The future interactive session in
+[*PLAN-REPL.md*](./PLAN-REPL.md) also depends on the decision, but it does not
+add REPL work to the M5 delivery queue.
 
 ### Functions and executable syntax
 
@@ -218,6 +220,12 @@ Before admitting one of these features, an architecture decision must define:
 A measured incompatibility may remain explicitly unsupported. M5 progress is
 reported honestly even when an ahead-of-time constraint prevents a complete
 claim.
+
+[*PLAN-REPL.md*](./PLAN-REPL.md) treats source accepted between interactive
+submissions as a tool-level compilation boundary. It does not admit `eval` or
+change this standards classification. Any incremental artifact or code-lifetime
+evidence it produces must update the applicable architecture decisions before a
+running session can load new code.
 
 
 Compiler and runtime invariants

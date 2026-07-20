@@ -136,3 +136,5 @@ Links
     constraints that motivate the boundary.
  -  [*ROADMAP.md*](../../ROADMAP.md) carries the M8 staged-compilation
     dependency if alternative 2 is ever selected.
+ -  [*PLAN-REPL.md*](../../PLAN-REPL.md) keeps future tool-level interactive
+    compilation separate from language-level dynamic source evaluation.

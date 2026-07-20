@@ -55,6 +55,12 @@ expanded ECMAScript profile. M5 should reuse the generator, shrinker,
 observation, and replay contracts established here. It must not begin with a
 second unrelated random-program framework.
 
+The deferred interactive-development track in
+[*PLAN-REPL.md*](./PLAN-REPL.md) extends the same infrastructure with structured
+submission sequences, persistent bindings, code-artifact lifetimes, and prompt
+schedules. Those properties begin only after the REPL session model has an
+accepted contract; this plan does not invent the interactive semantics.
+
 Property tests do not replace test262 or later web-platform tests. Standards
 suites prove behavior for reviewed specification cases. Property tests explore
 combinations, values, transformations, and execution states that a fixed suite

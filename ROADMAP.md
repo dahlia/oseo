@@ -26,11 +26,13 @@ evidence gives Oseo a better route. The roadmap should be updated when that
 happens so that it continues to describe the project's actual plan rather than
 preserving an obsolete one.
 
-The roadmap has two related tracks. The engine track builds the language
+The roadmap has two primary tracks. The engine track builds the language
 implementation, native compiler, and runtime. The compatibility track measures
 real programs and adds web-platform, Node.js, and package support. Compatibility
 experiments begin early, but compatibility claims follow the engine capabilities
-on which they depend.
+on which they depend. A deferred interactive-development track is recorded in
+[*PLAN-REPL.md*](./PLAN-REPL.md). It reuses these capability gates without
+changing their order.
 
 
 Working rules
@@ -72,6 +74,24 @@ Milestone map
 | M6        | Minimum common web API coverage and eventual WinterTC conformance  |
 | M7        | Selected Node.js APIs and practical package compatibility          |
 | M8        | A self-hosting Oseo compiler                                       |
+
+
+Interactive development track
+-----------------------------
+
+Oseo intends to provide a full-featured REPL that compiles submitted source to
+native code while preserving bindings, objects, closures, modules, asynchronous
+state, and diagnostics across submissions. [*PLAN-REPL.md*](./PLAN-REPL.md)
+records that target and the required session, incremental-artifact, and
+code-lifetime decisions.
+
+This track is planned and deferred. It is not M9, and no active milestone
+depends on REPL delivery. Host-assisted probes may begin after M5 settles the
+global-object and dynamic global-binding model and native loading has measured
+target evidence. A self-contained native REPL additionally depends on M8 so it
+can carry an Oseo compiler without embedding Node.js or Deno. Interactive
+compilation does not change the M5 exclusion of language-level `eval`, the
+`Function` constructor family, or unrestricted dynamic import.
 
 
 M0: Architecture and project foundations
@@ -537,6 +557,10 @@ The roadmap should be revised when evidence changes one of these assumptions:
     surface.
  -  Self-hosting can drift indefinitely if treated as a final rewrite. The
     compiler profile and host boundaries are enforced from M0 onward.
+ -  A stateful REPL requires code and object lifetimes to cross compilation
+    units. [*PLAN-REPL.md*](./PLAN-REPL.md) keeps implementation deferred until
+    session semantics, artifact loading, reclamation, and target evidence are
+    recorded.
 
 Changes to milestone order should update this document and name the new
 evidence. They should not silently relax the generic-fallback or hint-safety
