@@ -136,6 +136,17 @@ OseoResult oseo_function_create(
             context->allocations -= 1u;
         }
     }
+    /* SetFunctionName wraps a symbol key's description in brackets,
+     * producing "[description]", or an empty name for a
+     * descriptionless symbol. */
+    if (result.status == OSEO_STATUS_NORMAL && is_symbol(frame.slots[5])) {
+        result = oseo_internal_symbol_name(context, frame.slots[5]);
+        frame.slots[5] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && !is_string(frame.slots[5])) {
         result = failure(context, "OSEO2001", "Invalid function name.");
     }
@@ -278,6 +289,18 @@ OseoResult oseo_call_function(
         );
     } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
         result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
+        OseoValue description_input = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
+            result = oseo_internal_symbol_create(context, oseo_undefined());
+        } else {
+            result = oseo_internal_value_string(context, description_input);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_symbol_create(context, result.value);
+            }
+        }
     } else if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
         code_id == OSEO_PROMISE_REJECT_CODE_ID) {
         result = oseo_function_environment(context, callee);

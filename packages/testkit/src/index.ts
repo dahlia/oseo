@@ -84,6 +84,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "module-linking",
   "object-properties",
   "promise-settlement",
+  "symbols",
   "timers",
   "top-level-await",
   "var-bindings",

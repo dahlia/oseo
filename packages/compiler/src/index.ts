@@ -1298,6 +1298,9 @@ export type HirExpression =
       readonly kind: "error-intrinsic";
     })
   | (LocatedSyntax & {
+      readonly kind: "symbol-intrinsic";
+    })
+  | (LocatedSyntax & {
       readonly kind: "null";
     })
   | (LocatedSyntax & {
@@ -1665,6 +1668,9 @@ function resolveExpression(
           range: expression.range,
         };
       }
+      if (expression.name === "Symbol") {
+        return { kind: "symbol-intrinsic", range: expression.range };
+      }
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -1689,6 +1695,7 @@ function resolveExpression(
       expression.argument.name !== "undefined" &&
       expression.argument.name !== "NaN" &&
       expression.argument.name !== "Infinity" &&
+      expression.argument.name !== "Symbol" &&
       errorIntrinsicName(expression.argument.name) == null
     ) {
       state.diagnostics.push(
@@ -2643,6 +2650,9 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "error-intrinsic") {
     return `intrinsic ${expression.errorName}`;
   }
+  if (expression.kind === "symbol-intrinsic") {
+    return "intrinsic Symbol";
+  }
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }
@@ -2981,6 +2991,7 @@ export interface MirOperation {
     | "construct"
     | "construct-receiver"
     | "error-intrinsic"
+    | "symbol-intrinsic"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
@@ -3524,6 +3535,32 @@ function lowerExpression(
       errorName: expression.errorName,
       id,
       kind: "error-intrinsic",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "symbol-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "symbol intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "intrinsic Symbol",
+      id,
+      kind: "symbol-intrinsic",
       range: expression.range,
     });
     appendMirMetadata(

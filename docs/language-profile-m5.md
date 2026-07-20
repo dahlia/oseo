@@ -231,7 +231,11 @@ its deliberate boundary and its evidence:
     elements, and nesting bounded by the deterministic call-depth
     budget. An object inheriting the virtual function conversion
     without being callable throws the catchable `TypeError` that
-    `Function.prototype.toString` requires. The conversion feeds numeric
+    `Function.prototype.toString` requires. A user `Symbol.toPrimitive`
+    method, reachable once the program has touched the `Symbol`
+    intrinsic, is dispatched first with the specification hint string;
+    a non-callable non-nullish method and an object result throw
+    catchable `TypeError` instances. The conversion feeds numeric
     coercion, string conversion, addition with the default hint on both
     operands before the string test, relational comparison with the number hint
     in source order, loose equality, property keys, `console.log`, error
@@ -243,8 +247,31 @@ its deliberate boundary and its evidence:
     `Function.prototype.toString` or well-known symbols; a purely numeric
     conversion of such a value produces `NaN` without materializing the text,
     because every function source and promise tag string is non-numeric.
-    `@@toPrimitive` dispatch enters with symbols. Native differential fixtures,
+    `@@toPrimitive` dispatch is implemented by the symbols unit. Native
+    differential fixtures,
     runtime C fixtures, and reviewed test262 cases cover the conversion.
+ -  Symbol values and the `Symbol` intrinsic. `Symbol([description])`
+    creates a unique, GC-traced symbol primitive whose description
+    converts through the shared `ToString`; `typeof` reports
+    `"symbol"`, symbols are truthy, strict and loose equality compare
+    identity, and `new Symbol()` throws the catchable `TypeError` a
+    non-constructor requires. Symbols are admitted property keys
+    end to end: computed access, assignment, `delete`, `in`,
+    `Object.getOwnPropertyDescriptor`, and property definition treat
+    them as identity-compared keys, while `Object.keys` reports only
+    string keys. `ToPropertyKey` passes symbols through and converts
+    everything else to a string. Converting a symbol to a number or
+    string throws a catchable `TypeError`, and `console.log` renders a
+    symbol as `Symbol(description)` the way the host console does. The
+    well-known `Symbol.iterator`, `Symbol.toPrimitive`, and
+    `Symbol.toStringTag` are fixed non-writable properties of the
+    intrinsic, and `Symbol.toPrimitive` methods participate in generic
+    `ToPrimitive`. Deliberate boundaries: `Symbol.for`, `Symbol.keyFor`,
+    `Symbol.prototype` methods including `toString` and the
+    `description` accessor, `Symbol.hasInstance` dispatch in
+    `instanceof`, and `Symbol.toStringTag` observation in
+    `Object.prototype.toString` remain outside the profile until their
+    prerequisites land.
 
 
 Known gaps inside the claim
@@ -257,9 +284,12 @@ must never shrink by reclassification alone.
     symbols, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
- -  The general iterator protocol, well-known symbols, and the intrinsic
-    graph behind standard constructors other than the error family are
-    unimplemented. `Promise.all` and
+ -  The general iterator protocol and the intrinsic
+    graph behind standard constructors other than the error and symbol
+    families are
+    unimplemented. The well-known symbols exist as values, but no
+    built-in dispatches through `Symbol.iterator`,
+    `Symbol.hasInstance`, or `Symbol.toStringTag` yet. `Promise.all` and
     `Promise.race` accept M4 arrays only. test262 runtime negatives whose
     thrown value has no error identity, such as a thrown
     `Test262Error`, classify as unsupported with the

@@ -54,6 +54,12 @@ static bool string_equal(OseoValue left, OseoValue right) {
         ) == 0;
 }
 
+/* Property keys are strings compared by content or symbols by identity. */
+static bool property_key_equal(OseoValue left, OseoValue right) {
+    if (is_string(left) && is_string(right)) return string_equal(left, right);
+    return left == right;
+}
+
 static bool same_property_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -73,7 +79,9 @@ static size_t own_property_index(
     OseoValue key
 ) {
     for (size_t index = 0u; index < object->property_count; index += 1u) {
-        if (string_equal(object->properties[index].key, key)) return index;
+        if (property_key_equal(object->properties[index].key, key)) {
+            return index;
+        }
     }
     return SIZE_MAX;
 }
@@ -207,8 +215,12 @@ static OseoResult require_property_key(
     OseoContext *context,
     OseoValue key
 ) {
-    if (!is_string(key)) {
-        return failure(context, "OSEO2001", "Property key is not a string.");
+    if (!is_string(key) && !is_symbol(key)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Property key is not a string or symbol."
+        );
     }
     return normal(key);
 }
@@ -1122,7 +1134,11 @@ OseoResult oseo_object_builtin_keys(
         : 0u;
     if (object != NULL) {
         for (size_t index = 0u; index < object->property_count; index += 1u) {
-            if (object->properties[index].attributes.enumerable) count += 1u;
+            /* Object.keys reports only enumerable string keys. */
+            if (object->properties[index].attributes.enumerable &&
+                !is_symbol(object->properties[index].key)) {
+                count += 1u;
+            }
         }
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -1182,6 +1198,7 @@ OseoResult oseo_object_builtin_keys(
         OseoProperty *property = &object->properties[index];
         uint32_t ignored = 0u;
         if (!property->attributes.enumerable ||
+            is_symbol(property->key) ||
             array_index(property->key, &ignored)) continue;
         result = append_key(
             context,

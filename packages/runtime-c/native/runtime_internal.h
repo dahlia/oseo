@@ -46,6 +46,13 @@
     (SIZE_MAX - 9u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_ERROR_TO_STRING_CODE_ID \
     (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_SYMBOL_CONSTRUCT_CODE_ID \
+    (SIZE_MAX - 11u - OSEO_ERROR_KIND_COUNT)
+/* Well-known symbol table indexes shared with the public context. */
+#define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
+#define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
+#define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)2u)
+#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)3u)
 
 /*
  * The preferred-type hint passed to the generic ToPrimitive. The
@@ -72,6 +79,7 @@ typedef enum {
     OSEO_HEAP_JOB = 9,
     OSEO_HEAP_PROMISE_AGGREGATE = 10,
     OSEO_HEAP_TIMER = 11,
+    OSEO_HEAP_SYMBOL = 12,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -97,6 +105,12 @@ typedef struct {
     OseoHeapObject header;
     OseoValue value;
 } OseoCell;
+
+typedef struct {
+    OseoHeapObject header;
+    /* The description string, or undefined for a bare Symbol(). */
+    OseoValue description;
+} OseoSymbol;
 
 typedef struct {
     OseoPropertyAttributes attributes;
@@ -223,6 +237,9 @@ static inline OseoOrdinaryObject *ordinary_object(OseoValue value) {
 static inline OseoCell *cell_object(OseoValue value) {
     return (OseoCell *)heap_object(value);
 }
+static inline OseoSymbol *symbol_object(OseoValue value) {
+    return (OseoSymbol *)heap_object(value);
+}
 static inline OseoFunction *function_object(OseoValue value) {
     return (OseoFunction *)heap_object(value);
 }
@@ -280,6 +297,10 @@ static inline bool is_environment(OseoValue value) {
 static inline bool is_cell(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_CELL;
+}
+static inline bool is_symbol(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_SYMBOL;
 }
 static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -397,6 +418,22 @@ OseoResult oseo_internal_to_primitive(
     OseoContext *context,
     OseoValue value,
     OseoToPrimitiveHint hint
+);
+OseoResult oseo_internal_symbol_create(
+    OseoContext *context,
+    OseoValue description
+);
+OseoResult oseo_internal_symbol_text(
+    OseoContext *context,
+    OseoValue symbol
+);
+OseoResult oseo_internal_symbol_name(
+    OseoContext *context,
+    OseoValue symbol
+);
+OseoResult oseo_internal_well_known_symbol(
+    OseoContext *context,
+    size_t index
 );
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_jobs_drain_until(

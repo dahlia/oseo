@@ -527,6 +527,62 @@ static void test_error_intrinsics(OseoContext *context, OseoValue *roots) {
     );
 }
 
+static void test_symbols(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_symbol_intrinsic(context));
+    assert(
+        require_normal(oseo_symbol_intrinsic(context)) == roots[0]
+    );
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_symbol_intrinsic(context)) == roots[0]
+    );
+    roots[1] = make_text(context, "mark");
+    roots[2] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    roots[3] = require_normal(oseo_call_function(
+        context,
+        roots[0],
+        oseo_undefined(),
+        1u,
+        &roots[1],
+        oseo_undefined()
+    ));
+    assert(roots[2] != roots[3]);
+    roots[5] = require_normal(oseo_typeof(context, roots[2]));
+    roots[6] = require_normal(oseo_typeof(context, roots[3]));
+    assert(
+        require_normal(
+            oseo_strict_equal(context, roots[5], roots[6])
+        ) == oseo_boolean(true)
+    );
+    roots[4] = require_normal(oseo_object_literal_create(context));
+    (void)require_normal(oseo_object_set(
+        context,
+        roots[4],
+        roots[2],
+        oseo_number(1.0),
+        true
+    ));
+    oseo_collect(context);
+    assert(
+        require_normal(oseo_object_get(context, roots[4], roots[2])) ==
+        oseo_number(1.0)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[4], roots[3])) ==
+        oseo_undefined()
+    );
+    OseoResult numeric = oseo_to_number(context, roots[2]);
+    assert(numeric.status == OSEO_STATUS_THROW);
+    assert(!context->has_diagnostic);
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -543,6 +599,7 @@ int main(void) {
     test_loose_equality_boundary(&context, frame.slots);
     test_to_primitive_conversion(&context, frame.slots);
     test_error_intrinsics(&context, frame.slots);
+    test_symbols(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

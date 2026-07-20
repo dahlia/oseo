@@ -218,6 +218,13 @@ OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
     if (is_string(value)) {
         return string_number(context, string_object(value));
     }
+    if (is_symbol(value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert a symbol to a number."
+        );
+    }
     if (is_object(value)) {
         OseoResult primitive = to_primitive_value(
             context,
@@ -396,6 +403,13 @@ static OseoResult value_text(
     const ConversionAncestor *previous
 ) {
     if (is_string(value)) return normal(value);
+    if (is_symbol(value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert a symbol to a string."
+        );
+    }
     if (is_object(value)) {
         OseoResult primitive = to_primitive_value(
             context,
@@ -746,6 +760,66 @@ static OseoResult to_primitive_value(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = value;
     bool converted = false;
+    /*
+     * A Symbol.toPrimitive method can exist only after the program has
+     * touched the Symbol intrinsic, so an untouched intrinsic skips
+     * the dispatch without creating it.
+     */
+    OseoValue exotic_key =
+        context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
+    if (tag_of(exotic_key) != OSEO_TAG_UNDEFINED &&
+        conversion_property_exists(frame.slots[0], exotic_key)) {
+        result = oseo_object_get(context, frame.slots[0], exotic_key);
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+        if (!is_nullish(frame.slots[2])) {
+            if (!is_function(frame.slots[2])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "The Symbol.toPrimitive method is not callable."
+                );
+                oseo_roots_release(context, &frame);
+                return result;
+            }
+            const char *hint_name =
+                hint == OSEO_TO_PRIMITIVE_STRING
+                    ? "string"
+                    : hint == OSEO_TO_PRIMITIVE_DEFAULT
+                        ? "default"
+                        : "number";
+            size_t hint_length = strlen(hint_name);
+            uint16_t hint_units[8];
+            for (size_t unit = 0u; unit < hint_length; unit += 1u) {
+                hint_units[unit] = (uint16_t)(unsigned char)hint_name[unit];
+            }
+            result = oseo_string_from_units(context, hint_units, hint_length);
+            frame.slots[1] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_call_function(
+                    context,
+                    frame.slots[2],
+                    frame.slots[0],
+                    1u,
+                    &frame.slots[1],
+                    oseo_undefined()
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL &&
+                is_object(result.value)) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Cannot convert an object to a primitive value."
+                );
+            }
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+    }
     for (size_t index = 0u; index < 2u; index += 1u) {
         bool trying_to_string = names[index] == to_string_units;
         result = oseo_string_from_units(
@@ -844,6 +918,18 @@ OseoResult oseo_internal_to_primitive(
 }
 
 OseoResult oseo_property_key(OseoContext *context, OseoValue value) {
+    if (is_symbol(value)) return normal(value);
+    if (is_object(value)) {
+        OseoResult primitive = to_primitive_value(
+            context,
+            value,
+            OSEO_TO_PRIMITIVE_STRING,
+            NULL
+        );
+        if (primitive.status != OSEO_STATUS_NORMAL) return primitive;
+        if (is_symbol(primitive.value)) return primitive;
+        return oseo_internal_value_string(context, primitive.value);
+    }
     return oseo_internal_value_string(context, value);
 }
 
@@ -861,6 +947,7 @@ OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
     else if (tag == OSEO_TAG_BOOLEAN) constant = "boolean";
     else if (is_number(value)) constant = "number";
     else if (is_string(value)) constant = "string";
+    else if (is_symbol(value)) constant = "symbol";
     else if (is_function(value)) constant = "function";
     else if (is_object(value)) constant = "object";
     if (constant == NULL) {
@@ -1214,6 +1301,11 @@ static OseoResult loose_equal_value(
         *equal = left_nullish && right_nullish;
         return normal(oseo_undefined());
     }
+    if ((is_symbol(left) || is_symbol(right)) &&
+        !is_object(left) && !is_object(right)) {
+        *equal = left == right;
+        return normal(oseo_undefined());
+    }
     if (left_tag == OSEO_TAG_BOOLEAN) {
         OseoResult number = oseo_internal_to_number(context, left);
         if (number.status != OSEO_STATUS_NORMAL) return number;
@@ -1545,8 +1637,9 @@ OseoResult oseo_console_log(
         if (index > 0u && fputc(' ', stdout) == EOF) {
             return failure(context, "OSEO3001", "Standard output failed.");
         }
-        OseoResult string =
-            oseo_internal_value_string(context, arguments[index]);
+        OseoResult string = is_symbol(arguments[index])
+            ? oseo_internal_symbol_text(context, arguments[index])
+            : oseo_internal_value_string(context, arguments[index]);
         if (string.status != OSEO_STATUS_NORMAL) return string;
         if (write_string(string.value) != 0) {
             return failure(context, "OSEO3001", "Standard output failed.");

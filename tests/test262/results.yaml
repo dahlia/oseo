@@ -1512,7 +1512,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/length.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/length.js:129:16:
+        stderr=\"test/built-ins/Promise/all/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1536,7 +1536,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/name.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/name.js:130:16:
+        stderr=\"test/built-ins/Promise/all/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1560,7 +1560,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/all/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/all/prop-desc.js:125:16:
+        stderr=\"test/built-ins/Promise/all/prop-desc.js:141:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1640,7 +1640,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/length.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/length.js:129:16:
+        stderr=\"test/built-ins/Promise/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1663,7 +1663,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/built-ins/Promise/name.js non-strict disabled failed (1):
-        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:130:16:
+        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1686,7 +1686,7 @@ results:
       - promise-settlement
     observation:
       detail: 'test/built-ins/Promise/promise.js non-strict disabled failed
-        (1): stdout="" stderr="test/built-ins/Promise/promise.js:128:16:
+        (1): stdout="" stderr="test/built-ins/Promise/promise.js:144:16:
         error[OSEO1001]: The profile admits this only where an enclosing
         non-arrow function provides it.\n"'
       unsupportedCapability: profile-syntax
@@ -1734,7 +1734,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/length.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/length.js:129:1\
+        stderr=\"test/built-ins/Promise/prototype/catch/length.js:145:1\
         6: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1758,7 +1758,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/name.js:130:16:
+        stderr=\"test/built-ins/Promise/prototype/catch/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -1782,8 +1782,8 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/catch/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:12\
-        1:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
+        stderr=\"test/built-ins/Promise/prototype/catch/prop-desc.js:13\
+        7:25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -1984,7 +1984,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/length.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/length.js:129:16:
+        stderr=\"test/built-ins/Promise/prototype/then/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2008,7 +2008,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/name.js:130:16:
+        stderr=\"test/built-ins/Promise/prototype/then/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2032,7 +2032,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/prototype/then/prop-desc.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/prototype/then/prop-desc.js:121\
+        stderr=\"test/built-ins/Promise/prototype/then/prop-desc.js:137\
         :25: error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2102,7 +2102,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/length.js:129:16:
+        stderr=\"test/built-ins/Promise/race/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2126,7 +2126,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/name.js non-strict disabled failed
         (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/name.js:130:16:
+        stderr=\"test/built-ins/Promise/race/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2150,7 +2150,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/race/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/race/prop-desc.js:125:16:
+        stderr=\"test/built-ins/Promise/race/prop-desc.js:141:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2197,7 +2197,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/length.js:129:16:
+        stderr=\"test/built-ins/Promise/reject/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2221,7 +2221,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/name.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/name.js:130:16:
+        stderr=\"test/built-ins/Promise/reject/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2245,7 +2245,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/reject/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/reject/prop-desc.js:125:16:
+        stderr=\"test/built-ins/Promise/reject/prop-desc.js:141:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2269,7 +2269,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/length.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/length.js:129:16:
+        stderr=\"test/built-ins/Promise/resolve/length.js:145:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2293,7 +2293,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/name.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/name.js:130:16:
+        stderr=\"test/built-ins/Promise/resolve/name.js:146:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2317,7 +2317,7 @@ results:
     observation:
       detail: "test/built-ins/Promise/resolve/prop-desc.js non-strict disabled
         failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Promise/resolve/prop-desc.js:125:16:
+        stderr=\"test/built-ins/Promise/resolve/prop-desc.js:141:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -2343,6 +2343,328 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/auto-boxing-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/auto-boxing-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/desc-to-string-symbol.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/invoked-with-new.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/iterator/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.toPrimitive
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/toPrimitive/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.toStringTag
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/toStringTag/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/uniqueness.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -12108,7 +12430,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 217
   harnessFailures: 0
-  passes: 111
+  passes: 121
   semanticFailures: 0
   unsupportedProfileFeatures: 143
   dependencies:
@@ -12178,6 +12500,12 @@ summary:
       passes: 2
       semanticFailures: 0
       unsupportedProfileFeatures: 35
+    - dependency: symbols
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 10
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: top-level-await
       expectedNegatives: 3
       harnessFailures: 0
@@ -12215,6 +12543,12 @@ summary:
       passes: 2
       semanticFailures: 0
       unsupportedProfileFeatures: 35
+    - group: built-ins/Symbol
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 10
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: language/expressions
       expectedNegatives: 42
       harnessFailures: 0

@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-6",
+  abiVersion: "m5-7",
   assets: [
     {
       kind: "header",
@@ -42,6 +42,11 @@ const runtimeInput: RuntimeInput = {
       kind: "source",
       name: "runtime_error.c",
       url: new URL("../native/runtime_error.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_symbol.c",
+      url: new URL("../native/runtime_symbol.c", import.meta.url),
     },
     {
       kind: "source",

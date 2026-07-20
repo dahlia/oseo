@@ -788,6 +788,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitConstructReceiver(state, operation);
   } else if (operation.kind === "error-intrinsic") {
     emitErrorIntrinsic(state, operation);
+  } else if (operation.kind === "symbol-intrinsic") {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(state, "result = oseo_symbol_intrinsic(context);");
+    line(state, `roots[${operation.id}] = result.value;`);
   } else if (operation.kind === "module-namespace-create") {
     emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {

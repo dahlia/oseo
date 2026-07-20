@@ -42,9 +42,10 @@ the rendered error identity. Generic `ToPrimitive` is implemented as
 one shared runtime conversion behind every coercing operator,
 template substitutions, property keys, error messages, and timer
 delays, with `@@toPrimitive` dispatch deferred to the symbols unit.
-The remaining item 4 work is the semantic groundwork that needs owned
-runtime surfaces:
-symbols, and the iterator protocol. The runtime component boundaries
+Symbol values, the `Symbol` intrinsic, symbol property keys, and the
+well-known symbols are implemented, with `Symbol.toPrimitive`
+dispatched by the generic conversion. The remaining item 4 work is
+the iterator protocol. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.

@@ -6,7 +6,12 @@ supportedFeatures:
   - const
   - exponentiation
   - let
+  - Symbol
+  - Symbol.iterator
+  - Symbol.toPrimitive
+  - Symbol.toStringTag
   - top-level-await
+  - well-known-symbols
 tests:
   - path: test/built-ins/Error/name.js
     expectedClassification: pass
@@ -257,6 +262,36 @@ tests:
   - path: test/built-ins/Promise/resolve/resolve-non-obj.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Symbol/auto-boxing-non-strict.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/auto-boxing-strict.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/desc-to-string-symbol.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/invoked-with-new.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/iterator/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/length.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/name.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/toPrimitive/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/toStringTag/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/uniqueness.js
+    expectedClassification: pass
+    dependencies: [symbols]
   - path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
     expectedClassification: pass
     dependencies: [functions]

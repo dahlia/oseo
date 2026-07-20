@@ -728,6 +728,72 @@ test("keeps shadowed error names ordinary bindings", () => {
   assert.match(printed, /%b\d+\(TypeError\)/u);
 });
 
+test("resolves the unshadowed Symbol intrinsic", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "Symbol", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "symbol-intrinsic.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  assert.match(printHir(hirResult.program), /intrinsic Symbol/u);
+  const operations = buildMir(hirResult.program).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const index = operations.findIndex(
+    (operation) => operation.kind === "symbol-intrinsic",
+  );
+  assert.ok(index >= 0);
+  assert.equal(operations[index - 1]?.kind, "safepoint");
+  assert.equal(operations[index + 1]?.kind, "check-status");
+});
+
+test("keeps a shadowed Symbol an ordinary binding", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "const",
+        name: "Symbol",
+        range,
+      },
+      {
+        expression: { kind: "identifier", name: "Symbol", range },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "shadowed-symbol.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const printed = printHir(hirResult.program);
+  assert.doesNotMatch(printed, /intrinsic Symbol/u);
+  assert.match(printed, /%b\d+\(Symbol\)/u);
+});
+
 test("lowers void to an operand evaluation without a status check", () => {
   const syntax: SyntaxProgram = {
     body: [

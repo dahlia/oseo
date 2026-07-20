@@ -81,6 +81,15 @@ hint order; objects on a default-intrinsics chain use the virtualized
 call-depth-bounded array joins, and an object with no convertible
 method throws a catchable `TypeError`. Function and promise text
 conversion remains an owned unsupported diagnostic.
+The `m5-7` ABI adds `oseo_symbol_intrinsic` and the *runtime\_symbol.c*
+component: unique GC-traced symbol primitives with descriptions, the
+lazily created non-constructible `Symbol` intrinsic carrying the
+well-known `iterator`, `toPrimitive`, and `toStringTag` symbols, and
+`Symbol(description)` creation. Symbols are identity-compared property
+keys, `typeof` reports `symbol`, numeric and string conversion throw
+catchable `TypeError` instances, console output renders
+`Symbol(description)`, and a reachable `Symbol.toPrimitive` method is
+dispatched by the generic `ToPrimitive`.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

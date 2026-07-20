@@ -674,6 +674,73 @@ console.log(renamed.toString(), renamed.name, renamed instanceof Error);
 `,
   },
   {
+    name: "symbols",
+    source: `
+const first = Symbol("mark");
+const second = Symbol("mark");
+console.log(typeof first, first === second, first === first);
+console.log(first, Symbol(), Symbol(42));
+console.log(typeof Symbol, typeof Symbol.iterator, typeof Symbol.toPrimitive);
+console.log(typeof Symbol.toStringTag, Symbol.iterator === Symbol.iterator);
+try {
+  new Symbol();
+} catch (error) {
+  console.log("construct", error instanceof TypeError);
+}
+try {
+  \`\${first}\`;
+} catch (error) {
+  console.log("template", error instanceof TypeError);
+}
+try {
+  first + 1;
+} catch (error) {
+  console.log("add", error instanceof TypeError);
+}
+try {
+  first * 2;
+} catch (error) {
+  console.log("multiply", error instanceof TypeError);
+}
+const store = {};
+store[first] = "symbol keyed";
+console.log(store[first], store[second], first in store);
+console.log(Object.keys(store).length);
+store.visible = 1;
+console.log(Object.keys(store).length, Object.keys(store)[0]);
+const reported = Object.getOwnPropertyDescriptor(store, first);
+console.log(reported.value, reported.enumerable);
+console.log(delete store[first], store[first], first in store);
+const custom = {};
+custom[Symbol.toPrimitive] = function (hint) { return hint; };
+console.log(custom + "", \`\${custom}\`, custom * 1, custom == "default");
+const poisonedHint = {};
+poisonedHint[Symbol.toPrimitive] = 5;
+try {
+  poisonedHint + 1;
+} catch (error) {
+  console.log("uncallable", error instanceof TypeError);
+}
+const objectHint = {};
+objectHint[Symbol.toPrimitive] = function () { return {}; };
+try {
+  objectHint + 1;
+} catch (error) {
+  console.log("object result", error instanceof TypeError);
+}
+console.log(first == second, first == first, first == "Symbol(mark)");
+console.log(!first, first ? "truthy" : "falsy");
+const boxed = { inner: Symbol("inner") };
+console.log(boxed.inner === boxed.inner, typeof boxed.inner);
+const namedKey = Symbol("named");
+const named = { [namedKey]: function () {} };
+console.log(named[namedKey].name);
+const bareKey = Symbol();
+const bare = { [bareKey]: function () {} };
+console.log(named[namedKey].name.length, bare[bareKey].name.length);
+`,
+  },
+  {
     name: "to-primitive",
     source: `
 const box = { valueOf: function () { return 7; } };

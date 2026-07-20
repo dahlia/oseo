@@ -92,6 +92,9 @@ struct OseoContext {
     /* Lazily created error intrinsics indexed by OseoErrorKind. */
     OseoValue error_constructors[7];
     OseoValue error_prototypes[7];
+    /* The lazily created Symbol intrinsic and well-known symbols. */
+    OseoValue symbol_constructor;
+    OseoValue well_known_symbols[3];
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
@@ -374,6 +377,7 @@ OseoResult oseo_object_builtin_set_prototype_of(
     const OseoValue *arguments
 );
 OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
+OseoResult oseo_symbol_intrinsic(OseoContext *context);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
 OseoResult oseo_to_number(OseoContext *context, OseoValue value);

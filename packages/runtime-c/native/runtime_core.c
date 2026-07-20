@@ -30,6 +30,12 @@ void oseo_context_init(
         context->error_constructors[kind] = oseo_undefined();
         context->error_prototypes[kind] = oseo_undefined();
     }
+    context->symbol_constructor = oseo_undefined();
+    for (size_t index = 0u;
+         index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        context->well_known_symbols[index] = oseo_undefined();
+    }
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -88,6 +94,12 @@ void oseo_context_destroy(OseoContext *context) {
     for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
         context->error_constructors[kind] = oseo_undefined();
         context->error_prototypes[kind] = oseo_undefined();
+    }
+    context->symbol_constructor = oseo_undefined();
+    for (size_t index = 0u;
+         index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
+         index += 1u) {
+        context->well_known_symbols[index] = oseo_undefined();
     }
     context->timer_head = oseo_undefined();
     oseo_collect(context);

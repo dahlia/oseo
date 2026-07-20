@@ -455,8 +455,8 @@ archives the objects in input order before linking generated C against the
 complete archive. Filesystem enumeration and shell glob order never select
 sources or archive layout. The runtime implementation is split across
 component translation units for context lifecycle, memory, bindings,
-objects, functions, errors, primitives, promises, and the event loop,
-sharing the
+objects, functions, errors, symbols, primitives, promises, and the
+event loop, sharing the
 package-private *runtime\_internal.h* that is never included by generated
 C; [*docs/runtime-components.md*](./docs/runtime-components.md) records
 that componentization and its ownership rules. Generated programs may
