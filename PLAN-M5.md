@@ -49,8 +49,9 @@ protocol is implemented as an owned runtime surface with a first-class
 array iterator, and `Promise.all` and `Promise.race` consume any
 object iterable through it, closing the iterator when a combinator
 rejects after a step, completing the delivery item 4 groundwork; the
-`for-of` statement and spread iteration remain later syntax work. The runtime
-component boundaries
+`for-of` statement now consumes the same object-iterator protocol with
+lexical, assignment, and cleanup semantics, while spread iteration remains
+later syntax work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.

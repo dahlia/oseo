@@ -41,6 +41,9 @@ allocate or materialize the property key.
 Pending throws carry their diagnostic location and message through generated
 completion slots, so intervening `finally` operations cannot overwrite an
 unhandled exception's report.
+Iterator operations keep the iterator, captured next method, and yielded value
+in distinct root slots. Generated close blocks consult the stored completion
+kind so `IteratorClose` preserves the required throw precedence.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

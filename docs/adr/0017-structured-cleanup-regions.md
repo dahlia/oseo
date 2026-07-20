@@ -53,9 +53,9 @@ Consequences
     cleanup it does not leave.
  -  The C backend stores one additional cleanup-depth array beside completion
     kind, value, target, and diagnostic metadata.
- -  Iterator closing can reuse this representation, but its step failures and
-    normal exhaustion must still select explicit paths that do not request
-    cleanup.
+ -  Synchronous `for-of` iterator closing reuses this representation. Its step
+    failures, normal exhaustion, and same-loop continuation select explicit
+    paths that do not request cleanup.
 
 
 Alternatives considered

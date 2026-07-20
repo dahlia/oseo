@@ -154,6 +154,11 @@ const sloppyNamed = function self() {
   return self === sloppyNamed;
 };
 console.log(sloppyNamed());
+const sloppyForOf = function self() {
+  for (self of [1]) return self === sloppyForOf;
+  return false;
+};
+console.log(sloppyForOf());
 const strictNamed = function self() {
   "use strict";
   try { self = 1; }
@@ -824,6 +829,148 @@ const primitiveReturn = abruptCloseIterable(function () { return 5; });
 Promise.all(primitiveReturn).then(null, function (error) {
   console.log("primitive-return", error instanceof RangeError, error.message);
 });
+`,
+  },
+  {
+    name: "for-of",
+    source: `
+let sum = 0;
+for (const value of [1, 2, 3]) { sum = sum + value; }
+console.log("sum", sum);
+
+const readers = [];
+let readerCount = 0;
+for (let value of [4, 5]) {
+  readers[readerCount] = function () { return value; };
+  readerCount = readerCount + 1;
+}
+console.log("cells", readers[0](), readers[1]());
+
+var retained = 0;
+for (var retained of [7, 8]) {}
+let assigned = 0;
+const holder = {};
+for (assigned of [9]) {}
+for (holder.value of [10]) {}
+console.log("targets", retained, assigned, holder.value);
+
+let normalSteps = 0;
+let normalCloses = 0;
+const normalIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        normalSteps = normalSteps + 1;
+        this.next = function () { return { value: -1, done: false }; };
+        return { value: normalSteps, done: normalSteps > 2 };
+      },
+      return: function () { normalCloses = normalCloses + 1; return {}; },
+    };
+  },
+};
+for (const value of normalIterable) {
+  if (value === 1) continue;
+  console.log("normal", value);
+}
+console.log("normal-state", normalSteps, normalCloses);
+
+function closingIterable(onReturn) {
+  return {
+    [Symbol.iterator]: function () {
+      let step = 0;
+      return {
+        next: function () {
+          step = step + 1;
+          return { value: step, done: step > 2 };
+        },
+        return: onReturn,
+      };
+    },
+  };
+}
+
+let breakCloses = 0;
+for (const value of closingIterable(function () {
+  breakCloses = breakCloses + 1;
+  return {};
+})) { break; }
+console.log("break", breakCloses);
+
+const immutableTarget = 0;
+let assignmentCloses = 0;
+try {
+  for (immutableTarget of closingIterable(function () {
+    assignmentCloses = assignmentCloses + 1;
+    return {};
+  })) {}
+} catch (error) {
+  console.log("assignment", error instanceof TypeError, assignmentCloses);
+}
+
+let returnCloses = 0;
+function takeFirst(iterable) {
+  for (const value of iterable) { return value; }
+  return 0;
+}
+console.log("return", takeFirst(closingIterable(function () {
+  returnCloses = returnCloses + 1;
+  return {};
+})), returnCloses);
+
+let outerCloses = 0;
+outer: for (const outerValue of [1, 2]) {
+  for (const innerValue of closingIterable(function () {
+    outerCloses = outerCloses + 1;
+    return {};
+  })) {
+    if (innerValue === outerValue) continue outer;
+  }
+}
+console.log("outer", outerCloses);
+
+try {
+  for (const value of closingIterable(function () {
+    throw new TypeError("close throw");
+  })) { break; }
+} catch (error) {
+  console.log("break precedence", error instanceof TypeError, error.message);
+}
+
+let throwCloses = 0;
+try {
+  for (const value of closingIterable(function () {
+    throwCloses = throwCloses + 1;
+    throw new TypeError("suppressed close");
+  })) { throw new RangeError("body throw"); }
+} catch (error) {
+  console.log(
+    "throw precedence",
+    error instanceof RangeError,
+    error.message,
+    throwCloses,
+  );
+}
+
+let nextCloses = 0;
+const throwingNext = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new RangeError("next throw"); },
+      return: function () { nextCloses = nextCloses + 1; return {}; },
+    };
+  },
+};
+try {
+  for (const value of throwingNext) {}
+} catch (error) {
+  console.log("next", error instanceof RangeError, nextCloses);
+}
+
+try {
+  for (let lexical of lexical) {}
+} catch (error) {
+  console.log("tdz", error instanceof ReferenceError);
+}
 `,
   },
   {
@@ -2156,6 +2303,7 @@ for (const fixture of fixtures) {
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
+    fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||
     fixture.name === "template-literals"

@@ -11,6 +11,9 @@ syntax enter only through owned syntax. The M4 module frontend converts static
 imports, exports, top-level await, promises, async functions, and timers to the
 same owned boundary. Async suspension suffixes become private continuation
 functions before compiler lowering.
+M5 synchronous `for-of` heads admit one identifier declaration or an existing
+binding or member target. Destructuring, `for-in`, and `for-await-of` remain
+owned profile failures.
 Call type arguments, optional parameters, TypeScript `this` parameters, and
 other withheld forms are rejected at this boundary. Source positions and UTF-8
 byte offsets are indexed once for linear-time conversion.

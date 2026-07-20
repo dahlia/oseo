@@ -350,6 +350,13 @@ loop inside the same region therefore stay direct, while a transfer to an outer
 target resumes through each exited cleanup from the inside out. ADR 0017 owns
 this representation and its ordering contract.
 
+Synchronous `for-of` lowering treats the acquired iterator as another cleanup
+region. Normal exhaustion, a failed iterator step, and a `continue` targeting
+the same loop bypass `IteratorClose`; a head-assignment failure or transfer out
+of the loop enters the close block. The stored completion decides whether a
+close-time language error replaces a non-throw completion or yields to the
+original throw.
+
 
 Modules and whole-program compilation
 -------------------------------------

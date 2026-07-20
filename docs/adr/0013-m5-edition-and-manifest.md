@@ -206,6 +206,11 @@ operator; `control-flow` for statement-level control-flow cases such as
 or dynamic import, as decided by
 [ADR 0016](./0016-dynamic-source-boundary.md).
 
+Later M5 semantic units extend the vocabulary with `error-intrinsics` for the
+named error family and catchable runtime errors, `symbols` for symbol values
+and well-known symbol behavior, and `iterator-protocol` for synchronous
+iterator acquisition, stepping, closing, and consumers.
+
 
 Alternatives considered
 -----------------------
