@@ -854,7 +854,13 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (operation.completionTarget != null) {
       line(
         state,
-        `completion_target[${slot}u] = ${operation.completionTarget}u;`,
+        `completion_target[${slot}u] = ` +
+          `${operation.completionTarget.blockId}u;`,
+      );
+      line(
+        state,
+        `completion_depth[${slot}u] = ` +
+          `${operation.completionTarget.cleanupDepth}u;`,
       );
     }
   } else if (operation.kind === "unary") {
@@ -904,45 +910,34 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (operation.abruptTarget == null) {
       line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
     } else {
+      const target = operation.abruptTarget.blockId;
       state.usesCompletion = true;
       line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
       line(state, "    if (context->has_diagnostic) goto abrupt;");
-      line(state, `    completion_kind[${operation.abruptTarget}u] = 2;`);
+      line(state, `    completion_kind[${target}u] = 2;`);
       line(
         state,
-        `    roots[${state.completionSlotStart + operation.abruptTarget}u] = ` +
+        `    roots[${state.completionSlotStart + target}u] = ` +
           "result.value;",
       );
+      line(state, `    completion_line[${target}u] = context->line;`);
+      line(state, `    completion_column[${target}u] = context->column;`);
+      line(state, `    completion_source_id[${target}u] = context->source_id;`);
       line(
         state,
-        `    completion_line[${operation.abruptTarget}u] = context->line;`,
-      );
-      line(
-        state,
-        `    completion_column[${operation.abruptTarget}u] = ` +
-          "context->column;",
-      );
-      line(
-        state,
-        `    completion_source_id[${operation.abruptTarget}u] = ` +
-          "context->source_id;",
-      );
-      line(
-        state,
-        `    completion_source_id_length[${operation.abruptTarget}u] = ` +
+        `    completion_source_id_length[${target}u] = ` +
           "context->source_id_length;",
       );
       line(
         state,
-        `    completion_error_code[${operation.abruptTarget}u] = ` +
-          "context->error_code;",
+        `    completion_error_code[${target}u] = context->error_code;`,
       );
       line(
         state,
-        `    completion_error_message[${operation.abruptTarget}u] = ` +
+        `    completion_error_message[${target}u] = ` +
           "context->error_message;",
       );
-      line(state, `    goto bb${operation.abruptTarget};`);
+      line(state, `    goto bb${target};`);
       line(state, "}");
     }
   }
@@ -962,6 +957,10 @@ function emitCompletionCopy(
   line(
     state,
     `    completion_target[${target}u] = completion_target[${source}u];`,
+  );
+  line(
+    state,
+    `    completion_depth[${target}u] = completion_depth[${source}u];`,
   );
   line(state, `    completion_line[${target}u] = completion_line[${source}u];`);
   line(
@@ -1023,15 +1022,21 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     state.usesCompletion = true;
     const slot = terminator.completionSlot;
     if (terminator.outerAbrupt != null) {
+      const target = terminator.outerAbrupt.blockId;
       line(state, `if (completion_kind[${slot}u] == 2) {`);
-      emitCompletionCopy(state, slot, terminator.outerAbrupt);
-      line(state, `    goto bb${terminator.outerAbrupt};`);
+      emitCompletionCopy(state, slot, target);
+      line(state, `    goto bb${target};`);
       line(state, "}");
     }
     if (terminator.outerFinalizer != null) {
-      line(state, `if (completion_kind[${slot}u] != 0) {`);
-      emitCompletionCopy(state, slot, terminator.outerFinalizer);
-      line(state, `    goto bb${terminator.outerFinalizer};`);
+      const target = terminator.outerFinalizer;
+      line(
+        state,
+        `if (completion_kind[${slot}u] != 0 && ` +
+          `completion_depth[${slot}u] <= ${target.cleanupDepth}u) {`,
+      );
+      emitCompletionCopy(state, slot, target.blockId);
+      line(state, `    goto bb${target.blockId};`);
       line(state, "}");
     }
     line(state, `if (completion_kind[${slot}u] == 1) {`);
@@ -1192,16 +1197,18 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
         block.terminator.outerFinalizer != null)
     ) {
       if (block.terminator.outerAbrupt != null) {
-        pending.push(block.terminator.outerAbrupt);
+        pending.push(block.terminator.outerAbrupt.blockId);
       }
       if (block.terminator.outerFinalizer != null) {
-        pending.push(block.terminator.outerFinalizer);
+        pending.push(block.terminator.outerFinalizer.blockId);
       }
     }
     for (const operation of block.operations) {
-      if (operation.abruptTarget != null) pending.push(operation.abruptTarget);
+      if (operation.abruptTarget != null) {
+        pending.push(operation.abruptTarget.blockId);
+      }
       if (operation.completionTarget != null) {
-        pending.push(operation.completionTarget);
+        pending.push(operation.completionTarget.blockId);
       }
     }
   }
@@ -1379,6 +1386,7 @@ function emitFunction(
     (state.usesCompletion
       ? `    int completion_kind[${completionSlots}u] = {0};\n` +
         `    size_t completion_target[${completionSlots}u] = {0};\n` +
+        `    size_t completion_depth[${completionSlots}u] = {0};\n` +
         `    size_t completion_line[${completionSlots}u] = {0};\n` +
         `    size_t completion_column[${completionSlots}u] = {0};\n` +
         `    const char *completion_source_id[${completionSlots}u] = ` +
@@ -1391,6 +1399,7 @@ function emitFunction(
         `{NULL};\n` +
         "    (void)completion_kind;\n" +
         "    (void)completion_target;\n" +
+        "    (void)completion_depth;\n" +
         "    (void)completion_line;\n" +
         "    (void)completion_column;\n" +
         "    (void)completion_source_id;\n" +

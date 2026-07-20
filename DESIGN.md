@@ -343,6 +343,13 @@ field. `return`, `break`, and `continue` are resolved within a compiled
 function; only thrown completion crosses an ordinary call boundary. Private
 helpers that are proven not to throw may return a value directly.
 
+Cleanup regions record the destination block and cleanup depth for every
+control transfer. A `finally` clause runs only when the transfer leaves its
+protected region. A `break` from an inner `switch` and a `continue` targeting a
+loop inside the same region therefore stay direct, while a transfer to an outer
+target resumes through each exited cleanup from the inside out. ADR 0017 owns
+this representation and its ordering contract.
+
 
 Modules and whole-program compilation
 -------------------------------------

@@ -305,6 +305,44 @@ while (nestedIndex < 2) {
   }
 }
 console.log(nestedIndex);
+let internalIndex = 0;
+try {
+  while (internalIndex < 2) {
+    switch (internalIndex) {
+      case 0: internalIndex = internalIndex + 1; break;
+      default: internalIndex = internalIndex + 1; break;
+    }
+    console.log("after internal switch", internalIndex);
+    continue;
+  }
+} finally {
+  console.log("one internal finally", internalIndex);
+}
+let layeredIndex = 0;
+try {
+  while (layeredIndex < 2) {
+    layeredIndex = layeredIndex + 1;
+    try {
+      continue;
+    } finally {
+      console.log("layered inner finally", layeredIndex);
+    }
+  }
+} finally {
+  console.log("layered outer finally", layeredIndex);
+}
+try {
+  layeredLoop: while (true) {
+    try {
+      break layeredLoop;
+    } finally {
+      console.log("labeled inner finally");
+    }
+  }
+  console.log("after layered label");
+} finally {
+  console.log("labeled outer finally");
+}
 `,
   },
   {

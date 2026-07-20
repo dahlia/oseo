@@ -1206,6 +1206,97 @@ test("evaluates switch case tests lazily in separate blocks", () => {
   assert.match(printMir(buildMir(hir)), /join switch bb/u);
 });
 
+test("runs cleanup only for control transfers that leave its region", () => {
+  const emptyBlock: SyntaxStatement = { body: [], kind: "block", range };
+  const internalTransfers: SyntaxProgram = {
+    body: [
+      {
+        block: {
+          body: [
+            {
+              body: {
+                body: [
+                  {
+                    cases: [
+                      {
+                        body: [{ kind: "break", range }],
+                        range,
+                      },
+                    ],
+                    discriminant: { kind: "number", range, value: 0 },
+                    kind: "switch",
+                    range,
+                  },
+                  { kind: "continue", range },
+                ],
+                kind: "block",
+                range,
+              },
+              kind: "while",
+              range,
+              test: { kind: "boolean", range, value: false },
+            },
+          ],
+          kind: "block",
+          range,
+        },
+        finalizer: emptyBlock,
+        handler: undefined,
+        kind: "try",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "internal-cleanup-targets.ts",
+  };
+  const internalHir = buildHir(internalTransfers).program;
+  assert.ok(internalHir != null);
+  const internalJumps = buildMir(internalHir)
+    .script.blocks.flatMap((block) => block.operations)
+    .filter(
+      (operation) =>
+        operation.kind === "completion-set" &&
+        operation.completionKind === "jump",
+    );
+  assert.equal(internalJumps.length, 0);
+
+  const externalTransfer: SyntaxProgram = {
+    body: [
+      {
+        body: {
+          block: {
+            body: [{ kind: "break", range }],
+            kind: "block",
+            range,
+          },
+          finalizer: emptyBlock,
+          handler: undefined,
+          kind: "try",
+          range,
+        },
+        kind: "while",
+        range,
+        test: { kind: "boolean", range, value: true },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "external-cleanup-target.ts",
+  };
+  const externalHir = buildHir(externalTransfer).program;
+  assert.ok(externalHir != null);
+  const externalJumps = buildMir(externalHir)
+    .script.blocks.flatMap((block) => block.operations)
+    .filter(
+      (operation) =>
+        operation.kind === "completion-set" &&
+        operation.completionKind === "jump",
+    );
+  assert.equal(externalJumps.length, 1);
+  assert.equal(externalJumps[0]?.completionTarget?.cleanupDepth, 0);
+});
+
 test("copies for-head bindings once per iteration", () => {
   const syntax: SyntaxProgram = {
     body: [

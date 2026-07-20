@@ -2967,6 +2967,12 @@ export interface MirGlobalBinding {
   readonly name: string;
 }
 
+/** One control destination and the cleanup nesting active at that point. */
+export interface MirControlTarget {
+  readonly blockId: number;
+  readonly cleanupDepth: number;
+}
+
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
   readonly arguments: readonly number[];
@@ -3020,10 +3026,10 @@ export interface MirOperation {
   readonly namespaceBindingIds?: readonly number[];
   readonly namespaceNames?: readonly string[];
   readonly checkedResult?: number;
-  readonly abruptTarget?: number;
+  readonly abruptTarget?: MirControlTarget;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";
   readonly completionSlot?: number;
-  readonly completionTarget?: number;
+  readonly completionTarget?: MirControlTarget;
   readonly errorName?: ErrorIntrinsicName;
   readonly functionId?: number;
   readonly functionKind?: FunctionKind;
@@ -3056,8 +3062,8 @@ export type MirTerminator =
   | {
       readonly completionSlot: number;
       readonly kind: "resume-completion";
-      readonly outerAbrupt?: number;
-      readonly outerFinalizer?: number;
+      readonly outerAbrupt?: MirControlTarget;
+      readonly outerFinalizer?: MirControlTarget;
     }
   | {
       readonly kind: "unreachable";
@@ -3114,23 +3120,27 @@ interface MutableMirBlock {
 }
 
 interface MirBuilder {
-  readonly abruptTargets: number[];
+  readonly abruptTargets: MirControlTarget[];
   readonly blocks: MutableMirBlock[];
   readonly loops: {
-    readonly breakTarget: number;
-    readonly continueTarget: number;
+    readonly breakTarget: MirControlTarget;
+    readonly continueTarget: MirControlTarget;
   }[];
   readonly labels: {
-    readonly breakTarget: number;
-    readonly continueTarget?: number;
+    readonly breakTarget: MirControlTarget;
+    readonly continueTarget?: MirControlTarget;
     readonly name: string;
   }[];
   /** Labels waiting for the next loop lowering to claim their targets. */
   readonly pendingLabels: string[];
-  readonly finalizers: number[];
+  readonly finalizers: MirControlTarget[];
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;
+}
+
+function controlTarget(builder: MirBuilder, blockId: number): MirControlTarget {
+  return { blockId, cleanupDepth: builder.finalizers.length };
 }
 
 function appendMirMetadata(
@@ -4354,7 +4364,7 @@ function setCompletion(
   slot: number,
   range: SourceRange,
   value?: number,
-  target?: number,
+  target?: MirControlTarget,
 ): void {
   appendMirMetadata(
     builder,
@@ -4375,12 +4385,19 @@ function enterFinalizer(
   kind: NonNullable<MirOperation["completionKind"]>,
   range: SourceRange,
   value?: number,
-  target?: number,
+  target?: MirControlTarget,
 ): boolean {
   const finalizer = builder.finalizers.at(-1);
   if (finalizer == null) return false;
-  setCompletion(builder, kind, finalizer, range, value, target);
-  builder.current.terminator = { kind: "jump", target: finalizer };
+  if (target != null && target.cleanupDepth > finalizer.cleanupDepth) {
+    return false;
+  }
+  const destination = target ?? { blockId: 0, cleanupDepth: 0 };
+  setCompletion(builder, kind, finalizer.blockId, range, value, destination);
+  builder.current.terminator = {
+    kind: "jump",
+    target: finalizer.blockId,
+  };
   return true;
 }
 
@@ -4394,9 +4411,14 @@ function lowerTryStatement(
     statement.finalizer == null ? undefined : createMirBlock(builder);
   const afterBlock = createMirBlock(builder);
   const outerAbrupt = builder.abruptTargets.at(-1);
-  const tryAbrupt = catchBlock?.id ?? finallyBlock?.id ?? outerAbrupt;
+  const finallyTarget =
+    finallyBlock == null ? undefined : controlTarget(builder, finallyBlock.id);
+  if (finallyTarget != null) builder.finalizers.push(finallyTarget);
+  const tryAbrupt =
+    catchBlock == null
+      ? (finallyTarget ?? outerAbrupt)
+      : controlTarget(builder, catchBlock.id);
   if (tryAbrupt != null) builder.abruptTargets.push(tryAbrupt);
-  if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
   const tryTerminated = lowerStatementBody(statement.block, builder);
   if (finallyBlock != null) builder.finalizers.pop();
   if (tryAbrupt != null) builder.abruptTargets.pop();
@@ -4410,7 +4432,7 @@ function lowerTryStatement(
         finallyBlock.id,
         statement.range,
         undefined,
-        afterBlock.id,
+        controlTarget(builder, afterBlock.id),
       );
       builder.current.terminator = {
         kind: "jump",
@@ -4449,9 +4471,9 @@ function lowerTryStatement(
       range: statement.handler.range,
     });
     recordRoot(builder, written, statement.handler.range);
-    const catchAbrupt = finallyBlock?.id ?? outerAbrupt;
+    const catchAbrupt = finallyTarget ?? outerAbrupt;
     if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
-    if (finallyBlock != null) builder.finalizers.push(finallyBlock.id);
+    if (finallyTarget != null) builder.finalizers.push(finallyTarget);
     const catchTerminated = lowerStatementBody(statement.handler.body, builder);
     if (finallyBlock != null) builder.finalizers.pop();
     if (catchAbrupt != null) builder.abruptTargets.pop();
@@ -4465,7 +4487,7 @@ function lowerTryStatement(
           finallyBlock.id,
           statement.range,
           undefined,
-          afterBlock.id,
+          controlTarget(builder, afterBlock.id),
         );
         builder.current.terminator = {
           kind: "jump",
@@ -4493,7 +4515,7 @@ function lowerTryStatement(
           const operation = block.operations[index];
           if (
             operation?.completionSlot === finallyBlock.id &&
-            operation.completionTarget === afterBlock.id
+            operation.completionTarget?.blockId === afterBlock.id
           ) {
             const replacement = { ...operation };
             delete replacement.completionTarget;
@@ -4568,11 +4590,17 @@ function lowerStatements(
     } else if (statement.kind === "throw") {
       const value = lowerExpression(statement.expression, builder);
       const target = builder.abruptTargets.at(-1);
-      setCompletion(builder, "throw", target ?? 0, statement.range, value);
+      setCompletion(
+        builder,
+        "throw",
+        target?.blockId ?? 0,
+        statement.range,
+        value,
+      );
       builder.current.terminator =
         target == null
           ? { completionSlot: 0, kind: "resume-completion" }
-          : { kind: "jump", target };
+          : { kind: "jump", target: target.blockId };
       return true;
     } else if (statement.kind === "try") {
       if (lowerTryStatement(statement, builder)) return true;
@@ -4580,7 +4608,7 @@ function lowerStatements(
       resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;
     } else if (statement.kind === "break" || statement.kind === "continue") {
-      let target: number;
+      let target: MirControlTarget;
       if (statement.label != null) {
         const label = builder.labels.findLast(
           (entry) => entry.name === statement.label,
@@ -4604,7 +4632,7 @@ function lowerStatements(
       if (
         !enterFinalizer(builder, "jump", statement.range, undefined, target)
       ) {
-        builder.current.terminator = { kind: "jump", target };
+        builder.current.terminator = { kind: "jump", target: target.blockId };
       }
       return true;
     } else if (statement.kind === "while") {
@@ -4624,14 +4652,14 @@ function lowerStatements(
         whenTrue: bodyBlock.id,
       };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: conditionBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, conditionBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: conditionBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, conditionBlock.id),
           name,
         });
       }
@@ -4672,7 +4700,10 @@ function lowerStatements(
       } else {
         const exitBlock = createMirBlock(builder);
         for (const name of names) {
-          builder.labels.push({ breakTarget: exitBlock.id, name });
+          builder.labels.push({
+            breakTarget: controlTarget(builder, exitBlock.id),
+            name,
+          });
         }
         const terminated = lowerStatements([inner], builder);
         builder.labels.length -= names.length;
@@ -4746,10 +4777,11 @@ function lowerStatements(
       }
       const enclosingLoop = builder.loops.at(-1);
       builder.loops.push({
-        breakTarget: exitBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
         // A continue inside a switch body still targets the enclosing
         // loop; resolution rejects a continue without one.
-        continueTarget: enclosingLoop?.continueTarget ?? -1,
+        continueTarget:
+          enclosingLoop?.continueTarget ?? controlTarget(builder, -1),
       });
       for (const [index, switchCase] of statement.cases.entries()) {
         builder.current = bodyBlocks[index]!;
@@ -4860,14 +4892,14 @@ function lowerStatements(
         whenTrue: bodyBlock.id,
       };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: updateBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, updateBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: updateBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, updateBlock.id),
           name,
         });
       }
@@ -4904,14 +4936,14 @@ function lowerStatements(
       const exitBlock = createMirBlock(builder);
       builder.current.terminator = { kind: "jump", target: bodyBlock.id };
       builder.loops.push({
-        breakTarget: exitBlock.id,
-        continueTarget: conditionBlock.id,
+        breakTarget: controlTarget(builder, exitBlock.id),
+        continueTarget: controlTarget(builder, conditionBlock.id),
       });
       const claimed = builder.pendingLabels.splice(0);
       for (const name of claimed) {
         builder.labels.push({
-          breakTarget: exitBlock.id,
-          continueTarget: conditionBlock.id,
+          breakTarget: controlTarget(builder, exitBlock.id),
+          continueTarget: controlTarget(builder, conditionBlock.id),
           name,
         });
       }
@@ -5425,10 +5457,10 @@ function printTerminator(terminator: MirTerminator): string {
     const destinations = [
       terminator.outerAbrupt == null
         ? undefined
-        : `throw bb${terminator.outerAbrupt}`,
+        : `throw bb${terminator.outerAbrupt.blockId}`,
       terminator.outerFinalizer == null
         ? undefined
-        : `finally bb${terminator.outerFinalizer}`,
+        : `finally bb${terminator.outerFinalizer.blockId}`,
     ].filter((destination) => destination != null);
     return destinations.length === 0
       ? completion
