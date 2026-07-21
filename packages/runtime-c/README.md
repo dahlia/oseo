@@ -107,6 +107,14 @@ entry points `oseo_iterator_get`, `oseo_iterator_next`, and
 `oseo_iterator_close`. Generated C keeps the iterator, captured next method,
 and yielded value in separate root slots instead of allocating a hidden
 iterator-record object. Promise combinators use the same entry points.
+The `m5-10` ABI adds `oseo_array_append` and `oseo_array_append_hole` for
+generated array accumulation. Value append creates a new own data property
+without consulting the prototype, while hole append advances only the array
+length. The array and appended value remain caller-rooted across property-key
+and storage allocation. Generated accumulation is monotonic, so the array must
+not already own the property named by its current length. Accumulation beyond
+the runtime's 32-bit array-index limit fails with `OSEO2001` for value append
+and a catchable `RangeError` for a trailing hole.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

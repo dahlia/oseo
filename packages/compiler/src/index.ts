@@ -3142,6 +3142,8 @@ export interface MirOperation {
   readonly id: number;
   readonly kind:
     | "add-smi-checked"
+    | "array-append"
+    | "array-append-hole"
     | "array-create"
     | "binary"
     | "binding-reset"
