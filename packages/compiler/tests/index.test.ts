@@ -151,6 +151,54 @@ test("prints iterator operations with their rooted secondary results", () => {
   assert.match(text, /%3, %4 = iterator-next step iterator %1, %2/u);
 });
 
+test("prints dynamic argument-list ownership", () => {
+  const mir: MirProgram = {
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "create arguments",
+              id: 0,
+              kind: "argument-list-create",
+              range,
+            },
+            {
+              argumentListId: 0,
+              arguments: [],
+              detail: "console_log",
+              id: 1,
+              kind: "call",
+              range,
+              target: { kind: "console-log" },
+            },
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "argument-list.ts",
+    specialization: "disabled",
+  };
+  assert.match(
+    printMir(mir),
+    /%1 = call console_log @1:1-1:2 argument-list=%0/u,
+  );
+});
+
 test("resolves owned syntax and prints deterministic generic IR", () => {
   const syntax: SyntaxProgram = {
     body: [

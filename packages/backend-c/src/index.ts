@@ -166,18 +166,46 @@ function emitConstant(
 function emitArguments(
   state: EmitState,
   operation: MirOperation,
-): { readonly count: number; readonly name: string } {
+): { readonly count: string; readonly name: string } {
+  if (operation.argumentListId != null) {
+    const count = `argument_count_${operation.id}`;
+    const name = `argument_values_${operation.id}`;
+    line(state, `size_t ${count} = 0u;`);
+    line(state, `const OseoValue *${name} = NULL;`);
+    line(
+      state,
+      `result = oseo_argument_list_view(context, ` +
+        `roots[${operation.argumentListId}], &${count}, &${name});`,
+    );
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    return { count, name };
+  }
   if (operation.arguments.length === 0) {
-    return { count: 0, name: "NULL" };
+    return { count: "0u", name: "NULL" };
   }
   for (let index = 0; index < operation.arguments.length; index += 1) {
     const value = operationArgument(operation, index);
     line(state, `roots[${state.argumentSlotStart + index}] = roots[${value}];`);
   }
   return {
-    count: operation.arguments.length,
+    count: `${operation.arguments.length}u`,
     name: `&roots[${state.argumentSlotStart}]`,
   };
+}
+
+function emittedArgument(
+  operation: MirOperation,
+  emitted: { readonly count: string; readonly name: string },
+  index: number,
+): string {
+  if (operation.argumentListId != null) {
+    return (
+      `(${emitted.count} > ${index}u ? ` +
+      `${emitted.name}[${index}] : oseo_undefined())`
+    );
+  }
+  const value = operation.arguments[index];
+  return value == null ? "oseo_undefined()" : `roots[${value}]`;
 }
 
 function emitRead(state: EmitState, operation: MirOperation): void {
@@ -437,16 +465,16 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   const callArguments = dynamic
     ? { ...operation, arguments: operation.arguments.slice(2) }
     : operation;
-  const argumentsValue = emitArguments(state, callArguments);
   location(state, operation.range);
   state.usesAbrupt = true;
+  const argumentsValue = emitArguments(state, callArguments);
   if (target.kind === "await") {
     const value = operationArgument(operation, 0);
     line(state, `result = oseo_await_value(context, roots[${value}]);`);
   } else if (target.kind === "console-log") {
     line(
       state,
-      `result = oseo_console_log(context, ${argumentsValue.count}u, ` +
+      `result = oseo_console_log(context, ${argumentsValue.count}, ` +
         `${argumentsValue.name});`,
     );
   } else if (target.kind === "object-intrinsic") {
@@ -461,40 +489,31 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     line(
       state,
       `result = ${names[target.method]}(context, ` +
-        `${argumentsValue.count}u, ${argumentsValue.name});`,
+        `${argumentsValue.count}, ${argumentsValue.name});`,
     );
   } else if (target.kind === "promise-constructor") {
-    const executor = operationArgument(operation, 0);
-    line(
-      state,
-      `result = oseo_promise_construct(context, roots[${executor}]);`,
-    );
+    const executor = emittedArgument(callArguments, argumentsValue, 0);
+    line(state, `result = oseo_promise_construct(context, ${executor});`);
   } else if (target.kind === "promise-intrinsic") {
     if (target.method === "asyncCall") {
-      const execution = operationArgument(operation, 0);
-      line(
-        state,
-        `result = oseo_promise_async_call(context, roots[${execution}]);`,
-      );
+      const execution = emittedArgument(callArguments, argumentsValue, 0);
+      line(state, `result = oseo_promise_async_call(context, ${execution});`);
     } else if (target.method === "awaitThen") {
-      const promise = operationArgument(operation, 0);
-      const onFulfilled = operationArgument(operation, 1);
+      const promise = emittedArgument(callArguments, argumentsValue, 0);
+      const onFulfilled = emittedArgument(callArguments, argumentsValue, 1);
       line(
         state,
         "result = oseo_promise_await_then(context, " +
-          `roots[${promise}], roots[${onFulfilled}]);`,
+          `${promise}, ${onFulfilled});`,
       );
     } else if (target.method === "then") {
-      const promise = operationArgument(operation, 0);
-      const onFulfilled = operationArgument(operation, 1);
-      const onRejected = operation.arguments[2];
-      const rejectedValue =
-        onRejected == null ? "oseo_undefined()" : `roots[${onRejected}]`;
+      const promise = emittedArgument(callArguments, argumentsValue, 0);
+      const onFulfilled = emittedArgument(callArguments, argumentsValue, 1);
+      const onRejected = emittedArgument(callArguments, argumentsValue, 2);
       line(
         state,
         "result = oseo_promise_then(context, " +
-          `roots[${promise}], roots[${onFulfilled}], ` +
-          `${rejectedValue});`,
+          `${promise}, ${onFulfilled}, ${onRejected});`,
       );
     } else {
       const names = {
@@ -503,27 +522,19 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         reject: "oseo_promise_reject",
         resolve: "oseo_promise_resolve",
       } as const;
-      const value = operation.arguments[0];
-      line(
-        state,
-        `result = ${names[target.method]}(context, ` +
-          `${value == null ? "oseo_undefined()" : `roots[${value}]`});`,
-      );
+      const value = emittedArgument(callArguments, argumentsValue, 0);
+      line(state, `result = ${names[target.method]}(context, ${value});`);
     }
   } else if (target.kind === "timer-intrinsic") {
     if (target.method === "setTimeout") {
       line(
         state,
-        `result = oseo_set_timeout(context, ${argumentsValue.count}u, ` +
+        `result = oseo_set_timeout(context, ${argumentsValue.count}, ` +
           `${argumentsValue.name});`,
       );
     } else {
-      const handle = operation.arguments[0];
-      line(
-        state,
-        `result = oseo_clear_timeout(context, ` +
-          `${handle == null ? "oseo_undefined()" : `roots[${handle}]`});`,
-      );
+      const handle = emittedArgument(callArguments, argumentsValue, 0);
+      line(state, `result = oseo_clear_timeout(context, ${handle});`);
     }
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
@@ -531,7 +542,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     line(
       state,
       `result = oseo_call_function(context, roots[${callee}], ` +
-        `roots[${receiver}], ${argumentsValue.count}u, ` +
+        `roots[${receiver}], ${argumentsValue.count}, ` +
         `${argumentsValue.name}, ` +
         (constructing ? `roots[${callee}]);` : "oseo_undefined());"),
     );
@@ -570,7 +581,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       state,
       `        result = ${functionName}` +
         `(context, oseo_undefined(), oseo_undefined(), ` +
-        `${argumentsValue.count}u, ${argumentsValue.name}, ` +
+        `${argumentsValue.count}, ${argumentsValue.name}, ` +
         "oseo_undefined());",
     );
     line(state, `        oseo_frame_leave(context, ${targetRootCount}u);`);
@@ -632,6 +643,26 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
           `${state.strict ? "true" : "false"});`,
       );
     }
+  }
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+function emitArgumentListOperation(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  if (operation.kind === "argument-list-create") {
+    line(state, "result = oseo_argument_list_create(context);");
+  } else {
+    const list = operationArgument(operation, 0);
+    const value = operationArgument(operation, 1);
+    line(
+      state,
+      `result = oseo_argument_list_append(context, roots[${list}], ` +
+        `roots[${value}]);`,
+    );
   }
   line(state, `roots[${operation.id}] = result.value;`);
 }
@@ -967,6 +998,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "call" || operation.kind === "construct") {
     emitCall(state, operation);
   } else if (
+    operation.kind === "argument-list-append" ||
+    operation.kind === "argument-list-create"
+  ) {
+    emitArgumentListOperation(state, operation);
+  } else if (
     operation.kind === "array-append" ||
     operation.kind === "array-append-hole" ||
     operation.kind === "array-create" ||
@@ -1211,6 +1247,7 @@ function maximumArgumentCount(blocks: readonly MirBlock[]): number {
   for (const block of blocks) {
     for (const operation of block.operations) {
       if (operation.kind === "call" || operation.kind === "construct") {
+        if (operation.argumentListId != null) continue;
         maximum = Math.max(maximum, operation.arguments.length);
       }
     }

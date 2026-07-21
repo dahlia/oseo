@@ -966,6 +966,13 @@ OseoResult oseo_object_builtin_create(
     size_t argument_count,
     const OseoValue *arguments
 ) {
+    if (argument_count > 1u) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Object.create descriptor maps are unsupported in M3."
+        );
+    }
     return oseo_object_create(
         context,
         builtin_argument(argument_count, arguments, 0u)

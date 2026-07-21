@@ -514,10 +514,11 @@ source challenge features through explicit unsupported classifications.
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
 `do-while`, `for`, `for-of`, `switch`, and labeled statements, and the
-array literal spread consumer now reuses the synchronous iterator protocol
-through rooted dynamic accumulation. Generated Node, Deno, native, and
-test262 evidence covers its values, holes, evaluation order, captured `next`,
-and abrupt steps. The intrinsics
+array literal, call argument, and constructor argument spread consumers now
+reuse the synchronous iterator protocol through rooted dynamic accumulation.
+Generated Node, Deno, and native evidence covers their values, evaluation
+order, captured `next`, and abrupt steps; reviewed test262 evidence covers
+iterator acquisition and abrupt steps for all three consumers. The intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
@@ -529,8 +530,8 @@ no compatibility counts; the error, symbol, and iterator components
 landed with the M5 intrinsics units. The remaining queue is:
 
 1.  Complete the remaining foundational expressions and coercions after the
-    landed errors, symbols, synchronous iterator consumers, and array literal
-    spread.
+    landed errors, symbols, synchronous iterator consumers, and array literal,
+    call argument, and constructor argument spread.
 2.  Add built-in families and broader executable syntax in dependency order.
 3.  Close the named edition with reproducible standards and generated
     evidence.

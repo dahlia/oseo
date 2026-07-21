@@ -410,6 +410,26 @@ captured method invalidation, abrupt steps without close, holes, and evaluation
 order.
 
 
+M5 argument spread properties
+-----------------------------
+
+The call and constructor argument spread property generates two bounded integer
+sequences per case and combines ordinary arguments with spread segments. Each
+case selects an intrinsic, method, dynamic function, or ordinary constructor
+consumer. Its independent model predicts the result, left-to-right marker
+order, iterator-step count, close count, and thrown error identity. Each case
+compares Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled native execution with collection forced at every
+safepoint.
+
+The ordinary suite uses seed `0x5eed0006`, ten successful cases, at most five
+values per spread, and no filtering. The extended tier raises the reviewed size
+to nine values per spread and runs ten times the ordinary budget through the
+shared replay controls. Fixed native fixtures retain `Promise` construction,
+callee-before-argument evaluation, abrupt spreads without close, and the
+absence of invocation after a spread failure.
+
+
 Test placement and package boundaries
 -------------------------------------
 

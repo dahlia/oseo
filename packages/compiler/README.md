@@ -30,6 +30,12 @@ Array literal spread reuses iterator get and next while accumulating values and
 holes through dedicated MIR operations. Iterator acquisition and stepping
 failures return directly without `IteratorClose`, matching array accumulation
 semantics. Arrays without spread retain their fixed-length lowering.
+Call and constructor argument spread accumulate ordinary and iterated values in
+a rooted private argument list after evaluating the target. Abrupt iterator
+work returns without `IteratorClose`; invocations without spread retain fixed
+positional lowering. Construction allocates its receiver after accumulation. A
+spread before a later top-level await point remains an explicit unsupported
+combination until continuation extraction can retain the list.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

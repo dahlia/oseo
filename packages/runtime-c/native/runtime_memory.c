@@ -35,6 +35,11 @@ static void trace_object(
         mark_value(((OseoCell *)object)->value, worklist);
     } else if (object->kind == OSEO_HEAP_SYMBOL) {
         mark_value(((OseoSymbol *)object)->description, worklist);
+    } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
+        OseoArgumentList *list = (OseoArgumentList *)object;
+        for (size_t index = 0u; index < list->length; index += 1u) {
+            mark_value(list->values[index], worklist);
+        }
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||
@@ -92,6 +97,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
+    } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
+        free(((OseoArgumentList *)object)->values);
     }
     free(object);
 }

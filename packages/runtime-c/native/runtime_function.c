@@ -10,6 +10,113 @@
  * generic dispatch.
  */
 
+static bool is_argument_list(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_ARGUMENT_LIST;
+}
+
+static OseoArgumentList *argument_list(OseoValue value) {
+    return (OseoArgumentList *)heap_object(value);
+}
+
+OseoResult oseo_argument_list_create(OseoContext *context) {
+    OseoArgumentList *list =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*list));
+    if (list == NULL) {
+        return failure(context, "OSEO2001", "Argument list allocation failed.");
+    }
+    list->values = NULL;
+    list->length = 0u;
+    list->capacity = 0u;
+    return oseo_internal_publish_heap(
+        context,
+        &list->header,
+        OSEO_HEAP_ARGUMENT_LIST
+    );
+}
+
+static OseoResult grow_argument_list(
+    OseoContext *context,
+    OseoValue list_value
+) {
+    OseoArgumentList *list = argument_list(list_value);
+    if (list->length < list->capacity) return normal(list_value);
+    size_t capacity = list->capacity == 0u ? 4u : list->capacity * 2u;
+    if (capacity < list->capacity ||
+        capacity > SIZE_MAX / sizeof(OseoValue)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Argument list storage is too large."
+        );
+    }
+    if (context->collect_every_safepoint) oseo_collect(context);
+    list = argument_list(list_value);
+    context->allocation_attempts += 1u;
+    if (context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Argument list allocation failed."
+        );
+    }
+    OseoValue *values = malloc(capacity * sizeof(*values));
+    if (values == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Argument list allocation failed."
+        );
+    }
+    if (list->length > 0u) {
+        memcpy(values, list->values, list->length * sizeof(*values));
+    }
+    free(list->values);
+    list->values = values;
+    list->capacity = capacity;
+    return normal(list_value);
+}
+
+OseoResult oseo_argument_list_append(
+    OseoContext *context,
+    OseoValue list_value,
+    OseoValue value
+) {
+    if (!is_argument_list(list_value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Argument list append requires a list."
+        );
+    }
+    OseoResult grown = grow_argument_list(context, list_value);
+    if (grown.status != OSEO_STATUS_NORMAL) return grown;
+    OseoArgumentList *list = argument_list(list_value);
+    list->values[list->length] = value;
+    list->length += 1u;
+    return normal(list_value);
+}
+
+OseoResult oseo_argument_list_view(
+    OseoContext *context,
+    OseoValue list_value,
+    size_t *count,
+    const OseoValue **arguments
+) {
+    if (!is_argument_list(list_value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Argument list view requires a list."
+        );
+    }
+    OseoArgumentList *list = argument_list(list_value);
+    *count = list->length;
+    *arguments = list->values;
+    return normal(list_value);
+}
+
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,

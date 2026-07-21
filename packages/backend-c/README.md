@@ -48,6 +48,10 @@ Dynamic array accumulation emits runtime value and hole append operations.
 Array spread steps its captured iterator method in MIR control-flow blocks and
 returns abrupt acquisition, step, and append results without synthesizing a
 close block.
+Call and constructor spread use the same iterator control flow while appending
+values to a GC-traced argument list. Generated invocations borrow the list count
+and stable value pointer only for the call, while fixed-arity paths keep their
+positional arguments.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

@@ -382,6 +382,94 @@ static void test_array_accumulation(
     );
 }
 
+static void test_argument_lists(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    size_t count = SIZE_MAX;
+    const OseoValue *arguments = (const OseoValue *)1;
+    roots[0] = require_normal(oseo_argument_list_create(context));
+    assert(
+        require_normal(oseo_argument_list_view(
+            context,
+            roots[0],
+            &count,
+            &arguments
+        )) == roots[0]
+    );
+    assert(count == 0u);
+    assert(arguments == NULL);
+
+    roots[1] = make_text(context, "kept");
+    OseoValue kept = roots[1];
+    context->collect_every_safepoint = true;
+    assert(
+        require_normal(oseo_argument_list_append(
+            context,
+            roots[0],
+            roots[1]
+        )) == roots[0]
+    );
+    for (size_t index = 1u; index < 7u; index += 1u) {
+        assert(
+            require_normal(oseo_argument_list_append(
+                context,
+                roots[0],
+                oseo_number((double)index)
+            )) == roots[0]
+        );
+    }
+    context->collect_every_safepoint = false;
+    roots[1] = oseo_undefined();
+    oseo_collect(context);
+    (void)require_normal(oseo_argument_list_view(
+        context,
+        roots[0],
+        &count,
+        &arguments
+    ));
+    assert(count == 7u);
+    assert(arguments != NULL);
+    assert(arguments[0] == kept);
+    for (size_t index = 1u; index < count; index += 1u) {
+        assert(arguments[index] == oseo_number((double)index));
+    }
+
+    roots[1] = require_normal(oseo_argument_list_create(context));
+    oseo_context_fail_allocation_at(context, 1u);
+    assert(
+        oseo_argument_list_append(
+            context,
+            roots[1],
+            oseo_number(1.0)
+        ).status == OSEO_STATUS_THROW
+    );
+    oseo_context_fail_allocation_at(context, 0u);
+    (void)require_normal(oseo_argument_list_view(
+        context,
+        roots[1],
+        &count,
+        &arguments
+    ));
+    assert(count == 0u);
+    assert(arguments == NULL);
+    assert(
+        oseo_argument_list_append(
+            context,
+            oseo_undefined(),
+            oseo_number(1.0)
+        ).status == OSEO_STATUS_THROW
+    );
+    assert(
+        oseo_argument_list_view(
+            context,
+            oseo_undefined(),
+            &count,
+            &arguments
+        ).status == OSEO_STATUS_THROW
+    );
+}
+
 static void test_function_cells(OseoContext *context, OseoValue *roots) {
     static const uint16_t function_name[] = {
         'f', 'i', 'x', 't', 'u', 'r', 'e',
@@ -716,6 +804,7 @@ int main(void) {
     test_ordinary_properties(&context, frame.slots);
     test_arrays(&context, frame.slots);
     test_array_accumulation(&context, frame.slots);
+    test_argument_lists(&context, frame.slots);
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);

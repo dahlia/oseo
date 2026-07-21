@@ -156,6 +156,15 @@ export type SyntaxArrayElement =
   | SyntaxExpression
   | undefined;
 
+/** One spread entry retained inside an owned call argument list. */
+export interface SyntaxSpreadArgument extends LocatedSyntax {
+  readonly argument: SyntaxExpression;
+  readonly kind: "spread";
+}
+
+/** One ordinary or spread owned call argument. */
+export type SyntaxCallArgument = SyntaxExpression | SyntaxSpreadArgument;
+
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
@@ -182,7 +191,7 @@ export type SyntaxExpression =
       readonly value: boolean;
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxExpression[];
+      readonly arguments: readonly SyntaxCallArgument[];
       readonly kind: "call";
       readonly target: SyntaxCallTarget;
     })
@@ -216,12 +225,12 @@ export type SyntaxExpression =
       readonly kind: "null";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxExpression[];
+      readonly arguments: readonly SyntaxCallArgument[];
       readonly callee: SyntaxExpression;
       readonly kind: "new";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxExpression[];
+      readonly arguments: readonly SyntaxCallArgument[];
       readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
@@ -1306,6 +1315,15 @@ export interface HirArraySpreadElement extends LocatedSyntax {
 /** One ordinary, spread, or elided HIR array literal entry. */
 export type HirArrayElement = HirArraySpreadElement | HirExpression | undefined;
 
+/** One resolved spread entry retained inside an HIR call argument list. */
+export interface HirSpreadArgument extends LocatedSyntax {
+  readonly argument: HirExpression;
+  readonly kind: "spread";
+}
+
+/** One ordinary or spread HIR call argument. */
+export type HirCallArgument = HirExpression | HirSpreadArgument;
+
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
   | (LocatedSyntax & {
@@ -1335,7 +1353,7 @@ export type HirExpression =
       readonly value: boolean;
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly HirExpression[];
+      readonly arguments: readonly HirCallArgument[];
       readonly kind: "call";
       readonly target: HirCallTarget;
     })
@@ -1385,12 +1403,12 @@ export type HirExpression =
       readonly kind: "module-namespace";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly HirExpression[];
+      readonly arguments: readonly HirCallArgument[];
       readonly callee: HirExpression;
       readonly kind: "new";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly HirExpression[];
+      readonly arguments: readonly HirCallArgument[];
       readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
@@ -1662,6 +1680,18 @@ function inferFunctionName(
     : expression;
 }
 
+function resolveCallArgument(
+  argument: SyntaxCallArgument,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirCallArgument | undefined {
+  if (argument.kind === "spread") {
+    const resolved = resolveExpression(argument.argument, scopes, state);
+    return resolved == null ? undefined : { ...argument, argument: resolved };
+  }
+  return resolveExpression(argument, scopes, state);
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -1862,9 +1892,9 @@ function resolveExpression(
       : { ...expression, key, object, value };
   }
   if (expression.kind === "new") {
-    const argumentsValue: HirExpression[] = [];
+    const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
-      const resolved = resolveExpression(argument, scopes, state);
+      const resolved = resolveCallArgument(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
@@ -1885,9 +1915,9 @@ function resolveExpression(
       : { ...expression, arguments: argumentsValue, callee };
   }
   if (expression.kind === "promise-construct") {
-    const argumentsValue: HirExpression[] = [];
+    const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
-      const resolved = resolveExpression(argument, scopes, state);
+      const resolved = resolveCallArgument(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
@@ -1897,9 +1927,9 @@ function resolveExpression(
       range: expression.range,
     };
   }
-  const argumentValues: HirExpression[] = [];
+  const argumentValues: HirCallArgument[] = [];
   for (const argument of expression.arguments) {
-    const resolved = resolveExpression(argument, scopes, state);
+    const resolved = resolveCallArgument(argument, scopes, state);
     if (resolved == null) return undefined;
     argumentValues.push(resolved);
   }
@@ -1920,7 +1950,8 @@ function resolveExpression(
       );
     } else if (
       expression.target.method === "create" &&
-      expression.arguments.length > 1
+      expression.arguments.length > 1 &&
+      !expression.arguments.some((argument) => argument.kind === "spread")
     ) {
       const descriptorMap = expression.arguments[1];
       if (descriptorMap == null) {
@@ -2797,6 +2828,12 @@ function numberText(value: number): string {
   return String(value);
 }
 
+function printHirCallArgument(argument: HirCallArgument): string {
+  return argument.kind === "spread"
+    ? `...${printHirExpression(argument.argument)}`
+    : printHirExpression(argument);
+}
+
 function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding-set") {
     return (
@@ -2901,14 +2938,14 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +
-      expression.arguments.map(printHirExpression).join(", ") +
+      expression.arguments.map(printHirCallArgument).join(", ") +
       ")"
     );
   }
   if (expression.kind === "promise-construct") {
     return (
       "new intrinsic Promise(" +
-      expression.arguments.map(printHirExpression).join(", ") +
+      expression.arguments.map(printHirCallArgument).join(", ") +
       ")"
     );
   }
@@ -2927,7 +2964,7 @@ function printHirExpression(expression: HirExpression): string {
                 `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
-    expression.arguments.map(printHirExpression).join(", ") +
+    expression.arguments.map(printHirCallArgument).join(", ") +
     ")"
   );
 }
@@ -3164,6 +3201,7 @@ export interface MirControlTarget {
 
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
+  readonly argumentListId?: number;
   readonly arguments: readonly number[];
   readonly arrayLength?: number;
   readonly bindingId?: number;
@@ -3173,6 +3211,8 @@ export interface MirOperation {
   readonly id: number;
   readonly kind:
     | "add-smi-checked"
+    | "argument-list-append"
+    | "argument-list-create"
     | "array-append"
     | "array-append-hole"
     | "array-create"
@@ -3581,18 +3621,85 @@ function lowerArrayHoleAppend(
   recordRoot(builder, result, range);
 }
 
-function lowerArraySpread(
-  element: HirArraySpreadElement,
-  array: number,
+function lowerArgumentListCreate(
+  range: SourceRange,
   builder: MirBuilder,
-): void {
-  const iterable = lowerExpression(element.argument, builder);
+): number {
   appendMirMetadata(
     builder,
     "safepoint",
-    "get array spread iterator",
+    "dynamic argument list allocation",
+    [],
+    range,
+  );
+  const list = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "dynamic argument list",
+    id: list,
+    kind: "argument-list-create",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> append, abrupt -> return",
+    [list],
+    range,
+  );
+  return recordRoot(builder, list, range);
+}
+
+function lowerArgumentListAppend(
+  list: number,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "call argument append",
+    [list, value],
+    range,
+  );
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [list, value],
+    detail: "call argument append",
+    id: result,
+    kind: "argument-list-append",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return without close",
+    [result],
+    range,
+  );
+  recordRoot(builder, result, range);
+}
+
+type SpreadDestination =
+  | { readonly kind: "argument-list"; readonly value: number }
+  | { readonly kind: "array"; readonly value: number };
+
+function lowerSpreadValues(
+  spread: HirArraySpreadElement | HirSpreadArgument,
+  destination: SpreadDestination,
+  builder: MirBuilder,
+): void {
+  const label = destination.kind === "array" ? "array" : "call argument";
+  const iterable = lowerExpression(spread.argument, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    `get ${label} spread iterator`,
     [iterable],
-    element.range,
+    spread.range,
   );
   const iterator = builder.nextValue;
   builder.nextValue += 1;
@@ -3604,17 +3711,17 @@ function lowerArraySpread(
     id: iterator,
     iteratorNextMethodResult: nextMethod,
     kind: "iterator-get",
-    range: element.range,
+    range: spread.range,
   });
   appendMirMetadata(
     builder,
     "check-status",
     "normal -> step, abrupt -> return without close",
     [iterator],
-    element.range,
+    spread.range,
   );
-  recordRoot(builder, iterator, element.range);
-  recordRoot(builder, nextMethod, element.range);
+  recordRoot(builder, iterator, spread.range);
+  recordRoot(builder, nextMethod, spread.range);
 
   const stepBlock = createMirBlock(builder);
   const appendBlock = createMirBlock(builder);
@@ -3625,9 +3732,9 @@ function lowerArraySpread(
   appendMirMetadata(
     builder,
     "safepoint",
-    "step array spread iterator",
+    `step ${label} spread iterator`,
     [iterator, nextMethod],
-    element.range,
+    spread.range,
   );
   const hasValue = builder.nextValue;
   builder.nextValue += 1;
@@ -3639,16 +3746,16 @@ function lowerArraySpread(
     id: hasValue,
     iteratorValueResult: value,
     kind: "iterator-next",
-    range: element.range,
+    range: spread.range,
   });
   appendMirMetadata(
     builder,
     "check-status",
     "normal -> branch, abrupt -> return without close",
     [hasValue],
-    element.range,
+    spread.range,
   );
-  recordRoot(builder, value, element.range);
+  recordRoot(builder, value, spread.range);
   builder.current.terminator = {
     kind: "branch",
     test: hasValue,
@@ -3657,17 +3764,60 @@ function lowerArraySpread(
   };
 
   builder.current = appendBlock;
-  lowerArrayAppend(array, value, element.range, builder);
+  if (destination.kind === "array") {
+    lowerArrayAppend(destination.value, value, spread.range, builder);
+  } else {
+    lowerArgumentListAppend(destination.value, value, spread.range, builder);
+  }
   builder.current.terminator = { kind: "jump", target: stepBlock.id };
 
   builder.current = exitBlock;
   appendMirMetadata(
     builder,
     "join",
-    `array spread bb${stepBlock.id}`,
+    `${label} spread bb${stepBlock.id}`,
     [],
-    element.range,
+    spread.range,
   );
+}
+
+function lowerArraySpread(
+  element: HirArraySpreadElement,
+  array: number,
+  builder: MirBuilder,
+): void {
+  lowerSpreadValues(element, { kind: "array", value: array }, builder);
+}
+
+function lowerCallArguments(
+  argumentsValue: readonly HirCallArgument[],
+  range: SourceRange,
+  builder: MirBuilder,
+): { readonly ids: readonly number[]; readonly list?: number } {
+  if (!argumentsValue.some((argument) => argument.kind === "spread")) {
+    return {
+      ids: argumentsValue.map((argument) => {
+        if (argument.kind === "spread") {
+          throw new Error("Static call lowering received a spread argument.");
+        }
+        return lowerExpression(argument, builder);
+      }),
+    };
+  }
+  const list = lowerArgumentListCreate(range, builder);
+  for (const argument of argumentsValue) {
+    if (argument.kind === "spread") {
+      lowerSpreadValues(
+        argument,
+        { kind: "argument-list", value: list },
+        builder,
+      );
+    } else {
+      const value = lowerExpression(argument, builder);
+      lowerArgumentListAppend(list, value, argument.range, builder);
+    }
+  }
+  return { ids: [], list };
 }
 
 function lowerExpression(
@@ -4449,22 +4599,28 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "promise-construct") {
-    const argumentIds = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
-    if (argumentIds.length === 0) {
+    const argumentIds = [...lowered.ids];
+    if (lowered.list == null && argumentIds.length === 0) {
       argumentIds.push(lowerSyntheticUndefined(expression.range, builder));
     }
+    const safepointArguments =
+      lowered.list == null ? argumentIds : [...argumentIds, lowered.list];
     appendMirMetadata(
       builder,
       "safepoint",
       "Promise constructor",
-      argumentIds,
+      safepointArguments,
       expression.range,
     );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
+      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
       arguments: argumentIds,
       detail: "Promise constructor",
       id,
@@ -4483,8 +4639,10 @@ function lowerExpression(
   }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
-    const argumentIds = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
     appendMirMetadata(
       builder,
@@ -4510,17 +4668,20 @@ function lowerExpression(
       expression.range,
     );
     recordRoot(builder, receiver, expression.range);
-    const argumentsValue = [callee, receiver, ...argumentIds];
+    const argumentsValue = [callee, receiver, ...lowered.ids];
+    const safepointArguments =
+      lowered.list == null ? argumentsValue : [...argumentsValue, lowered.list];
     appendMirMetadata(
       builder,
       "safepoint",
       "constructor call",
-      argumentsValue,
+      safepointArguments,
       expression.range,
     );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
+      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
       arguments: argumentsValue,
       detail: "dynamic constructor",
       id,
@@ -4538,36 +4699,53 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   let callArguments: number[];
+  let argumentListId: number | undefined;
   let callTarget: MirCallTarget;
   let detail: string;
   if (expression.target.kind === "console-log") {
-    callArguments = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
+    callArguments = [...lowered.ids];
+    argumentListId = lowered.list;
     callTarget = { kind: "console-log" };
     detail = "console_log";
   } else if (expression.target.kind === "object-intrinsic") {
-    callArguments = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
+    callArguments = [...lowered.ids];
+    argumentListId = lowered.list;
     callTarget = {
       kind: "object-intrinsic",
       method: expression.target.method,
     };
     detail = `Object.${expression.target.method}`;
   } else if (expression.target.kind === "promise-intrinsic") {
-    callArguments = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
+    callArguments = [...lowered.ids];
+    argumentListId = lowered.list;
     callTarget = {
       kind: "promise-intrinsic",
       method: expression.target.method,
     };
     detail = `Promise.${expression.target.method}`;
   } else if (expression.target.kind === "timer-intrinsic") {
-    callArguments = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
+    callArguments = [...lowered.ids];
+    argumentListId = lowered.list;
     callTarget = {
       kind: "timer-intrinsic",
       method: expression.target.method,
@@ -4607,17 +4785,22 @@ function lowerExpression(
       );
       recordRoot(builder, callee, expression.range);
     }
-    const argumentsValue = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
-    callArguments = [callee, receiver, ...argumentsValue];
+    callArguments = [callee, receiver, ...lowered.ids];
+    argumentListId = lowered.list;
     callTarget = { kind: "dynamic" };
     detail = "dynamic function value";
   }
+  const safepointArguments =
+    argumentListId == null ? callArguments : [...callArguments, argumentListId];
   const safepointId = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: callArguments,
+    arguments: safepointArguments,
     detail,
     id: safepointId,
     kind: "safepoint",
@@ -4626,6 +4809,7 @@ function lowerExpression(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
+    ...(argumentListId == null ? {} : { argumentListId }),
     arguments: callArguments,
     detail,
     id,
@@ -5728,6 +5912,9 @@ function maximumMirValue(functionValue: MirFunction): number {
       if (operation.checkedResult != null) {
         maximum = Math.max(maximum, operation.checkedResult);
       }
+      if (operation.argumentListId != null) {
+        maximum = Math.max(maximum, operation.argumentListId);
+      }
       if (operation.iteratorNextMethodResult != null) {
         maximum = Math.max(maximum, operation.iteratorNextMethodResult);
       }
@@ -6116,11 +6303,16 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
           : ` hint=${operation.hint.provenance}:${operation.hint.name}`;
       const cacheText =
         operation.cacheId == null ? "" : ` cache=%${operation.cacheId}`;
+      const argumentListText =
+        operation.argumentListId == null
+          ? ""
+          : ` argument-list=%${operation.argumentListId}`;
       lines.push(
         `    ${resultText} = ${operation.kind} ` +
           `${operation.detail}` +
           `${argumentText === "" ? "" : ` ${argumentText}`} ` +
-          `@${rangeText(operation.range)}${hintTextValue}${cacheText}`,
+          `@${rangeText(operation.range)}${hintTextValue}${cacheText}` +
+          argumentListText,
       );
     }
     lines.push(`    ${printTerminator(block.terminator)}`);
@@ -6219,6 +6411,12 @@ function retainModuleSource<T>(value: T, sourceId: string): T {
   ) as T;
 }
 
+function hirCallArgumentHasAwait(argument: HirCallArgument): boolean {
+  return hirExpressionHasAwait(
+    argument.kind === "spread" ? argument.argument : argument,
+  );
+}
+
 function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
   if (expression.kind === "binding-set") {
@@ -6247,16 +6445,16 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
           ? hirExpressionHasAwait(expression.target.object) ||
             hirExpressionHasAwait(expression.target.key)
           : false;
-    return targetAwait || expression.arguments.some(hirExpressionHasAwait);
+    return targetAwait || expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "new") {
     return (
       hirExpressionHasAwait(expression.callee) ||
-      expression.arguments.some(hirExpressionHasAwait)
+      expression.arguments.some(hirCallArgumentHasAwait)
     );
   }
   if (expression.kind === "promise-construct") {
-    return expression.arguments.some(hirExpressionHasAwait);
+    return expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "object") {
     return expression.properties.some(
@@ -6463,6 +6661,25 @@ interface ModuleExpressionParts {
   rebuild(children: readonly HirExpression[]): HirExpression;
 }
 
+function hirArgumentExpressions(
+  argumentsValue: readonly HirCallArgument[],
+): readonly HirExpression[] {
+  return argumentsValue.map((argument) =>
+    argument.kind === "spread" ? argument.argument : argument,
+  );
+}
+
+function rebuildHirArguments(
+  original: readonly HirCallArgument[],
+  rebuilt: readonly HirExpression[],
+): readonly HirCallArgument[] {
+  return original.map((argument, index) =>
+    argument.kind === "spread"
+      ? { ...argument, argument: rebuilt[index]! }
+      : rebuilt[index]!,
+  );
+}
+
 function moduleExpressionParts(
   expression: HirExpression,
 ): ModuleExpressionParts | undefined {
@@ -6511,12 +6728,15 @@ function moduleExpressionParts(
     };
   }
   if (expression.kind === "call") {
+    const argumentChildren = hirArgumentExpressions(expression.arguments);
+    const rebuildArguments = (argumentsValue: readonly HirExpression[]) =>
+      rebuildHirArguments(expression.arguments, argumentsValue);
     if (expression.target.kind === "dynamic") {
       return {
-        children: [expression.target.callee, ...expression.arguments],
+        children: [expression.target.callee, ...argumentChildren],
         rebuild: ([callee, ...argumentsValue]) => ({
           ...expression,
-          arguments: argumentsValue,
+          arguments: rebuildArguments(argumentsValue),
           target: { callee: callee!, kind: "dynamic" },
         }),
       };
@@ -6526,39 +6746,40 @@ function moduleExpressionParts(
         children: [
           expression.target.object,
           expression.target.key,
-          ...expression.arguments,
+          ...argumentChildren,
         ],
         rebuild: ([object, key, ...argumentsValue]) => ({
           ...expression,
-          arguments: argumentsValue,
+          arguments: rebuildArguments(argumentsValue),
           target: { key: key!, kind: "method", object: object! },
         }),
       };
     }
     return {
-      children: expression.arguments,
+      children: argumentChildren,
       rebuild: (argumentsValue) => ({
         ...expression,
-        arguments: argumentsValue,
+        arguments: rebuildArguments(argumentsValue),
       }),
     };
   }
   if (expression.kind === "new") {
+    const argumentChildren = hirArgumentExpressions(expression.arguments);
     return {
-      children: [expression.callee, ...expression.arguments],
+      children: [expression.callee, ...argumentChildren],
       rebuild: ([callee, ...argumentsValue]) => ({
         ...expression,
-        arguments: argumentsValue,
+        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
         callee: callee!,
       }),
     };
   }
   if (expression.kind === "promise-construct") {
     return {
-      children: expression.arguments,
+      children: hirArgumentExpressions(expression.arguments),
       rebuild: (argumentsValue) => ({
         ...expression,
-        arguments: argumentsValue,
+        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
       }),
     };
   }
@@ -6667,6 +6888,53 @@ function extractModuleAwait(
           state.sourceId,
           preceding,
           "Array spread before a top-level await point is unsupported.",
+        ),
+      );
+      return undefined;
+    }
+  }
+  if (expression.kind === "call") {
+    const targetChildren =
+      expression.target.kind === "dynamic"
+        ? 1
+        : expression.target.kind === "method"
+          ? 2
+          : 0;
+    const argumentIndex = childIndex - targetChildren;
+    const preceding =
+      argumentIndex < 0
+        ? undefined
+        : expression.arguments
+            .slice(0, argumentIndex)
+            .find((argument) => argument.kind === "spread");
+    if (preceding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          preceding,
+          "Call argument spread before a top-level await point is " +
+            "unsupported.",
+        ),
+      );
+      return undefined;
+    }
+  }
+  if (expression.kind === "new" || expression.kind === "promise-construct") {
+    const targetChildren = expression.kind === "new" ? 1 : 0;
+    const argumentIndex = childIndex - targetChildren;
+    const preceding =
+      argumentIndex < 0
+        ? undefined
+        : expression.arguments
+            .slice(0, argumentIndex)
+            .find((argument) => argument.kind === "spread");
+    if (preceding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          preceding,
+          "Constructor argument spread before a top-level await point is " +
+            "unsupported.",
         ),
       );
       return undefined;

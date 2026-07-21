@@ -330,26 +330,49 @@ test("lowers array spread through dynamic accumulation", () => {
   assert.doesNotMatch(mir, /iterator-close/u);
 });
 
-test("keeps call and constructor spread outside the profile", () => {
+test("lowers call spread through dynamic argument accumulation", () => {
   const call = compileSource(babelFrontend, {
-    source: "fn(...values);",
+    source: `const values = [1, 2];
+console.log(0, ...values, 3);`,
     sourceId: "call-spread.ts",
   });
-  assert.equal(call.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    call.diagnostics[0]?.message,
-    "Call argument spread is unsupported.",
+  assert.deepEqual(call.diagnostics, []);
+  assert.ok(call.hir != null);
+  assert.ok(call.mir != null);
+  assert.match(
+    printHir(call.hir),
+    /call intrinsic console\.log\(0, \.\.\.%b\d+\(values\), 3\)/u,
   );
+  const mir = printMir(call.mir);
+  assert.match(mir, /argument-list-create dynamic argument list/u);
+  assert.match(mir, /argument-list-append call argument append/u);
+  assert.match(mir, /iterator-get GetIterator sync/u);
+  assert.match(mir, /iterator-next IteratorStep and IteratorValue/u);
+  assert.match(mir, /call console_log .*argument-list=%\d+/u);
+  assert.doesNotMatch(mir, /iterator-close/u);
+});
 
+test("lowers constructor spread through dynamic argument accumulation", () => {
   const construct = compileSource(babelFrontend, {
-    source: "new Box(...values);",
+    source: `function Box(first, second, third, fourth) {}
+const values = [1, 2];
+new Box(0, ...values, 3);`,
     sourceId: "constructor-spread.ts",
   });
-  assert.equal(construct.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    construct.diagnostics[0]?.message,
-    "Constructor argument spread is unsupported.",
+  assert.deepEqual(construct.diagnostics, []);
+  assert.ok(construct.hir != null);
+  assert.ok(construct.mir != null);
+  assert.match(
+    printHir(construct.hir),
+    /new %b\d+\(Box\)\(0, \.\.\.%b\d+\(values\), 3\)/u,
   );
+  const mir = printMir(construct.mir);
+  assert.match(mir, /argument-list-create dynamic argument list/u);
+  assert.match(mir, /argument-list-append call argument append/u);
+  assert.match(mir, /iterator-get GetIterator sync/u);
+  assert.match(mir, /iterator-next IteratorStep and IteratorValue/u);
+  assert.match(mir, /construct dynamic constructor .*argument-list=%\d+/u);
+  assert.doesNotMatch(mir, /iterator-close/u);
 });
 
 test("accepts uninitialized let as undefined", () => {
@@ -1167,6 +1190,111 @@ test("rejects array spread before a top-level await point", () => {
   assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
 });
 
+test("rejects call spread before a top-level await point", () => {
+  const sourceId = "file:///app/call-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "const items = [1, 2];\n" +
+      "console.log(...items, await Promise.resolve(3));",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "call-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Call argument spread before a top-level await point is unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+});
+
+test("rejects constructor spread before a top-level await point", () => {
+  const sourceId = "file:///app/constructor-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "function Box() {}\n" +
+      "const items = [1, 2];\n" +
+      "new Box(...items, await Promise.resolve(3));",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "constructor-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Constructor argument spread before a top-level await point is " +
+      "unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 3);
+});
+
+test("rejects Promise spread before a top-level await point", () => {
+  const sourceId = "file:///app/promise-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "function settle(resolve) { resolve(1); }\n" +
+      "new Promise(...[settle], await Promise.resolve(3));",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "promise-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Constructor argument spread before a top-level await point is " +
+      "unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+});
+
 test("diagnoses excessive top-level await depth", () => {
   const sourceId = "file:///app/deep-await.js";
   const accepted = babelModuleFrontend.parseModule({
@@ -1220,6 +1348,7 @@ test("lowers M4 promise construction and static methods", () => {
       "function settle(resolve) { resolve(1); }",
       "function observe(value) { console.log(value); }",
       "new Promise(settle).then(observe);",
+      "new Promise(...[settle]).then(observe);",
       "Promise.resolve(2).then(observe);",
       "Promise.reject(3).catch(observe);",
       "Promise.all([4, 5]).then(observe);",
@@ -1235,6 +1364,15 @@ test("lowers M4 promise construction and static methods", () => {
       operation.target == null ? [] : [operation.target],
     );
   assert.ok(targets.some((target) => target.kind === "promise-constructor"));
+  assert.ok(
+    result.mir.script.blocks
+      .flatMap((block) => block.operations)
+      .some(
+        (operation) =>
+          operation.target?.kind === "promise-constructor" &&
+          operation.argumentListId != null,
+      ),
+  );
   assert.ok(
     targets.some(
       (target) =>

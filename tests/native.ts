@@ -495,6 +495,97 @@ try { [...throwingSpread]; } catch (error) {
 try { [...5]; } catch (error) {
   console.log(error instanceof TypeError);
 }
+function reportCall(first, second, third, fourth) {
+  console.log(first, second, third, fourth);
+}
+reportCall("call", ...[1, 2], 3);
+console.log("intrinsic", ...[4, 5]);
+const spreadReceiver = {
+  label: "receiver",
+  report: function (first, second) {
+    console.log(this.label, first, second);
+  },
+};
+spreadReceiver.report(...[6, 7]);
+let callOrder = "";
+function selectSpreadCall() {
+  callOrder = callOrder + "callee";
+  return function (value) { console.log(callOrder, value); };
+}
+const orderedCallSpread = {
+  [Symbol.iterator]: function () {
+    callOrder = callOrder + "-spread";
+    return [8][Symbol.iterator]();
+  },
+};
+selectSpreadCall()(...orderedCallSpread);
+let callCloseCalls = 0;
+let callInvocations = 0;
+const throwingCallSpread = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new RangeError("call spread step"); },
+      return: function () {
+        callCloseCalls = callCloseCalls + 1;
+        return {};
+      },
+    };
+  },
+};
+function shouldNotRun() { callInvocations = callInvocations + 1; }
+try { shouldNotRun(...throwingCallSpread); } catch (error) {
+  console.log(
+    error instanceof RangeError,
+    callCloseCalls,
+    callInvocations,
+  );
+}
+function SpreadBox(first, second, third) {
+  this.first = first;
+  this.second = second;
+  this.third = third;
+}
+const spreadBox = new SpreadBox("new", ...[8, 9]);
+console.log(spreadBox.first, spreadBox.second, spreadBox.third);
+let constructOrder = "";
+function OrderedBox(value) {
+  this.value = value;
+  console.log(constructOrder, this.value);
+}
+function selectSpreadConstructor() {
+  constructOrder = constructOrder + "callee";
+  return OrderedBox;
+}
+const orderedConstructorSpread = {
+  [Symbol.iterator]: function () {
+    constructOrder = constructOrder + "-spread";
+    return [10][Symbol.iterator]();
+  },
+};
+new (selectSpreadConstructor())(...orderedConstructorSpread);
+let constructCloseCalls = 0;
+let constructInvocations = 0;
+const throwingConstructorSpread = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new RangeError("constructor spread step"); },
+      return: function () {
+        constructCloseCalls = constructCloseCalls + 1;
+        return {};
+      },
+    };
+  },
+};
+function ShouldNotConstruct() {
+  constructInvocations = constructInvocations + 1;
+}
+try { new ShouldNotConstruct(...throwingConstructorSpread); } catch (error) {
+  console.log(
+    error instanceof RangeError,
+    constructCloseCalls,
+    constructInvocations,
+  );
+}
 `,
   },
   {
@@ -1920,6 +2011,7 @@ const thenable = {
 };
 console.log("sync start");
 new Promise(settle).then(show);
+new Promise(...[settle]).then(show);
 latched.then(show, showRejected);
 thrownAfterResolve.then(show, showRejected);
 Promise.resolve(thenable).then(show, showRejected);
@@ -2275,6 +2367,22 @@ assert.equal(descriptorMapCompilation.mir, undefined);
 assert.match(
   descriptorMapCompilation.diagnostics[0]?.message ?? "",
   /descriptor maps are unsupported/u,
+);
+
+const spreadDescriptorMap = await runNativeCli(
+  {
+    args: ["spread-descriptor-map.ts"],
+    source: "Object.create(...[null, { item: { value: 3 } }]);",
+    sourceId: "spread-descriptor-map.ts",
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(spreadDescriptorMap.exitStatus, 1);
+assert.equal(spreadDescriptorMap.stdout, "");
+assert.match(
+  spreadDescriptorMap.stderr,
+  /error\[OSEO2001\].*descriptor maps are unsupported/u,
 );
 
 async function requireSuccess(

@@ -86,6 +86,7 @@ typedef enum {
     OSEO_HEAP_PROMISE_AGGREGATE = 10,
     OSEO_HEAP_TIMER = 11,
     OSEO_HEAP_SYMBOL = 12,
+    OSEO_HEAP_ARGUMENT_LIST = 13,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -117,6 +118,13 @@ typedef struct {
     /* The description string, or undefined for a bare Symbol(). */
     OseoValue description;
 } OseoSymbol;
+
+typedef struct {
+    OseoHeapObject header;
+    OseoValue *values;
+    size_t length;
+    size_t capacity;
+} OseoArgumentList;
 
 typedef struct {
     OseoPropertyAttributes attributes;
