@@ -348,6 +348,85 @@ static OseoResult grow_properties(
     return normal(object_value);
 }
 
+static OseoResult array_index_key(
+    OseoContext *context,
+    uint32_t index
+) {
+    uint16_t units[10];
+    size_t start = sizeof(units) / sizeof(*units);
+    do {
+        units[start - 1u] =
+            UINT16_C(0x30) + (uint16_t)(index % UINT32_C(10));
+        start -= 1u;
+        index /= UINT32_C(10);
+    } while (index != 0u);
+    return oseo_string_from_units(
+        context,
+        &units[start],
+        sizeof(units) / sizeof(*units) - start
+    );
+}
+
+OseoResult oseo_array_append(
+    OseoContext *context,
+    OseoValue array_value,
+    OseoValue value
+) {
+    if (!is_array(array_value)) {
+        return type_error(context, "Array append requires an array.");
+    }
+    OseoOrdinaryObject *array = ordinary_object(array_value);
+    if (!array->length_writable) {
+        return type_error(context, "Cannot extend a read-only array.");
+    }
+    if (array->array_length == UINT32_MAX) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Array accumulation is too large."
+        );
+    }
+    uint32_t index = array->array_length;
+    OseoResult grown = grow_properties(context, array_value);
+    if (grown.status != OSEO_STATUS_NORMAL) return grown;
+    OseoResult key = array_index_key(context, index);
+    if (key.status != OSEO_STATUS_NORMAL) return key;
+    array = ordinary_object(array_value);
+    OseoProperty *property = &array->properties[array->property_count];
+    property->attributes = (OseoPropertyAttributes){true, true, true};
+    property->key = key.value;
+    property->value = value;
+    array->property_count += 1u;
+    array->array_length = index + 1u;
+    array->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(array_value);
+}
+
+OseoResult oseo_array_append_hole(
+    OseoContext *context,
+    OseoValue array_value
+) {
+    if (!is_array(array_value)) {
+        return type_error(context, "Array hole append requires an array.");
+    }
+    OseoOrdinaryObject *array = ordinary_object(array_value);
+    if (!array->length_writable) {
+        return type_error(context, "Cannot extend a read-only array.");
+    }
+    if (array->array_length == UINT32_MAX) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_RANGE,
+            "Invalid array length."
+        );
+    }
+    array->array_length += 1u;
+    array->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    return normal(array_value);
+}
+
 OseoResult oseo_object_get(
     OseoContext *context,
     OseoValue object_value,

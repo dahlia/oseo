@@ -51,8 +51,8 @@ first reviewed test262 cases land.
 
 | Group                | Status  | Owning contract      |
 | -------------------- | ------- | -------------------- |
-| language/expressions | partial | M3 and M4 profiles   |
-| language/statements  | partial | M3 and M4 profiles   |
+| language/expressions | partial | M5 profile           |
+| language/statements  | partial | M5 profile           |
 | language/module-code | partial | M4 profile, ADR 0009 |
 | built-ins/Object     | partial | M3 profile, ADR 0008 |
 | built-ins/Promise    | partial | M4 profile, ADR 0010 |
@@ -287,27 +287,36 @@ its deliberate boundary and its evidence:
     `Symbol.iterator` method and a `next` method both drive iteration.
     The iterator's next method is captured once by `GetIterator` and
     reused for every step, as the iterator record requires.
-    `Promise.all`, `Promise.race`, and synchronous `for-of` consume object
-    iterables through this protocol. A `for-of` head admits one `const`,
-    `let`, or `var` identifier declaration, an existing binding, or a
-    static or computed member target. Lexical declarations create their
-    TDZ before the iterable expression and receive a fresh cell for each
-    iteration. Normal exhaustion and a failing iterator step do not
-    close the iterator; head assignment failures, `break`, `return`,
-    `throw`, and transfers to an outer label do. A `continue` targeting
-    the same loop keeps the iterator open. Close-time completion follows
-    `IteratorClose`: a close failure replaces `break` or `return`, while
-    an in-flight throw stays authoritative. Native differential fixtures,
-    generated Node, Deno, and native properties under both specialization
-    policies and forced collection, MIR structural tests, and reviewed
-    test262 cases cover the consumer. Deliberate
+    `Promise.all`, `Promise.race`, synchronous `for-of`, and array literal
+    spread consume object iterables through this protocol. A `for-of` head
+    admits one `const`, `let`, or `var` identifier declaration, an existing
+    binding, or a static or computed member target. Lexical declarations
+    create their TDZ before the iterable expression and receive a fresh cell
+    for each iteration. Normal exhaustion and a failing iterator step do not
+    close the iterator; head assignment failures, `break`, `return`, `throw`,
+    and transfers to an outer label do. A `continue` targeting the same loop
+    keeps the iterator open. Close-time completion follows `IteratorClose`: a
+    close failure replaces `break` or `return`, while an in-flight throw stays
+    authoritative.
+ -  Array literal spread. A literal containing spread allocates an empty rooted
+    array and accumulates ordinary values, holes, and iterator values in source
+    order. Each value becomes a new own indexed data property without
+    consulting the prototype; each hole advances only `length`. Spread captures
+    the iterator's `next` method once and never calls `IteratorClose` for
+    acquisition, step, value, or append failures. Literals without spread keep
+    fixed-length lowering. A spread preceding a later top-level await point is
+    rejected because the current continuation representation cannot preserve
+    completed iteration without observing it again. Native differential
+    fixtures, generated Node, Deno, and native properties under both
+    specialization policies and forced collection, MIR structural tests, and
+    five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
-    specification reaches by boxing, is unsupported and the combinators
-    and `for-of` accept only object iterables; the array iterator methods are
-    array-specific rather than the generic `%Array.prototype.values%`;
-    and `for-await-of`, spread and destructuring iteration, array and string
-    iterator prototype identity, and generator-based iterators remain outside
-    the admitted syntax.
+    specification reaches by boxing, is unsupported; the promise combinators,
+    `for-of`, and array spread accept only object iterables. The array iterator
+    methods are array-specific rather than the generic
+    `%Array.prototype.values%`; and `for-await-of`, call and constructor spread,
+    destructuring iteration, array and string iterator prototype identity, and
+    generator-based iterators remain outside the admitted syntax.
 
 
 Known gaps inside the claim
@@ -316,8 +325,8 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring, spread, default parameters, classes, generators,
-    symbols, big integers, regular expressions, and the remaining
+ -  Destructuring, call and constructor spread, default and rest parameters,
+    classes, generators, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic

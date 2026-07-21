@@ -26,6 +26,10 @@ operation has an explicit safepoint.
 Synchronous `for-of` adds backend-neutral iterator get, next, and close
 operations with separately rooted results. Cleanup-depth targets distinguish
 same-loop continuation from transfers that must close the iterator.
+Array literal spread reuses iterator get and next while accumulating values and
+holes through dedicated MIR operations. Iterator acquisition and stepping
+failures return directly without `IteratorClose`, matching array accumulation
+semantics. Arrays without spread retain their fixed-length lowering.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

@@ -432,6 +432,69 @@ console.log(values.length, values[4], values[5]);
 console.log(delete values[5], values.length, values[5]);
 values.length = 1;
 console.log(values.length, values[0], values[2]);
+function arrayMark(label, value) {
+  console.log(label);
+  return value;
+}
+const accumulated = [
+  arrayMark("before", 0),
+  ...arrayMark("iterable", [arrayMark("inside", "one"), "two"]),
+  ,
+  ...arrayMark("second iterable", ["three", "four"]),
+  arrayMark("after", 3),
+];
+console.log(
+  accumulated.length,
+  accumulated[0],
+  accumulated[1],
+  accumulated[2],
+  accumulated[3],
+  accumulated[4],
+  accumulated[5],
+  accumulated[6],
+);
+let capturedCalls = 0;
+const capturedNext = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        capturedCalls = capturedCalls + 1;
+        this.next = function () { return { value: -1, done: false }; };
+        return { value: capturedCalls, done: capturedCalls > 2 };
+      },
+    };
+  },
+};
+const capturedValues = [...capturedNext];
+console.log(
+  capturedValues.length,
+  capturedValues[0],
+  capturedValues[1],
+  capturedCalls,
+);
+let spreadCloseCalls = 0;
+let spreadStep = 0;
+const throwingSpread = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        spreadStep = spreadStep + 1;
+        if (spreadStep === 2) throw new RangeError("spread step");
+        return { value: "kept", done: false };
+      },
+      return: function () {
+        spreadCloseCalls = spreadCloseCalls + 1;
+        return {};
+      },
+    };
+  },
+};
+try { [...throwingSpread]; } catch (error) {
+  console.log(error instanceof RangeError, spreadCloseCalls);
+}
+try { [...5]; } catch (error) {
+  console.log(error instanceof TypeError);
+}
 `,
   },
   {
@@ -2303,6 +2366,7 @@ for (const fixture of fixtures) {
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
+    fixture.name === "arrays" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||

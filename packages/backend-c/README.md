@@ -44,6 +44,10 @@ unhandled exception's report.
 Iterator operations keep the iterator, captured next method, and yielded value
 in distinct root slots. Generated close blocks consult the stored completion
 kind so `IteratorClose` preserves the required throw precedence.
+Dynamic array accumulation emits runtime value and hole append operations.
+Array spread steps its captured iterator method in MIR control-flow blocks and
+returns abrupt acquisition, step, and append results without synthesizing a
+close block.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

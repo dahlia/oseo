@@ -144,6 +144,18 @@ export type UnaryOperator =
 /** Short-circuit operators lowered through explicit control flow. */
 export type LogicalOperator = "&&" | "??" | "||";
 
+/** One spread entry retained inside an owned array literal. */
+export interface SyntaxArraySpreadElement extends LocatedSyntax {
+  readonly argument: SyntaxExpression;
+  readonly kind: "spread";
+}
+
+/** One ordinary, spread, or elided owned array literal entry. */
+export type SyntaxArrayElement =
+  | SyntaxArraySpreadElement
+  | SyntaxExpression
+  | undefined;
+
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
@@ -156,7 +168,7 @@ export type SyntaxExpression =
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
-      readonly elements: readonly (SyntaxExpression | undefined)[];
+      readonly elements: readonly SyntaxArrayElement[];
       readonly kind: "array";
     })
   | (LocatedSyntax & {
@@ -1285,6 +1297,15 @@ export type HirCallTarget =
       readonly object: HirExpression;
     };
 
+/** One resolved spread entry retained inside an HIR array literal. */
+export interface HirArraySpreadElement extends LocatedSyntax {
+  readonly argument: HirExpression;
+  readonly kind: "spread";
+}
+
+/** One ordinary, spread, or elided HIR array literal entry. */
+export type HirArrayElement = HirArraySpreadElement | HirExpression | undefined;
+
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
   | (LocatedSyntax & {
@@ -1300,7 +1321,7 @@ export type HirExpression =
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
-      readonly elements: readonly (HirExpression | undefined)[];
+      readonly elements: readonly HirArrayElement[];
       readonly kind: "array";
     })
   | (LocatedSyntax & {
@@ -1672,10 +1693,16 @@ function resolveExpression(
         };
   }
   if (expression.kind === "array") {
-    const elements: (HirExpression | undefined)[] = [];
+    const elements: HirArrayElement[] = [];
     for (const element of expression.elements) {
       if (element == null) {
         elements.push(undefined);
+        continue;
+      }
+      if (element.kind === "spread") {
+        const argument = resolveExpression(element.argument, scopes, state);
+        if (argument == null) return undefined;
+        elements.push({ ...element, argument });
         continue;
       }
       const resolved = resolveExpression(element, scopes, state);
@@ -2782,7 +2809,11 @@ function printHirExpression(expression: HirExpression): string {
       "[" +
       expression.elements
         .map((element) =>
-          element == null ? "<hole>" : printHirExpression(element),
+          element == null
+            ? "<hole>"
+            : element.kind === "spread"
+              ? `...${printHirExpression(element.argument)}`
+              : printHirExpression(element),
         )
         .join(", ") +
       "]"
@@ -3142,6 +3173,8 @@ export interface MirOperation {
   readonly id: number;
   readonly kind:
     | "add-smi-checked"
+    | "array-append"
+    | "array-append-hole"
     | "array-create"
     | "binary"
     | "binding-reset"
@@ -3491,6 +3524,152 @@ function lowerSpecializedPropertyGet(
   return joinValue;
 }
 
+function lowerArrayAppend(
+  array: number,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "array element append",
+    [array, value],
+    range,
+  );
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [array, value],
+    detail: "array element append",
+    id: result,
+    kind: "array-append",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return without close",
+    [result],
+    range,
+  );
+  recordRoot(builder, result, range);
+}
+
+function lowerArrayHoleAppend(
+  array: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(builder, "safepoint", "array hole append", [array], range);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [array],
+    detail: "array hole append",
+    id: result,
+    kind: "array-append-hole",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return without close",
+    [result],
+    range,
+  );
+  recordRoot(builder, result, range);
+}
+
+function lowerArraySpread(
+  element: HirArraySpreadElement,
+  array: number,
+  builder: MirBuilder,
+): void {
+  const iterable = lowerExpression(element.argument, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "get array spread iterator",
+    [iterable],
+    element.range,
+  );
+  const iterator = builder.nextValue;
+  builder.nextValue += 1;
+  const nextMethod = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterable],
+    detail: "GetIterator sync",
+    id: iterator,
+    iteratorNextMethodResult: nextMethod,
+    kind: "iterator-get",
+    range: element.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> step, abrupt -> return without close",
+    [iterator],
+    element.range,
+  );
+  recordRoot(builder, iterator, element.range);
+  recordRoot(builder, nextMethod, element.range);
+
+  const stepBlock = createMirBlock(builder);
+  const appendBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  builder.current.terminator = { kind: "jump", target: stepBlock.id };
+
+  builder.current = stepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "step array spread iterator",
+    [iterator, nextMethod],
+    element.range,
+  );
+  const hasValue = builder.nextValue;
+  builder.nextValue += 1;
+  const value = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator, nextMethod],
+    detail: "IteratorStep and IteratorValue",
+    id: hasValue,
+    iteratorValueResult: value,
+    kind: "iterator-next",
+    range: element.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> return without close",
+    [hasValue],
+    element.range,
+  );
+  recordRoot(builder, value, element.range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: hasValue,
+    whenFalse: exitBlock.id,
+    whenTrue: appendBlock.id,
+  };
+
+  builder.current = appendBlock;
+  lowerArrayAppend(array, value, element.range, builder);
+  builder.current.terminator = { kind: "jump", target: stepBlock.id };
+
+  builder.current = exitBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `array spread bb${stepBlock.id}`,
+    [],
+    element.range,
+  );
+}
+
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
@@ -3602,6 +3781,9 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "array") {
+    const hasSpread = expression.elements.some(
+      (element) => element?.kind === "spread",
+    );
     appendMirMetadata(
       builder,
       "safepoint",
@@ -3613,8 +3795,8 @@ function lowerExpression(
     builder.nextValue += 1;
     builder.current.operations.push({
       arguments: [],
-      arrayLength: expression.elements.length,
-      detail: `array length ${expression.elements.length}`,
+      arrayLength: hasSpread ? 0 : expression.elements.length,
+      detail: `array length ${hasSpread ? 0 : expression.elements.length}`,
       id,
       kind: "array-create",
       range: expression.range,
@@ -3627,9 +3809,25 @@ function lowerExpression(
       expression.range,
     );
     recordRoot(builder, id, expression.range);
+    if (hasSpread) {
+      for (const element of expression.elements) {
+        if (element == null) {
+          lowerArrayHoleAppend(id, expression.range, builder);
+        } else if (element.kind === "spread") {
+          lowerArraySpread(element, id, builder);
+        } else {
+          const value = lowerExpression(element, builder);
+          lowerArrayAppend(id, value, element.range, builder);
+        }
+      }
+      return id;
+    }
     for (let index = 0; index < expression.elements.length; index += 1) {
       const element = expression.elements[index];
       if (element == null) continue;
+      if (element.kind === "spread") {
+        throw new Error("Static array lowering received a spread element.");
+      }
       const keyExpression: HirExpression = {
         kind: "string",
         range: element.range,
@@ -6028,7 +6226,11 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
   }
   if (expression.kind === "array") {
     return expression.elements.some(
-      (element) => element != null && hirExpressionHasAwait(element),
+      (element) =>
+        element != null &&
+        hirExpressionHasAwait(
+          element.kind === "spread" ? element.argument : element,
+        ),
     );
   }
   if (expression.kind === "binary") {
@@ -6281,12 +6483,19 @@ function moduleExpressionParts(
       element == null ? [] : [index],
     );
     return {
-      children: indices.map((index) => expression.elements[index]!),
+      children: indices.map((index) => {
+        const element = expression.elements[index]!;
+        return element.kind === "spread" ? element.argument : element;
+      }),
       rebuild: (children) => ({
         ...expression,
         elements: expression.elements.map((element, index) => {
           const childIndex = indices.indexOf(index);
-          return childIndex < 0 ? element : children[childIndex];
+          if (childIndex < 0 || element == null) return element;
+          const child = children[childIndex]!;
+          return element.kind === "spread"
+            ? { ...element, argument: child }
+            : child;
         }),
       }),
     };
@@ -6447,6 +6656,22 @@ function extractModuleAwait(
   if (parts == null) return undefined;
   const childIndex = parts.children.findIndex(hirExpressionHasAwait);
   if (childIndex < 0) return undefined;
+  if (expression.kind === "array") {
+    const preceding = expression.elements
+      .filter((element) => element != null)
+      .slice(0, childIndex)
+      .find((element) => element.kind === "spread");
+    if (preceding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          preceding,
+          "Array spread before a top-level await point is unsupported.",
+        ),
+      );
+      return undefined;
+    }
+  }
   const prefix: HirStatement[] = [];
   const children = [...parts.children];
   for (let index = 0; index < childIndex; index += 1) {
@@ -6543,8 +6768,10 @@ function lowerModuleEvaluationBody(
 ): readonly HirStatement[] | undefined {
   const body: HirStatement[] = [];
   for (const [index, statement] of statements.entries()) {
+    const diagnosticCount = state.diagnostics.length;
     const point = moduleAwaitPoint(statement, state);
     if (point == null) {
+      if (state.diagnostics.length > diagnosticCount) return undefined;
       if (hirStatementHasAwait(statement)) {
         state.diagnostics.push(
           sourceDiagnostic(

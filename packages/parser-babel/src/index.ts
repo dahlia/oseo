@@ -11,6 +11,7 @@ import type {
   SourceFrontend,
   SourceInput,
   SourceRange,
+  SyntaxArrayElement,
   SyntaxCallTarget,
   SyntaxExpression,
   SyntaxForDeclaration,
@@ -478,15 +479,25 @@ function expression(
   const located = location(context, value);
   if (value.type === "ArrayExpression") {
     const rawElements = Array.isArray(value.elements) ? value.elements : [];
-    const elements: (SyntaxExpression | undefined)[] = [];
+    const elements: SyntaxArrayElement[] = [];
     for (const rawElement of rawElements) {
       if (rawElement == null) {
         elements.push(undefined);
         continue;
       }
       const elementNode = node(rawElement);
-      if (elementNode == null || elementNode.type === "SpreadElement") {
-        return unsupported(context, value, "Array spread is unsupported.");
+      if (elementNode == null) return unsupported(context, value);
+      if (elementNode.type === "SpreadElement") {
+        const argumentNode = node(elementNode.argument);
+        if (argumentNode == null) return unsupported(context, elementNode);
+        const argument = expression(context, argumentNode);
+        if (argument == null) return undefined;
+        elements.push({
+          ...location(context, elementNode),
+          argument,
+          kind: "spread",
+        });
+        continue;
       }
       const converted = expression(context, elementNode);
       if (converted == null) return undefined;
@@ -806,7 +817,11 @@ function expression(
     const argumentValues: SyntaxExpression[] = [];
     for (const argumentValue of nodes(value.arguments)) {
       if (argumentValue.type === "SpreadElement") {
-        return unsupported(context, argumentValue);
+        return unsupported(
+          context,
+          argumentValue,
+          "Call argument spread is unsupported.",
+        );
       }
       const converted = expression(context, argumentValue);
       if (converted == null) return undefined;
@@ -830,7 +845,11 @@ function expression(
     const argumentValues: SyntaxExpression[] = [];
     for (const argumentValue of nodes(value.arguments)) {
       if (argumentValue.type === "SpreadElement") {
-        return unsupported(context, argumentValue);
+        return unsupported(
+          context,
+          argumentValue,
+          "Constructor argument spread is unsupported.",
+        );
       }
       const converted = expression(context, argumentValue);
       if (converted == null) return undefined;

@@ -177,7 +177,7 @@ with-env {
 '''
 
 [tasks."test:property:native"]
-description = "Run bounded host-native M4 schedule properties"
+description = "Run bounded host-native semantic properties"
 depends = ["build"]
 run = "node --test tests/property/*.property.test.ts"
 

@@ -231,6 +231,89 @@ test("emits rooted iterator protocol operations", () => {
   );
 });
 
+test("emits dynamic array accumulation operations", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "array-spread.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              arrayLength: 0,
+              detail: "array length 0",
+              id: 0,
+              kind: "array-create",
+              range,
+            },
+            {
+              arguments: [],
+              constant: { kind: "number", value: 7 },
+              detail: "7",
+              id: 1,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0, 1],
+              detail: "append array value",
+              id: 2,
+              kind: "array-append",
+              range,
+            },
+            {
+              arguments: [2],
+              detail: "check array append",
+              id: 3,
+              kind: "check-status",
+              range,
+            },
+            {
+              arguments: [0],
+              detail: "append array hole",
+              id: 4,
+              kind: "array-append-hole",
+              range,
+            },
+            {
+              arguments: [4],
+              detail: "check array hole",
+              id: 5,
+              kind: "check-status",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 6,
+    },
+    sourceId: "array-spread.ts",
+    specialization: "disabled",
+  });
+  assert.ok(
+    emitted.source.includes("oseo_array_append(context, roots[0], roots[1])"),
+  );
+  assert.ok(
+    emitted.source.includes("oseo_array_append_hole(context, roots[0])"),
+  );
+});
+
 test("scans large MIR argument lists without spreading them", () => {
   const range = {
     end: { column: 1, line: 1 },

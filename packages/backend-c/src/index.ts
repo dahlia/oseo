@@ -592,6 +592,17 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       state,
       `result = oseo_array_create(context, ${operation.arrayLength}u);`,
     );
+  } else if (operation.kind === "array-append") {
+    const array = operationArgument(operation, 0);
+    const value = operationArgument(operation, 1);
+    line(
+      state,
+      `result = oseo_array_append(context, roots[${array}], ` +
+        `roots[${value}]);`,
+    );
+  } else if (operation.kind === "array-append-hole") {
+    const array = operationArgument(operation, 0);
+    line(state, `result = oseo_array_append_hole(context, roots[${array}]);`);
   } else if (operation.kind === "object-create") {
     line(state, "result = oseo_object_literal_create(context);");
   } else if (operation.kind === "property-key") {
@@ -956,6 +967,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "call" || operation.kind === "construct") {
     emitCall(state, operation);
   } else if (
+    operation.kind === "array-append" ||
+    operation.kind === "array-append-hole" ||
     operation.kind === "array-create" ||
     operation.kind === "object-create" ||
     operation.kind === "property-key" ||

@@ -309,6 +309,79 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
     );
 }
 
+static void test_array_accumulation(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    roots[0] = require_normal(oseo_array_create(context, 0u));
+    roots[5] = make_text(context, "ten");
+    context->collect_every_safepoint = true;
+    assert(
+        require_normal(
+            oseo_array_append(context, roots[0], roots[5])
+        ) == roots[0]
+    );
+    assert(
+        require_normal(oseo_array_append_hole(context, roots[0])) == roots[0]
+    );
+    assert(
+        require_normal(
+            oseo_array_append(context, roots[0], oseo_number(30.0))
+        ) == roots[0]
+    );
+    context->collect_every_safepoint = false;
+
+    roots[1] = make_text(context, "0");
+    roots[2] = make_text(context, "1");
+    roots[3] = make_text(context, "2");
+    roots[4] = make_text(context, "length");
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[4])) ==
+        oseo_number(3.0)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[1])) ==
+        roots[5]
+    );
+    assert(
+        require_normal(oseo_object_has_own(context, roots[0], roots[2])) ==
+        oseo_boolean(false)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[0], roots[3])) ==
+        oseo_number(30.0)
+    );
+
+    roots[5] = require_normal(oseo_object_create(context, oseo_null()));
+    assert(
+        oseo_array_append(context, roots[5], oseo_number(1.0)).status ==
+        OSEO_STATUS_THROW
+    );
+    assert(
+        oseo_array_append_hole(context, roots[5]).status ==
+        OSEO_STATUS_THROW
+    );
+    OseoPropertyAttributes fixed = {false, true, true};
+    (void)require_normal(oseo_object_define(
+        context,
+        roots[5],
+        roots[1],
+        oseo_number(99.0),
+        fixed
+    ));
+    roots[6] = require_normal(oseo_array_create(context, 0u));
+    (void)require_normal(
+        oseo_object_set_prototype(context, roots[6], roots[5])
+    );
+    (void)require_normal(
+        oseo_array_append(context, roots[6], oseo_number(1.0))
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[6], roots[1])) ==
+        oseo_number(1.0)
+    );
+}
+
 static void test_function_cells(OseoContext *context, OseoValue *roots) {
     static const uint16_t function_name[] = {
         'f', 'i', 'x', 't', 'u', 'r', 'e',
@@ -642,6 +715,7 @@ int main(void) {
     test_allocation_failure(&context, frame.slots);
     test_ordinary_properties(&context, frame.slots);
     test_arrays(&context, frame.slots);
+    test_array_accumulation(&context, frame.slots);
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);

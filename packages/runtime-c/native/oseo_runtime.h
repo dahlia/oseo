@@ -303,6 +303,19 @@ OseoResult oseo_constructor_receiver(
     OseoValue prototype
 );
 OseoResult oseo_array_create(OseoContext *context, size_t length);
+/*
+ * Append operations are for monotonic generated array accumulation. The
+ * array must not already own the property named by its current length.
+ */
+OseoResult oseo_array_append(
+    OseoContext *context,
+    OseoValue array,
+    OseoValue value
+);
+OseoResult oseo_array_append_hole(
+    OseoContext *context,
+    OseoValue array
+);
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);

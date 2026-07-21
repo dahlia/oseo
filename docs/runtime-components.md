@@ -69,6 +69,10 @@ Ownership follows the plan's target layout:
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
 *oseo\_runtime.h*. Promise combinators share those public operations.
+Array literal spread also shares iterator get and next, then calls the
+`oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
+owned by *runtime\_object.c*. The append operations preserve monotonic own
+indexed-property accumulation and keep allocation policy outside the backend.
 
 ### Internal helpers
 
