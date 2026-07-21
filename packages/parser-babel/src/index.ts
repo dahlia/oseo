@@ -12,6 +12,7 @@ import type {
   SourceInput,
   SourceRange,
   SyntaxArrayElement,
+  SyntaxCallArgument,
   SyntaxCallTarget,
   SyntaxExpression,
   SyntaxForDeclaration,
@@ -814,14 +815,19 @@ function expression(
     const callee = node(value.callee);
     if (callee == null) return unsupported(context, value);
     const target = callTarget(context, callee);
-    const argumentValues: SyntaxExpression[] = [];
+    const argumentValues: SyntaxCallArgument[] = [];
     for (const argumentValue of nodes(value.arguments)) {
       if (argumentValue.type === "SpreadElement") {
-        return unsupported(
-          context,
-          argumentValue,
-          "Call argument spread is unsupported.",
-        );
+        const spreadArgument = node(argumentValue.argument);
+        if (spreadArgument == null) return unsupported(context, argumentValue);
+        const converted = expression(context, spreadArgument);
+        if (converted == null) return undefined;
+        argumentValues.push({
+          ...location(context, argumentValue),
+          argument: converted,
+          kind: "spread",
+        });
+        continue;
       }
       const converted = expression(context, argumentValue);
       if (converted == null) return undefined;

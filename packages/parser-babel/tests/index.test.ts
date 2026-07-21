@@ -330,17 +330,29 @@ test("lowers array spread through dynamic accumulation", () => {
   assert.doesNotMatch(mir, /iterator-close/u);
 });
 
-test("keeps call and constructor spread outside the profile", () => {
+test("lowers call spread through dynamic argument accumulation", () => {
   const call = compileSource(babelFrontend, {
-    source: "fn(...values);",
+    source: `const values = [1, 2];
+console.log(0, ...values, 3);`,
     sourceId: "call-spread.ts",
   });
-  assert.equal(call.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    call.diagnostics[0]?.message,
-    "Call argument spread is unsupported.",
+  assert.deepEqual(call.diagnostics, []);
+  assert.ok(call.hir != null);
+  assert.ok(call.mir != null);
+  assert.match(
+    printHir(call.hir),
+    /call intrinsic console\.log\(0, \.\.\.%b\d+\(values\), 3\)/u,
   );
+  const mir = printMir(call.mir);
+  assert.match(mir, /argument-list-create dynamic argument list/u);
+  assert.match(mir, /argument-list-append call argument append/u);
+  assert.match(mir, /iterator-get GetIterator sync/u);
+  assert.match(mir, /iterator-next IteratorStep and IteratorValue/u);
+  assert.match(mir, /call console_log .*argument-list=%\d+/u);
+  assert.doesNotMatch(mir, /iterator-close/u);
+});
 
+test("keeps constructor spread outside the profile", () => {
   const construct = compileSource(babelFrontend, {
     source: "new Box(...values);",
     sourceId: "constructor-spread.ts",
@@ -1163,6 +1175,40 @@ test("rejects array spread before a top-level await point", () => {
   assert.equal(
     compiled.diagnostics[0]?.message,
     "Array spread before a top-level await point is unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+});
+
+test("rejects call spread before a top-level await point", () => {
+  const sourceId = "file:///app/call-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "const items = [1, 2];\n" +
+      "console.log(...items, await Promise.resolve(3));",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "call-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Call argument spread before a top-level await point is unsupported.",
   );
   assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
 });

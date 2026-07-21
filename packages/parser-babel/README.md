@@ -13,9 +13,9 @@ same owned boundary. Async suspension suffixes become private continuation
 functions before compiler lowering.
 M5 synchronous `for-of` heads admit one identifier declaration or an existing
 binding or member target. Destructuring, `for-in`, and `for-await-of` remain
-owned profile failures. Array literals retain spread entries at the owned
-syntax boundary. Call and constructor argument spread remain explicit profile
-failures until their dynamic argument-list representation is reviewed.
+owned profile failures. Array literals and call arguments retain spread entries
+at the owned syntax boundary. Constructor argument spread remains an explicit
+profile failure until its construction lowering is reviewed.
 Call type arguments, optional parameters, TypeScript `this` parameters, and
 other withheld forms are rejected at this boundary. Source positions and UTF-8
 byte offsets are indexed once for linear-time conversion.

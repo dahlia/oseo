@@ -73,6 +73,11 @@ Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
 owned by *runtime\_object.c*. The append operations preserve monotonic own
 indexed-property accumulation and keep allocation policy outside the backend.
+Call argument spread shares iterator get and next without iterator close, then
+uses the `oseo_argument_list_create`, `oseo_argument_list_append`, and
+`oseo_argument_list_view` ABI operations owned by *runtime\_function.c*. The
+GC-traced private list keeps dynamic call arguments rooted without exposing a
+JavaScript object or moving process execution into the backend.
 
 ### Internal helpers
 

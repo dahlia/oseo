@@ -367,6 +367,15 @@ Because top-level await continuation extraction cannot yet retain an already
 accumulated prefix without observably iterating it again, a spread before a
 later top-level await point is a source-located unsupported combination.
 
+Call argument spread reuses iterator acquisition and step without a cleanup
+region, then appends ordinary and iterated values to a rooted private argument
+list. The call target and method receiver are resolved before accumulation, and
+arguments are appended from left to right. Abrupt acquisition, step, value, or
+append completion returns without `IteratorClose` or invoking the call. Calls
+without spread retain fixed positional lowering. A spread before a later
+top-level await point is rejected for the same continuation ownership reason as
+array spread. Constructor spread remains a separate lowering unit.
+
 
 Modules and whole-program compilation
 -------------------------------------
