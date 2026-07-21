@@ -519,10 +519,11 @@ reuse the synchronous iterator protocol through rooted dynamic accumulation.
 Generated Node, Deno, and native evidence covers their values, evaluation
 order, captured `next`, and abrupt steps; reviewed test262 evidence covers
 iterator acquisition and abrupt steps for all three consumers. The core stream
-also admits standalone lexical array binding declarations with elisions,
-defaults, nested array patterns, rest, and conditional iterator closing.
-Generated evidence covers the binding values and cleanup model; `var` array
-bindings and reviewed standards cases remain in the same unit. The intrinsics
+also admits standalone `const`, `let`, and hoisted `var` array binding
+declarations with elisions, defaults, nested array patterns, rest, and
+conditional iterator closing. Generated evidence covers binding values,
+hoisting, and cleanup; reviewed standards cases remain in the same unit. The
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
@@ -535,7 +536,7 @@ landed with the M5 intrinsics units. The remaining queue is:
 
 1.  Complete the remaining foundational expressions and coercions after the
     landed errors, symbols, synchronous iterator consumers, spread consumers,
-    and lexical array binding declarations.
+    and array binding declarations.
 2.  Add built-in families and broader executable syntax in dependency order.
 3.  Close the named edition with reproducible standards and generated
     evidence.

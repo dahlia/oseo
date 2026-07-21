@@ -1518,6 +1518,11 @@ const [prior = 10, later = prior + 1] = [];
 const [hole = 12] = [,];
 const [named = function () {}] = [];
 const [...[restFirst, restSecond]] = [8, 9];
+console.log("var-before", beforeVar, mixedVar, blockVar);
+var [beforeVar] = [25], mixedVar = 26, [, laterVar = 27] = [];
+if (true) {
+  var [blockVar] = [28];
+}
 console.log(
   "values",
   first,
@@ -1532,6 +1537,13 @@ console.log(
   restFirst,
   restSecond
 );
+console.log("var-after", beforeVar, mixedVar, laterVar, blockVar);
+
+function overwriteParameter(parameter) {
+  var [parameter] = [29];
+  return parameter;
+}
+console.log("var-parameter", overwriteParameter(0));
 
 try {
   const [self = self] = [];
@@ -1670,6 +1682,12 @@ async function bindingAfterAwait() {
   console.log("after-await", read());
 }
 bindingAfterAwait();
+
+async function awaitedVarBinding() {
+  var [awaitedVar, defaultedVar = 31] = await Promise.resolve([30]);
+  console.log("awaited-var", awaitedVar, defaultedVar);
+}
+awaitedVarBinding();
 `,
   },
   {
@@ -3608,6 +3626,29 @@ assert.equal(nativeAsyncModule.stderr, "");
 assert.equal(
   nativeAsyncModule.stdout,
   "dependency ready\nentry ready\nlate timer\n",
+);
+
+const awaitedVarModule = [
+  root,
+  "tests/fixtures/async-modules/var-array-binding.js",
+].join("/");
+const nativeAwaitedVarModule = await runNativeCli(
+  {
+    args: [awaitedVarModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(
+  nativeAwaitedVarModule.exitStatus,
+  0,
+  nativeAwaitedVarModule.stderr,
+);
+assert.equal(nativeAwaitedVarModule.stderr, "");
+assert.equal(
+  nativeAwaitedVarModule.stdout,
+  "var module before undefined undefined undefined\n" +
+    "var module after 1 2 3 4\n",
 );
 
 const rejectionAfterAwait = [

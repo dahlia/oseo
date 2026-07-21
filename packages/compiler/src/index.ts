@@ -331,7 +331,7 @@ export interface HirArrayBindingPattern extends LocatedSyntax {
 export type HirBindingPattern = HirArrayBindingPattern | HirBindingIdentifier;
 
 /** How a resolved array pattern stores each identifier leaf. */
-export type BindingPatternMode = "declare" | "initialize";
+export type BindingPatternMode = "declare" | "initialize" | "write";
 
 /** One switch clause; a missing test marks the default clause. */
 export interface SyntaxSwitchCase {
@@ -5666,9 +5666,19 @@ function lowerBindingTarget(
     bindingId: pattern.bindingId,
     detail: `%b${pattern.bindingId} ${pattern.name}`,
     id,
-    kind: "initialize",
+    kind: mode === "write" ? "write" : "initialize",
+    ...(mode === "write" ? { mutable: pattern.mutable } : {}),
     range: pattern.range,
   });
+  if (mode === "write") {
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> close iterator",
+      [id],
+      pattern.range,
+    );
+  }
   recordRoot(builder, id, pattern.range);
 }
 
@@ -7583,7 +7593,11 @@ function moduleAwaitPoint(
         };
       }
       if (statement.kind === "array-binding") {
-        return { ...statement, initializer: resumed, mode: "initialize" };
+        return {
+          ...statement,
+          initializer: resumed,
+          mode: statement.declarationKind === "var" ? "write" : "initialize",
+        };
       }
       return { ...statement, expression: resumed };
     },

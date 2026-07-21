@@ -79,7 +79,7 @@ iterator close, then use the `oseo_argument_list_create`,
 by *runtime\_function.c*. The GC-traced private list keeps dynamic invocation
 arguments rooted without exposing a JavaScript object or moving process
 execution into the backend.
-Lexical array binding declarations reuse iterator get, next, and close without
+Array binding declarations reuse iterator get, next, and close without
 adding a runtime ABI entry point. Generated control flow owns the per-pattern
 done state and conditional cleanup, and rest targets reuse array append.
 

@@ -25,7 +25,7 @@ const { assertAsyncProperty, propertySize } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-type DeclarationKind = "const" | "let";
+type DeclarationKind = "const" | "let" | "var";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
 type Value = number | undefined;
@@ -73,7 +73,7 @@ const valuesArbitrary = fc.array(valueArbitrary, {
   maxLength: large ? 9 : 5,
 });
 const bindingArbitraries = {
-  declarationKind: fc.constantFrom<DeclarationKind>("const", "let"),
+  declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
   nestedMissing: fc.boolean(),
   nestedValues: valuesArbitrary,
@@ -362,7 +362,7 @@ async function references(source: string): Promise<
 }
 
 test(
-  "generated lexical array bindings match the M5 iterator model",
+  "generated array bindings match the M5 iterator model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
@@ -422,10 +422,10 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "const and let array patterns with defaults, elision, nesting, " +
-          "rest, arrays, custom iterators, and abrupt steps",
+          "const, let, and var array patterns with defaults, elision, " +
+          "nesting, rest, arrays, custom iterators, and abrupt steps",
         numRuns: 10,
-        profile: "M5 lexical array binding initialization",
+        profile: "M5 array binding declarations",
         seed: 0x5eed_0007,
         sizeLimit: large ? "9 outer and nested values" : "5 values",
         timeLimitMilliseconds: 180_000,

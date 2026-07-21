@@ -1010,6 +1010,33 @@ function statement(
       const assignments: SyntaxStatement[] = [];
       for (const declarator of nodes(value.declarations)) {
         const identifier = node(declarator.id);
+        const initializerNode = node(declarator.init);
+        if (identifier?.type === "ArrayPattern") {
+          if (initializerNode == null) {
+            return unsupported(
+              context,
+              declarator,
+              "An array binding declaration needs an initializer.",
+            );
+          }
+          const pattern = bindingPattern(context, identifier);
+          const initializer = expression(context, initializerNode);
+          if (
+            pattern?.kind !== "array-binding-pattern" ||
+            initializer == null
+          ) {
+            return undefined;
+          }
+          assignments.push({
+            ...location(context, declarator),
+            declarationKind: "var",
+            initializer,
+            kind: "array-binding",
+            mode: "write",
+            pattern,
+          });
+          continue;
+        }
         const name =
           identifier == null ? undefined : identifierName(identifier);
         if (name == null) {
@@ -1019,7 +1046,6 @@ function statement(
             "var destructuring is unsupported.",
           );
         }
-        const initializerNode = node(declarator.init);
         if (initializerNode == null) continue;
         const assigned = expression(context, initializerNode);
         if (assigned == null) return undefined;
@@ -1655,10 +1681,7 @@ function awaitPoint(
     awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
   const name = identifier == null ? undefined : identifierName(identifier);
   if (identifier == null || operand == null) return undefined;
-  if (
-    name == null &&
-    (identifier.type !== "ArrayPattern" || value.kind === "var")
-  ) {
+  if (name == null && identifier.type !== "ArrayPattern") {
     return undefined;
   }
   const pattern =
@@ -1834,7 +1857,8 @@ function asyncStatementList(
                   declarationKind: point.declaration.kind,
                   initializer: identifierExpression(valueName, range),
                   kind: "array-binding",
-                  mode: "initialize",
+                  mode:
+                    point.declaration.kind === "var" ? "write" : "initialize",
                   pattern: point.declaration.pattern,
                   range,
                 }
@@ -2017,33 +2041,48 @@ function collectVarStatement(
     for (const declarator of nodes(value.declarations)) {
       const identifier = node(declarator.id);
       const name = identifier == null ? undefined : identifierName(identifier);
-      if (identifier == null || name == null) {
+      let names: readonly string[];
+      if (identifier == null) {
+        unsupported(context, declarator, "var destructuring is unsupported.");
+        return false;
+      } else if (name != null) {
+        names = [name];
+      } else if (identifier.type === "ArrayPattern") {
+        const pattern = bindingPattern(context, identifier);
+        if (pattern?.kind !== "array-binding-pattern") return false;
+        names = patternNames(pattern);
+      } else {
         unsupported(context, declarator, "var destructuring is unsupported.");
         return false;
       }
-      if (catchParameters.has(name)) {
-        unsupported(
-          context,
-          declarator,
-          "A var declaration sharing a catch parameter name is outside " +
-            "the admitted profile.",
-        );
-        return false;
-      }
-      if (lexicalFrames.some((frame) => frame.has(name))) {
-        unsupported(
-          context,
-          declarator,
-          `Cannot redeclare lexical binding '${name}' with var.`,
-        );
-        return false;
-      }
-      if (!collected.has(name)) {
-        collected.set(name, {
-          ...location(context, declarator),
-          declarator,
-          hint: typeHint(context, identifier.typeAnnotation),
-        });
+      for (const bindingName of names) {
+        if (catchParameters.has(bindingName)) {
+          unsupported(
+            context,
+            declarator,
+            "A var declaration sharing a catch parameter name is outside " +
+              "the admitted profile.",
+          );
+          return false;
+        }
+        if (lexicalFrames.some((frame) => frame.has(bindingName))) {
+          unsupported(
+            context,
+            declarator,
+            `Cannot redeclare lexical binding '${bindingName}' with var.`,
+          );
+          return false;
+        }
+        if (!collected.has(bindingName)) {
+          collected.set(bindingName, {
+            ...location(context, declarator),
+            declarator,
+            hint:
+              identifier.type === "Identifier"
+                ? typeHint(context, identifier.typeAnnotation)
+                : undefined,
+          });
+        }
       }
     }
     return true;

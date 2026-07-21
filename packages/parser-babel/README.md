@@ -22,10 +22,14 @@ The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
 `/** ... */` block comments contribute JSDoc hints; ordinary block and line
 comments never do.
-Standalone one-declarator `const` and `let` array binding declarations are
-converted into compiler-owned recursive patterns. The admitted pattern domain
+Standalone one-declarator `const` and `let` array binding declarations and
+standalone `var` declaration lists are converted into compiler-owned recursive
+patterns. A `var` list may mix plain and array declarators; every pattern name
+joins the existing function-scope hoisting and redeclaration pass. The admitted
+pattern domain
 includes elisions, defaults without `await`, nested array patterns, and a final
 identifier or nested array rest target. Object patterns, pattern type
-annotations, `var` patterns, and other destructuring positions remain explicit
-boundaries. Direct awaited initializers resume into the predeclared lexical
-cells, and module exports name every binding in the pattern.
+annotations, and other destructuring positions remain explicit boundaries.
+Direct awaited initializers resume into predeclared lexical cells or write
+hoisted `var` cells. Lexical module exports name every binding in the pattern;
+`export var` remains outside the profile.
