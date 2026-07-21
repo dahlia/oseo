@@ -50,8 +50,11 @@ array iterator, and `Promise.all` and `Promise.race` consume any
 object iterable through it, closing the iterator when a combinator
 rejects after a step, completing the delivery item 4 groundwork; the
 `for-of` statement now consumes the same object-iterator protocol with
-lexical, assignment, and cleanup semantics, while spread iteration remains
-later syntax work. The runtime component boundaries
+lexical, assignment, and cleanup semantics. Array literal spread now consumes
+that protocol through dynamic own-property accumulation, preserving holes,
+captured `next` methods, and the specified absence of `IteratorClose` on
+acquisition or step failures. Call, constructor, and destructuring spread
+remain later syntax work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
@@ -156,6 +159,13 @@ Complete the remaining coercions, operators, declarations, destructuring,
 default values, rest and spread behavior, template literals, and control-flow
 forms required by later built-ins. Preserve left-to-right evaluation and
 abrupt-completion order before adding specialized paths.
+
+Array literal spread is complete for object iterables. Its generated property
+suite uses seed `0x5eed0005`, compares an independent accumulation model with
+Node.js, Deno, and both native specialization policies, and forces collection
+on the enabled path. Five reviewed test262 cases pin iterator acquisition and
+step failures. Dynamic call and constructor argument lists remain a separate
+representation problem and are not implied by this checkpoint.
 
 ### Intrinsics and built-in objects
 

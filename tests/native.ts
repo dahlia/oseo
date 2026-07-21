@@ -440,6 +440,7 @@ const accumulated = [
   arrayMark("before", 0),
   ...arrayMark("iterable", [arrayMark("inside", "one"), "two"]),
   ,
+  ...arrayMark("second iterable", ["three", "four"]),
   arrayMark("after", 3),
 ];
 console.log(
@@ -449,6 +450,8 @@ console.log(
   accumulated[2],
   accumulated[3],
   accumulated[4],
+  accumulated[5],
+  accumulated[6],
 );
 let capturedCalls = 0;
 const capturedNext = {

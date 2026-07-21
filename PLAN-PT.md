@@ -390,6 +390,26 @@ TDZ, fresh closure cells, assignment failure, nested outward transfer, step
 failure without close, and close-completion precedence.
 
 
+M5 array spread properties
+--------------------------
+
+The array literal spread property generates two bounded integer sequences per
+case and uses them in one literal with two spread segments. The first segment
+varies across ordinary array, custom iterable, captured-`next`, throwing-step,
+and non-iterable modes. Its independent model predicts the accumulated values
+and hole, left-to-right marker order, iterator-step count, close count, and
+thrown error identity. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0005`, ten successful cases, at most five
+values per spread, and no filtering. The extended tier raises the reviewed
+size to nine values per spread and runs ten times the ordinary budget through
+the shared replay controls. Fixed native fixtures retain multiple spreads,
+captured method invalidation, abrupt steps without close, holes, and evaluation
+order.
+
+
 Test placement and package boundaries
 -------------------------------------
 

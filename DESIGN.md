@@ -357,6 +357,16 @@ of the loop enters the close block. The stored completion decides whether a
 close-time language error replaces a non-throw completion or yields to the
 original throw.
 
+Array literal spread reuses the same iterator acquisition and step operations
+without creating a cleanup region. Array accumulation never calls
+`IteratorClose` for acquisition, step, value, or append failures. A literal
+containing spread starts from an empty rooted array and appends values or holes
+through runtime operations that create own indexed properties without
+consulting the prototype. Literals without spread keep the fixed-length path.
+Because top-level await continuation extraction cannot yet retain an already
+accumulated prefix without observably iterating it again, a spread before a
+later top-level await point is a source-located unsupported combination.
+
 
 Modules and whole-program compilation
 -------------------------------------
