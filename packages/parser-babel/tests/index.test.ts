@@ -611,6 +611,92 @@ test("rejects var destructuring explicitly", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /var destructuring/u);
 });
 
+test("converts lexical array binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const values = [1, 2, undefined, [5], 6];\n" +
+      "const [first, , second = 3, [nested] = [4], ...rest] = values;\n" +
+      "let [mutable] = rest;\n",
+    sourceId: "array-bindings.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /const declare \[%b\d+ first, , %b\d+ second = 3/u);
+  assert.match(hir, /\.\.\.%b\d+ rest/u);
+  assert.match(mir, /done-state=%\d+/u);
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /array binding rest/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|AssignmentPattern/u,
+  );
+});
+
+test("supports direct await into a lexical array binding", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack() {\n" +
+      "  const [first, second = 2] = await Promise.resolve([1]);\n" +
+      "  console.log(first, second);\n" +
+      "}\n" +
+      "unpack();\n",
+    sourceId: "await-array-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
+});
+
+test("exports every lexical array binding name", () => {
+  const sourceId = "file:///app/array-bindings.js";
+  const result = babelModuleFrontend.parseModule({
+    source: [
+      "export const [first, second = 2] = ",
+      "await Promise.resolve([1]);",
+    ].join(""),
+    sourceId,
+  });
+  assert.ok(result.module != null);
+  assert.deepEqual(
+    result.module.exports.flatMap((entry) =>
+      entry.kind === "star" ? [] : [entry.exportedName],
+    ),
+    ["first", "second"],
+  );
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "array-bindings",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+});
+
+test("keeps later array binding consumers outside the profile", () => {
+  for (const [name, source] of [
+    ["object element", "const [{ value }] = [{ value: 1 }];"],
+    ["pattern annotation", "const [value]: [number] = [1];"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(result.mir, undefined);
+  }
+});
+
 test("rejects ambient declare declarations", () => {
   const result = compileSource(babelFrontend, {
     source: "declare var ambient: number;",

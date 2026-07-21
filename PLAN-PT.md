@@ -430,6 +430,27 @@ callee-before-argument evaluation, abrupt spreads without close, and the
 absence of invocation after a spread failure.
 
 
+M5 array binding properties
+---------------------------
+
+The array binding property generates a standalone `const` or `let`
+declaration with one recursive array pattern. Shapes cover an ordinary head,
+an elision with an `undefined` default, a nested array, an identifier rest, and
+a nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
+and throwing defaults. Its independent model predicts the bound value, step
+count, close count, and thrown error identity. Each case compares Node.js,
+Deno, specialization-disabled native execution, and specialization-enabled
+native execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
+values, and no filtering. The extended tier raises the reviewed size to nine
+values and runs ten times the ordinary budget through the shared replay
+controls. Fixed native fixtures retain lexical temporal dead zones,
+function-name inference, direct awaited initialization, early and exhausted
+iterators, nested close order, abrupt steps without close, and close-completion
+precedence.
+
+
 Test placement and package boundaries
 -------------------------------------
 

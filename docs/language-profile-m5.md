@@ -313,11 +313,12 @@ its deliberate boundary and its evidence:
     five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
     specification reaches by boxing, is unsupported; the promise combinators,
-    `for-of`, array spread, call spread, and constructor spread accept only
+    `for-of`, array spread, call spread, constructor spread, and lexical array
+    binding declarations accept only
     object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and `for-await-of`, destructuring
-    iteration, array and string iterator prototype identity, and generator-based
-    iterators remain outside the admitted syntax.
+    the generic `%Array.prototype.values%`; and `for-await-of`, remaining
+    destructuring positions, array and string iterator prototype identity, and
+    generator-based iterators remain outside the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -335,6 +336,23 @@ its deliberate boundary and its evidence:
     cases pin iterator acquisition and step failures across calls and
     construction. Call and constructor spread inherit the object-iterable
     boundary.
+ -  Lexical array binding declarations. A standalone one-declarator `const` or
+    `let` statement admits empty patterns, elisions, defaults, nested array
+    patterns, and a final identifier or nested array rest target. Every lexical
+    name enters its temporal dead zone before the initializer runs. Lowering
+    evaluates the initializer once, captures `next` once per pattern, steps
+    from left to right, and applies a default only when the iterated value is
+    `undefined`. Rest exhausts its iterator into a new array. Normal or abrupt
+    completion closes every non-exhausted iterator from the inside out, while
+    normal exhaustion and a failing iterator step do not close. An in-flight
+    throw remains authoritative over a close failure. Direct awaited
+    initialization is supported in asynchronous functions and modules, and a
+    module export exposes every bound name. Native differential fixtures and
+    generated Node, Deno, and native properties cover values, temporal dead
+    zones, function-name inference, cleanup precedence, both specialization
+    policies, and forced collection. `var`, object patterns, assignment
+    patterns, parameters, catch bindings, loop heads, pattern type annotations,
+    and `await` inside a default remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -343,10 +361,11 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring, default and rest parameters, classes, generators, big
-    integers, regular expressions, and the remaining expression grammar are
-    outside the admitted syntax. Owner: the core expressions and bindings
-    stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Object patterns, `var` and non-declaration destructuring positions, default
+    and rest parameters, classes, generators, big integers, regular
+    expressions, and the remaining expression grammar are outside the admitted
+    syntax. Owner: the core expressions and bindings stream in
+    [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

@@ -53,9 +53,11 @@ rejects after a step, completing the delivery item 4 groundwork; the
 lexical, assignment, and cleanup semantics. Array literal spread now consumes
 that protocol through dynamic own-property accumulation, preserving holes,
 captured `next` methods, and the specified absence of `IteratorClose` on
-acquisition or step failures. Call, constructor, and destructuring spread
-are being delivered as separate syntax units: call and constructor spread now
-use a rooted dynamic argument list, while destructuring spread remains later
+acquisition or step failures. Call and constructor spread use a rooted dynamic
+argument list. Standalone lexical array binding declarations now admit
+elisions, defaults, nested array patterns, and rest through the same iterator
+protocol, with conditional `IteratorClose` and direct awaited initialization.
+`var`, object patterns, and the remaining destructuring positions remain later
 work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
@@ -175,6 +177,17 @@ method, and dynamic calls and ordinary construction, both native specialization
 policies, and forced collection. Native fixtures also cover `Promise`
 construction. Ten reviewed test262 cases pin iterator acquisition and step
 failures across calls and construction.
+
+Standalone `const` and `let` array binding declarations now own recursive
+parser-independent patterns. Their lowering evaluates the initializer once,
+steps from left to right, applies defaults only to `undefined`, drains rest
+elements, and closes a non-exhausted iterator on normal or abrupt pattern
+completion. The generated property suite uses seed `0x5eed0007`, compares an
+independent binding and cleanup model with Node.js, Deno, and both native
+specialization policies, and forces collection on the enabled path. Fixed
+native fixtures retain temporal dead zones, function-name inference, nested
+close order, step failure, and close-completion precedence. `var` bindings and
+reviewed test262 evidence remain the next parts of this syntax unit.
 
 ### Intrinsics and built-in objects
 

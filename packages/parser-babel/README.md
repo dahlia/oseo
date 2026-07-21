@@ -22,3 +22,10 @@ The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
 `/** ... */` block comments contribute JSDoc hints; ordinary block and line
 comments never do.
+Standalone one-declarator `const` and `let` array binding declarations are
+converted into compiler-owned recursive patterns. The admitted pattern domain
+includes elisions, defaults without `await`, nested array patterns, and a final
+identifier or nested array rest target. Object patterns, pattern type
+annotations, `var` patterns, and other destructuring positions remain explicit
+boundaries. Direct awaited initializers resume into the predeclared lexical
+cells, and module exports name every binding in the pattern.

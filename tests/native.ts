@@ -1508,6 +1508,171 @@ console.log("done");
 `,
   },
   {
+    name: "array-bindings",
+    source: `
+const [first, , fallback = 3, [nested] = [4], ...rest] =
+  [1, 2, undefined, [5], 6, 7];
+let [mutable] = rest;
+mutable = mutable + 1;
+const [prior = 10, later = prior + 1] = [];
+const [hole = 12] = [,];
+const [named = function () {}] = [];
+const [...[restFirst, restSecond]] = [8, 9];
+console.log(
+  "values",
+  first,
+  fallback,
+  nested,
+  rest.length,
+  mutable,
+  prior,
+  later,
+  hole,
+  named.name,
+  restFirst,
+  restSecond
+);
+
+try {
+  const [self = self] = [];
+  console.log(self);
+} catch (error) {
+  console.log("tdz", error instanceof ReferenceError);
+}
+
+let earlySteps = 0;
+let earlyCloses = 0;
+const earlyIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        earlySteps = earlySteps + 1;
+        return { value: earlySteps, done: false };
+      },
+      return: function () {
+        earlyCloses = earlyCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+const [early] = earlyIterable;
+console.log("early", early, earlySteps, earlyCloses);
+
+let emptySteps = 0;
+let emptyCloses = 0;
+const emptyIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        emptySteps = emptySteps + 1;
+        return { value: 1, done: false };
+      },
+      return: function () {
+        emptyCloses = emptyCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+const [] = emptyIterable;
+console.log("empty", emptySteps, emptyCloses);
+
+let exhaustedCloses = 0;
+const exhaustedIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: 0, done: true }; },
+      return: function () {
+        exhaustedCloses = exhaustedCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+const [exhausted = 13] = exhaustedIterable;
+console.log("exhausted", exhausted, exhaustedCloses);
+
+let abruptCloses = 0;
+const abruptIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: undefined, done: false }; },
+      return: function () {
+        abruptCloses = abruptCloses + 1;
+        throw new TypeError("close");
+      },
+    };
+  },
+};
+try {
+  const [value = (function () { throw new RangeError("default"); })()] =
+    abruptIterable;
+  console.log(value);
+} catch (error) {
+  console.log(
+    "abrupt",
+    error instanceof RangeError,
+    error.message,
+    abruptCloses,
+  );
+}
+
+let stepCloses = 0;
+const stepFailure = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new RangeError("step"); },
+      return: function () {
+        stepCloses = stepCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  const [value] = stepFailure;
+  console.log(value);
+} catch (error) {
+  console.log("step", error instanceof RangeError, stepCloses);
+}
+
+let closeOrder = "";
+const innerIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: 21, done: false }; },
+      return: function () { closeOrder = closeOrder + "i"; return {}; },
+    };
+  },
+};
+const outerIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: innerIterable, done: false }; },
+      return: function () { closeOrder = closeOrder + "o"; return {}; },
+    };
+  },
+};
+const [[inner]] = outerIterable;
+console.log("nested", inner, closeOrder);
+
+async function awaitedBinding() {
+  const [awaited, defaulted = 23] = await Promise.resolve([22]);
+  console.log("awaited", awaited, defaulted);
+}
+awaitedBinding();
+
+async function bindingAfterAwait() {
+  function read() { return after; }
+  await Promise.resolve();
+  const [after] = [24];
+  console.log("after-await", read());
+}
+bindingAfterAwait();
+`,
+  },
+  {
     name: "in-and-instanceof",
     source: `
 const box = { present: undefined, value: 1 };
@@ -2475,6 +2640,7 @@ for (const fixture of fixtures) {
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
     fixture.name === "arrays" ||
+    fixture.name === "array-bindings" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||
