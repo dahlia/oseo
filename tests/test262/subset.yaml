@@ -4,6 +4,7 @@ supportedFeatures:
   - coalesce-expression
   - computed-property-names
   - const
+  - destructuring-binding
   - exponentiation
   - for-of
   - let
@@ -1388,6 +1389,31 @@ tests:
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/const/dstr/ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/const/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
   - path: test/language/statements/const/global-use-before-initialization-in-declaration-statement.js
     expectedClassification: expected-negative
     dependencies: [error-intrinsics, lexical-bindings]
@@ -1498,6 +1524,31 @@ tests:
   - path: test/language/statements/labeled/value-await-module.js
     expectedClassification: expected-negative
     dependencies: [control-flow, module-linking]
+  - path: test/language/statements/let/dstr/ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/let/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]
@@ -1543,3 +1594,28 @@ tests:
   - path: test/language/statements/variable/S12.2_A8_T4.js
     expectedClassification: expected-negative
     dependencies: [var-bindings]
+  - path: test/language/statements/variable/dstr/ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]

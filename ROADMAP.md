@@ -522,7 +522,8 @@ iterator acquisition and abrupt steps for all three consumers. The core stream
 also admits standalone `const`, `let`, and hoisted `var` array binding
 declarations with elisions, defaults, nested array patterns, rest, and
 conditional iterator closing. Generated evidence covers binding values,
-hoisting, and cleanup; reviewed standards cases remain in the same unit. The
+hoisting, and cleanup; 24 reviewed standards cases cover the three declaration
+kinds, defaults, nested patterns, rest, and iterator done-state handling. The
 intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;

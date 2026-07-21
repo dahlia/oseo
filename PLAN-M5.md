@@ -17,7 +17,9 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications.
+honest unsupported classifications. The current reviewed manifest records 164
+passes, 226 expected negatives, and 143 unsupported profile features with no
+semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
@@ -188,8 +190,10 @@ independent binding and cleanup model with Node.js, Deno, and both native
 specialization policies, and forces collection on the enabled path. Fixed
 native fixtures retain temporal dead zones, function-name inference, nested
 close order, step failure, close-completion precedence, `var` hoisting,
-redeclaration, and direct awaited writes. Reviewed test262 evidence remains the
-next part of this syntax unit.
+redeclaration, and direct awaited writes. Reviewed test262 evidence completes
+the same syntax unit: 24 passing cases cover `const`, `let`, and `var` values,
+defaults for holes and exhausted iterators, function-name inference, nested
+patterns, rest, and iterator done-state handling.
 
 ### Intrinsics and built-in objects
 

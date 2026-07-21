@@ -36,6 +36,10 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
+The current manifest contains 533 reviewed cases: 164 passes, 226 expected
+negatives, and 143 unsupported profile features. It records no semantic or
+harness failures.
+
 
 Capability groups
 -----------------
@@ -354,9 +358,12 @@ its deliberate boundary and its evidence:
     differential fixtures and
     generated Node, Deno, and native properties cover values, temporal dead
     zones, function-name inference, cleanup precedence, both specialization
-    policies, and forced collection. Object patterns, assignment patterns,
-    parameters, catch bindings, loop heads, `export var`, pattern type
-    annotations, and `await` inside a default remain outside this syntax unit.
+    policies, and forced collection. Twenty-four reviewed test262 cases cover
+    all three declaration kinds, values, defaults for holes and exhausted
+    iterators, function-name inference, nested patterns, rest, and iterator
+    done-state handling. Object patterns, assignment patterns, parameters,
+    catch bindings, loop heads, `export var`, pattern type annotations, and
+    `await` inside a default remain outside this syntax unit.
 
 
 Known gaps inside the claim
