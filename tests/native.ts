@@ -806,7 +806,13 @@ let tdzRead;
 try { tdzWrite = 1; } catch (error) { console.log("tdz write"); }
 let tdzWrite;
 const immutable = 1;
-try { immutable = 2; } catch (error) { console.log("const write"); }
+try { immutable = 2; } catch (error) {
+  console.log(
+    "const write",
+    error instanceof TypeError,
+    !(error instanceof ReferenceError),
+  );
+}
 if (false) immutable = 3;
 console.log(immutable);
 `,
@@ -1550,6 +1556,13 @@ try {
   console.log(self);
 } catch (error) {
   console.log("tdz", error instanceof ReferenceError);
+}
+
+try {
+  const [before = (laterConst = 1), laterConst] = [];
+  console.log(before, laterConst);
+} catch (error) {
+  console.log("default-write-tdz", error instanceof ReferenceError);
 }
 
 let earlySteps = 0;

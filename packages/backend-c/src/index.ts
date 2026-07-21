@@ -242,7 +242,17 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
       );
       return;
     }
-    line(state, "result = oseo_write_immutable_binding(context);");
+    line(
+      state,
+      `result = oseo_environment_get(context, ` +
+        `roots[${state.environmentSlot}], ${bindingId}u);`,
+    );
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, "    result = oseo_cell_get(context, result.value);");
+    line(state, "}");
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, "    result = oseo_write_immutable_binding(context);");
+    line(state, "}");
     return;
   }
   line(
