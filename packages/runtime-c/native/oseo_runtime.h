@@ -289,6 +289,18 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_argument_list_create(OseoContext *context);
+OseoResult oseo_argument_list_append(
+    OseoContext *context,
+    OseoValue list,
+    OseoValue value
+);
+OseoResult oseo_argument_list_view(
+    OseoContext *context,
+    OseoValue list,
+    size_t *count,
+    const OseoValue **arguments
+);
 OseoResult oseo_function_prototype(
     OseoContext *context,
     OseoValue function

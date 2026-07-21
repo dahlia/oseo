@@ -3164,6 +3164,7 @@ export interface MirControlTarget {
 
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
+  readonly argumentListId?: number;
   readonly arguments: readonly number[];
   readonly arrayLength?: number;
   readonly bindingId?: number;
@@ -3173,6 +3174,8 @@ export interface MirOperation {
   readonly id: number;
   readonly kind:
     | "add-smi-checked"
+    | "argument-list-append"
+    | "argument-list-create"
     | "array-append"
     | "array-append-hole"
     | "array-create"
@@ -5728,6 +5731,9 @@ function maximumMirValue(functionValue: MirFunction): number {
       if (operation.checkedResult != null) {
         maximum = Math.max(maximum, operation.checkedResult);
       }
+      if (operation.argumentListId != null) {
+        maximum = Math.max(maximum, operation.argumentListId);
+      }
       if (operation.iteratorNextMethodResult != null) {
         maximum = Math.max(maximum, operation.iteratorNextMethodResult);
       }
@@ -6116,11 +6122,16 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
           : ` hint=${operation.hint.provenance}:${operation.hint.name}`;
       const cacheText =
         operation.cacheId == null ? "" : ` cache=%${operation.cacheId}`;
+      const argumentListText =
+        operation.argumentListId == null
+          ? ""
+          : ` argument-list=%${operation.argumentListId}`;
       lines.push(
         `    ${resultText} = ${operation.kind} ` +
           `${operation.detail}` +
           `${argumentText === "" ? "" : ` ${argumentText}`} ` +
-          `@${rangeText(operation.range)}${hintTextValue}${cacheText}`,
+          `@${rangeText(operation.range)}${hintTextValue}${cacheText}` +
+          argumentListText,
       );
     }
     lines.push(`    ${printTerminator(block.terminator)}`);

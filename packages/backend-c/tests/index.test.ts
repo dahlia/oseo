@@ -314,6 +314,99 @@ test("emits dynamic array accumulation operations", () => {
   );
 });
 
+test("emits GC-rooted dynamic argument lists", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "create argument list",
+              id: 0,
+              kind: "argument-list-create",
+              range,
+            },
+            {
+              arguments: [],
+              constant: { kind: "number", value: 7 },
+              detail: "7",
+              id: 1,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0, 1],
+              detail: "append call argument",
+              id: 2,
+              kind: "argument-list-append",
+              range,
+            },
+            {
+              arguments: [2],
+              detail: "normal -> continue, abrupt -> return",
+              id: 3,
+              kind: "check-status",
+              range,
+            },
+            {
+              argumentListId: 0,
+              arguments: [],
+              detail: "console_log",
+              id: 4,
+              kind: "call",
+              range,
+              target: { kind: "console-log" },
+            },
+            {
+              arguments: [4],
+              detail: "normal -> continue, abrupt -> return",
+              id: 5,
+              kind: "check-status",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 4 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 6,
+    },
+    sourceId: "argument-list.ts",
+    specialization: "disabled",
+  });
+  assert.ok(emitted.source.includes("oseo_argument_list_create(context)"));
+  assert.ok(
+    emitted.source.includes(
+      "oseo_argument_list_append(context, roots[0], roots[1])",
+    ),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_argument_list_view(context, roots[0], &argument_count_4,",
+    ),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_console_log(context, argument_count_4, argument_values_4)",
+    ),
+  );
+});
+
 test("scans large MIR argument lists without spreading them", () => {
   const range = {
     end: { column: 1, line: 1 },
