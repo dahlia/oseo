@@ -331,8 +331,10 @@ its deliberate boundary and its evidence:
     is rejected until continuation extraction can retain an accumulated
     argument prefix. Native differential fixtures, generated Node, Deno, and
     native properties under both specialization policies and forced collection,
-    and MIR structural tests cover the dynamic-list path. Call and constructor
-    spread inherit the object-iterable boundary.
+    and MIR structural tests cover the dynamic-list path. Ten reviewed test262
+    cases pin iterator acquisition and step failures across calls and
+    construction. Call and constructor spread inherit the object-iterable
+    boundary.
 
 
 Known gaps inside the claim

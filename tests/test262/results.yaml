@@ -3961,6 +3961,172 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-mult-err-itr-get-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-mult-err-itr-step.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-sngl-err-itr-get-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-sngl-err-itr-get-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-sngl-err-itr-step.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -4781,6 +4947,172 @@ results:
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/new/spread-err-mult-err-itr-get-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/new/spread-err-mult-err-itr-step.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/new/spread-err-sngl-err-itr-get-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/new/spread-err-sngl-err-itr-get-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/new/spread-err-sngl-err-itr-step.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -12935,7 +13267,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 226
   harnessFailures: 0
-  passes: 130
+  passes: 140
   semanticFailures: 0
   unsupportedProfileFeatures: 143
   dependencies:
@@ -12966,7 +13298,7 @@ summary:
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 44
+      passes: 46
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: expression-operators
@@ -12984,7 +13316,7 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 9
+      passes: 19
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
@@ -13063,7 +13395,7 @@ summary:
     - group: language/expressions
       expectedNegatives: 42
       harnessFailures: 0
-      passes: 25
+      passes: 35
       semanticFailures: 0
       unsupportedProfileFeatures: 27
     - group: language/module-code

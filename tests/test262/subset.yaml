@@ -446,6 +446,21 @@ tests:
   - path: test/language/expressions/await/no-operand.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/call/spread-err-mult-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-mult-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-itr-get-value.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
   - path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -542,6 +557,21 @@ tests:
   - path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/new/spread-err-mult-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/new/spread-err-mult-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/new/spread-err-sngl-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/language/expressions/new/spread-err-sngl-err-itr-get-value.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, iterator-protocol]
+  - path: test/language/expressions/new/spread-err-sngl-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]

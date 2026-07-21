@@ -173,7 +173,8 @@ its callee before arguments and allocating the receiver only after accumulation
 succeeds. The generated property suite uses seed `0x5eed0006` across intrinsic,
 method, and dynamic calls and ordinary construction, both native specialization
 policies, and forced collection. Native fixtures also cover `Promise`
-construction.
+construction. Ten reviewed test262 cases pin iterator acquisition and step
+failures across calls and construction.
 
 ### Intrinsics and built-in objects
 
