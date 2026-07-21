@@ -540,6 +540,52 @@ try { shouldNotRun(...throwingCallSpread); } catch (error) {
     callInvocations,
   );
 }
+function SpreadBox(first, second, third) {
+  this.first = first;
+  this.second = second;
+  this.third = third;
+}
+const spreadBox = new SpreadBox("new", ...[8, 9]);
+console.log(spreadBox.first, spreadBox.second, spreadBox.third);
+let constructOrder = "";
+function OrderedBox(value) {
+  this.value = value;
+  console.log(constructOrder, this.value);
+}
+function selectSpreadConstructor() {
+  constructOrder = constructOrder + "callee";
+  return OrderedBox;
+}
+const orderedConstructorSpread = {
+  [Symbol.iterator]: function () {
+    constructOrder = constructOrder + "-spread";
+    return [10][Symbol.iterator]();
+  },
+};
+new (selectSpreadConstructor())(...orderedConstructorSpread);
+let constructCloseCalls = 0;
+let constructInvocations = 0;
+const throwingConstructorSpread = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new RangeError("constructor spread step"); },
+      return: function () {
+        constructCloseCalls = constructCloseCalls + 1;
+        return {};
+      },
+    };
+  },
+};
+function ShouldNotConstruct() {
+  constructInvocations = constructInvocations + 1;
+}
+try { new ShouldNotConstruct(...throwingConstructorSpread); } catch (error) {
+  console.log(
+    error instanceof RangeError,
+    constructCloseCalls,
+    constructInvocations,
+  );
+}
 `,
   },
   {
@@ -1965,6 +2011,7 @@ const thenable = {
 };
 console.log("sync start");
 new Promise(settle).then(show);
+new Promise(...[settle]).then(show);
 latched.then(show, showRejected);
 thrownAfterResolve.then(show, showRejected);
 Promise.resolve(thenable).then(show, showRejected);

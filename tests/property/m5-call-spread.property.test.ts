@@ -25,7 +25,7 @@ const { assertAsyncProperty, propertySize } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-type CallKind = "dynamic" | "intrinsic" | "method";
+type CallKind = "constructor" | "dynamic" | "intrinsic" | "method";
 type SpreadMode =
   | "array"
   | "captured-next"
@@ -52,7 +52,12 @@ const nativeTarget = targetForExecutionHost(
 );
 const large = propertySize() === "large";
 const caseArbitrary = fc.record({
-  callKind: fc.constantFrom<CallKind>("dynamic", "intrinsic", "method"),
+  callKind: fc.constantFrom<CallKind>(
+    "constructor",
+    "dynamic",
+    "intrinsic",
+    "method",
+  ),
   mode: fc.constantFrom<SpreadMode>(
     "array",
     "captured-next",
@@ -128,6 +133,17 @@ function selectSpreadCall() {
 }
 `;
   }
+  if (callKind === "constructor") {
+    return `
+const SpreadConstructor = function (${parameterNames.join(", ")}) {
+  console.log("constructor", ${parameterNames.join(", ")});
+};
+function selectSpreadConstructor() {
+  mark("target", undefined);
+  return SpreadConstructor;
+}
+`;
+  }
   return `
 const receiver = { label: "method", report: ${report} };
 `;
@@ -139,6 +155,9 @@ function callSource(callKind: CallKind, argumentsSource: string): string {
   }
   if (callKind === "dynamic") {
     return `selectSpreadCall()(${argumentsSource});`;
+  }
+  if (callKind === "constructor") {
+    return `new (selectSpreadConstructor())(${argumentsSource});`;
   }
   return (
     'mark("receiver", receiver)[mark("key", "report")](' +
@@ -174,7 +193,9 @@ console.log("state", steps, closes, order);
 }
 
 function orderPrefix(callKind: CallKind): readonly string[] {
-  if (callKind === "dynamic") return ["target"];
+  if (callKind === "constructor" || callKind === "dynamic") {
+    return ["target"];
+  }
   if (callKind === "method") return ["receiver", "key"];
   return [];
 }
@@ -255,13 +276,13 @@ async function references(source: string): Promise<
 }
 
 test(
-  "generated call spread cases match the M5 argument-list model",
+  "generated argument spread cases match the M5 dynamic-list model",
   {
     skip: nativeTarget == null ? "requires a supported native host" : false,
   },
   async () => {
     await assertAsyncProperty(
-      "call spread preserves generated argument observations",
+      "call and constructor spread preserve generated observations",
       fc.asyncProperty(caseArbitrary, async (testCase) => {
         const source = printCase(testCase);
         const expected = {
@@ -311,10 +332,10 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "mixed arguments for intrinsic, method, and dynamic calls with " +
-          "custom iterables, captured next, and abrupt steps",
+          "mixed arguments for intrinsic, method, dynamic, and constructor " +
+          "consumers with custom iterables, captured next, and abrupt steps",
         numRuns: 10,
-        profile: "M5 call spread and dynamic argument accumulation",
+        profile: "M5 call and constructor spread argument accumulation",
         seed: 0x5eed_0006,
         sizeLimit: large
           ? "9 values in each spread"

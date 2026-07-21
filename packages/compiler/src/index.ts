@@ -225,12 +225,12 @@ export type SyntaxExpression =
       readonly kind: "null";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxExpression[];
+      readonly arguments: readonly SyntaxCallArgument[];
       readonly callee: SyntaxExpression;
       readonly kind: "new";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly SyntaxExpression[];
+      readonly arguments: readonly SyntaxCallArgument[];
       readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
@@ -1403,12 +1403,12 @@ export type HirExpression =
       readonly kind: "module-namespace";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly HirExpression[];
+      readonly arguments: readonly HirCallArgument[];
       readonly callee: HirExpression;
       readonly kind: "new";
     })
   | (LocatedSyntax & {
-      readonly arguments: readonly HirExpression[];
+      readonly arguments: readonly HirCallArgument[];
       readonly kind: "promise-construct";
     })
   | (LocatedSyntax & {
@@ -1892,9 +1892,9 @@ function resolveExpression(
       : { ...expression, key, object, value };
   }
   if (expression.kind === "new") {
-    const argumentsValue: HirExpression[] = [];
+    const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
-      const resolved = resolveExpression(argument, scopes, state);
+      const resolved = resolveCallArgument(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
@@ -1915,9 +1915,9 @@ function resolveExpression(
       : { ...expression, arguments: argumentsValue, callee };
   }
   if (expression.kind === "promise-construct") {
-    const argumentsValue: HirExpression[] = [];
+    const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
-      const resolved = resolveExpression(argument, scopes, state);
+      const resolved = resolveCallArgument(argument, scopes, state);
       if (resolved == null) return undefined;
       argumentsValue.push(resolved);
     }
@@ -2938,14 +2938,14 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +
-      expression.arguments.map(printHirExpression).join(", ") +
+      expression.arguments.map(printHirCallArgument).join(", ") +
       ")"
     );
   }
   if (expression.kind === "promise-construct") {
     return (
       "new intrinsic Promise(" +
-      expression.arguments.map(printHirExpression).join(", ") +
+      expression.arguments.map(printHirCallArgument).join(", ") +
       ")"
     );
   }
@@ -4599,22 +4599,28 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "promise-construct") {
-    const argumentIds = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
-    if (argumentIds.length === 0) {
+    const argumentIds = [...lowered.ids];
+    if (lowered.list == null && argumentIds.length === 0) {
       argumentIds.push(lowerSyntheticUndefined(expression.range, builder));
     }
+    const safepointArguments =
+      lowered.list == null ? argumentIds : [...argumentIds, lowered.list];
     appendMirMetadata(
       builder,
       "safepoint",
       "Promise constructor",
-      argumentIds,
+      safepointArguments,
       expression.range,
     );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
+      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
       arguments: argumentIds,
       detail: "Promise constructor",
       id,
@@ -4633,8 +4639,10 @@ function lowerExpression(
   }
   if (expression.kind === "new") {
     const callee = lowerExpression(expression.callee, builder);
-    const argumentIds = expression.arguments.map((argument) =>
-      lowerExpression(argument, builder),
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
     );
     appendMirMetadata(
       builder,
@@ -4660,17 +4668,20 @@ function lowerExpression(
       expression.range,
     );
     recordRoot(builder, receiver, expression.range);
-    const argumentsValue = [callee, receiver, ...argumentIds];
+    const argumentsValue = [callee, receiver, ...lowered.ids];
+    const safepointArguments =
+      lowered.list == null ? argumentsValue : [...argumentsValue, lowered.list];
     appendMirMetadata(
       builder,
       "safepoint",
       "constructor call",
-      argumentsValue,
+      safepointArguments,
       expression.range,
     );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
+      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
       arguments: argumentsValue,
       detail: "dynamic constructor",
       id,
@@ -6439,11 +6450,11 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "new") {
     return (
       hirExpressionHasAwait(expression.callee) ||
-      expression.arguments.some(hirExpressionHasAwait)
+      expression.arguments.some(hirCallArgumentHasAwait)
     );
   }
   if (expression.kind === "promise-construct") {
-    return expression.arguments.some(hirExpressionHasAwait);
+    return expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "object") {
     return expression.properties.some(
@@ -6650,6 +6661,25 @@ interface ModuleExpressionParts {
   rebuild(children: readonly HirExpression[]): HirExpression;
 }
 
+function hirArgumentExpressions(
+  argumentsValue: readonly HirCallArgument[],
+): readonly HirExpression[] {
+  return argumentsValue.map((argument) =>
+    argument.kind === "spread" ? argument.argument : argument,
+  );
+}
+
+function rebuildHirArguments(
+  original: readonly HirCallArgument[],
+  rebuilt: readonly HirExpression[],
+): readonly HirCallArgument[] {
+  return original.map((argument, index) =>
+    argument.kind === "spread"
+      ? { ...argument, argument: rebuilt[index]! }
+      : rebuilt[index]!,
+  );
+}
+
 function moduleExpressionParts(
   expression: HirExpression,
 ): ModuleExpressionParts | undefined {
@@ -6698,17 +6728,9 @@ function moduleExpressionParts(
     };
   }
   if (expression.kind === "call") {
-    const argumentChildren = expression.arguments.map((argument) =>
-      argument.kind === "spread" ? argument.argument : argument,
-    );
-    const rebuildArguments = (
-      argumentsValue: readonly HirExpression[],
-    ): readonly HirCallArgument[] =>
-      expression.arguments.map((argument, index) =>
-        argument.kind === "spread"
-          ? { ...argument, argument: argumentsValue[index]! }
-          : argumentsValue[index]!,
-      );
+    const argumentChildren = hirArgumentExpressions(expression.arguments);
+    const rebuildArguments = (argumentsValue: readonly HirExpression[]) =>
+      rebuildHirArguments(expression.arguments, argumentsValue);
     if (expression.target.kind === "dynamic") {
       return {
         children: [expression.target.callee, ...argumentChildren],
@@ -6742,21 +6764,22 @@ function moduleExpressionParts(
     };
   }
   if (expression.kind === "new") {
+    const argumentChildren = hirArgumentExpressions(expression.arguments);
     return {
-      children: [expression.callee, ...expression.arguments],
+      children: [expression.callee, ...argumentChildren],
       rebuild: ([callee, ...argumentsValue]) => ({
         ...expression,
-        arguments: argumentsValue,
+        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
         callee: callee!,
       }),
     };
   }
   if (expression.kind === "promise-construct") {
     return {
-      children: expression.arguments,
+      children: hirArgumentExpressions(expression.arguments),
       rebuild: (argumentsValue) => ({
         ...expression,
-        arguments: argumentsValue,
+        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
       }),
     };
   }
@@ -6890,6 +6913,27 @@ function extractModuleAwait(
           state.sourceId,
           preceding,
           "Call argument spread before a top-level await point is " +
+            "unsupported.",
+        ),
+      );
+      return undefined;
+    }
+  }
+  if (expression.kind === "new" || expression.kind === "promise-construct") {
+    const targetChildren = expression.kind === "new" ? 1 : 0;
+    const argumentIndex = childIndex - targetChildren;
+    const preceding =
+      argumentIndex < 0
+        ? undefined
+        : expression.arguments
+            .slice(0, argumentIndex)
+            .find((argument) => argument.kind === "spread");
+    if (preceding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          preceding,
+          "Constructor argument spread before a top-level await point is " +
             "unsupported.",
         ),
       );

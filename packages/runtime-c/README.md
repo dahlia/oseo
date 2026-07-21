@@ -117,8 +117,8 @@ the runtime's 32-bit array-index limit fails with `OSEO2001` for value append
 and a catchable `RangeError` for a trailing hole.
 The `m5-11` ABI adds GC-traced dynamic argument lists. Generated code creates
 and appends to a private list while evaluating spread arguments, then borrows
-its stable count and value pointer for the call. The list remains rooted across
-the call and is never exposed as a JavaScript object.
+its stable count and value pointer for the call or construction. The list
+remains rooted across invocation and is never exposed as a JavaScript object.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

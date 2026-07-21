@@ -514,11 +514,11 @@ source challenge features through explicit unsupported classifications.
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
 `do-while`, `for`, `for-of`, `switch`, and labeled statements, and the
-array literal and call argument spread consumers now reuse the synchronous
-iterator protocol through rooted dynamic accumulation. Generated Node, Deno,
-and native evidence covers their values, evaluation order, captured `next`,
-and abrupt steps; reviewed test262 evidence also covers array values and holes.
-The intrinsics
+array literal, call argument, and constructor argument spread consumers now
+reuse the synchronous iterator protocol through rooted dynamic accumulation.
+Generated Node, Deno, and native evidence covers their values, evaluation
+order, captured `next`, and abrupt steps; reviewed test262 evidence also covers
+array values and holes. The intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

@@ -288,8 +288,8 @@ its deliberate boundary and its evidence:
     The iterator's next method is captured once by `GetIterator` and
     reused for every step, as the iterator record requires.
     `Promise.all`, `Promise.race`, synchronous `for-of`, array literal spread,
-    and call argument spread consume object iterables through this protocol. A
-    `for-of` head
+    and call and constructor argument spread consume object iterables through
+    this protocol. A `for-of` head
     admits one `const`, `let`, or `var` identifier declaration, an existing
     binding, or a static or computed member target. Lexical declarations
     create their TDZ before the iterable expression and receive a fresh cell
@@ -313,25 +313,26 @@ its deliberate boundary and its evidence:
     five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
     specification reaches by boxing, is unsupported; the promise combinators,
-    `for-of`, array spread, and call spread accept only object iterables. The
-    array iterator methods are array-specific rather than the generic
-    `%Array.prototype.values%`; and `for-await-of`, constructor spread,
-    destructuring iteration, array and string iterator prototype identity, and
-    generator-based iterators remain outside the admitted syntax.
- -  Call argument spread. A call containing spread evaluates its target first,
-    then accumulates ordinary arguments and spread iterator values from left to
-    right in a rooted private argument list. Iterator acquisition, step, value,
-    and append failures do not call `IteratorClose`, and an abrupt spread stops
-    later arguments and the call itself. Intrinsic, method, and dynamic calls
-    share this path; calls without spread retain fixed positional arguments.
-    Dynamic arity does not bypass admitted intrinsic contracts, so
-    `Object.create(...values)` still rejects a descriptor-map argument. A spread
-    preceding a later top-level await point is rejected until continuation
-    extraction can retain an accumulated argument prefix. Native differential
-    fixtures, generated Node, Deno, and native properties under both
-    specialization policies and forced collection, and MIR structural tests
-    cover the argument-list path. Constructor spread remains outside the
-    admitted syntax, and call spread inherits the object-iterable boundary.
+    `for-of`, array spread, call spread, and constructor spread accept only
+    object iterables. The array iterator methods are array-specific rather than
+    the generic `%Array.prototype.values%`; and `for-await-of`, destructuring
+    iteration, array and string iterator prototype identity, and generator-based
+    iterators remain outside the admitted syntax.
+ -  Call and constructor argument spread. A call or construction containing
+    spread evaluates its target first, then accumulates ordinary arguments and
+    spread iterator values from left to right in a rooted private argument
+    list. Iterator acquisition, step, value, and append failures do not call
+    `IteratorClose`, and an abrupt spread stops later arguments and invocation.
+    Intrinsic, method, dynamic call, ordinary construction, and `Promise`
+    construction paths share this representation; invocations without spread
+    retain fixed positional arguments. Dynamic arity does not bypass admitted
+    intrinsic contracts, so `Object.create(...values)` still rejects a
+    descriptor-map argument. A spread preceding a later top-level await point
+    is rejected until continuation extraction can retain an accumulated
+    argument prefix. Native differential fixtures, generated Node, Deno, and
+    native properties under both specialization policies and forced collection,
+    and MIR structural tests cover the dynamic-list path. Call and constructor
+    spread inherit the object-iterable boundary.
 
 
 Known gaps inside the claim
@@ -340,10 +341,10 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring, constructor spread, default and rest parameters, classes,
-    generators, big integers, regular expressions, and the remaining expression
-    grammar are outside the admitted syntax. Owner: the core expressions and
-    bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Destructuring, default and rest parameters, classes, generators, big
+    integers, regular expressions, and the remaining expression grammar are
+    outside the admitted syntax. Owner: the core expressions and bindings
+    stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

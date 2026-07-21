@@ -54,8 +54,8 @@ lexical, assignment, and cleanup semantics. Array literal spread now consumes
 that protocol through dynamic own-property accumulation, preserving holes,
 captured `next` methods, and the specified absence of `IteratorClose` on
 acquisition or step failures. Call, constructor, and destructuring spread
-are being delivered as separate syntax units: call spread now uses a rooted
-dynamic argument list, while constructor and destructuring spread remain later
+are being delivered as separate syntax units: call and constructor spread now
+use a rooted dynamic argument list, while destructuring spread remains later
 work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
@@ -168,10 +168,12 @@ Node.js, Deno, and both native specialization policies, and forces collection
 on the enabled path. Five reviewed test262 cases pin iterator acquisition and
 step failures. Call argument spread now uses a rooted dynamic argument list and
 preserves target-first, left-to-right evaluation without `IteratorClose` on
-spread failures. Its generated property suite uses seed `0x5eed0006` across
-intrinsic, method, and dynamic calls, both native specialization policies, and
-forced collection. Constructor argument spread remains a separate lowering
-unit.
+spread failures. Constructor argument spread shares the list while evaluating
+its callee before arguments and allocating the receiver only after accumulation
+succeeds. The generated property suite uses seed `0x5eed0006` across intrinsic,
+method, and dynamic calls and ordinary construction, both native specialization
+policies, and forced collection. Native fixtures also cover `Promise`
+construction.
 
 ### Intrinsics and built-in objects
 

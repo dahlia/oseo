@@ -848,14 +848,19 @@ function expression(
     const calleeNode = node(value.callee);
     if (calleeNode == null) return unsupported(context, value);
     const callee = expression(context, calleeNode);
-    const argumentValues: SyntaxExpression[] = [];
+    const argumentValues: SyntaxCallArgument[] = [];
     for (const argumentValue of nodes(value.arguments)) {
       if (argumentValue.type === "SpreadElement") {
-        return unsupported(
-          context,
-          argumentValue,
-          "Constructor argument spread is unsupported.",
-        );
+        const spreadArgument = node(argumentValue.argument);
+        if (spreadArgument == null) return unsupported(context, argumentValue);
+        const converted = expression(context, spreadArgument);
+        if (converted == null) return undefined;
+        argumentValues.push({
+          ...location(context, argumentValue),
+          argument: converted,
+          kind: "spread",
+        });
+        continue;
       }
       const converted = expression(context, argumentValue);
       if (converted == null) return undefined;
