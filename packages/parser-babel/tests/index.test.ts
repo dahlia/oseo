@@ -306,6 +306,52 @@ test("preserves array elements and holes in owned syntax", () => {
   assert.match(printMir(result.mir), /array-create array length 3/u);
 });
 
+test("lowers array spread through dynamic accumulation", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const values = [1, 2];\n" +
+      "const result = [0, ...values, , 3];\n" +
+      "console.log(result.length);",
+    sourceId: "array-spread.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(
+    printHir(result.hir),
+    /\[0, \.\.\.%b\d+\(values\), <hole>, 3\]/u,
+  );
+  const mir = printMir(result.mir);
+  assert.match(mir, /array-create array length 0/u);
+  assert.match(mir, /array-append array element append/u);
+  assert.match(mir, /array-append-hole array hole append/u);
+  assert.match(mir, /iterator-get GetIterator sync/u);
+  assert.match(mir, /iterator-next IteratorStep and IteratorValue/u);
+  assert.doesNotMatch(mir, /iterator-close/u);
+});
+
+test("keeps call and constructor spread outside the profile", () => {
+  const call = compileSource(babelFrontend, {
+    source: "fn(...values);",
+    sourceId: "call-spread.ts",
+  });
+  assert.equal(call.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    call.diagnostics[0]?.message,
+    "Call argument spread is unsupported.",
+  );
+
+  const construct = compileSource(babelFrontend, {
+    source: "new Box(...values);",
+    sourceId: "constructor-spread.ts",
+  });
+  assert.equal(construct.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    construct.diagnostics[0]?.message,
+    "Constructor argument spread is unsupported.",
+  );
+});
+
 test("accepts uninitialized let as undefined", () => {
   const result = compileSource(babelFrontend, {
     source: "let value; console.log(value);",
@@ -1085,6 +1131,40 @@ test("lowers top-level await to an owned scheduler checkpoint", () => {
       .some((operation) => operation.target?.kind === "await"),
   );
   assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
+});
+
+test("rejects array spread before a top-level await point", () => {
+  const sourceId = "file:///app/array-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "const items = [1, 2];\n" +
+      "export const values = [...items, await Promise.resolve(3)];",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "array-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Array spread before a top-level await point is unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
 });
 
 test("diagnoses excessive top-level await depth", () => {
