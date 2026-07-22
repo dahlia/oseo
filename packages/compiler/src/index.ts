@@ -312,6 +312,7 @@ export interface SyntaxObjectBindingProperty extends LocatedSyntax {
 export interface SyntaxObjectBindingPattern extends LocatedSyntax {
   readonly kind: "object-binding-pattern";
   readonly properties: readonly SyntaxObjectBindingProperty[];
+  readonly rest?: SyntaxBindingIdentifier;
 }
 
 /** One recursively owned binding pattern admitted by the current profile. */
@@ -352,6 +353,7 @@ export interface HirObjectBindingProperty extends LocatedSyntax {
 export interface HirObjectBindingPattern extends LocatedSyntax {
   readonly kind: "object-binding-pattern";
   readonly properties: readonly HirObjectBindingProperty[];
+  readonly rest?: HirBindingIdentifier;
 }
 
 /** One recursively resolved binding pattern. */
@@ -2137,9 +2139,12 @@ type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
 function syntaxBindingNames(pattern: SyntaxBindingPattern): readonly string[] {
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
-    return pattern.properties.flatMap((property) =>
-      syntaxBindingNames(property.pattern),
-    );
+    return [
+      ...pattern.properties.flatMap((property) =>
+        syntaxBindingNames(property.pattern),
+      ),
+      ...(pattern.rest == null ? [] : [pattern.rest.name]),
+    ];
   }
   return [
     ...pattern.elements.flatMap((element) =>
@@ -2352,9 +2357,12 @@ function hirBindingIdentifiers(
 ): readonly HirBindingIdentifier[] {
   if (pattern.kind === "binding-identifier") return [pattern];
   if (pattern.kind === "object-binding-pattern") {
-    return pattern.properties.flatMap((property) =>
-      hirBindingIdentifiers(property.pattern),
-    );
+    return [
+      ...pattern.properties.flatMap((property) =>
+        hirBindingIdentifiers(property.pattern),
+      ),
+      ...(pattern.rest == null ? [] : [pattern.rest]),
+    ];
   }
   return [
     ...pattern.elements.flatMap((element) =>
@@ -2529,10 +2537,22 @@ function resolveBindingPattern(
         range: property.range,
       });
     }
+    let rest: HirBindingIdentifier | undefined;
+    if (pattern.rest != null) {
+      const resolvedRest = resolveBindingPattern(
+        pattern.rest,
+        scopes,
+        state,
+        mode,
+      );
+      if (resolvedRest?.kind !== "binding-identifier") return undefined;
+      rest = resolvedRest;
+    }
     return {
       ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
       kind: "object-binding-pattern",
       properties,
+      ...(rest == null ? {} : { rest }),
       range: pattern.range,
     };
   }
@@ -3275,20 +3295,18 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
     return `%b${pattern.bindingId} ${pattern.name}`;
   }
   if (pattern.kind === "object-binding-pattern") {
-    return (
-      "{" +
-      pattern.properties
-        .map(
-          (property) =>
-            `${printHirExpression(property.key)}: ` +
-            printHirBindingPattern(property.pattern) +
-            (property.initializer == null
-              ? ""
-              : ` = ${printHirExpression(property.initializer)}`),
-        )
-        .join(", ") +
-      "}"
+    const properties = pattern.properties.map(
+      (property) =>
+        `${printHirExpression(property.key)}: ` +
+        printHirBindingPattern(property.pattern) +
+        (property.initializer == null
+          ? ""
+          : ` = ${printHirExpression(property.initializer)}`),
     );
+    if (pattern.rest != null) {
+      properties.push(`...${printHirBindingPattern(pattern.rest)}`);
+    }
+    return `{${properties.join(", ")}}`;
   }
   const elements = pattern.elements.map((element) =>
     element == null
@@ -3586,6 +3604,7 @@ export interface MirOperation {
     | "module-namespace-create"
     | "object-coercible"
     | "object-create"
+    | "object-rest"
     | "property-key"
     | "property-delete"
     | "property-get"
@@ -5831,8 +5850,10 @@ function lowerObjectBindingPattern(
     pattern.range,
   );
   recordRoot(builder, object, pattern.range);
+  const excludedKeys: number[] = [];
   for (const property of pattern.properties) {
     const key = lowerPropertyKey(property.key, builder);
+    excludedKeys.push(key);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -5864,6 +5885,33 @@ function lowerObjectBindingPattern(
       builder,
     );
     lowerBindingTarget(property.pattern, value, mode, builder);
+  }
+  if (pattern.rest != null) {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "object binding rest copy",
+      [object, ...excludedKeys],
+      pattern.rest.range,
+    );
+    const rest = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [object, ...excludedKeys],
+      detail: "CopyDataProperties for object binding rest",
+      id: rest,
+      kind: "object-rest",
+      range: pattern.rest.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> bind rest object, abrupt -> transfer",
+      [rest],
+      pattern.rest.range,
+    );
+    recordRoot(builder, rest, pattern.rest.range);
+    lowerBindingTarget(pattern.rest, rest, mode, builder);
   }
 }
 

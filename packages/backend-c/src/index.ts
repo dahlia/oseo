@@ -675,6 +675,24 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       state,
       `result = oseo_require_object_coercible(context, roots[${input}]);`,
     );
+  } else if (operation.kind === "object-rest") {
+    const object = operationArgument(operation, 0);
+    const excluded = operation.arguments.slice(1);
+    const excludedName = `object_rest_excluded_${operation.id}`;
+    if (excluded.length > 0) {
+      line(
+        state,
+        `OseoValue ${excludedName}[${excluded.length}u] = {` +
+          excluded.map((id) => `roots[${id}]`).join(", ") +
+          "};",
+      );
+    }
+    line(
+      state,
+      `result = oseo_object_rest(context, roots[${object}], ` +
+        `${excluded.length}u, ` +
+        (excluded.length === 0 ? "NULL);" : `${excludedName});`),
+    );
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(state, `result = oseo_property_key(context, roots[${input}]);`);
@@ -1067,6 +1085,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "array-create" ||
     operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
+    operation.kind === "object-rest" ||
     operation.kind === "property-key" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||

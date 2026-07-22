@@ -12360,6 +12360,82 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/const/dstr/obj-ptrn-rest-skip-non-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/const/dstr/obj-ptrn-rest-val-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: ReferenceError
       expectedFailurePhase: runtime
       features: []
@@ -13801,6 +13877,82 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/let/dstr/obj-ptrn-rest-skip-non-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/let/dstr/obj-ptrn-rest-val-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes:
@@ -14750,11 +14902,87 @@ results:
       harnessFailed: false
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/variable/dstr/obj-ptrn-rest-skip-non-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - object-rest
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/variable/dstr/obj-ptrn-rest-val-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 226
   harnessFailures: 0
-  passes: 182
+  passes: 188
   semanticFailures: 0
   unsupportedProfileFeatures: 143
   dependencies:
@@ -14779,7 +15007,7 @@ summary:
     - dependency: destructuring-bindings
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 42
+      passes: 48
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: dynamic-source
@@ -14815,7 +15043,7 @@ summary:
     - dependency: lexical-bindings
       expectedNegatives: 12
       harnessFailures: 0
-      passes: 35
+      passes: 39
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: module-linking
@@ -14827,7 +15055,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 28
+      passes: 34
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: promise-settlement
@@ -14851,7 +15079,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 18
+      passes: 20
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
@@ -14900,6 +15128,6 @@ summary:
     - group: language/statements
       expectedNegatives: 48
       harnessFailures: 0
-      passes: 72
+      passes: 78
       semanticFailures: 0
       unsupportedProfileFeatures: 16

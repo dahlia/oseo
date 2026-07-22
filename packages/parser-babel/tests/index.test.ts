@@ -807,10 +807,25 @@ test("exports every lexical object binding name", () => {
   );
 });
 
+test("converts object binding rest to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const key = 'picked';\n" +
+      "const { [key]: value, ...rest } = " +
+      "{ picked: 1, retained: 2 };\n",
+    sourceId: "object-binding-rest.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /\.\.\.%b\d+ rest/u);
+  assert.match(printMir(result.mir), /object-rest CopyDataProperties/u);
+  assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
+});
+
 test("keeps later binding consumers outside the profile", () => {
   for (const [name, source] of [
     ["pattern annotation", "const [value]: [number] = [1];"],
-    ["object rest", "const { value, ...rest } = { value: 1 };"],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,

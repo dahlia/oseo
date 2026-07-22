@@ -953,6 +953,136 @@ static OseoResult ascii_string(OseoContext *context, const char *text) {
     return oseo_internal_allocate_string(context, units, length);
 }
 
+static bool rest_key_is_excluded(
+    OseoValue key,
+    size_t excluded_count,
+    const OseoValue *excluded_keys
+) {
+    for (size_t index = 0u; index < excluded_count; index += 1u) {
+        if (property_key_equal(key, excluded_keys[index])) return true;
+    }
+    return false;
+}
+
+static OseoResult snapshot_rest_keys(
+    OseoContext *context,
+    OseoRootFrame *frame,
+    size_t key_count
+) {
+    OseoValue source = frame->slots[0];
+    size_t output = 0u;
+    if (is_string(source)) {
+        for (size_t index = 0u; index < key_count; index += 1u) {
+            char key_text[24];
+            (void)snprintf(key_text, sizeof(key_text), "%zu", index);
+            OseoResult key = ascii_string(context, key_text);
+            if (key.status != OSEO_STATUS_NORMAL) return key;
+            frame->slots[3u + output] = key.value;
+            output += 1u;
+        }
+        return normal(oseo_undefined());
+    }
+    if (!is_object(source)) return normal(oseo_undefined());
+    uint64_t previous = UINT64_MAX;
+    while (output < key_count) {
+        OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
+        size_t selected = SIZE_MAX;
+        uint32_t selected_number = 0u;
+        for (size_t index = 0u; index < object->property_count; index += 1u) {
+            uint32_t number = 0u;
+            if (!array_index(object->properties[index].key, &number) ||
+                (previous != UINT64_MAX && number <= previous)) continue;
+            if (selected == SIZE_MAX || number < selected_number) {
+                selected = index;
+                selected_number = number;
+            }
+        }
+        if (selected == SIZE_MAX) break;
+        frame->slots[3u + output] = object->properties[selected].key;
+        output += 1u;
+        previous = selected_number;
+    }
+    OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        uint32_t ignored = 0u;
+        OseoValue key = object->properties[index].key;
+        if (is_symbol(key) || array_index(key, &ignored)) continue;
+        frame->slots[3u + output] = key;
+        output += 1u;
+    }
+    object = ordinary_object(frame->slots[0]);
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        OseoValue key = object->properties[index].key;
+        if (!is_symbol(key)) continue;
+        frame->slots[3u + output] = key;
+        output += 1u;
+    }
+    if (output != key_count) {
+        return failure(context, "OSEO2001", "Own-key snapshot changed.");
+    }
+    return normal(oseo_undefined());
+}
+
+OseoResult oseo_object_rest(
+    OseoContext *context,
+    OseoValue source,
+    size_t excluded_count,
+    const OseoValue *excluded_keys
+) {
+    if (is_nullish(source)) {
+        return type_error(context, "Cannot destructure a nullish value.");
+    }
+    size_t key_count = is_string(source)
+        ? string_object(source)->length
+        : is_object(source)
+            ? ordinary_object(source)->property_count
+            : 0u;
+    if (key_count > SIZE_MAX - 3u) {
+        return failure(context, "OSEO2001", "Own-key snapshot is too large.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = source;
+    result = oseo_object_literal_create(context);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = snapshot_rest_keys(context, &frame, key_count);
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < key_count;
+         index += 1u) {
+        OseoValue key = frame.slots[3u + index];
+        if (rest_key_is_excluded(key, excluded_count, excluded_keys)) {
+            continue;
+        }
+        OseoPropertyAttributes attributes = {false, false, false};
+        OseoValue ignored = oseo_undefined();
+        bool exists = is_string(frame.slots[0])
+            ? string_own_property(frame.slots[0], key, NULL)
+            : oseo_internal_own_descriptor(
+                frame.slots[0], key, &ignored, &attributes);
+        bool enumerable = is_string(frame.slots[0])
+            ? exists && !oseo_internal_string_is_ascii(key, "length")
+            : exists && attributes.enumerable;
+        if (!enumerable) continue;
+        result = oseo_object_get(context, frame.slots[0], key);
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[1],
+                key,
+                frame.slots[2],
+                (OseoPropertyAttributes){true, true, true}
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static OseoResult define_ascii_value(
     OseoContext *context,
     OseoRootFrame *frame,

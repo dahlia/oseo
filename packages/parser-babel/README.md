@@ -28,9 +28,9 @@ A `var` list may mix plain and pattern declarators; every pattern name joins the
 existing function-scope hoisting and redeclaration pass. Array patterns admit
 elisions, defaults without `await`, nesting, and a final identifier or nested
 array rest target. Object patterns admit static and computed properties,
-shorthand and renamed targets, defaults, and nested object or array patterns.
-Object rest, pattern type annotations, and other destructuring positions remain
-explicit boundaries.
+shorthand and renamed targets, defaults, nested object or array patterns, and a
+final identifier rest target. Pattern type annotations and other destructuring
+positions remain explicit boundaries.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.

@@ -387,8 +387,12 @@ patterns and binding leaves. Lowering checks `RequireObjectCoercible` before it
 evaluates the first property name, converts computed and static names through
 the shared property-key operation, reads from left to right, and selects a
 default only for `undefined`. Nested object and array patterns compose directly;
-object rest remains outside this unit until `CopyDataProperties`, enumerable
-own-key order, and symbol exclusions land together.
+a final identifier rest target snapshots own keys in ECMAScript order, excludes
+the already evaluated property keys, and copies the remaining enumerable values
+through the generic property-read path. The fresh result uses ordinary writable,
+enumerable, and configurable data properties. This keeps symbol exclusions,
+primitive string indices, and future accessor behavior on the same
+`CopyDataProperties` path.
 
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument

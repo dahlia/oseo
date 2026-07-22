@@ -558,10 +558,12 @@ kinds, defaults, nested patterns, rest, and iterator done-state handling. The
 same declaration positions now admit object patterns with static, computed,
 shorthand, renamed, defaulted, and nested properties. Generated evidence covers
 ordinary, primitive, and nullish inputs, property order, both specialization
-policies, and forced collection. Eighteen reviewed standards cases cover
-`const`, `let`, and `var` nullish coercibility, trailing shorthand properties,
-and function-name inference; object rest remains a later semantic unit. The
-intrinsics
+policies, and forced collection. A final identifier rest target preserves
+enumerable own-key order, string and symbol exclusions, and fresh data
+descriptors under a second generated property suite. Twenty-four reviewed
+standards cases cover `const`, `let`, and `var` nullish coercibility, trailing
+shorthand properties, function-name inference, rest exclusions, fresh data
+descriptors, and non-enumerable omission. The intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

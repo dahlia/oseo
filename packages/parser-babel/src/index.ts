@@ -908,13 +908,29 @@ function bindingPattern(
   }
   if (value.type === "ObjectPattern") {
     const properties: SyntaxObjectBindingPattern["properties"][number][] = [];
-    for (const property of nodes(value.properties)) {
+    let rest: SyntaxObjectBindingPattern["rest"];
+    const objectProperties = nodes(value.properties);
+    for (const [index, property] of objectProperties.entries()) {
       if (property.type === "RestElement") {
-        return unsupported(
-          context,
-          property,
-          "Object binding rest properties are unsupported.",
-        );
+        if (index !== objectProperties.length - 1) {
+          return unsupported(
+            context,
+            property,
+            "An object binding rest property must be last.",
+          );
+        }
+        const argument = node(property.argument);
+        if (argument == null) return unsupported(context, property);
+        const converted = bindingPattern(context, argument);
+        if (converted?.kind !== "binding-identifier") {
+          return unsupported(
+            context,
+            property,
+            "An object binding rest target must be an identifier.",
+          );
+        }
+        rest = converted;
+        continue;
       }
       if (property.type !== "ObjectProperty" || property.method === true) {
         return unsupported(
@@ -989,6 +1005,7 @@ function bindingPattern(
       ...location(context, value),
       kind: "object-binding-pattern",
       properties,
+      ...(rest == null ? {} : { rest }),
     };
   }
   const rawElements = Array.isArray(value.elements)
@@ -1050,9 +1067,12 @@ function bindingPattern(
 function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
-    return pattern.properties.flatMap((property) =>
-      patternNames(property.pattern),
-    );
+    return [
+      ...pattern.properties.flatMap((property) =>
+        patternNames(property.pattern),
+      ),
+      ...(pattern.rest == null ? [] : [pattern.rest.name]),
+    ];
   }
   return [
     ...pattern.elements.flatMap((element) =>
