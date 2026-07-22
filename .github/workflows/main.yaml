@@ -96,32 +96,46 @@ jobs:
           if-no-files-found: warn
 
   test_native_support:
-    name: native support (${{ matrix.target }})
-    runs-on: ${{ matrix.os }}
+    name: >-
+      native support (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
+    runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        include:
+        platform:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
           - os: macos-15
             target: macos-aarch64
+        shard:
+          - 1
+          - 2
+          - 3
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
-      - run: mise run test:probes
+      - if: matrix.shard == 1
+        run: mise run test:probes
         env:
           TMPDIR: ${{ runner.temp }}
-      - run: mise run test:property:extended
+      - if: matrix.shard == 1
+        run: mise run test:property:extended:package
+      - run: >-
+          mise run test:property:extended:native:shard
+          --test-shard=${{ matrix.shard }}/3 tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-support-diagnostics-${{ matrix.target }}
+          name: >-
+            ${{ format(
+            'native-support-diagnostics-{0}-{1}-of-3',
+            matrix.platform.target,
+            matrix.shard) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 

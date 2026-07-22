@@ -295,13 +295,24 @@ specialization, or native generators run `mise run test:native`,
 tasks execute the matching host target and retain the AArch64 Linux cross-link;
 do not replace a required execution with a blanket skip.
 
-CI may partition the two longest suites with `--shard INDEX/TOTAL`, for example
-`mise run test:native --shard 1/3` or
-`mise run test:test262 --shard 1/3`. Indices are one-based, and each shard
-selects a deterministic round-robin partition of the reviewed input order.
-Run every index for the same total on each matching host. The unsharded tasks
-remain the local gates, and `mise run test262:update` always regenerates the
-complete manifest without sharding.
+CI partitions the native and test262 suites with `--shard INDEX/TOTAL`, for
+example `mise run test:native --shard 1/3` or
+`mise run test:test262 --shard 1/3`. Each shard selects a deterministic
+round-robin partition of the reviewed input order.
+
+The focused `test:property:extended:native` and
+`test:property:extended:package` tasks compose the local extended property
+gate. CI partitions the native component by file through Node.js:
+
+~~~~ sh
+mise run test:property:extended:native:shard \
+  --test-shard=1/3 tests/property/*.property.test.ts
+~~~~
+
+Indices are one-based. Run every index for the same total and exact property
+file set on each matching host. The unsharded tasks remain the local gates, and
+`mise run test262:update` always regenerates the complete manifest without
+sharding.
 
 
 Package manifests and versions
