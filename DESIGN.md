@@ -453,7 +453,13 @@ alive.
 The runtime ABI is the replacement boundary for a future platform event
 adapter. Streams, `fetch()`, I/O readiness, wakeups, and wall-clock observation
 remain outside M4 and must extend the same documented scheduling and liveness
-model.
+model. [*PLAN-NIO.md*](./PLAN-NIO.md) owns the measured probes, deterministic
+test adapter, platform capability model, and decision that will turn this
+replacement boundary into a native I/O interface. Platform completions become
+runtime tasks; they do not call generated functions directly or take ownership
+of the ECMAScript job queue. Monotonic time drives waits and timer deadlines;
+epoch-based real time supplies `Date` and other civil-time observations.
+Adjustment of the real-time clock must not accelerate or delay scheduled work.
 
 
 Native backend
@@ -506,7 +512,11 @@ that componentization and its ownership rules. Generated programs may
 still depend on
 selected system libraries. Those dependencies must be listed as part of
 the target definition and must not be confused with Node-API addon
-support.
+support. Native I/O libraries and system frameworks are selected per operation
+and target under [*PLAN-NIO.md*](./PLAN-NIO.md), with a tested fallback rather
+than an assumption that one API covers every clock, socket, and file operation.
+The M6 compatibility boundary separately owns the TLS client, certificate and
+hostname verification, and trust-store decision layered over that transport.
 
 
 Self-hosting
@@ -637,7 +647,9 @@ before the affected implementation becomes a dependency of later
 milestones:
 
  -  the long-term native code-generation backend;
- -  the native event-loop and system-library boundary;
+ -  the native event-loop and system-library boundary, including the
+    completion, cancellation, buffer-lifetime, and fallback decisions scoped by
+    [*PLAN-NIO.md*](./PLAN-NIO.md);
  -  the global object and dynamic global binding resolution, where a
     mutable `globalThis` meets closed-world name resolution;
  -  the interactive session and incremental artifact boundary, including

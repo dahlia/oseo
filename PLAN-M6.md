@@ -13,9 +13,9 @@ named by the targeted standard edition.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The completed
-runtime componentization recorded in
+[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
+records under *docs/adr/*. The completed runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
 the prerequisite for every large web API family: a new API lands in an
 owned runtime component, not in a catch-all translation unit. Evidence
@@ -94,14 +94,15 @@ shared prerequisite; changing it updates this plan in the same change.
     runtime's UTF-16 strings and the binary-data built-ins from the M5
     stream, because encoding APIs produce `Uint8Array` values.
 2.  **Events and abort signals.** `Event`, `EventTarget`, `AbortController`,
-    and `AbortSignal`, including `AbortSignal.timeout()` on the M4 timer
-    queue. Prerequisites: stable class-shaped built-ins from M5 and
-    reentrancy rules for listener invocation order.
+    and `AbortSignal`. `AbortSignal.timeout()` remains deferred to group 3.
+    Prerequisites: stable class-shaped built-ins from M5 and reentrancy rules
+    for listener invocation order.
 3.  **Timers, performance, and error reporting.** Standardized `setTimeout`
-    and `setInterval` behavior beyond the M4 subset, `queueMicrotask()`,
-    `performance.now()`, `structuredClone()`, and host error reporting
-    events. Prerequisites: a monotonic clock host interface and the
-    serialization walk shared with later `Blob` work.
+    and `setInterval` behavior beyond the M4 subset, `AbortSignal.timeout()`,
+    `queueMicrotask()`, `performance.now()`, `structuredClone()`, and host error
+    reporting events. Prerequisites: the completed clock and wakeup integration
+    checkpoint from [*PLAN-NIO.md*](./PLAN-NIO.md) and the serialization walk
+    shared with later `Blob` work.
 4.  **Binary payload containers.** `Blob`, `File`, and `FormData`.
     Prerequisites: groups 1 and 3.
 5.  **Streams.** `ReadableStream`, `WritableStream`, `TransformStream`, and
@@ -110,8 +111,11 @@ shared prerequisite; changing it updates this plan in the same change.
     the largest single specification in the profile and receive their own
     conformance matrix before implementation begins.
 6.  **HTTP primitives.** `Headers`, `Request`, `Response`, and `fetch()`.
-    Prerequisites: groups 1 through 5 and the native event-loop I/O
-    decision below.
+    Prerequisites: groups 1 through 5; accepted and implemented socket and
+    name-resolution backends on Linux AMD64 and macOS AArch64, including the
+    cancellation, buffer-lifetime, and fallback decisions under
+    [*PLAN-NIO.md*](./PLAN-NIO.md); and the accepted TLS client and trust-store
+    decision described below.
 7.  **Web Crypto.** `crypto.getRandomValues()`, `crypto.randomUUID()`, and
     `SubtleCrypto`. Prerequisites: binary data and a reviewed cryptography
     dependency decision; Oseo does not implement primitives itself without
@@ -129,18 +133,65 @@ shared prerequisite; changing it updates this plan in the same change.
 Native I/O boundary
 -------------------
 
-Groups 1 through 5 extend the existing deterministic scheduler without new
-system dependencies. `fetch()` and any future socket or file capability
-need readiness notification, wall-clock observation, and network access
-that the M4 event loop deliberately excluded.
+[*PLAN-NIO.md*](./PLAN-NIO.md) owns the platform-neutral operation and
+completion ABI, platform probes, system-facility selection, fallbacks, and
+deterministic test adapter. M6 consumes that boundary; it does not choose an
+I/O backend inside `fetch()` or a Streams implementation.
 
-Before group 6 begins, an architecture decision defines the platform event
-adapter behind the runtime ABI: which system facilities each supported
-target uses, how readiness integrates with timer and microtask ordering,
-how tests inject a deterministic replacement, and how sandboxed test
-execution avoids real network dependence. The deterministic logical clock
-remains the default for tests; wall-clock and network behavior are opt-in
-capabilities recorded in target descriptions.
+Groups 1 and 2 extend the deterministic scheduler without native I/O; the
+time-based `AbortSignal` method remains absent until group 3. The NIO clock and
+wakeup checkpoint already makes existing positive-delay timers wait for elapsed
+monotonic time in production before M5 exposes `Date`. Group 3 consumes that
+integration to standardize timer edge behavior and add `AbortSignal.timeout()`
+and `performance.now()`; it does not first activate elapsed waiting. Groups 4
+and 5 can implement their data and queuing semantics before a real network
+backend exists. Before group 6 begins, both supported execution targets need
+accepted and implemented socket and name-resolution capabilities with
+cancellation, buffer ownership, wakeup, and liveness behavior. Sandboxed tests
+keep using the deterministic adapter and injected endpoints rather than public
+network access. The M6-owned HTTPS security decision below is a separate
+prerequisite.
+
+Host traces are not entry evidence for M6 as a whole or for starting any group.
+Once the versioned trace loader in [*PLAN-NIO.md*](./PLAN-NIO.md) lands, an
+NIO-backed native completion property must retain them before that property
+enters a gate. Groups 1 and 2 do not wait for this future work.
+
+An operating-system completion becomes an Oseo task. Oseo still owns timer and
+microtask ordering, rejection checkpoints, and shutdown. No platform callback
+may invoke JavaScript directly or make a backend's incidental completion order
+the unspecified language scheduler.
+
+
+HTTPS security boundary
+-----------------------
+
+[*PLAN-NIO.md*](./PLAN-NIO.md) ends at asynchronous byte transport. M6 owns the
+TLS client and trust-store decision required before group 6 begins. That
+decision selects the provider or system framework on each supported target and
+records its pinned version or operating-system boundary, license, update path,
+C and Zig toolchain integration, static-link behavior, binary cost, and
+replacement boundary. A TLS choice does not select the group 7 Web Crypto
+implementation implicitly.
+
+The decision freezes the supported TLS and ALPN baseline, SNI behavior,
+certificate-chain and hostname verification, certificate-validity time source,
+revocation policy, trust-store discovery and override policy, and error mapping.
+Production uses the target's recorded trust source and fails with an owned
+capability or TLS error when that source is unavailable. It must not silently
+disable certificate or hostname verification. Handshake cancellation, shutdown,
+buffer lifetime, and scheduler handoff follow the same liveness rules as the
+transport beneath them.
+
+Checked-in HTTPS tests use a loopback server, a private test CA, fixed leaf
+certificates, and an injected verification time. They cover a valid chain,
+unknown issuer, hostname mismatch, expired and not-yet-valid certificates,
+handshake cancellation, abrupt peer shutdown, and unavailable trust material.
+The test-only CA override never becomes the production default. Native probes
+inspect default trust-store discovery without modifying it and retain the
+selected source and capability result for Linux AMD64 and macOS AArch64;
+AArch64 Linux retains compile-link evidence. No ordinary test contacts a public
+HTTPS endpoint.
 
 
 Compiler and runtime invariants
@@ -183,7 +234,9 @@ Each API group contributes, before it is considered complete:
 The M4 deterministic schedule model grows with each group: abort signals,
 stream reactions, and fetch completions become generated schedule commands
 so event-loop liveness and ordering claims stay tested rather than
-asserted.
+asserted. Native adapter cancellation races, partial completions, and fallback
+selection remain owned by [*PLAN-NIO.md*](./PLAN-NIO.md) and feed the same
+retained schedule evidence.
 
 
 Performance and code size
@@ -192,8 +245,8 @@ Performance and code size
 Each group records generated C size, executable size, and startup cost
 before and after it lands. Streams, Web Crypto, and WebAssembly receive
 size budgets when their conformance matrices are written. A dependency
-added for cryptography or compression needs the same pinning, target, and
-replacement-boundary treatment as the Zig toolchain.
+added for TLS, cryptography, or compression needs the same pinning, target,
+and replacement-boundary treatment as the Zig toolchain.
 
 
 Delivery order
@@ -204,16 +257,24 @@ Delivery order
     architecture decision.
 2.  Land the web-platform-test harness adapter, subset manifest, and gate
     with honest unavailable-capability reporting.
-3.  Implement groups 1 through 3 in order, each as reviewed semantic units
-    inside owned runtime components.
-4.  Record the native I/O boundary decision, then implement groups 4 and 5.
-5.  Implement group 6 against the platform event adapter with
-    deterministic test injection.
-6.  Resolve the Web Crypto dependency decision and implement group 7.
-7.  Resolve the WebAssembly execution decision and implement group 8.
-8.  Complete group 9, the deviation documentation, and the integration
+3.  Implement groups 1 and 2 as reviewed semantic units inside owned runtime
+    components.
+4.  Consume the completed native clock and wakeup integration checkpoint, then
+    implement group 3 and the data and queuing semantics in groups 4 and 5.
+5.  Complete the native socket and name-resolution adapter decision and both
+    supported backends.
+6.  Probe candidate TLS clients and trust sources on Linux AMD64 and macOS
+    AArch64, recording Zig and C integration, static-link behavior, binary cost,
+    default trust-store discovery, deterministic loopback HTTPS evidence, and
+    AArch64 Linux compile-link evidence.
+7.  Accept the TLS client and trust-store decision from that target evidence.
+8.  Implement group 6 with deterministic transport and TLS completion
+    injection.
+9.  Resolve the Web Crypto dependency decision and implement group 7.
+10. Resolve the WebAssembly execution decision and implement group 8.
+11. Complete group 9, the deviation documentation, and the integration
     audit.
-9.  Publish the reproducible conformance evidence and, only when every
+12. Publish the reproducible conformance evidence and, only when every
     criterion below holds, the WinterTC conformance statement.
 
 Each checkpoint updates the standards manifest, the affected profile and
@@ -237,8 +298,13 @@ M6 is complete only when:
     [*PLAN-M5.md*](./PLAN-M5.md) claim or a recorded boundary decision;
  -  every API group lives in an owned runtime component with complete
     tracing, rooting, forced-collection, and failure-injection coverage;
- -  the platform event adapter keeps deterministic test execution and
-    records wall-clock and network capabilities per target;
+ -  the platform event adapter keeps deterministic test execution and records
+    monotonic-clock, real-time, socket, and name-resolution capabilities plus
+    fallbacks per target under [*PLAN-NIO.md*](./PLAN-NIO.md);
+ -  `https:` fetch uses a recorded TLS provider and trust source on each
+    supported target, validates certificate chains and hostnames, and passes the
+    loopback security, cancellation, and failure corpus without a verification
+    bypass;
  -  differential, property, sanitizer, dual-execution-target, and
     cross-link gates cover the complete web API corpus;
  -  capability, performance, and code-size reports are reproducible from

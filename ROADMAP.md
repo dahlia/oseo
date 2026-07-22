@@ -32,7 +32,10 @@ real programs and adds web-platform, Node.js, and package support. Compatibility
 experiments begin early, but compatibility claims follow the engine capabilities
 on which they depend. A deferred interactive-development track is recorded in
 [*PLAN-REPL.md*](./PLAN-REPL.md). It reuses these capability gates without
-changing their order.
+changing their order. A native I/O infrastructure track is recorded in
+[*PLAN-NIO.md*](./PLAN-NIO.md). It may run probes alongside M5 and supplies the
+clock, wakeup, network, and file adapter gates consumed by later compatibility
+work.
 
 
 Working rules
@@ -74,6 +77,31 @@ Milestone map
 | M6        | Minimum common web API coverage and eventual WinterTC conformance  |
 | M7        | Selected Node.js APIs and practical package compatibility          |
 | M8        | A self-hosting Oseo compiler                                       |
+
+
+Native I/O track
+----------------
+
+Oseo's deterministic M4 scheduler deliberately has no real clock, socket, or
+file readiness backend. [*PLAN-NIO.md*](./PLAN-NIO.md) defines the separate
+track that measures platform facilities, freezes a completion-driven runtime
+adapter, preserves a deterministic test implementation, and records a fallback
+for every selected operation.
+
+This track is planned and its probe work is not started. Linux `io_uring`, the
+Linux readiness and worker fallbacks, the available macOS system interfaces,
+and maintained portable libraries remain candidates rather than commitments.
+Windows IOCP and I/O Ring are future-target candidates; this track does not add
+Windows to the supported target set by itself.
+
+Before M5 exposes its `Date` family, the native clock checkpoint supplies epoch
+real time and moves existing production timer waits to monotonic elapsed time in
+the same release. M6 can begin its pure-data API groups earlier; its timer and
+performance work standardizes the APIs over that clock contract. `fetch()`
+waits for accepted and implemented socket and name-resolution backends plus an
+M6-owned TLS client and trust-store decision on both supported execution
+targets. Selected M7 file APIs later extend the same operation, cancellation,
+buffer, and liveness contracts rather than creating a second event loop.
 
 
 Interactive development track
@@ -369,7 +397,9 @@ Individual API groups may begin as soon as their engine prerequisites are
 stable, even while M5 continues. Completing M6 and making a conformance claim
 still depend on completing the relevant ECMAScript work.
 [*PLAN-M6.md*](./PLAN-M6.md) records the group prerequisites, standards
-boundary, and exit criteria in detail.
+boundary, and exit criteria in detail. Its monotonic-clock and `fetch()` work
+consume the native adapter gates in [*PLAN-NIO.md*](./PLAN-NIO.md); web API
+semantics, TLS client, and trust-store decisions remain owned by M6.
 
 ### Planned order
 
@@ -403,7 +433,8 @@ M7: Node.js and package compatibility
 
 M7 adds the parts of the Node.js ecosystem that measured package experiments
 show to be useful for Oseo's server-oriented audience. It does not add Node-API
-native addons.
+native addons. File and subprocess I/O reuse the adapter and target capability
+model established under [*PLAN-NIO.md*](./PLAN-NIO.md).
 
 ### Initial candidates
 
@@ -561,6 +592,9 @@ The roadmap should be revised when evidence changes one of these assumptions:
  -  The Minimum common web API includes several large standards, including
     streams, cryptography, and WebAssembly. M6 is divided by API group and test
     surface.
+ -  Native I/O facilities differ by operation, kernel, sandbox, and target. The
+    probes and fallbacks in [*PLAN-NIO.md*](./PLAN-NIO.md) keep one fashionable
+    backend name from becoming an unmeasured portability requirement.
  -  Self-hosting can drift indefinitely if treated as a final rewrite. The
     compiler profile and host boundaries are enforced from M0 onward.
  -  A stateful REPL requires code and object lifetimes to cross compilation

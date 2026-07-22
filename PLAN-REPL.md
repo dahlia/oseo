@@ -17,7 +17,8 @@ for M5.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md), and
+[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-PT.md*](./PLAN-PT.md), and
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Evidence from an
 interactive prototype must update the affected document or decision record
 instead of bypassing its current boundary.
@@ -199,6 +200,12 @@ promise, which jobs drain before a result is printed, how output from later
 tasks is ordered against new input, and how referenced timers affect session
 liveness. Tests use the deterministic clock and injected task sources already
 established by M4.
+
+When a session admits network, file, or subprocess work, it consumes the
+completion, cancellation, wakeup, and liveness contracts from
+[*PLAN-NIO.md*](./PLAN-NIO.md). The session still owns prompt readiness and
+JavaScript job ordering; a platform callback cannot publish a prompt or invoke
+generated code directly.
 
 Interruption is a runtime transition, not an operating-system signal handler
 that abandons arbitrary C frames. A safe initial implementation may interrupt

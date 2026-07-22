@@ -61,6 +61,17 @@ submission sequences, persistent bindings, code-artifact lifetimes, and prompt
 schedules. Those properties begin only after the REPL session model has an
 accepted contract; this plan does not invent the interactive semantics.
 
+The native I/O track in [*PLAN-NIO.md*](./PLAN-NIO.md) extends the schedule
+model with injected completions, partial transfers, cancellation races,
+wakeups, independently injected monotonic and epoch real time, wall-clock
+discontinuities, name-resolution answers and failures, and fallback selection.
+Its deterministic adapter remains the oracle. Native conformance observes
+clocks and completions without synthetic clock control. When that work lands, a
+failing native run must retain its host-selected merged scheduler trace,
+including monotonic observations, epoch real-time reads, timer deadlines, and
+scheduler task order, then replay that trace through the deterministic adapter.
+Real kernel timing is retained evidence, not a property precondition.
+
 Property tests do not replace test262 or later web-platform tests. Standards
 suites prove behavior for reviewed specification cases. Property tests explore
 combinations, values, transformations, and execution states that a fixed suite
@@ -116,6 +127,13 @@ A property must be deterministic once its seed, replay path, compiler options,
 target, and injected host state are fixed. It must not depend on wall-clock
 timing, filesystem enumeration order, ambient environment variables, or an
 unrecorded random source.
+
+Native I/O observation is not deterministic merely because its generated
+command seed is fixed. Once native I/O properties exist, such a run must record
+the merged scheduler trace required to turn completion order, timer placement,
+and epoch real-time observations into injected host state. Deterministic replay
+uses that trace with the test adapter and does not require the kernel to choose
+the same order again.
 
 Native properties select the supported target from normalized execution-host
 facts. Replay and retained failure records include the operating system,
@@ -458,7 +476,9 @@ Execution tiers and budgets
 ---------------------------
 
 Property testing uses two execution tiers. Both are deterministic once their
-reported seeds are known.
+reported seeds and injected host state are known. A native I/O conformance run
+is observational evidence until its merged scheduler trace is replayed through
+the deterministic adapter.
 
 The ordinary gate runs through `mise run test`. Package-level pure properties
 are discovered by the Node.js and Deno tasks. Cross-package native properties
@@ -507,10 +527,36 @@ Every failure report includes:
  -  private counters when enabled; and
  -  the retained artifact directory for a native failure.
 
-The property tasks accept `OSEO_PROPERTY_SEED`, `OSEO_PROPERTY_PATH`,
-`OSEO_PROPERTY_RUN_SCALE`, and `OSEO_PROPERTY_SIZE` without editing a test. A
-minimized native failure can be replayed by setting the reported seed and path
-before `mise run test:property:native`.
+The current property tasks accept `OSEO_PROPERTY_SEED`, `OSEO_PROPERTY_PATH`,
+`OSEO_PROPERTY_RUN_SCALE`, and `OSEO_PROPERTY_SIZE` without editing a test.
+`test:property:native` does not yet load scheduler traces or recognize
+`OSEO_PROPERTY_TRACE`; native I/O property work has not started.
+
+Before a native I/O property enters a test gate, its implementation must add a
+versioned merged scheduler trace to the failure record, including monotonic
+observations, epoch real-time reads, timer deadlines, wait returns, and task
+order. The trace header binds the schedule to the minimized case with a digest
+of its versioned canonical structured-input serialization and a separate digest
+of the issued-operation stream. It must also add `OSEO_PROPERTY_TRACE` as an
+explicit trace-file input. Trace replay must require that explicit input. When
+it is supplied, the task must reject an unreadable, incompatible, or
+header-mismatched trace instead of ignoring the input or selecting an implicit
+latest failure.
+
+That future implementation must print a shell-safe invocation containing the
+reported seed, replay path, and trace path. With `OSEO_PROPERTY_TRACE` set,
+`test:property:native` must check that the trace header matches the suite, seed,
+replay path, canonical structured-input digest, and issued-operation digest,
+then replay it through the deterministic adapter. It computes both digests from
+the reconstructed case before injecting any clock or completion event. Without
+the trace input, running the same seed against a production backend is a new
+observational run, not deterministic replay. The planned invocation shape is:
+
+~~~~ sh
+# Planned interface; not implemented by the current task.
+OSEO_PROPERTY_SEED='...' OSEO_PROPERTY_PATH='...' \
+  OSEO_PROPERTY_TRACE='...' mise run test:property:native
+~~~~
 
 A fixed defect is represented by a reviewed example-based regression test or
 fixture containing the minimized case. Seed replay is diagnostic metadata, not

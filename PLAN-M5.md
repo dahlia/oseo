@@ -63,8 +63,9 @@ items 5, 6, 8, and 9 remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted records
-under *docs/adr/*. The completed runtime componentization recorded in
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
+language profiles, and accepted records under *docs/adr/*. The completed
+runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) provides
 the component boundaries that large intrinsic tables and built-in
 families build on. Evidence that changes one of these contracts updates
@@ -193,6 +194,15 @@ whose semantics the admitted
 profile can already express may instead be self-hosted in the compiled
 subset, as [*ROADMAP.md*](./ROADMAP.md) records under M8, keeping only its
 primitive operations in the C runtime.
+
+The `Date` family depends on the completed clock and wakeup integration
+checkpoint in [*PLAN-NIO.md*](./PLAN-NIO.md), not only on an epoch-based
+real-time read. That checkpoint enables the real-time capability and routes
+existing production timer waits through the separate monotonic clock in the
+same release. `Date.now()` and `Date` operations that obtain the current time
+read real time; elapsed scheduling uses monotonic time. Tests inject both clock
+domains explicitly. A built-in must not read the bootstrap host's clock or
+derive epoch time from the M4 logical scheduler.
 
 The global object enters through this stream in dependency order:
 standard constructors become real intrinsic values first, the global
