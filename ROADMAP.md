@@ -558,7 +558,9 @@ kinds, defaults, nested patterns, rest, and iterator done-state handling. The
 same declaration positions now admit object patterns with static, computed,
 shorthand, renamed, defaulted, and nested properties. Generated evidence covers
 ordinary, primitive, and nullish inputs, property order, both specialization
-policies, and forced collection; object rest remains a later semantic unit. The
+policies, and forced collection. Eighteen reviewed standards cases cover
+`const`, `let`, and `var` nullish coercibility, trailing shorthand properties,
+and function-name inference; object rest remains a later semantic unit. The
 intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
