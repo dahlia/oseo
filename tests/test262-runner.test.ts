@@ -10,8 +10,10 @@ import type { Test262Case } from "../packages/testkit/src/index.ts";
 import {
   assembleTest262Source,
   executeTest262Case,
+  parseReviewedManifest,
   parseReviewedSubset,
   parseTest262Case,
+  selectManifestShard,
   serializeTest262Manifest,
   serializeTargetParity,
 } from "../tools/test262.ts";
@@ -542,6 +544,54 @@ test("serializes reviewed manifests without volatile metadata", () => {
   const parity = serializeTargetParity(serialized, revision);
   assert.match(parity, /canonicalDigest: >-/u);
   assert.ok(parity.split("\n").every((line) => line.length <= 80));
+});
+
+test("round-trips and shards the checked-in reviewed manifest", async () => {
+  const text = await readFile(
+    new URL("test262/results.yaml", import.meta.url),
+    "utf8",
+  );
+  const manifest = parseReviewedManifest(text);
+  assert.equal(serializeTest262Manifest(manifest), text);
+
+  const shards = [1, 2, 3].map((index) =>
+    selectManifestShard(manifest, { index, total: 3 }),
+  );
+  assert.deepEqual(
+    shards
+      .flatMap((shard) => shard.results)
+      .map((result) => result.case.path)
+      .toSorted(),
+    manifest.results.map((result) => result.case.path).toSorted(),
+  );
+  assert.equal(
+    shards.reduce((total, shard) => total + shard.summary.passes, 0),
+    manifest.summary.passes,
+  );
+});
+
+test("rejects malformed reviewed manifest entries", () => {
+  assert.throws(
+    () =>
+      parseReviewedManifest(`results:
+  - case: {}
+    classification: pass
+    dependencies: []
+suiteRevision: ${revision}
+`),
+    /test262 result 0 path must be a non-empty string/u,
+  );
+  assert.throws(
+    () =>
+      parseReviewedManifest(`results:
+  - case:
+      path: test/example.js
+    classification: pass
+suiteRevision: ${revision}
+summary: {}
+`),
+    /test262 result 0 dependencies must be an array/u,
+  );
 });
 
 function respond(stdout: string): Test262Executor {

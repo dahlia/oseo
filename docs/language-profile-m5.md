@@ -456,6 +456,12 @@ every requested strictness mode, and every executed case compares
 specialization-disabled and specialization-enabled native observations with
 collection forced at every safepoint.
 
+CI can execute the reviewed subset in deterministic round-robin partitions by
+passing `--shard INDEX/TOTAL` to `mise run test:test262`. Every one-based index
+for the selected total must complete on each matching host. Each shard compares
+only its selected observations with the corresponding entries in the complete
+checked-in manifest. Manifest regeneration remains an unsharded operation.
+
 Linux AMD64 and macOS AArch64 execute that same reviewed subset. The canonical
 manifest keeps one counted result per upstream path, while
 *target-parity.yaml* pins its digest and supported execution targets. A

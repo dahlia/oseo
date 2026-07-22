@@ -21,6 +21,17 @@ import {
   withNativeFixture,
 } from "../packages/testkit/src/index.ts";
 import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
+import {
+  isTestShardPosition,
+  parseTestShardArguments,
+  selectTestShard,
+} from "../tools/shard.ts";
+
+const nativeArguments = parseTestShardArguments(process.argv.slice(2));
+if (nativeArguments.help) {
+  console.log("usage: node tests/native.ts [--shard INDEX/TOTAL]");
+  process.exit(0);
+}
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = createNodeHost();
@@ -2736,7 +2747,8 @@ async function references(fixture: Fixture): Promise<
   }
 }
 
-for (const fixture of fixtures) {
+const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
+for (const fixture of selectedFixtures) {
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
   const disabledCompilation = compileSource(
@@ -2888,265 +2900,266 @@ for (const fixture of fixtures) {
   }
 }
 
-// Multi-source runtime build contract: every reviewed runtime
-// translation unit plus an extra probe unit compiles, archives in
-// input order, and links into an executable whose observation matches
-// the reviewed-runtime build. The copied runtime_core.c gains an
-// undefined reference to a symbol defined only by the probe unit, so
-// a successful link proves the linker extracted the probe archive
-// member.
-{
-  const probeDirectory = await host.makeTemporaryDirectory("oseo-multi-tu-");
-  const probeSourcePath = `${probeDirectory}/runtime_probe.c`;
-  await host.writeTextFile(
-    probeSourcePath,
-    "int oseo_probe_second_translation_unit(void);\n" +
-      "int oseo_probe_second_translation_unit(void) { return 1; }\n",
-  );
-  const multiSourceRuntime = {
-    getRuntimeInput() {
-      const base = cRuntimeProvider.getRuntimeInput();
-      return {
-        abiVersion: base.abiVersion,
-        assets: [
-          ...base.assets,
-          {
-            kind: "source" as const,
-            name: "runtime_probe.c",
-            url: new URL(`file://${probeSourcePath}`),
-          },
-        ],
-      };
-    },
-  };
-  const probeReferenceHost = {
-    ...host,
-    async readTextFile(path: string | URL): Promise<string> {
-      const source = await host.readTextFile(path);
-      if (
-        !(path instanceof URL) ||
-        !path.pathname.endsWith("/runtime_core.c")
-      ) {
-        return source;
-      }
-      return (
-        source +
-        "\nint oseo_probe_second_translation_unit(void);\n" +
-        "int oseo_probe_link_participation(void);\n" +
-        "int oseo_probe_link_participation(void) {\n" +
-        "    return oseo_probe_second_translation_unit();\n" +
-        "}\n"
-      );
-    },
-  };
-  const multiSourceCompilation = compileSource(
+if (isTestShardPosition(0, nativeArguments.shard)) {
+  // Multi-source runtime build contract: every reviewed runtime
+  // translation unit plus an extra probe unit compiles, archives in
+  // input order, and links into an executable whose observation matches
+  // the reviewed-runtime build. The copied runtime_core.c gains an
+  // undefined reference to a symbol defined only by the probe unit, so
+  // a successful link proves the linker extracted the probe archive
+  // member.
+  {
+    const probeDirectory = await host.makeTemporaryDirectory("oseo-multi-tu-");
+    const probeSourcePath = `${probeDirectory}/runtime_probe.c`;
+    await host.writeTextFile(
+      probeSourcePath,
+      "int oseo_probe_second_translation_unit(void);\n" +
+        "int oseo_probe_second_translation_unit(void) { return 1; }\n",
+    );
+    const multiSourceRuntime = {
+      getRuntimeInput() {
+        const base = cRuntimeProvider.getRuntimeInput();
+        return {
+          abiVersion: base.abiVersion,
+          assets: [
+            ...base.assets,
+            {
+              kind: "source" as const,
+              name: "runtime_probe.c",
+              url: new URL(`file://${probeSourcePath}`),
+            },
+          ],
+        };
+      },
+    };
+    const probeReferenceHost = {
+      ...host,
+      async readTextFile(path: string | URL): Promise<string> {
+        const source = await host.readTextFile(path);
+        if (
+          !(path instanceof URL) ||
+          !path.pathname.endsWith("/runtime_core.c")
+        ) {
+          return source;
+        }
+        return (
+          source +
+          "\nint oseo_probe_second_translation_unit(void);\n" +
+          "int oseo_probe_link_participation(void);\n" +
+          "int oseo_probe_link_participation(void) {\n" +
+          "    return oseo_probe_second_translation_unit();\n" +
+          "}\n"
+        );
+      },
+    };
+    const multiSourceCompilation = compileSource(
+      babelFrontend,
+      { source: 'console.log("multi-source runtime");', sourceId: "multi.ts" },
+      { observeSpecialization: false, specialization: "disabled" },
+    );
+    assert.deepEqual(multiSourceCompilation.diagnostics, []);
+    assert(multiSourceCompilation.mir != null, "multi-source MIR");
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host: probeReferenceHost,
+        input: multiSourceCompilation.mir,
+        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        operation: "execute",
+        runtime: multiSourceRuntime,
+        target: nativeTarget,
+        toolchain: zigToolchain,
+      },
+      (native) => {
+        assert.equal(native.stdout, "multi-source runtime\n");
+        assert.equal(native.exitStatus, 0);
+        const reviewedSourceNames = cRuntimeProvider
+          .getRuntimeInput()
+          .assets.filter((asset) => asset.kind === "source")
+          .map((asset) => asset.name);
+        const expectedNames = [...reviewedSourceNames, "runtime_probe.c"];
+        const compileLines = native.compilerInvocation.filter((line) =>
+          line.includes(" -c "),
+        );
+        assert.equal(compileLines.length, expectedNames.length);
+        expectedNames.forEach((name, index) => {
+          assert.ok(
+            compileLines[index]?.includes(`/${name} `),
+            `compile request ${index} covers ${name}`,
+          );
+        });
+        const archiveLine = native.compilerInvocation.find((line) =>
+          line.includes("zig ar "),
+        );
+        assert(archiveLine != null, "archive request recorded");
+        let archiveCursor = 0;
+        for (const [index, name] of expectedNames.entries()) {
+          const member = `${name.replace(/\.c$/u, "")}-${index}-`;
+          const at = archiveLine.indexOf(member, archiveCursor);
+          assert.ok(at >= 0, `archive member ${member} appears in order`);
+          archiveCursor = at + member.length;
+        }
+      },
+    );
+    await host.remove(probeDirectory);
+  }
+
+  const assemblyCompilation = compileSource(
     babelFrontend,
-    { source: 'console.log("multi-source runtime");', sourceId: "multi.ts" },
-    { observeSpecialization: false, specialization: "disabled" },
+    {
+      source:
+        "function add(left: number, right: number) { " +
+        "return left + right; } console.log(add(1, 2));",
+      sourceId: "assembly-specialization.ts",
+    },
+    { specialization: "enabled" },
   );
-  assert.deepEqual(multiSourceCompilation.diagnostics, []);
-  assert(multiSourceCompilation.mir != null, "multi-source MIR");
+  const assemblyMir = assemblyCompilation.mir;
+  assert(assemblyMir != null, "assembly specialization MIR");
+  const assemblySource = cBackend.emit(assemblyMir).source;
+  for (const [target, zigTarget] of [
+    ["linux-x86_64-gnu", "x86_64-linux-gnu"],
+    ["macos-aarch64", "aarch64-macos"],
+    ["linux-aarch64-musl", "aarch64-linux-musl"],
+  ] as const) {
+    const directory = await host.makeTemporaryDirectory("oseo-assembly-");
+    try {
+      const generatedPath = `${directory}/generated.c`;
+      const headerPath = `${directory}/oseo_runtime.h`;
+      const assemblyPath = `${directory}/generated.s`;
+      await host.writeTextFile(generatedPath, assemblySource);
+      const runtimeHeader = cRuntimeProvider
+        .getRuntimeInput()
+        .assets.find((asset) => asset.kind === "header");
+      assert(runtimeHeader != null, "runtime header");
+      await host.writeTextFile(
+        headerPath,
+        await host.readTextFile(runtimeHeader.url),
+      );
+      const assembly = await host.run({
+        args: [
+          "cc",
+          "-target",
+          zigTarget,
+          "-std=c11",
+          "-O2",
+          "-S",
+          "-I",
+          directory,
+          generatedPath,
+          "-o",
+          assemblyPath,
+        ],
+        command: "zig",
+        cwd: directory,
+      });
+      assert.equal(assembly.exitStatus, 0, assembly.stderr);
+      const text = await host.readTextFile(assemblyPath);
+      assert.match(
+        text,
+        /(?:callq?|bl)\s+_?oseo_add(?:@PLT)?/u,
+        `${target}: generic fallback retained`,
+      );
+      assert.doesNotMatch(
+        text,
+        /(?:callq?|bl)\s+_?oseo_(?:value_is_smi|smi_try_add|value_box_smi)/u,
+        `${target}: small-integer primitives inline`,
+      );
+    } finally {
+      await host.remove(directory);
+    }
+  }
+
+  const recursiveCompilation = compileSource(babelFrontend, {
+    source: "function recurse() { return recurse(); } recurse();",
+    sourceId: "recursive-compile-only.ts",
+  });
+  assert.deepEqual(recursiveCompilation.diagnostics, []);
+  assert(recursiveCompilation.mir != null, "recursive compile-only MIR");
   await withNativeFixture(
     {
       backend: cBackend,
-      host: probeReferenceHost,
-      input: multiSourceCompilation.mir,
-      keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
-      operation: "execute",
-      runtime: multiSourceRuntime,
-      target: nativeTarget,
+      host,
+      input: recursiveCompilation.mir,
+      operation: "compile",
+      runtime: cRuntimeProvider,
+      target: describeTarget("linux-aarch64-musl"),
       toolchain: zigToolchain,
     },
-    (native) => {
-      assert.equal(native.stdout, "multi-source runtime\n");
-      assert.equal(native.exitStatus, 0);
-      const reviewedSourceNames = cRuntimeProvider
-        .getRuntimeInput()
-        .assets.filter((asset) => asset.kind === "source")
-        .map((asset) => asset.name);
-      const expectedNames = [...reviewedSourceNames, "runtime_probe.c"];
-      const compileLines = native.compilerInvocation.filter((line) =>
-        line.includes(" -c "),
-      );
-      assert.equal(compileLines.length, expectedNames.length);
-      expectedNames.forEach((name, index) => {
-        assert.ok(
-          compileLines[index]?.includes(`/${name} `),
-          `compile request ${index} covers ${name}`,
-        );
-      });
-      const archiveLine = native.compilerInvocation.find((line) =>
-        line.includes("zig ar "),
-      );
-      assert(archiveLine != null, "archive request recorded");
-      let archiveCursor = 0;
-      for (const [index, name] of expectedNames.entries()) {
-        const member = `${name.replace(/\.c$/u, "")}-${index}-`;
-        const at = archiveLine.indexOf(member, archiveCursor);
-        assert.ok(at >= 0, `archive member ${member} appears in order`);
-        archiveCursor = at + member.length;
-      }
+    (cross) => {
+      assert.match(cross.emittedC, /switch \(code_id\)/u);
+      assert.match(cross.emittedC, /oseo_call_function\(context/u);
+      assert.match(cross.emittedC, /result = oseo_function_0\(/u);
     },
   );
-  await host.remove(probeDirectory);
-}
 
-const assemblyCompilation = compileSource(
-  babelFrontend,
-  {
-    source:
-      "function add(left: number, right: number) { " +
-      "return left + right; } console.log(add(1, 2));",
-    sourceId: "assembly-specialization.ts",
-  },
-  { specialization: "enabled" },
-);
-const assemblyMir = assemblyCompilation.mir;
-assert(assemblyMir != null, "assembly specialization MIR");
-const assemblySource = cBackend.emit(assemblyMir).source;
-for (const [target, zigTarget] of [
-  ["linux-x86_64-gnu", "x86_64-linux-gnu"],
-  ["macos-aarch64", "aarch64-macos"],
-  ["linux-aarch64-musl", "aarch64-linux-musl"],
-] as const) {
-  const directory = await host.makeTemporaryDirectory("oseo-assembly-");
-  try {
-    const generatedPath = `${directory}/generated.c`;
-    const headerPath = `${directory}/oseo_runtime.h`;
-    const assemblyPath = `${directory}/generated.s`;
-    await host.writeTextFile(generatedPath, assemblySource);
-    const runtimeHeader = cRuntimeProvider
-      .getRuntimeInput()
-      .assets.find((asset) => asset.kind === "header");
-    assert(runtimeHeader != null, "runtime header");
-    await host.writeTextFile(
-      headerPath,
-      await host.readTextFile(runtimeHeader.url),
-    );
-    const assembly = await host.run({
-      args: [
-        "cc",
-        "-target",
-        zigTarget,
-        "-std=c11",
-        "-O2",
-        "-S",
-        "-I",
-        directory,
-        generatedPath,
-        "-o",
-        assemblyPath,
-      ],
-      command: "zig",
-      cwd: directory,
-    });
-    assert.equal(assembly.exitStatus, 0, assembly.stderr);
-    const text = await host.readTextFile(assemblyPath);
-    assert.match(
-      text,
-      /(?:callq?|bl)\s+_?oseo_add(?:@PLT)?/u,
-      `${target}: generic fallback retained`,
-    );
-    assert.doesNotMatch(
-      text,
-      /(?:callq?|bl)\s+_?oseo_(?:value_is_smi|smi_try_add|value_box_smi)/u,
-      `${target}: small-integer primitives inline`,
-    );
-  } finally {
-    await host.remove(directory);
-  }
-}
-
-const recursiveCompilation = compileSource(babelFrontend, {
-  source: "function recurse() { return recurse(); } recurse();",
-  sourceId: "recursive-compile-only.ts",
-});
-assert.deepEqual(recursiveCompilation.diagnostics, []);
-assert(recursiveCompilation.mir != null, "recursive compile-only MIR");
-await withNativeFixture(
-  {
-    backend: cBackend,
+  const cli = await runNativeCli(
+    {
+      args: ["cli-fixture.ts"],
+      source: 'console.log("cli-native");',
+      sourceId: "cli-fixture.ts",
+      version: "0.1.0",
+    },
     host,
-    input: recursiveCompilation.mir,
-    operation: "compile",
-    runtime: cRuntimeProvider,
-    target: describeTarget("linux-aarch64-musl"),
-    toolchain: zigToolchain,
-  },
-  (cross) => {
-    assert.match(cross.emittedC, /switch \(code_id\)/u);
-    assert.match(cross.emittedC, /oseo_call_function\(context/u);
-    assert.match(cross.emittedC, /result = oseo_function_0\(/u);
-  },
-);
+  );
+  assert.deepEqual(cli, {
+    exitStatus: 0,
+    stderr: "",
+    stdout: "cli-native\n",
+  });
 
-const cli = await runNativeCli(
-  {
-    args: ["cli-fixture.ts"],
-    source: 'console.log("cli-native");',
-    sourceId: "cli-fixture.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.deepEqual(cli, {
-  exitStatus: 0,
-  stderr: "",
-  stdout: "cli-native\n",
-});
+  let tdzDirectory: string | undefined;
+  let tdzCleanupCount = 0;
+  const tdzHost = {
+    ...host,
+    async makeTemporaryDirectory(prefix: string): Promise<string> {
+      const directory = await host.makeTemporaryDirectory(prefix);
+      tdzDirectory = directory;
+      return directory;
+    },
+    async remove(path: string): Promise<void> {
+      assert.equal(path, tdzDirectory);
+      tdzCleanupCount += 1;
+      await host.remove(path);
+    },
+  };
+  const tdz = await runNativeCli(
+    {
+      args: ["tdz-runtime.ts"],
+      source:
+        "function read() { console.log(value); }\n" +
+        "read();\n" +
+        "const value = 1;\n",
+      sourceId: "tdz-runtime.ts",
+      version: "0.1.0",
+    },
+    tdzHost,
+  );
+  assert.equal(tdz.exitStatus, 1);
+  assert.equal(tdz.stdout, "");
+  assert.match(tdz.stderr, /error\[OSEO2001\].*before initialization/u);
+  assert.equal(tdzCleanupCount, 1);
 
-let tdzDirectory: string | undefined;
-let tdzCleanupCount = 0;
-const tdzHost = {
-  ...host,
-  async makeTemporaryDirectory(prefix: string): Promise<string> {
-    const directory = await host.makeTemporaryDirectory(prefix);
-    tdzDirectory = directory;
-    return directory;
-  },
-  async remove(path: string): Promise<void> {
-    assert.equal(path, tdzDirectory);
-    tdzCleanupCount += 1;
-    await host.remove(path);
-  },
-};
-const tdz = await runNativeCli(
-  {
-    args: ["tdz-runtime.ts"],
-    source:
-      "function read() { console.log(value); }\n" +
-      "read();\n" +
-      "const value = 1;\n",
-    sourceId: "tdz-runtime.ts",
-    version: "0.1.0",
-  },
-  tdzHost,
-);
-assert.equal(tdz.exitStatus, 1);
-assert.equal(tdz.stdout, "");
-assert.match(tdz.stderr, /error\[OSEO2001\].*before initialization/u);
-assert.equal(tdzCleanupCount, 1);
+  const assignmentTdz = await runNativeCli(
+    {
+      args: ["assignment-tdz.ts"],
+      source: "value = 1; let value = 2;",
+      sourceId: "assignment-tdz.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(assignmentTdz.exitStatus, 1);
+  assert.equal(assignmentTdz.stdout, "");
+  assert.match(
+    assignmentTdz.stderr,
+    /error\[OSEO2001\].*assigned before initialization/u,
+  );
 
-const assignmentTdz = await runNativeCli(
-  {
-    args: ["assignment-tdz.ts"],
-    source: "value = 1; let value = 2;",
-    sourceId: "assignment-tdz.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(assignmentTdz.exitStatus, 1);
-assert.equal(assignmentTdz.stdout, "");
-assert.match(
-  assignmentTdz.stderr,
-  /error\[OSEO2001\].*assigned before initialization/u,
-);
-
-const finallyTdz = await runNativeCli(
-  {
-    args: ["finally-tdz.ts"],
-    source: `function fail() {
+  const finallyTdz = await runNativeCli(
+    {
+      args: ["finally-tdz.ts"],
+      source: `function fail() {
   try {
     value;
   } finally {
@@ -3156,74 +3169,74 @@ const finallyTdz = await runNativeCli(
 }
 fail();
 `,
-    sourceId: "finally-tdz.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(finallyTdz.exitStatus, 1);
-assert.equal(finallyTdz.stdout, "cleanup\n");
-assert.match(
-  finallyTdz.stderr,
-  /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: ReferenceError: Binding/u,
-);
+      sourceId: "finally-tdz.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(finallyTdz.exitStatus, 1);
+  assert.equal(finallyTdz.stdout, "cleanup\n");
+  assert.match(
+    finallyTdz.stderr,
+    /^finally-tdz\.ts:3:\d+: error\[OSEO2001\]: ReferenceError: Binding/u,
+  );
 
-const functionCoercion = await runNativeCli(
-  {
-    args: ["function-coercion.ts"],
-    source: "function probe() {}\nconsole.log(probe + 1);",
-    sourceId: "function-coercion.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(functionCoercion.exitStatus, 1);
-assert.equal(functionCoercion.stdout, "");
-assert.match(
-  functionCoercion.stderr,
-  /error\[OSEO2001\].*Function and promise text conversion is unsupported/u,
-);
+  const functionCoercion = await runNativeCli(
+    {
+      args: ["function-coercion.ts"],
+      source: "function probe() {}\nconsole.log(probe + 1);",
+      sourceId: "function-coercion.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(functionCoercion.exitStatus, 1);
+  assert.equal(functionCoercion.stdout, "");
+  assert.match(
+    functionCoercion.stderr,
+    /error\[OSEO2001\].*Function and promise text conversion is unsupported/u,
+  );
 
-const objectTimerDelay = await runNativeCli(
-  {
-    args: ["object-timer-delay.ts"],
-    source: `
+  const objectTimerDelay = await runNativeCli(
+    {
+      args: ["object-timer-delay.ts"],
+      source: `
 function task(value) { console.log(value); }
 setTimeout(task, {}, "object delay");
 setTimeout(task, function delay() {}, "function delay");
 `,
-    sourceId: "object-timer-delay.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(objectTimerDelay.exitStatus, 0);
-assert.equal(objectTimerDelay.stderr, "");
-assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
+      sourceId: "object-timer-delay.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(objectTimerDelay.exitStatus, 0);
+  assert.equal(objectTimerDelay.stderr, "");
+  assert.equal(objectTimerDelay.stdout, "object delay\nfunction delay\n");
 
-const asyncPromiseIdentity = await runNativeCli(
-  {
-    args: ["async-promise-identity.ts"],
-    source: `
+  const asyncPromiseIdentity = await runNativeCli(
+    {
+      args: ["async-promise-identity.ts"],
+      source: `
 let inner;
 async function source() { await 0; }
 async function wrapper() { inner = source(); return inner; }
 const outer = wrapper();
 console.log(outer === inner);
 `,
-    sourceId: "async-promise-identity.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(asyncPromiseIdentity.exitStatus, 0);
-assert.equal(asyncPromiseIdentity.stderr, "");
-assert.equal(asyncPromiseIdentity.stdout, "false\n");
+      sourceId: "async-promise-identity.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(asyncPromiseIdentity.exitStatus, 0);
+  assert.equal(asyncPromiseIdentity.stderr, "");
+  assert.equal(asyncPromiseIdentity.stdout, "false\n");
 
-const asyncPromiseAssimilation = await runNativeCli(
-  {
-    args: ["async-promise-assimilation.ts"],
-    source: `
+  const asyncPromiseAssimilation = await runNativeCli(
+    {
+      args: ["async-promise-assimilation.ts"],
+      source: `
 const inner = Promise.resolve(1);
 inner.then = function customThen(onFulfilled) {
   console.log("custom then");
@@ -3232,77 +3245,77 @@ inner.then = function customThen(onFulfilled) {
 async function wrapper() { return inner; }
 wrapper().then(function show(value) { console.log(value); });
 `,
-    sourceId: "async-promise-assimilation.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(asyncPromiseAssimilation.exitStatus, 0);
-assert.equal(asyncPromiseAssimilation.stderr, "");
-assert.equal(asyncPromiseAssimilation.stdout, "custom then\n2\n");
+      sourceId: "async-promise-assimilation.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(asyncPromiseAssimilation.exitStatus, 0);
+  assert.equal(asyncPromiseAssimilation.stderr, "");
+  assert.equal(asyncPromiseAssimilation.stdout, "custom then\n2\n");
 
-const rejectionPassThroughLocation = await runNativeCli(
-  {
-    args: ["rejection-pass-through.ts"],
-    source: `async function fail() { throw "failure"; }
+  const rejectionPassThroughLocation = await runNativeCli(
+    {
+      args: ["rejection-pass-through.ts"],
+      source: `async function fail() { throw "failure"; }
 async function wrapper() { return fail(); }
 wrapper();
 console.log("after");
 `,
-    sourceId: "rejection-pass-through.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(rejectionPassThroughLocation.exitStatus, 1);
-assert.equal(rejectionPassThroughLocation.stdout, "after\n");
-assert.match(
-  rejectionPassThroughLocation.stderr,
-  /^rejection-pass-through\.ts:1:\d+: error\[OSEO2001\]/u,
-);
+      sourceId: "rejection-pass-through.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(rejectionPassThroughLocation.exitStatus, 1);
+  assert.equal(rejectionPassThroughLocation.stdout, "after\n");
+  assert.match(
+    rejectionPassThroughLocation.stderr,
+    /^rejection-pass-through\.ts:1:\d+: error\[OSEO2001\]/u,
+  );
 
-const retargetedArrayTimerDelay = await runNativeCli(
-  {
-    args: ["retargeted-array-timer-delay.ts"],
-    source: `
+  const retargetedArrayTimerDelay = await runNativeCli(
+    {
+      args: ["retargeted-array-timer-delay.ts"],
+      source: `
 function task() { console.log("retargeted array delay"); }
 const delay = [];
 Object.setPrototypeOf(delay, {});
 setTimeout(task, delay);
 `,
-    sourceId: "retargeted-array-timer-delay.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(retargetedArrayTimerDelay.exitStatus, 0);
-assert.equal(retargetedArrayTimerDelay.stderr, "");
-assert.equal(retargetedArrayTimerDelay.stdout, "retargeted array delay\n");
+      sourceId: "retargeted-array-timer-delay.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(retargetedArrayTimerDelay.exitStatus, 0);
+  assert.equal(retargetedArrayTimerDelay.stderr, "");
+  assert.equal(retargetedArrayTimerDelay.stdout, "retargeted array delay\n");
 
-const inheritedObjectArrayTimerDelay = await runNativeCli(
-  {
-    args: ["inherited-object-array-timer-delay.ts"],
-    source: `
+  const inheritedObjectArrayTimerDelay = await runNativeCli(
+    {
+      args: ["inherited-object-array-timer-delay.ts"],
+      source: `
 function task() { console.log("inherited object array delay"); }
 const delay = Object.create({});
 setTimeout(task, [delay]);
 `,
-    sourceId: "inherited-object-array-timer-delay.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(inheritedObjectArrayTimerDelay.exitStatus, 0);
-assert.equal(inheritedObjectArrayTimerDelay.stderr, "");
-assert.equal(
-  inheritedObjectArrayTimerDelay.stdout,
-  "inherited object array delay\n",
-);
+      sourceId: "inherited-object-array-timer-delay.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedObjectArrayTimerDelay.exitStatus, 0);
+  assert.equal(inheritedObjectArrayTimerDelay.stderr, "");
+  assert.equal(
+    inheritedObjectArrayTimerDelay.stdout,
+    "inherited object array delay\n",
+  );
 
-const objectLengthArrayTimerDelay = await runNativeCli(
-  {
-    args: ["object-length-array-timer-delay.ts"],
-    source: `
+  const objectLengthArrayTimerDelay = await runNativeCli(
+    {
+      args: ["object-length-array-timer-delay.ts"],
+      source: `
 function task() { console.log("object length array delay"); }
 const delay = {};
 Object.setPrototypeOf(delay, [1]);
@@ -3314,122 +3327,124 @@ delay.length = {
 };
 setTimeout(task, delay);
 `,
-    sourceId: "object-length-array-timer-delay.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(objectLengthArrayTimerDelay.exitStatus, 0);
-assert.equal(objectLengthArrayTimerDelay.stderr, "");
-assert.equal(
-  objectLengthArrayTimerDelay.stdout,
-  "coerce array length\nobject length array delay\n",
-);
+      sourceId: "object-length-array-timer-delay.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(objectLengthArrayTimerDelay.exitStatus, 0);
+  assert.equal(objectLengthArrayTimerDelay.stderr, "");
+  assert.equal(
+    objectLengthArrayTimerDelay.stdout,
+    "coerce array length\nobject length array delay\n",
+  );
 
-const accessorDescriptor = await runNativeCli(
-  {
-    args: ["accessor-descriptor.ts"],
-    source:
-      'Object.defineProperty({}, "item", {' +
-      " get: function () { return 42; } });",
-    sourceId: "accessor-descriptor.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(accessorDescriptor.exitStatus, 1);
-assert.equal(accessorDescriptor.stdout, "");
-assert.match(
-  accessorDescriptor.stderr,
-  /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
-);
+  const accessorDescriptor = await runNativeCli(
+    {
+      args: ["accessor-descriptor.ts"],
+      source:
+        'Object.defineProperty({}, "item", {' +
+        " get: function () { return 42; } });",
+      sourceId: "accessor-descriptor.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorDescriptor.exitStatus, 1);
+  assert.equal(accessorDescriptor.stdout, "");
+  assert.match(
+    accessorDescriptor.stderr,
+    /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
+  );
 
-const inheritedAccessorDescriptor = await runNativeCli(
-  {
-    args: ["inherited-accessor-descriptor.ts"],
-    source:
-      "const descriptor = Object.create({ " +
-      "get: function () { return 42; } }); " +
-      'Object.defineProperty({}, "item", descriptor);',
-    sourceId: "inherited-accessor-descriptor.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(inheritedAccessorDescriptor.exitStatus, 1);
-assert.equal(inheritedAccessorDescriptor.stdout, "");
-assert.match(
-  inheritedAccessorDescriptor.stderr,
-  /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
-);
+  const inheritedAccessorDescriptor = await runNativeCli(
+    {
+      args: ["inherited-accessor-descriptor.ts"],
+      source:
+        "const descriptor = Object.create({ " +
+        "get: function () { return 42; } }); " +
+        'Object.defineProperty({}, "item", descriptor);',
+      sourceId: "inherited-accessor-descriptor.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedAccessorDescriptor.exitStatus, 1);
+  assert.equal(inheritedAccessorDescriptor.stdout, "");
+  assert.match(
+    inheritedAccessorDescriptor.stderr,
+    /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
+  );
+}
 
-const nulSourceId = "source\0identifier.ts";
-const nulSourceDiagnostic = await runNativeCli(
-  {
-    args: ["nul-source-id.ts"],
-    source: "console.log(value); const value = 1;",
-    sourceId: nulSourceId,
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nulSourceDiagnostic.exitStatus, 1);
-assert.equal(nulSourceDiagnostic.stdout, "");
-assert.ok(nulSourceDiagnostic.stderr.startsWith(`${nulSourceId}:`));
-assert.match(nulSourceDiagnostic.stderr, /error\[OSEO2001\]/u);
+if (isTestShardPosition(1, nativeArguments.shard)) {
+  const nulSourceId = "source\0identifier.ts";
+  const nulSourceDiagnostic = await runNativeCli(
+    {
+      args: ["nul-source-id.ts"],
+      source: "console.log(value); const value = 1;",
+      sourceId: nulSourceId,
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nulSourceDiagnostic.exitStatus, 1);
+  assert.equal(nulSourceDiagnostic.stdout, "");
+  assert.ok(nulSourceDiagnostic.stderr.startsWith(`${nulSourceId}:`));
+  assert.match(nulSourceDiagnostic.stderr, /error\[OSEO2001\]/u);
 
-const recursion = await runNativeCli(
-  {
-    args: ["recursive-runtime.ts"],
-    source: "function recurse() { return recurse(); } recurse();",
-    sourceId: "recursive-runtime.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(recursion.exitStatus, 1);
-assert.equal(recursion.stdout, "");
-assert.match(recursion.stderr, /error\[OSEO2001\].*call depth/u);
+  const recursion = await runNativeCli(
+    {
+      args: ["recursive-runtime.ts"],
+      source: "function recurse() { return recurse(); } recurse();",
+      sourceId: "recursive-runtime.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(recursion.exitStatus, 1);
+  assert.equal(recursion.stdout, "");
+  assert.match(recursion.stderr, /error\[OSEO2001\].*call depth/u);
 
-const caughtRecursion = await runNativeCli(
-  {
-    args: ["caught-recursion-runtime.ts"],
-    source:
-      "function recurse() { return recurse(); } " +
-      'try { recurse(); } catch (error) { console.log("caught"); }',
-    sourceId: "caught-recursion-runtime.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(caughtRecursion.exitStatus, 1);
-assert.equal(caughtRecursion.stdout, "");
-assert.match(caughtRecursion.stderr, /error\[OSEO2001\].*call depth/u);
+  const caughtRecursion = await runNativeCli(
+    {
+      args: ["caught-recursion-runtime.ts"],
+      source:
+        "function recurse() { return recurse(); } " +
+        'try { recurse(); } catch (error) { console.log("caught"); }',
+      sourceId: "caught-recursion-runtime.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(caughtRecursion.exitStatus, 1);
+  assert.equal(caughtRecursion.stdout, "");
+  assert.match(caughtRecursion.stderr, /error\[OSEO2001\].*call depth/u);
 
-const caughtLanguageError = await runNativeCli(
-  {
-    args: ["caught-language-error.ts"],
-    source: `
+  const caughtLanguageError = await runNativeCli(
+    {
+      args: ["caught-language-error.ts"],
+      source: `
 try { const value = 1; value = 2; } catch (error) {}
 throw 1;
 `,
-    sourceId: "caught-language-error.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(caughtLanguageError.exitStatus, 1);
-assert.equal(caughtLanguageError.stdout, "");
-assert.match(
-  caughtLanguageError.stderr,
-  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
-);
-assert.doesNotMatch(caughtLanguageError.stderr, /immutable binding/u);
+      sourceId: "caught-language-error.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(caughtLanguageError.exitStatus, 1);
+  assert.equal(caughtLanguageError.stdout, "");
+  assert.match(
+    caughtLanguageError.stderr,
+    /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+  );
+  assert.doesNotMatch(caughtLanguageError.stderr, /immutable binding/u);
 
-const thrownTimer = await runNativeCli(
-  {
-    args: ["thrown-timer-runtime.ts"],
-    source: `
+  const thrownTimer = await runNativeCli(
+    {
+      args: ["thrown-timer-runtime.ts"],
+      source: `
 function observe(value) { console.log(value); }
 function task() {
   Promise.resolve("microtask after throw").then(observe);
@@ -3437,522 +3452,544 @@ function task() {
 }
 setTimeout(task, 0);
 `,
-    sourceId: "thrown-timer-runtime.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownTimer.exitStatus, 1);
-assert.equal(thrownTimer.stdout, "microtask after throw\n");
-assert.match(
-  thrownTimer.stderr,
-  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
-);
+      sourceId: "thrown-timer-runtime.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownTimer.exitStatus, 1);
+  assert.equal(thrownTimer.stdout, "microtask after throw\n");
+  assert.match(
+    thrownTimer.stderr,
+    /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+  );
 
-const thrownEntry = await runNativeCli(
-  {
-    args: ["thrown-entry-runtime.ts"],
-    source: `
+  const thrownEntry = await runNativeCli(
+    {
+      args: ["thrown-entry-runtime.ts"],
+      source: `
 function observe(value) { console.log(value); }
 Promise.resolve("microtask after entry throw").then(observe);
 throw "entry failure";
 `,
-    sourceId: "thrown-entry-runtime.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownEntry.exitStatus, 1);
-assert.equal(thrownEntry.stdout, "microtask after entry throw\n");
-assert.match(
-  thrownEntry.stderr,
-  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
-);
+      sourceId: "thrown-entry-runtime.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownEntry.exitStatus, 1);
+  assert.equal(thrownEntry.stdout, "microtask after entry throw\n");
+  assert.match(
+    thrownEntry.stderr,
+    /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+  );
 
-const thrownTypedEntry = await runNativeCli(
-  {
-    args: ["thrown-typed-entry.ts"],
-    source: 'throw new TypeError("typed unhandled");',
-    sourceId: "thrown-typed-entry.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownTypedEntry.exitStatus, 1);
-assert.equal(thrownTypedEntry.stdout, "");
-assert.match(
-  thrownTypedEntry.stderr,
-  /^thrown-typed-entry\.ts:1:\d+: error\[OSEO2001\]: TypeError: typed/u,
-);
-// The stable machine-readable marker records the intrinsic error kind.
-assert.match(thrownTypedEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+  const thrownTypedEntry = await runNativeCli(
+    {
+      args: ["thrown-typed-entry.ts"],
+      source: 'throw new TypeError("typed unhandled");',
+      sourceId: "thrown-typed-entry.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownTypedEntry.exitStatus, 1);
+  assert.equal(thrownTypedEntry.stdout, "");
+  assert.match(
+    thrownTypedEntry.stderr,
+    /^thrown-typed-entry\.ts:1:\d+: error\[OSEO2001\]: TypeError: typed/u,
+  );
+  // The stable machine-readable marker records the intrinsic error kind.
+  assert.match(thrownTypedEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
 
-const thrownRuntimeTyped = await runNativeCli(
-  {
-    args: ["thrown-runtime-typed.ts"],
-    source: "const target = null; target.item;",
-    sourceId: "thrown-runtime-typed.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownRuntimeTyped.exitStatus, 1);
-assert.equal(thrownRuntimeTyped.stdout, "");
-assert.match(
-  thrownRuntimeTyped.stderr,
-  /error\[OSEO2001\]: TypeError: Cannot read properties of a nullish value\./u,
-);
+  const thrownRuntimeTyped = await runNativeCli(
+    {
+      args: ["thrown-runtime-typed.ts"],
+      source: "const target = null; target.item;",
+      sourceId: "thrown-runtime-typed.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownRuntimeTyped.exitStatus, 1);
+  assert.equal(thrownRuntimeTyped.stdout, "");
+  assert.match(
+    thrownRuntimeTyped.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot read properties of a nullish/u,
+  );
 
-const thrownRenamedEntry = await runNativeCli(
-  {
-    args: ["thrown-renamed-entry.ts"],
-    source: `
+  const thrownRenamedEntry = await runNativeCli(
+    {
+      args: ["thrown-renamed-entry.ts"],
+      source: `
 const renamed = new Error("body");
 renamed.name = "한글이름";
 throw renamed;
 `,
-    sourceId: "thrown-renamed-entry.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownRenamedEntry.exitStatus, 1);
-assert.equal(thrownRenamedEntry.stdout, "");
-assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
-// The marker keeps the intrinsic Error identity even though the human
-// diagnostic shows the mutated non-identifier name.
-assert.match(thrownRenamedEntry.stderr, /\nOSEO_THROWN Error\n$/u);
+      sourceId: "thrown-renamed-entry.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownRenamedEntry.exitStatus, 1);
+  assert.equal(thrownRenamedEntry.stdout, "");
+  assert.match(thrownRenamedEntry.stderr, /error\[OSEO2001\]: 한글이름: body/u);
+  // The marker keeps the intrinsic Error identity even though the human
+  // diagnostic shows the mutated non-identifier name.
+  assert.match(thrownRenamedEntry.stderr, /\nOSEO_THROWN Error\n$/u);
 
-const thrownEmptyEntry = await runNativeCli(
-  {
-    args: ["thrown-empty-entry.ts"],
-    source: `
+  const thrownEmptyEntry = await runNativeCli(
+    {
+      args: ["thrown-empty-entry.ts"],
+      source: `
 const blank = new TypeError("");
 blank.name = "";
 throw blank;
 `,
-    sourceId: "thrown-empty-entry.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownEmptyEntry.exitStatus, 1);
-assert.equal(thrownEmptyEntry.stdout, "");
-// With no renderable name or message the human diagnostic falls back to the
-// generic throw text, yet the marker still exposes the intrinsic identity.
-assert.match(
-  thrownEmptyEntry.stderr,
-  /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
-);
-assert.match(thrownEmptyEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+      sourceId: "thrown-empty-entry.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownEmptyEntry.exitStatus, 1);
+  assert.equal(thrownEmptyEntry.stdout, "");
+  // With no renderable name or message the human diagnostic falls back to the
+  // generic throw text, yet the marker still exposes the intrinsic identity.
+  assert.match(
+    thrownEmptyEntry.stderr,
+    /error\[OSEO2001\]: Unhandled JavaScript throw\./u,
+  );
+  assert.match(thrownEmptyEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
 
-const thrownPrototypeEntry = await runNativeCli(
-  {
-    args: ["thrown-prototype-entry.ts"],
-    source: `
+  const thrownPrototypeEntry = await runNativeCli(
+    {
+      args: ["thrown-prototype-entry.ts"],
+      source: `
 throw TypeError.prototype;
 `,
-    sourceId: "thrown-prototype-entry.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownPrototypeEntry.exitStatus, 1);
-assert.equal(thrownPrototypeEntry.stdout, "");
-// Throwing the intrinsic prototype object itself keeps its exact identity,
-// because the kind walk starts at the thrown value rather than its prototype.
-assert.match(thrownPrototypeEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
+      sourceId: "thrown-prototype-entry.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownPrototypeEntry.exitStatus, 1);
+  assert.equal(thrownPrototypeEntry.stdout, "");
+  // Throwing the intrinsic prototype object itself keeps its exact identity,
+  // because the kind walk starts at the thrown value rather than its prototype.
+  assert.match(thrownPrototypeEntry.stderr, /\nOSEO_THROWN TypeError\n$/u);
 
-const thrownConvertedMessage = await runNativeCli(
-  {
-    args: ["thrown-converted-message.ts"],
-    source: `
+  const thrownConvertedMessage = await runNativeCli(
+    {
+      args: ["thrown-converted-message.ts"],
+      source: `
 const boom = new Error("original");
 boom.message = { toString: function () { return "converted"; } };
 throw boom;
 `,
-    sourceId: "thrown-converted-message.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(thrownConvertedMessage.exitStatus, 1);
-assert.equal(thrownConvertedMessage.stdout, "");
-// The diagnostic points at the throw site (line 4), not the toString
-// method whose conversion moved the context source location.
-assert.match(
-  thrownConvertedMessage.stderr,
-  /^thrown-converted-message\.ts:4:1: error\[OSEO2001\]: Error: converted/u,
-);
+      sourceId: "thrown-converted-message.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(thrownConvertedMessage.exitStatus, 1);
+  assert.equal(thrownConvertedMessage.stdout, "");
+  // The diagnostic points at the throw site (line 4), not the toString
+  // method whose conversion moved the context source location.
+  assert.match(
+    thrownConvertedMessage.stderr,
+    /^thrown-converted-message\.ts:4:1: error\[OSEO2001\]: Error: converted/u,
+  );
 
-const wideBindings = Array.from(
-  { length: 3_000 },
-  (_, index) => `const value${index} = ${index};`,
-).join("\n");
-const wideRecursion = await runNativeCli(
-  {
-    args: ["wide-recursion-runtime.ts"],
-    source:
-      `function recurse(depth) {\n${wideBindings}\n` +
-      "  if (depth === 0) return 0;\n" +
-      "  return recurse(depth - 1);\n" +
-      "}\n" +
-      "console.log(recurse(100));\n",
-    sourceId: "wide-recursion-runtime.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(wideRecursion.exitStatus, 1);
-assert.equal(wideRecursion.stdout, "");
-assert.match(wideRecursion.stderr, /error\[OSEO2001\].*frame budget/u);
+  const wideBindings = Array.from(
+    { length: 3_000 },
+    (_, index) => `const value${index} = ${index};`,
+  ).join("\n");
+  const wideRecursion = await runNativeCli(
+    {
+      args: ["wide-recursion-runtime.ts"],
+      source:
+        `function recurse(depth) {\n${wideBindings}\n` +
+        "  if (depth === 0) return 0;\n" +
+        "  return recurse(depth - 1);\n" +
+        "}\n" +
+        "console.log(recurse(100));\n",
+      sourceId: "wide-recursion-runtime.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(wideRecursion.exitStatus, 1);
+  assert.equal(wideRecursion.stdout, "");
+  assert.match(wideRecursion.stderr, /error\[OSEO2001\].*frame budget/u);
 
-const rootAllocationFailureHost = {
-  ...host,
-  async readTextFile(path: string | URL): Promise<string> {
-    const source = await host.readTextFile(path);
-    if (!(path instanceof URL) || !path.pathname.endsWith("/runtime_core.c")) {
-      return source;
-    }
-    const injected = source.replace(
-      "slots = calloc(slot_count, sizeof(OseoValue));",
-      "slots = NULL;",
-    );
-    assert.notEqual(injected, source, "root allocation failure injected");
-    return injected;
-  },
-};
-const rootAllocationFailure = await runNativeCli(
-  {
-    args: ["root-allocation-runtime.ts"],
-    source: "console.log(1);",
-    sourceId: "root-allocation-runtime.ts",
-    version: "0.1.0",
-  },
-  rootAllocationFailureHost,
-);
-assert.equal(rootAllocationFailure.exitStatus, 1);
-assert.equal(rootAllocationFailure.stdout, "");
-assert.match(
-  rootAllocationFailure.stderr,
-  /error\[OSEO2001\].*Root frame allocation failed/u,
-);
+  const rootAllocationFailureHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_core.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "slots = calloc(slot_count, sizeof(OseoValue));",
+        "slots = NULL;",
+      );
+      assert.notEqual(injected, source, "root allocation failure injected");
+      return injected;
+    },
+  };
+  const rootAllocationFailure = await runNativeCli(
+    {
+      args: ["root-allocation-runtime.ts"],
+      source: "console.log(1);",
+      sourceId: "root-allocation-runtime.ts",
+      version: "0.1.0",
+    },
+    rootAllocationFailureHost,
+  );
+  assert.equal(rootAllocationFailure.exitStatus, 1);
+  assert.equal(rootAllocationFailure.stdout, "");
+  assert.match(
+    rootAllocationFailure.stderr,
+    /error\[OSEO2001\].*Root frame allocation failed/u,
+  );
 
-const concatenationOverflowHost = {
-  ...host,
-  async readTextFile(path: string | URL): Promise<string> {
-    const source = await host.readTextFile(path);
-    if (
-      !(path instanceof URL) ||
-      !path.pathname.endsWith("/runtime_primitive.c")
-    ) {
-      return source;
-    }
-    const injected = source.replace(
-      "OseoString *right_object = string_object(slots[1]);",
-      "OseoString *right_object = string_object(slots[1]);\n" +
-        "    right_object->length = SIZE_MAX;",
-    );
-    assert.notEqual(injected, source, "concatenation overflow injected");
-    return injected;
-  },
-};
-const concatenationOverflow = await runNativeCli(
-  {
-    args: ["concatenation-overflow-runtime.ts"],
-    source: 'console.log("left" + "right");',
-    sourceId: "concatenation-overflow-runtime.ts",
-    version: "0.1.0",
-  },
-  concatenationOverflowHost,
-);
-assert.equal(concatenationOverflow.exitStatus, 1);
-assert.equal(concatenationOverflow.stdout, "");
-assert.match(
-  concatenationOverflow.stderr,
-  /error\[OSEO2001\].*String allocation is too large/u,
-);
+  const concatenationOverflowHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_primitive.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "OseoString *right_object = string_object(slots[1]);",
+        "OseoString *right_object = string_object(slots[1]);\n" +
+          "    right_object->length = SIZE_MAX;",
+      );
+      assert.notEqual(injected, source, "concatenation overflow injected");
+      return injected;
+    },
+  };
+  const concatenationOverflow = await runNativeCli(
+    {
+      args: ["concatenation-overflow-runtime.ts"],
+      source: 'console.log("left" + "right");',
+      sourceId: "concatenation-overflow-runtime.ts",
+      version: "0.1.0",
+    },
+    concatenationOverflowHost,
+  );
+  assert.equal(concatenationOverflow.exitStatus, 1);
+  assert.equal(concatenationOverflow.stdout, "");
+  assert.match(
+    concatenationOverflow.stderr,
+    /error\[OSEO2001\].*String allocation is too large/u,
+  );
 
-const allocationFailureHost = {
-  ...host,
-  async readTextFile(path: string | URL): Promise<string> {
-    const source = await host.readTextFile(path);
-    if (
-      !(path instanceof URL) ||
-      !path.pathname.endsWith("/runtime_primitive.c")
-    ) {
-      return source;
-    }
-    const injected = source.replace(
-      "char *text = malloc(length + 1u);",
-      "char *text = NULL;",
-    );
-    assert.notEqual(injected, source, "numeric allocation failure injected");
-    return injected;
-  },
-};
-const allocationFailure = await runNativeCli(
-  {
-    args: ["numeric-conversion-runtime.ts"],
-    source: 'console.log(-"1");',
-    sourceId: "numeric-conversion-runtime.ts",
-    version: "0.1.0",
-  },
-  allocationFailureHost,
-);
-assert.equal(allocationFailure.exitStatus, 1);
-assert.equal(allocationFailure.stdout, "");
-assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+  const allocationFailureHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_primitive.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "char *text = malloc(length + 1u);",
+        "char *text = NULL;",
+      );
+      assert.notEqual(injected, source, "numeric allocation failure injected");
+      return injected;
+    },
+  };
+  const allocationFailure = await runNativeCli(
+    {
+      args: ["numeric-conversion-runtime.ts"],
+      source: 'console.log(-"1");',
+      sourceId: "numeric-conversion-runtime.ts",
+      version: "0.1.0",
+    },
+    allocationFailureHost,
+  );
+  assert.equal(allocationFailure.exitStatus, 1);
+  assert.equal(allocationFailure.stdout, "");
+  assert.match(allocationFailure.stderr, /error\[OSEO2001\].*allocation/u);
+}
 
-// The switch-tdz fixture explains why this check bypasses the Deno
-// reference: Deno's TypeScript transpile loses the case-level TDZ.
-const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;
-const nativeSwitchTdz = await runNativeCli(
-  {
-    args: [switchTdzEntry],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
-assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
+if (isTestShardPosition(2, nativeArguments.shard)) {
+  // The switch-tdz fixture explains why this check bypasses the Deno
+  // reference: Deno's TypeScript transpile loses the case-level TDZ.
+  const switchTdzEntry = `${root}/tests/fixtures/switch-tdz.js`;
+  const nativeSwitchTdz = await runNativeCli(
+    {
+      args: [switchTdzEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
+  assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
 
-const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
-const nativeModule = await runNativeCli(
-  {
-    args: [moduleEntry],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
-assert.equal(nativeModule.stderr, "");
-assert.equal(
-  nativeModule.stdout,
-  "var order 1 2 undefined\n" +
-    "cycle b ready default ready\ncycle c ready\ncycle a\n" +
-    "default first\ndefault second\nidentity once\n" +
-    "answer increment 41\n" +
-    "42\ntrue true false\n" +
-    "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
-);
+  const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
+  const nativeModule = await runNativeCli(
+    {
+      args: [moduleEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
+  assert.equal(nativeModule.stderr, "");
+  assert.equal(
+    nativeModule.stdout,
+    "var order 1 2 undefined\n" +
+      "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+      "default first\ndefault second\nidentity once\n" +
+      "answer increment 41\n" +
+      "42\ntrue true false\n" +
+      "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
+  );
 
-const importWriteEntry = [
-  root,
-  "tests/fixtures/modules/import-write-entry.js",
-].join("/");
-const nativeImportWrite = await runNativeCli(
-  {
-    args: [importWriteEntry],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeImportWrite.exitStatus, 0, nativeImportWrite.stderr);
-assert.equal(nativeImportWrite.stderr, "");
-assert.equal(nativeImportWrite.stdout, "TypeError\n");
+  const importWriteEntry = [
+    root,
+    "tests/fixtures/modules/import-write-entry.js",
+  ].join("/");
+  const nativeImportWrite = await runNativeCli(
+    {
+      args: [importWriteEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeImportWrite.exitStatus, 0, nativeImportWrite.stderr);
+  assert.equal(nativeImportWrite.stderr, "");
+  assert.equal(nativeImportWrite.stdout, "TypeError\n");
 
-const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
-const nativeAsyncModule = await runNativeCli(
-  {
-    args: [asyncModuleEntry],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeAsyncModule.exitStatus, 0, nativeAsyncModule.stderr);
-assert.equal(nativeAsyncModule.stderr, "");
-assert.equal(
-  nativeAsyncModule.stdout,
-  "dependency ready\nentry ready\nlate timer\n",
-);
+  const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
+  const nativeAsyncModule = await runNativeCli(
+    {
+      args: [asyncModuleEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeAsyncModule.exitStatus, 0, nativeAsyncModule.stderr);
+  assert.equal(nativeAsyncModule.stderr, "");
+  assert.equal(
+    nativeAsyncModule.stdout,
+    "dependency ready\nentry ready\nlate timer\n",
+  );
 
-const awaitedVarModule = [
-  root,
-  "tests/fixtures/async-modules/var-array-binding.js",
-].join("/");
-const nativeAwaitedVarModule = await runNativeCli(
-  {
-    args: [awaitedVarModule],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(
-  nativeAwaitedVarModule.exitStatus,
-  0,
-  nativeAwaitedVarModule.stderr,
-);
-assert.equal(nativeAwaitedVarModule.stderr, "");
-assert.equal(
-  nativeAwaitedVarModule.stdout,
-  "var module before undefined undefined undefined\n" +
-    "var module after 1 2 3 4\n",
-);
+  const awaitedVarModule = [
+    root,
+    "tests/fixtures/async-modules/var-array-binding.js",
+  ].join("/");
+  const nativeAwaitedVarModule = await runNativeCli(
+    {
+      args: [awaitedVarModule],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeAwaitedVarModule.exitStatus,
+    0,
+    nativeAwaitedVarModule.stderr,
+  );
+  assert.equal(nativeAwaitedVarModule.stderr, "");
+  assert.equal(
+    nativeAwaitedVarModule.stdout,
+    "var module before undefined undefined undefined\n" +
+      "var module after 1 2 3 4\n",
+  );
 
-const awaitedObjectVarModule = [
-  root,
-  "tests/fixtures/async-modules/var-object-binding.js",
-].join("/");
-const nativeAwaitedObjectVarModule = await runNativeCli(
-  {
-    args: [awaitedObjectVarModule],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(
-  nativeAwaitedObjectVarModule.exitStatus,
-  0,
-  nativeAwaitedObjectVarModule.stderr,
-);
-assert.equal(nativeAwaitedObjectVarModule.stderr, "");
-assert.equal(
-  nativeAwaitedObjectVarModule.stdout,
-  "object var before undefined undefined\nobject var after 1 2\n",
-);
+  const awaitedObjectVarModule = [
+    root,
+    "tests/fixtures/async-modules/var-object-binding.js",
+  ].join("/");
+  const nativeAwaitedObjectVarModule = await runNativeCli(
+    {
+      args: [awaitedObjectVarModule],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeAwaitedObjectVarModule.exitStatus,
+    0,
+    nativeAwaitedObjectVarModule.stderr,
+  );
+  assert.equal(nativeAwaitedObjectVarModule.stderr, "");
+  assert.equal(
+    nativeAwaitedObjectVarModule.stdout,
+    "object var before undefined undefined\nobject var after 1 2\n",
+  );
 
-const rejectionAfterAwait = [
-  root,
-  "tests/fixtures/async-modules/rejection-after-await.js",
-].join("/");
-const nativeRejectionAfterAwait = await runNativeCli(
-  {
-    args: [rejectionAfterAwait],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(
-  nativeRejectionAfterAwait.exitStatus,
-  0,
-  nativeRejectionAfterAwait.stderr,
-);
-assert.equal(nativeRejectionAfterAwait.stderr, "");
-assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
+  const rejectionAfterAwait = [
+    root,
+    "tests/fixtures/async-modules/rejection-after-await.js",
+  ].join("/");
+  const nativeRejectionAfterAwait = await runNativeCli(
+    {
+      args: [rejectionAfterAwait],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeRejectionAfterAwait.exitStatus,
+    0,
+    nativeRejectionAfterAwait.stderr,
+  );
+  assert.equal(nativeRejectionAfterAwait.stderr, "");
+  assert.equal(nativeRejectionAfterAwait.stdout, "handled after await\n");
 
-const awaitQueueOrder = [
-  root,
-  "tests/fixtures/async-modules/await-queue-order.js",
-].join("/");
-const nativeAwaitQueueOrder = await runNativeCli(
-  {
-    args: [awaitQueueOrder],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeAwaitQueueOrder.exitStatus, 0, nativeAwaitQueueOrder.stderr);
-assert.equal(nativeAwaitQueueOrder.stderr, "");
-assert.equal(nativeAwaitQueueOrder.stdout, "after\nnested\n");
+  const awaitQueueOrder = [
+    root,
+    "tests/fixtures/async-modules/await-queue-order.js",
+  ].join("/");
+  const nativeAwaitQueueOrder = await runNativeCli(
+    {
+      args: [awaitQueueOrder],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeAwaitQueueOrder.exitStatus,
+    0,
+    nativeAwaitQueueOrder.stderr,
+  );
+  assert.equal(nativeAwaitQueueOrder.stderr, "");
+  assert.equal(nativeAwaitQueueOrder.stdout, "after\nnested\n");
 
-const independentModuleEntry = [
-  root,
-  "tests/fixtures/async-modules/independent-entry.mjs",
-].join("/");
-const nativeIndependentModule = await runNativeCli(
-  {
-    args: [independentModuleEntry],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeIndependentModule.exitStatus, 0);
-assert.equal(nativeIndependentModule.stderr, "");
-assert.equal(nativeIndependentModule.stdout, "a start\noperand\nb\na done 2\n");
+  const independentModuleEntry = [
+    root,
+    "tests/fixtures/async-modules/independent-entry.mjs",
+  ].join("/");
+  const nativeIndependentModule = await runNativeCli(
+    {
+      args: [independentModuleEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeIndependentModule.exitStatus, 0);
+  assert.equal(nativeIndependentModule.stderr, "");
+  assert.equal(
+    nativeIndependentModule.stdout,
+    "a start\noperand\nb\na done 2\n",
+  );
 
-const unhandledBeforeTimer = [
-  root,
-  "tests/fixtures/async-modules/unhandled-before-timer.js",
-].join("/");
-const nativeUnhandledBeforeTimer = await runNativeCli(
-  {
-    args: [unhandledBeforeTimer],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeUnhandledBeforeTimer.exitStatus, 1);
-assert.equal(nativeUnhandledBeforeTimer.stdout, "");
-assert.match(
-  nativeUnhandledBeforeTimer.stderr,
-  /error\[OSEO2001\].*Unhandled promise rejection/u,
-);
+  const unhandledBeforeTimer = [
+    root,
+    "tests/fixtures/async-modules/unhandled-before-timer.js",
+  ].join("/");
+  const nativeUnhandledBeforeTimer = await runNativeCli(
+    {
+      args: [unhandledBeforeTimer],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeUnhandledBeforeTimer.exitStatus, 1);
+  assert.equal(nativeUnhandledBeforeTimer.stdout, "");
+  assert.match(
+    nativeUnhandledBeforeTimer.stderr,
+    /error\[OSEO2001\].*Unhandled promise rejection/u,
+  );
 
-const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
-const nativeBlockedModule = await runNativeCli(
-  {
-    args: [blockedModule],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeBlockedModule.exitStatus, 1);
-assert.equal(nativeBlockedModule.stdout, "");
-assert.match(
-  nativeBlockedModule.stderr,
-  /error\[OSEO3001\].*Top-level await cannot make progress/u,
-);
+  const blockedModule = `${root}/tests/fixtures/async-modules/blocked.js`;
+  const nativeBlockedModule = await runNativeCli(
+    {
+      args: [blockedModule],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeBlockedModule.exitStatus, 1);
+  assert.equal(nativeBlockedModule.stdout, "");
+  assert.match(
+    nativeBlockedModule.stderr,
+    /error\[OSEO3001\].*Top-level await cannot make progress/u,
+  );
 
-const diagnosticModule = `${root}/tests/fixtures/module-diagnostics/entry.mjs`;
-const nativeDiagnosticModule = await runNativeCli(
-  {
-    args: [diagnosticModule],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeDiagnosticModule.exitStatus, 1);
-assert.equal(
-  nativeDiagnosticModule.stdout,
-  "dependency before throw\ndependency cleanup\n",
-);
-assert.match(
-  nativeDiagnosticModule.stderr,
-  /module-diagnostics\/dep\.mjs:5:3: error\[OSEO2001\]/u,
-);
+  const diagnosticModule = [
+    root,
+    "tests/fixtures/module-diagnostics/entry.mjs",
+  ].join("/");
+  const nativeDiagnosticModule = await runNativeCli(
+    {
+      args: [diagnosticModule],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeDiagnosticModule.exitStatus, 1);
+  assert.equal(
+    nativeDiagnosticModule.stdout,
+    "dependency before throw\ndependency cleanup\n",
+  );
+  assert.match(
+    nativeDiagnosticModule.stderr,
+    /module-diagnostics\/dep\.mjs:5:3: error\[OSEO2001\]/u,
+  );
 
-const rejectionLocation = [
-  root,
-  "tests/fixtures/rejection-location/entry.mjs",
-].join("/");
-const nativeRejectionLocation = await runNativeCli(
-  {
-    args: [rejectionLocation],
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(nativeRejectionLocation.exitStatus, 1);
-assert.equal(nativeRejectionLocation.stdout, "entry after rejection\n");
-assert.match(
-  nativeRejectionLocation.stderr,
-  /rejection-location\/dep\.mjs:2:3: error\[OSEO2001\]/u,
-);
+  const rejectionLocation = [
+    root,
+    "tests/fixtures/rejection-location/entry.mjs",
+  ].join("/");
+  const nativeRejectionLocation = await runNativeCli(
+    {
+      args: [rejectionLocation],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeRejectionLocation.exitStatus, 1);
+  assert.equal(nativeRejectionLocation.stdout, "entry after rejection\n");
+  assert.match(
+    nativeRejectionLocation.stderr,
+    /rejection-location\/dep\.mjs:2:3: error\[OSEO2001\]/u,
+  );
 
-const topLevelAwaitRejection = await runNativeCli(
-  {
-    args: ["top-level-await-rejection.mjs"],
-    source: `console.log("before rejection");
+  const topLevelAwaitRejection = await runNativeCli(
+    {
+      args: ["top-level-await-rejection.mjs"],
+      source: `console.log("before rejection");
 await Promise.reject("bad");
 `,
-    sourceId: "top-level-await-rejection.mjs",
-    version: "0.1.0",
-  },
-  host,
-);
-assert.equal(topLevelAwaitRejection.exitStatus, 1);
-assert.equal(topLevelAwaitRejection.stdout, "before rejection\n");
-assert.match(
-  topLevelAwaitRejection.stderr,
-  /top-level-await-rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
-);
+      sourceId: "top-level-await-rejection.mjs",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(topLevelAwaitRejection.exitStatus, 1);
+  assert.equal(topLevelAwaitRejection.stdout, "before rejection\n");
+  assert.match(
+    topLevelAwaitRejection.stderr,
+    /top-level-await-rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
+  );
+}
 
 console.log(
-  `native fixtures: ${fixtures.length} Node, Deno, and ` +
+  `native fixtures: ${selectedFixtures.length}/${fixtures.length} Node, ` +
+    "Deno, and " +
     `${nativeTarget.name} outputs match`,
 );
 console.log(
-  `cross fixtures: ${fixtures.length + 1} linux-aarch64-musl builds passed`,
+  `cross fixtures: ${
+    selectedFixtures.length +
+    (isTestShardPosition(0, nativeArguments.shard) ? 1 : 0)
+  } linux-aarch64-musl builds passed`,
 );
-console.log("assembly fixtures: all configured target paths inspected");
+if (isTestShardPosition(0, nativeArguments.shard)) {
+  console.log("assembly fixtures: all configured target paths inspected");
+}

@@ -9,11 +9,13 @@ postinstall = "mise generate git-pre-commit --write --task=check"
 [tools]
 "aqua:dahlia/hongdown" = "0.5.1"
 "aqua:nushell/nushell" = "0.114.1"
+actionlint = "1.7.12"
 aube = "1.26.0"
 deno = "2.9.2"
 node = "24.18.0"
 oxfmt = "0.59.0"
 oxlint = "1.74.0"
+shellcheck = "0.11.0"
 zig = "0.16.0"
 
 [deps.aube]
@@ -34,6 +36,7 @@ mise run check:versions
 
 [tasks.check]
 depends = [
+  "check:actions",
   "check:boundaries",
   "check:fmt",
   "check:lines",
@@ -42,6 +45,10 @@ depends = [
   "check:types",
   "check:versions",
 ]
+
+[tasks."check:actions"]
+description = "Validate GitHub Actions workflows"
+run = "actionlint"
 
 [tasks."check:boundaries"]
 run = "node tools/check-boundaries.ts"
@@ -128,6 +135,7 @@ run = "deno test -A packages"
 [tasks."test:native"]
 description = "Run host-native fixtures and cross-target structural checks"
 depends = ["build"]
+raw_args = true
 run = "node tests/native.ts"
 
 [tasks."test:node"]
@@ -184,6 +192,7 @@ run = "node --test tests/property/*.property.test.ts"
 [tasks."test:test262"]
 description = "Run the pinned test262 subset on the matching native target"
 depends = ["build"]
+raw_args = true
 run = "node tools/test262.ts"
 
 [tasks."test262:update"]

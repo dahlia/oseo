@@ -49,6 +49,9 @@ import type {
 } from "../packages/testkit/src/index.ts";
 import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
 
+import { parseTestShardArguments, selectTestShard } from "./shard.ts";
+import type { TestShard } from "./shard.ts";
+
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
 const resultPath = join(repositoryRoot, "tests/test262/results.yaml");
@@ -1237,6 +1240,51 @@ function canonicalizeManifestTarget(
   };
 }
 
+/** Parse the checked-in result fields required for shard reconstruction. */
+export function parseReviewedManifest(text: string): ReviewedTest262Manifest {
+  const root = record(parseYaml(text) as unknown, "test262 results");
+  const rawResults = root.results;
+  if (!Array.isArray(rawResults)) {
+    throw new Error("test262 results must contain a results array.");
+  }
+  const results = rawResults.map((value, index) => {
+    const item = record(value, `test262 result ${index}`);
+    const testCase = record(item.case, `test262 result ${index} case`);
+    stringValue(testCase.path, `test262 result ${index} path`);
+    classification(item.classification);
+    if (!Array.isArray(item.dependencies)) {
+      throw new Error(`test262 result ${index} dependencies must be an array.`);
+    }
+    stringArray(item.dependencies, `test262 result ${index} dependencies`);
+    return item as unknown as Test262Result;
+  });
+  const summary = record(root.summary, "test262 results summary");
+  return {
+    results,
+    suiteRevision: stringValue(
+      root.suiteRevision,
+      "test262 results suiteRevision",
+    ),
+    summary: summary as unknown as Test262Summary,
+  };
+}
+
+/** Select and re-summarize one deterministic result-manifest shard. */
+export function selectManifestShard(
+  manifest: ReviewedTest262Manifest,
+  shard?: TestShard,
+): ReviewedTest262Manifest {
+  const results = selectTestShard(manifest.results, shard);
+  if (shard == null) {
+    return manifest;
+  }
+  return {
+    results,
+    suiteRevision: manifest.suiteRevision,
+    summary: summarizeTest262(results),
+  };
+}
+
 function manifestDigest(serialized: string): string {
   return `sha256:${createHash("sha256").update(serialized).digest("hex")}`;
 }
@@ -1283,26 +1331,35 @@ function validateTargetParity(
 }
 
 async function main(): Promise<void> {
-  const update = process.argv.slice(2);
-  if (update.length > 1 || (update[0] != null && update[0] !== "--update")) {
-    throw new Error("usage: node tools/test262.ts [--update]");
+  const cliArguments = parseTestShardArguments(process.argv.slice(2), {
+    allowUpdate: true,
+  });
+  if (cliArguments.help) {
+    console.log(
+      "usage: node tools/test262.ts [--shard INDEX/TOTAL | --update]",
+    );
+    return;
   }
   requireSupportedHost();
   const subset = parseReviewedSubset(await readFile(subsetPath, "utf8"));
+  const selectedSubset = {
+    ...subset,
+    tests: selectTestShard(subset.tests, cliArguments.shard),
+  };
   const root = await suiteRoot(subset.suiteRevision);
   const harnesses = await readHarnesses();
   const previousGc = process.env.OSEO_GC_EVERY_SAFEPOINT;
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   let manifest: ReviewedTest262Manifest;
   try {
-    manifest = await createReviewedManifest(subset, root, harnesses);
+    manifest = await createReviewedManifest(selectedSubset, root, harnesses);
   } finally {
     if (previousGc == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
     else process.env.OSEO_GC_EVERY_SAFEPOINT = previousGc;
   }
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);
-  if (update[0] === "--update") {
+  if (cliArguments.update) {
     await writeFile(resultPath, serialized);
     await writeFile(
       parityPath,
@@ -1310,7 +1367,16 @@ async function main(): Promise<void> {
     );
   } else {
     const expected = await readFile(resultPath, "utf8");
-    if (expected !== serialized) {
+    const expectedResult =
+      cliArguments.shard == null
+        ? expected
+        : serializeTest262Manifest(
+            selectManifestShard(
+              parseReviewedManifest(expected),
+              cliArguments.shard,
+            ),
+          );
+    if (expectedResult !== serialized) {
       throw new Error(
         "Reviewed test262 results changed; run mise run test262:update.",
       );
@@ -1323,6 +1389,7 @@ async function main(): Promise<void> {
   }
   console.log(
     `test262 revision=${manifest.suiteRevision} target=${executionTarget} ` +
+      `tests=${selectedSubset.tests.length}/${subset.tests.length} ` +
       `pass=${manifest.summary.passes} ` +
       `expected-negative=${manifest.summary.expectedNegatives} ` +
       `unsupported=${manifest.summary.unsupportedProfileFeatures}`,
