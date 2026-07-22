@@ -82,6 +82,10 @@ execution into the backend.
 Array binding declarations reuse iterator get, next, and close without
 adding a runtime ABI entry point. Generated control flow owns the per-pattern
 done state and conditional cleanup, and rest targets reuse array append.
+Object binding declarations use the `oseo_require_object_coercible`
+generated-code ABI operation owned by *runtime\_object.c*, followed by the
+existing property-key conversion and property-read operations. The compiler
+owns recursive target initialization and default selection.
 
 ### Internal helpers
 

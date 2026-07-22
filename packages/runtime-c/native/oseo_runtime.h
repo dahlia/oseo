@@ -330,6 +330,10 @@ OseoResult oseo_array_append_hole(
 );
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);
+OseoResult oseo_require_object_coercible(
+    OseoContext *context,
+    OseoValue value
+);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);
 OseoResult oseo_object_define(
     OseoContext *context,

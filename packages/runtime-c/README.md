@@ -122,6 +122,10 @@ The `m5-11` ABI adds GC-traced dynamic argument lists. Generated code creates
 and appends to a private list while evaluating spread arguments, then borrows
 its stable count and value pointer for the call or construction. The list
 remains rooted across invocation and is never exposed as a JavaScript object.
+The `m5-12` ABI adds `oseo_require_object_coercible` for object binding
+initialization. It rejects `null` and `undefined` with a catchable `TypeError`
+before a computed property name can run, while every other admitted value
+continues through the existing primitive-aware property-read operations.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

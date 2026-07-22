@@ -43,6 +43,11 @@ rooted array, and enters conditional close blocks for abrupt or early normal
 completion. Nested patterns compose those cleanup regions from the inside out.
 Lexical leaves initialize predeclared cells, while hoisted `var` leaves use
 checked writes to existing function-scope cells.
+Object binding declarations share those recursive leaves. MIR checks
+`RequireObjectCoercible` before evaluating a computed property name, converts
+each key through `ToPropertyKey`, reads properties from left to right, applies
+defaults only to `undefined`, and enters nested array or object patterns without
+recovering frontend syntax.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

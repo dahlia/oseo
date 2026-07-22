@@ -1704,6 +1704,116 @@ awaitedVarBinding();
 `,
   },
   {
+    name: "object-bindings",
+    source: `
+const key = "value";
+const symbol = Symbol("picked");
+const {
+  [key]: first,
+  missing: fallback = 2,
+  nested: { item },
+  array: [head],
+  [symbol]: symbolValue,
+} = {
+  value: 1,
+  nested: { item: 3 },
+  array: [4],
+  [symbol]: 5,
+};
+let { mutable } = { mutable: 6 };
+mutable = mutable + 1;
+const { named = function () {} } = {};
+const { length: textLength, 0: firstUnit } = "abc";
+const {} = 1;
+console.log(
+  "values",
+  first,
+  fallback,
+  item,
+  head,
+  symbolValue,
+  mutable,
+  named.name,
+  textLength,
+  firstUnit,
+);
+
+console.log("var-before", beforeVar, mixedVar, blockVar);
+var { value: beforeVar } = { value: 8 }, mixedVar = 9;
+if (true) {
+  var { value: blockVar } = { value: 10 };
+}
+console.log("var-after", beforeVar, mixedVar, blockVar);
+
+function overwriteParameter(parameter) {
+  var { value: parameter } = { value: 11 };
+  return parameter;
+}
+console.log("var-parameter", overwriteParameter(0));
+
+try {
+  const { self = self } = {};
+  console.log(self);
+} catch (error) {
+  console.log("tdz", error instanceof ReferenceError);
+}
+
+let keyOrder = "";
+const keyObject = {
+  [Symbol.toPrimitive]: function () {
+    keyOrder = keyOrder + "k";
+    return "selected";
+  },
+};
+const {
+  [(keyOrder = keyOrder + "e", keyObject)]: selected =
+    (keyOrder = keyOrder + "d", 12),
+} = {};
+console.log("order", selected, keyOrder);
+
+keyOrder = "";
+try {
+  const { [(keyOrder = keyOrder + "bad")]: never } = null;
+  console.log(never);
+} catch (error) {
+console.log("nullish", error instanceof TypeError, keyOrder);
+}
+
+let outerCloses = 0;
+const outerIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: null, done: false }; },
+      return: function () {
+        outerCloses = outerCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  const [{ value: nestedValue }] = outerIterable;
+  console.log(nestedValue);
+} catch (error) {
+  console.log("nested-close", error instanceof TypeError, outerCloses);
+}
+
+async function awaitedBinding() {
+  const { value: awaited, missing: defaulted = 14 } =
+    await Promise.resolve({ value: 13 });
+  console.log("awaited", awaited, defaulted);
+}
+awaitedBinding();
+
+async function awaitedVarBinding() {
+  var { value: awaitedVar, missing: defaultedVar = 16 } =
+    await Promise.resolve({ value: 15 });
+  console.log("awaited-var", awaitedVar, defaultedVar);
+}
+awaitedVarBinding();
+`,
+  },
+  {
     name: "in-and-instanceof",
     source: `
 const box = { present: undefined, value: 1 };
@@ -2672,6 +2782,7 @@ for (const fixture of fixtures) {
     fixture.name === "timer-event-loop" ||
     fixture.name === "arrays" ||
     fixture.name === "array-bindings" ||
+    fixture.name === "object-bindings" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||
@@ -3677,6 +3788,28 @@ assert.equal(
   nativeAwaitedVarModule.stdout,
   "var module before undefined undefined undefined\n" +
     "var module after 1 2 3 4\n",
+);
+
+const awaitedObjectVarModule = [
+  root,
+  "tests/fixtures/async-modules/var-object-binding.js",
+].join("/");
+const nativeAwaitedObjectVarModule = await runNativeCli(
+  {
+    args: [awaitedObjectVarModule],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(
+  nativeAwaitedObjectVarModule.exitStatus,
+  0,
+  nativeAwaitedObjectVarModule.stderr,
+);
+assert.equal(nativeAwaitedObjectVarModule.stderr, "");
+assert.equal(
+  nativeAwaitedObjectVarModule.stdout,
+  "object var before undefined undefined\nobject var after 1 2\n",
 );
 
 const rejectionAfterAwait = [

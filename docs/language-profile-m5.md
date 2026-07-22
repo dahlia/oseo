@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 533 reviewed cases: 164 passes, 226 expected
+The current manifest contains 551 reviewed cases: 182 passes, 226 expected
 negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -361,9 +361,30 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Object patterns, assignment patterns, parameters,
-    catch bindings, loop heads, `export var`, pattern type annotations, and
-    `await` inside a default remain outside this syntax unit.
+    done-state handling. Assignment patterns, parameters, catch bindings, loop
+    heads, `export var`, pattern type annotations, and `await` inside a default
+    remain outside this array syntax unit.
+ -  Object binding declarations. A standalone one-declarator `const` or `let`
+    statement and each declarator in a standalone `var` statement admit static,
+    computed, shorthand, renamed, defaulted, and recursively nested object or
+    array properties. Every lexical name enters its temporal dead zone before
+    the initializer runs, and every `var` name joins function-scope hoisting.
+    Lowering applies `RequireObjectCoercible` before the first property name,
+    converts each key through `ToPropertyKey`, reads through `GetV` from left to
+    right, and applies a default only to `undefined`. Strings expose their
+    admitted indexed and `length` properties; other non-nullish primitives
+    produce `undefined` for absent properties. Direct awaited initialization or
+    writing is supported in asynchronous functions and modules, and lexical
+    module exports expose every bound name. Native differential fixtures and a
+    generated property with seed `0x5eed0008` cover values, temporal dead zones,
+    function-name inference, computed and default order, symbol keys, primitive
+    inputs, nullish failure, both specialization policies, and forced
+    collection. Eighteen reviewed test262 cases cover all three declaration
+    kinds, nullish coercibility, trailing shorthand properties, and
+    function-name inference for function, arrow, and covered expressions.
+    Object rest, assignment patterns, parameters, catch bindings, loop heads,
+    `export var`, pattern type annotations, and `await` inside a property name
+    or default remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -372,7 +393,7 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Object patterns, non-declaration destructuring positions, default and rest
+ -  Object rest, non-declaration destructuring positions, default and rest
     parameters, classes, generators, big integers, regular
     expressions, and the remaining expression grammar are outside the admitted
     syntax. Owner: the core expressions and bindings stream in

@@ -56,6 +56,9 @@ Array binding lowering associates iterator get, next, and close operations with
 a backend-local done bit. Exhaustion suppresses later steps and close calls,
 while generated cleanup blocks close only a still-open iterator and preserve an
 in-flight throw over a close failure.
+Object binding lowering emits the MIR-owned coercibility check before computed
+keys, then uses the existing property-key and generic property-read operations.
+Nested patterns reuse the same binding targets and abrupt-completion path.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

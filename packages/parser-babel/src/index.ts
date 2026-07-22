@@ -24,6 +24,7 @@ import type {
   SyntaxImportEntry,
   SyntaxModule,
   SyntaxModuleSpecifier,
+  SyntaxObjectBindingPattern,
   SyntaxParameter,
   SyntaxProgram,
   SyntaxExportEntry,
@@ -885,16 +886,16 @@ function bindingPattern(
       return unsupported(
         context,
         value,
-        "Array binding identifiers cannot be optional.",
+        "Binding identifiers cannot be optional.",
       );
     }
     return { ...location(context, value), kind: "binding-identifier", name };
   }
-  if (value.type !== "ArrayPattern") {
+  if (value.type !== "ArrayPattern" && value.type !== "ObjectPattern") {
     return unsupported(
       context,
       value,
-      "Only identifier and nested array binding patterns are supported.",
+      "Only identifier, array, and object binding patterns are supported.",
     );
   }
   const annotation = node(value.typeAnnotation);
@@ -902,8 +903,93 @@ function bindingPattern(
     return unsupported(
       context,
       annotation,
-      "TypeScript annotations on array binding patterns are unsupported.",
+      "TypeScript annotations on binding patterns are unsupported.",
     );
+  }
+  if (value.type === "ObjectPattern") {
+    const properties: SyntaxObjectBindingPattern["properties"][number][] = [];
+    for (const property of nodes(value.properties)) {
+      if (property.type === "RestElement") {
+        return unsupported(
+          context,
+          property,
+          "Object binding rest properties are unsupported.",
+        );
+      }
+      if (property.type !== "ObjectProperty" || property.method === true) {
+        return unsupported(
+          context,
+          property,
+          "This object binding property is unsupported.",
+        );
+      }
+      const keyNode = node(property.key);
+      const valueNode = node(property.value);
+      if (keyNode == null || valueNode == null) {
+        return unsupported(context, property);
+      }
+      if (property.computed === true && nodeContainsAwait(keyNode)) {
+        return unsupported(
+          context,
+          keyNode,
+          "Await inside an object binding property name is unsupported.",
+        );
+      }
+      let key: SyntaxExpression | undefined;
+      if (property.computed === true) {
+        key = expression(context, keyNode);
+      } else {
+        const name = identifierName(keyNode);
+        if (name != null) {
+          key = { ...location(context, keyNode), kind: "string", value: name };
+        } else if (keyNode.type === "NumericLiteral") {
+          key = {
+            ...location(context, keyNode),
+            kind: "string",
+            value: String(keyNode.value),
+          };
+        } else {
+          key = expression(context, keyNode);
+        }
+      }
+      const left =
+        valueNode.type === "AssignmentPattern"
+          ? node(valueNode.left)
+          : valueNode;
+      const right =
+        valueNode.type === "AssignmentPattern"
+          ? node(valueNode.right)
+          : undefined;
+      if (left == null) return unsupported(context, property);
+      if (right != null && nodeContainsAwait(right)) {
+        return unsupported(
+          context,
+          right,
+          "Await inside a binding default is unsupported.",
+        );
+      }
+      const pattern = bindingPattern(context, left);
+      const initializer =
+        right == null ? undefined : expression(context, right);
+      if (
+        key == null ||
+        pattern == null ||
+        (right != null && initializer == null)
+      ) {
+        return undefined;
+      }
+      properties.push({
+        ...location(context, property),
+        ...(initializer == null ? {} : { initializer }),
+        key,
+        pattern,
+      });
+    }
+    return {
+      ...location(context, value),
+      kind: "object-binding-pattern",
+      properties,
+    };
   }
   const rawElements = Array.isArray(value.elements)
     ? (value.elements as readonly unknown[])
@@ -963,6 +1049,11 @@ function bindingPattern(
 
 function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
   if (pattern.kind === "binding-identifier") return [pattern.name];
+  if (pattern.kind === "object-binding-pattern") {
+    return pattern.properties.flatMap((property) =>
+      patternNames(property.pattern),
+    );
+  }
   return [
     ...pattern.elements.flatMap((element) =>
       element == null ? [] : patternNames(element.pattern),
@@ -980,8 +1071,17 @@ function rawPatternNames(value: BabelNode): readonly string[] {
     );
     return child == null ? [] : rawPatternNames(child);
   }
-  if (value.type !== "ArrayPattern") return [];
-  return nodes(value.elements).flatMap(rawPatternNames);
+  if (value.type === "ArrayPattern") {
+    return nodes(value.elements).flatMap(rawPatternNames);
+  }
+  if (value.type === "ObjectPattern") {
+    return nodes(value.properties).flatMap((property) => {
+      if (property.type === "RestElement") return rawPatternNames(property);
+      const propertyValue = node(property.value);
+      return propertyValue == null ? [] : rawPatternNames(propertyValue);
+    });
+  }
+  return [];
 }
 
 function statement(
@@ -1011,27 +1111,27 @@ function statement(
       for (const declarator of nodes(value.declarations)) {
         const identifier = node(declarator.id);
         const initializerNode = node(declarator.init);
-        if (identifier?.type === "ArrayPattern") {
+        if (
+          identifier?.type === "ArrayPattern" ||
+          identifier?.type === "ObjectPattern"
+        ) {
           if (initializerNode == null) {
             return unsupported(
               context,
               declarator,
-              "An array binding declaration needs an initializer.",
+              "A binding pattern declaration needs an initializer.",
             );
           }
           const pattern = bindingPattern(context, identifier);
           const initializer = expression(context, initializerNode);
-          if (
-            pattern?.kind !== "array-binding-pattern" ||
-            initializer == null
-          ) {
+          if (pattern == null || initializer == null) {
             return undefined;
           }
           assignments.push({
             ...location(context, declarator),
             declarationKind: "var",
             initializer,
-            kind: "array-binding",
+            kind: "binding-pattern",
             mode: "write",
             pattern,
           });
@@ -1084,23 +1184,26 @@ function statement(
     if (declaration == null) return unsupported(context, value);
     const identifier = node(declaration.id);
     const initializerNode = node(declaration.init);
-    if (identifier?.type === "ArrayPattern") {
+    if (
+      identifier?.type === "ArrayPattern" ||
+      identifier?.type === "ObjectPattern"
+    ) {
       if (initializerNode == null) {
         return unsupported(
           context,
           declaration,
-          "An array binding declaration needs an initializer.",
+          "A binding pattern declaration needs an initializer.",
         );
       }
       const pattern = bindingPattern(context, identifier);
       const initializer = expression(context, initializerNode);
-      return pattern?.kind !== "array-binding-pattern" || initializer == null
+      return pattern == null || initializer == null
         ? undefined
         : {
             ...located,
             declarationKind: value.kind,
             initializer,
-            kind: "array-binding",
+            kind: "binding-pattern",
             mode: "declare",
             pattern,
           };
@@ -1647,7 +1750,7 @@ interface AwaitPoint {
     readonly hint: Hint | undefined;
     readonly kind: "const" | "let" | "var";
     readonly name?: string;
-    readonly pattern?: SyntaxArrayBindingPattern;
+    readonly pattern?: SyntaxBindingPattern;
   };
   readonly operand: BabelNode;
   readonly returnValue: boolean;
@@ -1681,17 +1784,18 @@ function awaitPoint(
     awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
   const name = identifier == null ? undefined : identifierName(identifier);
   if (identifier == null || operand == null) return undefined;
-  if (name == null && identifier.type !== "ArrayPattern") {
+  if (
+    name == null &&
+    identifier.type !== "ArrayPattern" &&
+    identifier.type !== "ObjectPattern"
+  ) {
     return undefined;
   }
   const pattern =
-    identifier.type === "ArrayPattern"
+    identifier.type === "ArrayPattern" || identifier.type === "ObjectPattern"
       ? bindingPattern(context, identifier)
       : undefined;
-  if (
-    identifier.type === "ArrayPattern" &&
-    pattern?.kind !== "array-binding-pattern"
-  ) {
+  if (name == null && pattern == null) {
     return undefined;
   }
   return {
@@ -1702,7 +1806,7 @@ function awaitPoint(
           : undefined,
       kind: value.kind,
       ...(name == null ? {} : { name }),
-      ...(pattern?.kind === "array-binding-pattern" ? { pattern } : {}),
+      ...(pattern == null ? {} : { pattern }),
     },
     operand,
     returnValue: false,
@@ -1739,7 +1843,7 @@ function asyncScopePlaceholder(
     ];
   }
   const pattern = bindingPattern(context, identifier);
-  if (pattern?.kind !== "array-binding-pattern") return undefined;
+  if (pattern == null) return undefined;
   const declarationKind = value.kind === "const" ? "const" : "let";
   return patternNames(pattern).map((bindingName) => ({
     hint: undefined,
@@ -1856,7 +1960,7 @@ function asyncStatementList(
               ? {
                   declarationKind: point.declaration.kind,
                   initializer: identifierExpression(valueName, range),
-                  kind: "array-binding",
+                  kind: "binding-pattern",
                   mode:
                     point.declaration.kind === "var" ? "write" : "initialize",
                   pattern: point.declaration.pattern,
@@ -1936,7 +2040,7 @@ function asyncStatementList(
       body.push(
         converted.kind === "const" || converted.kind === "let"
           ? { ...converted, kind: "binding-init" }
-          : converted.kind === "array-binding" &&
+          : converted.kind === "binding-pattern" &&
               converted.declarationKind !== "var" &&
               converted.mode === "declare"
             ? { ...converted, mode: "initialize" }
@@ -2047,9 +2151,12 @@ function collectVarStatement(
         return false;
       } else if (name != null) {
         names = [name];
-      } else if (identifier.type === "ArrayPattern") {
+      } else if (
+        identifier.type === "ArrayPattern" ||
+        identifier.type === "ObjectPattern"
+      ) {
         const pattern = bindingPattern(context, identifier);
-        if (pattern?.kind !== "array-binding-pattern") return false;
+        if (pattern == null) return false;
         names = patternNames(pattern);
       } else {
         unsupported(context, declarator, "var destructuring is unsupported.");
@@ -2511,7 +2618,7 @@ function exportForDeclaration(
   declaration: SyntaxFunction | SyntaxStatement,
 ): readonly SyntaxExportEntry[] | undefined {
   if (
-    declaration.kind === "array-binding" &&
+    declaration.kind === "binding-pattern" &&
     declaration.declarationKind !== "var"
   ) {
     return patternNames(declaration.pattern).map((name) => ({
