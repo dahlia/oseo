@@ -242,6 +242,10 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
       );
       return;
     }
+    if (operation.importedBinding === true) {
+      line(state, "result = oseo_write_immutable_binding(context);");
+      return;
+    }
     line(
       state,
       `result = oseo_environment_get(context, ` +

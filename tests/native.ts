@@ -3626,6 +3626,21 @@ assert.equal(
     "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
 );
 
+const importWriteEntry = [
+  root,
+  "tests/fixtures/modules/import-write-entry.js",
+].join("/");
+const nativeImportWrite = await runNativeCli(
+  {
+    args: [importWriteEntry],
+    version: "0.1.0",
+  },
+  host,
+);
+assert.equal(nativeImportWrite.exitStatus, 0, nativeImportWrite.stderr);
+assert.equal(nativeImportWrite.stderr, "");
+assert.equal(nativeImportWrite.stdout, "TypeError\n");
+
 const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
 const nativeAsyncModule = await runNativeCli(
   {

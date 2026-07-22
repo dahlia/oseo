@@ -401,6 +401,7 @@ export type HirForOfTarget =
   | {
       readonly bindingId: number;
       readonly functionNameBinding?: true;
+      readonly importedBinding?: true;
       readonly kind: "binding";
       readonly mutable: boolean;
       readonly name: string;
@@ -1391,6 +1392,7 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionNameBinding?: boolean;
+      readonly importedBinding?: boolean;
       readonly kind: "binding-set";
       readonly mutable: boolean;
       readonly name: string;
@@ -1675,6 +1677,7 @@ interface Binding {
   readonly functionId?: number;
   readonly functionNameBinding?: boolean;
   readonly id: number;
+  readonly importedBinding?: boolean;
   readonly mutable: boolean;
   readonly name: string;
   readonly pendingDeclaration?: boolean;
@@ -1782,6 +1785,9 @@ function resolveExpression(
           bindingId: binding.id,
           ...(binding.functionNameBinding === true
             ? { functionNameBinding: true }
+            : {}),
+          ...(binding.importedBinding === true
+            ? { importedBinding: true }
             : {}),
           mutable: binding.mutable,
           value: inferFunctionName(value, binding.name),
@@ -2852,6 +2858,9 @@ function resolveStatement(
           ...(binding.functionNameBinding === true
             ? { functionNameBinding: true as const }
             : {}),
+          ...(binding.importedBinding === true
+            ? { importedBinding: true as const }
+            : {}),
           mutable: binding.mutable,
         };
       }
@@ -3502,6 +3511,7 @@ export interface MirOperation {
   readonly functionLength?: number;
   readonly functionName?: string;
   readonly functionNameBinding?: boolean;
+  readonly importedBinding?: boolean;
   readonly hint?: MirHint;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
@@ -4099,6 +4109,7 @@ function lowerExpression(
       ...(expression.functionNameBinding === true
         ? { functionNameBinding: true }
         : {}),
+      ...(expression.importedBinding === true ? { importedBinding: true } : {}),
       id,
       kind: "write",
       mutable: expression.mutable,
@@ -5348,6 +5359,9 @@ function lowerForOfTarget(
       detail: `%b${target.bindingId} ${target.name}`,
       ...(target.kind === "binding" && target.functionNameBinding === true
         ? { functionNameBinding: true }
+        : {}),
+      ...(target.kind === "binding" && target.importedBinding === true
+        ? { importedBinding: true }
         : {}),
       id,
       kind: "write",
@@ -7800,6 +7814,7 @@ export function compileModuleGraph(
         }
         bindings.set(imported.localName, {
           id: bindingId,
+          importedBinding: true,
           mutable: false,
           name: imported.localName,
         });
@@ -7808,6 +7823,7 @@ export function compileModuleGraph(
       if (imported.cellId == null) continue;
       bindings.set(imported.localName, {
         id: imported.cellId,
+        importedBinding: true,
         mutable: false,
         name: imported.localName,
       });
