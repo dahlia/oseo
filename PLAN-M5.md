@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 182
+honest unsupported classifications. The current reviewed manifest records 188
 passes, 226 expected negatives, and 143 unsupported profile features with no
 semantic or harness failures.
 
@@ -210,9 +210,10 @@ through the generic property path, and creates ordinary data properties on a
 fresh object. The generated property suites use seeds `0x5eed0008` and
 `0x5eed0009` across ordinary, primitive, and nullish inputs, static and
 computed string and symbol exclusions, both native specialization policies, and
-forced collection. Eighteen reviewed test262 cases cover all three declaration
-kinds, nullish coercibility, trailing shorthand properties, and function-name
-inference for function, arrow, and covered expressions.
+forced collection. Twenty-four reviewed test262 cases cover all three
+declaration kinds, nullish coercibility, trailing shorthand properties,
+function-name inference for function, arrow, and covered expressions, rest
+exclusions, fresh data descriptors, and non-enumerable omission.
 
 ### Intrinsics and built-in objects
 

@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 551 reviewed cases: 182 passes, 226 expected
+The current manifest contains 557 reviewed cases: 188 passes, 226 expected
 negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -384,12 +384,13 @@ its deliberate boundary and its evidence:
     key, skips non-enumerable and inherited properties, and creates writable,
     enumerable, and configurable data properties on a fresh object. A second
     generated property with seed `0x5eed0009` covers `const`, `let`, and `var`,
-    both specialization policies, and forced collection. Eighteen reviewed
+    both specialization policies, and forced collection. Twenty-four reviewed
     test262 cases cover all three declaration kinds, nullish coercibility,
-    trailing shorthand properties, and function-name inference for function,
-    arrow, and covered expressions. Assignment patterns, parameters, catch
-    bindings, loop heads, `export var`, pattern type annotations, and `await`
-    inside a property name or default remain outside this syntax unit.
+    trailing shorthand properties, function-name inference for function, arrow,
+    and covered expressions, plus rest exclusions, fresh data descriptors, and
+    non-enumerable omission. Assignment patterns, parameters, catch bindings,
+    loop heads, `export var`, pattern type annotations, and `await` inside a
+    property name or default remain outside this syntax unit.
 
 
 Known gaps inside the claim

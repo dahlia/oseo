@@ -8,6 +8,7 @@ supportedFeatures:
   - exponentiation
   - for-of
   - let
+  - object-rest
   - Symbol
   - Symbol.iterator
   - Symbol.toPrimitive
@@ -1447,6 +1448,12 @@ tests:
   - path: test/language/statements/const/dstr/obj-ptrn-id-trailing-comma.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/const/dstr/obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/const/dstr/obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
   - path: test/language/statements/const/global-use-before-initialization-in-declaration-statement.js
     expectedClassification: expected-negative
     dependencies: [error-intrinsics, lexical-bindings]
@@ -1615,6 +1622,12 @@ tests:
   - path: test/language/statements/let/dstr/obj-ptrn-id-trailing-comma.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/let/dstr/obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/let/dstr/obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
   - path: test/language/statements/let/fn-name-fn.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]
@@ -1716,5 +1729,11 @@ tests:
     dependencies:
       [destructuring-bindings, functions, object-properties, var-bindings]
   - path: test/language/statements/variable/dstr/obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/statements/variable/dstr/obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/statements/variable/dstr/obj-ptrn-rest-val-obj.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
