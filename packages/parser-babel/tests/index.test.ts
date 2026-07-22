@@ -602,13 +602,18 @@ test("rejects var declarations sharing a catch parameter name", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
 });
 
-test("rejects var object destructuring explicitly", () => {
+test("converts hoisted var object binding patterns", () => {
   const result = compileSource(babelFrontend, {
-    source: "var { value } = { value: 1 };",
+    source:
+      "console.log(first, second);\n" +
+      "var { value: first, missing: second = 2 } = { value: 1 };",
     sourceId: "var-destructuring.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /var destructuring/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /var write \{"value": %b\d+ first/u);
+  assert.match(printMir(result.mir), /write %b\d+ first %\d+/u);
 });
 
 test("converts hoisted var array binding patterns", () => {
@@ -742,10 +747,70 @@ test("exports every lexical array binding name", () => {
   assert.ok(compiled.mir != null);
 });
 
-test("keeps later array binding consumers outside the profile", () => {
+test("converts lexical object binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const key = 'value';\n" +
+      "const { [key]: first, missing: second = 2, nested: { item }, " +
+      "array: [head] } = { value: 1, nested: { item: 3 }, array: [4] };\n" +
+      "let { mutable } = { mutable: 5 };\n",
+    sourceId: "object-bindings.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /const declare \{%b\d+\(key\): %b\d+ first/u);
+  assert.match(hir, /"nested": \{"item": %b\d+ item/u);
+  assert.match(mir, /RequireObjectCoercible for object binding/u);
+  assert.match(mir, /GetV for object binding/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ObjectPattern|ObjectProperty|AssignmentPattern/u,
+  );
+});
+
+test("supports direct await into an object binding", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack() {\n" +
+      "  const { value, missing = 2 } = " +
+      "await Promise.resolve({ value: 1 });\n" +
+      "  console.log(value, missing);\n" +
+      "}\n" +
+      "unpack();\n",
+    sourceId: "await-object-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(
+    printMir(result.mir),
+    /RequireObjectCoercible for object binding/u,
+  );
+});
+
+test("exports every lexical object binding name", () => {
+  const sourceId = "file:///app/object-bindings.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "export const { value, missing: fallback = 2 } = " +
+      "await Promise.resolve({ value: 1 });",
+    sourceId,
+  });
+  assert.ok(result.module != null);
+  assert.deepEqual(
+    result.module.exports.flatMap((entry) =>
+      entry.kind === "star" ? [] : [entry.exportedName],
+    ),
+    ["value", "fallback"],
+  );
+});
+
+test("keeps later binding consumers outside the profile", () => {
   for (const [name, source] of [
-    ["object element", "const [{ value }] = [{ value: 1 }];"],
     ["pattern annotation", "const [value]: [number] = [1];"],
+    ["object rest", "const { value, ...rest } = { value: 1 };"],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,

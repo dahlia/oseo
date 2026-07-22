@@ -282,6 +282,16 @@ OseoResult oseo_object_literal_create(OseoContext *context) {
     return object_create(context, oseo_null(), true);
 }
 
+OseoResult oseo_require_object_coercible(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_nullish(value)) {
+        return type_error(context, "Cannot destructure a nullish value.");
+    }
+    return normal(value);
+}
+
 OseoResult oseo_array_create(OseoContext *context, size_t length) {
     if (length > UINT32_MAX) {
         return failure(context, "OSEO2001", "Array length is too large.");

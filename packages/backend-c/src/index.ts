@@ -669,6 +669,12 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     line(state, `result = oseo_array_append_hole(context, roots[${array}]);`);
   } else if (operation.kind === "object-create") {
     line(state, "result = oseo_object_literal_create(context);");
+  } else if (operation.kind === "object-coercible") {
+    const input = operationArgument(operation, 0);
+    line(
+      state,
+      `result = oseo_require_object_coercible(context, roots[${input}]);`,
+    );
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(state, `result = oseo_property_key(context, roots[${input}]);`);
@@ -1059,6 +1065,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "array-append" ||
     operation.kind === "array-append-hole" ||
     operation.kind === "array-create" ||
+    operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
     operation.kind === "property-key" ||
     operation.kind === "property-delete" ||

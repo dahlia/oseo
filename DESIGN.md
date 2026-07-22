@@ -382,6 +382,14 @@ and direct awaited initializers resume by initializing those existing cells.
 order. A declaration list may mix plain and array `var` declarators without
 changing redeclaration or parameter-sharing behavior.
 
+Standalone object binding declarations use the same compiler-owned recursive
+patterns and binding leaves. Lowering checks `RequireObjectCoercible` before it
+evaluates the first property name, converts computed and static names through
+the shared property-key operation, reads from left to right, and selects a
+default only for `undefined`. Nested object and array patterns compose directly;
+object rest remains outside this unit until `CopyDataProperties`, enumerable
+own-key order, and symbol exclusions land together.
+
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument
 list. The call target and method receiver are resolved before accumulation, and

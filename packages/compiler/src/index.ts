@@ -301,10 +301,24 @@ export interface SyntaxArrayBindingPattern extends LocatedSyntax {
   readonly rest?: SyntaxBindingPattern;
 }
 
+/** One named or computed property in an owned object binding pattern. */
+export interface SyntaxObjectBindingProperty extends LocatedSyntax {
+  readonly initializer?: SyntaxExpression;
+  readonly key: SyntaxExpression;
+  readonly pattern: SyntaxBindingPattern;
+}
+
+/** One parser-independent object binding pattern. */
+export interface SyntaxObjectBindingPattern extends LocatedSyntax {
+  readonly kind: "object-binding-pattern";
+  readonly properties: readonly SyntaxObjectBindingProperty[];
+}
+
 /** One recursively owned binding pattern admitted by the current profile. */
 export type SyntaxBindingPattern =
   | SyntaxArrayBindingPattern
-  | SyntaxBindingIdentifier;
+  | SyntaxBindingIdentifier
+  | SyntaxObjectBindingPattern;
 
 /** One resolved identifier leaf with explicit binding identity. */
 export interface HirBindingIdentifier extends LocatedSyntax {
@@ -327,10 +341,26 @@ export interface HirArrayBindingPattern extends LocatedSyntax {
   readonly rest?: HirBindingPattern;
 }
 
-/** One recursively resolved binding pattern. */
-export type HirBindingPattern = HirArrayBindingPattern | HirBindingIdentifier;
+/** One resolved property in an object binding pattern. */
+export interface HirObjectBindingProperty extends LocatedSyntax {
+  readonly initializer?: HirExpression;
+  readonly key: HirExpression;
+  readonly pattern: HirBindingPattern;
+}
 
-/** How a resolved array pattern stores each identifier leaf. */
+/** One resolved object binding pattern. */
+export interface HirObjectBindingPattern extends LocatedSyntax {
+  readonly kind: "object-binding-pattern";
+  readonly properties: readonly HirObjectBindingProperty[];
+}
+
+/** One recursively resolved binding pattern. */
+export type HirBindingPattern =
+  | HirArrayBindingPattern
+  | HirBindingIdentifier
+  | HirObjectBindingPattern;
+
+/** How a resolved binding pattern stores each identifier leaf. */
 export type BindingPatternMode = "declare" | "initialize" | "write";
 
 /** One switch clause; a missing test marks the default clause. */
@@ -463,9 +493,9 @@ export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly declarationKind: "const" | "let" | "var";
       readonly initializer: SyntaxExpression;
-      readonly kind: "array-binding";
+      readonly kind: "binding-pattern";
       readonly mode: BindingPatternMode;
-      readonly pattern: SyntaxArrayBindingPattern;
+      readonly pattern: SyntaxBindingPattern;
     })
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
@@ -1560,9 +1590,9 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly declarationKind: "const" | "let" | "var";
       readonly initializer: HirExpression;
-      readonly kind: "array-binding";
+      readonly kind: "binding-pattern";
       readonly mode: BindingPatternMode;
-      readonly pattern: HirArrayBindingPattern;
+      readonly pattern: HirBindingPattern;
     })
   | (LocatedSyntax & {
       readonly bindingId: number;
@@ -2106,6 +2136,11 @@ type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
 
 function syntaxBindingNames(pattern: SyntaxBindingPattern): readonly string[] {
   if (pattern.kind === "binding-identifier") return [pattern.name];
+  if (pattern.kind === "object-binding-pattern") {
+    return pattern.properties.flatMap((property) =>
+      syntaxBindingNames(property.pattern),
+    );
+  }
   return [
     ...pattern.elements.flatMap((element) =>
       element == null ? [] : syntaxBindingNames(element.pattern),
@@ -2121,7 +2156,7 @@ function predeclareBindings(
 ): void {
   for (const statement of statements) {
     if (
-      statement.kind === "array-binding" &&
+      statement.kind === "binding-pattern" &&
       statement.mode === "declare" &&
       statement.declarationKind !== "var"
     ) {
@@ -2316,6 +2351,11 @@ function hirBindingIdentifiers(
   pattern: HirBindingPattern,
 ): readonly HirBindingIdentifier[] {
   if (pattern.kind === "binding-identifier") return [pattern];
+  if (pattern.kind === "object-binding-pattern") {
+    return pattern.properties.flatMap((property) =>
+      hirBindingIdentifiers(property.pattern),
+    );
+  }
   return [
     ...pattern.elements.flatMap((element) =>
       element == null ? [] : hirBindingIdentifiers(element.pattern),
@@ -2336,7 +2376,7 @@ function declaredHirBindingIds(
     ) {
       result.push(statement.bindingId);
     } else if (
-      statement.kind === "array-binding" &&
+      statement.kind === "binding-pattern" &&
       statement.mode === "declare" &&
       statement.declarationKind !== "var"
     ) {
@@ -2452,6 +2492,50 @@ function resolveBindingPattern(
       mutable: binding.mutable,
     };
   }
+  if (pattern.kind === "object-binding-pattern") {
+    const properties: HirObjectBindingProperty[] = [];
+    for (const property of pattern.properties) {
+      const key = resolveExpression(property.key, scopes, state);
+      const resolvedPattern = resolveBindingPattern(
+        property.pattern,
+        scopes,
+        state,
+        mode,
+      );
+      let initializer =
+        property.initializer == null
+          ? undefined
+          : resolveExpression(property.initializer, scopes, state);
+      if (
+        initializer != null &&
+        resolvedPattern?.kind === "binding-identifier"
+      ) {
+        initializer = inferFunctionName(initializer, resolvedPattern.name);
+      }
+      if (
+        key == null ||
+        resolvedPattern == null ||
+        (property.initializer != null && initializer == null)
+      ) {
+        return undefined;
+      }
+      properties.push({
+        ...(property.byteRange == null
+          ? {}
+          : { byteRange: property.byteRange }),
+        ...(initializer == null ? {} : { initializer }),
+        key,
+        pattern: resolvedPattern,
+        range: property.range,
+      });
+    }
+    return {
+      ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
+      kind: "object-binding-pattern",
+      properties,
+      range: pattern.range,
+    };
+  }
   const elements: (HirBindingElement | undefined)[] = [];
   for (const element of pattern.elements) {
     if (element == null) {
@@ -2506,7 +2590,7 @@ function resolveStatement(
   loopDepth = 0,
   breakDepth = 0,
 ): HirStatement | undefined {
-  if (statement.kind === "array-binding") {
+  if (statement.kind === "binding-pattern") {
     const initializer = resolveExpression(statement.initializer, scopes, state);
     const pattern = resolveBindingPattern(
       statement.pattern,
@@ -2514,7 +2598,7 @@ function resolveStatement(
       state,
       statement.mode,
     );
-    return initializer == null || pattern?.kind !== "array-binding-pattern"
+    return initializer == null || pattern == null
       ? undefined
       : { ...statement, initializer, pattern };
   }
@@ -3190,6 +3274,22 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
   if (pattern.kind === "binding-identifier") {
     return `%b${pattern.bindingId} ${pattern.name}`;
   }
+  if (pattern.kind === "object-binding-pattern") {
+    return (
+      "{" +
+      pattern.properties
+        .map(
+          (property) =>
+            `${printHirExpression(property.key)}: ` +
+            printHirBindingPattern(property.pattern) +
+            (property.initializer == null
+              ? ""
+              : ` = ${printHirExpression(property.initializer)}`),
+        )
+        .join(", ") +
+      "}"
+    );
+  }
   const elements = pattern.elements.map((element) =>
     element == null
       ? ""
@@ -3220,7 +3320,7 @@ function appendHirStatement(
         `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
         `${printHirExpression(statement.initializer)}${location}`,
     );
-  } else if (statement.kind === "array-binding") {
+  } else if (statement.kind === "binding-pattern") {
     lines.push(
       `${indent}${statement.declarationKind} ${statement.mode} ` +
         `${printHirBindingPattern(statement.pattern)} = ` +
@@ -3484,6 +3584,7 @@ export interface MirOperation {
     | "join"
     | "load-fixed-slot"
     | "module-namespace-create"
+    | "object-coercible"
     | "object-create"
     | "property-key"
     | "property-delete"
@@ -5130,7 +5231,7 @@ function resetBlockBindings(
         builder,
       );
     } else if (
-      statement.kind === "array-binding" &&
+      statement.kind === "binding-pattern" &&
       statement.mode === "declare" &&
       statement.declarationKind !== "var"
     ) {
@@ -5623,7 +5724,7 @@ function lowerBindingDefault(
   appendMirMetadata(
     builder,
     "check-status",
-    "normal -> select array binding default, abrupt -> close iterator",
+    "normal -> select binding default, abrupt -> transfer",
     [useDefault],
     range,
   );
@@ -5656,7 +5757,7 @@ function lowerBindingDefault(
   appendMirMetadata(
     builder,
     "join",
-    `array binding default bb${defaultBlock.id} + bb${valueBlock.id}`,
+    `binding default bb${defaultBlock.id} + bb${valueBlock.id}`,
     [],
     range,
   );
@@ -5671,6 +5772,10 @@ function lowerBindingTarget(
 ): void {
   if (pattern.kind === "array-binding-pattern") {
     lowerArrayBindingPattern(pattern, value, mode, builder);
+    return;
+  }
+  if (pattern.kind === "object-binding-pattern") {
+    lowerObjectBindingPattern(pattern, value, mode, builder);
     return;
   }
   const id = builder.nextValue;
@@ -5694,6 +5799,72 @@ function lowerBindingTarget(
     );
   }
   recordRoot(builder, id, pattern.range);
+}
+
+function lowerObjectBindingPattern(
+  pattern: HirObjectBindingPattern,
+  input: number,
+  mode: BindingPatternMode,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "require object-coercible binding input",
+    [input],
+    pattern.range,
+  );
+  const object = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "RequireObjectCoercible for object binding",
+    id: object,
+    kind: "object-coercible",
+    range: pattern.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> read binding properties, abrupt -> transfer",
+    [object],
+    pattern.range,
+  );
+  recordRoot(builder, object, pattern.range);
+  for (const property of pattern.properties) {
+    const key = lowerPropertyKey(property.key, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "object binding property lookup",
+      [object, key],
+      property.range,
+    );
+    const propertyValue = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [object, key],
+      detail: "GetV for object binding",
+      id: propertyValue,
+      kind: "property-get",
+      range: property.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> select binding value, abrupt -> transfer",
+      [propertyValue],
+      property.range,
+    );
+    recordRoot(builder, propertyValue, property.range);
+    const value = lowerBindingDefault(
+      propertyValue,
+      property.initializer,
+      property.range,
+      builder,
+    );
+    lowerBindingTarget(property.pattern, value, mode, builder);
+  }
 }
 
 function lowerArrayBindingRest(
@@ -5894,14 +6065,9 @@ function lowerStatements(
   builder: MirBuilder,
 ): boolean {
   for (const statement of statements) {
-    if (statement.kind === "array-binding") {
+    if (statement.kind === "binding-pattern") {
       const value = lowerExpression(statement.initializer, builder);
-      lowerArrayBindingPattern(
-        statement.pattern,
-        value,
-        statement.mode,
-        builder,
-      );
+      lowerBindingTarget(statement.pattern, value, statement.mode, builder);
     } else if (
       statement.kind === "binding-init" ||
       statement.kind === "const" ||
@@ -6770,7 +6936,7 @@ export function buildMir(
     statement.kind === "let" ||
     statement.kind === "function-init"
       ? [{ id: statement.bindingId, name: statement.name }]
-      : statement.kind === "array-binding" &&
+      : statement.kind === "binding-pattern" &&
           statement.mode === "declare" &&
           statement.declarationKind !== "var"
         ? hirBindingIdentifiers(statement.pattern).map((binding) => ({
@@ -7109,7 +7275,7 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
   ) {
     return hirExpressionHasAwait(statement.initializer);
   }
-  if (statement.kind === "array-binding") {
+  if (statement.kind === "binding-pattern") {
     return hirExpressionHasAwait(statement.initializer);
   }
   if (statement.kind === "expression" || statement.kind === "throw") {
@@ -7192,7 +7358,7 @@ function collectHirBindings(
     ) {
       bindings.push({ id: statement.bindingId, name: statement.name });
     } else if (
-      statement.kind === "array-binding" &&
+      statement.kind === "binding-pattern" &&
       statement.mode === "declare" &&
       statement.declarationKind !== "var"
     ) {
@@ -7583,7 +7749,7 @@ function moduleAwaitPoint(
       : statement.kind === "binding-init" ||
           statement.kind === "const" ||
           statement.kind === "let" ||
-          statement.kind === "array-binding"
+          statement.kind === "binding-pattern"
         ? statement.initializer
         : undefined;
   if (expression == null) return undefined;
@@ -7606,7 +7772,7 @@ function moduleAwaitPoint(
           kind: "binding-init",
         };
       }
-      if (statement.kind === "array-binding") {
+      if (statement.kind === "binding-pattern") {
         return {
           ...statement,
           initializer: resumed,

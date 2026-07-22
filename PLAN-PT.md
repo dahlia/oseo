@@ -469,6 +469,24 @@ initialization and writes, early and exhausted iterators, nested close order,
 abrupt steps without close, and close-completion precedence.
 
 
+M5 object binding properties
+----------------------------
+
+The object binding property generates a standalone `const`, `let`, or `var`
+declaration with static, computed, defaulted, nested object, or nested array
+properties. Inputs vary across ordinary objects, strings, numbers, `null`, and
+`undefined`. Its independent model predicts the bound value, computed-key and
+default order, and nullish `TypeError`. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
+values, and no filtering. The extended tier runs ten times the ordinary budget
+through the shared replay controls. Fixed native fixtures retain temporal dead
+zones, function-name inference, symbol keys, primitive property reads, nested
+patterns, nullish ordering, `var` hoisting, and awaited initialization.
+
+
 Test placement and package boundaries
 -------------------------------------
 
