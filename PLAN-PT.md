@@ -486,6 +486,17 @@ through the shared replay controls. Fixed native fixtures retain temporal dead
 zones, function-name inference, symbol keys, primitive property reads, nested
 patterns, nullish ordering, `var` hoisting, and awaited initialization.
 
+The object rest property uses seed `0x5eed0009` and generates `const`, `let`,
+and `var` declarations with static, computed string, or computed symbol
+exclusions. Its independent oracle predicts the selected value, ordered string
+keys, retained and excluded symbols, omitted non-enumerable and inherited
+properties, fresh data descriptors, and computed-key evaluation count. Each
+case compares Node.js, Deno, and both native specialization policies, with
+collection forced on the enabled path. The ordinary suite runs ten cases over
+five bounded own properties without filtering; the extended tier runs ten times
+that budget. Fixed native fixtures retain empty exclusions, primitive string
+indices, nested rest targets, symbol exclusions, and declaration-kind hoisting.
+
 
 Test placement and package boundaries
 -------------------------------------

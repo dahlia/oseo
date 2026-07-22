@@ -1782,6 +1782,76 @@ const {
 } = {};
 console.log("order", selected, keyOrder);
 
+const copiedSymbol = Symbol("copied");
+const excludedSymbol = Symbol("excluded");
+const restSource = {
+  10: "ten",
+  2: "two",
+  keep: "kept",
+  [copiedSymbol]: "symbol",
+  [excludedSymbol]: "excluded",
+};
+Object.defineProperty(restSource, "hidden", {
+  value: "hidden",
+  enumerable: false,
+});
+Object.setPrototypeOf(restSource, { inherited: "inherited" });
+let excludedEvaluations = 0;
+const excludedKey = {
+  [Symbol.toPrimitive]: function () {
+    excludedEvaluations = excludedEvaluations + 1;
+    return excludedSymbol;
+  },
+};
+const {
+  2: pickedIndex,
+  [excludedKey]: pickedSymbol,
+  ...restObject
+} = restSource;
+const restKeys = Object.keys(restObject);
+console.log(
+  "rest",
+  pickedIndex,
+  pickedSymbol,
+  excludedEvaluations,
+  restKeys.length,
+  restKeys[0],
+  restKeys[1],
+  restObject[copiedSymbol],
+  restObject[excludedSymbol],
+  restObject.inherited,
+  restObject.hidden,
+);
+const restDescriptor = Object.getOwnPropertyDescriptor(restObject, "10");
+console.log(
+  "rest-descriptor",
+  restDescriptor.value,
+  restDescriptor.writable,
+  restDescriptor.enumerable,
+  restDescriptor.configurable,
+);
+const { 1: middleUnit, ...textRest } = "abc";
+const textRestKeys = Object.keys(textRest);
+console.log(
+  "string-rest",
+  middleUnit,
+  textRestKeys.length,
+  textRestKeys[0],
+  textRestKeys[1],
+  textRest[0],
+  textRest[2],
+);
+const { nested: { chosen, ...nestedRest }, ...outerRest } = {
+  nested: { chosen: 20, retained: 21 },
+  outer: 22,
+};
+console.log("nested-rest", chosen, nestedRest.retained, outerRest.outer);
+let { ...letRest } = { mutableRest: 23 };
+var { ...varRest } = { hoistedRest: 24 };
+console.log("declaration-rest", letRest.mutableRest, varRest.hoistedRest);
+const { ...numberRest } = 1;
+console.log("number-rest", Object.keys(numberRest).length);
+
 keyOrder = "";
 try {
   const { [(keyOrder = keyOrder + "bad")]: never } = null;

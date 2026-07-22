@@ -126,6 +126,10 @@ The `m5-12` ABI adds `oseo_require_object_coercible` for object binding
 initialization. It rejects `null` and `undefined` with a catchable `TypeError`
 before a computed property name can run, while every other admitted value
 continues through the existing primitive-aware property-read operations.
+The `m5-13` ABI adds `oseo_object_rest` for `CopyDataProperties`. It snapshots
+own keys in ECMAScript order, skips excluded and non-enumerable keys, reads each
+remaining value through the generic property path, and creates ordinary data
+properties on a fresh result object.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

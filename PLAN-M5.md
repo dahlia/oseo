@@ -62,9 +62,10 @@ elisions, defaults, nested array patterns, and rest through the same iterator
 protocol, with conditional `IteratorClose` and direct awaited initialization.
 Standalone object binding declarations now admit `const`, `let`, and hoisted
 `var` with static, computed, shorthand, renamed, defaulted, and nested object or
-array properties. They preserve nullish checks, property-key and default order,
-and direct awaited initialization. Object rest and the remaining destructuring
-positions remain later work. The runtime component boundaries
+array properties and a final identifier rest target. They preserve nullish
+checks, property-key and default order, direct awaited initialization, ordered
+enumerable own-key copying, and string and symbol exclusions. The remaining
+destructuring positions remain later work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
@@ -202,13 +203,16 @@ patterns, rest, and iterator done-state handling.
 Standalone object binding declarations reuse the same recursive binding leaves
 without iterator cleanup. They check `RequireObjectCoercible` before a computed
 key, apply `ToPropertyKey` and `GetV` from left to right, select defaults only
-for `undefined`, and compose nested object and array patterns. The generated
-property suite uses seed `0x5eed0008` across ordinary, primitive, and nullish
-inputs, both native specialization policies, and forced collection. Object rest
-is deferred until its enumerable own-key, symbol exclusion, getter, and copy
-semantics can land together. Eighteen reviewed test262 cases cover all three
-declaration kinds, nullish coercibility, trailing shorthand properties, and
-function-name inference for function, arrow, and covered expressions.
+for `undefined`, and compose nested object and array patterns. A final
+identifier rest target snapshots own keys in ECMAScript order, excludes each
+previously evaluated property key, reads the remaining enumerable own values
+through the generic property path, and creates ordinary data properties on a
+fresh object. The generated property suites use seeds `0x5eed0008` and
+`0x5eed0009` across ordinary, primitive, and nullish inputs, static and
+computed string and symbol exclusions, both native specialization policies, and
+forced collection. Eighteen reviewed test262 cases cover all three declaration
+kinds, nullish coercibility, trailing shorthand properties, and function-name
+inference for function, arrow, and covered expressions.
 
 ### Intrinsics and built-in objects
 

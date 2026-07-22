@@ -334,6 +334,12 @@ OseoResult oseo_require_object_coercible(
     OseoContext *context,
     OseoValue value
 );
+OseoResult oseo_object_rest(
+    OseoContext *context,
+    OseoValue source,
+    size_t excluded_count,
+    const OseoValue *excluded_keys
+);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);
 OseoResult oseo_object_define(
     OseoContext *context,
