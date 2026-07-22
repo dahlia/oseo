@@ -10,6 +10,7 @@ import type { Test262Case } from "../packages/testkit/src/index.ts";
 import {
   assembleTest262Source,
   executeTest262Case,
+  normalizeReviewedManifestText,
   parseReviewedManifest,
   parseReviewedSubset,
   parseTest262Case,
@@ -551,8 +552,17 @@ test("round-trips and shards the checked-in reviewed manifest", async () => {
     new URL("test262/results.yaml", import.meta.url),
     "utf8",
   );
-  const manifest = parseReviewedManifest(text);
-  assert.equal(serializeTest262Manifest(manifest), text);
+  const canonicalText = normalizeReviewedManifestText(text);
+  const manifest = parseReviewedManifest(canonicalText);
+  assert.equal(serializeTest262Manifest(manifest), canonicalText);
+  assert.equal(
+    serializeTest262Manifest(
+      parseReviewedManifest(
+        normalizeReviewedManifestText(canonicalText.replaceAll("\n", "\r\n")),
+      ),
+    ),
+    canonicalText,
+  );
 
   const shards = [1, 2, 3].map((index) =>
     selectManifestShard(manifest, { index, total: 3 }),

@@ -1289,6 +1289,11 @@ function manifestDigest(serialized: string): string {
   return `sha256:${createHash("sha256").update(serialized).digest("hex")}`;
 }
 
+/** Normalize reviewed manifest checkout text to canonical LF line endings. */
+export function normalizeReviewedManifestText(text: string): string {
+  return text.replaceAll("\r\n", "\n");
+}
+
 /** Serialize the canonical manifest digest and supported execution targets. */
 export function serializeTargetParity(
   serializedManifest: string,
@@ -1366,7 +1371,9 @@ async function main(): Promise<void> {
       serializeTargetParity(serialized, manifest.suiteRevision),
     );
   } else {
-    const expected = await readFile(resultPath, "utf8");
+    const expected = normalizeReviewedManifestText(
+      await readFile(resultPath, "utf8"),
+    );
     const expectedResult =
       cliArguments.shard == null
         ? expected
