@@ -210,6 +210,9 @@ Later M5 semantic units extend the vocabulary with `error-intrinsics` for the
 named error family and catchable runtime errors, `symbols` for symbol values
 and well-known symbol behavior, and `iterator-protocol` for synchronous
 iterator acquisition, stepping, closing, and consumers.
+`destructuring-bindings` identifies binding-pattern initialization and
+assignment semantics independently from the declaration kind that owns the
+bound names.
 
 
 Alternatives considered

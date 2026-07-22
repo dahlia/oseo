@@ -36,6 +36,10 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
+The current manifest contains 533 reviewed cases: 164 passes, 226 expected
+negatives, and 143 unsupported profile features. It records no semantic or
+harness failures.
+
 
 Capability groups
 -----------------
@@ -151,7 +155,7 @@ its deliberate boundary and its evidence:
     into hoisted bindings initialized to `undefined` plus in-place
     assignments, so no separate binding kind reaches HIR or the runtime.
     Deliberate boundaries, each rejected with a source-located
-    diagnostic: `var` destructuring, `export var`, ambient `declare`
+    diagnostic: `var` object destructuring, `export var`, ambient `declare`
     declarations, a `var` sharing a catch parameter name (ECMAScript
     allows it), a `var` sharing a block-level function declaration name,
     because Annex B function hoisting would make the difference
@@ -313,11 +317,12 @@ its deliberate boundary and its evidence:
     five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
     specification reaches by boxing, is unsupported; the promise combinators,
-    `for-of`, array spread, call spread, and constructor spread accept only
+    `for-of`, array spread, call spread, constructor spread, and array
+    binding declarations accept only
     object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and `for-await-of`, destructuring
-    iteration, array and string iterator prototype identity, and generator-based
-    iterators remain outside the admitted syntax.
+    the generic `%Array.prototype.values%`; and `for-await-of`, remaining
+    destructuring positions, array and string iterator prototype identity, and
+    generator-based iterators remain outside the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -335,6 +340,30 @@ its deliberate boundary and its evidence:
     cases pin iterator acquisition and step failures across calls and
     construction. Call and constructor spread inherit the object-iterable
     boundary.
+ -  Array binding declarations. A standalone one-declarator `const` or `let`
+    statement and each declarator in a standalone `var` statement admit empty
+    patterns, elisions, defaults, nested array patterns, and a final identifier
+    or nested array rest target. Every lexical name enters its temporal dead
+    zone before the initializer runs. Each `var` name is function-scope hoisted,
+    initialized to `undefined`, and written in source order; declaration lists
+    may mix plain and array declarators. Lowering
+    evaluates the initializer once, captures `next` once per pattern, steps
+    from left to right, and applies a default only when the iterated value is
+    `undefined`. Rest exhausts its iterator into a new array. Normal or abrupt
+    completion closes every non-exhausted iterator from the inside out, while
+    normal exhaustion and a failing iterator step do not close. An in-flight
+    throw remains authoritative over a close failure. Direct awaited
+    initialization or writing is supported in asynchronous functions and
+    modules, and a lexical module export exposes every bound name. Native
+    differential fixtures and
+    generated Node, Deno, and native properties cover values, temporal dead
+    zones, function-name inference, cleanup precedence, both specialization
+    policies, and forced collection. Twenty-four reviewed test262 cases cover
+    all three declaration kinds, values, defaults for holes and exhausted
+    iterators, function-name inference, nested patterns, rest, and iterator
+    done-state handling. Object patterns, assignment patterns, parameters,
+    catch bindings, loop heads, `export var`, pattern type annotations, and
+    `await` inside a default remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -343,10 +372,11 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring, default and rest parameters, classes, generators, big
-    integers, regular expressions, and the remaining expression grammar are
-    outside the admitted syntax. Owner: the core expressions and bindings
-    stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Object patterns, non-declaration destructuring positions, default and rest
+    parameters, classes, generators, big integers, regular
+    expressions, and the remaining expression grammar are outside the admitted
+    syntax. Owner: the core expressions and bindings stream in
+    [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

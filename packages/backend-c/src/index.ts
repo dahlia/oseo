@@ -242,7 +242,21 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
       );
       return;
     }
-    line(state, "result = oseo_write_immutable_binding(context);");
+    if (operation.importedBinding === true) {
+      line(state, "result = oseo_write_immutable_binding(context);");
+      return;
+    }
+    line(
+      state,
+      `result = oseo_environment_get(context, ` +
+        `roots[${state.environmentSlot}], ${bindingId}u);`,
+    );
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, "    result = oseo_cell_get(context, result.value);");
+    line(state, "}");
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, "    result = oseo_write_immutable_binding(context);");
+    line(state, "}");
     return;
   }
   line(
@@ -420,6 +434,9 @@ function emitIteratorOperation(
       `result = oseo_iterator_get(context, roots[${iterable}], ` +
         `&roots[${nextMethod}]);`,
     );
+    if (operation.iteratorDoneState != null) {
+      line(state, `bool iterator_done_${operation.iteratorDoneState} = false;`);
+    }
     line(state, `roots[${operation.id}] = result.value;`);
     return;
   }
@@ -431,14 +448,35 @@ function emitIteratorOperation(
       throw new Error(`MIR iterator next %${operation.id} has no value.`);
     }
     state.scalarKinds.set(operation.id, "boolean");
-    line(state, `bool iterator_done_${operation.id} = true;`);
-    line(
-      state,
-      `result = oseo_iterator_next(context, roots[${iterator}], ` +
-        `roots[${nextMethod}], &roots[${value}], ` +
-        `&iterator_done_${operation.id});`,
-    );
-    line(state, `bool fast_${operation.id} = !iterator_done_${operation.id};`);
+    const doneState = operation.iteratorDoneState ?? operation.id;
+    if (operation.iteratorDoneState == null) {
+      line(state, `bool iterator_done_${doneState} = true;`);
+    }
+    if (operation.iteratorDoneState != null) {
+      line(state, `if (iterator_done_${doneState}) {`);
+      line(
+        state,
+        `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+      );
+      line(state, `    roots[${value}] = oseo_undefined();`);
+      line(state, "} else {");
+      line(
+        state,
+        `    result = oseo_iterator_next(context, roots[${iterator}], ` +
+          `roots[${nextMethod}], &roots[${value}], ` +
+          `&iterator_done_${doneState});`,
+      );
+      line(state, "}");
+    } else {
+      line(
+        state,
+        `result = oseo_iterator_next(context, roots[${iterator}], ` +
+          `roots[${nextMethod}], &roots[${value}], ` +
+          `&iterator_done_${doneState});`,
+      );
+    }
+    line(state, `bool fast_${operation.id} = !iterator_done_${doneState};`);
+    line(state, `(void)fast_${operation.id};`);
     return;
   }
   const iterator = operationArgument(operation, 0);
@@ -447,11 +485,26 @@ function emitIteratorOperation(
     throw new Error(`MIR iterator close %${operation.id} has no completion.`);
   }
   state.usesCompletion = true;
-  line(
-    state,
-    `result = oseo_iterator_close(context, roots[${iterator}], ` +
-      `completion_kind[${slot}u] == 2);`,
-  );
+  if (operation.iteratorDoneState == null) {
+    line(
+      state,
+      `result = oseo_iterator_close(context, roots[${iterator}], ` +
+        `completion_kind[${slot}u] == 2);`,
+    );
+  } else {
+    line(state, `if (iterator_done_${operation.iteratorDoneState}) {`);
+    line(
+      state,
+      `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+    );
+    line(state, "} else {");
+    line(
+      state,
+      `    result = oseo_iterator_close(context, roots[${iterator}], ` +
+        `completion_kind[${slot}u] == 2);`,
+    );
+    line(state, "}");
+  }
   line(state, `roots[${operation.id}] = result.value;`);
 }
 

@@ -367,6 +367,21 @@ Because top-level await continuation extraction cannot yet retain an already
 accumulated prefix without observably iterating it again, a spread before a
 later top-level await point is a source-located unsupported combination.
 
+Standalone array binding declarations lower their recursive patterns
+through the same iterator operations. Each pattern owns a backend-local done
+state so normal exhaustion suppresses later steps and closing. Elisions still
+step, defaults execute only for `undefined`, nested patterns open nested cleanup
+regions, and rest drains the iterator into a rooted array. A step failure
+returns directly because the iterator record has already completed abruptly;
+later target or default failures close every still-open pattern from the inside
+out. The stored completion preserves the original throw over a failing close.
+The frontend predeclares every lexical name before evaluating the initializer,
+and direct awaited initializers resume by initializing those existing cells.
+`var` pattern names join the existing function-scope hoisting pass as
+`undefined`-initialized cells, then pattern leaves write those cells in source
+order. A declaration list may mix plain and array `var` declarators without
+changing redeclaration or parameter-sharing behavior.
+
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument
 list. The call target and method receiver are resolved before accumulation, and

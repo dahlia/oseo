@@ -107,6 +107,9 @@ entry points `oseo_iterator_get`, `oseo_iterator_next`, and
 `oseo_iterator_close`. Generated C keeps the iterator, captured next method,
 and yielded value in separate root slots instead of allocating a hidden
 iterator-record object. Promise combinators use the same entry points.
+Array binding declarations reuse these entry points without changing
+the runtime ABI. Generated code owns their iterator done state and conditional
+close control flow, while rest accumulation reuses `oseo_array_append`.
 The `m5-10` ABI adds `oseo_array_append` and `oseo_array_append_hole` for
 generated array accumulation. Value append creates a new own data property
 without consulting the prototype, while hole append advances only the array

@@ -76,6 +76,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "abrupt-completion",
   "async-functions",
   "control-flow",
+  "destructuring-bindings",
   "dynamic-source",
   "error-intrinsics",
   "expression-operators",

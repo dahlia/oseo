@@ -549,7 +549,13 @@ array literal, call argument, and constructor argument spread consumers now
 reuse the synchronous iterator protocol through rooted dynamic accumulation.
 Generated Node, Deno, and native evidence covers their values, evaluation
 order, captured `next`, and abrupt steps; reviewed test262 evidence covers
-iterator acquisition and abrupt steps for all three consumers. The intrinsics
+iterator acquisition and abrupt steps for all three consumers. The core stream
+also admits standalone `const`, `let`, and hoisted `var` array binding
+declarations with elisions, defaults, nested array patterns, rest, and
+conditional iterator closing. Generated evidence covers binding values,
+hoisting, and cleanup; 24 reviewed standards cases cover the three declaration
+kinds, defaults, nested patterns, rest, and iterator done-state handling. The
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
@@ -561,8 +567,8 @@ no compatibility counts; the error, symbol, and iterator components
 landed with the M5 intrinsics units. The remaining queue is:
 
 1.  Complete the remaining foundational expressions and coercions after the
-    landed errors, symbols, synchronous iterator consumers, and array literal,
-    call argument, and constructor argument spread.
+    landed errors, symbols, synchronous iterator consumers, spread consumers,
+    and array binding declarations.
 2.  Add built-in families and broader executable syntax in dependency order.
 3.  Close the named edition with reproducible standards and generated
     evidence.

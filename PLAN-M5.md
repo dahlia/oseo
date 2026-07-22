@@ -17,7 +17,9 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications.
+honest unsupported classifications. The current reviewed manifest records 164
+passes, 226 expected negatives, and 143 unsupported profile features with no
+semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
@@ -53,9 +55,12 @@ rejects after a step, completing the delivery item 4 groundwork; the
 lexical, assignment, and cleanup semantics. Array literal spread now consumes
 that protocol through dynamic own-property accumulation, preserving holes,
 captured `next` methods, and the specified absence of `IteratorClose` on
-acquisition or step failures. Call, constructor, and destructuring spread
-are being delivered as separate syntax units: call and constructor spread now
-use a rooted dynamic argument list, while destructuring spread remains later
+acquisition or step failures. Call and constructor spread use a rooted dynamic
+argument list. Standalone array binding declarations now admit `const`, `let`,
+and hoisted `var` with
+elisions, defaults, nested array patterns, and rest through the same iterator
+protocol, with conditional `IteratorClose` and direct awaited initialization.
+Object patterns and the remaining destructuring positions remain later
 work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
@@ -176,6 +181,20 @@ method, and dynamic calls and ordinary construction, both native specialization
 policies, and forced collection. Native fixtures also cover `Promise`
 construction. Ten reviewed test262 cases pin iterator acquisition and step
 failures across calls and construction.
+
+Standalone `const`, `let`, and `var` array binding declarations now own
+recursive parser-independent patterns. Their lowering evaluates the initializer
+once, steps from left to right, applies defaults only to `undefined`, drains
+rest elements, and closes a non-exhausted iterator on normal or abrupt pattern
+completion. The generated property suite uses seed `0x5eed0007`, compares an
+independent binding and cleanup model with Node.js, Deno, and both native
+specialization policies, and forces collection on the enabled path. Fixed
+native fixtures retain temporal dead zones, function-name inference, nested
+close order, step failure, close-completion precedence, `var` hoisting,
+redeclaration, and direct awaited writes. Reviewed test262 evidence completes
+the same syntax unit: 24 passing cases cover `const`, `let`, and `var` values,
+defaults for holes and exhausted iterators, function-name inference, nested
+patterns, rest, and iterator done-state handling.
 
 ### Intrinsics and built-in objects
 

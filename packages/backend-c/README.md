@@ -52,6 +52,10 @@ Call and constructor spread use the same iterator control flow while appending
 values to a GC-traced argument list. Generated invocations borrow the list count
 and stable value pointer only for the call, while fixed-arity paths keep their
 positional arguments.
+Array binding lowering associates iterator get, next, and close operations with
+a backend-local done bit. Exhaustion suppresses later steps and close calls,
+while generated cleanup blocks close only a still-open iterator and preserve an
+in-flight throw over a close failure.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

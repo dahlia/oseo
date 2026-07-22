@@ -36,6 +36,13 @@ work returns without `IteratorClose`; invocations without spread retain fixed
 positional lowering. Construction allocates its receiver after accumulation. A
 spread before a later top-level await point remains an explicit unsupported
 combination until continuation extraction can retain the list.
+Standalone array binding declarations use compiler-owned recursive
+patterns rather than frontend AST nodes. MIR gives each pattern an explicit
+iterator done state, steps elisions and elements in order, drains rest into a
+rooted array, and enters conditional close blocks for abrupt or early normal
+completion. Nested patterns compose those cleanup regions from the inside out.
+Lexical leaves initialize predeclared cells, while hoisted `var` leaves use
+checked writes to existing function-scope cells.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

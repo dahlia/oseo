@@ -602,13 +602,158 @@ test("rejects var declarations sharing a catch parameter name", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
 });
 
-test("rejects var destructuring explicitly", () => {
+test("rejects var object destructuring explicitly", () => {
   const result = compileSource(babelFrontend, {
     source: "var { value } = { value: 1 };",
     sourceId: "var-destructuring.ts",
   });
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.match(result.diagnostics[0]?.message ?? "", /var destructuring/u);
+});
+
+test("converts hoisted var array binding patterns", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(first, second, third);\n" +
+      "var [first, second = 2] = [1];\n" +
+      "var plain = 3, [, third] = [0, 4];\n",
+    sourceId: "var-array-bindings.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /var write \[%b\d+ first/u);
+  assert.match(printMir(result.mir), /write %b\d+ first %\d+/u);
+});
+
+test("supports direct await into a var array binding", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack() {\n" +
+      "  var [value, fallback = 2] = await Promise.resolve([1]);\n" +
+      "  return value + fallback;\n" +
+      "}\n" +
+      "unpack();\n",
+    sourceId: "await-var-array-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /write %b\d+ value %\d+/u);
+});
+
+test("preserves var writes across top-level await", () => {
+  const sourceId = "file:///app/await-var-array-binding.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "console.log(value, fallback);\n" +
+      "var [value, fallback = 2] = await Promise.resolve([1]);\n" +
+      "console.log(value, fallback);\n",
+    sourceId,
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "await-var-array-binding",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /write %b\d+ value %\d+/u);
+});
+
+test("converts lexical array binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const values = [1, 2, undefined, [5], 6];\n" +
+      "const [first, , second = 3, [nested] = [4], ...rest] = values;\n" +
+      "let [mutable] = rest;\n",
+    sourceId: "array-bindings.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /const declare \[%b\d+ first, , %b\d+ second = 3/u);
+  assert.match(hir, /\.\.\.%b\d+ rest/u);
+  assert.match(mir, /done-state=%\d+/u);
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /array binding rest/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|AssignmentPattern/u,
+  );
+});
+
+test("supports direct await into a lexical array binding", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack() {\n" +
+      "  const [first, second = 2] = await Promise.resolve([1]);\n" +
+      "  console.log(first, second);\n" +
+      "}\n" +
+      "unpack();\n",
+    sourceId: "await-array-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
+});
+
+test("exports every lexical array binding name", () => {
+  const sourceId = "file:///app/array-bindings.js";
+  const result = babelModuleFrontend.parseModule({
+    source: [
+      "export const [first, second = 2] = ",
+      "await Promise.resolve([1]);",
+    ].join(""),
+    sourceId,
+  });
+  assert.ok(result.module != null);
+  assert.deepEqual(
+    result.module.exports.flatMap((entry) =>
+      entry.kind === "star" ? [] : [entry.exportedName],
+    ),
+    ["first", "second"],
+  );
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "array-bindings",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+});
+
+test("keeps later array binding consumers outside the profile", () => {
+  for (const [name, source] of [
+    ["object element", "const [{ value }] = [{ value: 1 }];"],
+    ["pattern annotation", "const [value]: [number] = [1];"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(result.mir, undefined);
+  }
 });
 
 test("rejects ambient declare declarations", () => {
