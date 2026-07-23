@@ -91,6 +91,9 @@ array-append, and object-rest operations after generated code captures the
 pending thrown value. They add no runtime ABI entry point; compiler-owned
 cleanup regions route a pattern failure around the catch body and through an
 enclosing `finally`.
+Synchronous `for-of` declaration patterns also add no runtime ABI entry point.
+They initialize or write the same compiler-owned binding leaves, while nested
+array patterns close before the existing outer `for-of` cleanup resumes.
 
 ### Internal helpers
 

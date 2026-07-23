@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 204
-passes, 226 expected negatives, and 143 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 210
+passes, 226 expected negatives, and 185 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -68,8 +68,11 @@ enumerable own-key copying, and string and symbol exclusions. Catch parameter
 destructuring is now implemented: catch clauses admit the same
 recursive array and object patterns, including defaults and rest, with fresh
 catch cells, iterator cleanup, and abrupt propagation through `finally`.
-Assignment, parameter, and loop-head destructuring remain later work. The
-runtime component boundaries
+Synchronous `for-of` declaration heads now admit those recursive patterns for
+`const`, `let`, and `var`, preserving lexical temporal dead zones, fresh
+per-iteration cells, `var` hoisting, nested cleanup, and outer iterator close
+on pattern failure. Assignment, parameter, and classic `for` head
+destructuring remain later work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
@@ -232,6 +235,22 @@ step-failure behavior, and `finally` execution after pattern failure. Sixteen
 reviewed test262 cases cover array values, defaults, function-name inference,
 nested rest, object nullish failure, trailing properties, and object rest
 descriptors.
+
+Synchronous `for-of` declaration heads now accept the same recursive patterns
+for `const`, `let`, and `var`. Every lexical name enters its temporal dead zone
+before the iterable expression and receives a fresh cell before each
+`BindingInitialization`; `var` leaves write their existing hoisted cells.
+Nested array patterns close from the inside out, and a default, target, or
+object-coercibility failure closes the outer `for-of` iterator after any inner
+cleanup. The generated property suite uses seed `0x5eed000b` across array and
+object patterns, all three declaration kinds, present, missing, and nullish
+inputs, both native specialization policies, and forced collection. Fixed
+native fixtures retain closure cells, function-name inference, object rest,
+`var` retention, and outer close after a pattern failure. Six reviewed test262
+cases pin nullish object-pattern failure across all three declaration kinds.
+Another 42 selected binding cases reach the pattern head but remain honestly
+unsupported because their upstream loop body uses compound assignment, which
+is outside the admitted expression profile.
 
 ### Intrinsics and built-in objects
 

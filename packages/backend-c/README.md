@@ -63,6 +63,10 @@ Catch parameter lowering captures the pending thrown value, resets every catch
 cell, and runs the same recursive binding path before entering the body.
 Pattern failures retain iterator cleanup and continue through an enclosing
 `finally`.
+`for-of` declaration patterns reuse that binding path after each outer iterator
+step. Generated code resets lexical cells per iteration, writes hoisted `var`
+cells in place, and closes nested iterators before the outer iterator when
+initialization fails.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

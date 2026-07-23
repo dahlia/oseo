@@ -52,6 +52,10 @@ Catch parameters reuse those patterns after capturing the pending thrown value.
 MIR resets every catch cell before initialization, retains conditional iterator
 cleanup, and sends a pattern failure through the enclosing `finally` or abrupt
 target without entering the catch body.
+Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
+lexical leaves before iterator acquisition and before each iteration, while
+`var` leaves write hoisted cells. Nested pattern cleanup resumes through the
+outer iterator close block after a pattern failure.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

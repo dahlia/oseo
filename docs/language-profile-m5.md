@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 573 reviewed cases: 204 passes, 226 expected
-negatives, and 143 unsupported profile features. It records no semantic or
+The current manifest contains 621 reviewed cases: 210 passes, 226 expected
+negatives, and 185 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -293,16 +293,27 @@ its deliberate boundary and its evidence:
     reused for every step, as the iterator record requires.
     `Promise.all`, `Promise.race`, synchronous `for-of`, array literal spread,
     and call and constructor argument spread consume object iterables through
-    this protocol. A `for-of` head
-    admits one `const`, `let`, or `var` identifier declaration, an existing
-    binding, or a static or computed member target. Lexical declarations
-    create their TDZ before the iterable expression and receive a fresh cell
-    for each iteration. Normal exhaustion and a failing iterator step do not
-    close the iterator; head assignment failures, `break`, `return`, `throw`,
-    and transfers to an outer label do. A `continue` targeting the same loop
-    keeps the iterator open. Close-time completion follows `IteratorClose`: a
-    close failure replaces `break` or `return`, while an in-flight throw stays
-    authoritative.
+    this protocol. A `for-of` head admits one `const`, `let`, or `var`
+    identifier, array, or object declaration, an existing binding, or a static
+    or computed member target. Declaration patterns reuse every binding form
+    admitted for standalone declarations. Lexical names create their TDZ
+    before the iterable expression and receive a fresh cell for each
+    iteration; `var` leaves write their existing hoisted cells. Nested array
+    patterns close from the inside out, then a default, target, or
+    object-coercibility failure closes the outer iterator. Normal exhaustion
+    and a failing iterator step do not close the iterator; head assignment
+    failures, `break`, `return`, `throw`, and transfers to an outer label do. A
+    `continue` targeting the same loop keeps the iterator open. Close-time
+    completion follows `IteratorClose`: a close failure replaces `break` or
+    `return`, while an in-flight throw stays authoritative. Native differential
+    fixtures and a generated property with seed `0x5eed000b` cover all three
+    declaration kinds, array and object values, defaults, rest, nullish
+    failure, fresh cells, both specialization policies, and forced collection.
+    Six reviewed test262 cases pin nullish object-pattern failure across all
+    three declaration kinds. Another 42 selected binding cases reach the
+    pattern head but remain classified as unsupported because their upstream
+    loop body uses compound assignment, which is outside the admitted
+    expression profile.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without
@@ -317,12 +328,12 @@ its deliberate boundary and its evidence:
     five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
     specification reaches by boxing, is unsupported; the promise combinators,
-    `for-of`, array spread, call spread, constructor spread, and array
-    binding declarations accept only
+    `for-of`, array spread, call spread, constructor spread, and array binding
+    declarations accept only
     object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and `for-await-of`, remaining
-    destructuring positions, array and string iterator prototype identity, and
-    generator-based iterators remain outside the admitted syntax.
+    the generic `%Array.prototype.values%`; and `for-await-of`, destructuring
+    assignment targets in `for-of`, array and string iterator prototype
+    identity, and generator-based iterators remain outside the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -361,7 +372,7 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment patterns, parameters, loop heads,
+    done-state handling. Assignment patterns, parameters, classic `for` heads,
     `export var`, pattern type annotations, and `await` inside a default remain
     outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
@@ -388,9 +399,9 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment patterns, parameters, loop heads,
-    `export var`, pattern type annotations, and `await` inside a property name
-    or default remain outside this object declaration syntax unit.
+    non-enumerable omission. Assignment patterns, parameters, classic `for`
+    heads, `export var`, pattern type annotations, and `await` inside a property
+    name or default remain outside this object declaration syntax unit.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -407,8 +418,8 @@ its deliberate boundary and its evidence:
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
     properties, and object rest descriptors. Assignment patterns, function
-    parameters, loop heads, pattern type annotations, and `await` inside a
-    property name or default remain outside this syntax unit.
+    parameters, classic `for` heads, pattern type annotations, and `await`
+    inside a property name or default remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -417,8 +428,8 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring assignment, function and loop-head binding patterns, default
-    and rest parameters, classes, generators, big integers, regular
+ -  Destructuring assignment, function and classic `for` binding patterns,
+    default and rest parameters, classes, generators, big integers, regular
     expressions, and the remaining expression grammar are outside the admitted
     syntax. Owner: the core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md).

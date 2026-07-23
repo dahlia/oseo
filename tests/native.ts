@@ -1025,6 +1025,29 @@ for (assigned of [9]) {}
 for (holder.value of [10]) {}
 console.log("targets", retained, assigned, holder.value);
 
+const patternReaders = [];
+let patternReaderCount = 0;
+for (const [head, ...tail] of [[1, 2], [3, 4]]) {
+  patternReaders[patternReaderCount] = function () {
+    return head + tail[0];
+  };
+  patternReaderCount = patternReaderCount + 1;
+}
+for (let { value = 5, ...other } of [{ extra: 6 }]) {
+  console.log("object-pattern", value, other.extra);
+}
+var [retainedPattern] = [0];
+for (var [retainedPattern] of [[11]]) {}
+console.log(
+  "patterns",
+  patternReaders[0](),
+  patternReaders[1](),
+  retainedPattern,
+);
+for (const [inferred = function () {}] of [[]]) {
+  console.log("pattern-name", inferred.name);
+}
+
 let normalSteps = 0;
 let normalCloses = 0;
 const normalIterable = {
@@ -1141,6 +1164,91 @@ try {
   for (let lexical of lexical) {}
 } catch (error) {
   console.log("tdz", error instanceof ReferenceError);
+}
+
+let patternTdz = false;
+for (const attempt of [1, 2]) {
+  try {
+    for (
+      const [patternLexical] of
+      attempt === 1 ? [[12]] : patternLexical
+    ) {}
+  } catch (error) {
+    patternTdz = error instanceof ReferenceError;
+  }
+}
+console.log("pattern-tdz", patternTdz);
+
+let patternFailureCloses = 0;
+const nullPatternIterable = {
+  [Symbol.iterator]: function () {
+    let done = false;
+    return {
+      next: function () {
+        if (done) return { value: undefined, done: true };
+        done = true;
+        return { value: null, done: false };
+      },
+      return: function () {
+        patternFailureCloses = patternFailureCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  for (const { value } of nullPatternIterable) {}
+} catch (error) {
+  console.log(
+    "pattern-failure",
+    error instanceof TypeError,
+    patternFailureCloses,
+  );
+}
+
+let patternCloseOrder = "";
+const nestedPatternIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: 1, done: false }; },
+      return: function () {
+        patternCloseOrder = patternCloseOrder + "inner";
+        return {};
+      },
+    };
+  },
+};
+const outerPatternIterable = {
+  [Symbol.iterator]: function () {
+    let done = false;
+    return {
+      next: function () {
+        if (done) return { value: undefined, done: true };
+        done = true;
+        return { value: [nestedPatternIterable], done: false };
+      },
+      return: function () {
+        patternCloseOrder = patternCloseOrder + "-outer";
+        return {};
+      },
+    };
+  },
+};
+function failPatternDefault() {
+  throw new RangeError("pattern default");
+}
+try {
+  for (
+    const [[nestedValue], missing = failPatternDefault()] of
+    outerPatternIterable
+  ) {}
+} catch (error) {
+  console.log(
+    "pattern-close-order",
+    error instanceof RangeError,
+    error.message,
+    patternCloseOrder,
+  );
 }
 `,
   },

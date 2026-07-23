@@ -394,11 +394,13 @@ M5 synchronous iterator properties
 ----------------------------------
 
 The first M5 source-to-native grammar property generates bounded integer
-iterables, every admitted `for-of` head form, early-transfer positions, and
-normal or throwing `return` methods. Its independent model predicts the result
-or error, accumulated values, iterator-step count, and close count. Each case
-compares Node.js, Deno, specialization-disabled native execution, and
-specialization-enabled execution with collection forced at every safepoint.
+iterables, each admitted identifier or member `for-of` head form,
+early-transfer positions, and normal or throwing `return` methods. Its
+independent model predicts the result or error, accumulated values,
+iterator-step count, and close count. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint. The separate binding property below
+owns declaration-pattern heads.
 
 The ordinary suite uses seed `0x5eed0004`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -514,6 +516,24 @@ budget through the shared replay controls. Fixed native fixtures retain fresh
 catch cells, function-name inference, iterator cleanup after a default failure,
 step failure without close, nullish object failure, and `finally` execution
 when catch parameter initialization completes abruptly.
+
+
+M5 for-of binding properties
+----------------------------
+
+The `for-of` binding property generates a `const`, `let`, or `var` declaration
+head with an array or object pattern, default, and rest target. Inputs vary
+between present, missing, and nullish values. Its independent model predicts
+both closure observations, including fresh per-iteration lexical cells and the
+one shared `var` cell, or the escaped nullish `TypeError`. Each case compares
+Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed000b`, ten successful cases, two
+iterations, bounded integer values, and no filtering. The extended tier runs
+ten times the ordinary budget through the shared replay controls. Fixed native
+fixtures retain lexical temporal dead zones, function-name inference, object
+rest, `var` retention, and outer iterator close after pattern failure.
 
 
 Test placement and package boundaries
