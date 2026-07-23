@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 188
+honest unsupported classifications. The current reviewed manifest records 204
 passes, 226 expected negatives, and 143 unsupported profile features with no
 semantic or harness failures.
 
@@ -64,8 +64,12 @@ Standalone object binding declarations now admit `const`, `let`, and hoisted
 `var` with static, computed, shorthand, renamed, defaulted, and nested object or
 array properties and a final identifier rest target. They preserve nullish
 checks, property-key and default order, direct awaited initialization, ordered
-enumerable own-key copying, and string and symbol exclusions. The remaining
-destructuring positions remain later work. The runtime component boundaries
+enumerable own-key copying, and string and symbol exclusions. Catch parameter
+destructuring is now implemented: catch clauses admit the same
+recursive array and object patterns, including defaults and rest, with fresh
+catch cells, iterator cleanup, and abrupt propagation through `finally`.
+Assignment, parameter, and loop-head destructuring remain later work. The
+runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
@@ -214,6 +218,20 @@ forced collection. Twenty-four reviewed test262 cases cover all three
 declaration kinds, nullish coercibility, trailing shorthand properties,
 function-name inference for function, arrow, and covered expressions, rest
 exclusions, fresh data descriptors, and non-enumerable omission.
+
+Catch parameters now reuse those recursive patterns and binding leaves. Every
+catch binding is created uninitialized before the pending thrown value enters
+`BindingInitialization`. Array patterns keep conditional `IteratorClose`,
+object patterns keep nullish checks and ordered property reads, and a pattern
+failure skips the catch body while propagating through the enclosing
+`finally`. The generated property suite uses seed `0x5eed000a` across array
+and object patterns, present, missing, and nullish inputs, defaults, rest, both
+native specialization policies, and forced collection. Fixed native fixtures
+retain fresh catch cells, function-name inference, iterator cleanup and
+step-failure behavior, and `finally` execution after pattern failure. Sixteen
+reviewed test262 cases cover array values, defaults, function-name inference,
+nested rest, object nullish failure, trailing properties, and object rest
+descriptors.
 
 ### Intrinsics and built-in objects
 

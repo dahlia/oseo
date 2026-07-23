@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 557 reviewed cases: 188 passes, 226 expected
+The current manifest contains 573 reviewed cases: 204 passes, 226 expected
 negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -155,8 +155,8 @@ its deliberate boundary and its evidence:
     into hoisted bindings initialized to `undefined` plus in-place
     assignments, so no separate binding kind reaches HIR or the runtime.
     Deliberate boundaries, each rejected with a source-located
-    diagnostic: `var` object destructuring, `export var`, ambient `declare`
-    declarations, a `var` sharing a catch parameter name (ECMAScript
+    diagnostic: `export var`, ambient `declare` declarations, a `var` sharing a
+    catch parameter name (ECMAScript
     allows it), a `var` sharing a block-level function declaration name,
     because Annex B function hoisting would make the difference
     observable, and an awaited initializer in a declaration list with
@@ -361,9 +361,9 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment patterns, parameters, catch bindings, loop
-    heads, `export var`, pattern type annotations, and `await` inside a default
-    remain outside this array syntax unit.
+    done-state handling. Assignment patterns, parameters, loop heads,
+    `export var`, pattern type annotations, and `await` inside a default remain
+    outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -388,8 +388,26 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment patterns, parameters, catch bindings,
-    loop heads, `export var`, pattern type annotations, and `await` inside a
+    non-enumerable omission. Assignment patterns, parameters, loop heads,
+    `export var`, pattern type annotations, and `await` inside a property name
+    or default remain outside this object declaration syntax unit.
+ -  Catch binding patterns. A catch parameter admits every array and object
+    binding pattern supported by standalone declarations, including defaults,
+    nested patterns, array rest, and final identifier object rest. Every bound
+    name receives a fresh uninitialized catch cell before the thrown value
+    enters `BindingInitialization`, so defaults observe catch-parameter TDZ and
+    closures from repeated catch evaluations retain distinct cells. Array
+    patterns preserve iterator acquisition, step, conditional close, nested
+    close order, and throw precedence. Object patterns preserve nullish checks,
+    computed-key and default order, symbol exclusions, and
+    `CopyDataProperties`. A pattern failure skips the catch body and propagates
+    through an enclosing `finally`. Native differential fixtures and a
+    generated property with seed `0x5eed000a` cover array and object values,
+    defaults, rest, nullish failure, both specialization policies, and forced
+    collection. Sixteen reviewed test262 cases cover array values, defaults,
+    function-name inference, nested rest, object nullish failure, trailing
+    properties, and object rest descriptors. Assignment patterns, function
+    parameters, loop heads, pattern type annotations, and `await` inside a
     property name or default remain outside this syntax unit.
 
 
@@ -399,10 +417,10 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Non-declaration destructuring positions, default and rest parameters,
-    classes, generators, big integers, regular expressions, and the remaining
-    expression grammar are outside the admitted syntax. Owner: the core
-    expressions and bindings stream in
+ -  Destructuring assignment, function and loop-head binding patterns, default
+    and rest parameters, classes, generators, big integers, regular
+    expressions, and the remaining expression grammar are outside the admitted
+    syntax. Owner: the core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol

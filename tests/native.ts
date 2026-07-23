@@ -1895,6 +1895,110 @@ awaitedVarBinding();
 `,
   },
   {
+    name: "catch-bindings",
+    source: `
+const outer = "outer";
+try {
+  throw { values: [1, undefined, 3], kept: 4 };
+} catch ({
+  values: [first, fallback = 2, ...rest],
+  missing: named = function () {},
+  ...other
+}) {
+  console.log(
+    "values",
+    first,
+    fallback,
+    rest[0],
+    named.name,
+    other.kept,
+    outer,
+  );
+}
+console.log("outer", outer);
+
+let firstClosure;
+let secondClosure;
+let index = 0;
+while (index < 2) {
+  try {
+    throw [index];
+  } catch ([caught]) {
+    const read = function () { return caught; };
+    if (index === 0) firstClosure = read;
+    else secondClosure = read;
+  }
+  index = index + 1;
+}
+console.log("fresh", firstClosure(), secondClosure());
+
+let closes = 0;
+const iterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return { value: undefined, done: false };
+      },
+      return: function () {
+        closes = closes + 1;
+        return {};
+      },
+    };
+  },
+};
+let finalized = false;
+try {
+  try {
+    throw iterable;
+  } catch ([value = (function () { throw new RangeError("default"); })()]) {
+    console.log(value);
+  } finally {
+    finalized = true;
+  }
+} catch (error) {
+  console.log(
+    "abrupt",
+    error instanceof RangeError,
+    error.message,
+    closes,
+    finalized,
+  );
+}
+
+let stepCloses = 0;
+const stepFailure = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { throw new TypeError("step"); },
+      return: function () {
+        stepCloses = stepCloses + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  try {
+    throw stepFailure;
+  } catch ([value]) {
+    console.log(value);
+  }
+} catch (error) {
+  console.log("step", error instanceof TypeError, stepCloses);
+}
+
+try {
+  try {
+    throw null;
+  } catch ({ value }) {
+    console.log(value);
+  }
+} catch (error) {
+  console.log("nullish", error instanceof TypeError);
+}
+`,
+  },
+  {
     name: "in-and-instanceof",
     source: `
 const box = { present: undefined, value: 1 };
@@ -2865,6 +2969,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "arrays" ||
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
+    fixture.name === "catch-bindings" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||

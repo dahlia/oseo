@@ -1664,6 +1664,70 @@ tests:
   - path: test/language/statements/try/S12.14_A18_T2.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/try/dstr/ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
+  - path: test/language/statements/try/dstr/obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        lexical-bindings,
+        object-properties,
+      ]
+  - path: test/language/statements/try/dstr/obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        lexical-bindings,
+        object-properties,
+      ]
+  - path: test/language/statements/try/dstr/obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, lexical-bindings, object-properties]
+  - path: test/language/statements/try/dstr/obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, lexical-bindings, object-properties]
+  - path: test/language/statements/try/dstr/obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, lexical-bindings, object-properties]
+  - path: test/language/statements/try/dstr/obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/try/dstr/obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/try/dstr/obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, lexical-bindings, object-properties]
   - path: test/language/statements/variable/S12.2_A12.js
     expectedClassification: pass
     dependencies: [control-flow, var-bindings]

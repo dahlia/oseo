@@ -252,6 +252,67 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
   assert.doesNotMatch(firstMir, /guard-smi|add-smi-checked/u);
 });
 
+test("rejects duplicate names in owned catch binding patterns", () => {
+  const identifier = {
+    kind: "binding-identifier",
+    name: "value",
+    range,
+  } as const;
+  const patterns = [
+    {
+      elements: [
+        { pattern: identifier, range },
+        { pattern: identifier, range },
+      ],
+      kind: "array-binding-pattern",
+      range,
+    },
+    {
+      kind: "object-binding-pattern",
+      properties: [
+        {
+          key: { kind: "string", range, value: "first" },
+          pattern: identifier,
+          range,
+        },
+        {
+          key: { kind: "string", range, value: "second" },
+          pattern: identifier,
+          range,
+        },
+      ],
+      range,
+    },
+  ] as const;
+  for (const pattern of patterns) {
+    const result = buildHir({
+      body: [
+        {
+          block: { body: [], kind: "block", range },
+          finalizer: undefined,
+          handler: {
+            body: { body: [], kind: "block", range },
+            pattern,
+            range,
+          },
+          kind: "try",
+          range,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: "duplicate-catch-binding.ts",
+    });
+    assert.equal(result.program, undefined);
+    assert.equal(result.diagnostics.length, 1);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /Duplicate catch binding 'value'/u,
+    );
+  }
+});
+
 test("retains lexical reads for runtime temporal-dead-zone checks", () => {
   const syntax: SyntaxProgram = {
     body: [

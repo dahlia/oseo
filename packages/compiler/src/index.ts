@@ -540,7 +540,7 @@ export type SyntaxStatement =
       readonly handler:
         | {
             readonly body: SyntaxStatement;
-            readonly name: string;
+            readonly pattern: SyntaxBindingPattern;
             readonly range: SourceRange;
           }
         | undefined;
@@ -1648,9 +1648,8 @@ export type HirStatement =
       readonly block: HirStatement;
       readonly handler:
         | {
-            readonly bindingId: number;
             readonly body: HirStatement;
-            readonly name: string;
+            readonly pattern: HirBindingPattern;
             readonly range: SourceRange;
           }
         | undefined;
@@ -2426,7 +2425,11 @@ function declaredHirBindingIds(
     } else if (statement.kind === "try") {
       result.push(...declaredHirBindingIds([statement.block]));
       if (statement.handler != null) {
-        result.push(statement.handler.bindingId);
+        result.push(
+          ...hirBindingIdentifiers(statement.handler.pattern).map(
+            (item) => item.bindingId,
+          ),
+        );
         result.push(...declaredHirBindingIds([statement.handler.body]));
       }
       if (statement.finalizer != null) {
@@ -2676,20 +2679,38 @@ function resolveStatement(
     );
     let handler:
       | {
-          readonly bindingId: number;
           readonly body: HirStatement;
-          readonly name: string;
+          readonly pattern: HirBindingPattern;
           readonly range: SourceRange;
         }
       | undefined;
     if (statement.handler != null) {
-      const binding: Binding = {
-        id: state.nextBindingId,
-        mutable: true,
-        name: statement.handler.name,
-      };
-      state.nextBindingId += 1;
-      const catchScope = new Map([[statement.handler.name, binding]]);
+      const catchScope = new Map<string, Binding>();
+      for (const name of syntaxBindingNames(statement.handler.pattern)) {
+        if (catchScope.has(name)) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement.handler.pattern,
+              `Duplicate catch binding '${name}'.`,
+            ),
+          );
+          return undefined;
+        }
+        catchScope.set(name, {
+          id: state.nextBindingId,
+          mutable: true,
+          name,
+        });
+        state.nextBindingId += 1;
+      }
+      const pattern = resolveBindingPattern(
+        statement.handler.pattern,
+        [...scopes, catchScope],
+        state,
+        "declare",
+      );
+      if (pattern == null) return undefined;
       const body = resolveStatement(
         statement.handler.body,
         [...scopes, catchScope],
@@ -2700,9 +2721,8 @@ function resolveStatement(
       );
       if (body == null) return undefined;
       handler = {
-        bindingId: binding.id,
         body,
-        name: statement.handler.name,
+        pattern,
         range: statement.handler.range,
       };
     }
@@ -3368,8 +3388,7 @@ function appendHirStatement(
     appendHirStatement(lines, statement.block, `${indent}  `);
     if (statement.handler != null) {
       lines.push(
-        `${indent}catch %b${statement.handler.bindingId} ` +
-          `${statement.handler.name}`,
+        `${indent}catch ${printHirBindingPattern(statement.handler.pattern)}`,
       );
       appendHirStatement(lines, statement.handler.body, `${indent}  `);
     }
@@ -5355,37 +5374,29 @@ function lowerTryStatement(
 
   if (catchBlock != null && statement.handler != null) {
     builder.current = catchBlock;
-    resetBinding(
-      statement.handler.bindingId,
-      statement.handler.name,
-      statement.handler.range,
-      builder,
-    );
+    for (const binding of hirBindingIdentifiers(statement.handler.pattern)) {
+      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+    }
     const caught = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
       arguments: [],
-      detail: statement.handler.name,
+      detail: "catch parameter",
       id: caught,
       kind: "caught",
       completionSlot: catchBlock.id,
       range: statement.handler.range,
     });
     recordRoot(builder, caught, statement.handler.range);
-    const written = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [caught],
-      bindingId: statement.handler.bindingId,
-      detail: statement.handler.name,
-      id: written,
-      kind: "initialize",
-      range: statement.handler.range,
-    });
-    recordRoot(builder, written, statement.handler.range);
     const catchAbrupt = finallyTarget ?? outerAbrupt;
     if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
     if (finallyTarget != null) builder.finalizers.push(finallyTarget);
+    lowerBindingTarget(
+      statement.handler.pattern,
+      caught,
+      "initialize",
+      builder,
+    );
     const catchTerminated = lowerStatementBody(statement.handler.body, builder);
     if (finallyBlock != null) builder.finalizers.pop();
     if (catchAbrupt != null) builder.abruptTargets.pop();
@@ -7421,10 +7432,11 @@ function collectHirBindings(
     } else if (statement.kind === "try") {
       collect(statement.block);
       if (statement.handler != null) {
-        bindings.push({
-          id: statement.handler.bindingId,
-          name: statement.handler.name,
-        });
+        for (const binding of hirBindingIdentifiers(
+          statement.handler.pattern,
+        )) {
+          bindings.push({ id: binding.bindingId, name: binding.name });
+        }
         collect(statement.handler.body);
       }
       if (statement.finalizer != null) collect(statement.finalizer);

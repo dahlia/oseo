@@ -1553,26 +1553,26 @@ function statement(
     let handler:
       | {
           readonly body: SyntaxStatement;
-          readonly name: string;
+          readonly pattern: SyntaxBindingPattern;
           readonly range: SourceRange;
         }
       | undefined;
     if (handlerNode != null) {
       const parameter = node(handlerNode.param);
       const bodyNode = node(handlerNode.body);
-      const name = parameter == null ? undefined : identifierName(parameter);
-      if (parameter == null || name == null || bodyNode == null) {
+      if (parameter == null || bodyNode == null) {
         return unsupported(
           context,
           handlerNode,
-          "A catch clause requires one identifier binding.",
+          "A catch clause requires one binding pattern.",
         );
       }
+      const pattern = bindingPattern(context, parameter);
       const body = statement(context, bodyNode, functionBody);
-      if (body == null) return undefined;
+      if (pattern == null || body == null) return undefined;
       handler = {
         body,
-        name,
+        pattern,
         range: sourceRange(context.locations, parameter),
       };
     }
@@ -2339,13 +2339,11 @@ function collectVarStatement(
     const handler = node(value.handler);
     if (handler != null) {
       const parameter = node(handler.param);
-      const parameterName =
-        parameter == null ? undefined : identifierName(parameter);
       const handlerBody = node(handler.body);
       const handlerCatch =
-        parameterName == null
+        parameter == null
           ? catchParameters
-          : new Set([...catchParameters, parameterName]);
+          : new Set([...catchParameters, ...rawPatternNames(parameter)]);
       if (
         handlerBody != null &&
         !collectVarStatement(

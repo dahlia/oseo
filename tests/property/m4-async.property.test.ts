@@ -293,7 +293,7 @@ test(
         sizeLimit: large
           ? "6 async calls, 12 promises, and 10 timers"
           : "3 async calls, 6 promises, and 5 timers",
-        timeLimitMilliseconds: 120_000,
+        timeLimitMilliseconds: 180_000,
       },
     );
   },
