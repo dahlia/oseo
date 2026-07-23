@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 210
+honest unsupported classifications. The current reviewed manifest records 221
 passes, 226 expected negatives, and 185 unsupported profile features with no
 semantic or harness failures.
 
@@ -269,6 +269,9 @@ collection. Fixed native fixtures retain expression-result identity,
 function-name inference, step failure without close, target failure with close,
 and computed-key suppression on nullish object input. Member targets remain
 outside this unit until assignment references become explicit pattern leaves.
+Eleven reviewed test262 cases pin identifier writes, nested patterns, defaults,
+rest, result identity, nullish and immutable-target errors, and function-name
+inference under both strictness and specialization policies.
 
 ### Intrinsics and built-in objects
 

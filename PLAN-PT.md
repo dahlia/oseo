@@ -552,7 +552,9 @@ values, and no filtering. The extended tier runs ten times the ordinary budget
 through the shared replay controls. Fixed native fixtures retain function-name
 inference, step failure without close, immutable-target failure with close,
 computed-key suppression for nullish object input, and direct awaited right
-operands.
+operands. Eleven reviewed test262 cases pin identifier writes, nested patterns,
+defaults, rest, result identity, nullish and immutable-target errors, and
+function-name inference under both strictness and specialization policies.
 
 
 Test placement and package boundaries
