@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 573 reviewed cases: 204 passes, 226 expected
-negatives, and 143 unsupported profile features. It records no semantic or
+The current manifest contains 621 reviewed cases: 210 passes, 226 expected
+negatives, and 185 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -309,6 +309,11 @@ its deliberate boundary and its evidence:
     fixtures and a generated property with seed `0x5eed000b` cover all three
     declaration kinds, array and object values, defaults, rest, nullish
     failure, fresh cells, both specialization policies, and forced collection.
+    Six reviewed test262 cases pin nullish object-pattern failure across all
+    three declaration kinds. Another 42 selected binding cases reach the
+    pattern head but remain classified as unsupported because their upstream
+    loop body uses compound assignment, which is outside the admitted
+    expression profile.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without

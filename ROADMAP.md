@@ -572,6 +572,9 @@ manifest. Synchronous `for-of` declaration heads now admit the same recursive
 patterns for `const`, `let`, and `var`. Generated and fixed native evidence
 covers temporal dead zones, fresh per-iteration cells, `var` retention, nested
 cleanup, object rest, and outer iterator close after pattern failure. The
+reviewed standards manifest adds six passing nullish object-pattern cases
+across all three declaration kinds. Another 42 selected cases record the
+separate compound-assignment boundary in their upstream loop bodies. The
 intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
