@@ -2440,12 +2440,15 @@ function hirBindingPatternHasAwait(pattern: HirBindingPattern): boolean {
   }
   if (pattern.kind === "binding-identifier") return false;
   if (pattern.kind === "object-binding-pattern") {
-    return pattern.properties.some(
-      (property) =>
-        hirExpressionHasAwait(property.key) ||
-        (property.initializer != null &&
-          hirExpressionHasAwait(property.initializer)) ||
-        hirBindingPatternHasAwait(property.pattern),
+    return (
+      pattern.properties.some(
+        (property) =>
+          hirExpressionHasAwait(property.key) ||
+          (property.initializer != null &&
+            hirExpressionHasAwait(property.initializer)) ||
+          hirBindingPatternHasAwait(property.pattern),
+      ) ||
+      (pattern.rest != null && hirBindingPatternHasAwait(pattern.rest))
     );
   }
   return (
@@ -7625,7 +7628,10 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
     return hirExpressionHasAwait(statement.initializer);
   }
   if (statement.kind === "binding-pattern") {
-    return hirExpressionHasAwait(statement.initializer);
+    return (
+      hirExpressionHasAwait(statement.initializer) ||
+      hirBindingPatternHasAwait(statement.pattern)
+    );
   }
   if (statement.kind === "expression" || statement.kind === "throw") {
     return hirExpressionHasAwait(statement.expression);

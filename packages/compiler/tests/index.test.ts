@@ -2508,3 +2508,103 @@ test("rejects asynchronous module cycles before scheduling", () => {
   assert.equal(result.mir, undefined);
   assert.match(result.diagnostics[0]?.message ?? "", /asynchronous module/iu);
 });
+
+test("rejects await in object-rest assignment member targets", () => {
+  const canonicalId = "file:///object-rest-await.js";
+  const module = {
+    canonicalId,
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "object-rest-await",
+    syntax: {
+      ...testModule(canonicalId, ""),
+      body: [
+        {
+          expression: {
+            kind: "destructuring-set" as const,
+            pattern: {
+              kind: "object-binding-pattern" as const,
+              properties: [],
+              range,
+              rest: {
+                key: {
+                  argument: { kind: "string" as const, range, value: "key" },
+                  kind: "await" as const,
+                  range,
+                },
+                kind: "assignment-member" as const,
+                object: { kind: "object" as const, properties: [], range },
+                range,
+              },
+            },
+            range,
+            value: { kind: "object" as const, properties: [], range },
+          },
+          kind: "expression" as const,
+          range,
+        },
+      ],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [module],
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /top-level await.*outside M4/iu,
+  );
+});
+
+test("rejects await in top-level binding-pattern keys", () => {
+  const canonicalId = "file:///binding-pattern-await.js";
+  const module = {
+    canonicalId,
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "binding-pattern-await",
+    syntax: {
+      ...testModule(canonicalId, ""),
+      body: [
+        {
+          declarationKind: "const" as const,
+          initializer: { kind: "object" as const, properties: [], range },
+          kind: "binding-pattern" as const,
+          mode: "declare" as const,
+          pattern: {
+            kind: "object-binding-pattern" as const,
+            properties: [
+              {
+                key: {
+                  argument: { kind: "string" as const, range, value: "key" },
+                  kind: "await" as const,
+                  range,
+                },
+                pattern: {
+                  kind: "binding-identifier" as const,
+                  name: "value",
+                  range,
+                },
+                range,
+              },
+            ],
+            range,
+          },
+          range,
+        },
+      ],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [module],
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /top-level await.*outside M4/iu,
+  );
+});
