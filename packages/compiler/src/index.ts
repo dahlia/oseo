@@ -177,6 +177,11 @@ export type SyntaxExpression =
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
+      readonly kind: "destructuring-set";
+      readonly pattern: SyntaxBindingPattern;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
       readonly elements: readonly SyntaxArrayElement[];
       readonly kind: "array";
     })
@@ -324,6 +329,8 @@ export type SyntaxBindingPattern =
 /** One resolved identifier leaf with explicit binding identity. */
 export interface HirBindingIdentifier extends LocatedSyntax {
   readonly bindingId: number;
+  readonly functionNameBinding?: true;
+  readonly importedBinding?: true;
   readonly kind: "binding-identifier";
   readonly mutable: boolean;
   readonly name: string;
@@ -1443,6 +1450,11 @@ export type HirExpression =
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly kind: "destructuring-set";
+      readonly pattern: HirBindingPattern;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
       readonly elements: readonly HirArrayElement[];
       readonly kind: "array";
     })
@@ -1835,6 +1847,18 @@ function resolveExpression(
           mutable: binding.mutable,
           value: inferFunctionName(value, binding.name),
         };
+  }
+  if (expression.kind === "destructuring-set") {
+    const value = resolveExpression(expression.value, scopes, state);
+    const pattern = resolveBindingPattern(
+      expression.pattern,
+      scopes,
+      state,
+      "write",
+    );
+    return value == null || pattern == null
+      ? undefined
+      : { ...expression, pattern, value };
   }
   if (expression.kind === "array") {
     const elements: HirArrayElement[] = [];
@@ -2544,6 +2568,12 @@ function resolveBindingPattern(
     return {
       ...pattern,
       bindingId: binding.id,
+      ...(binding.functionNameBinding === true
+        ? { functionNameBinding: true as const }
+        : {}),
+      ...(binding.importedBinding === true
+        ? { importedBinding: true as const }
+        : {}),
       mutable: binding.mutable,
     };
   }
@@ -3259,6 +3289,12 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding-set") {
     return (
       `%b${expression.bindingId} ${expression.name} = ` +
+      printHirExpression(expression.value)
+    );
+  }
+  if (expression.kind === "destructuring-set") {
+    return (
+      `write ${printHirBindingPattern(expression.pattern)} = ` +
       printHirExpression(expression.value)
     );
   }
@@ -4345,6 +4381,11 @@ function lowerExpression(
       expression.range,
     );
     return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "destructuring-set") {
+    const value = lowerExpression(expression.value, builder);
+    lowerBindingTarget(expression.pattern, value, "write", builder);
+    return value;
   }
   if (expression.kind === "function") {
     appendMirMetadata(
@@ -5914,12 +5955,25 @@ function lowerBindingTarget(
     lowerObjectBindingPattern(pattern, value, mode, builder);
     return;
   }
+  if (mode === "write") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "binding pattern write error",
+      [value],
+      pattern.range,
+    );
+  }
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [value],
     bindingId: pattern.bindingId,
     detail: `%b${pattern.bindingId} ${pattern.name}`,
+    ...(pattern.functionNameBinding === true
+      ? { functionNameBinding: true }
+      : {}),
+    ...(pattern.importedBinding === true ? { importedBinding: true } : {}),
     id,
     kind: mode === "write" ? "write" : "initialize",
     ...(mode === "write" ? { mutable: pattern.mutable } : {}),
@@ -5929,7 +5983,7 @@ function lowerBindingTarget(
     appendMirMetadata(
       builder,
       "check-status",
-      "normal -> continue, abrupt -> close iterator",
+      "normal -> continue, abrupt -> transfer",
       [id],
       pattern.range,
     );
@@ -7351,6 +7405,12 @@ function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "binding-set") {
     return hirExpressionHasAwait(expression.value);
   }
+  if (expression.kind === "destructuring-set") {
+    return (
+      hirExpressionHasAwait(expression.value) ||
+      hirBindingPatternHasAwait(expression.pattern)
+    );
+  }
   if (expression.kind === "array") {
     return expression.elements.some(
       (element) =>
@@ -7640,6 +7700,12 @@ function moduleExpressionParts(
     };
   }
   if (expression.kind === "binding-set") {
+    return {
+      children: [expression.value],
+      rebuild: ([value]) => ({ ...expression, value: value! }),
+    };
+  }
+  if (expression.kind === "destructuring-set") {
     return {
       children: [expression.value],
       rebuild: ([value]) => ({ ...expression, value: value! }),

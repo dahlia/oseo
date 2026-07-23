@@ -372,9 +372,9 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment patterns, parameters, classic `for` heads,
-    `export var`, pattern type annotations, and `await` inside a default remain
-    outside this array declaration syntax unit.
+    done-state handling. Assignment member targets, parameters, classic `for`
+    heads, `export var`, pattern type annotations, and `await` inside a default
+    remain outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -399,9 +399,10 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment patterns, parameters, classic `for`
-    heads, `export var`, pattern type annotations, and `await` inside a property
-    name or default remain outside this object declaration syntax unit.
+    non-enumerable omission. Assignment member targets, parameters, classic
+    `for` heads, `export var`, pattern type annotations, and `await` inside a
+    property name or default remain outside this object declaration syntax
+    unit.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -417,9 +418,25 @@ its deliberate boundary and its evidence:
     defaults, rest, nullish failure, both specialization policies, and forced
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
-    properties, and object rest descriptors. Assignment patterns, function
-    parameters, classic `for` heads, pattern type annotations, and `await`
-    inside a property name or default remain outside this syntax unit.
+    properties, and object rest descriptors. Assignment member targets,
+    function parameters, classic `for` heads, pattern type annotations, and
+    `await` inside a property name or default remain outside this syntax unit.
+ -  Destructuring assignment with identifier targets. An assignment expression
+    admits recursive array and object patterns whose leaves and rest targets
+    name existing bindings. It evaluates the right operand once before pattern
+    work and produces that original value. Array patterns retain iterator
+    acquisition, captured `next`, defaults, nested patterns, rest, conditional
+    close, and throw precedence. Object patterns retain the coercibility check
+    before computed keys, ordered `ToPropertyKey` and `GetV`, defaults, nested
+    patterns, symbol exclusions, and `CopyDataProperties`. Leaves use ordinary
+    checked writes, so assignment to an immutable local or imported binding
+    keeps its specified catchable error. Direct awaited right operands resume
+    before any pattern work in asynchronous functions and modules. Native
+    differential fixtures and a generated property with seed `0x5eed000c` cover
+    array and object inputs, defaults, rest, nullish failure, result identity,
+    both specialization policies, and forced collection. Member targets,
+    destructuring `for-of` assignment heads, pattern type annotations, and
+    `await` inside a property name or default remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -428,11 +445,11 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring assignment, function and classic `for` binding patterns,
-    default and rest parameters, classes, generators, big integers, regular
-    expressions, and the remaining expression grammar are outside the admitted
-    syntax. Owner: the core expressions and bindings stream in
-    [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Destructuring assignment member targets and `for-of` assignment patterns,
+    function and classic `for` binding patterns, default and rest parameters,
+    classes, generators, big integers, regular expressions, and the remaining
+    expression grammar are outside the admitted syntax. Owner: the core
+    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

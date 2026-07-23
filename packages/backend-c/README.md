@@ -67,6 +67,10 @@ Pattern failures retain iterator cleanup and continue through an enclosing
 step. Generated code resets lexical cells per iteration, writes hoisted `var`
 cells in place, and closes nested iterators before the outer iterator when
 initialization fails.
+Standalone destructuring assignment reuses the same recursive path with checked
+writes to existing identifier cells. Generated code preserves the original
+right-hand value as the expression result and routes an immutable or imported
+write through every active array-pattern close block.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared

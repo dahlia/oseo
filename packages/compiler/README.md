@@ -56,6 +56,11 @@ Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
 lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the
 outer iterator close block after a pattern failure.
+Destructuring assignment evaluates its right operand once, then sends the same
+recursive patterns through checked writes to existing identifier cells. The
+expression retains the original right-hand value, nested array cleanup stays
+inside out, and imported and immutable leaves keep their ordinary errors.
+Member assignment targets remain outside the owned pattern representation.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

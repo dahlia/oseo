@@ -7,3 +7,9 @@ try {
 } catch (error) {
   console.log(error.name);
 }
+try {
+  // eslint-disable-next-line no-import-assign -- Pattern writes stay immutable.
+  [value] = [3];
+} catch (error) {
+  console.log(error.name);
+}

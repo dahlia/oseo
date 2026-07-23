@@ -833,6 +833,80 @@ test("converts object binding rest to owned syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
 });
 
+test("converts destructuring assignments to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let first; let fallback; let nested; let rest;\n" +
+      "let picked; let other;\n" +
+      "const values = [1, undefined, [3], 4];\n" +
+      "const result = " +
+      "([first, fallback = 2, [nested], ...rest] = values);\n" +
+      "({ picked, missing: fallback = 5, ...other } = " +
+      "{ picked: 6, kept: 7 });\n" +
+      "console.log(result === values, first, fallback, nested, " +
+      "rest[0], picked, other.kept);\n",
+    sourceId: "destructuring-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /write \[%b\d+ first, %b\d+ fallback = 2/u);
+  assert.match(hir, /write \{"picked": %b\d+ picked/u);
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /object-rest CopyDataProperties/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|AssignmentPattern|RestElement/u,
+  );
+});
+
+test("supports awaited destructuring assignment in modules", () => {
+  const sourceId = "file:///app/await-destructuring-assignment.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "let value;\n" +
+      "[value] = await Promise.resolve([1]);\n" +
+      "console.log(value);\n",
+    sourceId,
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "await-destructuring-assignment",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /GetIterator sync for array binding/u);
+});
+
+test("supports awaited destructuring assignment in async functions", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack(input) {\n" +
+      "  let value;\n" +
+      "  [value] = await input;\n" +
+      "  return value;\n" +
+      "}\n" +
+      "unpack(Promise.resolve([1]));\n",
+    sourceId: "await-destructuring-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
+});
+
 test("converts catch binding patterns to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -860,6 +934,7 @@ test("converts catch binding patterns to owned syntax", () => {
 test("keeps later binding consumers outside the profile", () => {
   for (const [name, source] of [
     ["pattern annotation", "const [value]: [number] = [1];"],
+    ["assignment member target", "let target = {}; ([target.value] = [1]);"],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,
@@ -1754,6 +1829,19 @@ test("diagnoses excessive async continuation depth", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
   assert.equal(result.diagnostics[0]?.range.start.line, 258);
+});
+
+test("counts awaited destructuring assignments as async continuations", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function deep() {\nlet value;\n" +
+      "[value] = await [0];\n".repeat(257) +
+      "}\n",
+    sourceId: "deep-await-destructuring-assignment.js",
+  });
+  assert.equal(result.mir, undefined);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
 });
 
 test("preserves async returns and bindings across await", () => {

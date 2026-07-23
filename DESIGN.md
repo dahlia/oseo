@@ -405,6 +405,17 @@ their conditional iterator cleanup, object patterns retain nullish and
 property-order behavior, and a pattern failure skips the catch body while
 continuing through an enclosing `finally` or abrupt target.
 
+Destructuring assignment reuses those recursive array and object operations
+after evaluating its right operand once. Identifier leaves write existing
+cells, so immutable and imported bindings retain their ordinary assignment
+errors, and the expression produces the original right-hand value. Array
+patterns conditionally close their iterators after an early normal completion
+or a target or default failure. Object patterns check coercibility before
+computed keys and share the same ordered property reads and
+`CopyDataProperties` path. Member leaves remain outside the admitted assignment
+unit until their reference-evaluation order joins the owned pattern
+representation.
+
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument
 list. The call target and method receiver are resolved before accumulation, and
