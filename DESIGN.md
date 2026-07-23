@@ -355,7 +355,11 @@ region. Normal exhaustion, a failed iterator step, and a `continue` targeting
 the same loop bypass `IteratorClose`; a head-assignment failure or transfer out
 of the loop enters the close block. The stored completion decides whether a
 close-time language error replaces a non-throw completion or yields to the
-original throw.
+original throw. A `const`, `let`, or `var` declaration head may use the same
+recursive array or object binding patterns as a standalone declaration.
+Lexical pattern names enter the temporal dead zone before iterator acquisition
+and receive fresh cells before each iteration. A pattern failure closes its
+own nested iterators before closing the outer `for-of` iterator.
 
 Array literal spread reuses the same iterator acquisition and step operations
 without creating a cleanup region. Array accumulation never calls

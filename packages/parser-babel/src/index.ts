@@ -1355,22 +1355,35 @@ function statement(
         declarations.length !== 1 ||
         declaration == null ||
         identifier == null ||
-        name == null ||
         declaration.init != null
       ) {
         return unsupported(
           context,
           left,
-          "A for-of declaration needs one uninitialized identifier.",
+          "A for-of declaration needs one uninitialized binding.",
         );
       }
-      target = {
-        declarationKind: left.kind,
-        hint: typeHint(context, identifier.typeAnnotation),
-        kind: "declaration",
-        name,
-        range: location(context, declaration).range,
-      };
+      if (name != null) {
+        target = {
+          declarationKind: left.kind,
+          hint: typeHint(context, identifier.typeAnnotation),
+          kind: "declaration",
+          name,
+          range: location(context, declaration).range,
+        };
+      } else if (
+        identifier.type === "ArrayPattern" ||
+        identifier.type === "ObjectPattern"
+      ) {
+        const pattern = bindingPattern(context, identifier);
+        if (pattern == null) return undefined;
+        target = {
+          declarationKind: left.kind,
+          kind: "pattern-declaration",
+          pattern,
+          range: location(context, declaration).range,
+        };
+      }
     } else {
       const name = identifierName(left);
       if (name != null) {

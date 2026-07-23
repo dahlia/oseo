@@ -11,8 +11,9 @@ syntax enter only through owned syntax. The M4 module frontend converts static
 imports, exports, top-level await, promises, async functions, and timers to the
 same owned boundary. Async suspension suffixes become private continuation
 functions before compiler lowering.
-M5 synchronous `for-of` heads admit one identifier declaration or an existing
-binding or member target. Destructuring, `for-in`, and `for-await-of` remain
+M5 synchronous `for-of` heads admit one identifier, array, or object
+declaration, or an existing binding or member target. `for-in`,
+`for-await-of`, assignment patterns, and classic `for` head patterns remain
 owned profile failures. Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
 Call type arguments, optional parameters, TypeScript `this` parameters, and
@@ -29,9 +30,10 @@ existing function-scope hoisting and redeclaration pass. Array patterns admit
 elisions, defaults without `await`, nesting, and a final identifier or nested
 array rest target. Object patterns admit static and computed properties,
 shorthand and renamed targets, defaults, nested object or array patterns, and a
-final identifier rest target. Catch parameters reuse the same recursive
-patterns. Pattern type annotations, assignment patterns, function parameters,
-and loop-head destructuring remain explicit boundaries.
+final identifier rest target. Catch parameters and synchronous `for-of`
+declarations reuse the same recursive patterns. Pattern type annotations,
+assignment patterns, function parameters, and classic `for` head destructuring
+remain explicit boundaries.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.

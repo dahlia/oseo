@@ -1022,7 +1022,6 @@ test("converts classic for statements to owned syntax", () => {
 const unsupportedForForms = [
   ["for-in", "for (const key in {}) console.log(key);"],
   ["for-await-of", "async function f() { for await (const x of []) {} }"],
-  ["for-of destructuring", "for (const [item] of []) console.log(item);"],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;
 
@@ -1052,6 +1051,39 @@ test("converts synchronous for-of heads to owned syntax", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.match(printHir(result.hir), /for \(const %b\d+ item of \[\]\)/u);
+});
+
+test("converts for-of declaration binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const readers = [];\n" +
+      "let index = 0;\n" +
+      "for (const [first, ...rest] of [[1, 2]]) {\n" +
+      "  readers[index] = function () { return first + rest[0]; };\n" +
+      "  index = index + 1;\n" +
+      "}\n" +
+      "for (let { value = 3, ...rest } of [{}]) {\n" +
+      "  console.log(value, Object.keys(rest).length);\n" +
+      "}\n" +
+      "for (var [retained] of [[4]]) {}\n" +
+      "console.log(readers[0](), retained);\n",
+    sourceId: "for-of-binding-patterns.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /for \(const \[%b\d+ first, \.\.\.%b\d+ rest\] of/u);
+  assert.match(hir, /for \(let \{"value": %b\d+ value = 3/u);
+  assert.match(hir, /for \(var \[%b\d+ retained\] of/u);
+  assert.match(mir, /fresh lexical cell for first/u);
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /object-rest CopyDataProperties/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|RestElement/u,
+  );
 });
 
 test("keeps a lexical for-of binding in the iterable TDZ", () => {

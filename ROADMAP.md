@@ -568,7 +568,11 @@ recursive array and object binding semantics. Generated and fixed native
 evidence covers defaults, rest, nullish failure, iterator cleanup, fresh catch
 cells, and abrupt propagation through `finally`. Sixteen reviewed standards
 cases add array and object catch patterns to the measured compatibility
-manifest. The intrinsics
+manifest. Synchronous `for-of` declaration heads now admit the same recursive
+patterns for `const`, `let`, and `var`. Generated and fixed native evidence
+covers temporal dead zones, fresh per-iteration cells, `var` retention, nested
+cleanup, object rest, and outer iterator close after pattern failure. The
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

@@ -408,6 +408,12 @@ export type SyntaxForOfTarget =
       readonly range: SourceRange;
     }
   | {
+      readonly declarationKind: "const" | "let" | "var";
+      readonly kind: "pattern-declaration";
+      readonly pattern: SyntaxBindingPattern;
+      readonly range: SourceRange;
+    }
+  | {
       readonly kind: "binding";
       readonly name: string;
       readonly range: SourceRange;
@@ -428,6 +434,12 @@ export type HirForOfTarget =
       readonly kind: "declaration";
       readonly mutable: boolean;
       readonly name: string;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly declarationKind: "const" | "let" | "var";
+      readonly kind: "pattern-declaration";
+      readonly pattern: HirBindingPattern;
       readonly range: SourceRange;
     }
   | {
@@ -2371,6 +2383,29 @@ function hirBindingIdentifiers(
   ];
 }
 
+function hirBindingPatternHasAwait(pattern: HirBindingPattern): boolean {
+  if (pattern.kind === "binding-identifier") return false;
+  if (pattern.kind === "object-binding-pattern") {
+    return pattern.properties.some(
+      (property) =>
+        hirExpressionHasAwait(property.key) ||
+        (property.initializer != null &&
+          hirExpressionHasAwait(property.initializer)) ||
+        hirBindingPatternHasAwait(property.pattern),
+    );
+  }
+  return (
+    pattern.elements.some(
+      (element) =>
+        element != null &&
+        ((element.initializer != null &&
+          hirExpressionHasAwait(element.initializer)) ||
+          hirBindingPatternHasAwait(element.pattern)),
+    ) ||
+    (pattern.rest != null && hirBindingPatternHasAwait(pattern.rest))
+  );
+}
+
 function declaredHirBindingIds(
   statements: readonly HirStatement[],
 ): readonly number[] {
@@ -2416,6 +2451,15 @@ function declaredHirBindingIds(
         statement.target.declarationKind !== "var"
       ) {
         result.push(statement.target.bindingId);
+      } else if (
+        statement.target.kind === "pattern-declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        result.push(
+          ...hirBindingIdentifiers(statement.target.pattern).map(
+            (item) => item.bindingId,
+          ),
+        );
       }
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "switch") {
@@ -2930,6 +2974,7 @@ function resolveStatement(
   if (statement.kind === "for-of") {
     let forScopes = scopes;
     let declaredBinding: Binding | undefined;
+    let patternScope: Map<string, Binding> | undefined;
     if (
       statement.target.kind === "declaration" &&
       statement.target.declarationKind !== "var"
@@ -2944,6 +2989,30 @@ function resolveStatement(
         ...scopes,
         new Map([[statement.target.name, declaredBinding]]),
       ];
+    } else if (
+      statement.target.kind === "pattern-declaration" &&
+      statement.target.declarationKind !== "var"
+    ) {
+      patternScope = new Map<string, Binding>();
+      for (const name of syntaxBindingNames(statement.target.pattern)) {
+        if (patternScope.has(name)) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement.target.pattern,
+              `Duplicate for-of binding '${name}'.`,
+            ),
+          );
+          return undefined;
+        }
+        patternScope.set(name, {
+          id: state.nextBindingId,
+          mutable: statement.target.declarationKind === "let",
+          name,
+        });
+        state.nextBindingId += 1;
+      }
+      forScopes = [...scopes, patternScope];
     }
     const iterable = resolveExpression(statement.iterable, forScopes, state);
     let target: HirForOfTarget | undefined;
@@ -2964,6 +3033,17 @@ function resolveStatement(
           bindingId: binding.id,
           mutable: binding.mutable,
         };
+      }
+    } else if (statement.target.kind === "pattern-declaration") {
+      const lexical = statement.target.declarationKind !== "var";
+      const pattern = resolveBindingPattern(
+        statement.target.pattern,
+        lexical ? forScopes : scopes,
+        state,
+        lexical ? "declare" : "write",
+      );
+      if (pattern != null) {
+        target = { ...statement.target, pattern };
       }
     } else if (statement.target.kind === "binding") {
       const binding = findBinding(scopes, statement.target.name);
@@ -3440,10 +3520,13 @@ function appendHirStatement(
       statement.target.kind === "declaration"
         ? `${statement.target.declarationKind} ` +
           `%b${statement.target.bindingId} ${statement.target.name}`
-        : statement.target.kind === "binding"
-          ? `%b${statement.target.bindingId} ${statement.target.name}`
-          : `${printHirExpression(statement.target.object)}[` +
-            `${printHirExpression(statement.target.key)}]`;
+        : statement.target.kind === "pattern-declaration"
+          ? `${statement.target.declarationKind} ` +
+            printHirBindingPattern(statement.target.pattern)
+          : statement.target.kind === "binding"
+            ? `%b${statement.target.bindingId} ${statement.target.name}`
+            : `${printHirExpression(statement.target.object)}[` +
+              `${printHirExpression(statement.target.key)}]`;
     lines.push(
       `${indent}for (${target} of ` +
         `${printHirExpression(statement.iterable)})${location}`,
@@ -5459,6 +5542,20 @@ function lowerForOfTarget(
   value: number,
   builder: MirBuilder,
 ): void {
+  if (target.kind === "pattern-declaration") {
+    if (target.declarationKind !== "var") {
+      for (const binding of hirBindingIdentifiers(target.pattern)) {
+        resetBinding(binding.bindingId, binding.name, binding.range, builder);
+      }
+    }
+    lowerBindingTarget(
+      target.pattern,
+      value,
+      target.declarationKind === "var" ? "write" : "initialize",
+      builder,
+    );
+    return;
+  }
   if (target.kind === "declaration" && target.declarationKind !== "var") {
     resetBinding(target.bindingId, target.name, target.range, builder);
     const id = builder.nextValue;
@@ -5553,6 +5650,15 @@ function lowerForOfStatement(
       statement.target.range,
       builder,
     );
+  } else if (
+    statement.target.kind === "pattern-declaration" &&
+    statement.target.declarationKind !== "var"
+  ) {
+    for (const binding of hirBindingIdentifiers(statement.target.pattern)) {
+      // ForIn/OfHeadEvaluation creates every lexical pattern binding before
+      // evaluating the iterable, so same-name reads observe the TDZ.
+      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+    }
   }
   const iterable = lowerExpression(statement.iterable, builder);
   appendMirMetadata(
@@ -7388,6 +7494,8 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
   if (statement.kind === "for-of") {
     return (
       hirExpressionHasAwait(statement.iterable) ||
+      (statement.target.kind === "pattern-declaration" &&
+        hirBindingPatternHasAwait(statement.target.pattern)) ||
       (statement.target.kind === "property" &&
         (hirExpressionHasAwait(statement.target.object) ||
           hirExpressionHasAwait(statement.target.key))) ||
@@ -7460,6 +7568,13 @@ function collectHirBindings(
           id: statement.target.bindingId,
           name: statement.target.name,
         });
+      } else if (
+        statement.target.kind === "pattern-declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        for (const binding of hirBindingIdentifiers(statement.target.pattern)) {
+          bindings.push({ id: binding.bindingId, name: binding.name });
+        }
       }
       collect(statement.body);
     } else if (statement.kind === "switch") {
