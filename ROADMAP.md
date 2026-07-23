@@ -575,7 +575,14 @@ cleanup, object rest, and outer iterator close after pattern failure. The
 reviewed standards manifest adds six passing nullish object-pattern cases
 across all three declaration kinds. Another 42 selected cases record the
 separate compound-assignment boundary in their upstream loop bodies. The
-intrinsics
+same recursive paths now admit standalone destructuring assignment with
+existing identifier leaves. Generated and fixed native evidence covers
+defaults, rest, result identity, nullish failure, iterator cleanup, immutable
+and imported binding errors, direct awaited right operands, both
+specialization policies, and forced collection. Eleven reviewed standards
+cases cover identifier writes, nested patterns, defaults, rest, result
+identity, nullish and immutable-target errors, and function-name inference.
+Member targets remain a separate assignment-pattern unit. The intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

@@ -652,6 +652,13 @@ function expression(
         ? undefined
         : { ...located, kind: "binding-set", name, value: assigned };
     }
+    if (left.type === "ArrayPattern" || left.type === "ObjectPattern") {
+      const pattern = bindingPattern(context, left);
+      const assigned = expression(context, right);
+      return pattern == null || assigned == null
+        ? undefined
+        : { ...located, kind: "destructuring-set", pattern, value: assigned };
+    }
     const member = memberParts(context, left);
     const assigned = expression(context, right);
     return member == null || assigned == null
@@ -1740,12 +1747,55 @@ function nodeContainsAwait(value: unknown): boolean {
 
 const maximumAsyncContinuationCount = 256;
 
+interface DirectAwaitAssignment {
+  readonly left: BabelNode;
+  readonly operand: BabelNode;
+}
+
+function unparenthesizedExpression(value: unknown): BabelNode | undefined {
+  let current = node(value);
+  while (current?.type === "ParenthesizedExpression") {
+    current = node(current.expression);
+  }
+  return current;
+}
+
+function directAwaitAssignment(
+  value: BabelNode,
+): DirectAwaitAssignment | undefined {
+  if (value.type !== "ExpressionStatement") return undefined;
+  const expressionValue = unparenthesizedExpression(value.expression);
+  if (
+    expressionValue?.type !== "AssignmentExpression" ||
+    expressionValue.operator !== "="
+  ) {
+    return undefined;
+  }
+  const left = node(expressionValue.left);
+  const awaited = unparenthesizedExpression(expressionValue.right);
+  const operand =
+    awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
+  if (
+    left == null ||
+    operand == null ||
+    (left.type !== "ArrayPattern" && left.type !== "ObjectPattern")
+  ) {
+    return undefined;
+  }
+  return { left, operand };
+}
+
 function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
   if (value.type === "ExpressionStatement") {
-    return node(value.expression)?.type === "AwaitExpression";
+    return (
+      directAwaitAssignment(value) != null ||
+      unparenthesizedExpression(value.expression)?.type === "AwaitExpression"
+    );
   }
   if (value.type === "ReturnStatement") {
-    return node(value.argument)?.type === "AwaitExpression";
+    return (
+      unparenthesizedExpression(value.argument)?.type === "AwaitExpression"
+    );
   }
   if (value.type !== "VariableDeclaration") return false;
   if (value.kind !== "const" && value.kind !== "let" && value.kind !== "var") {
@@ -1754,7 +1804,7 @@ function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
   const declarations = nodes(value.declarations);
   return (
     declarations.length === 1 &&
-    node(declarations[0]?.init)?.type === "AwaitExpression"
+    unparenthesizedExpression(declarations[0]?.init)?.type === "AwaitExpression"
   );
 }
 
@@ -1779,6 +1829,7 @@ function validateAsyncContinuationCount(
 }
 
 interface AwaitPoint {
+  readonly assignment?: SyntaxBindingPattern;
   readonly declaration?: {
     readonly hint: Hint | undefined;
     readonly kind: "const" | "let" | "var";
@@ -1794,13 +1845,24 @@ function awaitPoint(
   value: BabelNode,
 ): AwaitPoint | undefined {
   if (value.type === "ExpressionStatement") {
-    const awaited = node(value.expression);
+    const directAssignment = directAwaitAssignment(value);
+    if (directAssignment != null) {
+      const assignment = bindingPattern(context, directAssignment.left);
+      return assignment == null
+        ? undefined
+        : {
+            assignment,
+            operand: directAssignment.operand,
+            returnValue: false,
+          };
+    }
+    const awaited = unparenthesizedExpression(value.expression);
     const operand =
       awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
     return operand == null ? undefined : { operand, returnValue: false };
   }
   if (value.type === "ReturnStatement") {
-    const awaited = node(value.argument);
+    const awaited = unparenthesizedExpression(value.argument);
     const operand =
       awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
     return operand == null ? undefined : { operand, returnValue: true };
@@ -1812,7 +1874,10 @@ function awaitPoint(
   const declarations = nodes(value.declarations);
   const declaration = declarations.length === 1 ? declarations[0] : undefined;
   const identifier = declaration == null ? undefined : node(declaration.id);
-  const awaited = declaration == null ? undefined : node(declaration.init);
+  const awaited =
+    declaration == null
+      ? undefined
+      : unparenthesizedExpression(declaration.init);
   const operand =
     awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
   const name = identifier == null ? undefined : identifierName(identifier);
@@ -1987,40 +2052,53 @@ function asyncStatementList(
           values.slice(index + 1),
           "continuation",
         );
-        if (continuationBody != null && point.declaration != null) {
+        if (continuationBody != null) {
           const received: SyntaxStatement | undefined =
-            point.declaration.pattern != null
+            point.assignment != null
               ? {
-                  declarationKind: point.declaration.kind,
-                  initializer: identifierExpression(valueName, range),
-                  kind: "binding-pattern",
-                  mode:
-                    point.declaration.kind === "var" ? "write" : "initialize",
-                  pattern: point.declaration.pattern,
+                  expression: {
+                    kind: "destructuring-set",
+                    pattern: point.assignment,
+                    range,
+                    value: identifierExpression(valueName, range),
+                  },
+                  kind: "expression",
                   range,
                 }
-              : point.declaration.name == null
-                ? undefined
-                : point.declaration.kind === "var"
-                  ? {
-                      expression: {
-                        kind: "binding-set",
+              : point.declaration?.pattern != null
+                ? {
+                    declarationKind: point.declaration.kind,
+                    initializer: identifierExpression(valueName, range),
+                    kind: "binding-pattern",
+                    mode:
+                      point.declaration.kind === "var" ? "write" : "initialize",
+                    pattern: point.declaration.pattern,
+                    range,
+                  }
+                : point.declaration?.name == null
+                  ? undefined
+                  : point.declaration.kind === "var"
+                    ? {
+                        expression: {
+                          kind: "binding-set",
+                          name: point.declaration.name,
+                          range,
+                          value: identifierExpression(valueName, range),
+                        },
+                        kind: "expression",
+                        range,
+                      }
+                    : {
+                        hint: point.declaration.hint,
+                        initializer: identifierExpression(valueName, range),
+                        kind: "binding-init",
                         name: point.declaration.name,
                         range,
-                        value: identifierExpression(valueName, range),
-                      },
-                      kind: "expression",
-                      range,
-                    }
-                  : {
-                      hint: point.declaration.hint,
-                      initializer: identifierExpression(valueName, range),
-                      kind: "binding-init",
-                      name: point.declaration.name,
-                      range,
-                    };
-          if (received == null) return undefined;
-          continuationBody = [received, ...continuationBody];
+                      };
+          if (point.assignment != null || point.declaration != null) {
+            if (received == null) return undefined;
+            continuationBody = [received, ...continuationBody];
+          }
         }
       }
       if (continuationBody == null) return undefined;

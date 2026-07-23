@@ -2275,6 +2275,33 @@ test("lowers linked modules through shared live binding identities", () => {
           kind: "expression" as const,
           range,
         },
+        {
+          expression: {
+            kind: "destructuring-set" as const,
+            pattern: {
+              elements: [
+                {
+                  pattern: {
+                    kind: "binding-identifier" as const,
+                    name: "value",
+                    range,
+                  },
+                  range,
+                },
+              ],
+              kind: "array-binding-pattern" as const,
+              range,
+            },
+            range,
+            value: {
+              elements: [{ kind: "number" as const, range, value: 43 }],
+              kind: "array" as const,
+              range,
+            },
+          },
+          kind: "expression" as const,
+          range,
+        },
       ],
       imports: [
         {
@@ -2320,13 +2347,19 @@ test("lowers linked modules through shared live binding identities", () => {
   );
   assert.equal(importedRead?.bindingId, 0);
   assert.equal(importedRead?.range.sourceId, entry.canonicalId);
-  const importedWrite = operations.find(
+  const importedWrites = operations.filter(
     (operation) =>
       operation.kind === "write" && operation.detail.includes("value"),
   );
-  assert.equal(importedWrite?.bindingId, 0);
-  assert.equal(importedWrite?.importedBinding, true);
-  assert.equal(importedWrite?.range.sourceId, entry.canonicalId);
+  assert.equal(importedWrites.length, 2);
+  assert.ok(
+    importedWrites.every(
+      (operation) =>
+        operation.bindingId === 0 &&
+        operation.importedBinding === true &&
+        operation.range.sourceId === entry.canonicalId,
+    ),
+  );
   const dependencyInitialize = operations.find(
     (operation) => operation.kind === "initialize" && operation.bindingId === 0,
   );

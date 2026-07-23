@@ -319,6 +319,58 @@ tests:
   - path: test/language/expressions/arrow-function/prototype-rules.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/expressions/assignment/dstr/array-elem-put-const.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        iterator-protocol,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/assignment/dstr/array-elem-target-identifier.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/expressions/assignment/dstr/array-rest-after-element.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/expressions/assignment/dstr/obj-empty-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, error-intrinsics, object-properties]
+  - path: test/language/expressions/assignment/dstr/obj-id-identifier-resolution-lone.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/expressions/assignment/dstr/obj-id-init-assignment-missing.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/expressions/assignment/dstr/obj-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, object-properties, var-bindings]
+  - path: test/language/expressions/assignment/dstr/obj-id-put-const.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        lexical-bindings,
+        object-properties,
+      ]
+  - path: test/language/expressions/assignment/dstr/obj-prop-nested-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/assignment/dstr/obj-rest-valid-object.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]

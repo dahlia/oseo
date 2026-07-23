@@ -2003,6 +2003,120 @@ awaitedVarBinding();
 `,
   },
   {
+    name: "destructuring-assignments",
+    source: `
+let first;
+let fallback;
+let nested;
+let arrayRest;
+const arrayInput = [1, undefined, [3], 4, 5];
+const arrayResult =
+  ([first, fallback = 2, [nested], ...arrayRest] = arrayInput);
+console.log(
+  "array",
+  arrayResult === arrayInput,
+  first,
+  fallback,
+  nested,
+  arrayRest[0],
+  arrayRest[1],
+);
+
+let picked;
+let objectFallback;
+let objectRest;
+const objectInput = { picked: 6, kept: 7 };
+const objectResult =
+  ({ picked, missing: objectFallback = 8, ...objectRest } = objectInput);
+console.log(
+  "object",
+  objectResult === objectInput,
+  picked,
+  objectFallback,
+  objectRest.kept,
+);
+
+let keyOrder = "";
+let untouched = 9;
+try {
+  ({ [(keyOrder = keyOrder + "key")]: untouched } = null);
+} catch (error) {
+  console.log(
+    "nullish",
+    error instanceof TypeError,
+    keyOrder,
+    untouched,
+  );
+}
+
+let closeCount = 0;
+const immutable = 10;
+const closingIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return { value: 11, done: false };
+      },
+      return: function () {
+        closeCount = closeCount + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  [immutable] = closingIterable;
+} catch (error) {
+  console.log(
+    "immutable",
+    error instanceof TypeError,
+    immutable,
+    closeCount,
+  );
+}
+
+let stepCloseCount = 0;
+const failingIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        throw new RangeError("step");
+      },
+      return: function () {
+        stepCloseCount = stepCloseCount + 1;
+        return {};
+      },
+    };
+  },
+};
+try {
+  [first] = failingIterable;
+} catch (error) {
+  console.log(
+    "step",
+    error instanceof RangeError,
+    error.message,
+    stepCloseCount,
+  );
+}
+
+let inferred;
+[inferred = function () {}] = [];
+console.log("name", inferred.name);
+
+async function awaitedAssignment() {
+  let awaited;
+  const awaitedInput = [12];
+  [awaited] = await Promise.resolve(awaitedInput);
+  console.log("awaited", awaited);
+  let awaitedObject;
+  ({ value: awaitedObject } = await Promise.resolve({ value: 13 }));
+  console.log("awaited object", awaitedObject);
+}
+awaitedAssignment();
+`,
+  },
+  {
     name: "catch-bindings",
     source: `
 const outer = "outer";
@@ -4053,7 +4167,7 @@ if (isTestShardPosition(2, nativeArguments.shard)) {
   );
   assert.equal(nativeImportWrite.exitStatus, 0, nativeImportWrite.stderr);
   assert.equal(nativeImportWrite.stderr, "");
-  assert.equal(nativeImportWrite.stdout, "TypeError\n");
+  assert.equal(nativeImportWrite.stdout, "TypeError\nTypeError\n");
 
   const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
   const nativeAsyncModule = await runNativeCli(
@@ -4069,6 +4183,25 @@ if (isTestShardPosition(2, nativeArguments.shard)) {
     nativeAsyncModule.stdout,
     "dependency ready\nentry ready\nlate timer\n",
   );
+
+  const awaitedAssignmentModule = [
+    root,
+    "tests/fixtures/async-modules/destructuring-assignment.js",
+  ].join("/");
+  const nativeAwaitedAssignmentModule = await runNativeCli(
+    {
+      args: [awaitedAssignmentModule],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeAwaitedAssignmentModule.exitStatus,
+    0,
+    nativeAwaitedAssignmentModule.stderr,
+  );
+  assert.equal(nativeAwaitedAssignmentModule.stderr, "");
+  assert.equal(nativeAwaitedAssignmentModule.stdout, "assignment module 1\n");
 
   const awaitedVarModule = [
     root,

@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 210
+honest unsupported classifications. The current reviewed manifest records 221
 passes, 226 expected negatives, and 185 unsupported profile features with no
 semantic or harness failures.
 
@@ -71,8 +71,13 @@ catch cells, iterator cleanup, and abrupt propagation through `finally`.
 Synchronous `for-of` declaration heads now admit those recursive patterns for
 `const`, `let`, and `var`, preserving lexical temporal dead zones, fresh
 per-iteration cells, `var` hoisting, nested cleanup, and outer iterator close
-on pattern failure. Assignment, parameter, and classic `for` head
-destructuring remain later work. The runtime component boundaries
+on pattern failure. Standalone destructuring assignment now admits
+recursive array and object patterns whose leaves and rest targets are existing
+identifiers. It evaluates the right operand once, returns that original value,
+preserves default and rest behavior, conditionally closes array iterators, and
+retains immutable and imported binding errors. Member targets, parameter
+patterns, and classic `for` head destructuring remain later work. The runtime
+component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
@@ -251,6 +256,22 @@ cases pin nullish object-pattern failure across all three declaration kinds.
 Another 42 selected binding cases reach the pattern head but remain honestly
 unsupported because their upstream loop body uses compound assignment, which
 is outside the admitted expression profile.
+
+Standalone destructuring assignment now accepts recursive array and object
+patterns with existing identifier leaves. The right operand evaluates once
+before pattern work and remains the assignment expression result. Defaults,
+nested patterns, array and object rest, computed keys, conditional
+`IteratorClose`, immutable-binding errors, imported-binding errors, and abrupt
+completion reuse the declaration paths without creating cells. The generated
+property suite uses seed `0x5eed000c` across array and object patterns, present,
+missing, and nullish inputs, both native specialization policies, and forced
+collection. Fixed native fixtures retain expression-result identity,
+function-name inference, step failure without close, target failure with close,
+and computed-key suppression on nullish object input. Member targets remain
+outside this unit until assignment references become explicit pattern leaves.
+Eleven reviewed test262 cases pin identifier writes, nested patterns, defaults,
+rest, result identity, nullish and immutable-target errors, and function-name
+inference under both strictness and specialization policies.
 
 ### Intrinsics and built-in objects
 
