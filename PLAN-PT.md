@@ -498,6 +498,24 @@ that budget. Fixed native fixtures retain empty exclusions, primitive string
 indices, nested rest targets, symbol exclusions, and declaration-kind hoisting.
 
 
+M5 catch binding properties
+---------------------------
+
+The catch binding property generates an array or object catch parameter with a
+default and rest target. Inputs vary between a present value, a missing value,
+and `null`. Its independent model predicts the selected bound value, retained
+rest value, or escaped nullish `TypeError`. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed000a`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain fresh
+catch cells, function-name inference, iterator cleanup after a default failure,
+step failure without close, nullish object failure, and `finally` execution
+when catch parameter initialization completes abruptly.
+
+
 Test placement and package boundaries
 -------------------------------------
 

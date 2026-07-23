@@ -563,7 +563,10 @@ enumerable own-key order, string and symbol exclusions, and fresh data
 descriptors under a second generated property suite. Twenty-four reviewed
 standards cases cover `const`, `let`, and `var` nullish coercibility, trailing
 shorthand properties, function-name inference, rest exclusions, fresh data
-descriptors, and non-enumerable omission. The intrinsics
+descriptors, and non-enumerable omission. Catch parameters now reuse the same
+recursive array and object binding semantics. Generated and fixed native
+evidence covers defaults, rest, nullish failure, iterator cleanup, fresh catch
+cells, and abrupt propagation through `finally`. The intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

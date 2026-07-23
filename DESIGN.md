@@ -394,6 +394,13 @@ enumerable, and configurable data properties. This keeps symbol exclusions,
 primitive string indices, and future accessor behavior on the same
 `CopyDataProperties` path.
 
+Catch parameters reuse the same recursive binding initialization after
+capturing the pending thrown value into the catch environment. Every leaf
+binding is created uninitialized before the pattern runs. Array patterns retain
+their conditional iterator cleanup, object patterns retain nullish and
+property-order behavior, and a pattern failure skips the catch body while
+continuing through an enclosing `finally` or abrupt target.
+
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument
 list. The call target and method receiver are resolved before accumulation, and

@@ -602,6 +602,16 @@ test("rejects var declarations sharing a catch parameter name", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
 });
 
+test("rejects var declarations sharing a catch pattern name", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "try { throw { value: 1 }; } " +
+      "catch ({ value: caught }) { var caught; }",
+    sourceId: "var-catch-pattern.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+});
+
 test("converts hoisted var object binding patterns", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -821,6 +831,30 @@ test("converts object binding rest to owned syntax", () => {
   assert.match(printHir(result.hir), /\.\.\.%b\d+ rest/u);
   assert.match(printMir(result.mir), /object-rest CopyDataProperties/u);
   assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
+});
+
+test("converts catch binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "try { throw { values: [1, 2], kept: 3 }; } " +
+      "catch ({ values: [first, ...rest], ...other }) { " +
+      "console.log(first, rest[0], other.kept); }",
+    sourceId: "catch-bindings.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /catch \{"values": \[%b\d+ first/u);
+  assert.match(hir, /\.\.\.%b\d+ other/u);
+  assert.match(mir, /caught catch parameter/u);
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /object-rest CopyDataProperties/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|RestElement/u,
+  );
 });
 
 test("keeps later binding consumers outside the profile", () => {

@@ -86,6 +86,11 @@ Object binding declarations use the `oseo_require_object_coercible`
 generated-code ABI operation owned by *runtime\_object.c*, followed by the
 existing property-key conversion and property-read operations. The compiler
 owns recursive target initialization and default selection.
+Catch binding patterns reuse the same iterator, coercibility, property-read,
+array-append, and object-rest operations after generated code captures the
+pending thrown value. They add no runtime ABI entry point; compiler-owned
+cleanup regions route a pattern failure around the catch body and through an
+enclosing `finally`.
 
 ### Internal helpers
 

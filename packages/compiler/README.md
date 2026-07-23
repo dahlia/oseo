@@ -48,6 +48,10 @@ Object binding declarations share those recursive leaves. MIR checks
 each key through `ToPropertyKey`, reads properties from left to right, applies
 defaults only to `undefined`, and enters nested array or object patterns without
 recovering frontend syntax.
+Catch parameters reuse those patterns after capturing the pending thrown value.
+MIR resets every catch cell before initialization, retains conditional iterator
+cleanup, and sends a pattern failure through the enclosing `finally` or abrupt
+target without entering the catch body.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

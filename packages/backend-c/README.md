@@ -59,6 +59,10 @@ in-flight throw over a close failure.
 Object binding lowering emits the MIR-owned coercibility check before computed
 keys, then uses the existing property-key and generic property-read operations.
 Nested patterns reuse the same binding targets and abrupt-completion path.
+Catch parameter lowering captures the pending thrown value, resets every catch
+cell, and runs the same recursive binding path before entering the body.
+Pattern failures retain iterator cleanup and continue through an enclosing
+`finally`.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared
