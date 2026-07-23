@@ -1752,11 +1752,19 @@ interface DirectAwaitAssignment {
   readonly operand: BabelNode;
 }
 
+function unparenthesizedExpression(value: unknown): BabelNode | undefined {
+  let current = node(value);
+  while (current?.type === "ParenthesizedExpression") {
+    current = node(current.expression);
+  }
+  return current;
+}
+
 function directAwaitAssignment(
   value: BabelNode,
 ): DirectAwaitAssignment | undefined {
   if (value.type !== "ExpressionStatement") return undefined;
-  const expressionValue = node(value.expression);
+  const expressionValue = unparenthesizedExpression(value.expression);
   if (
     expressionValue?.type !== "AssignmentExpression" ||
     expressionValue.operator !== "="
@@ -1764,7 +1772,7 @@ function directAwaitAssignment(
     return undefined;
   }
   const left = node(expressionValue.left);
-  const awaited = node(expressionValue.right);
+  const awaited = unparenthesizedExpression(expressionValue.right);
   const operand =
     awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
   if (
@@ -1781,11 +1789,13 @@ function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
   if (value.type === "ExpressionStatement") {
     return (
       directAwaitAssignment(value) != null ||
-      node(value.expression)?.type === "AwaitExpression"
+      unparenthesizedExpression(value.expression)?.type === "AwaitExpression"
     );
   }
   if (value.type === "ReturnStatement") {
-    return node(value.argument)?.type === "AwaitExpression";
+    return (
+      unparenthesizedExpression(value.argument)?.type === "AwaitExpression"
+    );
   }
   if (value.type !== "VariableDeclaration") return false;
   if (value.kind !== "const" && value.kind !== "let" && value.kind !== "var") {
@@ -1794,7 +1804,7 @@ function isDirectAsyncAwaitPoint(value: BabelNode): boolean {
   const declarations = nodes(value.declarations);
   return (
     declarations.length === 1 &&
-    node(declarations[0]?.init)?.type === "AwaitExpression"
+    unparenthesizedExpression(declarations[0]?.init)?.type === "AwaitExpression"
   );
 }
 
@@ -1846,13 +1856,13 @@ function awaitPoint(
             returnValue: false,
           };
     }
-    const awaited = node(value.expression);
+    const awaited = unparenthesizedExpression(value.expression);
     const operand =
       awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
     return operand == null ? undefined : { operand, returnValue: false };
   }
   if (value.type === "ReturnStatement") {
-    const awaited = node(value.argument);
+    const awaited = unparenthesizedExpression(value.argument);
     const operand =
       awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
     return operand == null ? undefined : { operand, returnValue: true };
@@ -1864,7 +1874,10 @@ function awaitPoint(
   const declarations = nodes(value.declarations);
   const declaration = declarations.length === 1 ? declarations[0] : undefined;
   const identifier = declaration == null ? undefined : node(declaration.id);
-  const awaited = declaration == null ? undefined : node(declaration.init);
+  const awaited =
+    declaration == null
+      ? undefined
+      : unparenthesizedExpression(declaration.init);
   const operand =
     awaited?.type === "AwaitExpression" ? node(awaited.argument) : undefined;
   const name = identifier == null ? undefined : identifierName(identifier);

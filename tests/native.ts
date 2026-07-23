@@ -2109,6 +2109,9 @@ async function awaitedAssignment() {
   const awaitedInput = [12];
   [awaited] = await Promise.resolve(awaitedInput);
   console.log("awaited", awaited);
+  let awaitedObject;
+  ({ value: awaitedObject } = await Promise.resolve({ value: 13 }));
+  console.log("awaited object", awaitedObject);
 }
 awaitedAssignment();
 `,

@@ -907,6 +907,49 @@ test("supports awaited destructuring assignment in async functions", () => {
   assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
 });
 
+test("supports parenthesized awaited object assignments", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function unpack(input) {\n" +
+      "  let value;\n" +
+      "  ({ value } = (await input));\n" +
+      "  return value;\n" +
+      "}\n" +
+      "unpack(Promise.resolve({ value: 1 }));\n",
+    sourceId: "await-object-destructuring-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /GetV for object binding/u);
+});
+
+test("supports parenthesized direct await points", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function settle(input) {\n" +
+      "  const value = (await input);\n" +
+      "  (await input);\n" +
+      "  return (await value);\n" +
+      "}\n" +
+      "settle(Promise.resolve(Promise.resolve(1)));\n",
+    sourceId: "parenthesized-direct-await.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const operations = [
+    ...result.mir.script.blocks,
+    ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
+  ].flatMap((block) => block.operations);
+  assert.equal(
+    operations.filter(
+      (operation) =>
+        operation.target?.kind === "promise-intrinsic" &&
+        operation.target.method === "awaitThen",
+    ).length,
+    3,
+  );
+});
+
 test("converts catch binding patterns to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
