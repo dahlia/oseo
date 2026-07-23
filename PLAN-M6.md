@@ -13,9 +13,10 @@ named by the targeted standard edition.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
-records under *docs/adr/*. The completed runtime componentization recorded in
+[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
+language profiles, and accepted records under *docs/adr/*. The completed
+runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
 the prerequisite for every large web API family: a new API lands in an
 owned runtime component, not in a catch-all translation unit. Evidence
@@ -56,7 +57,8 @@ M6 group work begins from these contracts:
     runtime ABI, never by calling Node.js or Deno;
  -  the compatibility manifest and test262 harness report honest
     classifications, and [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md)
-    keeps dynamic source evaluation explicitly unsupported;
+    keeps dynamic source evaluation explicitly unsupported while
+    [*PLAN-DYN.md*](./PLAN-DYN.md) owns its deferred capability track;
  -  property suites retain seeds, replay paths, and structured inputs under
     [*PLAN-PT.md*](./PLAN-PT.md); and
  -  strict C warnings, sanitizers, Linux AMD64 execution, macOS AArch64

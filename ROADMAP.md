@@ -35,7 +35,10 @@ on which they depend. A deferred interactive-development track is recorded in
 changing their order. A native I/O infrastructure track is recorded in
 [*PLAN-NIO.md*](./PLAN-NIO.md). It may run probes alongside M5 and supplies the
 clock, wakeup, network, and file adapter gates consumed by later compatibility
-work.
+work. A deferred dynamic-source and staged-compilation track is recorded in
+[*PLAN-DYN.md*](./PLAN-DYN.md). It keeps closed AOT binaries compiler-free
+while defining the evidence required for bounded dynamic import, late native
+artifacts, and optional runtime compilation.
 
 
 Working rules
@@ -102,6 +105,25 @@ waits for accepted and implemented socket and name-resolution backends plus an
 M6-owned TLS client and trust-store decision on both supported execution
 targets. Selected M7 file APIs later extend the same operation, cancellation,
 buffer, and liveness contracts rather than creating a second event loop.
+
+
+Dynamic source track
+--------------------
+
+Oseo's smallest deployment remains a closed ahead-of-time binary. A program
+does not carry a source parser, compiler, incremental loader, or code-lifetime
+machinery unless its selected capability profile needs them.
+[*PLAN-DYN.md*](./PLAN-DYN.md) separates closed source, a finite precompiled
+dynamic module set, late native artifacts, and runtime source compilation so
+one dynamic feature does not make every executable equally large.
+
+This track is planned and deferred. Build-time-resolvable dynamic import can be
+probed before self-hosting because it preserves a closed graph. Late native
+artifact probes may share the REPL loader boundary. A standalone runtime
+compiler depends on M8, the global-binding decision, code-lifetime evidence,
+and target support for executable code loading. None of this changes the M5
+unsupported classifications until a feature-specific decision updates ADR
+0016.
 
 
 Interactive development track
@@ -336,9 +358,11 @@ graphs.
  -  host exception and unhandled-rejection reporting;
  -  a documented shutdown rule for pending tasks and handles.
 
-Dynamic import may be added for module graphs resolvable at build time. `eval`
-and the `Function` constructor remain unsupported unless a later architecture
-decision explains how they fit an ahead-of-time runtime.
+Dynamic import may be added for module graphs resolvable at build time.
+[*PLAN-DYN.md*](./PLAN-DYN.md) records the finite-set, promise, identity, and
+evidence gates for that subset. `eval` and the `Function` constructor remain
+unsupported unless a later architecture decision explains how they fit an
+ahead-of-time runtime.
 
 ### Exit criteria
 
@@ -487,7 +511,9 @@ family lands.
  -  bootstrap parser use stays outside backend and optimization code;
  -  continuous integration reports which compiler packages Oseo can compile;
  -  runtime APIs needed by the compiler are added through ordinary compatibility
-    plans rather than hidden bootstrap hooks.
+    plans rather than hidden bootstrap hooks; and
+ -  compiler-enabled deployment remains an optional capability under
+    [*PLAN-DYN.md*](./PLAN-DYN.md), not a cost added to every closed binary.
 
 ### Bootstrap stages
 
@@ -541,7 +567,9 @@ the candidate edition boundary and manifest schema are frozen, the test262
 harness observes module and asynchronous execution, and the
 dependency-indexed baseline is published.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
-source challenge features through explicit unsupported classifications.
+source challenge features through explicit unsupported classifications, while
+[*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
+track.
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
 `do-while`, `for`, `for-of`, `switch`, and labeled statements, and the
@@ -634,6 +662,10 @@ The roadmap should be revised when evidence changes one of these assumptions:
     units. [*PLAN-REPL.md*](./PLAN-REPL.md) keeps implementation deferred until
     session semantics, artifact loading, reclamation, and target evidence are
     recorded.
+ -  Dynamic source can make compiler, loader, and code-lifetime support a
+    deployment cost even for programs that never use it.
+    [*PLAN-DYN.md*](./PLAN-DYN.md) requires explicit capability derivation and
+    compiler-absence evidence before such support enters the runtime.
 
 Changes to milestone order should update this document and name the new
 evidence. They should not silently relax the generic-fallback or hint-safety

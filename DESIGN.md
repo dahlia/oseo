@@ -458,15 +458,19 @@ the language profile with owned diagnostics and honest manifest
 classifications. Supporting any of them requires an explicit design that
 does not quietly introduce an interpreter or JIT tier; staged compilation
 is the recorded candidate for `eval`, and build-time-resolvable dynamic
-import remains a deferred admission with its own plan.
+import remains a deferred admission.
+[*PLAN-DYN.md*](./PLAN-DYN.md) scopes the capability derivation, optional
+runtime composition, artifact loading, and evidence required by either route.
 
 Interactive compilation is a separate tool boundary. A future REPL may accept
 source between submissions and ask a supported compiler host to produce a new
 native unit, but that does not expose source compilation to an executing Oseo
 program or admit `eval`. [*PLAN-REPL.md*](./PLAN-REPL.md) requires a persistent
 session, explicit incremental artifacts, and owned code lifetime before such a
-unit can join a running process. Replaying earlier submissions is not a valid
-substitute because it would repeat visible effects and lose object identity.
+unit can join a running process. Its loader and lifetime evidence can satisfy
+shared [*PLAN-DYN.md*](./PLAN-DYN.md) entry criteria without changing the
+language profile. Replaying earlier submissions is not a valid substitute
+because it would repeat visible effects and lose object identity.
 
 Package resolution is separate from module semantics. Early milestones use
 explicit files or URLs. *package.json* `exports` and `imports`, CommonJS, and
@@ -566,6 +570,12 @@ and target under [*PLAN-NIO.md*](./PLAN-NIO.md), with a tested fallback rather
 than an assumption that one API covers every clock, socket, and file operation.
 The M6 compatibility boundary separately owns the TLS client, certificate and
 hostname verification, and trust-store decision layered over that transport.
+
+The complete runtime archive is an implementation input, not a requirement that
+every executable retain every component. [*PLAN-DYN.md*](./PLAN-DYN.md) defines
+the future capability requirement graph and retained manifest that can select a
+reviewed component closure. Static-linker dead stripping alone is not a
+capability contract.
 
 
 Self-hosting
@@ -690,10 +700,11 @@ Remaining architecture decisions
 M0 accepted the bootstrap parser, initial C boundary, x86-64 value layout,
 generic call result, and explicit root protocol. ADR 0016 keeps `eval`, the
 `Function` constructor, and dynamic import explicitly unsupported during M5
-and names staged compilation as the only design-compatible route to
-admitting them later. The following questions still need decision records
-before the affected implementation becomes a dependency of later
-milestones:
+and names staged compilation as the only design-compatible route to admitting
+them later. [*PLAN-DYN.md*](./PLAN-DYN.md) records the capability, packaging,
+artifact, and evidence gates for that future work. The following questions
+still need decision records before the affected implementation becomes a
+dependency of later milestones:
 
  -  the long-term native code-generation backend;
  -  the native event-loop and system-library boundary, including the
@@ -701,6 +712,10 @@ milestones:
     [*PLAN-NIO.md*](./PLAN-NIO.md);
  -  the global object and dynamic global binding resolution, where a
     mutable `globalThis` meets closed-world name resolution;
+ -  capability-aware runtime composition and the staged compiler service,
+    including bounded dynamic import, late artifact validation, compiler
+    absence in closed builds, and code lifetime, as scoped by
+    [*PLAN-DYN.md*](./PLAN-DYN.md);
  -  the interactive session and incremental artifact boundary, including
     cross-unit bindings, code lifetime, reclamation, and target support, as
     scoped by [*PLAN-REPL.md*](./PLAN-REPL.md);

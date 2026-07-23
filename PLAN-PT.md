@@ -61,6 +61,12 @@ submission sequences, persistent bindings, code-artifact lifetimes, and prompt
 schedules. Those properties begin only after the REPL session model has an
 accepted contract; this plan does not invent the interactive semantics.
 
+The deferred dynamic-source track in [*PLAN-DYN.md*](./PLAN-DYN.md) adds
+capability derivation, finite dynamic module sets, late artifact validation,
+compiler-enabled execution, and code-reclamation models. Those properties
+begin only after the applicable capability or semantic unit has an accepted
+contract. A REPL property does not count as language-level `eval` evidence.
+
 The native I/O track in [*PLAN-NIO.md*](./PLAN-NIO.md) extends the schedule
 model with injected completions, partial transfers, cancellation races,
 wakeups, independently injected monotonic and epoch real time, wall-clock

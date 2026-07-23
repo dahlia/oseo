@@ -60,8 +60,9 @@ Alternatives considered
 3.  **Admit only build-time-known dynamic import.** Deferred, not decided.
     A dynamic `import()` whose specifier is resolvable while linking keeps
     the program closed. M4 already anticipates this route. It still needs
-    its own plan covering promise identity, failure timing, and manifest
-    evidence before admission.
+    a feature decision covering promise identity, failure timing, and
+    manifest evidence before admission. [*PLAN-DYN.md*](../../PLAN-DYN.md)
+    records those entry criteria.
 4.  **Keep every dynamic source form explicitly unsupported.** Selected
     for M5. The compiler already rejects these forms with source-located
     diagnostics, the manifest can carry them as unsupported profile
@@ -136,5 +137,7 @@ Links
     constraints that motivate the boundary.
  -  [*ROADMAP.md*](../../ROADMAP.md) carries the M8 staged-compilation
     dependency if alternative 2 is ever selected.
+ -  [*PLAN-DYN.md*](../../PLAN-DYN.md) defines the deferred capability,
+    packaging, artifact, and evidence track without changing this decision.
  -  [*PLAN-REPL.md*](../../PLAN-REPL.md) keeps future tool-level interactive
     compilation separate from language-level dynamic source evaluation.

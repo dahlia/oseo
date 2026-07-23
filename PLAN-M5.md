@@ -24,8 +24,10 @@ semantic or harness failures.
 Delivery item 7 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
 `Function` constructor, and dynamic import explicitly unsupported with owned
-diagnostics and the `dynamic-source` manifest tag. Realms, agents, and
-shared memory remain classified through missing harness capabilities.
+diagnostics and the `dynamic-source` manifest tag.
+[*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
+track without reopening the M5 decision. Realms, agents, and shared memory
+remain classified through missing harness capabilities.
 Delivery item 4 is substantially in progress. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
@@ -84,9 +86,9 @@ items 5, 6, 8, and 9 remain open.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The completed
-runtime componentization recorded in
+[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
+records under *docs/adr/*. The completed runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) provides
 the component boundaries that large intrinsic tables and built-in
 families build on. Evidence that changes one of these contracts updates
@@ -308,9 +310,10 @@ declarations stay declarative and module bindings stay module-scoped, and
 `globalThis` is admitted last, after an architecture decision resolves
 dynamically created global bindings against closed-world name resolution.
 The M6 surface audit in [*PLAN-M6.md*](./PLAN-M6.md) depends on this
-order. The future interactive session in
-[*PLAN-REPL.md*](./PLAN-REPL.md) also depends on the decision, but it does not
-add REPL work to the M5 delivery queue.
+order. The future dynamic-source capability track in
+[*PLAN-DYN.md*](./PLAN-DYN.md) and interactive session in
+[*PLAN-REPL.md*](./PLAN-REPL.md) also depend on the decision, but neither adds
+work to the M5 delivery queue.
 
 ### Functions and executable syntax
 
@@ -352,6 +355,11 @@ submissions as a tool-level compilation boundary. It does not admit `eval` or
 change this standards classification. Any incremental artifact or code-lifetime
 evidence it produces must update the applicable architecture decisions before a
 running session can load new code.
+
+[*PLAN-DYN.md*](./PLAN-DYN.md) separates closed source, finite precompiled
+dynamic modules, late native artifacts, and runtime source compilation. It
+does not reopen this M5 boundary. A feature enters the language profile only
+after its own entry criteria and an update to ADR 0016.
 
 
 Compiler and runtime invariants

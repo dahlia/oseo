@@ -17,8 +17,8 @@ for M5.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), and
+[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), and
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Evidence from an
 interactive prototype must update the affected document or decision record
 instead of bypassing its current boundary.
@@ -43,7 +43,8 @@ language-level `eval`. REPL input arrives through an explicit session boundary
 between submissions. Arbitrary Oseo programs do not gain a way to compile
 source strings, and [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md)
 continues to govern `eval`, the `Function` constructor family, and unrestricted
-dynamic import.
+dynamic import. [*PLAN-DYN.md*](./PLAN-DYN.md) owns the capability and
+packaging gates for any future language-level admission.
 
 
 Target experience
@@ -108,6 +109,9 @@ run the compiler under Node.js or Deno and send verified native artifacts to a
 persistent Oseo runtime. After M8, the same compiler interface may be composed
 inside a native development environment. The session and artifact contracts
 must not depend on which supported compiler host performs that compilation.
+The loader, validation, and code-lifetime evidence should satisfy the shared
+late-artifact criteria in [*PLAN-DYN.md*](./PLAN-DYN.md) rather than creating a
+REPL-only native format.
 
 
 Session semantics to decide
@@ -333,5 +337,5 @@ The full-featured REPL is complete when:
 
 REPL support does not by itself close the dynamic-source compatibility gap.
 Language-level `eval`, the `Function` constructor family, and unrestricted
-dynamic import remain governed by their own accepted decision and standards
-evidence.
+dynamic import remain governed by their own accepted decision, the entry
+criteria in [*PLAN-DYN.md*](./PLAN-DYN.md), and standards evidence.
