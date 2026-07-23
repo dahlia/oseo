@@ -331,12 +331,30 @@ tests:
         iterator-protocol,
         lexical-bindings,
       ]
+  - path: test/language/expressions/assignment/dstr/array-elem-put-prop-ref.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/array-elem-target-identifier.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
   - path: test/language/expressions/assignment/dstr/array-rest-after-element.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/expressions/assignment/dstr/array-rest-put-prop-ref.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/obj-empty-null.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, error-intrinsics, object-properties]
@@ -368,6 +386,9 @@ tests:
         object-properties,
         var-bindings,
       ]
+  - path: test/language/expressions/assignment/dstr/obj-prop-put-prop-ref.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-properties, var-bindings]
   - path: test/language/expressions/assignment/dstr/obj-rest-valid-object.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
