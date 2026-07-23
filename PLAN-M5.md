@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 188
+honest unsupported classifications. The current reviewed manifest records 204
 passes, 226 expected negatives, and 143 unsupported profile features with no
 semantic or harness failures.
 
@@ -228,7 +228,10 @@ failure skips the catch body while propagating through the enclosing
 and object patterns, present, missing, and nullish inputs, defaults, rest, both
 native specialization policies, and forced collection. Fixed native fixtures
 retain fresh catch cells, function-name inference, iterator cleanup and
-step-failure behavior, and `finally` execution after pattern failure.
+step-failure behavior, and `finally` execution after pattern failure. Sixteen
+reviewed test262 cases cover array values, defaults, function-name inference,
+nested rest, object nullish failure, trailing properties, and object rest
+descriptors.
 
 ### Intrinsics and built-in objects
 

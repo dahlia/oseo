@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 557 reviewed cases: 188 passes, 226 expected
+The current manifest contains 573 reviewed cases: 204 passes, 226 expected
 negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -404,9 +404,11 @@ its deliberate boundary and its evidence:
     through an enclosing `finally`. Native differential fixtures and a
     generated property with seed `0x5eed000a` cover array and object values,
     defaults, rest, nullish failure, both specialization policies, and forced
-    collection. Assignment patterns, function parameters, loop heads, pattern
-    type annotations, and `await` inside a property name or default remain
-    outside this syntax unit.
+    collection. Sixteen reviewed test262 cases cover array values, defaults,
+    function-name inference, nested rest, object nullish failure, trailing
+    properties, and object rest descriptors. Assignment patterns, function
+    parameters, loop heads, pattern type annotations, and `await` inside a
+    property name or default remain outside this syntax unit.
 
 
 Known gaps inside the claim
