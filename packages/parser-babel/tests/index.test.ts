@@ -862,6 +862,43 @@ test("converts destructuring assignments to owned syntax", () => {
   );
 });
 
+test("converts destructuring assignment member targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const target = { values: [0], rest: undefined };\n" +
+      "let index = 0;\n" +
+      "[target.values[index], ...target.rest] = [1, 2];\n" +
+      "({ value: target.values[0], ...target.rest } = " +
+      "{ value: 3, kept: 4 });\n",
+    sourceId: "destructuring-assignment-members.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /write \[target /u);
+  assert.match(hir, /target .*\["rest"\]/u);
+  assert.match(mir, /destructuring member target/u);
+  assert.match(mir, /property-set/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|AssignmentPattern|RestElement/u,
+  );
+});
+
+test("rejects await inside destructuring assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function assign(target, input) {\n" +
+      "  [(await target).value] = input;\n" +
+      "}\n",
+    sourceId: "await-destructuring-target.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(result.mir, undefined);
+});
+
 test("supports awaited destructuring assignment in modules", () => {
   const sourceId = "file:///app/await-destructuring-assignment.js";
   const result = babelModuleFrontend.parseModule({
@@ -895,16 +932,18 @@ test("supports awaited destructuring assignment in async functions", () => {
   const result = compileSource(babelFrontend, {
     source:
       "async function unpack(input) {\n" +
-      "  let value;\n" +
-      "  [value] = await input;\n" +
-      "  return value;\n" +
+      "  const target = {};\n" +
+      "  [target.value] = await input;\n" +
+      "  return target.value;\n" +
       "}\n" +
       "unpack(Promise.resolve([1]));\n",
     sourceId: "await-destructuring-assignment.ts",
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /GetIterator sync for array binding/u);
+  assert.match(mir, /destructuring member target/u);
 });
 
 test("supports parenthesized awaited object assignments", () => {
@@ -977,7 +1016,6 @@ test("converts catch binding patterns to owned syntax", () => {
 test("keeps later binding consumers outside the profile", () => {
   for (const [name, source] of [
     ["pattern annotation", "const [value]: [number] = [1];"],
-    ["assignment member target", "let target = {}; ([target.value] = [1]);"],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,

@@ -27,11 +27,13 @@ const { assertAsyncProperty } = await import(
 
 type InputKind = "missing" | "null" | "present";
 type PatternKind = "array" | "object";
+type TargetKind = "identifier" | "member";
 
 interface DestructuringAssignmentCase {
   readonly fallback: number;
   readonly inputKind: InputKind;
   readonly patternKind: PatternKind;
+  readonly targetKind: TargetKind;
   readonly value: number;
 }
 
@@ -51,14 +53,18 @@ const caseArbitrary: fc.Arbitrary<DestructuringAssignmentCase> = fc.record({
   fallback: fc.integer({ max: 20, min: -20 }),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
+  targetKind: fc.constantFrom<TargetKind>("identifier", "member"),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 function patternSource(testCase: DestructuringAssignmentCase): string {
+  const assigned =
+    testCase.targetKind === "member" ? "target.assigned" : "assigned";
+  const rest = testCase.targetKind === "member" ? "target.rest" : "rest";
   if (testCase.patternKind === "array") {
-    return `[assigned = ${testCase.fallback}, ...rest]`;
+    return `[${assigned} = ${testCase.fallback}, ...${rest}]`;
   }
-  return `{ value: assigned = ${testCase.fallback}, ...rest }`;
+  return `{ value: ${assigned} = ${testCase.fallback}, ...${rest} }`;
 }
 
 function inputSource(testCase: DestructuringAssignmentCase): string {
@@ -74,16 +80,26 @@ function inputSource(testCase: DestructuringAssignmentCase): string {
 }
 
 function printCase(testCase: DestructuringAssignmentCase): string {
-  const restValue = testCase.patternKind === "array" ? "rest[0]" : "rest.extra";
+  const assignedValue =
+    testCase.targetKind === "member" ? "target.assigned" : "assigned";
+  const restValue =
+    testCase.targetKind === "member"
+      ? testCase.patternKind === "array"
+        ? "target.rest[0]"
+        : "target.rest.extra"
+      : testCase.patternKind === "array"
+        ? "rest[0]"
+        : "rest.extra";
   return `
 let assigned = 99;
 let rest;
+const target = { assigned: 99, rest: undefined };
 const input = ${inputSource(testCase)};
 try {
   const result = (${patternSource(testCase)} = input);
-  console.log("result", assigned, ${restValue}, result === input);
+  console.log("result", ${assignedValue}, ${restValue}, result === input);
 } catch (error) {
-  console.log("error", error.name, assigned);
+  console.log("error", error.name, ${assignedValue});
 }
 `;
 }
@@ -146,6 +162,7 @@ test(nullishModelTest, () => {
       fallback: 2,
       inputKind: "null",
       patternKind: "object",
+      targetKind: "identifier",
       value: 1,
     }),
     {},
@@ -214,8 +231,8 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "identifier-target array and object assignments with defaults, " +
-          "rest, present, missing, and nullish inputs",
+          "identifier and member-target array and object assignments with " +
+          "defaults, rest, present, missing, and nullish inputs",
         numRuns: 10,
         profile: "M5 destructuring assignment",
         seed: 0x5eed_000c,

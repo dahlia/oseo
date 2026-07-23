@@ -34,8 +34,9 @@ shorthand and renamed targets, defaults, nested object or array patterns, and a
 final identifier rest target. Catch parameters and synchronous `for-of`
 declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
-identifier. Member targets, pattern type annotations, function parameters, and
-classic `for` head destructuring remain explicit boundaries.
+identifier or a static or computed member reference. Await inside a member
+target, pattern type annotations, function parameters, and classic `for` head
+destructuring remain explicit boundaries.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.

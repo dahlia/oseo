@@ -2112,8 +2112,114 @@ async function awaitedAssignment() {
   let awaitedObject;
   ({ value: awaitedObject } = await Promise.resolve({ value: 13 }));
   console.log("awaited object", awaitedObject);
+  const awaitedMember = {};
+  [awaitedMember.value] = await Promise.resolve([14]);
+  console.log("awaited member", awaitedMember.value);
 }
 awaitedAssignment();
+
+let memberOrder = "";
+const memberTarget = {};
+const memberKey = {
+  toString: function () {
+    memberOrder = memberOrder + "key ";
+    return "value";
+  },
+};
+const memberIterable = {
+  [Symbol.iterator]: function () {
+    memberOrder = memberOrder + "iterator ";
+    return {
+      next: function () {
+        memberOrder = memberOrder + "next ";
+        return { value: 14, done: false };
+      },
+      return: function () {
+        memberOrder = memberOrder + "close ";
+        return {};
+      },
+    };
+  },
+};
+[
+  memberTarget[
+    (memberOrder = memberOrder + "target ", memberKey)
+  ],
+] = memberIterable;
+console.log("member array", memberOrder, memberTarget.value);
+
+memberOrder = "";
+const throwingMemberKey = {
+  toString: function () {
+    memberOrder = memberOrder + "key ";
+    throw new RangeError("key");
+  },
+};
+try {
+  [
+    memberTarget[
+      (memberOrder = memberOrder + "target ", throwingMemberKey)
+    ],
+  ] = memberIterable;
+} catch (error) {
+  console.log(
+    "member key error",
+    error instanceof RangeError,
+    error.message,
+    memberOrder,
+  );
+}
+
+memberOrder = "";
+function memberTargetFailure() {
+  memberOrder = memberOrder + "target ";
+  throw new RangeError("target");
+}
+try {
+  [memberTarget[memberTargetFailure()]] = memberIterable;
+} catch (error) {
+  console.log(
+    "member target error",
+    error instanceof RangeError,
+    error.message,
+    memberOrder,
+  );
+}
+
+memberOrder = "";
+const memberSource = { value: undefined };
+({
+  value: memberTarget[
+    (memberOrder = memberOrder + "target ", memberKey)
+  ] = (memberOrder = memberOrder + "default ", 15),
+} = memberSource);
+console.log("member object", memberOrder, memberTarget.value);
+
+memberOrder = "";
+[
+  ...memberTarget[
+    (memberOrder = memberOrder + "target ", memberKey)
+  ]
+] = [16, 17];
+console.log(
+  "member array rest",
+  memberOrder,
+  memberTarget.value[0],
+  memberTarget.value[1],
+);
+
+memberOrder = "";
+const memberRestSource = { kept: 18 };
+({
+  ...memberTarget[
+    (memberOrder = memberOrder + "target ", memberKey)
+  ]
+} = memberRestSource);
+console.log(
+  "member object rest",
+  memberOrder,
+  memberTarget.value.kept,
+);
 `,
   },
   {

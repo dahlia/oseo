@@ -546,21 +546,23 @@ M5 destructuring assignment properties
 --------------------------------------
 
 The destructuring assignment property generates an array or object assignment
-pattern with an existing identifier target, default, and rest target. Inputs
-vary between present, missing, and nullish values. Its independent model
+pattern with an existing identifier or member target, default, and rest target.
+Inputs vary between present, missing, and nullish values. Its independent model
 predicts the assigned value, retained rest value, original right-hand result
-identity, or nullish `TypeError` without changing the previous target. Each case
-compares Node.js, Deno, specialization-disabled native execution, and
+identity, or nullish `TypeError` without changing the previous target. Each
+case compares Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled execution with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed000c`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
 through the shared replay controls. Fixed native fixtures retain function-name
-inference, step failure without close, immutable-target failure with close,
-computed-key suppression for nullish object input, and direct awaited right
-operands. Eleven reviewed test262 cases pin identifier writes, nested patterns,
-defaults, rest, result identity, nullish and immutable-target errors, and
-function-name inference under both strictness and specialization policies.
+inference, member object, key, conversion, read, and default order,
+member-target failure cleanup, step failure without close, immutable-target
+failure with close, computed-key suppression for nullish object input, and
+direct awaited right operands. Eleven reviewed test262 cases pin identifier
+writes, nested patterns, defaults, rest, result identity, nullish and
+immutable-target errors, and function-name inference under both strictness and
+specialization policies.
 
 
 Test placement and package boundaries

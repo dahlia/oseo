@@ -653,7 +653,7 @@ function expression(
         : { ...located, kind: "binding-set", name, value: assigned };
     }
     if (left.type === "ArrayPattern" || left.type === "ObjectPattern") {
-      const pattern = bindingPattern(context, left);
+      const pattern = bindingPattern(context, left, true);
       const assigned = expression(context, right);
       return pattern == null || assigned == null
         ? undefined
@@ -886,6 +886,7 @@ function expression(
 function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
+  assignment = false,
 ): SyntaxBindingPattern | undefined {
   if (value.type === "Identifier") {
     const name = identifierName(value);
@@ -897,6 +898,26 @@ function bindingPattern(
       );
     }
     return { ...location(context, value), kind: "binding-identifier", name };
+  }
+  if (value.type === "MemberExpression") {
+    if (!assignment) {
+      return unsupported(
+        context,
+        value,
+        "Member targets are supported only in assignment patterns.",
+      );
+    }
+    if (nodeContainsAwait(value)) {
+      return unsupported(
+        context,
+        value,
+        "Await inside a destructuring assignment target is unsupported.",
+      );
+    }
+    const member = memberParts(context, value);
+    return member == null
+      ? undefined
+      : { ...location(context, value), ...member, kind: "assignment-member" };
   }
   if (value.type !== "ArrayPattern" && value.type !== "ObjectPattern") {
     return unsupported(
@@ -928,8 +949,11 @@ function bindingPattern(
         }
         const argument = node(property.argument);
         if (argument == null) return unsupported(context, property);
-        const converted = bindingPattern(context, argument);
-        if (converted?.kind !== "binding-identifier") {
+        const converted = bindingPattern(context, argument, assignment);
+        if (
+          converted?.kind !== "binding-identifier" &&
+          converted?.kind !== "assignment-member"
+        ) {
           return unsupported(
             context,
             property,
@@ -991,7 +1015,7 @@ function bindingPattern(
           "Await inside a binding default is unsupported.",
         );
       }
-      const pattern = bindingPattern(context, left);
+      const pattern = bindingPattern(context, left, assignment);
       const initializer =
         right == null ? undefined : expression(context, right);
       if (
@@ -1036,7 +1060,7 @@ function bindingPattern(
       }
       const argument = node(element.argument);
       if (argument == null) return unsupported(context, element);
-      rest = bindingPattern(context, argument);
+      rest = bindingPattern(context, argument, assignment);
       if (rest == null) return undefined;
       continue;
     }
@@ -1052,7 +1076,7 @@ function bindingPattern(
         "Await inside an array binding default is unsupported.",
       );
     }
-    const pattern = bindingPattern(context, left);
+    const pattern = bindingPattern(context, left, assignment);
     const initializer = right == null ? undefined : expression(context, right);
     if (pattern == null || (right != null && initializer == null)) {
       return undefined;
@@ -1072,13 +1096,14 @@ function bindingPattern(
 }
 
 function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
+  if (pattern.kind === "assignment-member") return [];
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
     return [
       ...pattern.properties.flatMap((property) =>
         patternNames(property.pattern),
       ),
-      ...(pattern.rest == null ? [] : [pattern.rest.name]),
+      ...(pattern.rest == null ? [] : patternNames(pattern.rest)),
     ];
   }
   return [
@@ -1847,7 +1872,7 @@ function awaitPoint(
   if (value.type === "ExpressionStatement") {
     const directAssignment = directAwaitAssignment(value);
     if (directAssignment != null) {
-      const assignment = bindingPattern(context, directAssignment.left);
+      const assignment = bindingPattern(context, directAssignment.left, true);
       return assignment == null
         ? undefined
         : {
