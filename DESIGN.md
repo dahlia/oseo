@@ -702,6 +702,14 @@ cases; the extended task increases both case count and schedule size.
 Each run records the normalized execution host, exact native target, and
 sanitizer modes in its retained failure context.
 
+The native integration command remains *tests/native.ts*. It owns argument
+parsing, deterministic shard selection, orchestration, and stable summaries.
+The immutable fixture contract and ordered semantic families live under
+*tests/native/*; their explicit concatenation order, rather than filesystem
+enumeration or import side effects, determines shard membership. Non-catalog
+module, diagnostic, runtime, and target inspections use shard-owned scenario
+modules under *tests/native/scenarios/*.
+
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of
 the program-visible runtime API.

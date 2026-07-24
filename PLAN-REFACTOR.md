@@ -4,12 +4,13 @@ Compiler source decomposition plan
 Status
 ------
 
-Implementation status: in progress. The baseline checkpoint is complete on the
-`refactor` branch. This temporary cross-milestone plan decomposes the compiler,
-Babel frontend adapter, and native fixture runner before the next broad M5
-language and built-in batches. It preserves the current language profile,
-package interfaces, intermediate representations, generated behavior,
-diagnostics, and compatibility classifications.
+Implementation status: in progress. The baseline and decomposition checkpoints
+are complete on the `refactor` branch; closing verification and plan retirement
+remain. This temporary cross-milestone plan decomposes the compiler, Babel
+frontend adapter, and native fixture runner before the next broad M5 language
+and built-in batches. It preserves the current language profile, package
+interfaces, intermediate representations, generated behavior, diagnostics, and
+compatibility classifications.
 
 The plan is retired after its exit criteria pass and its durable ownership
 rules move into [*DESIGN.md*](./DESIGN.md), package documentation, and the
@@ -160,6 +161,19 @@ diagnostics, hints, mutually recursive grammar and asynchronous conversion,
 module conversion, and public composition. The mutually recursive conversion
 unit follows the documented exception rather than adding cyclic forwarding
 modules. Babel nodes remain private to the adapter.
+
+### Native test checkpoint
+
+The native command entry point now composes an immutable fixture contract,
+ordered semantic fixture families, and shard-owned non-catalog scenarios from
+*tests/native/*. The reviewed execution fixture order has the unchanged digest
+`sha256:74de29c14eeaa816d95ac0b3b8d4c347845c73f39ebc2acfdc533f5d53edcb09`.
+The `--shard INDEX/TOTAL` syntax, explicit concatenation order, scenario shard
+positions, and final summaries remain unchanged.
+
+`mise run test:native` passes with 53 of 53 Node.js, Deno, and
+`linux-x86_64-gnu` output comparisons, 54 `linux-aarch64-musl` cross builds,
+and all configured target assembly inspections.
 
 
 Ownership rules
