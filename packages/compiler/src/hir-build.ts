@@ -1520,6 +1520,17 @@ function resolveStatement(
       if (pattern != null) {
         target = { ...statement.target, pattern };
       }
+    } else if (statement.target.kind === "assignment-pattern") {
+      const pattern = resolveBindingPattern(
+        statement.target.pattern,
+        scopes,
+        state,
+        "write",
+        true,
+      );
+      if (pattern != null) {
+        target = { ...statement.target, pattern };
+      }
     } else if (statement.target.kind === "binding") {
       const binding = findBinding(scopes, statement.target.name);
       if (binding == null) {

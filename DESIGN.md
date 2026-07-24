@@ -386,6 +386,9 @@ recursive array or object binding patterns as a standalone declaration.
 Lexical pattern names enter the temporal dead zone before iterator acquisition
 and receive fresh cells before each iteration. A pattern failure closes its
 own nested iterators before closing the outer `for-of` iterator.
+An assignment head may use the corresponding recursive assignment patterns.
+Its identifier and member leaves write existing targets without creating
+cells, and a target failure follows the same inner-before-outer cleanup order.
 
 Array literal spread reuses the same iterator acquisition and step operations
 without creating a cleanup region. Array accumulation never calls

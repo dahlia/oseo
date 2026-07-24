@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 266
+honest unsupported classifications. The current reviewed manifest records 272
 passes, 226 expected negatives, and 143 unsupported profile features with no
 semantic or harness failures.
 
@@ -73,7 +73,9 @@ catch cells, iterator cleanup, and abrupt propagation through `finally`.
 Synchronous `for-of` declaration heads now admit those recursive patterns for
 `const`, `let`, and `var`, preserving lexical temporal dead zones, fresh
 per-iteration cells, `var` hoisting, nested cleanup, and outer iterator close
-on pattern failure. Standalone destructuring assignment now admits
+on pattern failure. Its non-declaration heads also admit recursive array and
+object assignment patterns with existing identifier or member leaves.
+Standalone destructuring assignment now admits
 recursive array and object patterns whose leaves and rest targets are existing
 identifiers or member references. It evaluates the right operand once, returns
 that original value, preserves default and rest behavior, conditionally closes
@@ -293,6 +295,18 @@ target remains unsupported until it joins the admitted continuation positions.
 Fourteen reviewed test262 cases pin identifier and member writes, nested
 patterns, defaults, rest, result identity, nullish and immutable-target errors,
 and function-name inference under both strictness and specialization policies.
+
+Synchronous `for-of` assignment heads now accept the same recursive array and
+object patterns. Each outer step writes existing identifier or member leaves
+without creating cells. Defaults, nesting, rest, nullish failure, immutable
+target errors, and member-reference evaluation reuse standalone destructuring
+assignment. A pattern failure closes any active inner array iterator before
+closing the outer `for-of` iterator. The generated property suite uses seed
+`0x5eed000e` across array and object patterns, identifier and member targets,
+present, missing, and nullish inputs, both native specialization policies, and
+forced collection. Fixed native fixtures retain multiple iterations, object
+rest, immutable failure, and the inner-before-outer cleanup order. Six reviewed
+test262 cases pin identifier, member, default, and array-rest paths.
 
 Compound assignment now accepts `+=`, `-=`, `*=`, `/=`, `%=`, `**=`, `<<=`,
 `>>=`, `>>>=`, `&=`, `^=`, `|=`, `&&=`, `||=`, and `??=` for existing

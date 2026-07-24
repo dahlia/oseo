@@ -69,6 +69,9 @@ Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
 lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the
 outer iterator close block after a pattern failure.
+Assignment-pattern heads reuse the existing-target path without creating
+cells. Their identifier and member leaves run after each outer iterator step,
+and a failure resumes through nested pattern cleanup before that outer close.
 Destructuring assignment evaluates its right operand once, then sends the same
 recursive patterns through checked writes to existing identifier cells or
 owned member references. Member object and key expressions lower before the

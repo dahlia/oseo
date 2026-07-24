@@ -628,7 +628,12 @@ direct awaited right operands, both specialization policies, and forced
 collection. Fourteen reviewed standards cases cover identifier and member
 writes, nested patterns, defaults, rest, result identity, nullish and
 immutable-target errors, and function-name inference. Await inside a member
-target remains a separate continuation unit. The intrinsics
+target remains a separate continuation unit. Synchronous `for-of` assignment
+heads now reuse those recursive patterns and existing targets. Generated and
+fixed native evidence covers defaults, rest, member leaves, nullish and
+immutable failure, and inner-before-outer iterator cleanup. Six reviewed
+standards cases cover identifier, member, default, and array-rest heads. The
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

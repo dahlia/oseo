@@ -325,10 +325,12 @@ function appendHirStatement(
         : statement.target.kind === "pattern-declaration"
           ? `${statement.target.declarationKind} ` +
             printHirBindingPattern(statement.target.pattern)
-          : statement.target.kind === "binding"
-            ? `%b${statement.target.bindingId} ${statement.target.name}`
-            : `${printHirExpression(statement.target.object)}[` +
-              `${printHirExpression(statement.target.key)}]`;
+          : statement.target.kind === "assignment-pattern"
+            ? printHirBindingPattern(statement.target.pattern)
+            : statement.target.kind === "binding"
+              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              : `${printHirExpression(statement.target.object)}[` +
+                `${printHirExpression(statement.target.key)}]`;
     lines.push(
       `${indent}for (${target} of ` +
         `${printHirExpression(statement.iterable)})${location}`,

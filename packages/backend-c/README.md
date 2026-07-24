@@ -67,6 +67,9 @@ Pattern failures retain iterator cleanup and continue through an enclosing
 step. Generated code resets lexical cells per iteration, writes hoisted `var`
 cells in place, and closes nested iterators before the outer iterator when
 initialization fails.
+`for-of` assignment patterns reuse the existing-target path after each outer
+step. They add no target cells, and a checked identifier or member write
+failure closes nested pattern iterators before the outer iterator.
 Standalone destructuring assignment reuses the same recursive path with checked
 writes to existing identifier cells and property writes through member
 references evaluated before the corresponding source value. Generated code

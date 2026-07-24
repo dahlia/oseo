@@ -94,6 +94,9 @@ enclosing `finally`.
 Synchronous `for-of` declaration patterns also add no runtime ABI entry point.
 They initialize or write the same compiler-owned binding leaves, while nested
 array patterns close before the existing outer `for-of` cleanup resumes.
+Assignment-pattern heads likewise reuse the existing-target path without a new
+runtime operation. Checked identifier and member writes retain the same
+inner-before-outer iterator cleanup.
 Standalone destructuring assignment likewise adds no runtime ABI entry point.
 It writes existing identifier cells through the declaration paths and preserves
 the original right-hand result. Array patterns retain conditional iterator

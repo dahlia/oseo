@@ -97,6 +97,11 @@ export type HirForOfTarget =
       readonly range: SourceRange;
     }
   | {
+      readonly kind: "assignment-pattern";
+      readonly pattern: HirBindingPattern;
+      readonly range: SourceRange;
+    }
+  | {
       readonly bindingId: number;
       readonly functionNameBinding?: true;
       readonly importedBinding?: true;

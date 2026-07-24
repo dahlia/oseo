@@ -390,6 +390,11 @@ export type SyntaxForOfTarget =
       readonly range: SourceRange;
     }
   | {
+      readonly kind: "assignment-pattern";
+      readonly pattern: SyntaxAssignmentPattern;
+      readonly range: SourceRange;
+    }
+  | {
       readonly kind: "binding";
       readonly name: string;
       readonly range: SourceRange;

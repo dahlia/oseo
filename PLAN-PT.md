@@ -567,10 +567,30 @@ through the shared replay controls. Fixed native fixtures retain function-name
 inference, member object, key, conversion, read, and default order,
 member-target failure cleanup, step failure without close, immutable-target
 failure with close, computed-key suppression for nullish object input, and
-direct awaited right operands. Eleven reviewed test262 cases pin identifier
+direct awaited right operands. Fourteen reviewed test262 cases pin identifier
 writes, nested patterns, defaults, rest, result identity, nullish and
 immutable-target errors, and function-name inference under both strictness and
 specialization policies.
+
+
+M5 for-of assignment properties
+-------------------------------
+
+The `for-of` assignment property generates an array or object assignment
+pattern with existing identifier or member leaves, defaults, and rest. Two
+outer iterations vary present, missing, and nullish inputs. Its independent
+model predicts the final targets, retained rest values, accumulated body
+result, or escaped `TypeError`, together with the outer iterator close count.
+Each case compares the model with Node.js, Deno, specialization-disabled native
+execution, and specialization-enabled execution with collection forced at
+every safepoint.
+
+The ordinary suite uses seed `0x5eed000e`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+identifier and member targets, defaults, object rest, immutable-target failure,
+and inner-before-outer iterator cleanup. Six reviewed test262 cases pin
+identifier, member, default, and array-rest heads.
 
 
 M5 compound assignment properties

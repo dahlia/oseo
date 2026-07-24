@@ -175,6 +175,39 @@ test("converts for-of declaration binding patterns to owned syntax", () => {
   );
 });
 
+test("converts for-of destructuring assignment heads to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let first = 0;\n" +
+      "const target = {};\n" +
+      "for ([first, target.value] of [[1, 2]]) {}\n" +
+      "for ({ value: first, ...target.rest } of " +
+      "[{ value: 3, extra: 4 }]) {}\n" +
+      "console.log(first, target.value, target.rest.extra);\n",
+    sourceId: "for-of-assignment-patterns.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(
+    hir,
+    /for \(\[%b\d+ first, target %b\d+\(target\)\["value"\]\] of/u,
+  );
+  assert.match(
+    hir,
+    /for \(\{"value": %b\d+ first, \.\.\.target %b\d+\(target\)\["rest"\]\}/u,
+  );
+  assert.match(mir, /IteratorClose for array binding/u);
+  assert.match(mir, /destructuring member target/u);
+  assert.match(mir, /object-rest CopyDataProperties/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|RestElement/u,
+  );
+});
+
 test("keeps a lexical for-of binding in the iterable TDZ", () => {
   const result = compileSource(babelFrontend, {
     source: "for (let item of item) {}",

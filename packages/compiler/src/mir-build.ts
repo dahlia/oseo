@@ -1931,6 +1931,10 @@ function lowerForOfTarget(
   value: number,
   builder: MirBuilder,
 ): void {
+  if (target.kind === "assignment-pattern") {
+    lowerBindingTarget(target.pattern, value, "write", builder);
+    return;
+  }
   if (target.kind === "pattern-declaration") {
     if (target.declarationKind !== "var") {
       for (const binding of hirBindingIdentifiers(target.pattern)) {

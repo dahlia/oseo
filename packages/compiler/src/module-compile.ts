@@ -171,7 +171,8 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
   if (statement.kind === "for-of") {
     return (
       hirExpressionHasAwait(statement.iterable) ||
-      (statement.target.kind === "pattern-declaration" &&
+      ((statement.target.kind === "pattern-declaration" ||
+        statement.target.kind === "assignment-pattern") &&
         hirBindingPatternHasAwait(statement.target.pattern)) ||
       (statement.target.kind === "property" &&
         (hirExpressionHasAwait(statement.target.object) ||

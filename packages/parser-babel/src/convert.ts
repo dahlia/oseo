@@ -1177,6 +1177,17 @@ export function statement(
           name,
           range: location(context, left).range,
         };
+      } else if (
+        assignmentTarget.type === "ArrayPattern" ||
+        assignmentTarget.type === "ObjectPattern"
+      ) {
+        const pattern = bindingPattern(context, assignmentTarget, true);
+        if (pattern == null) return undefined;
+        target = {
+          kind: "assignment-pattern",
+          pattern,
+          range: location(context, left).range,
+        };
       } else {
         const member = memberParts(context, assignmentTarget);
         if (member != null) {
@@ -1193,7 +1204,7 @@ export function statement(
       return unsupported(
         context,
         left,
-        "A for-of head needs an identifier or member assignment target.",
+        "A for-of head needs an assignment target.",
       );
     }
     const iterable = expression(context, rightNode);

@@ -450,6 +450,20 @@ for (const [inferred = function () {}] of [[]]) {
   console.log("pattern-name", inferred.name);
 }
 
+let assignmentHead = 0;
+const assignmentHolder = {};
+for ([assignmentHead, assignmentHolder.value] of [[12, 13]]) {}
+for (
+  { value: assignmentHead, ...assignmentHolder.rest } of
+  [{ value: 14, extra: 15 }]
+) {}
+console.log(
+  "assignment-patterns",
+  assignmentHead,
+  assignmentHolder.value,
+  assignmentHolder.rest.extra,
+);
+
 let normalSteps = 0;
 let normalCloses = 0;
 const normalIterable = {
@@ -501,6 +515,20 @@ try {
   })) {}
 } catch (error) {
   console.log("assignment", error instanceof TypeError, assignmentCloses);
+}
+
+let patternAssignmentCloses = 0;
+try {
+  for ([immutableTarget] of closingIterable(function () {
+    patternAssignmentCloses = patternAssignmentCloses + 1;
+    return {};
+  })) {}
+} catch (error) {
+  console.log(
+    "pattern-assignment",
+    error instanceof TypeError,
+    patternAssignmentCloses,
+  );
 }
 
 let returnCloses = 0;
@@ -649,6 +677,16 @@ try {
     "pattern-close-order",
     error instanceof RangeError,
     error.message,
+    patternCloseOrder,
+  );
+}
+patternCloseOrder = "";
+try {
+  for ([[immutableTarget]] of outerPatternIterable) {}
+} catch (error) {
+  console.log(
+    "assignment-pattern-close-order",
+    error instanceof TypeError,
     patternCloseOrder,
   );
 }

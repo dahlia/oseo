@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 635 reviewed cases: 266 passes, 226 expected
+The current manifest contains 641 reviewed cases: 272 passes, 226 expected
 negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -308,8 +308,9 @@ its deliberate boundary and its evidence:
     `Promise.all`, `Promise.race`, synchronous `for-of`, array literal spread,
     and call and constructor argument spread consume object iterables through
     this protocol. A `for-of` head admits one `const`, `let`, or `var`
-    identifier, array, or object declaration, an existing binding, or a static
-    or computed member target. Transparent parentheses around existing
+    identifier, array, or object declaration, an existing binding, a static or
+    computed member target, or an array or object assignment pattern whose
+    leaves are existing targets. Transparent parentheses around existing
     identifier and member targets are normalized before classification.
     Declaration patterns reuse every binding form admitted for standalone
     declarations. Lexical names create their TDZ before the iterable expression
@@ -324,10 +325,15 @@ its deliberate boundary and its evidence:
     authoritative. Native differential fixtures and a generated property with
     seed `0x5eed000b` cover all three declaration kinds, array and object
     values, defaults, rest, nullish failure, fresh cells, both specialization
-    policies, and forced collection. Forty-eight reviewed test262 cases pin
-    these binding paths across all three declaration kinds. Six cover nullish
-    object-pattern failure, and 42 also exercise compound assignment in their
-    loop bodies.
+    policies, and forced collection. Assignment patterns preserve the same
+    defaults, rest, member-reference evaluation, and inner-before-outer cleanup
+    as standalone destructuring assignment. Native differential fixtures and a
+    generated property with seed `0x5eed000e` cover array and object patterns,
+    identifier and member targets, nullish failure, both specialization
+    policies, and forced collection. Fifty-four reviewed test262 cases pin
+    `for-of` patterns. Forty-eight cover declarations across all three kinds,
+    including 42 that exercise compound assignment, and six cover assignment
+    heads.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without
@@ -345,9 +351,9 @@ its deliberate boundary and its evidence:
     `for-of`, array spread, call spread, constructor spread, and array binding
     declarations accept only
     object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and `for-await-of`, destructuring
-    assignment targets in `for-of`, array and string iterator prototype
-    identity, and generator-based iterators remain outside the admitted syntax.
+    the generic `%Array.prototype.values%`; and `for-await-of`, array and string
+    iterator prototype identity, and generator-based iterators remain outside
+    the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -459,10 +465,10 @@ its deliberate boundary and its evidence:
     identity, both specialization policies, and forced collection. Fourteen
     reviewed test262 cases add strict and non-strict evidence for identifier and
     member writes, nested patterns, defaults, rest, result identity, nullish and
-    immutable target errors, and function-name inference. Destructuring
-    `for-of` assignment heads, pattern type annotations, and `await` inside a
-    source property name, default, or member target remain outside this syntax
-    unit.
+    immutable target errors, and function-name inference. Synchronous `for-of`
+    assignment heads reuse this pattern and target contract. Pattern type
+    annotations and `await` inside a source property name, default, or member
+    target remain outside this syntax unit.
 
 
 Known gaps inside the claim
@@ -471,13 +477,12 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring `for-of` assignment patterns, function and classic `for`
-    binding patterns, default and rest parameters, classes, generators, big
-    integers, regular expressions, and the remaining expression grammar are
-    outside the admitted syntax. Owner: the core expressions and bindings
-    stream in [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax,
-    objects, matching, and ahead-of-time literal compilation owned by
-    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+ -  Function and classic `for` binding patterns, default and rest parameters,
+    classes, generators, big integers, regular expressions, and the remaining
+    expression grammar are outside the admitted syntax. Owner: the core
+    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md), with
+    regular expression syntax, objects, matching, and ahead-of-time literal
+    compilation owned by [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is
