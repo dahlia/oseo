@@ -208,6 +208,53 @@ test("converts for-of destructuring assignment heads to owned syntax", () => {
   );
 });
 
+test("checks for-of assignment member bases before key conversion", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const key = { toString: function () { return 'value'; } };\n" +
+      "for ([null[key]] of [[1]]) {}\n",
+    sourceId: "for-of-nullish-assignment-member.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const block = result.mir.script.blocks.find((candidate) =>
+    candidate.operations.some(
+      (operation) =>
+        operation.kind === "object-coercible" &&
+        operation.detail === "RequireObjectCoercible for assignment target",
+    ),
+  );
+  assert.ok(block != null);
+  const coercibleIndex = block.operations.findIndex(
+    (operation) => operation.kind === "object-coercible",
+  );
+  assert.ok(coercibleIndex >= 0);
+  const keyOffset = block.operations
+    .slice(coercibleIndex + 1)
+    .findIndex((operation) => operation.kind === "property-key");
+  const setOffset = block.operations
+    .slice(coercibleIndex + 1)
+    .findIndex(
+      (operation) =>
+        operation.kind === "property-set" &&
+        operation.detail === "destructuring member target",
+    );
+  const keyIndex = coercibleIndex + 1 + keyOffset;
+  const setIndex = coercibleIndex + 1 + setOffset;
+  assert.ok(keyOffset >= 0);
+  assert.ok(setOffset >= 0);
+  assert.ok(keyIndex > coercibleIndex);
+  assert.ok(setIndex > keyIndex);
+  assert.ok(
+    block.operations
+      .slice(coercibleIndex, keyIndex)
+      .some(
+        (operation) =>
+          operation.kind === "check-status" && operation.abruptTarget != null,
+      ),
+  );
+});
+
 test("keeps a lexical for-of binding in the iterable TDZ", () => {
   const result = compileSource(babelFrontend, {
     source: "for (let item of item) {}",

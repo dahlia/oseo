@@ -76,9 +76,10 @@ Destructuring assignment evaluates its right operand once, then sends the same
 recursive patterns through checked writes to existing identifier cells or
 owned member references. Member object and key expressions lower before the
 corresponding iterator step, source read, or default; key conversion and
-storage lower after value selection. The expression retains the original
-right-hand value, nested array cleanup stays inside out, and imported and
-immutable leaves keep their ordinary errors.
+storage lower after value selection. A nullish member base fails before key
+conversion and resumes through active nested and outer iterator cleanup. The
+expression retains the original right-hand value, nested array cleanup stays
+inside out, and imported and immutable leaves keep their ordinary errors.
 Compound assignment retains one identifier read or one member object,
 property-key expression, converted key, and property read before evaluating its
 right operand. The retained raw key value is converted again on the write path

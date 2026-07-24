@@ -289,16 +289,18 @@ operand evaluates once before pattern work and remains the assignment
 expression result. A member leaf evaluates its object and computed-key
 expression before the corresponding iterator step, source property read, or
 default, then converts the key and stores only after selecting the assigned
-value. Defaults, nested patterns, array and object rest, computed source keys,
-conditional `IteratorClose`, immutable-binding errors, imported-binding
-errors, and abrupt completion reuse the declaration paths without creating
-cells. The generated property suite uses seed `0x5eed000c` across identifier
-and member targets, array and object patterns, present, missing, and nullish
-inputs, both native specialization policies, and forced collection. Fixed
-native fixtures retain expression-result identity, function-name inference,
-member-reference order, step failure without close, target failure with close,
-and computed-key suppression on nullish object input. Await inside a member
-target remains unsupported until it joins the admitted continuation positions.
+value. A nullish member base fails before key conversion and resumes through
+any active pattern cleanup. Defaults, nested patterns, array and object rest,
+computed source keys, conditional `IteratorClose`, immutable-binding errors,
+imported-binding errors, and abrupt completion reuse the declaration paths
+without creating cells. The generated property suite uses seed `0x5eed000c`
+across identifier and member targets, array and object patterns, present,
+missing, and nullish inputs, both native specialization policies, and forced
+collection. Fixed native fixtures retain expression-result identity,
+function-name inference, member-reference order, step failure without close,
+target failure with close, and computed-key suppression for nullish source
+inputs and member bases. Await inside a member target remains unsupported until
+it joins the admitted continuation positions.
 Fourteen reviewed test262 cases pin identifier and member writes, nested
 patterns, defaults, rest, result identity, nullish and immutable-target errors,
 and function-name inference under both strictness and specialization policies.
@@ -312,8 +314,9 @@ closing the outer `for-of` iterator. The generated property suite uses seed
 `0x5eed000e` across array and object patterns, identifier and member targets,
 present, missing, and nullish inputs, both native specialization policies, and
 forced collection. Fixed native fixtures retain multiple iterations, object
-rest, immutable failure, and the inner-before-outer cleanup order. Six reviewed
-test262 cases pin identifier, member, default, and array-rest paths.
+rest, immutable failure, nullish member key-conversion suppression, and the
+inner-before-outer cleanup order. Six reviewed test262 cases pin identifier,
+member, default, and array-rest paths.
 
 Compound assignment now accepts `+=`, `-=`, `*=`, `/=`, `%=`, `**=`, `<<=`,
 `>>=`, `>>>=`, `&=`, `^=`, `|=`, `&&=`, `||=`, and `??=` for existing

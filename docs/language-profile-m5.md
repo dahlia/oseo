@@ -346,10 +346,11 @@ its deliberate boundary and its evidence:
     as standalone destructuring assignment. Native differential fixtures and a
     generated property with seed `0x5eed000e` cover array and object patterns,
     identifier and member targets, nullish failure, both specialization
-    policies, and forced collection. Fifty-four reviewed test262 cases pin
-    `for-of` patterns. Forty-eight cover declarations across all three kinds,
-    including 42 that exercise compound assignment, and six cover assignment
-    heads.
+    policies, and forced collection. A nullish member base fails before
+    property-key conversion, then nested pattern cleanup completes before the
+    outer iterator closes. Fifty-four reviewed test262 cases pin `for-of`
+    patterns. Forty-eight cover declarations across all three kinds, including
+    42 that exercise compound assignment, and six cover assignment heads.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without

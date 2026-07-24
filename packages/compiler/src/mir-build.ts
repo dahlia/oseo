@@ -596,7 +596,7 @@ function lowerObjectCoercible(
   appendMirMetadata(
     builder,
     "safepoint",
-    "require update target object-coercible",
+    "require assignment target object-coercible",
     [input],
     range,
   );
@@ -604,7 +604,7 @@ function lowerObjectCoercible(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [input],
-    detail: "RequireObjectCoercible for update target",
+    detail: "RequireObjectCoercible for assignment target",
     id,
     kind: "object-coercible",
     range,
@@ -2434,18 +2434,23 @@ function lowerBindingTarget(
       throw new Error("Assignment member target was not prepared.");
     }
     const prepared = reference;
+    const object = lowerObjectCoercible(
+      prepared.object,
+      pattern.object.range,
+      builder,
+    );
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
     appendMirMetadata(
       builder,
       "safepoint",
       "destructuring member target storage growth",
-      [prepared.object, key, value],
+      [object, key, value],
       pattern.range,
     );
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      arguments: [prepared.object, key, value],
+      arguments: [object, key, value],
       detail: "destructuring member target",
       id,
       kind: "property-set",

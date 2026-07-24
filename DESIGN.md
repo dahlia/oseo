@@ -441,10 +441,11 @@ errors, while member leaves retain their object and key expressions as owned
 assignment references. A member reference evaluates its object and computed-key
 expression before the corresponding iterator step, source property read, or
 default. Property-key conversion and storage occur after the selected value is
-known. The expression produces the original right-hand value. Array patterns
-conditionally close their iterators after an early normal completion or a
-target or default failure. Object patterns check coercibility before computed
-source keys and share the same ordered property reads and
+known. A nullish member base fails before property-key conversion and resumes
+through any active pattern cleanup. The expression produces the original
+right-hand value. Array patterns conditionally close their iterators after an
+early normal completion or a target or default failure. Object patterns check
+coercibility before computed source keys and share the same ordered reads and
 `CopyDataProperties` path. Await inside a member target remains outside the
 admitted continuation positions.
 
