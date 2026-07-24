@@ -203,6 +203,26 @@ test("accepts parenthesized direct call targets", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
+test("accepts parenthesized assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let value = 0;\n" +
+      "const target = { value: 0 };\n" +
+      "(value) = 1;\n" +
+      "(target.value) = 2;\n" +
+      "for ((value) of []) {}\n" +
+      "for ((target.value) of []) {}\n",
+    sourceId: "parenthesized-assignment-targets.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /= safepoint binding assignment error/u);
+  assert.match(mir, /property-set property-set/u);
+  assert.match(mir, /property-set for-of property target/u);
+});
+
 test("retains function name and length metadata in MIR", () => {
   const result = compileSource(babelFrontend, {
     source: [
@@ -223,7 +243,8 @@ test("converts ordinary object operations to owned syntax", () => {
     source:
       'const value = { first: 1, ["second"]: undefined };\n' +
       "value.first = 2;\n" +
-      'console.log(value.first, value["second"], delete value.first);\n',
+      'console.log(value.first, value["second"], delete value.first, ' +
+      'delete (value["second"]));\n',
     sourceId: "objects.ts",
   });
   assert.deepEqual(result.diagnostics, []);
@@ -862,6 +883,79 @@ test("converts destructuring assignments to owned syntax", () => {
   );
 });
 
+test("converts destructuring assignment member targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const target = { values: [0], rest: undefined };\n" +
+      "let index = 0;\n" +
+      "[target.values[index], ...target.rest] = [1, 2];\n" +
+      "({ value: target.values[0], ...target.rest } = " +
+      "{ value: 3, kept: 4 });\n",
+    sourceId: "destructuring-assignment-members.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /write \[target /u);
+  assert.match(hir, /target .*\["rest"\]/u);
+  assert.match(mir, /destructuring member target/u);
+  assert.match(mir, /property-set/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|AssignmentPattern|RestElement/u,
+  );
+});
+
+test("converts parenthesized destructuring assignment member targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const target = { first: 0, second: 0 };\n" +
+      "[(target.first)] = [1];\n" +
+      "({ value: (target.second) } = { value: 2 });\n",
+    sourceId: "parenthesized-destructuring-assignment-members.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /target .*\["first"\]/u);
+  assert.match(hir, /target .*\["second"\]/u);
+  assert.match(mir, /destructuring member target/u);
+  assert.match(mir, /property-set/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|AssignmentPattern|RestElement/u,
+  );
+  assert.doesNotMatch(JSON.stringify(result.hir), /ParenthesizedExpression/u);
+});
+
+test("rejects await inside destructuring assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function assign(target, input) {\n" +
+      "  [(await target).value] = input;\n" +
+      "}\n",
+    sourceId: "await-destructuring-target.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(result.mir, undefined);
+});
+
+test("rejects await inside parenthesized assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function assign(target, input) {\n" +
+      "  [((await target).value)] = input;\n" +
+      "}\n",
+    sourceId: "await-parenthesized-destructuring-target.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(result.mir, undefined);
+});
+
 test("supports awaited destructuring assignment in modules", () => {
   const sourceId = "file:///app/await-destructuring-assignment.js";
   const result = babelModuleFrontend.parseModule({
@@ -895,16 +989,18 @@ test("supports awaited destructuring assignment in async functions", () => {
   const result = compileSource(babelFrontend, {
     source:
       "async function unpack(input) {\n" +
-      "  let value;\n" +
-      "  [value] = await input;\n" +
-      "  return value;\n" +
+      "  const target = {};\n" +
+      "  [target.value] = await input;\n" +
+      "  return target.value;\n" +
       "}\n" +
       "unpack(Promise.resolve([1]));\n",
     sourceId: "await-destructuring-assignment.ts",
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.match(printMir(result.mir), /GetIterator sync for array binding/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /GetIterator sync for array binding/u);
+  assert.match(mir, /destructuring member target/u);
 });
 
 test("supports parenthesized awaited object assignments", () => {
@@ -977,7 +1073,6 @@ test("converts catch binding patterns to owned syntax", () => {
 test("keeps later binding consumers outside the profile", () => {
   for (const [name, source] of [
     ["pattern annotation", "const [value]: [number] = [1];"],
-    ["assignment member target", "let target = {}; ([target.value] = [1]);"],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,

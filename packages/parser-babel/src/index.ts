@@ -11,6 +11,8 @@ import type {
   SourceFrontend,
   SourceInput,
   SourceRange,
+  SyntaxAssignmentPattern,
+  SyntaxAssignmentTarget,
   SyntaxArrayBindingPattern,
   SyntaxArrayElement,
   SyntaxBindingPattern,
@@ -67,6 +69,9 @@ interface SourceIndex {
   readonly length: number;
   readonly lines: readonly number[];
 }
+
+type AssignmentArrayBindingElement =
+  SyntaxArrayBindingPattern<SyntaxAssignmentPattern>["elements"][number];
 
 function node(value: unknown): BabelNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
@@ -549,7 +554,7 @@ function expression(
   }
   if (value.type === "UnaryExpression") {
     if (value.operator === "delete") {
-      const argumentNode = node(value.argument);
+      const argumentNode = unparenthesizedExpression(value.argument);
       if (argumentNode == null) return unsupported(context, value);
       const member = memberParts(context, argumentNode);
       return member == null
@@ -642,7 +647,7 @@ function expression(
     if (value.operator !== "=") {
       return unsupported(context, value, "This assignment is unsupported.");
     }
-    const left = node(value.left);
+    const left = unparenthesizedExpression(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
     const name = identifierName(left);
@@ -653,7 +658,7 @@ function expression(
         : { ...located, kind: "binding-set", name, value: assigned };
     }
     if (left.type === "ArrayPattern" || left.type === "ObjectPattern") {
-      const pattern = bindingPattern(context, left);
+      const pattern = bindingPattern(context, left, true);
       const assigned = expression(context, right);
       return pattern == null || assigned == null
         ? undefined
@@ -886,7 +891,29 @@ function expression(
 function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
-): SyntaxBindingPattern | undefined {
+  assignment: true,
+): SyntaxAssignmentPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+  assignment?: false,
+): SyntaxBindingPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+  assignment: boolean,
+): SyntaxAssignmentPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+  assignment = false,
+): SyntaxAssignmentPattern | undefined {
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null
+      ? unsupported(context, value)
+      : bindingPattern(context, inner, assignment);
+  }
   if (value.type === "Identifier") {
     const name = identifierName(value);
     if (name == null || value.optional === true) {
@@ -897,6 +924,26 @@ function bindingPattern(
       );
     }
     return { ...location(context, value), kind: "binding-identifier", name };
+  }
+  if (value.type === "MemberExpression") {
+    if (!assignment) {
+      return unsupported(
+        context,
+        value,
+        "Member targets are supported only in assignment patterns.",
+      );
+    }
+    if (nodeContainsAwait(value)) {
+      return unsupported(
+        context,
+        value,
+        "Await inside a destructuring assignment target is unsupported.",
+      );
+    }
+    const member = memberParts(context, value);
+    return member == null
+      ? undefined
+      : { ...location(context, value), ...member, kind: "assignment-member" };
   }
   if (value.type !== "ArrayPattern" && value.type !== "ObjectPattern") {
     return unsupported(
@@ -914,8 +961,11 @@ function bindingPattern(
     );
   }
   if (value.type === "ObjectPattern") {
-    const properties: SyntaxObjectBindingPattern["properties"][number][] = [];
-    let rest: SyntaxObjectBindingPattern["rest"];
+    const properties: SyntaxObjectBindingPattern<
+      SyntaxAssignmentPattern,
+      SyntaxAssignmentTarget
+    >["properties"][number][] = [];
+    let rest: SyntaxAssignmentTarget | undefined;
     const objectProperties = nodes(value.properties);
     for (const [index, property] of objectProperties.entries()) {
       if (property.type === "RestElement") {
@@ -928,8 +978,11 @@ function bindingPattern(
         }
         const argument = node(property.argument);
         if (argument == null) return unsupported(context, property);
-        const converted = bindingPattern(context, argument);
-        if (converted?.kind !== "binding-identifier") {
+        const converted = bindingPattern(context, argument, assignment);
+        if (
+          converted?.kind !== "binding-identifier" &&
+          converted?.kind !== "assignment-member"
+        ) {
           return unsupported(
             context,
             property,
@@ -991,7 +1044,7 @@ function bindingPattern(
           "Await inside a binding default is unsupported.",
         );
       }
-      const pattern = bindingPattern(context, left);
+      const pattern = bindingPattern(context, left, assignment);
       const initializer =
         right == null ? undefined : expression(context, right);
       if (
@@ -1018,8 +1071,8 @@ function bindingPattern(
   const rawElements = Array.isArray(value.elements)
     ? (value.elements as readonly unknown[])
     : [];
-  const elements: SyntaxArrayBindingPattern["elements"][number][] = [];
-  let rest: SyntaxBindingPattern | undefined;
+  const elements: AssignmentArrayBindingElement[] = [];
+  let rest: SyntaxAssignmentPattern | undefined;
   for (const [index, rawElement] of rawElements.entries()) {
     const element = node(rawElement);
     if (element == null) {
@@ -1036,7 +1089,7 @@ function bindingPattern(
       }
       const argument = node(element.argument);
       if (argument == null) return unsupported(context, element);
-      rest = bindingPattern(context, argument);
+      rest = bindingPattern(context, argument, assignment);
       if (rest == null) return undefined;
       continue;
     }
@@ -1052,7 +1105,7 @@ function bindingPattern(
         "Await inside an array binding default is unsupported.",
       );
     }
-    const pattern = bindingPattern(context, left);
+    const pattern = bindingPattern(context, left, assignment);
     const initializer = right == null ? undefined : expression(context, right);
     if (pattern == null || (right != null && initializer == null)) {
       return undefined;
@@ -1078,7 +1131,7 @@ function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
       ...pattern.properties.flatMap((property) =>
         patternNames(property.pattern),
       ),
-      ...(pattern.rest == null ? [] : [pattern.rest.name]),
+      ...(pattern.rest == null ? [] : patternNames(pattern.rest)),
     ];
   }
   return [
@@ -1392,7 +1445,8 @@ function statement(
         };
       }
     } else {
-      const name = identifierName(left);
+      const assignmentTarget = unparenthesizedExpression(left) ?? left;
+      const name = identifierName(assignmentTarget);
       if (name != null) {
         target = {
           kind: "binding",
@@ -1400,7 +1454,7 @@ function statement(
           range: location(context, left).range,
         };
       } else {
-        const member = memberParts(context, left);
+        const member = memberParts(context, assignmentTarget);
         if (member != null) {
           target = {
             key: member.key,
@@ -1829,7 +1883,7 @@ function validateAsyncContinuationCount(
 }
 
 interface AwaitPoint {
-  readonly assignment?: SyntaxBindingPattern;
+  readonly assignment?: SyntaxAssignmentPattern;
   readonly declaration?: {
     readonly hint: Hint | undefined;
     readonly kind: "const" | "let" | "var";
@@ -1847,7 +1901,7 @@ function awaitPoint(
   if (value.type === "ExpressionStatement") {
     const directAssignment = directAwaitAssignment(value);
     if (directAssignment != null) {
-      const assignment = bindingPattern(context, directAssignment.left);
+      const assignment = bindingPattern(context, directAssignment.left, true);
       return assignment == null
         ? undefined
         : {

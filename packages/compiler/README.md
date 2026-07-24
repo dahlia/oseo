@@ -5,6 +5,10 @@ This package owns Oseo syntax, hint metadata, lexical resolution, HIR, MIR,
 specialization policy, diagnostics, targets, and extension interfaces.
 Concrete parser, backend, runtime, toolchain, and host packages implement these
 contracts without becoming compiler-core dependencies.
+The exported syntax contract separates declaration binding patterns from
+destructuring assignment patterns. Only assignment patterns admit member
+targets, and lexical resolution validates that context independently of binding
+write mode.
 
 Native target descriptions contain immutable artifact facts, including the
 architecture, operating system, ABI, executable format, C standard, and
@@ -57,10 +61,12 @@ lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the
 outer iterator close block after a pattern failure.
 Destructuring assignment evaluates its right operand once, then sends the same
-recursive patterns through checked writes to existing identifier cells. The
-expression retains the original right-hand value, nested array cleanup stays
-inside out, and imported and immutable leaves keep their ordinary errors.
-Member assignment targets remain outside the owned pattern representation.
+recursive patterns through checked writes to existing identifier cells or
+owned member references. Member object and key expressions lower before the
+corresponding iterator step, source read, or default; key conversion and
+storage lower after value selection. The expression retains the original
+right-hand value, nested array cleanup stays inside out, and imported and
+immutable leaves keep their ordinary errors.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

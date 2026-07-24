@@ -408,13 +408,16 @@ continuing through an enclosing `finally` or abrupt target.
 Destructuring assignment reuses those recursive array and object operations
 after evaluating its right operand once. Identifier leaves write existing
 cells, so immutable and imported bindings retain their ordinary assignment
-errors, and the expression produces the original right-hand value. Array
-patterns conditionally close their iterators after an early normal completion
-or a target or default failure. Object patterns check coercibility before
-computed keys and share the same ordered property reads and
-`CopyDataProperties` path. Member leaves remain outside the admitted assignment
-unit until their reference-evaluation order joins the owned pattern
-representation.
+errors, while member leaves retain their object and key expressions as owned
+assignment references. A member reference evaluates its object and computed-key
+expression before the corresponding iterator step, source property read, or
+default. Property-key conversion and storage occur after the selected value is
+known. The expression produces the original right-hand value. Array patterns
+conditionally close their iterators after an early normal completion or a
+target or default failure. Object patterns check coercibility before computed
+source keys and share the same ordered property reads and
+`CopyDataProperties` path. Await inside a member target remains outside the
+admitted continuation positions.
 
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument

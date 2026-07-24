@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 632 reviewed cases: 221 passes, 226 expected
+The current manifest contains 635 reviewed cases: 224 passes, 226 expected
 negatives, and 185 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -295,25 +295,26 @@ its deliberate boundary and its evidence:
     and call and constructor argument spread consume object iterables through
     this protocol. A `for-of` head admits one `const`, `let`, or `var`
     identifier, array, or object declaration, an existing binding, or a static
-    or computed member target. Declaration patterns reuse every binding form
-    admitted for standalone declarations. Lexical names create their TDZ
-    before the iterable expression and receive a fresh cell for each
-    iteration; `var` leaves write their existing hoisted cells. Nested array
-    patterns close from the inside out, then a default, target, or
-    object-coercibility failure closes the outer iterator. Normal exhaustion
-    and a failing iterator step do not close the iterator; head assignment
-    failures, `break`, `return`, `throw`, and transfers to an outer label do. A
-    `continue` targeting the same loop keeps the iterator open. Close-time
-    completion follows `IteratorClose`: a close failure replaces `break` or
-    `return`, while an in-flight throw stays authoritative. Native differential
-    fixtures and a generated property with seed `0x5eed000b` cover all three
-    declaration kinds, array and object values, defaults, rest, nullish
-    failure, fresh cells, both specialization policies, and forced collection.
-    Six reviewed test262 cases pin nullish object-pattern failure across all
-    three declaration kinds. Another 42 selected binding cases reach the
-    pattern head but remain classified as unsupported because their upstream
-    loop body uses compound assignment, which is outside the admitted
-    expression profile.
+    or computed member target. Transparent parentheses around existing
+    identifier and member targets are normalized before classification.
+    Declaration patterns reuse every binding form admitted for standalone
+    declarations. Lexical names create their TDZ before the iterable expression
+    and receive a fresh cell for each iteration; `var` leaves write their
+    existing hoisted cells. Nested array patterns close from the inside out,
+    then a default, target, or object-coercibility failure closes the outer
+    iterator. Normal exhaustion and a failing iterator step do not close the
+    iterator; head assignment failures, `break`, `return`, `throw`, and
+    transfers to an outer label do. A `continue` targeting the same loop keeps
+    the iterator open. Close-time completion follows `IteratorClose`: a close
+    failure replaces `break` or `return`, while an in-flight throw stays
+    authoritative. Native differential fixtures and a generated property with
+    seed `0x5eed000b` cover all three declaration kinds, array and object
+    values, defaults, rest, nullish failure, fresh cells, both specialization
+    policies, and forced collection. Six reviewed test262 cases pin nullish
+    object-pattern failure across all three declaration kinds. Another 42
+    selected binding cases reach the pattern head but remain classified as
+    unsupported because their upstream loop body uses compound assignment,
+    which is outside the admitted expression profile.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without
@@ -421,25 +422,34 @@ its deliberate boundary and its evidence:
     properties, and object rest descriptors. Assignment member targets,
     function parameters, classic `for` heads, pattern type annotations, and
     `await` inside a property name or default remain outside this syntax unit.
- -  Destructuring assignment with identifier targets. An assignment expression
-    admits recursive array and object patterns whose leaves and rest targets
-    name existing bindings. It evaluates the right operand once before pattern
-    work and produces that original value. Array patterns retain iterator
-    acquisition, captured `next`, defaults, nested patterns, rest, conditional
-    close, and throw precedence. Object patterns retain the coercibility check
-    before computed keys, ordered `ToPropertyKey` and `GetV`, defaults, nested
-    patterns, symbol exclusions, and `CopyDataProperties`. Leaves use ordinary
-    checked writes, so assignment to an immutable local or imported binding
-    keeps its specified catchable error. Direct awaited right operands resume
-    before any pattern work in asynchronous functions and modules. Native
-    differential fixtures and a generated property with seed `0x5eed000c` cover
-    array and object inputs, defaults, rest, nullish failure, result identity,
-    both specialization policies, and forced collection. Eleven reviewed
-    test262 cases add strict and non-strict evidence for identifier writes,
-    nested patterns, defaults, rest, result identity, nullish and immutable
-    target errors, and function-name inference. Member targets, destructuring
+ -  Destructuring assignment with identifier and member targets. An assignment
+    expression admits recursive array and object patterns whose leaves and rest
+    targets name existing bindings or evaluate static or computed member
+    references. Transparent parentheses around identifier and member targets
+    are normalized before classification. The expression evaluates the right
+    operand once before pattern work and produces that original value. A member
+    leaf evaluates its object and computed-key expression before the
+    corresponding iterator step, source property read, or default, then
+    converts the key and stores after selecting the value. Array patterns
+    retain iterator acquisition, captured `next`, defaults, nested patterns,
+    rest, conditional close, and throw precedence. Object patterns retain the
+    coercibility check before computed source keys, ordered `ToPropertyKey` and
+    `GetV`, defaults, nested patterns, symbol exclusions, and
+    `CopyDataProperties`. Identifier leaves use ordinary checked writes, so
+    assignment to an immutable local or imported binding keeps its specified
+    catchable error. Direct awaited right operands resume before any pattern
+    work in asynchronous functions and modules. Await inside a member target
+    is rejected until that nested suspension position has an owned continuation
+    contract. Native differential fixtures cover identifier and member targets.
+    A generated property with seed `0x5eed000c` also covers parenthesized member
+    targets, array and object inputs, defaults, rest, nullish failure, result
+    identity, both specialization policies, and forced collection. Fourteen
+    reviewed test262 cases add strict and non-strict evidence for identifier and
+    member writes, nested patterns, defaults, rest, result identity, nullish and
+    immutable target errors, and function-name inference. Destructuring
     `for-of` assignment heads, pattern type annotations, and `await` inside a
-    property name or default remain outside this syntax unit.
+    source property name, default, or member target remain outside this syntax
+    unit.
 
 
 Known gaps inside the claim
@@ -448,11 +458,11 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Destructuring assignment member targets and `for-of` assignment patterns,
-    function and classic `for` binding patterns, default and rest parameters,
-    classes, generators, big integers, regular expressions, and the remaining
-    expression grammar are outside the admitted syntax. Owner: the core
-    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Destructuring `for-of` assignment patterns, function and classic `for`
+    binding patterns, default and rest parameters, classes, generators, big
+    integers, regular expressions, and the remaining expression grammar are
+    outside the admitted syntax. Owner: the core expressions and bindings
+    stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

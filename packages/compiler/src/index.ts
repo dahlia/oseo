@@ -178,7 +178,7 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "destructuring-set";
-      readonly pattern: SyntaxBindingPattern;
+      readonly pattern: SyntaxAssignmentPattern;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
@@ -293,38 +293,68 @@ export interface SyntaxBindingIdentifier extends LocatedSyntax {
   readonly name: string;
 }
 
-/** One initialized element in an owned array binding pattern. */
-export interface SyntaxBindingElement extends LocatedSyntax {
+/** One member reference used as a destructuring assignment target. */
+export interface SyntaxAssignmentMemberTarget extends LocatedSyntax {
+  readonly key: SyntaxExpression;
+  readonly kind: "assignment-member";
+  readonly object: SyntaxExpression;
+}
+
+/** One initialized element in an owned recursive pattern. */
+export interface SyntaxBindingElement<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
-  readonly pattern: SyntaxBindingPattern;
+  readonly pattern: Pattern;
 }
 
 /** One parser-independent array binding pattern. */
-export interface SyntaxArrayBindingPattern extends LocatedSyntax {
-  readonly elements: readonly (SyntaxBindingElement | undefined)[];
+export interface SyntaxArrayBindingPattern<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
+  readonly elements: readonly (SyntaxBindingElement<Pattern> | undefined)[];
   readonly kind: "array-binding-pattern";
-  readonly rest?: SyntaxBindingPattern;
+  readonly rest?: Pattern;
 }
 
-/** One named or computed property in an owned object binding pattern. */
-export interface SyntaxObjectBindingProperty extends LocatedSyntax {
+/** One named or computed property in an owned recursive pattern. */
+export interface SyntaxObjectBindingProperty<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
   readonly key: SyntaxExpression;
-  readonly pattern: SyntaxBindingPattern;
+  readonly pattern: Pattern;
 }
 
 /** One parser-independent object binding pattern. */
-export interface SyntaxObjectBindingPattern extends LocatedSyntax {
+export interface SyntaxObjectBindingPattern<
+  Pattern = SyntaxBindingPattern,
+  Rest = SyntaxBindingIdentifier,
+> extends LocatedSyntax {
   readonly kind: "object-binding-pattern";
-  readonly properties: readonly SyntaxObjectBindingProperty[];
-  readonly rest?: SyntaxBindingIdentifier;
+  readonly properties: readonly SyntaxObjectBindingProperty<Pattern>[];
+  readonly rest?: Rest;
 }
 
-/** One recursively owned binding pattern admitted by the current profile. */
+/** One identifier leaf admitted by a declaration binding pattern. */
+export type SyntaxBindingTarget = SyntaxBindingIdentifier;
+
+/** One leaf admitted by a destructuring assignment pattern. */
+export type SyntaxAssignmentTarget =
+  | SyntaxAssignmentMemberTarget
+  | SyntaxBindingIdentifier;
+
+/** One recursively owned declaration binding pattern. */
 export type SyntaxBindingPattern =
-  | SyntaxArrayBindingPattern
-  | SyntaxBindingIdentifier
-  | SyntaxObjectBindingPattern;
+  | SyntaxArrayBindingPattern<SyntaxBindingPattern>
+  | SyntaxBindingTarget
+  | SyntaxObjectBindingPattern<SyntaxBindingPattern, SyntaxBindingTarget>;
+
+/** One recursively owned destructuring assignment pattern. */
+export type SyntaxAssignmentPattern =
+  | SyntaxArrayBindingPattern<SyntaxAssignmentPattern>
+  | SyntaxAssignmentTarget
+  | SyntaxObjectBindingPattern<SyntaxAssignmentPattern, SyntaxAssignmentTarget>;
 
 /** One resolved identifier leaf with explicit binding identity. */
 export interface HirBindingIdentifier extends LocatedSyntax {
@@ -334,6 +364,13 @@ export interface HirBindingIdentifier extends LocatedSyntax {
   readonly kind: "binding-identifier";
   readonly mutable: boolean;
   readonly name: string;
+}
+
+/** One resolved member reference used as an assignment-pattern leaf. */
+export interface HirAssignmentMemberTarget extends LocatedSyntax {
+  readonly key: HirExpression;
+  readonly kind: "assignment-member";
+  readonly object: HirExpression;
 }
 
 /** One resolved initialized element in an array binding pattern. */
@@ -360,13 +397,16 @@ export interface HirObjectBindingProperty extends LocatedSyntax {
 export interface HirObjectBindingPattern extends LocatedSyntax {
   readonly kind: "object-binding-pattern";
   readonly properties: readonly HirObjectBindingProperty[];
-  readonly rest?: HirBindingIdentifier;
+  readonly rest?: HirBindingTarget;
 }
 
-/** One recursively resolved binding pattern. */
+/** One resolved leaf admitted by a declaration or assignment pattern. */
+export type HirBindingTarget = HirAssignmentMemberTarget | HirBindingIdentifier;
+
+/** One recursively resolved binding or assignment pattern. */
 export type HirBindingPattern =
   | HirArrayBindingPattern
-  | HirBindingIdentifier
+  | HirBindingTarget
   | HirObjectBindingPattern;
 
 /** How a resolved binding pattern stores each identifier leaf. */
@@ -1855,6 +1895,7 @@ function resolveExpression(
       scopes,
       state,
       "write",
+      true,
     );
     return value == null || pattern == null
       ? undefined
@@ -2171,14 +2212,17 @@ function resolveExpression(
 
 type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
 
-function syntaxBindingNames(pattern: SyntaxBindingPattern): readonly string[] {
+function syntaxBindingNames(
+  pattern: SyntaxAssignmentPattern,
+): readonly string[] {
+  if (pattern.kind === "assignment-member") return [];
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
     return [
       ...pattern.properties.flatMap((property) =>
         syntaxBindingNames(property.pattern),
       ),
-      ...(pattern.rest == null ? [] : [pattern.rest.name]),
+      ...(pattern.rest == null ? [] : syntaxBindingNames(pattern.rest)),
     ];
   }
   return [
@@ -2390,13 +2434,14 @@ function resolveFunction(
 function hirBindingIdentifiers(
   pattern: HirBindingPattern,
 ): readonly HirBindingIdentifier[] {
+  if (pattern.kind === "assignment-member") return [];
   if (pattern.kind === "binding-identifier") return [pattern];
   if (pattern.kind === "object-binding-pattern") {
     return [
       ...pattern.properties.flatMap((property) =>
         hirBindingIdentifiers(property.pattern),
       ),
-      ...(pattern.rest == null ? [] : [pattern.rest]),
+      ...(pattern.rest == null ? [] : hirBindingIdentifiers(pattern.rest)),
     ];
   }
   return [
@@ -2408,14 +2453,23 @@ function hirBindingIdentifiers(
 }
 
 function hirBindingPatternHasAwait(pattern: HirBindingPattern): boolean {
+  if (pattern.kind === "assignment-member") {
+    return (
+      hirExpressionHasAwait(pattern.object) ||
+      hirExpressionHasAwait(pattern.key)
+    );
+  }
   if (pattern.kind === "binding-identifier") return false;
   if (pattern.kind === "object-binding-pattern") {
-    return pattern.properties.some(
-      (property) =>
-        hirExpressionHasAwait(property.key) ||
-        (property.initializer != null &&
-          hirExpressionHasAwait(property.initializer)) ||
-        hirBindingPatternHasAwait(property.pattern),
+    return (
+      pattern.properties.some(
+        (property) =>
+          hirExpressionHasAwait(property.key) ||
+          (property.initializer != null &&
+            hirExpressionHasAwait(property.initializer)) ||
+          hirBindingPatternHasAwait(property.pattern),
+      ) ||
+      (pattern.rest != null && hirBindingPatternHasAwait(pattern.rest))
     );
   }
   return (
@@ -2545,11 +2599,29 @@ function resolveFunctionExpression(
 }
 
 function resolveBindingPattern(
-  pattern: SyntaxBindingPattern,
+  pattern: SyntaxAssignmentPattern,
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
   mode: BindingPatternMode,
+  allowAssignmentTargets: boolean,
 ): HirBindingPattern | undefined {
+  if (pattern.kind === "assignment-member") {
+    if (!allowAssignmentTargets) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          pattern,
+          "Member targets are valid only in assignment patterns.",
+        ),
+      );
+      return undefined;
+    }
+    const object = resolveExpression(pattern.object, scopes, state);
+    const key = resolveExpression(pattern.key, scopes, state);
+    return object == null || key == null
+      ? undefined
+      : { ...pattern, key, object };
+  }
   if (pattern.kind === "binding-identifier") {
     const binding =
       mode === "declare"
@@ -2586,6 +2658,7 @@ function resolveBindingPattern(
         scopes,
         state,
         mode,
+        allowAssignmentTargets,
       );
       let initializer =
         property.initializer == null
@@ -2614,15 +2687,21 @@ function resolveBindingPattern(
         range: property.range,
       });
     }
-    let rest: HirBindingIdentifier | undefined;
+    let rest: HirBindingTarget | undefined;
     if (pattern.rest != null) {
       const resolvedRest = resolveBindingPattern(
         pattern.rest,
         scopes,
         state,
         mode,
+        allowAssignmentTargets,
       );
-      if (resolvedRest?.kind !== "binding-identifier") return undefined;
+      if (
+        resolvedRest?.kind !== "binding-identifier" &&
+        resolvedRest?.kind !== "assignment-member"
+      ) {
+        return undefined;
+      }
       rest = resolvedRest;
     }
     return {
@@ -2644,6 +2723,7 @@ function resolveBindingPattern(
       scopes,
       state,
       mode,
+      allowAssignmentTargets,
     );
     let initializer =
       element.initializer == null
@@ -2668,7 +2748,13 @@ function resolveBindingPattern(
   const rest =
     pattern.rest == null
       ? undefined
-      : resolveBindingPattern(pattern.rest, scopes, state, mode);
+      : resolveBindingPattern(
+          pattern.rest,
+          scopes,
+          state,
+          mode,
+          allowAssignmentTargets,
+        );
   if (pattern.rest != null && rest == null) return undefined;
   return {
     ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
@@ -2694,6 +2780,7 @@ function resolveStatement(
       scopes,
       state,
       statement.mode,
+      false,
     );
     return initializer == null || pattern == null
       ? undefined
@@ -2783,6 +2870,7 @@ function resolveStatement(
         [...scopes, catchScope],
         state,
         "declare",
+        false,
       );
       if (pattern == null) return undefined;
       const body = resolveStatement(
@@ -3071,6 +3159,7 @@ function resolveStatement(
         lexical ? forScopes : scopes,
         state,
         lexical ? "declare" : "write",
+        false,
       );
       if (pattern != null) {
         target = { ...statement.target, pattern };
@@ -3427,6 +3516,12 @@ function printHirExpression(expression: HirExpression): string {
 }
 
 function printHirBindingPattern(pattern: HirBindingPattern): string {
+  if (pattern.kind === "assignment-member") {
+    return (
+      `target ${printHirExpression(pattern.object)}[` +
+      `${printHirExpression(pattern.key)}]`
+    );
+  }
   if (pattern.kind === "binding-identifier") {
     return `%b${pattern.bindingId} ${pattern.name}`;
   }
@@ -3918,12 +4013,20 @@ function lowerPropertyKey(
   builder: MirBuilder,
 ): number {
   const input = lowerExpression(expression, builder);
+  return convertPropertyKey(input, expression.range, builder);
+}
+
+function convertPropertyKey(
+  input: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
   appendMirMetadata(
     builder,
     "safepoint",
     "primitive property-key conversion",
     [input],
-    expression.range,
+    range,
   );
   const id = builder.nextValue;
   builder.nextValue += 1;
@@ -3932,16 +4035,16 @@ function lowerPropertyKey(
     detail: "ToPropertyKey for admitted primitives",
     id,
     kind: "property-key",
-    range: expression.range,
+    range,
   });
   appendMirMetadata(
     builder,
     "check-status",
     "normal -> continue, abrupt -> return",
     [id],
-    expression.range,
+    range,
   );
-  return recordRoot(builder, id, expression.range);
+  return recordRoot(builder, id, range);
 }
 
 function lowerSpecializedPropertyGet(
@@ -5946,7 +6049,40 @@ function lowerBindingTarget(
   value: number,
   mode: BindingPatternMode,
   builder: MirBuilder,
+  reference?: LoweredAssignmentReference,
 ): void {
+  if (pattern.kind === "assignment-member") {
+    if (reference == null) {
+      throw new Error("Assignment member target was not prepared.");
+    }
+    const prepared = reference;
+    const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "destructuring member target storage growth",
+      [prepared.object, key, value],
+      pattern.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [prepared.object, key, value],
+      detail: "destructuring member target",
+      id,
+      kind: "property-set",
+      range: pattern.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> transfer",
+      [id],
+      pattern.range,
+    );
+    recordRoot(builder, id, pattern.range);
+    return;
+  }
   if (pattern.kind === "array-binding-pattern") {
     lowerArrayBindingPattern(pattern, value, mode, builder);
     return;
@@ -5991,6 +6127,24 @@ function lowerBindingTarget(
   recordRoot(builder, id, pattern.range);
 }
 
+interface LoweredAssignmentReference {
+  readonly key: number;
+  readonly object: number;
+}
+
+function lowerAssignmentReference(
+  pattern: HirBindingPattern,
+  mode: BindingPatternMode,
+  builder: MirBuilder,
+): LoweredAssignmentReference | undefined {
+  if (pattern.kind !== "assignment-member" || mode !== "write") {
+    return undefined;
+  }
+  const object = lowerExpression(pattern.object, builder);
+  const key = lowerExpression(pattern.key, builder);
+  return { key, object };
+}
+
 function lowerObjectBindingPattern(
   pattern: HirObjectBindingPattern,
   input: number,
@@ -6025,6 +6179,7 @@ function lowerObjectBindingPattern(
   for (const property of pattern.properties) {
     const key = lowerPropertyKey(property.key, builder);
     excludedKeys.push(key);
+    const target = lowerAssignmentReference(property.pattern, mode, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -6055,9 +6210,10 @@ function lowerObjectBindingPattern(
       property.range,
       builder,
     );
-    lowerBindingTarget(property.pattern, value, mode, builder);
+    lowerBindingTarget(property.pattern, value, mode, builder, target);
   }
   if (pattern.rest != null) {
+    const target = lowerAssignmentReference(pattern.rest, mode, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -6082,7 +6238,7 @@ function lowerObjectBindingPattern(
       pattern.rest.range,
     );
     recordRoot(builder, rest, pattern.rest.range);
-    lowerBindingTarget(pattern.rest, rest, mode, builder);
+    lowerBindingTarget(pattern.rest, rest, mode, builder, target);
   }
 }
 
@@ -6095,6 +6251,7 @@ function lowerArrayBindingRest(
   range: SourceRange,
   builder: MirBuilder,
 ): void {
+  const target = lowerAssignmentReference(pattern, mode, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -6148,7 +6305,7 @@ function lowerArrayBindingRest(
   );
   builder.current.terminator = { kind: "jump", target: stepBlock.id };
   builder.current = bindBlock;
-  lowerBindingTarget(pattern, array, mode, builder);
+  lowerBindingTarget(pattern, array, mode, builder, target);
 }
 
 function lowerArrayBindingPattern(
@@ -6195,6 +6352,10 @@ function lowerArrayBindingPattern(
   builder.finalizers.push(closeTarget);
   builder.abruptTargets.push(closeTarget);
   for (const element of pattern.elements) {
+    const target =
+      element == null
+        ? undefined
+        : lowerAssignmentReference(element.pattern, mode, builder);
     const next = lowerBindingIteratorNext(
       iterator,
       nextMethod,
@@ -6209,7 +6370,7 @@ function lowerArrayBindingPattern(
       element.range,
       builder,
     );
-    lowerBindingTarget(element.pattern, value, mode, builder);
+    lowerBindingTarget(element.pattern, value, mode, builder, target);
   }
   if (pattern.rest != null) {
     lowerArrayBindingRest(
@@ -7501,7 +7662,10 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
     return hirExpressionHasAwait(statement.initializer);
   }
   if (statement.kind === "binding-pattern") {
-    return hirExpressionHasAwait(statement.initializer);
+    return (
+      hirExpressionHasAwait(statement.initializer) ||
+      hirBindingPatternHasAwait(statement.pattern)
+    );
   }
   if (statement.kind === "expression" || statement.kind === "throw") {
     return hirExpressionHasAwait(statement.expression);
