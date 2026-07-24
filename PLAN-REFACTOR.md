@@ -138,6 +138,17 @@ the target-parity record pins the same digest for `linux-x86_64-gnu` and
 test reproduces the Node.js and Deno package tests, the complete native catalog
 and cross-link, every architecture probe, and all 635 reviewed test262 cases.
 
+### Compiler source checkpoint
+
+The compiler implementation now follows the reviewed source map. Declarations,
+module operations, HIR construction and printing, generic MIR lowering,
+specialization, MIR printing, asynchronous module compilation, source
+composition, and native interfaces each have one package-private owner.
+The public *index.ts* retains the existing export names and package export map.
+The repository boundary check now rejects cycles in the compiler and Babel
+adapter source graphs. The package, type, formatting, lint, and archive checks
+pass with the split source tree.
+
 
 Ownership rules
 ---------------

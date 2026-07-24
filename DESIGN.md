@@ -136,6 +136,17 @@ syntax, resolved HIR, generic MIR, deterministic C11 lowering, static runtime
 linking, and native execution. M2 added guarded specialization to this same
 pipeline without creating a second composition path.
 
+The compiler package keeps those stages in package-private source modules.
+*source.ts* and *syntax.ts* own frontend-neutral inputs. *modules.ts* owns graph
+construction and linking. *hir.ts*, *hir-build.ts*, and *hir-print.ts* separate
+the HIR representation from construction and rendering. *mir.ts*,
+*mir-build.ts*, *mir-specialize.ts*, and *mir-print.ts* do the same for generic
+lowering, guarded specialization, and MIR rendering. *module-compile.ts* owns
+whole-graph asynchronous compilation, *compile.ts* composes source compilation,
+and *native.ts* owns native extension contracts. *index.ts* remains the public
+export and composition surface. Automated boundary checks reject cycles in the
+compiler and Babel adapter source graphs.
+
 
 Source frontend
 ---------------
