@@ -17,7 +17,8 @@ an investigation, not a migration.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-GC.md*](./PLAN-GC.md),
+[*PLAN-PT.md*](./PLAN-PT.md),
 [*PLAN-REPL.md*](./PLAN-REPL.md),
 [ADR 0003](./docs/adr/0003-c11-runtime-and-zig-boundary.md), and the target
 decisions under *docs/adr/*. Evidence that changes one of those contracts
@@ -125,6 +126,11 @@ The C runtime may remain in place when generated program code no longer passes
 through C. Conversely, changing a runtime component does not imply a new
 program backend.
 
+[*PLAN-GC.md*](./PLAN-GC.md) owns allocation, tracing, collection policy, and
+the behavior used to enumerate roots. A backend owns only its encoding of the
+compiler-provided root and safepoint facts. Adding a backend neither forks the
+heap nor requires a collector rewrite.
+
 ### Toolchain boundary
 
 A backend produces an explicit artifact or an explicit request for a separate
@@ -146,6 +152,11 @@ from generated machine code.
 Metadata needed by the collector or generic ABI is validated before code
 publication. Debug-only metadata may be optional when its absence cannot affect
 program behavior or memory safety.
+
+Collector metadata follows the same rule. MIR supplies safepoint liveness and
+heap-store facts before lowering; a candidate may encode them as explicit
+frames, stack maps, spills, or registers but cannot discover a missing live
+value afterward.
 
 
 Candidate classes
@@ -367,6 +378,11 @@ plan owns any conclusion about Oseo's general code-generation backend.
 A future program backend must consume or lower its backend-neutral artifact
 without changing regular expression semantics.
 
+[*PLAN-GC.md*](./PLAN-GC.md) owns collector evolution. A backend candidate may
+share root-map or barrier probes with that track, but changing the program
+backend and changing the collector remain separate decisions with independent
+replacement triggers.
+
 
 Delivery order
 --------------
@@ -403,6 +419,8 @@ An accepted backend decision updates [*DESIGN.md*](./DESIGN.md), this plan,
 target records, package boundaries, and the applicable runtime ABI or artifact
 decision. [*ROADMAP.md*](./ROADMAP.md) records whether the track remains
 deferred, is under investigation, or has moved to an implementation plan.
+Any changed root or barrier encoding also updates [*PLAN-GC.md*](./PLAN-GC.md)
+and its liveness evidence without making that encoding the collector policy.
 
 Public CLI and package documentation describe backend selection only after a
 supported selection surface exists. Stable Oseo target names do not change when

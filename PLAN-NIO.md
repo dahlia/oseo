@@ -19,7 +19,8 @@ fallback, and target requirements are recorded in an architecture decision.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-M6.md*](./PLAN-M6.md),
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-M6.md*](./PLAN-M6.md),
 [*PLAN-PT.md*](./PLAN-PT.md), [ADR 0012](./docs/adr/0012-native-event-loop.md),
 and the target decisions under *docs/adr/*. Evidence from a probe must update
 the affected plan or decision instead of turning a provisional backend into an
@@ -168,6 +169,12 @@ pinning contract, but that choice needs collector and failure-injection tests.
 Closing an adapter, ring, descriptor, or handle does not by itself prove that a
 kernel or worker has stopped touching its buffers.
 
+[*PLAN-GC.md*](./PLAN-GC.md) owns any pinned or stable heap space and measures
+its collector cost. This plan owns whether an operation copies into native
+storage or requests that facility. The first adapter should not make a general
+pinning API a prerequisite when bounded native storage satisfies the same
+lifetime contract.
+
 
 Platform candidates
 -------------------
@@ -274,6 +281,8 @@ worker occupancy where applicable, and bounded shutdown time. Safety evidence
 includes strict warnings, address and undefined-behavior sanitizers, forced
 collection, injected allocation failure, and repeated cancellation races. A
 candidate wins only for the operation and target represented by the evidence.
+Buffer and operation storage report managed, native, pinned, and copied bytes
+through the accounting categories in [*PLAN-GC.md*](./PLAN-GC.md).
 
 
 Testing and observability

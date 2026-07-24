@@ -353,6 +353,17 @@ A moving or generational collector is a later performance decision. Introducing
 one will require a separate decision record covering write barriers, interior
 pointers, pinned objects, and generated-code metadata.
 
+[*PLAN-GC.md*](./PLAN-GC.md) defines the work that precedes that decision:
+complete memory accounting, an ordinary automatic collection policy, mutable
+slot tracing, safepoint-specific root liveness, and measured replacement
+triggers. The collector remains one runtime service across native program
+backends that share this object model.
+
+A backend may choose its root encoding, but the compiler owns the live-set and
+safepoint facts and the runtime owns tracing and collection policy. A future
+WebAssembly strategy with an incompatible memory model requires its own
+representation decision.
+
 
 Calls, exceptions, and abrupt completion
 ----------------------------------------
@@ -771,6 +782,9 @@ dependency of later milestones:
 
  -  the long-term native code-generation backend, as scoped by
     [*PLAN-BACKEND.md*](./PLAN-BACKEND.md);
+ -  the long-term collector organization, including moving generations,
+    barriers, pinned or large objects, and pause policy, as scoped by
+    [*PLAN-GC.md*](./PLAN-GC.md);
  -  the native event-loop and system-library boundary, including the
     completion, cancellation, buffer-lifetime, and fallback decisions scoped by
     [*PLAN-NIO.md*](./PLAN-NIO.md);

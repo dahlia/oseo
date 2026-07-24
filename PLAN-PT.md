@@ -11,10 +11,11 @@ these models into grammar-based compatibility work. This cross-milestone plan
 does not replace [*PLAN-M5.md*](./PLAN-M5.md).
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
-[*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md), the frozen language
-profiles, and the accepted records under *docs/adr/*. When generated evidence
-invalidates an assumption in one of those documents, the implementation change
-must update the affected document rather than weakening the property.
+[*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
+[*PLAN-GC.md*](./PLAN-GC.md), the frozen language profiles, and the accepted
+records under *docs/adr/*. When generated evidence invalidates an assumption in
+one of those documents, the implementation change must update the affected
+document rather than weakening the property.
 
 
 Goal
@@ -54,6 +55,12 @@ M5 broadens this work into grammar-based differential generation across the
 expanded ECMAScript profile. M5 should reuse the generator, shrinker,
 observation, and replay contracts established here. It must not begin with a
 second unrelated random-program framework.
+
+The collector track in [*PLAN-GC.md*](./PLAN-GC.md) extends the same generated
+programs with ordinary adaptive collection, every-safepoint collection,
+deterministic tiny heaps, selected allocation counts, heap verification, root
+liveness replay, and later barrier verification. Collector policy changes do
+not create a second random-program or replay framework.
 
 The deferred interactive-development track in
 [*PLAN-REPL.md*](./PLAN-REPL.md) extends the same infrastructure with structured
@@ -362,6 +369,12 @@ Collector properties run the same generated program under ordinary collection
 and collection forced at every declared safepoint. Generated programs keep
 values live across nested calls, closure capture, allocation, thrown
 completion, constructor return, and specialized-to-generic transitions.
+
+As [*PLAN-GC.md*](./PLAN-GC.md) checkpoints land, the same properties add tiny
+deterministic heaps, selected-allocation collection, heap verification, dead
+root-slot checks, and forwarding or barrier verification. A moving probe must
+exercise mutable root and heap slots, promotion, large objects, and any accepted
+pinning boundary before becoming a default.
 
 Failure injection is generated independently of program generation. Allocation
 failure points, root-budget exhaustion, and supported host failures are selected

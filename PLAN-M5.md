@@ -118,8 +118,9 @@ complete an M5 semantic unit by itself.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The completed
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), the frozen language profiles, and
+accepted records under *docs/adr/*. The completed
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) provides the
 component boundaries that large intrinsic tables and built-in families build
@@ -500,6 +501,11 @@ pointer is reacquired from a rooted value after a safepoint. Resource limits
 produce owned diagnostics unless the selected edition requires a catchable
 language value.
 
+[*PLAN-GC.md*](./PLAN-GC.md) owns the shared slot, descriptor, root-liveness,
+memory-accounting, and collector-policy contracts. M5 semantic units supply
+their roots and heap layouts through those contracts rather than adding
+family-specific collection paths.
+
 Specialization remains optional. Generated and standards tests compare enabled
 and disabled execution, truthful and false hints, guard misses, forced
 collection, and visible side-effect order. Compatibility work cannot make type
@@ -552,6 +558,10 @@ Performance and code size
 M5 records compile time, generated C size, executable size, peak runtime
 allocation, and selected workload latency. These measurements guide ordering
 and specialization, but they never waive semantic failures.
+
+Collector measurements distinguish requested, committed, live, auxiliary, and
+external bytes and record collection pauses under [*PLAN-GC.md*](./PLAN-GC.md).
+One peak-allocation number cannot justify a collector or allocator change.
 
 An optimization begins with a generic oracle, structural guard evidence, and a
 measured bottleneck. It retains disabled-policy and guard-miss tests. A large

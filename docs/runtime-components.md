@@ -41,7 +41,9 @@ Ownership follows the plan's target layout:
     limits, frames, root-stack operations, and immediate value
     constructors;
  -  *runtime\_memory.c*: GC-managed heap allocation, publication,
-    tracing, collection, and destruction;
+    tracing, collection, and destruction; [*PLAN-GC.md*](../PLAN-GC.md)
+    owns the planned policy, accounting, slot, descriptor, and collector
+    evolution boundaries;
  -  *runtime\_binding.c*: environments, binding cells, and module
     namespaces;
  -  *runtime\_object.c*: strings used as property keys, arrays, ordinary
@@ -334,7 +336,9 @@ cross-responsibility dependencies that shape the internal header are:
     objects; collection and tracing must see every heap kind. Root slot
     arrays, object property storage, coercion text buffers, and
     timer-conversion string buffers are separate direct `calloc`, `malloc`,
-    or `realloc` allocations with their own cleanup paths.
+    or `realloc` allocations with their own cleanup paths. The complete
+    accounting and ownership of those allocations is planned in
+    [*PLAN-GC.md*](../PLAN-GC.md).
  -  Coercions (`to_number`, `value_string`, `ascii_string`) are called from
     object semantics (array length, property keys, descriptors) and from
     operators, console output, and timer argument conversion.

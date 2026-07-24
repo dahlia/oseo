@@ -18,8 +18,8 @@ for M5.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), and
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), and
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Evidence from an
 interactive prototype must update the affected document or decision record
 instead of bypassing its current boundary.
@@ -196,6 +196,11 @@ forced collection, Linux AMD64 execution, macOS AArch64 execution, and AArch64
 Linux compile-link inspection. A target that cannot load a chosen artifact
 format receives an explicit capability result rather than a silent fallback to
 an interpreter.
+
+Collector tracing and companion-table accounting follow
+[*PLAN-GC.md*](./PLAN-GC.md). Reclamation still waits for the code-lifetime
+conditions above; an unreachable managed wrapper alone does not prove that no
+native frame is executing the artifact.
 
 
 Asynchronous execution and interruption

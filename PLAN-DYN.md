@@ -19,9 +19,10 @@ compiler.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-REPL.md*](./PLAN-REPL.md), and the
-accepted records under *docs/adr/*. Evidence that changes one of those
-contracts updates the affected document in the same change.
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-REPL.md*](./PLAN-REPL.md), and the accepted records under *docs/adr/*.
+Evidence that changes one of those contracts updates the affected document in
+the same change.
 
 
 Goal
@@ -329,6 +330,11 @@ an explicit companion table. Raw instruction pointers are not treated as heap
 objects. Unloading begins only after no live value, native frame, pending job,
 diagnostic, or source record can reach the artifact, and target-specific
 instruction-cache or loader requirements have completed.
+
+[*PLAN-GC.md*](./PLAN-GC.md) owns the tracing and accounting behavior used by
+that companion table. A moving collector may update managed owners, but it does
+not relocate published executable code or infer code reachability from raw
+instruction pointers.
 
 Source text, line maps, stack metadata, canonical module records, and compiler
 diagnostics may have different retention needs from executable pages. The

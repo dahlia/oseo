@@ -94,6 +94,10 @@ abrupt, and host-call behavior. The named check is “M1 safepoint liveness
 replay,” which compares MIR live sets with registered slots while forcing every
 possible collection.
 
+[*PLAN-GC.md*](../../PLAN-GC.md) scopes the production non-moving checkpoint,
+mutable slot tracing, exact liveness work, measurements, and entry criteria
+that precede either replacement.
+
 
 Links
 -----
@@ -102,3 +106,4 @@ Links
 recognition.
 [*0005-generic-call-and-abrupt-completion.md*](./0005-generic-call-and-abrupt-completion.md)
 defines the exits that must balance root frames.
+[*PLAN-GC.md*](../../PLAN-GC.md) defines the collector evolution track.

@@ -20,7 +20,7 @@ contracts.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of
 those contracts updates the affected document in the same change.
@@ -280,6 +280,11 @@ Matcher work stacks, capture registers, temporary character sets, and result
 construction must not retain unrooted heap pointers across a safepoint.
 Backtracking must not use unbounded native C recursion. An explicit work area
 has a checked size and an owned allocation failure path.
+
+Managed edges use the slot and descriptor contract in
+[*PLAN-GC.md*](./PLAN-GC.md). Native work areas and dynamic matcher backing
+stores report their retained bytes through its accounting categories even when
+they remain outside the movable heap.
 
 
 Probes and decisions

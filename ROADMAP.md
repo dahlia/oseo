@@ -52,6 +52,13 @@ and portability backend. The track starts a candidate investigation only when
 representative measurements reach a recorded replacement trigger, and it does
 not reserve a milestone or put a backend migration in the M5 queue.
 
+A garbage-collector evolution track is recorded in
+[*PLAN-GC.md*](./PLAN-GC.md). The precise non-moving collector remains the
+reference while its first checkpoint adds ordinary automatic collection,
+complete memory accounting, mutable slot tracing, and exact safepoint
+liveness. Moving, generational, incremental, parallel, and concurrent
+collectors remain measured decisions rather than milestone assumptions.
+
 
 Working rules
 -------------
@@ -92,6 +99,24 @@ Milestone map
 | M6        | Minimum common web API coverage and eventual WinterTC conformance  |
 | M7        | Selected Node.js APIs and practical package compatibility          |
 | M8        | A self-hosting Oseo compiler                                       |
+
+
+Garbage collector track
+-----------------------
+
+Oseo uses one runtime collector across native program backends that share the
+current object model. M5 may carry the production mark-and-sweep checkpoint
+because it preserves language semantics while bounding ordinary heap growth
+and making allocation behavior measurable. That work does not add a
+compatibility result or force a backend migration.
+
+Representative M5 allocation lifetimes and M6 server workloads decide whether
+a copying nursery beside a non-moving old generation deserves a production
+probe. Old-generation compaction, incremental marking, parallel work,
+concurrency, stack maps, and general pinning each require their own recorded
+trigger. [*PLAN-GC.md*](./PLAN-GC.md) owns those gates, while M5 through M7
+continue to own the language and host objects whose roots and resource
+lifetimes the collector must preserve.
 
 
 Native I/O track
@@ -415,7 +440,8 @@ implementation task.
  -  increase test262 coverage and publish reproducible result manifests;
  -  add grammar-based and property-based differential generation;
  -  test garbage collection, exceptions, and specialization across the expanded
-    value space;
+    value space under the modes and accounting contract in
+    [*PLAN-GC.md*](./PLAN-GC.md);
  -  identify constructs that fundamentally challenge ahead-of-time compilation
     and settle them through architecture decisions.
 
@@ -689,8 +715,9 @@ The roadmap should be revised when evidence changes one of these assumptions:
  -  JavaScript's reflective object behavior can make shape specialization more
     expensive than expected. Generic property semantics come first so a failed
     experiment does not block correctness.
- -  Garbage-collector and exception ABIs can force broad rewrites. They are
-    settled before the object model expands.
+ -  Garbage-collector and exception ABIs can force broad rewrites. The
+    backend-independent root, slot, and policy boundaries in
+    [*PLAN-GC.md*](./PLAN-GC.md) precede a moving or generational decision.
  -  The Minimum common web API includes several large standards, including
     streams, cryptography, and WebAssembly. M6 is divided by API group and test
     surface.

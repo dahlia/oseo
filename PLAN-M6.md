@@ -14,8 +14,9 @@ named by the targeted standard edition.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The completed
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
+records under *docs/adr/*. The completed
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
 the prerequisite for every large web API family: a new API lands in an
@@ -212,6 +213,11 @@ corpus. Specialization remains optional and honest: no web API may depend
 on a hint being true, and every fast path keeps a compiled generic
 fallback.
 
+Web components use the shared descriptors, mutable slots, memory accounting,
+and root-liveness contract in [*PLAN-GC.md*](./PLAN-GC.md). Their explicit
+abort, completion, buffer, and shutdown lifetimes do not become finalizers when
+collector policy changes.
+
 APIs that the profile does not yet implement are absent or throw the
 specified error; they are never silently stubbed. A partially implemented
 interface is a reviewed, documented state, not a quiet approximation.
@@ -249,6 +255,11 @@ before and after it lands. Streams, Web Crypto, and WebAssembly receive
 size budgets when their conformance matrices are written. A dependency
 added for TLS, cryptography, or compression needs the same pinning, target,
 and replacement-boundary treatment as the Zig toolchain.
+
+Long-running group workloads also record live and peak memory, allocation
+rate, collection pauses, and tail latency through [*PLAN-GC.md*](./PLAN-GC.md).
+Those observations may open a collector investigation; no M6 group selects a
+collector by itself.
 
 
 Delivery order

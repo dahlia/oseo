@@ -101,6 +101,9 @@ an opaque stable layout identity. A later collector may trace or compact
 metadata provided that the public semantics and guard-miss contract remain
 unchanged.
 
+[*PLAN-GC.md*](../../PLAN-GC.md) defines the measurements, mutable slot
+contract, and decision gate for such a collector change.
+
 
 Links
 -----
@@ -109,3 +112,4 @@ Links
 tagged word that carries heap references.
 [*0006-root-stack-and-safepoints.md*](./0006-root-stack-and-safepoints.md)
 defines the existing explicit root protocol.
+[*PLAN-GC.md*](../../PLAN-GC.md) defines the collector evolution track.
