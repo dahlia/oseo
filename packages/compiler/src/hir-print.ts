@@ -319,12 +319,16 @@ function appendHirStatement(
           ? ""
           : printHirExpression(statement.init)
         : statement.declarations
-            .map(
-              (declaration) =>
-                `${declaration.mutable ? "let" : "const"} ` +
-                `%b${declaration.bindingId} ${declaration.name} = ` +
-                printHirExpression(declaration.initializer),
-            )
+            .map((declaration) => {
+              const target =
+                declaration.kind === "binding"
+                  ? `%b${declaration.bindingId} ${declaration.name}`
+                  : printHirBindingPattern(declaration.pattern);
+              return (
+                `${declaration.declarationKind} ${target} = ` +
+                printHirExpression(declaration.initializer)
+              );
+            })
             .join(", "),
       statement.test == null ? "" : printHirExpression(statement.test),
       statement.update == null ? "" : printHirExpression(statement.update),

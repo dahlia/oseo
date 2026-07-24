@@ -906,7 +906,16 @@ export function declaredHirBindingIds(
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {
-        result.push(declaration.bindingId);
+        if (declaration.declarationKind === "var") continue;
+        if (declaration.kind === "binding") {
+          result.push(declaration.bindingId);
+        } else {
+          result.push(
+            ...hirBindingIdentifiers(declaration.pattern).map(
+              (item) => item.bindingId,
+            ),
+          );
+        }
       }
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "for-of") {
@@ -1404,38 +1413,70 @@ function resolveStatement(
     let init: HirExpression | undefined;
     if (statement.declarations != null) {
       for (const declaration of statement.declarations) {
-        if (forScope.has(declaration.name)) {
-          state.diagnostics.push(
-            sourceDiagnostic(
-              state.sourceId,
-              statement,
-              `Duplicate declaration '${declaration.name}'.`,
-            ),
-          );
-          return undefined;
+        if (declaration.declarationKind === "var") continue;
+        const names =
+          declaration.kind === "binding"
+            ? [declaration.name]
+            : syntaxBindingNames(declaration.pattern);
+        for (const name of names) {
+          if (forScope.has(name)) {
+            state.diagnostics.push(
+              sourceDiagnostic(
+                state.sourceId,
+                statement,
+                `Duplicate declaration '${name}'.`,
+              ),
+            );
+            return undefined;
+          }
+          forScope.set(name, {
+            id: state.nextBindingId,
+            mutable: declaration.declarationKind === "let",
+            name,
+          });
+          state.nextBindingId += 1;
         }
-        forScope.set(declaration.name, {
-          id: state.nextBindingId,
-          mutable: declaration.mutable,
-          name: declaration.name,
-        });
-        state.nextBindingId += 1;
       }
       declarations = [];
       for (const declaration of statement.declarations) {
-        const binding = forScope.get(declaration.name);
+        const declarationScopes =
+          declaration.declarationKind === "var" ? scopes : forScopes;
         const initializer = resolveExpression(
           declaration.initializer,
-          forScopes,
+          declarationScopes,
           state,
         );
-        if (binding == null || initializer == null) return undefined;
+        if (initializer == null) return undefined;
+        if (declaration.kind === "binding") {
+          const binding =
+            declaration.declarationKind === "var"
+              ? findBinding(scopes, declaration.name)
+              : forScope.get(declaration.name);
+          if (binding == null) return undefined;
+          declarations.push({
+            bindingId: binding.id,
+            declarationKind: declaration.declarationKind,
+            hint: declaration.hint,
+            initializer: inferFunctionName(initializer, declaration.name),
+            kind: "binding",
+            name: declaration.name,
+            range: declaration.range,
+          });
+          continue;
+        }
+        const pattern = resolveBindingPattern(
+          declaration.pattern,
+          declarationScopes,
+          state,
+          declaration.declarationKind === "var" ? "write" : "declare",
+          false,
+        );
+        if (pattern == null) return undefined;
         declarations.push({
-          bindingId: binding.id,
-          hint: declaration.hint,
-          initializer: inferFunctionName(initializer, declaration.name),
-          mutable: declaration.mutable,
-          name: declaration.name,
+          declarationKind: declaration.declarationKind,
+          initializer,
+          kind: "pattern",
+          pattern,
           range: declaration.range,
         });
       }

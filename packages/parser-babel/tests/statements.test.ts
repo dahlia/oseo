@@ -108,6 +108,22 @@ test("converts classic for statements to owned syntax", () => {
   assert.match(printHir(result.hir), /for \(let %b/u);
 });
 
+test("converts classic for binding patterns to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "for (let [index, step = 1] = [0]; index < 2; index += step) {}\n" +
+      "for (const { value, ...rest } = { value: 1 }; value < 2;) break;\n" +
+      "for (var [retained] = [3]; retained < 4; retained++) {}\n",
+    sourceId: "for-binding-patterns.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /for \(let \[/u);
+  assert.match(hir, /for \(const \{/u);
+  assert.match(hir, /for \(var \[/u);
+});
+
 const unsupportedForForms = [
   ["for-in", "for (const key in {}) console.log(key);"],
   ["for-await-of", "async function f() { for await (const x of []) {} }"],

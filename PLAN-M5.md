@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 277
+honest unsupported classifications. The current reviewed manifest records 284
 passes, 228 expected negatives, and 142 unsupported profile features with no
 semantic or harness failures.
 
@@ -95,11 +95,18 @@ evaluate their object and key expressions once, then perform the observable
 read and write key conversions in order. Four new passing test262 cases cover
 the four forms, and the admitted classic `for` update promotes one existing
 exponentiation case to pass.
-Awaited member targets, parameter patterns, and classic `for` head
-destructuring remain later work. The runtime component boundaries
-recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
-are implemented, so that work is no longer blocked on them. Delivery
-items 5, 6, 8, and 9 remain open.
+Classic `for` declaration heads now accept recursive array and object patterns
+for `const`, `let`, and `var`. Lexical leaves preserve temporal dead zones,
+mutable `let` leaves receive fresh per-iteration cells, and `var` leaves write
+their hoisted cells. Generated evidence uses seed `0x5eed0010` across both
+pattern families, defaults, rest, nullish inputs, all three declaration kinds,
+both specialization policies, and forced collection. Seven reviewed test262
+cases pin the admitted paths.
+Awaited member targets and parameter patterns remain later work. The runtime
+component boundaries recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
+so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
+remain open.
 
 Before the next broad M5 syntax and built-in batches, the compiler, Babel
 frontend adapter, and native fixture runner were decomposed into
@@ -282,6 +289,25 @@ native fixtures retain closure cells, function-name inference, object rest,
 test262 cases now pin the binding paths across all three declaration kinds. Six
 cover nullish object-pattern failure, while another 42 exercise their loop
 bodies through compound assignment.
+
+Classic `for` declaration heads now accept recursive array and object patterns
+for `const`, `let`, and `var`. Initializers reuse the standalone declaration
+semantics, including defaults, rest, nullish object failure, nested iterator
+cleanup, and checked writes to hoisted `var` cells. Lexical names enter their
+temporal dead zone before initialization. At the end of each iteration, every
+mutable `let` leaf moves into a fresh cell before the update expression runs,
+so closures capture one iteration, while `const` retains its single
+environment.
+
+The generated property suite uses seed `0x5eed0010` across both pattern
+families, all three declaration kinds, present, missing, and nullish inputs,
+both native specialization policies, and forced collection. Its independent
+cell model distinguishes `const` values, per-iteration `let` closures, and the
+shared final `var` cell. Fixed native fixtures retain temporal dead zones,
+nullish object failure, conditional iterator close, array defaults, object
+rest, closure identity, and post-loop `var` values. Seven reviewed test262
+cases pin array defaults, trailing object patterns, and object rest across all
+three declaration kinds.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

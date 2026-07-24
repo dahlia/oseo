@@ -114,6 +114,71 @@ for (let i = 0; i < 3; i = i + 1) console.log("let", i);
 const captures = [];
 for (let i = 0; i < 3; i = i + 1) { captures[i] = () => i; }
 console.log(captures[0](), captures[1](), captures[2]());
+let patternCapture0;
+let patternCapture1;
+let patternCapture2;
+let patternCaptureIndex = 0;
+for (let [value] = [0]; value < 3; value++) {
+  if (patternCaptureIndex === 0) patternCapture0 = () => value;
+  if (patternCaptureIndex === 1) patternCapture1 = () => value;
+  if (patternCaptureIndex === 2) patternCapture2 = () => value;
+  patternCaptureIndex++;
+}
+console.log(
+  "pattern",
+  patternCapture0(),
+  patternCapture1(),
+  patternCapture2(),
+);
+try {
+  for (let [patternTdz = patternTdz] = []; false; ) {}
+} catch (error) {
+  console.log("pattern-tdz", error.name);
+}
+try {
+  for (const {} = null; false; ) {}
+} catch (error) {
+  console.log("pattern-null", error.name);
+}
+let patternCloseCount = 0;
+let patternCloseValue = 0;
+const patternCloseIterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        patternCloseValue = 9;
+        return { value: patternCloseValue, done: false };
+      },
+      return: function () {
+        patternCloseCount++;
+        return {};
+      },
+    };
+  },
+};
+for (let [patternFirst] = patternCloseIterable; false; ) {}
+console.log("pattern-close", patternCloseValue, patternCloseCount);
+for (
+  const { value: constantValue, ...constantRest } = {
+    value: 4,
+    extra: 5,
+  };
+  constantValue < 5;
+) {
+  console.log("const-pattern", constantValue, constantRest.extra);
+  break;
+}
+for (
+  var [retainedHead, ...retainedTail] = [6, 7, 8];
+  retainedHead < 7;
+  retainedHead++
+) {}
+console.log(
+  "var-pattern",
+  retainedHead,
+  retainedTail[0],
+  retainedTail[1],
+);
 for (var counted = 0; counted < 2; counted = counted + 1) {
   console.log("var", counted);
 }

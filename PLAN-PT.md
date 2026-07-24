@@ -573,6 +573,25 @@ nullish and immutable-target errors, and function-name inference under both
 strictness and specialization policies.
 
 
+M5 classic for binding properties
+---------------------------------
+
+The classic `for` binding property generates a `const`, `let`, or `var`
+declaration head with an array or object pattern, default, and rest target.
+Inputs vary between present, missing, and nullish values. Its independent cell
+model predicts constant observations, fresh per-iteration `let` closures, the
+one shared final `var` cell, or an escaped nullish `TypeError`. Each case
+compares Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0010`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain array
+defaults and rest, object rest, temporal dead zones, nullish failure,
+conditional iterator close, lexical closure identity, and post-loop `var`
+values. Seven reviewed test262 cases pin the admitted paths.
+
+
 M5 for-of assignment properties
 -------------------------------
 

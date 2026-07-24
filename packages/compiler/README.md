@@ -69,6 +69,11 @@ Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
 lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the
 outer iterator close block after a pattern failure.
+Classic `for` declaration heads also reuse the recursive patterns. Every
+lexical leaf enters its temporal dead zone before its initializer, and each
+mutable `let` leaf moves into a fresh per-iteration cell before the loop update.
+`const` leaves retain their single environment, while `var` leaves write the
+existing hoisted cells.
 Assignment-pattern heads reuse the existing-target path without creating
 cells. Their identifier and member leaves run after each outer iterator step,
 and a failure resumes through nested pattern cleanup before that outer close.

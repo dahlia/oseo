@@ -234,7 +234,17 @@ function collectHirBindings(
       collect(statement.body);
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {
-        bindings.push({ id: declaration.bindingId, name: declaration.name });
+        if (declaration.declarationKind === "var") continue;
+        if (declaration.kind === "binding") {
+          bindings.push({
+            id: declaration.bindingId,
+            name: declaration.name,
+          });
+        } else {
+          for (const binding of hirBindingIdentifiers(declaration.pattern)) {
+            bindings.push({ id: binding.bindingId, name: binding.name });
+          }
+        }
       }
       collect(statement.body);
     } else if (statement.kind === "for-of") {
