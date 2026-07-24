@@ -89,12 +89,13 @@ items 5, 6, 8, and 9 remain open.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
-records under *docs/adr/*. The completed runtime componentization recorded in
-[*docs/runtime-components.md*](./docs/runtime-components.md) provides
-the component boundaries that large intrinsic tables and built-in
-families build on. Evidence that changes one of these contracts updates
-the affected document in the same change.
+[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), the frozen
+language profiles, and accepted records under *docs/adr/*. The completed
+runtime componentization recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md) provides the
+component boundaries that large intrinsic tables and built-in families build
+on. Evidence that changes one of these contracts updates the affected document
+in the same change.
 
 
 Goal
@@ -287,6 +288,14 @@ Establish the intrinsic graph, well-known symbols, iterator protocols, error
 objects, and property attributes needed by standard constructors and prototype
 methods. Add numeric, string, array, object, function, collection, regular
 expression, date, and binary-data families in dependency order.
+
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns the regular expression family. It
+keeps one owned pattern and matcher model across dynamic construction and
+ahead-of-time literal compilation, preserves fresh object identity and
+`lastIndex`, and defers the matcher backend choice until code-size, Unicode,
+resource, and target probes compare the candidates. Regular expressions remain
+outside the active profile until that plan admits a coherent semantic
+checkpoint.
 
 An intrinsic enters through a table or owned runtime interface whose identity
 and attributes are testable. Generated C must not duplicate mutable singleton

@@ -40,6 +40,12 @@ work. A deferred dynamic-source and staged-compilation track is recorded in
 while defining the evidence required for bounded dynamic import, late native
 artifacts, and optional runtime compilation.
 
+The M5 regular expression family is detailed in
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md). That plan separates fresh `RegExp` object
+state from shareable matcher artifacts, keeps dynamic patterns on the same
+semantic model as literals, and measures ahead-of-time C lowering against a
+compact generic matcher before selecting a backend.
+
 
 Working rules
 -------------
@@ -398,6 +404,8 @@ implementation task.
 
  -  expand syntax and semantics in dependency order;
  -  implement standard built-in objects and intrinsic functions;
+ -  compile regular expression literals ahead of time while preserving one
+    generic matcher contract for dynamic patterns;
  -  increase test262 coverage and publish reproducible result manifests;
  -  add grammar-based and property-based differential generation;
  -  test garbage collection, exceptions, and specialization across the expanded
@@ -626,6 +634,9 @@ landed with the M5 intrinsics units. The remaining queue is:
     landed errors, symbols, synchronous iterator consumers, spread consumers,
     and array binding declarations.
 2.  Add built-in families and broader executable syntax in dependency order.
+    The regular expression family follows
+    [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), including the generic matcher before
+    ahead-of-time literal lowering and measured fast paths.
 3.  Close the named edition with reproducible standards and generated
     evidence.
 

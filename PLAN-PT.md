@@ -78,6 +78,14 @@ including monotonic observations, epoch real-time reads, timer deadlines, and
 scheduler task order, then replay that trace through the deterministic adapter.
 Real kernel timing is retained evidence, not a property precondition.
 
+The regular expression work in
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) adds a structured pattern grammar whose
+shrinker preserves captures, references, assertions, and flag-sensitive
+validity. It compares dynamic construction, generic matching, and
+ahead-of-time literal strategies with both reference hosts. The matcher model
+does not become a second random-source framework; it composes with the same
+seed, replay, target, specialization, and forced-collection controls.
+
 Property tests do not replace test262 or later web-platform tests. Standards
 suites prove behavior for reviewed specification cases. Property tests explore
 combinations, values, transformations, and execution states that a fixed suite

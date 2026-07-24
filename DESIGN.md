@@ -292,6 +292,15 @@ operations remaining native, following the practice of mainstream engines.
 [*ROADMAP.md*](./ROADMAP.md) records this direction under M8; the choice is
 made per family with recorded evidence when the family lands.
 
+Regular expressions add a narrower compiler inside that boundary.
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) requires an Oseo-owned pattern and matcher
+representation shared by dynamic construction and ahead-of-time literal
+compilation. A literal may lower to native C or an immutable compact artifact,
+but each evaluation still allocates a fresh `RegExp` object. Matcher strategy,
+Unicode data, mutable object state, and collector-owned work areas remain
+separate contracts so a static fast path cannot replace generic ECMAScript
+behavior.
+
 An ordinary object is expected to contain a header and indexed storage. The
 header identifies the object's runtime kind, garbage-collector state, and shape.
 Shapes are immutable descriptions of property layout and attributes. Adding a
@@ -579,6 +588,12 @@ every executable retain every component. [*PLAN-DYN.md*](./PLAN-DYN.md) defines
 the future capability requirement graph and retained manifest that can select a
 reviewed component closure. Static-linker dead stripping alone is not a
 capability contract.
+
+A future regular expression component follows the same rule. Literal-only
+programs may retain immutable matcher artifacts and shared execution primitives
+without retaining the dynamic pattern parser and compiler. Reachable dynamic
+`RegExp` construction adds those components explicitly, as required by
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md).
 
 
 Self-hosting

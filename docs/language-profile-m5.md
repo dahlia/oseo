@@ -462,7 +462,9 @@ must never shrink by reclassification alone.
     binding patterns, default and rest parameters, classes, generators, big
     integers, regular expressions, and the remaining expression grammar are
     outside the admitted syntax. Owner: the core expressions and bindings
-    stream in [*PLAN-M5.md*](../PLAN-M5.md).
+    stream in [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax,
+    objects, matching, and ahead-of-time literal compilation owned by
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is
