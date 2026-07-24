@@ -581,6 +581,73 @@ holder.value = 0;
 const shortResult = target()[key()] &&= right();
 console.log("short", shortResult, holder.value, order);
 
+let conversionCount = 0;
+let conversionOrder = "";
+const changingKey = {
+  [Symbol.toPrimitive]: function () {
+    conversionCount += 1;
+    conversionOrder += "key" + conversionCount + " ";
+    return conversionCount === 1 ? "read" : "write";
+  },
+};
+const changingHolder = { read: 1, write: 9 };
+function conversionRight() {
+  conversionOrder += "right ";
+  return 2;
+}
+const conversionResult = changingHolder[changingKey] += conversionRight();
+console.log(
+  "conversion",
+  conversionResult,
+  changingHolder.read,
+  changingHolder.write,
+  conversionCount,
+  conversionOrder,
+);
+
+let logicalConversionCount = 0;
+let logicalConversionOrder = "";
+const logicalChangingKey = {
+  [Symbol.toPrimitive]: function () {
+    logicalConversionCount += 1;
+    logicalConversionOrder += "key" + logicalConversionCount + " ";
+    return logicalConversionCount === 1 ? "read" : "write";
+  },
+};
+const logicalChangingHolder = { read: 0, write: 9 };
+function logicalConversionRight() {
+  logicalConversionOrder += "right ";
+  return 2;
+}
+const logicalConversionResult =
+  logicalChangingHolder[logicalChangingKey] ||= logicalConversionRight();
+console.log(
+  "logical-conversion",
+  logicalConversionResult,
+  logicalChangingHolder.read,
+  logicalChangingHolder.write,
+  logicalConversionCount,
+  logicalConversionOrder,
+);
+
+let skippedConversionCount = 0;
+const skippedChangingKey = {
+  [Symbol.toPrimitive]: function () {
+    skippedConversionCount += 1;
+    return skippedConversionCount === 1 ? "read" : "write";
+  },
+};
+const skippedChangingHolder = { read: 1, write: 9 };
+const skippedConversionResult =
+  skippedChangingHolder[skippedChangingKey] ||= 2;
+console.log(
+  "skipped-conversion",
+  skippedConversionResult,
+  skippedChangingHolder.read,
+  skippedChangingHolder.write,
+  skippedConversionCount,
+);
+
 let named;
 named ||= function () {};
 const namedMember = {};

@@ -111,29 +111,34 @@ function binaryResult(
 function expected(testCase: CompoundAssignmentCase): {
   readonly result: number | null;
   readonly rightCount: number;
+  readonly writeCount: number;
 } {
   const left = initialValue(testCase);
   if (testCase.operator === "&&") {
     return {
       result: left === 0 ? left : testCase.right,
       rightCount: left === 0 ? 0 : 1,
+      writeCount: left === 0 ? 0 : 1,
     };
   }
   if (testCase.operator === "||") {
     return {
       result: left === 0 ? testCase.right : left,
       rightCount: left === 0 ? 1 : 0,
+      writeCount: left === 0 ? 1 : 0,
     };
   }
   if (testCase.operator === "??") {
     return {
       result: left == null ? testCase.right : left,
       rightCount: left == null ? 1 : 0,
+      writeCount: left == null ? 1 : 0,
     };
   }
   return {
     result: binaryResult(testCase.operator, testCase.left, testCase.right),
     rightCount: 1,
+    writeCount: 1,
   };
 }
 
@@ -144,8 +149,15 @@ function printCase(testCase: CompoundAssignmentCase): string {
   return `
 let objectCount = 0;
 let keyCount = 0;
+let conversionCount = 0;
 let rightCount = 0;
 const holder = { value: ${String(initial)} };
+const propertyKey = {
+  [Symbol.toPrimitive]: function () {
+    conversionCount += 1;
+    return "value";
+  },
+};
 let target = ${String(initial)};
 function object() {
   objectCount += 1;
@@ -153,7 +165,7 @@ function object() {
 }
 function key() {
   keyCount += 1;
-  return "value";
+  return propertyKey;
 }
 function right() {
   rightCount += 1;
@@ -165,6 +177,7 @@ console.log(
   "" + ${testCase.targetKind === "member" ? "holder.value" : "target"},
   objectCount,
   keyCount,
+  conversionCount,
   rightCount,
 );
 `;
@@ -219,7 +232,7 @@ test("compound assignment model keeps short-circuit writes conditional", () => {
       right: 2,
       targetKind: "identifier",
     }),
-    { result: 1, rightCount: 0 },
+    { result: 1, rightCount: 0, writeCount: 0 },
   );
 });
 
@@ -233,13 +246,14 @@ test(
         const source = printCase(testCase);
         const modeled = expected(testCase);
         const memberCount = testCase.targetKind === "member" ? 1 : 0;
+        const conversionCount = memberCount * (1 + modeled.writeCount);
         const result = String(modeled.result);
         const expectedObservation = {
           exitStatus: 0,
           stderr: "",
           stdout:
             `${result} ${result} ${memberCount} ${memberCount} ` +
-            `${modeled.rightCount}\n`,
+            `${conversionCount} ${modeled.rightCount}\n`,
         };
         assertMatchingObservations([
           expectedObservation,
@@ -287,7 +301,8 @@ test(
               ],
         domain:
           "all compound operators over identifier and computed member " +
-          "targets with bounded integers and direct nullish cases",
+          "targets with observable property-key conversion, bounded " +
+          "integers, and direct nullish cases",
         numRuns: 10,
         profile: "M5 compound assignment",
         seed: 0x5eed_000d,

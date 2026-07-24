@@ -580,8 +580,9 @@ The compound assignment property generates one of the 15 arithmetic,
 exponentiation, bitwise, shift, or logical operators with either an identifier
 or computed member target. Inputs use bounded integers, with direct nullish
 cases for `??=`. Its independent model predicts the assigned result, whether
-the right operand runs, and the object, key, and right-operand evaluation
-counts. Each case compares the model with Node.js, Deno,
+the right operand and write run, and the object, key, property-key conversion,
+and right-operand evaluation counts. Each case compares the model with Node.js,
+Deno,
 specialization-disabled native execution, and specialization-enabled execution
 with collection forced at every safepoint.
 
@@ -590,8 +591,8 @@ integer values, and no filtering. The extended tier runs ten times the
 ordinary budget through the shared replay controls. Fixed native fixtures
 retain every operator, expression results, logical short-circuiting, identifier
 function-name inference, unnamed property functions, member-reference order,
-and immutable-target failure. Forty-two reviewed test262 cases pin `+=` inside
-`for-of` binding loops.
+observable read and write key conversions, and immutable-target failure.
+Forty-two reviewed test262 cases pin `+=` inside `for-of` binding loops.
 
 
 Test placement and package boundaries

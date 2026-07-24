@@ -298,23 +298,26 @@ Compound assignment now accepts `+=`, `-=`, `*=`, `/=`, `%=`, `**=`, `<<=`,
 `>>=`, `>>>=`, `&=`, `^=`, `|=`, `&&=`, `||=`, and `??=` for existing
 identifier and member targets. Identifier targets perform one checked read
 before the right operand and one checked write afterward. Member targets
-evaluate their object and property key once, convert the key once, and read the
-current value before evaluating the right operand. Logical assignments lower
-through explicit branches, so their short path skips the right operand and the
-write. Anonymous functions on taken logical-assignment paths retain inferred
-identifier names, while property targets remain unnamed. Imported and immutable
-targets preserve their catchable write errors after the right operand has run.
+evaluate their object and property-key expression once. They convert the
+retained key value for the read, then convert it again after the right operand
+on the taken write path. Logical assignments lower through explicit branches,
+so their short path skips the right operand, second conversion, and write.
+Anonymous functions on taken logical-assignment paths retain inferred
+identifier names, while property targets remain unnamed. Imported and
+immutable targets preserve their catchable write errors after the right operand
+has run.
 
 The generated property suite uses seed `0x5eed000d` across all 15 operators,
 identifier and member targets, bounded numeric inputs, nullish values, both
 native specialization policies, and forced collection. Its independent model
 also predicts member-reference and right-operand counts. Fixed native fixtures
 retain every operator, expression results, logical short-circuiting, computed
-property references, identifier function-name inference, and immutable failure.
-Forty-two reviewed test262 `for-of` binding cases now pass because their `+=`
-loop bodies use the same lowering. Await inside a compound assignment remains
-unsupported until continuation extraction can retain the already-read target
-value across suspension.
+property references, observable read and write key conversions, identifier
+function-name inference, and immutable failure. Forty-two reviewed test262
+`for-of` binding cases now pass because their `+=` loop bodies use the same
+lowering. Await inside a compound assignment remains unsupported until
+continuation extraction can retain the already-read target value across
+suspension.
 
 ### Intrinsics and built-in objects
 

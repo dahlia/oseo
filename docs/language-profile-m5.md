@@ -195,11 +195,13 @@ its deliberate boundary and its evidence:
     write the right operand only on the selected path, and preserve anonymous
     function-name inference for identifier targets. Property targets leave
     anonymous functions unnamed. Member assignments evaluate the object and
-    key once, convert the key once, and perform one property read before the
-    right operand. Immutable and imported targets retain their catchable write
-    errors. Native differential fixtures and a generated property with seed
-    `0x5eed000d` cover all 15 operators, both target forms, short-circuiting,
-    reference counts, both specialization policies, and forced collection.
+    key expression once, convert the retained key value for the read, and
+    convert it again after the right operand on the taken write path. A
+    short-circuited logical assignment skips that second conversion. Immutable
+    and imported targets retain their catchable write errors. Native
+    differential fixtures and a generated property with seed `0x5eed000d`
+    cover all 15 operators, both target forms, short-circuiting, reference and
+    conversion counts, both specialization policies, and forced collection.
     Await inside a compound assignment remains rejected until continuation
     extraction can retain the already-read current value.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,

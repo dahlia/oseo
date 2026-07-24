@@ -1418,14 +1418,32 @@ function lowerExpression(
   }
   if (expression.kind === "property-update") {
     const object = lowerExpression(expression.object, builder);
-    const key = lowerPropertyKey(expression.key, builder);
-    const current = lowerPropertyRead(object, key, expression.range, builder);
+    const keyInput = lowerExpression(expression.key, builder);
+    const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
+    const current = lowerPropertyRead(
+      object,
+      readKey,
+      expression.range,
+      builder,
+    );
     return lowerAssignmentValue(
       current,
       expression.operator,
       expression.value,
-      (value) =>
-        lowerPropertyWrite(object, key, value, expression.range, builder),
+      (value) => {
+        const writeKey = convertPropertyKey(
+          keyInput,
+          expression.key.range,
+          builder,
+        );
+        return lowerPropertyWrite(
+          object,
+          writeKey,
+          value,
+          expression.range,
+          builder,
+        );
+      },
       expression.range,
       builder,
     );
