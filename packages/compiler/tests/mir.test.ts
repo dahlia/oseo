@@ -888,9 +888,10 @@ test("copies for-head bindings once per iteration", () => {
         },
         declarations: [
           {
+            declarationKind: "let",
             hint: undefined,
             initializer: { kind: "number", range, value: 0 },
-            mutable: true,
+            kind: "binding",
             name: "index",
             range,
           },

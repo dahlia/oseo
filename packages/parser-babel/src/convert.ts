@@ -1257,75 +1257,75 @@ export function statement(
           "Ambient declarations are erased by TypeScript and unsupported.",
         );
       }
-      if (initNode.kind === "var") {
-        const assignments: SyntaxExpression[] = [];
-        for (const declarator of nodes(initNode.declarations)) {
-          const identifier = node(declarator.id);
-          const name =
-            identifier == null ? undefined : identifierName(identifier);
-          if (name == null) {
-            return unsupported(
-              context,
-              declarator,
-              "var destructuring is unsupported.",
-            );
-          }
-          const initializerNode = node(declarator.init);
-          if (initializerNode == null) continue;
-          const assigned = expression(context, initializerNode);
-          if (assigned == null) return undefined;
-          assignments.push({
-            ...location(context, declarator),
-            kind: "binding-set",
-            name,
-            value: assigned,
-          });
+      if (
+        initNode.kind !== "const" &&
+        initNode.kind !== "let" &&
+        initNode.kind !== "var"
+      ) {
+        return unsupported(
+          context,
+          initNode,
+          "Only const, let, and var declarations are supported.",
+        );
+      }
+      declarations = [];
+      for (const declarator of nodes(initNode.declarations)) {
+        const identifier = node(declarator.id);
+        if (identifier == null) return unsupported(context, declarator);
+        const initializerNode = node(declarator.init);
+        if (initNode.kind === "const" && initializerNode == null) {
+          return unsupported(
+            context,
+            declarator,
+            "A const binding needs an initializer.",
+          );
         }
-        if (assignments.length === 1) init = assignments[0];
-        else if (assignments.length > 1) {
-          init = { ...located, expressions: assignments, kind: "sequence" };
-        }
-      } else if (initNode.kind === "const" || initNode.kind === "let") {
-        declarations = [];
-        for (const declarator of nodes(initNode.declarations)) {
-          const identifier = node(declarator.id);
-          const name =
-            identifier == null ? undefined : identifierName(identifier);
-          if (identifier == null || name == null) {
-            return unsupported(
-              context,
-              declarator,
-              "for declarations need plain identifiers.",
-            );
-          }
-          const initializerNode = node(declarator.init);
-          if (initNode.kind === "const" && initializerNode == null) {
-            return unsupported(
-              context,
-              declarator,
-              "A const binding needs one identifier and an initializer.",
-            );
-          }
-          const declaratorRange = location(context, declarator);
+        const declaratorRange = location(context, declarator);
+        const name = identifierName(identifier);
+        if (name != null) {
+          if (initNode.kind === "var" && initializerNode == null) continue;
           const initializer =
             initializerNode == null
               ? { ...declaratorRange, kind: "undefined" as const }
               : expression(context, initializerNode);
           if (initializer == null) return undefined;
           declarations.push({
+            declarationKind: initNode.kind,
             hint: typeHint(context, identifier.typeAnnotation),
             initializer,
-            mutable: initNode.kind === "let",
+            kind: "binding",
             name,
             range: declaratorRange.range,
           });
+          continue;
         }
-      } else {
-        return unsupported(
-          context,
-          initNode,
-          "Only const, let, and var declarations are supported.",
-        );
+        if (
+          identifier.type !== "ArrayPattern" &&
+          identifier.type !== "ObjectPattern"
+        ) {
+          return unsupported(
+            context,
+            declarator,
+            "A for declaration needs a binding pattern.",
+          );
+        }
+        if (initializerNode == null) {
+          return unsupported(
+            context,
+            declarator,
+            "A binding pattern declaration needs an initializer.",
+          );
+        }
+        const pattern = bindingPattern(context, identifier);
+        const initializer = expression(context, initializerNode);
+        if (pattern == null || initializer == null) return undefined;
+        declarations.push({
+          declarationKind: initNode.kind,
+          initializer,
+          kind: "pattern",
+          pattern,
+          range: declaratorRange.range,
+        });
       }
     } else if (initNode != null) {
       init = expression(context, initNode);

@@ -70,15 +70,30 @@ export interface HirSwitchCase {
   readonly range: SourceRange;
   readonly test?: HirExpression;
 }
-/** One resolved for-head binding copied into each iteration. */
-export interface HirForDeclaration {
+/** One resolved identifier binding in a classic for statement head. */
+export interface HirForBindingDeclaration {
   readonly bindingId: number;
+  readonly declarationKind: "const" | "let" | "var";
   readonly hint: Hint | undefined;
   readonly initializer: HirExpression;
-  readonly mutable: boolean;
+  readonly kind: "binding";
   readonly name: string;
   readonly range: SourceRange;
 }
+
+/** One resolved recursive pattern in a classic for statement head. */
+export interface HirForPatternDeclaration {
+  readonly declarationKind: "const" | "let" | "var";
+  readonly initializer: HirExpression;
+  readonly kind: "pattern";
+  readonly pattern: HirBindingPattern;
+  readonly range: SourceRange;
+}
+
+/** One resolved declaration in a classic for statement head. */
+export type HirForDeclaration =
+  | HirForBindingDeclaration
+  | HirForPatternDeclaration;
 /** One resolved for-of target with explicit binding identity. */
 export type HirForOfTarget =
   | {

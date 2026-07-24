@@ -381,14 +381,29 @@ export interface SyntaxSwitchCase {
   readonly test?: SyntaxExpression;
 }
 
-/** One lexical binding declared by a classic for statement head. */
-export interface SyntaxForDeclaration {
+/** One identifier binding declared by a classic for statement head. */
+export interface SyntaxForBindingDeclaration {
+  readonly declarationKind: "const" | "let" | "var";
   readonly hint: Hint | undefined;
   readonly initializer: SyntaxExpression;
-  readonly mutable: boolean;
+  readonly kind: "binding";
   readonly name: string;
   readonly range: SourceRange;
 }
+
+/** One recursive binding pattern declared by a classic for statement head. */
+export interface SyntaxForPatternDeclaration {
+  readonly declarationKind: "const" | "let" | "var";
+  readonly initializer: SyntaxExpression;
+  readonly kind: "pattern";
+  readonly pattern: SyntaxBindingPattern;
+  readonly range: SourceRange;
+}
+
+/** One binding declaration in a classic for statement head. */
+export type SyntaxForDeclaration =
+  | SyntaxForBindingDeclaration
+  | SyntaxForPatternDeclaration;
 
 /** One source-level assignment or declaration target in a for-of head. */
 export type SyntaxForOfTarget =

@@ -13,8 +13,9 @@ and timers to the same owned boundary. Async suspension suffixes become private
 continuation functions before compiler lowering.
 M5 synchronous `for-of` heads admit one identifier, array, or object
 declaration, an existing binding or member target, or an array or object
-assignment pattern whose leaves are existing targets. `for-in`,
-`for-await-of`, and classic `for` head patterns remain owned profile failures.
+assignment pattern whose leaves are existing targets. Classic `for`
+declarations admit the same array and object binding patterns. `for-in` and
+`for-await-of` remain owned profile failures.
 Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
 Call type arguments, optional parameters, TypeScript `this` parameters, and
@@ -36,8 +37,8 @@ declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
 assignment heads reuse that assignment target conversion. Await inside a
-member target, pattern type annotations, function parameters, and classic
-`for` head destructuring remain explicit boundaries.
+member target, pattern type annotations, function parameters, and `for-in` and
+`for-await-of` heads remain explicit boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its

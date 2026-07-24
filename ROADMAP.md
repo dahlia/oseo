@@ -639,10 +639,14 @@ target remains a separate continuation unit. Synchronous `for-of` assignment
 heads now reuse those recursive patterns and existing targets. Generated and
 fixed native evidence covers defaults, rest, member leaves, nullish and
 immutable failure, and inner-before-outer iterator cleanup. Six reviewed
-standards cases cover identifier, member, default, and array-rest heads. The
-intrinsics
-stream has landed the named error family as runtime-owned constructor
-values with typed catchable runtime errors;
+standards cases cover identifier, member, default, and array-rest heads.
+Classic `for` declaration heads now accept recursive array and object patterns
+for `const`, `let`, and `var`. Generated and fixed native evidence covers
+defaults, rest, nullish failure, lexical per-iteration cells, hoisted `var`
+cells, both specialization policies, and forced collection. Seven reviewed
+standards cases pin the admitted paths. The intrinsics stream has landed the
+named error family as runtime-owned constructor values with typed catchable
+runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is

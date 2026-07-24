@@ -2187,6 +2187,76 @@ tests:
   - path: test/language/statements/for-of/head-var-no-expr.js
     expectedClassification: expected-negative
     dependencies: [control-flow, var-bindings]
+  - path: test/language/statements/for/dstr/const-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        lexical-bindings,
+      ]
+  - path: test/language/statements/for/dstr/const-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        lexical-bindings,
+        object-properties,
+      ]
+  - path: test/language/statements/for/dstr/let-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        lexical-bindings,
+      ]
+  - path: test/language/statements/for/dstr/let-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        lexical-bindings,
+        object-properties,
+      ]
+  - path: test/language/statements/for/dstr/var-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/language/statements/for/dstr/var-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/statements/for/dstr/var-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/statements/for/let-identifier-with-newline.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, lexical-bindings]

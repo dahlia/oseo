@@ -2,6 +2,7 @@ import { specializeAddition } from "./mir-specialize.ts";
 import type {
   HirArrayBindingPattern,
   HirArraySpreadElement,
+  HirBindingIdentifier,
   HirBindingPattern,
   HirCallArgument,
   HirExpression,
@@ -2823,6 +2824,23 @@ function lowerArrayBindingPattern(
   );
 }
 
+function forDeclarationBindings(
+  declaration: HirForDeclaration,
+): readonly HirBindingIdentifier[] {
+  if (declaration.kind === "pattern") {
+    return hirBindingIdentifiers(declaration.pattern);
+  }
+  return [
+    {
+      bindingId: declaration.bindingId,
+      kind: "binding-identifier",
+      mutable: declaration.declarationKind !== "const",
+      name: declaration.name,
+      range: declaration.range,
+    },
+  ];
+}
+
 function lowerStatements(
   statements: readonly HirStatement[],
   builder: MirBuilder,
@@ -3102,60 +3120,50 @@ function lowerStatements(
       lowerForOfStatement(statement, builder);
     } else if (statement.kind === "for") {
       const declarations = statement.declarations ?? [];
-      const initializeBinding = (
-        declaration: HirForDeclaration,
-        value: number,
-      ): void => {
-        const id = builder.nextValue;
-        builder.nextValue += 1;
-        builder.current.operations.push({
-          arguments: [value],
-          bindingId: declaration.bindingId,
-          detail: `%b${declaration.bindingId} ${declaration.name}`,
-          id,
-          kind: "initialize",
-          range: declaration.range,
-        });
-        recordRoot(builder, id, declaration.range);
-      };
       // CreatePerIterationEnvironment: each iteration reads the current
-      // values, gives every mutable for-head binding a fresh cell, and
+      // values, gives every let-bound for-head name a fresh cell, and
       // re-initializes it, so closures capture one environment per
       // iteration. A const head has no per-iteration bindings.
-      const perIteration = declarations.filter(
-        (declaration) => declaration.mutable,
+      const perIteration = declarations.flatMap((declaration) =>
+        declaration.declarationKind === "let"
+          ? forDeclarationBindings(declaration)
+          : [],
       );
       const copyEnvironment = (): void => {
-        for (const declaration of perIteration) {
+        for (const binding of perIteration) {
           const value = lowerExpression(
             {
-              bindingId: declaration.bindingId,
+              bindingId: binding.bindingId,
               kind: "binding",
-              name: declaration.name,
-              range: declaration.range,
+              name: binding.name,
+              range: binding.range,
             },
             builder,
           );
-          resetBinding(
-            declaration.bindingId,
-            declaration.name,
-            declaration.range,
-            builder,
-          );
-          initializeBinding(declaration, value);
+          resetBinding(binding.bindingId, binding.name, binding.range, builder);
+          lowerBindingTarget(binding, value, "initialize", builder);
         }
       };
       for (const declaration of declarations) {
-        resetBinding(
-          declaration.bindingId,
-          declaration.name,
-          declaration.range,
-          builder,
-        );
+        if (declaration.declarationKind === "var") continue;
+        for (const binding of forDeclarationBindings(declaration)) {
+          resetBinding(binding.bindingId, binding.name, binding.range, builder);
+        }
       }
       for (const declaration of declarations) {
         const value = lowerExpression(declaration.initializer, builder);
-        initializeBinding(declaration, value);
+        const mode =
+          declaration.declarationKind === "var" ? "write" : "initialize";
+        if (declaration.kind === "binding") {
+          lowerBindingTarget(
+            forDeclarationBindings(declaration)[0]!,
+            value,
+            mode,
+            builder,
+          );
+        } else {
+          lowerBindingTarget(declaration.pattern, value, mode, builder);
+        }
       }
       if (statement.init != null) lowerExpression(statement.init, builder);
       if (perIteration.length > 0) copyEnvironment();

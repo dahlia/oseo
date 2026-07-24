@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 647 reviewed cases: 277 passes, 228 expected
+The current manifest contains 654 reviewed cases: 284 passes, 228 expected
 negatives, and 142 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -120,6 +120,16 @@ its deliberate boundary and its evidence:
     capture one environment per iteration, while a `const` head keeps
     its single environment as the specification requires. `continue`
     re-enters through the update clause after the per-iteration copy.
+    Declaration heads admit the same recursive array and object binding
+    patterns as standalone declarations. Each lexical leaf enters its temporal
+    dead zone before initialization, every mutable `let` leaf receives a fresh
+    per-iteration cell, and `var` leaves write their hoisted cells.
+    Generated Node, Deno, and native evidence uses seed `0x5eed0010` across
+    both pattern families, all three declaration kinds, defaults, rest,
+    nullish inputs, both specialization policies, and forced collection. Fixed
+    fixtures retain temporal dead zones, conditional iterator close, lexical
+    closure identity, and post-loop `var` values. Seven reviewed test262 cases
+    pin array defaults, trailing object patterns, and object rest.
     `for-in` stays rejected with a source-located diagnostic. The empty
     statement is also admitted as a no-op block.
  -  The `do-while` statement, lowered body-first with the same loop, join,
@@ -409,9 +419,9 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment member targets, parameters, classic `for`
-    heads, `export var`, pattern type annotations, and `await` inside a default
-    remain outside this array declaration syntax unit.
+    done-state handling. Assignment member targets, parameters, `export var`,
+    pattern type annotations, and `await` inside a default remain outside this
+    array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -436,10 +446,9 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment member targets, parameters, classic
-    `for` heads, `export var`, pattern type annotations, and `await` inside a
-    property name or default remain outside this object declaration syntax
-    unit.
+    non-enumerable omission. Assignment member targets, parameters,
+    `export var`, pattern type annotations, and `await` inside a property name
+    or default remain outside this object declaration syntax unit.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -456,8 +465,8 @@ its deliberate boundary and its evidence:
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
     properties, and object rest descriptors. Assignment member targets,
-    function parameters, classic `for` heads, pattern type annotations, and
-    `await` inside a property name or default remain outside this syntax unit.
+    function parameters, pattern type annotations, and `await` inside a
+    property name or default remain outside this syntax unit.
  -  Destructuring assignment with identifier and member targets. An assignment
     expression admits recursive array and object patterns whose leaves and rest
     targets name existing bindings or evaluate static or computed member
@@ -494,8 +503,8 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Function and classic `for` binding patterns, default and rest parameters,
-    classes, generators, big integers, regular expressions, and the remaining
+ -  Function binding patterns, default and rest parameters, classes,
+    generators, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the core
     expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md), with
     regular expression syntax, objects, matching, and ahead-of-time literal
