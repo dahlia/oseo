@@ -27,7 +27,7 @@ const { assertAsyncProperty } = await import(
 
 type InputKind = "missing" | "null" | "present";
 type PatternKind = "array" | "object";
-type TargetKind = "identifier" | "member";
+type TargetKind = "identifier" | "member" | "parenthesized-member";
 
 interface DestructuringAssignmentCase {
   readonly fallback: number;
@@ -53,14 +53,22 @@ const caseArbitrary: fc.Arbitrary<DestructuringAssignmentCase> = fc.record({
   fallback: fc.integer({ max: 20, min: -20 }),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
-  targetKind: fc.constantFrom<TargetKind>("identifier", "member"),
+  targetKind: fc.constantFrom<TargetKind>(
+    "identifier",
+    "member",
+    "parenthesized-member",
+  ),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 function patternSource(testCase: DestructuringAssignmentCase): string {
-  const assigned =
-    testCase.targetKind === "member" ? "target.assigned" : "assigned";
-  const rest = testCase.targetKind === "member" ? "target.rest" : "rest";
+  const memberTarget = testCase.targetKind !== "identifier";
+  let assigned = memberTarget ? "target.assigned" : "assigned";
+  let rest = memberTarget ? "target.rest" : "rest";
+  if (testCase.targetKind === "parenthesized-member") {
+    assigned = `(${assigned})`;
+    rest = `(${rest})`;
+  }
   if (testCase.patternKind === "array") {
     return `[${assigned} = ${testCase.fallback}, ...${rest}]`;
   }
@@ -80,16 +88,15 @@ function inputSource(testCase: DestructuringAssignmentCase): string {
 }
 
 function printCase(testCase: DestructuringAssignmentCase): string {
-  const assignedValue =
-    testCase.targetKind === "member" ? "target.assigned" : "assigned";
-  const restValue =
-    testCase.targetKind === "member"
-      ? testCase.patternKind === "array"
-        ? "target.rest[0]"
-        : "target.rest.extra"
-      : testCase.patternKind === "array"
-        ? "rest[0]"
-        : "rest.extra";
+  const memberTarget = testCase.targetKind !== "identifier";
+  const assignedValue = memberTarget ? "target.assigned" : "assigned";
+  const restValue = memberTarget
+    ? testCase.patternKind === "array"
+      ? "target.rest[0]"
+      : "target.rest.extra"
+    : testCase.patternKind === "array"
+      ? "rest[0]"
+      : "rest.extra";
   return `
 let assigned = 99;
 let rest;
@@ -231,8 +238,9 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "identifier and member-target array and object assignments with " +
-          "defaults, rest, present, missing, and nullish inputs",
+          "identifier, member, and parenthesized-member array and object " +
+          "assignments with defaults, rest, present, missing, and nullish " +
+          "inputs",
         numRuns: 10,
         profile: "M5 destructuring assignment",
         seed: 0x5eed_000c,

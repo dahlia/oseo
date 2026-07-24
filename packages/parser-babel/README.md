@@ -4,13 +4,13 @@
 This package contains the bootstrap Babel adapter. It converts accepted source
 immediately to Oseo-owned syntax and turns parser or profile failures into Oseo
 diagnostics. Babel nodes do not cross its public boundary.
-Parenthesized call targets are normalized before classification. The compiler
-then resolves `console` and `Object` lexically before admitting host or
-reflection intrinsics. M3 function values, objects, arrays, loops, and exception
-syntax enter only through owned syntax. The M4 module frontend converts static
-imports, exports, top-level await, promises, async functions, and timers to the
-same owned boundary. Async suspension suffixes become private continuation
-functions before compiler lowering.
+Parenthesized call and assignment targets are normalized before classification.
+The compiler then resolves `console` and `Object` lexically before admitting
+host or reflection intrinsics. M3 function values, objects, arrays, loops, and
+exception syntax enter only through owned syntax. The M4 module frontend
+converts static imports, exports, top-level await, promises, async functions,
+and timers to the same owned boundary. Async suspension suffixes become private
+continuation functions before compiler lowering.
 M5 synchronous `for-of` heads admit one identifier, array, or object
 declaration, or an existing binding or member target. `for-in`,
 `for-await-of`, destructuring `for-of` assignment heads, and classic `for` head

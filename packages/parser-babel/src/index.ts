@@ -549,7 +549,7 @@ function expression(
   }
   if (value.type === "UnaryExpression") {
     if (value.operator === "delete") {
-      const argumentNode = node(value.argument);
+      const argumentNode = unparenthesizedExpression(value.argument);
       if (argumentNode == null) return unsupported(context, value);
       const member = memberParts(context, argumentNode);
       return member == null
@@ -642,7 +642,7 @@ function expression(
     if (value.operator !== "=") {
       return unsupported(context, value, "This assignment is unsupported.");
     }
-    const left = node(value.left);
+    const left = unparenthesizedExpression(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
     const name = identifierName(left);
@@ -888,6 +888,12 @@ function bindingPattern(
   value: BabelNode,
   assignment = false,
 ): SyntaxBindingPattern | undefined {
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null
+      ? unsupported(context, value)
+      : bindingPattern(context, inner, assignment);
+  }
   if (value.type === "Identifier") {
     const name = identifierName(value);
     if (name == null || value.optional === true) {
@@ -1417,7 +1423,8 @@ function statement(
         };
       }
     } else {
-      const name = identifierName(left);
+      const assignmentTarget = unparenthesizedExpression(left) ?? left;
+      const name = identifierName(assignmentTarget);
       if (name != null) {
         target = {
           kind: "binding",
@@ -1425,7 +1432,7 @@ function statement(
           range: location(context, left).range,
         };
       } else {
-        const member = memberParts(context, left);
+        const member = memberParts(context, assignmentTarget);
         if (member != null) {
           target = {
             key: member.key,
