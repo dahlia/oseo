@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 284
-passes, 228 expected negatives, and 142 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 293
+passes, 235 expected negatives, and 135 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -102,7 +102,26 @@ their hoisted cells. Generated evidence uses seed `0x5eed0010` across both
 pattern families, defaults, rest, nullish inputs, all three declaration kinds,
 both specialization policies, and forced collection. Seven reviewed test262
 cases pin the admitted paths.
-Awaited member targets and parameter patterns remain later work. The runtime
+Synchronous functions, constructors, and arrows now accept recursive array and
+object binding-pattern parameters. Parameter initialization runs in source
+order in an environment outside the function body, so later parameters retain
+their temporal dead zones and body declarations do not leak into defaults.
+Generated evidence uses seed `0x5eed0011` across both pattern families,
+present, missing, and nullish inputs, both specialization policies, and forced
+collection. Four reviewed test262 cases pin array values, defaults, nesting,
+rest, and abrupt completion. Synchronous top-level default parameters now use
+the same separate parameter environment and preserve hints on identifier
+parameters. HIR and MIR retain JavaScript function length independently from
+the ABI parameter count. Generated evidence uses seed `0x5eed0012` across
+supplied and missing bounded integer values, both specialization policies, and
+forced collection. Fixed evidence covers explicit `undefined`, null, prior and
+later references, body isolation, abrupt initializers, constructors, arrows,
+function-name inference, and function length. Five reviewed test262 cases pin
+fallback selection, prior references, and length. Top-level rest parameters,
+asynchronous non-simple parameters, hints on pattern-bound names, and `var`
+declarations that share any parameter in a non-simple parameter list remain
+explicit boundaries.
+Awaited member targets remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -309,6 +328,30 @@ nullish object failure, conditional iterator close, array defaults, object
 rest, closure identity, and post-loop `var` values. Seven reviewed test262
 cases pin array defaults, trailing object patterns, and object rest across all
 three declaration kinds.
+
+Synchronous function, constructor, and arrow parameter lists now accept the
+same recursive array and object binding patterns. The frontend retains plain
+ABI parameters, then performs owned `BindingInitialization` in a separate
+parameter environment before entering the function body. This preserves
+left-to-right initialization, later-parameter temporal dead zones, conditional
+iterator close, object coercibility, default and rest behavior, lexical arrow
+receivers, and function `length`. The generated property suite uses seed
+`0x5eed0011` across both pattern families, present, missing, and nullish inputs,
+both native specialization policies, and forced collection. Fixed native
+fixtures retain nested defaults and rest, arrows, constructors, parameter
+temporal dead zones, iterator cleanup, and function length. Four reviewed
+test262 cases pin array values, nesting, defaults, rest, and abrupt completion.
+Synchronous top-level default parameters use the same parameter environment
+and retain JavaScript function length separately from the ABI parameter count.
+The generated property suite uses seed `0x5eed0012` across supplied and missing
+values, both specialization policies, and forced collection. Fixed evidence
+retains explicit `undefined`, null, prior and later references, body isolation,
+abrupt initializers, constructors, arrows, identifier hints, function-name
+inference, and function length. Five reviewed test262 cases pin fallback
+selection, prior references, and length. Top-level rest parameters,
+asynchronous non-simple parameters, TypeScript and JSDoc hints on pattern-bound
+names, and `var` declarations that share any parameter in a non-simple
+parameter list remain source-located unsupported boundaries.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

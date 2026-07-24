@@ -4,6 +4,7 @@ supportedFeatures:
   - coalesce-expression
   - computed-property-names
   - const
+  - default-parameters
   - destructuring-binding
   - exponentiation
   - for-of
@@ -310,6 +311,16 @@ tests:
   - path: test/language/expressions/array/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/arrow-function/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies:
+      [default-parameters, expression-operators, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/length-dflt.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
@@ -468,11 +479,11 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions]
   - path: test/language/expressions/async-function/named-dflt-params-duplicates.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-dflt-params-rest.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-object-destructuring-param-strict-body.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions]
@@ -486,11 +497,11 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions]
   - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/nameless-dflt-params-rest.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/nameless-object-destructuring-param-strict-body.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions]
@@ -588,8 +599,8 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/function/dflt-params-duplicates.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [functions]
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions]
   - path: test/language/expressions/function/name-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
@@ -1374,11 +1385,11 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions]
   - path: test/language/statements/async-function/dflt-params-duplicates.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/dflt-params-rest.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/early-errors-declaration-NSPL-with-USD.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -2272,6 +2283,29 @@ tests:
   - path: test/language/statements/function/S13.2_A6_T2.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/statements/function/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies:
+      [default-parameters, expression-operators, functions, var-bindings]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, error-intrinsics, functions, iterator-protocol]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/function/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/function/length-dflt.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/statements/function/name-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]

@@ -401,7 +401,6 @@ const unsupportedForms = [
   ["property", "console.error(1);"],
   ["with statement", "with ({}) { console.log(1); }"],
   ["module", 'import "fixture";'],
-  ["default parameter", "function value(input = 1) {}"],
   ["optional parameter", "function value(input?: number) {}"],
   [
     "TypeScript this parameter",

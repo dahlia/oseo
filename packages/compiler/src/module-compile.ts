@@ -682,9 +682,9 @@ function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
   return {
     functionId: functionValue.id,
     functionKind: functionValue.functionKind,
+    functionLength: functionValue.functionLength,
     kind: "function",
     name: functionValue.name,
-    parameterCount: functionValue.parameters.length,
     range: functionValue.range,
   };
 }
@@ -763,6 +763,7 @@ function lowerModuleEvaluationBody(
     if (suffix == null) return undefined;
     const continuation: HirFunction = {
       body: suffix,
+      functionLength: 1,
       functionKind: "arrow",
       id: functionId,
       kind: "hir-function",
@@ -1019,6 +1020,7 @@ export function compileModuleGraph(
     }
     const evaluator: HirFunction = {
       body: evaluatorBody,
+      functionLength: 0,
       functionKind: "arrow",
       id: evaluatorId,
       kind: "hir-function",

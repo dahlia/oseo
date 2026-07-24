@@ -299,7 +299,7 @@ export type HirExpression =
       readonly functionKind: FunctionKind;
       readonly kind: "function";
       readonly name: string;
-      readonly parameterCount: number;
+      readonly functionLength: number;
     })
   | (LocatedSyntax & {
       readonly bindingId: number;
@@ -471,7 +471,7 @@ export type HirStatement =
       readonly functionName: string;
       readonly kind: "function-init";
       readonly name: string;
-      readonly parameterCount: number;
+      readonly functionLength: number;
     })
   | (LocatedSyntax & {
       readonly alternate: HirStatement | undefined;
@@ -513,6 +513,8 @@ export interface HirParameter extends SyntaxParameter {
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
   readonly body: readonly HirStatement[];
+  /** JavaScript `length`, independent from the call ABI parameter count. */
+  readonly functionLength: number;
   readonly functionKind: FunctionKind;
   readonly id: number;
   readonly kind: "hir-function";

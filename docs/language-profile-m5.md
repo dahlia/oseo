@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 654 reviewed cases: 284 passes, 228 expected
-negatives, and 142 unsupported profile features. It records no semantic or
+The current manifest contains 663 reviewed cases: 293 passes, 235 expected
+negatives, and 135 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -419,7 +419,7 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment member targets, parameters, `export var`,
+    done-state handling. Assignment member targets, `export var`,
     pattern type annotations, and `await` inside a default remain outside this
     array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
@@ -446,9 +446,31 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment member targets, parameters,
+    non-enumerable omission. Assignment member targets,
     `export var`, pattern type annotations, and `await` inside a property name
     or default remain outside this object declaration syntax unit.
+ -  Synchronous function binding-pattern and default parameters. Function
+    declarations, constructors, and arrows accept recursive array and object
+    patterns plus top-level defaults. The frontend retains plain hidden ABI
+    parameters and performs `BindingInitialization` in a parameter environment
+    outside the function body. Initializers therefore run from left to right,
+    later parameters remain in their temporal dead zones, and body declarations
+    are not visible to defaults. A top-level default runs only for `undefined`;
+    identifier parameters retain their TypeScript and JSDoc hints. Ordinary
+    functions retain dynamic `this`, arrows retain lexical `this`, and
+    constructors initialize their receiver before parameter work. JavaScript
+    function length is retained independently from the ABI parameter count.
+    Native differential fixtures and generated properties with seeds
+    `0x5eed0011` and `0x5eed0012` cover both pattern families, supplied,
+    missing, explicit `undefined`, and nullish inputs, abrupt initializers, both
+    specialization policies, function-name inference, and forced collection.
+    Nine reviewed test262 cases cover array values, nested defaults, rest,
+    abrupt completion, top-level fallback selection, prior references, and
+    function length.
+    Top-level rest parameters, asynchronous non-simple parameters, TypeScript
+    and JSDoc hints on pattern-bound names, and `var` declarations sharing any
+    parameter in a non-simple parameter list remain source-located unsupported
+    boundaries.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -465,7 +487,7 @@ its deliberate boundary and its evidence:
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
     properties, and object rest descriptors. Assignment member targets,
-    function parameters, pattern type annotations, and `await` inside a
+    pattern type annotations, and `await` inside a
     property name or default remain outside this syntax unit.
  -  Destructuring assignment with identifier and member targets. An assignment
     expression admits recursive array and object patterns whose leaves and rest
@@ -503,12 +525,13 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Function binding patterns, default and rest parameters, classes,
-    generators, big integers, regular expressions, and the remaining
-    expression grammar are outside the admitted syntax. Owner: the core
-    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md), with
-    regular expression syntax, objects, matching, and ahead-of-time literal
-    compilation owned by [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+ -  Top-level rest parameters, asynchronous non-simple parameters, classes,
+    generators, big integers, regular expressions, and the remaining expression
+    grammar are outside the admitted syntax. Owner: the
+    core expressions and bindings stream in
+    [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
+    matching, and ahead-of-time literal compilation owned by
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

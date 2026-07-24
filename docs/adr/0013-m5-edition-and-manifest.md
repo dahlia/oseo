@@ -212,7 +212,9 @@ and well-known symbol behavior, and `iterator-protocol` for synchronous
 iterator acquisition, stepping, closing, and consumers.
 `destructuring-bindings` identifies binding-pattern initialization and
 assignment semantics independently from the declaration kind that owns the
-bound names.
+bound names. `default-parameters` identifies function parameter
+initialization whose fallback expressions and reported function length differ
+from a simple parameter list.
 
 
 Alternatives considered

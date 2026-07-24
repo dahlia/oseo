@@ -633,9 +633,9 @@ function resolveStatementList(
       functionId: info.id,
       functionKind: functionValue.functionKind,
       functionName: functionValue.name,
+      functionLength: functionValue.functionLength,
       kind: "function-init",
       name: bindingName,
-      parameterCount: functionValue.parameters.length,
       range: statement.range,
     });
   }
@@ -697,6 +697,7 @@ function resolveFunction(
   const resolved: HirFunction = {
     ...functionValue,
     body,
+    functionLength: functionValue.functionLength ?? parameters.length,
     functionKind: functionValue.functionKind ?? "ordinary",
     id,
     kind: "hir-function",
@@ -986,9 +987,9 @@ function resolveFunctionExpression(
   return {
     functionId: id,
     functionKind: resolved.functionKind,
+    functionLength: resolved.functionLength,
     kind: "function",
     name: expression.inferredName ?? functionValue.name ?? "",
-    parameterCount: resolved.parameters.length,
     range: expression.range,
   };
 }

@@ -670,7 +670,22 @@ Classic `for` declaration heads now accept recursive array and object patterns
 for `const`, `let`, and `var`. Generated and fixed native evidence covers
 defaults, rest, nullish failure, lexical per-iteration cells, hoisted `var`
 cells, both specialization policies, and forced collection. Seven reviewed
-standards cases pin the admitted paths. The intrinsics stream has landed the
+standards cases pin the admitted paths. Synchronous functions, constructors,
+and arrows now accept recursive array and object binding-pattern parameters.
+Generated and fixed native evidence covers defaults, rest, parameter temporal
+dead zones, body-declaration isolation, iterator cleanup, constructors,
+function length, both specialization policies, and forced collection. Four
+reviewed standards cases pin array values, nesting, defaults, rest, and abrupt
+completion. Synchronous top-level default parameters now share that parameter
+environment. Generated and fixed native evidence covers missing, explicit
+`undefined`, supplied and nullish values, prior and later references, abrupt
+initializers, constructors, arrows, TypeScript hints, function length, both
+specialization policies, and forced collection. Five reviewed standards cases
+pin fallback selection, prior references, and length. Top-level rest
+parameters, asynchronous non-simple parameters, pattern-bound hints, and `var`
+declarations sharing any parameter in a non-simple parameter list remain
+explicit next units. The intrinsics
+stream has landed the
 named error family as runtime-owned constructor values with typed catchable
 runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
