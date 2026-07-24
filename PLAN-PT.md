@@ -551,6 +551,25 @@ iterator cleanup after a default failure, body-declaration isolation, and
 function length.
 
 
+M5 default parameter properties
+-------------------------------
+
+The default parameter property generates a synchronous function whose second
+identifier parameter defaults to the first parameter plus a bounded integer.
+The call either supplies the second value or omits it. Its independent model
+predicts the selected value and a function length of one. Each case compares
+Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled native execution with collection forced at every
+safepoint.
+
+The ordinary suite uses seed `0x5eed0012`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+explicit `undefined`, null, prior and later references, body-declaration
+isolation, abrupt initializers, constructors, arrows, function-name inference,
+and function length.
+
+
 M5 for-of binding properties
 ----------------------------
 

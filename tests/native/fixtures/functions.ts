@@ -135,6 +135,59 @@ console.log(arrayPattern.length, objectPattern.length);
 `,
   },
   {
+    name: "function-default-parameters",
+    source: `
+function defaults(first, second = first + 1, third = second + 1) {
+  return [first, second, third];
+}
+console.log(defaults(1));
+console.log(defaults(1, undefined, 9));
+console.log(defaults(1, null));
+function objectDefault({ value } = { value: 4 }) {
+  return value;
+}
+console.log(objectDefault(), objectDefault({ value: 5 }));
+const bodyLocal = 6;
+function parameterScope(value = bodyLocal) {
+  function bodyLocal() { return 7; }
+  return [value, bodyLocal()];
+}
+console.log(parameterScope());
+function laterTdz(value = later, later = 8) {
+  return value;
+}
+try { laterTdz(); }
+catch (error) { console.log(error instanceof ReferenceError); }
+let entered = false;
+function failDefault() { throw "default"; }
+function abrupt(value = failDefault()) {
+  entered = true;
+  return value;
+}
+try { abrupt(); }
+catch (error) { console.log(error instanceof ReferenceError, entered); }
+function DefaultConstructor(value = this.seed) {
+  this.value = value;
+}
+DefaultConstructor.prototype.seed = 10;
+console.log(new DefaultConstructor().value);
+function ArrowFactory() {
+  this.seed = 11;
+  return (value = this.seed) => value;
+}
+console.log(new ArrowFactory()());
+function lengthOne(first, second = 2, third) {}
+function lengthZero(first = 1, second) {}
+function lengthTwo(first, second) {}
+console.log(lengthOne.length, lengthZero.length, lengthTwo.length);
+function inferredDefault(value = function () {}) {
+  return value.name;
+}
+const inferredArrowDefault = (value = () => 1) => value.name;
+console.log(inferredDefault(), inferredArrowDefault());
+`,
+  },
+  {
     name: "function-name-assignment",
     nonStrictScript: true,
     source: `

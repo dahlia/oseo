@@ -650,9 +650,15 @@ Generated and fixed native evidence covers defaults, rest, parameter temporal
 dead zones, body-declaration isolation, iterator cleanup, constructors,
 function length, both specialization policies, and forced collection. Four
 reviewed standards cases pin array values, nesting, defaults, rest, and abrupt
-completion. Top-level default and rest parameters, asynchronous
-binding-pattern parameters, and `var` declarations sharing any parameter in a
-binding-pattern parameter list remain explicit next units. The intrinsics
+completion. Synchronous top-level default parameters now share that parameter
+environment. Generated and fixed native evidence covers missing, explicit
+`undefined`, supplied and nullish values, prior and later references, abrupt
+initializers, constructors, arrows, TypeScript hints, function length, both
+specialization policies, and forced collection. Five reviewed standards cases
+pin fallback selection, prior references, and length. Top-level rest
+parameters, asynchronous non-simple parameters, pattern-bound hints, and `var`
+declarations sharing any parameter in a non-simple parameter list remain
+explicit next units. The intrinsics
 stream has landed the
 named error family as runtime-owned constructor values with typed catchable
 runtime errors;

@@ -84,6 +84,7 @@ function fixtureOptions(
         id: -1,
         kind: "mir-function",
         name: "<script>",
+        functionLength: 0,
         parameterCount: 0,
         parameters: [],
         range: {

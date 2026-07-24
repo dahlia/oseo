@@ -977,10 +977,10 @@ function lowerExpression(
       detail:
         `function @f${expression.functionId} ` +
         `name=${JSON.stringify(expression.name)} ` +
-        `length=${expression.parameterCount}`,
+        `length=${expression.functionLength}`,
       functionId: expression.functionId,
       functionKind: expression.functionKind,
-      functionLength: expression.parameterCount,
+      functionLength: expression.functionLength,
       functionName: expression.name,
       id,
       kind: "function-create",
@@ -2871,9 +2871,9 @@ function lowerStatements(
         {
           functionId: statement.functionId,
           functionKind: statement.functionKind,
+          functionLength: statement.functionLength,
           kind: "function",
           name: statement.functionName,
-          parameterCount: statement.parameterCount,
           range: statement.range,
         },
         builder,
@@ -3359,6 +3359,7 @@ function buildMirFunction(
   name: string,
   body: readonly HirStatement[],
   parameters: readonly HirParameter[],
+  functionLength: number,
   localBindingIds: readonly number[],
   selfBindingId: number | undefined,
   range: SourceRange,
@@ -3411,6 +3412,7 @@ function buildMirFunction(
       ...(block.parameters == null ? {} : { parameters: block.parameters }),
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
+    functionLength,
     id,
     kind: "mir-function",
     localBindingIds: [...localBindingIds],
@@ -3460,6 +3462,7 @@ export function buildMir(
         functionValue.name,
         functionValue.body,
         functionValue.parameters,
+        functionValue.functionLength,
         functionValue.localBindingIds,
         functionValue.selfBindingId,
         functionValue.range,
@@ -3478,6 +3481,7 @@ export function buildMir(
       "<script>",
       program.body,
       [],
+      0,
       [
         ...new Set([
           ...globalBindings.map((binding) => binding.id),

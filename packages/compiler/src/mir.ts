@@ -214,10 +214,13 @@ export interface MirSpecialization {
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
   readonly blocks: readonly MirBlock[];
+  /** JavaScript `length`, independent from the call ABI parameter count. */
+  readonly functionLength: number;
   readonly id: number;
   readonly kind: "mir-function";
   readonly localBindingIds?: readonly number[];
   readonly name: string;
+  /** Number of positional parameters consumed by the generated function. */
   readonly parameterCount: number;
   readonly parameters: readonly MirParameter[];
   readonly rootSlotCount: number;

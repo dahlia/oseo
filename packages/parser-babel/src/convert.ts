@@ -1476,6 +1476,7 @@ export function syntheticFunction(
   return {
     functionValue: {
       body,
+      functionLength: parameters.length,
       functionKind: "arrow",
       kind: "function",
       name: undefined,
@@ -2336,7 +2337,7 @@ export function hoistedVarDeclarations(
         context,
         info.declarator,
         `A var declaration sharing parameter '${name}' in a ` +
-          "binding-pattern parameter list is outside the admitted profile.",
+          "non-simple parameter list is outside the admitted profile.",
       );
     }
     if (skipNames.has(name)) continue;
@@ -2391,26 +2392,31 @@ export function functionDeclaration(
   const parameterInitializers: SyntaxStatement[] = [];
   const parameterNames: string[] = [];
   const parameterNodes = nodes(value.params);
+  const defaultParameterIndex = parameterNodes.findIndex(
+    (parameterNode) => parameterNode.type === "AssignmentPattern",
+  );
+  const functionLength =
+    defaultParameterIndex < 0 ? parameterNodes.length : defaultParameterIndex;
   const bindingPatternParameters = parameterNodes.some(
     (parameterNode) =>
       parameterNode.type === "ArrayPattern" ||
       parameterNode.type === "ObjectPattern",
   );
-  if (bindingPatternParameters && value.async === true) {
+  const defaultParameters = defaultParameterIndex >= 0;
+  const parameterEnvironment = bindingPatternParameters || defaultParameters;
+  if (parameterEnvironment && value.async === true) {
     return unsupported(
       context,
       value,
-      "Binding-pattern parameters in asynchronous functions are unsupported.",
+      "Binding-pattern and default parameters in asynchronous functions are " +
+        "unsupported.",
     );
   }
+  const strict =
+    context.strictStack.at(-1) === true ||
+    (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
+  const functionProvidesThis = value.type !== "ArrowFunctionExpression";
   for (const parameterNode of parameterNodes) {
-    if (parameterNode.type === "AssignmentPattern") {
-      return unsupported(
-        context,
-        parameterNode,
-        "Top-level default parameters are unsupported.",
-      );
-    }
     if (parameterNode.type === "RestElement") {
       return unsupported(
         context,
@@ -2418,26 +2424,54 @@ export function functionDeclaration(
         "Top-level rest parameters are unsupported.",
       );
     }
-    const parameterName = identifierName(parameterNode);
-    if (parameterName === "this" || parameterNode.optional === true) {
+    const parameterPattern =
+      parameterNode.type === "AssignmentPattern"
+        ? node(parameterNode.left)
+        : parameterNode;
+    const defaultNode =
+      parameterNode.type === "AssignmentPattern"
+        ? node(parameterNode.right)
+        : undefined;
+    if (parameterPattern == null) return unsupported(context, parameterNode);
+    const parameterName = identifierName(parameterPattern);
+    if (parameterName === "this" || parameterPattern.optional === true) {
       return unsupported(
         context,
-        parameterNode,
+        parameterPattern,
         "Optional and TypeScript this parameters are unsupported.",
       );
     }
-    if (bindingPatternParameters) {
-      if (parameterName == null && parameterNode.typeAnnotation != null) {
+    if (parameterEnvironment) {
+      if (parameterName == null && parameterPattern.typeAnnotation != null) {
         return unsupported(
           context,
-          parameterNode,
+          parameterPattern,
           "TypeScript annotations on binding-pattern parameters are " +
             "unsupported.",
         );
       }
-      const pattern = bindingPattern(context, parameterNode);
+      context.strictStack.push(strict);
+      context.functionStack.push(
+        functionProvidesThis ? true : context.functionStack.at(-1) === true,
+      );
+      const pattern = bindingPattern(context, parameterPattern);
+      let defaultInitializer =
+        defaultNode == null ? undefined : expression(context, defaultNode);
+      context.functionStack.pop();
+      context.strictStack.pop();
       if (pattern == null) return undefined;
+      if (defaultNode != null && defaultInitializer == null) return undefined;
       const names = patternNames(pattern);
+      if (
+        parameterName != null &&
+        defaultInitializer?.kind === "function" &&
+        defaultInitializer.functionValue.name == null
+      ) {
+        defaultInitializer = {
+          ...defaultInitializer,
+          inferredName: parameterName,
+        };
+      }
       if (
         parameterName == null &&
         names.some((bindingName) => jsdoc.parameters.has(bindingName))
@@ -2449,16 +2483,33 @@ export function functionDeclaration(
         );
       }
       const hints: Hint[] = [];
-      const parameterHint = typeHint(context, parameterNode.typeAnnotation);
+      const parameterHint = typeHint(context, parameterPattern.typeAnnotation);
       if (parameterHint != null) hints.push(parameterHint);
       const jsdocHint =
         parameterName == null ? undefined : jsdoc.parameters.get(parameterName);
       if (jsdocHint != null) hints.push(jsdocHint);
       const hiddenName = syntheticName(context, "parameter");
       parameters.push({ hints, name: hiddenName, range: pattern.range });
+      const input = identifierExpression(hiddenName, pattern.range);
+      const initializer =
+        defaultInitializer == null
+          ? input
+          : {
+              alternate: input,
+              consequent: defaultInitializer,
+              kind: "conditional" as const,
+              range: location(context, parameterNode).range,
+              test: {
+                kind: "binary" as const,
+                left: input,
+                operator: "===" as const,
+                range: location(context, parameterNode).range,
+                right: undefinedExpression(pattern.range),
+              },
+            };
       parameterInitializers.push({
         declarationKind: "let",
-        initializer: identifierExpression(hiddenName, pattern.range),
+        initializer,
         kind: "binding-pattern",
         mode: "declare",
         pattern,
@@ -2475,7 +2526,7 @@ export function functionDeclaration(
       );
     }
     const hints: Hint[] = [];
-    const typescriptHint = typeHint(context, parameterNode.typeAnnotation);
+    const typescriptHint = typeHint(context, parameterPattern.typeAnnotation);
     if (typescriptHint != null) hints.push(typescriptHint);
     const jsdocHint = jsdoc.parameters.get(parameterName);
     if (jsdocHint != null) hints.push(jsdocHint);
@@ -2490,9 +2541,6 @@ export function functionDeclaration(
   const returnHint = typeHint(context, value.returnType);
   if (returnHint != null) returnHints.push(returnHint);
   returnHints.push(...jsdoc.returns);
-  const strict =
-    context.strictStack.at(-1) === true ||
-    (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
   // Arrows do not provide their own receiver, so this stays admitted
@@ -2517,7 +2565,7 @@ export function functionDeclaration(
     context,
     children,
     new Set([...parameterNames, ...varScopedFunctionNames(children)]),
-    bindingPatternParameters ? new Set(parameterNames) : new Set<string>(),
+    parameterEnvironment ? new Set(parameterNames) : new Set<string>(),
   );
   if (hoisted == null) {
     context.functionStack.pop();
@@ -2564,7 +2612,7 @@ export function functionDeclaration(
       }
       executionBody.push(converted);
     }
-    if (bindingPatternParameters) {
+    if (parameterEnvironment) {
       const range = location(context, value).range;
       body.push(...parameterInitializers, {
         body: executionBody,
@@ -2581,6 +2629,7 @@ export function functionDeclaration(
   return {
     ...location(context, value),
     body,
+    functionLength,
     functionKind:
       value.type === "ArrowFunctionExpression"
         ? value.async === true

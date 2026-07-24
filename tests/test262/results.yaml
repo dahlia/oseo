@@ -2847,6 +2847,113 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/dflt-params-arg-val-undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/dflt-params-ref-prior.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - default-parameters
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/arrow-function/length-dflt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags:
         - noStrict
@@ -4027,15 +4134,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4052,15 +4160,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4176,15 +4285,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4201,15 +4311,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -5094,15 +5205,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
+      - default-parameters
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       features: []
@@ -11638,15 +11750,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -11663,15 +11776,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - default-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - default-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -16107,6 +16221,42 @@ results:
   - case:
       async: false
       features:
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/function/dflt-params-ref-prior.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - destructuring-binding
       flags:
         - generated
@@ -16234,6 +16384,42 @@ results:
     execution:
       harnessIncludes:
         - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - default-parameters
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/function/length-dflt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -18699,11 +18885,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 228
+  expectedNegatives: 235
   harnessFailures: 0
-  passes: 288
+  passes: 293
   semanticFailures: 0
-  unsupportedProfileFeatures: 142
+  unsupportedProfileFeatures: 135
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -18712,17 +18898,23 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 7
     - dependency: async-functions
-      expectedNegatives: 50
+      expectedNegatives: 56
       harnessFailures: 0
       passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 26
+      unsupportedProfileFeatures: 20
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
       passes: 68
       semanticFailures: 0
       unsupportedProfileFeatures: 2
+    - dependency: default-parameters
+      expectedNegatives: 7
+      harnessFailures: 0
+      passes: 5
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: destructuring-bindings
       expectedNegatives: 0
       harnessFailures: 0
@@ -18744,15 +18936,15 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 12
       harnessFailures: 0
-      passes: 71
+      passes: 73
       semanticFailures: 0
       unsupportedProfileFeatures: 12
     - dependency: functions
-      expectedNegatives: 11
+      expectedNegatives: 12
       harnessFailures: 0
-      passes: 52
+      passes: 57
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 1
     - dependency: iterator-protocol
       expectedNegatives: 0
       harnessFailures: 0
@@ -18774,7 +18966,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 84
+      passes: 86
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: promise-settlement
@@ -18798,7 +18990,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 57
+      passes: 60
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
@@ -18833,11 +19025,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 44
+      expectedNegatives: 49
       harnessFailures: 0
-      passes: 54
+      passes: 57
       semanticFailures: 0
-      unsupportedProfileFeatures: 26
+      unsupportedProfileFeatures: 21
     - group: language/module-code
       expectedNegatives: 136
       harnessFailures: 0
@@ -18845,8 +19037,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 65
     - group: language/statements
-      expectedNegatives: 48
+      expectedNegatives: 50
       harnessFailures: 0
-      passes: 159
+      passes: 161
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 14

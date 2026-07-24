@@ -434,18 +434,21 @@ their conditional iterator cleanup, object patterns retain nullish and
 property-order behavior, and a pattern failure skips the catch body while
 continuing through an enclosing `finally` or abrupt target.
 
-Synchronous function binding-pattern parameters reuse the same operations
-without changing the generic call ABI. The frontend replaces each source
-parameter with a private plain parameter, initializes every source pattern in
-order in the outer function environment, then enters a private lexical body
-block. This environment split keeps later parameters in their temporal dead
-zones during earlier defaults, prevents body declarations from becoming
-visible to parameter initializers, and adds no observable call. It also
-preserves dynamic `this` for ordinary functions and lexical `this` for arrows.
-Top-level default and rest parameters, asynchronous pattern parameters, hints
-on pattern-bound names, and `var` sharing with any parameter in a
-binding-pattern parameter list remain rejected until their environment and
-continuation interactions have direct representations.
+Synchronous function binding-pattern and default parameters reuse the same
+operations without changing the generic call ABI. The frontend replaces each
+source parameter with a private plain parameter, initializes every source
+binding in order in the outer function environment, then enters a private
+lexical body block. A default selects its initializer only when the raw
+argument is `undefined`. This environment split keeps later parameters in
+their temporal dead zones during earlier defaults, prevents body declarations
+from becoming visible to parameter initializers, and adds no observable call.
+It also preserves dynamic `this` for ordinary functions and lexical `this` for
+arrows. HIR and MIR retain JavaScript function length separately from the ABI
+parameter count, so the first default truncates only the reported `length`.
+Top-level rest parameters, asynchronous non-simple parameters, hints on
+pattern-bound names, and `var` sharing with any parameter in a non-simple
+parameter list remain rejected until their environment and continuation
+interactions have direct representations.
 
 Destructuring assignment reuses those recursive array and object operations
 after evaluating its right operand once. Identifier leaves write existing

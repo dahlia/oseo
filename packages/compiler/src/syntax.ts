@@ -549,6 +549,8 @@ export interface SyntaxFunction extends LocatedSyntax {
   /** Internal declaration binding when it differs from the function name. */
   readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  /** JavaScript `length`, which can differ from the ABI parameter count. */
+  readonly functionLength?: number;
   readonly functionKind?: FunctionKind;
   readonly kind: "function";
   readonly name: string | undefined;
