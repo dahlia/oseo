@@ -144,6 +144,38 @@ test("lowers top-level await to an owned scheduler checkpoint", () => {
   assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
 });
 
+test("rejects top-level await inside compound assignment", () => {
+  const sourceId = "file:///app/compound-assignment-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source: "let answer = 1;\nanswer += await Promise.resolve(41);",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "compound-assignment-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Await inside a compound assignment is unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+});
+
 test("rejects array spread before a top-level await point", () => {
   const sourceId = "file:///app/array-spread-await.js";
   const result = babelModuleFrontend.parseModule({

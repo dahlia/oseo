@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 635 reviewed cases: 224 passes, 226 expected
-negatives, and 185 unsupported profile features. It records no semantic or
+The current manifest contains 635 reviewed cases: 266 passes, 226 expected
+negatives, and 143 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -177,9 +177,7 @@ its deliberate boundary and its evidence:
     the same parameterized join structure as the other short-circuit
     operators, so the right operand evaluates only for a nullish left
     value. Sequences evaluate left to right and produce their final
-    operand. Logical assignment operators, including `??=`, remain
-    rejected, and `await` inside these operands keeps the shared
-    rejection. The `coalesce-expression` test262 feature is a supported
+    operand. The `coalesce-expression` test262 feature is a supported
     feature of the reviewed subset.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
@@ -190,6 +188,22 @@ its deliberate boundary and its evidence:
     exponents and unit bases with infinite exponents. Object operands
     convert through generic `ToPrimitive`. The `exponentiation`
     test262 feature is now a supported feature of the reviewed subset.
+ -  Compound assignment for identifiers and static or computed member
+    references. The arithmetic, exponentiation, bitwise, and shift forms reuse
+    their corresponding binary semantics after one checked read. The `&&=`,
+    `||=`, and `??=` forms branch on the retained current value, evaluate and
+    write the right operand only on the selected path, and preserve anonymous
+    function-name inference for identifier targets. Property targets leave
+    anonymous functions unnamed. Member assignments evaluate the object and
+    key expression once, convert the retained key value for the read, and
+    convert it again after the right operand on the taken write path. A
+    short-circuited logical assignment skips that second conversion. Immutable
+    and imported targets retain their catchable write errors. Native
+    differential fixtures and a generated property with seed `0x5eed000d`
+    cover all 15 operators, both target forms, short-circuiting, reference and
+    conversion counts, both specialization policies, and forced collection.
+    Await inside a compound assignment remains rejected until continuation
+    extraction can retain the already-read current value.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
     `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
     runtime-owned constructor values. An unshadowed reference to one of
@@ -310,11 +324,10 @@ its deliberate boundary and its evidence:
     authoritative. Native differential fixtures and a generated property with
     seed `0x5eed000b` cover all three declaration kinds, array and object
     values, defaults, rest, nullish failure, fresh cells, both specialization
-    policies, and forced collection. Six reviewed test262 cases pin nullish
-    object-pattern failure across all three declaration kinds. Another 42
-    selected binding cases reach the pattern head but remain classified as
-    unsupported because their upstream loop body uses compound assignment,
-    which is outside the admitted expression profile.
+    policies, and forced collection. Forty-eight reviewed test262 cases pin
+    these binding paths across all three declaration kinds. Six cover nullish
+    object-pattern failure, and 42 also exercise compound assignment in their
+    loop bodies.
  -  Array literal spread. A literal containing spread allocates an empty rooted
     array and accumulates ordinary values, holes, and iterator values in source
     order. Each value becomes a new own indexed data property without

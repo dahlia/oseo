@@ -1,4 +1,5 @@
 import type {
+  AssignmentOperator,
   BinaryOperator,
   ByteRange,
   Hint,
@@ -36,6 +37,24 @@ export function identifierName(value: BabelNode): string | undefined {
     ? value.name
     : undefined;
 }
+
+const compoundAssignmentOperators = new Map<unknown, AssignmentOperator>([
+  ["%=", "%"],
+  ["&=", "&"],
+  ["&&=", "&&"],
+  ["*=", "*"],
+  ["**=", "**"],
+  ["+=", "+"],
+  ["-=", "-"],
+  ["/=", "/"],
+  ["<<=", "<<"],
+  [">>=", ">>"],
+  [">>>=", ">>>"],
+  ["??=", "??"],
+  ["^=", "^"],
+  ["|=", "|"],
+  ["||=", "||"],
+]);
 
 export function moduleName(value: BabelNode): string | undefined {
   if (value.type === "StringLiteral" && typeof value.value === "string") {
@@ -324,12 +343,37 @@ export function expression(
       : { ...located, ...member, kind: "property-get" };
   }
   if (value.type === "AssignmentExpression") {
-    if (value.operator !== "=") {
-      return unsupported(context, value, "This assignment is unsupported.");
-    }
     const left = unparenthesizedExpression(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
+    if (value.operator !== "=") {
+      const operator = compoundAssignmentOperators.get(value.operator);
+      if (operator == null) {
+        return unsupported(context, value, "This assignment is unsupported.");
+      }
+      const assigned = expression(context, right);
+      if (assigned == null) return undefined;
+      const name = identifierName(left);
+      if (name != null) {
+        return {
+          ...located,
+          kind: "binding-update",
+          name,
+          operator,
+          value: assigned,
+        };
+      }
+      const member = memberParts(context, left);
+      return member == null
+        ? undefined
+        : {
+            ...located,
+            ...member,
+            kind: "property-update",
+            operator,
+            value: assigned,
+          };
+    }
     const name = identifierName(left);
     if (name != null) {
       const assigned = expression(context, right);

@@ -54,7 +54,7 @@ export async function runNativeScenario2(
   );
   assert.equal(nativeImportWrite.exitStatus, 0, nativeImportWrite.stderr);
   assert.equal(nativeImportWrite.stderr, "");
-  assert.equal(nativeImportWrite.stdout, "TypeError\nTypeError\n");
+  assert.equal(nativeImportWrite.stdout, "TypeError\nTypeError\nTypeError\n");
 
   const asyncModuleEntry = `${root}/tests/fixtures/async-modules/entry.js`;
   const nativeAsyncModule = await runNativeCli(

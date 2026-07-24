@@ -199,6 +199,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
     fixture.name === "catch-bindings" ||
+    fixture.name === "compound-assignments" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||

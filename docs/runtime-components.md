@@ -99,6 +99,11 @@ It writes existing identifier cells through the declaration paths and preserves
 the original right-hand result. Array patterns retain conditional iterator
 close, while object patterns retain coercibility, property-read, and rest-copy
 operations.
+Compound assignment also adds no runtime ABI entry point. Generated code
+retains one checked binding read or one object and converted property key, then
+reuses the existing binary, property-read, and checked write operations.
+Logical forms branch before the right operand and write, so their short path
+introduces no hidden runtime call.
 
 ### Internal helpers
 

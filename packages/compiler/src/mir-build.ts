@@ -29,7 +29,12 @@ import type {
   SpecializationMode,
 } from "./mir.ts";
 import type { SourceRange } from "./source.ts";
-import type { BindingPatternMode } from "./syntax.ts";
+import type {
+  AssignmentOperator,
+  BinaryOperator,
+  BindingPatternMode,
+  LogicalOperator,
+} from "./syntax.ts";
 function controlTarget(builder: MirBuilder, blockId: number): MirControlTarget {
   return { blockId, cleanupDepth: builder.finalizers.length };
 }
@@ -478,6 +483,334 @@ function lowerCallArguments(
   return { ids: [], list };
 }
 
+interface BindingWrite {
+  readonly bindingId: number;
+  readonly functionNameBinding?: boolean;
+  readonly importedBinding?: boolean;
+  readonly mutable: boolean;
+  readonly name: string;
+  readonly range: SourceRange;
+}
+
+function lowerBindingRead(
+  bindingId: number,
+  name: string,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(builder, "safepoint", "binding read error", [], range);
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    bindingId,
+    detail: name,
+    id,
+    kind: "read",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+function lowerBindingWrite(
+  expression: BindingWrite,
+  value: number,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "binding assignment error",
+    [value],
+    expression.range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [value],
+    bindingId: expression.bindingId,
+    detail: `%b${expression.bindingId} ${expression.name}`,
+    ...(expression.functionNameBinding === true
+      ? { functionNameBinding: true }
+      : {}),
+    ...(expression.importedBinding === true ? { importedBinding: true } : {}),
+    id,
+    kind: "write",
+    mutable: expression.mutable,
+    range: expression.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    expression.range,
+  );
+  return recordRoot(builder, id, expression.range);
+}
+
+function lowerPropertyRead(
+  object: number,
+  key: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "generic property lookup",
+    [object, key],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, key],
+    detail: "property-get",
+    id,
+    kind: "property-get",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+function lowerPropertyWrite(
+  object: number,
+  key: number,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "property storage growth",
+    [object, key, value],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, key, value],
+    detail: "property-set",
+    id,
+    kind: "property-set",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+function lowerBinaryValues(
+  left: number,
+  operator: BinaryOperator,
+  right: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  if (operator === "+") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "string addition fallback",
+      [left, right],
+      range,
+    );
+  } else if (operator === "in" || operator === "instanceof") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      operator === "in"
+        ? "property key allocation"
+        : "prototype key allocation",
+      [left, right],
+      range,
+    );
+  } else if (operator !== "===" && operator !== "!==") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "operand coercion",
+      [left, right],
+      range,
+    );
+  }
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [left, right],
+    detail: String(operator),
+    id,
+    kind: "binary",
+    operator,
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+function lowerLogicalValue(
+  left: number,
+  operator: LogicalOperator,
+  lowerRight: () => number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const rightBlock = createMirBlock(builder);
+  const shortBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  if (operator === "??") {
+    const nullishTest = (constant: MirConstant): number => {
+      const constantId = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [],
+        constant,
+        detail: constant.kind,
+        id: constantId,
+        kind: "constant",
+        range,
+      });
+      const testId = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [left, constantId],
+        detail: "===",
+        id: testId,
+        kind: "binary",
+        operator: "===",
+        range,
+      });
+      appendMirMetadata(
+        builder,
+        "check-status",
+        "normal -> continue, abrupt -> return",
+        [testId],
+        range,
+      );
+      return testId;
+    };
+    const undefinedBlock = createMirBlock(builder);
+    const isNull = nullishTest({ kind: "null" });
+    appendMirMetadata(
+      builder,
+      "branch",
+      `?? null -> bb${rightBlock.id}, other -> bb${undefinedBlock.id}`,
+      [isNull],
+      range,
+    );
+    builder.current.terminator = {
+      kind: "branch",
+      test: isNull,
+      whenFalse: undefinedBlock.id,
+      whenTrue: rightBlock.id,
+    };
+    builder.current = undefinedBlock;
+    const isUndefined = nullishTest({ kind: "undefined" });
+    appendMirMetadata(
+      builder,
+      "branch",
+      `?? undefined -> bb${rightBlock.id}, other -> bb${shortBlock.id}`,
+      [isUndefined],
+      range,
+    );
+    builder.current.terminator = {
+      kind: "branch",
+      test: isUndefined,
+      whenFalse: shortBlock.id,
+      whenTrue: rightBlock.id,
+    };
+  } else {
+    const takenBlock = operator === "&&" ? rightBlock.id : shortBlock.id;
+    const skippedBlock = operator === "&&" ? shortBlock.id : rightBlock.id;
+    appendMirMetadata(
+      builder,
+      "branch",
+      `${operator} true -> bb${takenBlock}, false -> bb${skippedBlock}`,
+      [left],
+      range,
+    );
+    builder.current.terminator = {
+      kind: "branch",
+      test: left,
+      whenFalse: skippedBlock,
+      whenTrue: takenBlock,
+    };
+  }
+  builder.current = shortBlock;
+  shortBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [left],
+  };
+  builder.current = rightBlock;
+  const right = lowerRight();
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [right],
+  };
+  builder.current = joinBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `${operator} bb${shortBlock.id} + bb${rightBlock.id}`,
+    [],
+    range,
+  );
+  return recordRoot(builder, result, range);
+}
+
+function lowerAssignmentValue(
+  current: number,
+  operator: AssignmentOperator,
+  value: HirExpression,
+  write: (assigned: number) => number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  if (operator === "&&" || operator === "??" || operator === "||") {
+    return lowerLogicalValue(
+      current,
+      operator,
+      () => write(lowerExpression(value, builder)),
+      range,
+      builder,
+    );
+  }
+  const right = lowerExpression(value, builder);
+  return write(lowerBinaryValues(current, operator, right, range, builder));
+}
+
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
@@ -513,36 +846,23 @@ function lowerExpression(
   }
   if (expression.kind === "binding-set") {
     const value = lowerExpression(expression.value, builder);
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "binding assignment error",
-      [value],
+    return lowerBindingWrite(expression, value, builder);
+  }
+  if (expression.kind === "binding-update") {
+    const current = lowerBindingRead(
+      expression.bindingId,
+      expression.name,
       expression.range,
-    );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [value],
-      bindingId: expression.bindingId,
-      detail: `%b${expression.bindingId} ${expression.name}`,
-      ...(expression.functionNameBinding === true
-        ? { functionNameBinding: true }
-        : {}),
-      ...(expression.importedBinding === true ? { importedBinding: true } : {}),
-      id,
-      kind: "write",
-      mutable: expression.mutable,
-      range: expression.range,
-    });
-    appendMirMetadata(
       builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
     );
-    return recordRoot(builder, id, expression.range);
+    return lowerAssignmentValue(
+      current,
+      expression.operator,
+      expression.value,
+      (value) => lowerBindingWrite(expression, value, builder),
+      expression.range,
+      builder,
+    );
   }
   if (expression.kind === "destructuring-set") {
     const value = lowerExpression(expression.value, builder);
@@ -758,31 +1078,12 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "binding") {
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "binding read error",
-      [],
+    return lowerBindingRead(
+      expression.bindingId,
+      expression.name,
       expression.range,
-    );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [],
-      bindingId: expression.bindingId,
-      detail: expression.name,
-      id,
-      kind: "read",
-      range: expression.range,
-    });
-    appendMirMetadata(
       builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
     );
-    return recordRoot(builder, id, expression.range);
   }
   if (
     expression.kind === "undefined" ||
@@ -898,115 +1199,13 @@ function lowerExpression(
   }
   if (expression.kind === "logical") {
     const left = lowerExpression(expression.left, builder);
-    const rightBlock = createMirBlock(builder);
-    const shortBlock = createMirBlock(builder);
-    const joinBlock = createMirBlock(builder);
-    const result = builder.nextValue;
-    builder.nextValue += 1;
-    joinBlock.parameters = [result];
-    if (expression.operator === "??") {
-      const nullishTest = (constant: MirConstant): number => {
-        const constantId = builder.nextValue;
-        builder.nextValue += 1;
-        builder.current.operations.push({
-          arguments: [],
-          constant,
-          detail: constant.kind,
-          id: constantId,
-          kind: "constant",
-          range: expression.range,
-        });
-        const testId = builder.nextValue;
-        builder.nextValue += 1;
-        builder.current.operations.push({
-          arguments: [left, constantId],
-          detail: "===",
-          id: testId,
-          kind: "binary",
-          operator: "===",
-          range: expression.range,
-        });
-        appendMirMetadata(
-          builder,
-          "check-status",
-          "normal -> continue, abrupt -> return",
-          [testId],
-          expression.range,
-        );
-        return testId;
-      };
-      const undefinedBlock = createMirBlock(builder);
-      const isNull = nullishTest({ kind: "null" });
-      appendMirMetadata(
-        builder,
-        "branch",
-        `?? null -> bb${rightBlock.id}, other -> bb${undefinedBlock.id}`,
-        [isNull],
-        expression.range,
-      );
-      builder.current.terminator = {
-        kind: "branch",
-        test: isNull,
-        whenFalse: undefinedBlock.id,
-        whenTrue: rightBlock.id,
-      };
-      builder.current = undefinedBlock;
-      const isUndefined = nullishTest({ kind: "undefined" });
-      appendMirMetadata(
-        builder,
-        "branch",
-        `?? undefined -> bb${rightBlock.id}, other -> bb${shortBlock.id}`,
-        [isUndefined],
-        expression.range,
-      );
-      builder.current.terminator = {
-        kind: "branch",
-        test: isUndefined,
-        whenFalse: shortBlock.id,
-        whenTrue: rightBlock.id,
-      };
-    } else {
-      const takenBlock =
-        expression.operator === "&&" ? rightBlock.id : shortBlock.id;
-      const skippedBlock =
-        expression.operator === "&&" ? shortBlock.id : rightBlock.id;
-      appendMirMetadata(
-        builder,
-        "branch",
-        `${expression.operator} true -> bb${takenBlock}, ` +
-          `false -> bb${skippedBlock}`,
-        [left],
-        expression.range,
-      );
-      builder.current.terminator = {
-        kind: "branch",
-        test: left,
-        whenFalse: skippedBlock,
-        whenTrue: takenBlock,
-      };
-    }
-    builder.current = shortBlock;
-    shortBlock.terminator = {
-      kind: "jump",
-      target: joinBlock.id,
-      values: [left],
-    };
-    builder.current = rightBlock;
-    const right = lowerExpression(expression.right, builder);
-    builder.current.terminator = {
-      kind: "jump",
-      target: joinBlock.id,
-      values: [right],
-    };
-    builder.current = joinBlock;
-    appendMirMetadata(
-      builder,
-      "join",
-      `${expression.operator} bb${shortBlock.id} + bb${rightBlock.id}`,
-      [],
+    return lowerLogicalValue(
+      left,
+      expression.operator,
+      () => lowerExpression(expression.right, builder),
       expression.range,
+      builder,
     );
-    return recordRoot(builder, result, expression.range);
   }
   if (expression.kind === "sequence") {
     let last: number | undefined;
@@ -1066,58 +1265,13 @@ function lowerExpression(
   if (expression.kind === "binary") {
     const left = lowerExpression(expression.left, builder);
     const right = lowerExpression(expression.right, builder);
-    if (expression.operator === "+") {
-      appendMirMetadata(
-        builder,
-        "safepoint",
-        "string addition fallback",
-        [left, right],
-        expression.range,
-      );
-    } else if (
-      expression.operator === "in" ||
-      expression.operator === "instanceof"
-    ) {
-      appendMirMetadata(
-        builder,
-        "safepoint",
-        expression.operator === "in"
-          ? "property key allocation"
-          : "prototype key allocation",
-        [left, right],
-        expression.range,
-      );
-    } else if (expression.operator !== "===" && expression.operator !== "!==") {
-      // Strict equality never coerces, but every other binary operator
-      // may reach generic ToPrimitive for an object operand, which
-      // allocates strings and typed errors and can call user functions,
-      // so it is a declared collection safepoint.
-      appendMirMetadata(
-        builder,
-        "safepoint",
-        "operand coercion",
-        [left, right],
-        expression.range,
-      );
-    }
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [left, right],
-      detail: String(expression.operator),
-      id,
-      kind: "binary",
-      operator: expression.operator,
-      range: expression.range,
-    });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
+    return lowerBinaryValues(
+      left,
+      expression.operator,
+      right,
       expression.range,
+      builder,
     );
-    return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "object") {
     appendMirMetadata(
@@ -1261,6 +1415,38 @@ function lowerExpression(
       expression.range,
     );
     return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "property-update") {
+    const object = lowerExpression(expression.object, builder);
+    const keyInput = lowerExpression(expression.key, builder);
+    const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
+    const current = lowerPropertyRead(
+      object,
+      readKey,
+      expression.range,
+      builder,
+    );
+    return lowerAssignmentValue(
+      current,
+      expression.operator,
+      expression.value,
+      (value) => {
+        const writeKey = convertPropertyKey(
+          keyInput,
+          expression.key.range,
+          builder,
+        );
+        return lowerPropertyWrite(
+          object,
+          writeKey,
+          value,
+          expression.range,
+          builder,
+        );
+      },
+      expression.range,
+      builder,
+    );
   }
   if (expression.kind === "promise-construct") {
     const lowered = lowerCallArguments(

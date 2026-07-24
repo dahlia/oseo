@@ -13136,20 +13136,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-name-iter-val.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-name-iter-val.js:135:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13164,20 +13173,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-ary-elem-init.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-ary-elem-init.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13192,20 +13210,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-exhausted.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-exhausted.js:126:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13220,21 +13247,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-fn-name-fn.js:128:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13249,20 +13285,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-hole.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-hole.js:122:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13277,20 +13322,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-undef.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-undef.js:125:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13305,20 +13359,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-iter-done.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-iter-done.js:124:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13333,20 +13396,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-ary-ptrn-rest-ary-elem.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-ary-ptrn-rest-ary-elem.js:148:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13437,22 +13509,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-arrow.js:126:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13467,22 +13548,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-cover.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-cover.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13497,22 +13587,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-fn.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13527,21 +13626,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-id-trailing-comma.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-id-trailing-comma.js:120:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13558,21 +13666,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-rest-skip-non-enumerable.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-rest-skip-non-enumerable.js:185:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13589,21 +13707,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/const-obj-ptrn-rest-val-obj.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/const-obj-ptrn-rest-val-obj.js:184:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13618,20 +13746,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-name-iter-val.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-name-iter-val.js:135:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13646,20 +13783,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-ary-elem-init.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-ary-elem-init.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13674,20 +13820,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-exhausted.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-exhausted.js:126:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13702,21 +13857,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-fn-name-fn.js:128:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13731,20 +13895,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-hole.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-hole.js:122:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13759,20 +13932,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-undef.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-undef.js:125:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13787,20 +13969,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-iter-done.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-iter-done.js:124:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13815,20 +14006,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-ary-ptrn-rest-ary-elem.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-ary-ptrn-rest-ary-elem.js:148:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13919,22 +14119,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-arrow.js:126:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13949,22 +14158,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-cover.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-cover.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -13979,22 +14197,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-fn.js:127:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14009,21 +14236,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-id-trailing-comma.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-id-trailing-comma.js:120:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14040,21 +14276,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-rest-skip-non-enumerable.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-rest-skip-non-enumerable.js:185:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14071,21 +14317,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - lexical-bindings
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/let-obj-ptrn-rest-val-obj.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/let-obj-ptrn-rest-val-obj.js:184:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14100,20 +14356,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-name-iter-val.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-name-iter-val.js:132:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14128,20 +14393,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-ary-elem-init.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-ary-elem-init.js:124:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14156,20 +14430,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-exhausted.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-exhausted.js:123:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14184,21 +14467,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-fn-name-fn.js:125:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14213,20 +14505,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-hole.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-hole.js:119:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14241,20 +14542,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-undef.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-undef.js:122:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14269,20 +14579,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-iter-done.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-iter-done.js:121:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14297,20 +14616,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-ary-ptrn-rest-ary-elem.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-ary-ptrn-rest-ary-elem.js:145:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14401,22 +14729,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-arrow.js:123:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14431,22 +14768,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-cover.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-cover.js:124:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14461,22 +14807,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - functions
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-fn.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-fn.js:124:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14491,21 +14846,30 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-id-trailing-comma.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-id-trailing-comma.js:117:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14522,21 +14886,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-rest-skip-non-enumerable.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-rest-skip-non-enumerable.js:182:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -14553,21 +14927,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - control-flow
       - destructuring-bindings
+      - expression-operators
       - iterator-protocol
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/for-of/dstr/var-obj-ptrn-rest-val-obj.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/for-of/dstr/var-obj-ptrn-rest-val-obj.js:181:3:
-        error[OSEO1001]: This assignment is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -17503,9 +17887,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 226
   harnessFailures: 0
-  passes: 224
+  passes: 266
   semanticFailures: 0
-  unsupportedProfileFeatures: 185
+  unsupportedProfileFeatures: 143
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -17522,15 +17906,15 @@ summary:
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
-      passes: 13
+      passes: 55
       semanticFailures: 0
-      unsupportedProfileFeatures: 44
+      unsupportedProfileFeatures: 2
     - dependency: destructuring-bindings
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 84
+      passes: 126
       semanticFailures: 0
-      unsupportedProfileFeatures: 42
+      unsupportedProfileFeatures: 0
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
@@ -17546,27 +17930,27 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 10
       harnessFailures: 0
-      passes: 11
+      passes: 53
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - dependency: functions
       expectedNegatives: 9
       harnessFailures: 0
-      passes: 36
+      passes: 48
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 2
     - dependency: iterator-protocol
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 64
+      passes: 106
       semanticFailures: 0
-      unsupportedProfileFeatures: 42
+      unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
       expectedNegatives: 12
       harnessFailures: 0
-      passes: 61
+      passes: 89
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 1
     - dependency: module-linking
       expectedNegatives: 137
       harnessFailures: 0
@@ -17576,9 +17960,9 @@ summary:
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 58
+      passes: 76
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 1
     - dependency: promise-settlement
       expectedNegatives: 0
       harnessFailures: 0
@@ -17600,9 +17984,9 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 33
+      passes: 47
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 0
   groups:
     - group: built-ins/Error
       expectedNegatives: 0
@@ -17649,6 +18033,6 @@ summary:
     - group: language/statements
       expectedNegatives: 48
       harnessFailures: 0
-      passes: 100
+      passes: 142
       semanticFailures: 0
-      unsupportedProfileFeatures: 58
+      unsupportedProfileFeatures: 16

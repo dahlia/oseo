@@ -39,6 +39,12 @@ function printHirExpression(expression: HirExpression): string {
       printHirExpression(expression.value)
     );
   }
+  if (expression.kind === "binding-update") {
+    return (
+      `%b${expression.bindingId} ${expression.name} ` +
+      `${expression.operator}= ${printHirExpression(expression.value)}`
+    );
+  }
   if (expression.kind === "destructuring-set") {
     return (
       `write ${printHirBindingPattern(expression.pattern)} = ` +
@@ -128,6 +134,13 @@ function printHirExpression(expression: HirExpression): string {
     return (
       `set ${printHirExpression(expression.object)}[` +
       `${printHirExpression(expression.key)}] = ` +
+      printHirExpression(expression.value)
+    );
+  }
+  if (expression.kind === "property-update") {
+    return (
+      `update ${printHirExpression(expression.object)}[` +
+      `${printHirExpression(expression.key)}] ${expression.operator}= ` +
       printHirExpression(expression.value)
     );
   }

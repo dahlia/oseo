@@ -76,6 +76,14 @@ corresponding iterator step, source read, or default; key conversion and
 storage lower after value selection. The expression retains the original
 right-hand value, nested array cleanup stays inside out, and imported and
 immutable leaves keep their ordinary errors.
+Compound assignment retains one identifier read or one member object,
+property-key expression, converted key, and property read before evaluating its
+right operand. The retained raw key value is converted again on the write path
+after the right operand. Binary forms reuse the corresponding MIR operator
+before a checked write. Logical forms lower through explicit branches, so the
+skipped path performs no right evaluation, second key conversion, or write.
+Await inside a compound assignment remains unsupported until module
+continuation extraction can preserve that retained current value.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

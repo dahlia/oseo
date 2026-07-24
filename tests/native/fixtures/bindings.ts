@@ -518,6 +518,180 @@ awaitedVarBinding();
 `,
   },
   {
+    name: "compound-assignments",
+    source: `
+let numeric = 5;
+numeric += 3;
+numeric -= 2;
+numeric *= 4;
+numeric /= 3;
+numeric %= 3;
+numeric **= 3;
+numeric <<= 2;
+numeric >>= 1;
+numeric >>>= 2;
+numeric |= 8;
+numeric &= 10;
+numeric ^= 3;
+console.log("numeric", numeric);
+
+let rightCount = 0;
+let andValue = 1;
+let orValue = 0;
+let nullishValue = null;
+andValue &&= (rightCount += 1, 5);
+orValue ||= (rightCount += 1, 6);
+nullishValue ??= (rightCount += 1, 7);
+let falseValue = false;
+let truthyValue = 8;
+let definedValue = 0;
+falseValue &&= (rightCount += 10, true);
+truthyValue ||= (rightCount += 10, 9);
+definedValue ??= (rightCount += 10, 10);
+console.log(
+  "logical",
+  andValue,
+  orValue,
+  nullishValue,
+  falseValue,
+  truthyValue,
+  definedValue,
+  rightCount,
+);
+
+let order = "";
+const holder = { value: 2 };
+function target() {
+  order += "object ";
+  return holder;
+}
+function key() {
+  order += "key ";
+  return "value";
+}
+function right() {
+  order += "right ";
+  return 3;
+}
+const memberResult = target()[key()] += right();
+console.log("member", memberResult, holder.value, order);
+
+order = "";
+holder.value = 0;
+const shortResult = target()[key()] &&= right();
+console.log("short", shortResult, holder.value, order);
+
+let conversionCount = 0;
+let conversionOrder = "";
+const changingKey = {
+  [Symbol.toPrimitive]: function () {
+    conversionCount += 1;
+    conversionOrder += "key" + conversionCount + " ";
+    return conversionCount === 1 ? "read" : "write";
+  },
+};
+const changingHolder = { read: 1, write: 9 };
+function conversionRight() {
+  conversionOrder += "right ";
+  return 2;
+}
+const conversionResult = changingHolder[changingKey] += conversionRight();
+console.log(
+  "conversion",
+  conversionResult,
+  changingHolder.read,
+  changingHolder.write,
+  conversionCount,
+  conversionOrder,
+);
+
+let logicalConversionCount = 0;
+let logicalConversionOrder = "";
+const logicalChangingKey = {
+  [Symbol.toPrimitive]: function () {
+    logicalConversionCount += 1;
+    logicalConversionOrder += "key" + logicalConversionCount + " ";
+    return logicalConversionCount === 1 ? "read" : "write";
+  },
+};
+const logicalChangingHolder = { read: 0, write: 9 };
+function logicalConversionRight() {
+  logicalConversionOrder += "right ";
+  return 2;
+}
+const logicalConversionResult =
+  logicalChangingHolder[logicalChangingKey] ||= logicalConversionRight();
+console.log(
+  "logical-conversion",
+  logicalConversionResult,
+  logicalChangingHolder.read,
+  logicalChangingHolder.write,
+  logicalConversionCount,
+  logicalConversionOrder,
+);
+
+let skippedConversionCount = 0;
+const skippedChangingKey = {
+  [Symbol.toPrimitive]: function () {
+    skippedConversionCount += 1;
+    return skippedConversionCount === 1 ? "read" : "write";
+  },
+};
+const skippedChangingHolder = { read: 1, write: 9 };
+const skippedConversionResult =
+  skippedChangingHolder[skippedChangingKey] ||= 2;
+console.log(
+  "skipped-conversion",
+  skippedConversionResult,
+  skippedChangingHolder.read,
+  skippedChangingHolder.write,
+  skippedConversionCount,
+);
+
+let named;
+named ||= function () {};
+const namedMember = {};
+namedMember.item ??= function () {};
+const computedName = "computed";
+namedMember[computedName] ||= function () {};
+console.log(
+  "names",
+  named.name,
+  namedMember.item.name,
+  namedMember.computed.name,
+);
+
+const immutable = 1;
+let immutableRight = 0;
+try {
+  immutable += (immutableRight += 1, 2);
+} catch (error) {
+  console.log(
+    "immutable",
+    error instanceof TypeError,
+    immutable,
+    immutableRight,
+  );
+}
+
+let logicalImmutableRight = 0;
+const lockedTruthy = 1;
+const lockedFalsy = 0;
+lockedTruthy ||= (logicalImmutableRight += 10, 2);
+try {
+  lockedFalsy ||= (logicalImmutableRight += 1, 2);
+} catch (error) {
+  console.log(
+    "logical-immutable",
+    error instanceof TypeError,
+    lockedTruthy,
+    lockedFalsy,
+    logicalImmutableRight,
+  );
+}
+`,
+  },
+  {
     name: "destructuring-assignments",
     source: `
 let first;
