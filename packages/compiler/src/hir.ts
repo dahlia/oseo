@@ -230,6 +230,16 @@ export type HirExpression =
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly functionNameBinding?: boolean;
+      readonly importedBinding?: boolean;
+      readonly kind: "binding-step";
+      readonly mutable: boolean;
+      readonly name: string;
+      readonly operator: "++" | "--";
+      readonly prefix: boolean;
+    })
+  | (LocatedSyntax & {
       readonly kind: "destructuring-set";
       readonly pattern: HirBindingPattern;
       readonly value: HirExpression;
@@ -336,6 +346,13 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: AssignmentOperator;
       readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "property-step";
+      readonly object: HirExpression;
+      readonly operator: "++" | "--";
+      readonly prefix: boolean;
     })
   | (LocatedSyntax & {
       readonly kind: "number";

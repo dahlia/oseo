@@ -615,6 +615,27 @@ observable read and write key conversions, and immutable-target failure.
 Forty-two reviewed test262 cases pin `+=` inside `for-of` binding loops.
 
 
+M5 update expression properties
+-------------------------------
+
+The update expression property generates prefix or postfix `++` or `--` with
+an identifier or computed member target. Inputs vary across bounded numbers,
+numeric strings, booleans, and null. Its independent model predicts the
+coerced previous value, stored value, expression result, object and key
+evaluation counts, and separate read and write key conversion counts. Each
+case compares the model with Node.js, Deno, specialization-disabled native
+execution, and specialization-enabled native execution with collection forced
+at every safepoint.
+
+The ordinary suite uses seed `0x5eed000f`, ten successful cases, one update per
+program, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain all
+four forms, numeric-string coercion, negative zero, infinities, `NaN`, distinct
+read and write properties, member-reference order, nullish-base key-conversion
+suppression, and immutable-target failure. Four reviewed test262 cases cover
+the four forms, and two parse negatives retain strict `arguments` early errors.
+
+
 Test placement and package boundaries
 -------------------------------------
 

@@ -588,6 +588,37 @@ function lowerPropertyRead(
   return recordRoot(builder, id, range);
 }
 
+function lowerObjectCoercible(
+  input: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "require update target object-coercible",
+    [input],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "RequireObjectCoercible for update target",
+    id,
+    kind: "object-coercible",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> convert property key, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
 function lowerPropertyWrite(
   object: number,
   key: number,
@@ -811,6 +842,51 @@ function lowerAssignmentValue(
   return write(lowerBinaryValues(current, operator, right, range, builder));
 }
 
+function lowerUpdateValue(
+  current: number,
+  operator: "++" | "--",
+  prefix: boolean,
+  write: (assigned: number) => number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "update operand coercion",
+    [current],
+    range,
+  );
+  const numeric = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [current],
+    detail: "+",
+    id: numeric,
+    kind: "unary",
+    operator: "+",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [numeric],
+    range,
+  );
+  recordRoot(builder, numeric, range);
+  const one = lowerExpression({ kind: "number", range, value: 1 }, builder);
+  const assigned = lowerBinaryValues(
+    numeric,
+    operator === "++" ? "+" : "-",
+    one,
+    range,
+    builder,
+  );
+  write(assigned);
+  return prefix ? assigned : numeric;
+}
+
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
@@ -859,6 +935,22 @@ function lowerExpression(
       current,
       expression.operator,
       expression.value,
+      (value) => lowerBindingWrite(expression, value, builder),
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "binding-step") {
+    const current = lowerBindingRead(
+      expression.bindingId,
+      expression.name,
+      expression.range,
+      builder,
+    );
+    return lowerUpdateValue(
+      current,
+      expression.operator,
+      expression.prefix,
       (value) => lowerBindingWrite(expression, value, builder),
       expression.range,
       builder,
@@ -1430,6 +1522,43 @@ function lowerExpression(
       current,
       expression.operator,
       expression.value,
+      (value) => {
+        const writeKey = convertPropertyKey(
+          keyInput,
+          expression.key.range,
+          builder,
+        );
+        return lowerPropertyWrite(
+          object,
+          writeKey,
+          value,
+          expression.range,
+          builder,
+        );
+      },
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "property-step") {
+    const objectInput = lowerExpression(expression.object, builder);
+    const keyInput = lowerExpression(expression.key, builder);
+    const object = lowerObjectCoercible(
+      objectInput,
+      expression.object.range,
+      builder,
+    );
+    const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
+    const current = lowerPropertyRead(
+      object,
+      readKey,
+      expression.range,
+      builder,
+    );
+    return lowerUpdateValue(
+      current,
+      expression.operator,
+      expression.prefix,
       (value) => {
         const writeKey = convertPropertyKey(
           keyInput,

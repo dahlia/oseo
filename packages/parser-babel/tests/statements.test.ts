@@ -335,7 +335,6 @@ test("rejects typeof with an unresolved name explicitly", () => {
 });
 
 const unsupportedForms = [
-  ["update expression", "let value = 1; value++;"],
   ["property", "console.error(1);"],
   ["with statement", "with ({}) { console.log(1); }"],
   ["module", 'import "fixture";'],

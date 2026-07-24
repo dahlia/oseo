@@ -692,6 +692,94 @@ try {
 `,
   },
   {
+    name: "update-expressions",
+    source: `
+let binding = "1";
+console.log(
+  "binding",
+  binding++,
+  binding,
+  ++binding,
+  binding--,
+  binding,
+  --binding,
+);
+
+let negativeZero = -0;
+const previousNegativeZero = negativeZero++;
+let positiveInfinity = Infinity;
+let notANumber = NaN;
+console.log(
+  "numeric-edges",
+  1 / previousNegativeZero,
+  negativeZero,
+  positiveInfinity++,
+  positiveInfinity,
+  notANumber--,
+  notANumber,
+);
+
+let order = "";
+let conversionCount = 0;
+const holder = { read: "4", write: 99 };
+const changingKey = {
+  [Symbol.toPrimitive]: function () {
+    conversionCount += 1;
+    order += "convert ";
+    if (conversionCount % 2 === 1) return "read";
+    return "write";
+  },
+};
+function target() {
+  order += "object ";
+  return holder;
+}
+function key() {
+  order += "key ";
+  return changingKey;
+}
+console.log("member-postfix", target()[key()]--, holder.write, order);
+order = "";
+console.log("member-prefix", ++target()[key()], holder.write, order);
+console.log("conversion-count", conversionCount);
+
+let nullKeyConversionCount = 0;
+const nullKey = {
+  toString: function () {
+    nullKeyConversionCount += 1;
+    return "value";
+  },
+};
+try {
+  null[nullKey]++;
+} catch (error) {
+  console.log(
+    "nullish-member",
+    error instanceof TypeError,
+    nullKeyConversionCount,
+  );
+}
+
+let coercionCount = 0;
+const immutable = {
+  [Symbol.toPrimitive]: function () {
+    coercionCount += 1;
+    return "7";
+  },
+};
+try {
+  immutable++;
+} catch (error) {
+  console.log(
+    "immutable",
+    error instanceof TypeError,
+    coercionCount,
+    typeof immutable,
+  );
+}
+`,
+  },
+  {
     name: "destructuring-assignments",
     source: `
 let first;

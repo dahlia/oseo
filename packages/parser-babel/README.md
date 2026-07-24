@@ -42,6 +42,10 @@ Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its
 already-read target value across suspension.
+Prefix and postfix `++` and `--` convert to separate owned identifier or member
+steps that retain result selection. A member step keeps its object and key
+expressions so the compiler can preserve one evaluation and two observable key
+conversions.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.

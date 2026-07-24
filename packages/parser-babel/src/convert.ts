@@ -394,6 +394,34 @@ export function expression(
       ? undefined
       : { ...located, ...member, kind: "property-set", value: assigned };
   }
+  if (value.type === "UpdateExpression") {
+    const argument = unparenthesizedExpression(value.argument);
+    if (argument == null) return unsupported(context, value);
+    const operator = value.operator;
+    if (operator !== "++" && operator !== "--") {
+      return unsupported(context, value, "This update is unsupported.");
+    }
+    const name = identifierName(argument);
+    if (name != null) {
+      return {
+        ...located,
+        kind: "binding-step",
+        name,
+        operator,
+        prefix: value.prefix === true,
+      };
+    }
+    const member = memberParts(context, argument);
+    return member == null
+      ? undefined
+      : {
+          ...located,
+          ...member,
+          kind: "property-step",
+          operator,
+          prefix: value.prefix === true,
+        };
+  }
   if (value.type === "LogicalExpression") {
     const operator = value.operator;
     if (operator !== "&&" && operator !== "||" && operator !== "??") {

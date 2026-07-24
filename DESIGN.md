@@ -448,6 +448,18 @@ source keys and share the same ordered property reads and
 `CopyDataProperties` path. Await inside a member target remains outside the
 admitted continuation positions.
 
+Update expressions retain an owned reference rather than rewriting to an
+ordinary assignment. An identifier target performs one checked read, numeric
+coercion, arithmetic by one, and one checked write. A member target evaluates
+its object and key expression once while retaining the raw key value. It
+converts that value independently for the read and write, because both
+conversions are observable and may select different properties. Prefix forms
+produce the assigned value; postfix forms retain the coerced previous value
+across the checked write. A nullish base fails its object-coercibility check
+after the key expression but before either key conversion. These paths reuse
+existing MIR numeric, property, and binding operations and add no runtime ABI
+operation.
+
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument
 list. The call target and method receiver are resolved before accumulation, and

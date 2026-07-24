@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 641 reviewed cases: 272 passes, 226 expected
-negatives, and 143 unsupported profile features. It records no semantic or
+The current manifest contains 647 reviewed cases: 277 passes, 228 expected
+negatives, and 142 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -204,6 +204,22 @@ its deliberate boundary and its evidence:
     conversion counts, both specialization policies, and forced collection.
     Await inside a compound assignment remains rejected until continuation
     extraction can retain the already-read current value.
+ -  Prefix and postfix `++` and `--` for identifiers and static or computed
+    member references. Each form reads once, coerces through the admitted
+    Number path, adds or subtracts one, and performs a checked write. Prefix
+    forms produce the assigned value; postfix forms produce the coerced
+    previous value. A member target evaluates its object and key expression
+    once, then converts the retained raw key separately for the read and write,
+    so the conversions may select different properties. Immutable targets keep
+    their catchable write errors after coercion. Native differential fixtures
+    and a generated property with seed `0x5eed000f` cover both operators,
+    both result forms, both target forms, numbers, numeric strings, booleans,
+    null, reference and conversion counts, both specialization policies, and
+    forced collection, including suppression of key conversion for a nullish
+    base. Four reviewed test262 cases cover the four forms, two expected parse
+    negatives retain strict `arguments` early errors, and the newly admitted
+    classic `for` update promotes an exponentiation case to pass. BigInt update
+    semantics remain outside the admitted value profile.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
     `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
     runtime-owned constructor values. An unshadowed reference to one of

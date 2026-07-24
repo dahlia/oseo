@@ -573,7 +573,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
     expectedClassification: expected-negative
@@ -650,6 +650,24 @@ tests:
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/postfix-decrement/whitespace.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/postfix-increment/11.3.1-2-1gs.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/postfix-increment/whitespace.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-decrement/11.4.5-2-2gs.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/prefix-decrement/whitespace.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-increment/whitespace.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]

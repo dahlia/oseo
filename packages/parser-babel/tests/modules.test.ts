@@ -176,6 +176,42 @@ test("rejects top-level await inside compound assignment", () => {
   assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
 });
 
+test("extracts top-level await inside an update member target", () => {
+  const sourceId = "file:///app/update-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      'const holder = { value: "4" };\n' +
+      "export const previous = " +
+      "(await Promise.resolve(holder)).value++;\n" +
+      "export const current = holder.value;\n",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "update-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const operations = [...compiled.mir.functions, compiled.mir.script]
+    .flatMap((functionValue) => functionValue.blocks)
+    .flatMap((block) => block.operations);
+  assert.ok(operations.some((operation) => operation.target?.kind === "await"));
+  assert.ok(operations.some((operation) => operation.kind === "property-get"));
+  assert.ok(operations.some((operation) => operation.kind === "property-set"));
+});
+
 test("rejects array spread before a top-level await point", () => {
   const sourceId = "file:///app/array-spread-await.js";
   const result = babelModuleFrontend.parseModule({

@@ -620,6 +620,13 @@ identifier or member reference across every arithmetic, bitwise, shift, and
 logical operator. Generated and fixed native evidence covers all 15 operators,
 short-circuiting, write errors, and identifier function-name inference. The 42
 selected `for-of` binding cases whose loop bodies use `+=` now pass. The same
+identifier and member reference paths now admit prefix and postfix `++` and
+`--`. Generated and fixed native evidence covers Number coercion, result
+selection, distinct read and write key conversions, immutable failure, both
+specialization policies, and forced collection. Four new reviewed standards
+cases cover the four forms, two parse negatives retain strict `arguments`
+early errors, and a classic `for` update promotes one existing exponentiation
+case to pass. The same
 recursive paths also admit standalone destructuring assignment with
 existing identifier and member leaves. Generated and fixed native evidence
 covers defaults, rest, result identity, member-reference evaluation order,

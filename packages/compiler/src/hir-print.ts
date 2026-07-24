@@ -45,6 +45,12 @@ function printHirExpression(expression: HirExpression): string {
       `${expression.operator}= ${printHirExpression(expression.value)}`
     );
   }
+  if (expression.kind === "binding-step") {
+    const target = `%b${expression.bindingId} ${expression.name}`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
+  }
   if (expression.kind === "destructuring-set") {
     return (
       `write ${printHirBindingPattern(expression.pattern)} = ` +
@@ -143,6 +149,14 @@ function printHirExpression(expression: HirExpression): string {
       `${printHirExpression(expression.key)}] ${expression.operator}= ` +
       printHirExpression(expression.value)
     );
+  }
+  if (expression.kind === "property-step") {
+    const target =
+      `update ${printHirExpression(expression.object)}[` +
+      `${printHirExpression(expression.key)}]`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
   }
   if (expression.kind === "module-namespace") {
     return `module-namespace {${expression.entries

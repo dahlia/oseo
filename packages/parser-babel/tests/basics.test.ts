@@ -60,6 +60,26 @@ test("preserves compound assignment references in owned IR", () => {
   assert.equal(mir.match(/property-set property-set/gu)?.length, 1);
 });
 
+test("preserves prefix and postfix update references in owned IR", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'let value = "1"; const target = { item: "4" };\n' +
+      "console.log(value++, ++value, target.item--, --target.item);\n",
+    sourceId: "update-expression.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /value\+\+/u);
+  assert.match(hir, /\+\+%b\d+ value/u);
+  assert.match(hir, /target.*"item".*--/u);
+  assert.match(hir, /--.*target.*"item"/u);
+  const mir = printMir(result.mir);
+  assert.equal(mir.match(/property-get property-get/gu)?.length, 2);
+  assert.equal(mir.match(/property-set property-set/gu)?.length, 2);
+});
+
 test("preserves non-strict script parameter bindings", () => {
   for (const name of ["eval", "arguments"]) {
     const result = compileSource(babelFrontend, {

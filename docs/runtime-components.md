@@ -107,6 +107,11 @@ retains one checked binding read or one object and converted property key, then
 reuses the existing binary, property-read, and checked write operations.
 Logical forms branch before the right operand and write, so their short path
 introduces no hidden runtime call.
+Update expressions likewise add no runtime ABI entry point. Generated code
+reuses Number coercion, arithmetic, property-key conversion, property reads,
+and checked binding or property writes. A member step retains one raw key value
+and invokes the existing coercibility check before converting separately for
+its read and write.
 
 ### Internal helpers
 

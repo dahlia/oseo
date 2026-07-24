@@ -87,6 +87,14 @@ before a checked write. Logical forms lower through explicit branches, so the
 skipped path performs no right evaluation, second key conversion, or write.
 Await inside a compound assignment remains unsupported until module
 continuation extraction can preserve that retained current value.
+Update expressions retain a binding reference or one member object and raw key
+value. They apply numeric coercion and arithmetic by one before a checked
+write. Member steps convert the raw key independently for the read and write.
+Prefix forms return the assigned value, while postfix forms keep the coerced
+previous value rooted across the write. A nullish base fails before either key
+conversion. The path reuses existing MIR operations and the module continuation
+extractor can rebuild a member step around an admitted await in its object or
+key expression.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

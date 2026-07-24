@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 272
-passes, 226 expected negatives, and 143 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 277
+passes, 228 expected negatives, and 142 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -88,6 +88,13 @@ The target reference and current value are evaluated once, logical assignments
 skip both the right operand and write on their short branch, and checked writes
 retain immutable and imported binding errors. This unit promotes the 42
 reviewed `for-of` binding cases whose loop bodies use `+=`.
+Prefix and postfix `++` and `--` now admit identifier and member references.
+They coerce the previous value through the admitted Number path, preserve the
+distinct prefix and postfix results, and reuse checked writes. Member targets
+evaluate their object and key expressions once, then perform the observable
+read and write key conversions in order. Four new passing test262 cases cover
+the four forms, and the admitted classic `for` update promotes one existing
+exponentiation case to pass.
 Awaited member targets, parameter patterns, and classic `for` head
 destructuring remain later work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
@@ -332,6 +339,29 @@ function-name inference, and immutable failure. Forty-two reviewed test262
 lowering. Await inside a compound assignment remains unsupported until
 continuation extraction can retain the already-read target value across
 suspension.
+
+Prefix and postfix update expressions now accept `++` and `--` on existing
+identifier and static or computed member targets. Each form reads the target
+once, applies Number coercion before adding or subtracting one, performs one
+checked write, and returns the assigned value for a prefix form or the coerced
+previous value for a postfix form. This Number path is complete for the current
+admitted value profile; BigInt update semantics remain with the later BigInt
+unit.
+
+A member target evaluates its object and property-key expression once. The raw
+key value converts for the read and converts again for the write, so the two
+conversions may select different properties. Immutable binding failure occurs
+after operand coercion and retains the resulting side effects. The generated
+property suite uses seed `0x5eed000f` across both operators, both result forms,
+identifier and member targets, numbers, numeric strings, booleans, and null.
+It compares an independent model with Node.js, Deno, both native
+specialization policies, and forced collection. Fixed native evidence retains
+all four forms, negative zero, infinities, `NaN`, object and key evaluation
+counts, distinct read and write key conversions, key-conversion suppression for
+a nullish base, and immutable-target failure. Four reviewed test262 cases cover
+the four forms across whitespace boundaries, two parse negatives retain the
+strict `arguments` early errors, and the admitted classic `for` update promotes
+one existing exponentiation case to pass.
 
 ### Intrinsics and built-in objects
 

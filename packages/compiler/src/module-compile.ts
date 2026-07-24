@@ -438,7 +438,8 @@ function moduleExpressionParts(
   }
   if (
     expression.kind === "property-delete" ||
-    expression.kind === "property-get"
+    expression.kind === "property-get" ||
+    expression.kind === "property-step"
   ) {
     return {
       children: [expression.object, expression.key],

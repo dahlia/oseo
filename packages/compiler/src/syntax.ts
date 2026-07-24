@@ -130,6 +130,9 @@ export type AssignmentOperator =
   | "|"
   | "||";
 
+/** Prefix and postfix operators that update one assignment target. */
+export type UpdateOperator = "++" | "--";
+
 /** One spread entry retained inside an owned array literal. */
 export interface SyntaxArraySpreadElement extends LocatedSyntax {
   readonly argument: SyntaxExpression;
@@ -167,6 +170,12 @@ export type SyntaxExpression =
       readonly name: string;
       readonly operator: AssignmentOperator;
       readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "binding-step";
+      readonly name: string;
+      readonly operator: UpdateOperator;
+      readonly prefix: boolean;
     })
   | (LocatedSyntax & {
       readonly kind: "destructuring-set";
@@ -259,6 +268,13 @@ export type SyntaxExpression =
       readonly object: SyntaxExpression;
       readonly operator: AssignmentOperator;
       readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property-step";
+      readonly object: SyntaxExpression;
+      readonly operator: UpdateOperator;
+      readonly prefix: boolean;
     })
   | (LocatedSyntax & {
       readonly kind: "number";

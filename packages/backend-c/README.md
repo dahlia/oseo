@@ -80,6 +80,12 @@ Compound assignment emits the existing binding or property read, binary
 operation, and checked write sequence against one retained reference. Logical
 forms branch before emitting the right operand and write, preserving the
 current value on the short path without adding a runtime ABI operation.
+Update expressions emit the same checked binding or member read and write
+operations around numeric coercion and arithmetic by one. A postfix form keeps
+the coerced previous value in its root slot across the write, while a prefix
+form returns the assigned value. Member forms retain one object and raw key
+evaluation but emit separate property-key conversions for the read and write.
+A nullish-base check precedes those conversions.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared
