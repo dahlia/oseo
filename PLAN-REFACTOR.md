@@ -4,11 +4,12 @@ Compiler source decomposition plan
 Status
 ------
 
-Implementation status: planned, not started. This temporary cross-milestone
-plan decomposes the compiler, Babel frontend adapter, and native fixture runner
-before the next broad M5 language and built-in batches. It preserves the
-current language profile, package interfaces, intermediate representations,
-generated behavior, diagnostics, and compatibility classifications.
+Implementation status: in progress. The baseline checkpoint is complete on the
+`refactor` branch. This temporary cross-milestone plan decomposes the compiler,
+Babel frontend adapter, and native fixture runner before the next broad M5
+language and built-in batches. It preserves the current language profile,
+package interfaces, intermediate representations, generated behavior,
+diagnostics, and compatibility classifications.
 
 The plan is retired after its exit criteria pass and its durable ownership
 rules move into [*DESIGN.md*](./DESIGN.md), package documentation, and the
@@ -113,6 +114,29 @@ The current package manifests expose only `"."`. Node.js and Deno execute the
 same package test sources. Repository checks already reject package dependency
 cycles and private cross-package imports. The decomposition extends those
 contracts inside each package rather than weakening them.
+
+### Recorded implementation baseline
+
+The implementation baseline is source revision
+`babe95cdf77bc1fea8760e29a55783544831abe0`. It retains the entry hotspot line
+counts above and records these generated public declaration digests:
+
+| Package              | Public declaration digest                                                 |
+| -------------------- | ------------------------------------------------------------------------- |
+| `@oseo/compiler`     | `sha256:e689a24cd180fa97ec72108b1e07337e562556bc0ddff1dad1be6761e41e0833` |
+| `@oseo/parser-babel` | `sha256:36e50ee398d3378f8399388846019b04d6d1ebf2efdf703dea828346bf32f489` |
+
+The reviewed native catalog has 53 execution fixtures, 54 AArch64 Linux
+cross-link fixtures, and all configured target assembly inspections. The
+test262 manifest contains 635 cases with 224 passes, 226 expected negatives,
+and 185 unsupported profile features. Its canonical digest is
+`sha256:a682a3872c4213ad7cb6d770b6f54cf35abd03d69bb7e5af43f4717366a5440c`;
+the target-parity record pins the same digest for `linux-x86_64-gnu` and
+`macos-aarch64`.
+
+`mise run check` and `mise run test` pass from this baseline. The aggregate
+test reproduces the Node.js and Deno package tests, the complete native catalog
+and cross-link, every architecture probe, and all 635 reviewed test262 cases.
 
 
 Ownership rules
