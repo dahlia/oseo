@@ -18,9 +18,17 @@ declarations admit the same array and object binding patterns. `for-in` and
 `for-await-of` remain owned profile failures.
 Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
-Call type arguments, optional parameters, TypeScript `this` parameters, and
-other withheld forms are rejected at this boundary. Source positions and UTF-8
-byte offsets are indexed once for linear-time conversion.
+Synchronous functions, constructors, and arrows admit recursive array and
+object binding-pattern parameters. The adapter gives the compiler plain hidden
+ABI parameters, then emits owned binding initialization before a private
+lexical body block. This preserves the separate parameter environment,
+left-to-right temporal dead zones, ordinary-function receivers, lexical arrow
+receivers, and function `length`. Top-level default and rest parameters,
+asynchronous binding-pattern parameters, optional parameters, TypeScript
+`this` parameters, hints on pattern-bound names, and `var` declarations sharing
+any parameter in a binding-pattern parameter list remain explicit boundaries.
+Call type arguments and other withheld forms are also rejected here. Source
+positions and UTF-8 byte offsets are indexed once for linear-time conversion.
 The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
 `/** ... */` block comments contribute JSDoc hints; ordinary block and line
@@ -37,8 +45,8 @@ declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
 assignment heads reuse that assignment target conversion. Await inside a
-member target, pattern type annotations, function parameters, and `for-in` and
-`for-await-of` heads remain explicit boundaries.
+member target, pattern type annotations, and `for-in` and `for-await-of` heads
+remain explicit boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its

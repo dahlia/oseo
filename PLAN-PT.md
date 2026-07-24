@@ -532,6 +532,25 @@ step failure without close, nullish object failure, and `finally` execution
 when catch parameter initialization completes abruptly.
 
 
+M5 function binding properties
+------------------------------
+
+The function parameter binding property generates an array or object parameter
+with a default and rest target. Inputs vary between a present value, a missing
+value, and `null`. Its independent model predicts the selected bound value,
+retained rest value, or escaped nullish `TypeError`. Each case compares
+Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled native execution with collection forced at every
+safepoint.
+
+The ordinary suite uses seed `0x5eed0011`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain nested
+defaults and rest, arrows, constructors, later-parameter temporal dead zones,
+iterator cleanup after a default failure, body-declaration isolation, and
+function length.
+
+
 M5 for-of binding properties
 ----------------------------
 

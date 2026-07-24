@@ -84,6 +84,57 @@ callConsole(localConsole);
 `,
   },
   {
+    name: "function-binding-patterns",
+    source: `
+function arrayPattern([first, second = 2, ...rest]) {
+  return [first, second, rest.length, rest[0]];
+}
+console.log(arrayPattern([1]));
+console.log(arrayPattern([3, 4, 5]));
+function objectPattern({ value, nested: { item = 6 }, ...rest }) {
+  return [value, item, rest.extra, Object.keys(rest).length];
+}
+console.log(objectPattern({ value: 7, nested: {}, extra: 8 }));
+const arrowPattern = ({ value }) => value;
+console.log(arrowPattern({ value: 9 }));
+const bodyLocal = 12;
+function parameterScope([value = bodyLocal]) {
+  function bodyLocal() { return 13; }
+  return [value, bodyLocal()];
+}
+console.log(parameterScope([]));
+function parameterFunction([value]) {
+  function value() { return 14; }
+  return value();
+}
+console.log(parameterFunction([0]));
+function laterTdz([value = later], later) {
+  return value;
+}
+try { laterTdz([], 10); }
+catch (error) { console.log(error instanceof ReferenceError); }
+function closeOnFailure([value = later], later) {
+  return value;
+}
+let closed = 0;
+const closingInput = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () { return { value: undefined, done: false }; },
+      return: function () { closed = closed + 1; return {}; },
+    };
+  },
+};
+try { closeOnFailure(closingInput); }
+catch (error) { console.log(error instanceof ReferenceError, closed); }
+function PatternConstructor({ value }) {
+  this.value = value;
+}
+console.log(new PatternConstructor({ value: 11 }).value);
+console.log(arrayPattern.length, objectPattern.length);
+`,
+  },
+  {
     name: "function-name-assignment",
     nonStrictScript: true,
     source: `

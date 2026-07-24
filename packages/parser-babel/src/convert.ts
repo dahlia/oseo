@@ -2296,12 +2296,14 @@ export function collectVarStatement(
  * ordinary assignments, so the pair preserves var semantics for the
  * admitted profile without a separate binding kind. Names owned by
  * parameters or var-scoped function declarations are skipped so bare
- * redeclarations do not reset them.
+ * redeclarations do not reset them. A caller may instead reject names whose
+ * sharing semantics require an environment representation it does not own.
  */
 export function hoistedVarDeclarations(
   context: ConvertContext,
   values: readonly BabelNode[],
   skipNames: ReadonlySet<string>,
+  rejectedNames: ReadonlySet<string> = new Set<string>(),
 ): SyntaxStatement[] | undefined {
   const collected = new Map<string, HoistedVar>();
   const blockFunctions = new Set<string>();
@@ -2327,6 +2329,14 @@ export function hoistedVarDeclarations(
         info.declarator,
         `A var declaration sharing the block-level function name ` +
           `'${name}' is outside the admitted profile.`,
+      );
+    }
+    if (rejectedNames.has(name)) {
+      return unsupported(
+        context,
+        info.declarator,
+        `A var declaration sharing parameter '${name}' in a ` +
+          "binding-pattern parameter list is outside the admitted profile.",
       );
     }
     if (skipNames.has(name)) continue;
@@ -2378,17 +2388,90 @@ export function functionDeclaration(
   }
   const jsdoc = jsdocHints(context, value);
   const parameters: SyntaxParameter[] = [];
-  for (const parameterNode of nodes(value.params)) {
-    const parameterName = identifierName(parameterNode);
-    if (
-      parameterName == null ||
-      parameterName === "this" ||
-      parameterNode.optional === true
-    ) {
+  const parameterInitializers: SyntaxStatement[] = [];
+  const parameterNames: string[] = [];
+  const parameterNodes = nodes(value.params);
+  const bindingPatternParameters = parameterNodes.some(
+    (parameterNode) =>
+      parameterNode.type === "ArrayPattern" ||
+      parameterNode.type === "ObjectPattern",
+  );
+  if (bindingPatternParameters && value.async === true) {
+    return unsupported(
+      context,
+      value,
+      "Binding-pattern parameters in asynchronous functions are unsupported.",
+    );
+  }
+  for (const parameterNode of parameterNodes) {
+    if (parameterNode.type === "AssignmentPattern") {
       return unsupported(
         context,
         parameterNode,
-        "M1 function parameters must be plain identifiers.",
+        "Top-level default parameters are unsupported.",
+      );
+    }
+    if (parameterNode.type === "RestElement") {
+      return unsupported(
+        context,
+        parameterNode,
+        "Top-level rest parameters are unsupported.",
+      );
+    }
+    const parameterName = identifierName(parameterNode);
+    if (parameterName === "this" || parameterNode.optional === true) {
+      return unsupported(
+        context,
+        parameterNode,
+        "Optional and TypeScript this parameters are unsupported.",
+      );
+    }
+    if (bindingPatternParameters) {
+      if (parameterName == null && parameterNode.typeAnnotation != null) {
+        return unsupported(
+          context,
+          parameterNode,
+          "TypeScript annotations on binding-pattern parameters are " +
+            "unsupported.",
+        );
+      }
+      const pattern = bindingPattern(context, parameterNode);
+      if (pattern == null) return undefined;
+      const names = patternNames(pattern);
+      if (
+        parameterName == null &&
+        names.some((bindingName) => jsdoc.parameters.has(bindingName))
+      ) {
+        return unsupported(
+          context,
+          parameterNode,
+          "JSDoc hints on binding-pattern parameters are unsupported.",
+        );
+      }
+      const hints: Hint[] = [];
+      const parameterHint = typeHint(context, parameterNode.typeAnnotation);
+      if (parameterHint != null) hints.push(parameterHint);
+      const jsdocHint =
+        parameterName == null ? undefined : jsdoc.parameters.get(parameterName);
+      if (jsdocHint != null) hints.push(jsdocHint);
+      const hiddenName = syntheticName(context, "parameter");
+      parameters.push({ hints, name: hiddenName, range: pattern.range });
+      parameterInitializers.push({
+        declarationKind: "let",
+        initializer: identifierExpression(hiddenName, pattern.range),
+        kind: "binding-pattern",
+        mode: "declare",
+        pattern,
+        range: pattern.range,
+      });
+      parameterNames.push(...names);
+      continue;
+    }
+    if (parameterName == null) {
+      return unsupported(
+        context,
+        parameterNode,
+        "Function parameters must be identifiers or binding patterns.",
       );
     }
     const hints: Hint[] = [];
@@ -2401,6 +2484,7 @@ export function functionDeclaration(
       hints,
       name: parameterName,
     });
+    parameterNames.push(parameterName);
   }
   const returnHints: Hint[] = [];
   const returnHint = typeHint(context, value.returnType);
@@ -2432,10 +2516,8 @@ export function functionDeclaration(
   const hoisted = hoistedVarDeclarations(
     context,
     children,
-    new Set([
-      ...parameters.map((parameter) => parameter.name),
-      ...varScopedFunctionNames(children),
-    ]),
+    new Set([...parameterNames, ...varScopedFunctionNames(children)]),
+    bindingPatternParameters ? new Set(parameterNames) : new Set<string>(),
   );
   if (hoisted == null) {
     context.functionStack.pop();
@@ -2469,7 +2551,7 @@ export function functionDeclaration(
       return undefined;
     }
   } else {
-    body.push(...hoisted);
+    const executionBody: (SyntaxFunction | SyntaxStatement)[] = [...hoisted];
     for (const child of children) {
       const converted =
         child.type === "FunctionDeclaration"
@@ -2480,7 +2562,17 @@ export function functionDeclaration(
         context.strictStack.pop();
         return undefined;
       }
-      body.push(converted);
+      executionBody.push(converted);
+    }
+    if (bindingPatternParameters) {
+      const range = location(context, value).range;
+      body.push(...parameterInitializers, {
+        body: executionBody,
+        kind: "block",
+        range,
+      });
+    } else {
+      body.push(...executionBody);
     }
   }
   context.functionStack.pop();

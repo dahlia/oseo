@@ -2272,6 +2272,22 @@ tests:
   - path: test/language/statements/function/S13.2_A6_T2.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, error-intrinsics, functions, iterator-protocol]
+  - path: test/language/statements/function/dstr/ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/statements/function/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
   - path: test/language/statements/function/name-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]

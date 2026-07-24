@@ -92,6 +92,69 @@ test("preserves non-strict script parameter bindings", () => {
   }
 });
 
+test("converts function binding patterns through owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function read([first, second = 2, ...rest], " +
+      "{ value, ...remaining }, scale: number) {\n" +
+      "  return [first, second, rest, value, remaining, scale];\n" +
+      "}\n" +
+      "const arrow = ({ value }) => value;\n",
+    sourceId: "parameter-patterns.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.equal(result.mir.functions.length, 2);
+  const declaration = result.syntax?.body[0];
+  assert.equal(declaration?.kind, "function");
+  if (declaration?.kind !== "function") return;
+  assert.deepEqual(
+    declaration.parameters[2]?.hints.map((hint) => hint.provenance),
+    ["typescript"],
+  );
+  const hir = printHir(result.hir);
+  assert.match(hir, /\[%b\d+ first, %b\d+ second = 2, \.\.\.%b\d+ rest\]/u);
+  assert.match(hir, /\{"value": %b\d+ value, \.\.\.%b\d+ remaining\}/u);
+  assert.doesNotMatch(
+    JSON.stringify(result.hir),
+    /ArrayPattern|ObjectPattern|RestElement/u,
+  );
+});
+
+test("keeps unsupported parameter boundaries explicit", () => {
+  for (const [name, source, message] of [
+    [
+      "top-level default",
+      "function value(input = 1) {}",
+      /default parameters/u,
+    ],
+    ["top-level rest", "function value(...input) {}", /rest parameters/u],
+    [
+      "async pattern",
+      "async function value([input]) {}",
+      /asynchronous functions/u,
+    ],
+    [
+      "shared var",
+      "function value([input]) { var input; }",
+      /binding-pattern parameter list/u,
+    ],
+    [
+      "shared plain var",
+      "function value([pattern], input) { var input; }",
+      /binding-pattern parameter list/u,
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.match(result.diagnostics[0]?.message ?? "", message);
+  }
+});
+
 test("retains script and function strictness in owned IR", () => {
   const script = compileSource(babelFrontend, {
     source: '"use strict"; function outer() { function inner() {} }',
