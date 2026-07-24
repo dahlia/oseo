@@ -149,6 +149,18 @@ The repository boundary check now rejects cycles in the compiler and Babel
 adapter source graphs. The package, type, formatting, lint, and archive checks
 pass with the split source tree.
 
+### Frontend and package test checkpoint
+
+Compiler tests now have source, HIR, MIR, and module owners. Babel adapter tests
+have basic conversion, binding, statement, module, and asynchronous owners.
+All sources still run unchanged under Node.js and Deno.
+
+The Babel adapter now separates raw parser shapes, source locations,
+diagnostics, hints, mutually recursive grammar and asynchronous conversion,
+module conversion, and public composition. The mutually recursive conversion
+unit follows the documented exception rather than adding cyclic forwarding
+modules. Babel nodes remain private to the adapter.
+
 
 Ownership rules
 ---------------

@@ -40,3 +40,11 @@ destructuring remain explicit boundaries.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.
+
+The adapter keeps raw Babel shapes and conversion context in *babel.ts*.
+*locations.ts* owns UTF-8 indexing and source diagnostics, while *hints.ts*
+owns TypeScript and JSDoc hint extraction. The mutually recursive expression,
+pattern, statement, function, hoisting, and asynchronous conversions remain
+together in *convert.ts*. *modules.ts* owns import, export, and module-program
+conversion. *index.ts* only parses through Babel and composes the two public
+frontend values. These files remain package-private implementation paths.

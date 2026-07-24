@@ -147,6 +147,12 @@ and *native.ts* owns native extension contracts. *index.ts* remains the public
 export and composition surface. Automated boundary checks reject cycles in the
 compiler and Babel adapter source graphs.
 
+The Babel adapter isolates raw parser shapes in *babel.ts*, source indexing and
+diagnostics in *locations.ts*, and hint extraction in *hints.ts*. Its
+expression, pattern, statement, function, hoisting, and asynchronous conversion
+remain one mutually recursive unit in *convert.ts*. *modules.ts* owns module
+entry conversion, and *index.ts* is the only public composition surface.
+
 
 Source frontend
 ---------------
