@@ -98,7 +98,10 @@ function resolveExpression(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | undefined {
-  if (expression.kind === "binding-set") {
+  if (
+    expression.kind === "binding-set" ||
+    expression.kind === "binding-update"
+  ) {
     const binding = findBinding(scopes, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (binding == null) {
@@ -123,7 +126,13 @@ function resolveExpression(
             ? { importedBinding: true }
             : {}),
           mutable: binding.mutable,
-          value: inferFunctionName(value, binding.name),
+          value:
+            expression.kind === "binding-set" ||
+            expression.operator === "&&" ||
+            expression.operator === "??" ||
+            expression.operator === "||"
+              ? inferFunctionName(value, binding.name)
+              : value,
         };
   }
   if (expression.kind === "destructuring-set") {
@@ -301,6 +310,14 @@ function resolveExpression(
       : { ...expression, key, object };
   }
   if (expression.kind === "property-set") {
+    const object = resolveExpression(expression.object, scopes, state);
+    const key = resolveExpression(expression.key, scopes, state);
+    const value = resolveExpression(expression.value, scopes, state);
+    return object == null || key == null || value == null
+      ? undefined
+      : { ...expression, key, object, value };
+  }
+  if (expression.kind === "property-update") {
     const object = resolveExpression(expression.object, scopes, state);
     const key = resolveExpression(expression.key, scopes, state);
     const value = resolveExpression(expression.value, scopes, state);
@@ -698,7 +715,10 @@ function hirCallArgumentHasAwait(argument: HirCallArgument): boolean {
 
 export function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
-  if (expression.kind === "binding-set") {
+  if (
+    expression.kind === "binding-set" ||
+    expression.kind === "binding-update"
+  ) {
     return hirExpressionHasAwait(expression.value);
   }
   if (expression.kind === "destructuring-set") {
@@ -757,7 +777,10 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
       hirExpressionHasAwait(expression.key)
     );
   }
-  if (expression.kind === "property-set") {
+  if (
+    expression.kind === "property-set" ||
+    expression.kind === "property-update"
+  ) {
     return (
       hirExpressionHasAwait(expression.object) ||
       hirExpressionHasAwait(expression.key) ||

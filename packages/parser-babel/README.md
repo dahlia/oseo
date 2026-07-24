@@ -37,6 +37,10 @@ assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Await inside a member
 target, pattern type annotations, function parameters, and classic `for` head
 destructuring remain explicit boundaries.
+Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
+and logical form into an owned identifier or member update. Await inside that
+expression remains an explicit boundary until the compiler can retain its
+already-read target value across suspension.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
 `export var` remains outside the profile.

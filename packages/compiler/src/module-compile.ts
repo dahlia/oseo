@@ -316,7 +316,10 @@ function moduleExpressionParts(
       rebuild: ([argument]) => ({ ...expression, argument: argument! }),
     };
   }
-  if (expression.kind === "binding-set") {
+  if (
+    expression.kind === "binding-set" ||
+    expression.kind === "binding-update"
+  ) {
     return {
       children: [expression.value],
       rebuild: ([value]) => ({ ...expression, value: value! }),
@@ -445,7 +448,10 @@ function moduleExpressionParts(
       }),
     };
   }
-  if (expression.kind === "property-set") {
+  if (
+    expression.kind === "property-set" ||
+    expression.kind === "property-update"
+  ) {
     return {
       children: [expression.object, expression.key, expression.value],
       rebuild: ([object, key, value]) => ({
@@ -496,6 +502,20 @@ function extractModuleAwait(
   expression: HirExpression,
   state: ModuleAsyncLoweringState,
 ): ExtractedModuleAwait | undefined {
+  if (
+    (expression.kind === "binding-update" ||
+      expression.kind === "property-update") &&
+    hirExpressionHasAwait(expression)
+  ) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        expression,
+        "Await inside a compound assignment is unsupported.",
+      ),
+    );
+    return undefined;
+  }
   if (
     expression.kind === "await" &&
     !hirExpressionHasAwait(expression.argument)

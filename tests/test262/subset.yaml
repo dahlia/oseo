@@ -1549,75 +1549,83 @@ tests:
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/for-of/dstr/const-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/const-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
@@ -1644,138 +1652,152 @@ tests:
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/const-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
   - path: test/language/statements/for-of/dstr/let-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
       ]
@@ -1802,106 +1824,155 @@ tests:
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/let-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
       ]
   - path: test/language/statements/for-of/dstr/var-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
-    dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
-  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
-    dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
-  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
-    dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
-  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
   - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
   - path: test/language/statements/for-of/dstr/var-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
   - path: test/language/statements/for-of/dstr/var-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
-      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        iterator-protocol,
+        var-bindings,
+      ]
   - path: test/language/statements/for-of/dstr/var-obj-init-null.js
     expectedClassification: pass
     dependencies:
@@ -1925,64 +1996,70 @@ tests:
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/for-of/dstr/var-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         control-flow,
         destructuring-bindings,
+        expression-operators,
         iterator-protocol,
         object-properties,
         var-bindings,

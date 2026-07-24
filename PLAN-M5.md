@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 224
-passes, 226 expected negatives, and 185 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 266
+passes, 226 expected negatives, and 143 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -80,6 +80,12 @@ that original value, preserves default and rest behavior, conditionally closes
 array iterators, and retains immutable and imported binding errors. Member
 object and key expressions run before iterator steps, source reads, and
 defaults, while key conversion and storage remain after value selection.
+Compound assignment now admits every arithmetic, exponentiation, bitwise,
+shift, and logical assignment operator for identifiers and member references.
+The target reference and current value are evaluated once, logical assignments
+skip both the right operand and write on their short branch, and checked writes
+retain immutable and imported binding errors. This unit promotes the 42
+reviewed `for-of` binding cases whose loop bodies use `+=`.
 Awaited member targets, parameter patterns, and classic `for` head
 destructuring remain later work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
@@ -263,11 +269,10 @@ cleanup. The generated property suite uses seed `0x5eed000b` across array and
 object patterns, all three declaration kinds, present, missing, and nullish
 inputs, both native specialization policies, and forced collection. Fixed
 native fixtures retain closure cells, function-name inference, object rest,
-`var` retention, and outer close after a pattern failure. Six reviewed test262
-cases pin nullish object-pattern failure across all three declaration kinds.
-Another 42 selected binding cases reach the pattern head but remain honestly
-unsupported because their upstream loop body uses compound assignment, which
-is outside the admitted expression profile.
+`var` retention, and outer close after a pattern failure. Forty-eight reviewed
+test262 cases now pin the binding paths across all three declaration kinds. Six
+cover nullish object-pattern failure, while another 42 exercise their loop
+bodies through compound assignment.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right
@@ -288,6 +293,28 @@ target remains unsupported until it joins the admitted continuation positions.
 Fourteen reviewed test262 cases pin identifier and member writes, nested
 patterns, defaults, rest, result identity, nullish and immutable-target errors,
 and function-name inference under both strictness and specialization policies.
+
+Compound assignment now accepts `+=`, `-=`, `*=`, `/=`, `%=`, `**=`, `<<=`,
+`>>=`, `>>>=`, `&=`, `^=`, `|=`, `&&=`, `||=`, and `??=` for existing
+identifier and member targets. Identifier targets perform one checked read
+before the right operand and one checked write afterward. Member targets
+evaluate their object and property key once, convert the key once, and read the
+current value before evaluating the right operand. Logical assignments lower
+through explicit branches, so their short path skips the right operand and the
+write. Anonymous functions on taken logical-assignment paths retain inferred
+identifier names, while property targets remain unnamed. Imported and immutable
+targets preserve their catchable write errors after the right operand has run.
+
+The generated property suite uses seed `0x5eed000d` across all 15 operators,
+identifier and member targets, bounded numeric inputs, nullish values, both
+native specialization policies, and forced collection. Its independent model
+also predicts member-reference and right-operand counts. Fixed native fixtures
+retain every operator, expression results, logical short-circuiting, computed
+property references, identifier function-name inference, and immutable failure.
+Forty-two reviewed test262 `for-of` binding cases now pass because their `+=`
+loop bodies use the same lowering. Await inside a compound assignment remains
+unsupported until continuation extraction can retain the already-read target
+value across suspension.
 
 ### Intrinsics and built-in objects
 

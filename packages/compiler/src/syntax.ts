@@ -112,6 +112,24 @@ export type UnaryOperator =
 /** Short-circuit operators lowered through explicit control flow. */
 export type LogicalOperator = "&&" | "??" | "||";
 
+/** Operators admitted by compound assignment expressions. */
+export type AssignmentOperator =
+  | "%"
+  | "&"
+  | "&&"
+  | "*"
+  | "**"
+  | "+"
+  | "-"
+  | "/"
+  | "<<"
+  | ">>"
+  | ">>>"
+  | "??"
+  | "^"
+  | "|"
+  | "||";
+
 /** One spread entry retained inside an owned array literal. */
 export interface SyntaxArraySpreadElement extends LocatedSyntax {
   readonly argument: SyntaxExpression;
@@ -142,6 +160,12 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "binding-update";
+      readonly name: string;
+      readonly operator: AssignmentOperator;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
@@ -227,6 +251,13 @@ export type SyntaxExpression =
       readonly key: SyntaxExpression;
       readonly kind: "property-set";
       readonly object: SyntaxExpression;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "property-update";
+      readonly object: SyntaxExpression;
+      readonly operator: AssignmentOperator;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {

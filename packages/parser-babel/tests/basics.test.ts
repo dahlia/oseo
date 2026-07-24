@@ -41,6 +41,25 @@ test("converts the M1 profile to owned syntax and retains hints", () => {
   );
 });
 
+test("preserves compound assignment references in owned IR", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let value = 1; const target = { item: 2 };\n" +
+      "value += 3;\n" +
+      "target.item &&= 4;\n",
+    sourceId: "compound-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /value \+= 3/u);
+  assert.match(hir, /update .*"item".* &&= 4/u);
+  const mir = printMir(result.mir);
+  assert.equal(mir.match(/property-get property-get/gu)?.length, 1);
+  assert.equal(mir.match(/property-set property-set/gu)?.length, 1);
+});
+
 test("preserves non-strict script parameter bindings", () => {
   for (const name of ["eval", "arguments"]) {
     const result = compileSource(babelFrontend, {

@@ -1,5 +1,6 @@
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
+  AssignmentOperator,
   BinaryOperator,
   BindingPatternMode,
   FunctionKind,
@@ -214,6 +215,16 @@ export type HirExpression =
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {
+      readonly bindingId: number;
+      readonly functionNameBinding?: boolean;
+      readonly importedBinding?: boolean;
+      readonly kind: "binding-update";
+      readonly mutable: boolean;
+      readonly name: string;
+      readonly operator: AssignmentOperator;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
       readonly kind: "destructuring-set";
       readonly pattern: HirBindingPattern;
       readonly value: HirExpression;
@@ -312,6 +323,13 @@ export type HirExpression =
       readonly key: HirExpression;
       readonly kind: "property-set";
       readonly object: HirExpression;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "property-update";
+      readonly object: HirExpression;
+      readonly operator: AssignmentOperator;
       readonly value: HirExpression;
     })
   | (LocatedSyntax & {

@@ -615,9 +615,12 @@ patterns for `const`, `let`, and `var`. Generated and fixed native evidence
 covers temporal dead zones, fresh per-iteration cells, `var` retention, nested
 cleanup, object rest, and outer iterator close after pattern failure. The
 reviewed standards manifest adds six passing nullish object-pattern cases
-across all three declaration kinds. Another 42 selected cases record the
-separate compound-assignment boundary in their upstream loop bodies. The
-same recursive paths now admit standalone destructuring assignment with
+across all three declaration kinds. Compound assignment now preserves one
+identifier or member reference across every arithmetic, bitwise, shift, and
+logical operator. Generated and fixed native evidence covers all 15 operators,
+short-circuiting, write errors, and identifier function-name inference. The 42
+selected `for-of` binding cases whose loop bodies use `+=` now pass. The same
+recursive paths also admit standalone destructuring assignment with
 existing identifier and member leaves. Generated and fixed native evidence
 covers defaults, rest, result identity, member-reference evaluation order,
 nullish failure, iterator cleanup, immutable and imported binding errors,

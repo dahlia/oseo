@@ -16,6 +16,7 @@ export type { SyntaxCallTarget } from "./syntax.ts";
 export type { BinaryOperator } from "./syntax.ts";
 export type { UnaryOperator } from "./syntax.ts";
 export type { LogicalOperator } from "./syntax.ts";
+export type { AssignmentOperator } from "./syntax.ts";
 export type { SyntaxArraySpreadElement } from "./syntax.ts";
 export type { SyntaxArrayElement } from "./syntax.ts";
 export type { SyntaxSpreadArgument } from "./syntax.ts";

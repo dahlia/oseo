@@ -73,6 +73,10 @@ references evaluated before the corresponding source value. Generated code
 preserves the original right-hand value as the expression result and routes an
 immutable, imported, member-reference, or member-write failure through every
 active array-pattern close block.
+Compound assignment emits the existing binding or property read, binary
+operation, and checked write sequence against one retained reference. Logical
+forms branch before emitting the right operand and write, preserving the
+current value on the short path without adding a runtime ABI operation.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared
