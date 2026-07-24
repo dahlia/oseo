@@ -178,7 +178,7 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "destructuring-set";
-      readonly pattern: SyntaxBindingPattern;
+      readonly pattern: SyntaxAssignmentPattern;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
@@ -300,43 +300,61 @@ export interface SyntaxAssignmentMemberTarget extends LocatedSyntax {
   readonly object: SyntaxExpression;
 }
 
-/** One initialized element in an owned array binding pattern. */
-export interface SyntaxBindingElement extends LocatedSyntax {
+/** One initialized element in an owned recursive pattern. */
+export interface SyntaxBindingElement<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
-  readonly pattern: SyntaxBindingPattern;
+  readonly pattern: Pattern;
 }
 
 /** One parser-independent array binding pattern. */
-export interface SyntaxArrayBindingPattern extends LocatedSyntax {
-  readonly elements: readonly (SyntaxBindingElement | undefined)[];
+export interface SyntaxArrayBindingPattern<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
+  readonly elements: readonly (SyntaxBindingElement<Pattern> | undefined)[];
   readonly kind: "array-binding-pattern";
-  readonly rest?: SyntaxBindingPattern;
+  readonly rest?: Pattern;
 }
 
-/** One named or computed property in an owned object binding pattern. */
-export interface SyntaxObjectBindingProperty extends LocatedSyntax {
+/** One named or computed property in an owned recursive pattern. */
+export interface SyntaxObjectBindingProperty<
+  Pattern = SyntaxBindingPattern,
+> extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
   readonly key: SyntaxExpression;
-  readonly pattern: SyntaxBindingPattern;
+  readonly pattern: Pattern;
 }
 
 /** One parser-independent object binding pattern. */
-export interface SyntaxObjectBindingPattern extends LocatedSyntax {
+export interface SyntaxObjectBindingPattern<
+  Pattern = SyntaxBindingPattern,
+  Rest = SyntaxBindingIdentifier,
+> extends LocatedSyntax {
   readonly kind: "object-binding-pattern";
-  readonly properties: readonly SyntaxObjectBindingProperty[];
-  readonly rest?: SyntaxBindingTarget;
+  readonly properties: readonly SyntaxObjectBindingProperty<Pattern>[];
+  readonly rest?: Rest;
 }
 
-/** One leaf admitted by a declaration or assignment pattern. */
-export type SyntaxBindingTarget =
+/** One identifier leaf admitted by a declaration binding pattern. */
+export type SyntaxBindingTarget = SyntaxBindingIdentifier;
+
+/** One leaf admitted by a destructuring assignment pattern. */
+export type SyntaxAssignmentTarget =
   | SyntaxAssignmentMemberTarget
   | SyntaxBindingIdentifier;
 
-/** One recursively owned binding or assignment pattern. */
+/** One recursively owned declaration binding pattern. */
 export type SyntaxBindingPattern =
-  | SyntaxArrayBindingPattern
+  | SyntaxArrayBindingPattern<SyntaxBindingPattern>
   | SyntaxBindingTarget
-  | SyntaxObjectBindingPattern;
+  | SyntaxObjectBindingPattern<SyntaxBindingPattern, SyntaxBindingTarget>;
+
+/** One recursively owned destructuring assignment pattern. */
+export type SyntaxAssignmentPattern =
+  | SyntaxArrayBindingPattern<SyntaxAssignmentPattern>
+  | SyntaxAssignmentTarget
+  | SyntaxObjectBindingPattern<SyntaxAssignmentPattern, SyntaxAssignmentTarget>;
 
 /** One resolved identifier leaf with explicit binding identity. */
 export interface HirBindingIdentifier extends LocatedSyntax {
@@ -1877,6 +1895,7 @@ function resolveExpression(
       scopes,
       state,
       "write",
+      true,
     );
     return value == null || pattern == null
       ? undefined
@@ -2193,7 +2212,9 @@ function resolveExpression(
 
 type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
 
-function syntaxBindingNames(pattern: SyntaxBindingPattern): readonly string[] {
+function syntaxBindingNames(
+  pattern: SyntaxAssignmentPattern,
+): readonly string[] {
   if (pattern.kind === "assignment-member") return [];
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
@@ -2578,13 +2599,14 @@ function resolveFunctionExpression(
 }
 
 function resolveBindingPattern(
-  pattern: SyntaxBindingPattern,
+  pattern: SyntaxAssignmentPattern,
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
   mode: BindingPatternMode,
+  allowAssignmentTargets: boolean,
 ): HirBindingPattern | undefined {
   if (pattern.kind === "assignment-member") {
-    if (mode !== "write") {
+    if (!allowAssignmentTargets) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -2636,6 +2658,7 @@ function resolveBindingPattern(
         scopes,
         state,
         mode,
+        allowAssignmentTargets,
       );
       let initializer =
         property.initializer == null
@@ -2671,6 +2694,7 @@ function resolveBindingPattern(
         scopes,
         state,
         mode,
+        allowAssignmentTargets,
       );
       if (
         resolvedRest?.kind !== "binding-identifier" &&
@@ -2699,6 +2723,7 @@ function resolveBindingPattern(
       scopes,
       state,
       mode,
+      allowAssignmentTargets,
     );
     let initializer =
       element.initializer == null
@@ -2723,7 +2748,13 @@ function resolveBindingPattern(
   const rest =
     pattern.rest == null
       ? undefined
-      : resolveBindingPattern(pattern.rest, scopes, state, mode);
+      : resolveBindingPattern(
+          pattern.rest,
+          scopes,
+          state,
+          mode,
+          allowAssignmentTargets,
+        );
   if (pattern.rest != null && rest == null) return undefined;
   return {
     ...(pattern.byteRange == null ? {} : { byteRange: pattern.byteRange }),
@@ -2749,6 +2780,7 @@ function resolveStatement(
       scopes,
       state,
       statement.mode,
+      false,
     );
     return initializer == null || pattern == null
       ? undefined
@@ -2838,6 +2870,7 @@ function resolveStatement(
         [...scopes, catchScope],
         state,
         "declare",
+        false,
       );
       if (pattern == null) return undefined;
       const body = resolveStatement(
@@ -3126,6 +3159,7 @@ function resolveStatement(
         lexical ? forScopes : scopes,
         state,
         lexical ? "declare" : "write",
+        false,
       );
       if (pattern != null) {
         target = { ...statement.target, pattern };

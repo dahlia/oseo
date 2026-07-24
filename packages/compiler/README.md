@@ -5,6 +5,10 @@ This package owns Oseo syntax, hint metadata, lexical resolution, HIR, MIR,
 specialization policy, diagnostics, targets, and extension interfaces.
 Concrete parser, backend, runtime, toolchain, and host packages implement these
 contracts without becoming compiler-core dependencies.
+The exported syntax contract separates declaration binding patterns from
+destructuring assignment patterns. Only assignment patterns admit member
+targets, and lexical resolution validates that context independently of binding
+write mode.
 
 Native target descriptions contain immutable artifact facts, including the
 architecture, operating system, ABI, executable format, C standard, and

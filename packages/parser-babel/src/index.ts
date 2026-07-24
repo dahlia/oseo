@@ -11,6 +11,8 @@ import type {
   SourceFrontend,
   SourceInput,
   SourceRange,
+  SyntaxAssignmentPattern,
+  SyntaxAssignmentTarget,
   SyntaxArrayBindingPattern,
   SyntaxArrayElement,
   SyntaxBindingPattern,
@@ -67,6 +69,9 @@ interface SourceIndex {
   readonly length: number;
   readonly lines: readonly number[];
 }
+
+type AssignmentArrayBindingElement =
+  SyntaxArrayBindingPattern<SyntaxAssignmentPattern>["elements"][number];
 
 function node(value: unknown): BabelNode | undefined {
   if (value == null || typeof value !== "object" || Array.isArray(value)) {
@@ -886,8 +891,23 @@ function expression(
 function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
+  assignment: true,
+): SyntaxAssignmentPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+  assignment?: false,
+): SyntaxBindingPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+  assignment: boolean,
+): SyntaxAssignmentPattern | undefined;
+function bindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
   assignment = false,
-): SyntaxBindingPattern | undefined {
+): SyntaxAssignmentPattern | undefined {
   if (value.type === "ParenthesizedExpression") {
     const inner = node(value.expression);
     return inner == null
@@ -941,8 +961,11 @@ function bindingPattern(
     );
   }
   if (value.type === "ObjectPattern") {
-    const properties: SyntaxObjectBindingPattern["properties"][number][] = [];
-    let rest: SyntaxObjectBindingPattern["rest"];
+    const properties: SyntaxObjectBindingPattern<
+      SyntaxAssignmentPattern,
+      SyntaxAssignmentTarget
+    >["properties"][number][] = [];
+    let rest: SyntaxAssignmentTarget | undefined;
     const objectProperties = nodes(value.properties);
     for (const [index, property] of objectProperties.entries()) {
       if (property.type === "RestElement") {
@@ -1048,8 +1071,8 @@ function bindingPattern(
   const rawElements = Array.isArray(value.elements)
     ? (value.elements as readonly unknown[])
     : [];
-  const elements: SyntaxArrayBindingPattern["elements"][number][] = [];
-  let rest: SyntaxBindingPattern | undefined;
+  const elements: AssignmentArrayBindingElement[] = [];
+  let rest: SyntaxAssignmentPattern | undefined;
   for (const [index, rawElement] of rawElements.entries()) {
     const element = node(rawElement);
     if (element == null) {
@@ -1102,7 +1125,6 @@ function bindingPattern(
 }
 
 function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
-  if (pattern.kind === "assignment-member") return [];
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
     return [
@@ -1861,7 +1883,7 @@ function validateAsyncContinuationCount(
 }
 
 interface AwaitPoint {
-  readonly assignment?: SyntaxBindingPattern;
+  readonly assignment?: SyntaxAssignmentPattern;
   readonly declaration?: {
     readonly hint: Hint | undefined;
     readonly kind: "const" | "let" | "var";

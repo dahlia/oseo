@@ -313,6 +313,82 @@ test("rejects duplicate names in owned catch binding patterns", () => {
   }
 });
 
+test("rejects assignment members in owned binding patterns", () => {
+  const member = {
+    key: { kind: "string", range, value: "value" },
+    kind: "assignment-member",
+    object: { kind: "object", properties: [], range },
+    range,
+  } as const;
+  const patterns = [
+    member,
+    {
+      elements: [{ pattern: member, range }],
+      kind: "array-binding-pattern",
+      range,
+    },
+  ] as const;
+  const declarations = [
+    { declarationKind: "var", mode: "write" },
+    { declarationKind: "let", mode: "declare" },
+  ] as const;
+  for (const declaration of declarations) {
+    for (const pattern of patterns) {
+      const result = buildHir({
+        body: [
+          {
+            ...declaration,
+            initializer: { elements: [], kind: "array", range },
+            kind: "binding-pattern",
+            pattern,
+            range,
+          },
+        ],
+        kind: "program",
+        range,
+        sourceId: `invalid-${declaration.declarationKind}-member-pattern.ts`,
+      } as unknown as SyntaxProgram);
+      assert.equal(result.program, undefined);
+      assert.match(
+        result.diagnostics[0]?.message ?? "",
+        /Member targets are valid only in assignment patterns/u,
+      );
+    }
+  }
+});
+
+test("rejects assignment members in owned for-of declarations", () => {
+  const result = buildHir({
+    body: [
+      {
+        body: { body: [], kind: "block", range },
+        iterable: { elements: [], kind: "array", range },
+        kind: "for-of",
+        range,
+        target: {
+          declarationKind: "var",
+          kind: "pattern-declaration",
+          pattern: {
+            key: { kind: "string", range, value: "value" },
+            kind: "assignment-member",
+            object: { kind: "object", properties: [], range },
+            range,
+          },
+          range,
+        },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "invalid-for-of-member-pattern.ts",
+  } as unknown as SyntaxProgram);
+  assert.equal(result.program, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Member targets are valid only in assignment patterns/u,
+  );
+});
+
 test("retains lexical reads for runtime temporal-dead-zone checks", () => {
   const syntax: SyntaxProgram = {
     body: [
