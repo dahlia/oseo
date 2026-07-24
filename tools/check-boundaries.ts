@@ -183,17 +183,46 @@ async function sourceImports(directory: string): Promise<ReadonlySet<string>> {
   return imports;
 }
 
+async function sourceImportGraph(
+  directory: string,
+): Promise<ReadonlyMap<string, ReadonlySet<string>>> {
+  const files = await sourceFiles(join(directory, "src"));
+  const knownFiles = new Set(files.map((path) => resolve(path)));
+  const graph = new Map<string, ReadonlySet<string>>();
+  for (const path of files) {
+    const source = await readFile(path, "utf8");
+    const syntax = parseBabel(source, {
+      plugins: ["typescript"],
+      sourceFilename: relative(directory, path),
+      sourceType: "module",
+    });
+    const specifiers = new Set<string>();
+    collectImportSpecifiers(syntax, specifiers, new WeakSet());
+    const dependencies = new Set<string>();
+    for (const specifier of specifiers) {
+      if (!isRelativeSpecifier(specifier)) continue;
+      const target = resolve(dirname(path), specifier);
+      if (knownFiles.has(target)) dependencies.add(relative(directory, target));
+    }
+    graph.set(relative(directory, path), dependencies);
+  }
+  return graph;
+}
+
 function visit(
   name: string,
   graph: ReadonlyMap<string, ReadonlySet<string>>,
   active: Set<string>,
   finished: Set<string>,
+  cycleKind: string,
 ): void {
-  if (active.has(name)) throw new Error(`Package dependency cycle at ${name}.`);
+  if (active.has(name)) {
+    throw new Error(`${cycleKind} cycle at ${name}.`);
+  }
   if (finished.has(name)) return;
   active.add(name);
   for (const dependency of graph.get(name) ?? []) {
-    visit(dependency, graph, active, finished);
+    visit(dependency, graph, active, finished, cycleKind);
   }
   active.delete(name);
   finished.add(name);
@@ -259,7 +288,15 @@ export async function checkPackageBoundaries(root: string): Promise<number> {
   }
   const finished = new Set<string>();
   for (const name of graph.keys()) {
-    visit(name, graph, new Set(), finished);
+    visit(name, graph, new Set(), finished, "Package dependency");
+  }
+  for (const data of packages) {
+    if (data.name !== compiler && data.name !== babelParserOwner) continue;
+    const sourceGraph = await sourceImportGraph(data.directory);
+    const sourceFinished = new Set<string>();
+    for (const path of sourceGraph.keys()) {
+      visit(path, sourceGraph, new Set(), sourceFinished, "Source import");
+    }
   }
   return packages.length;
 }
@@ -267,5 +304,8 @@ export async function checkPackageBoundaries(root: string): Promise<number> {
 const entryPath = process.argv[1];
 if (entryPath != null && pathToFileURL(entryPath).href === import.meta.url) {
   const packageCount = await checkPackageBoundaries(process.cwd());
-  console.log(`packages=${packageCount} dependency-boundaries=valid`);
+  console.log(
+    `packages=${packageCount} dependency-boundaries=valid ` +
+      "source-graphs=acyclic",
+  );
 }

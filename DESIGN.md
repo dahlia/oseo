@@ -136,6 +136,23 @@ syntax, resolved HIR, generic MIR, deterministic C11 lowering, static runtime
 linking, and native execution. M2 added guarded specialization to this same
 pipeline without creating a second composition path.
 
+The compiler package keeps those stages in package-private source modules.
+*source.ts* and *syntax.ts* own frontend-neutral inputs. *modules.ts* owns graph
+construction and linking. *hir.ts*, *hir-build.ts*, and *hir-print.ts* separate
+the HIR representation from construction and rendering. *mir.ts*,
+*mir-build.ts*, *mir-specialize.ts*, and *mir-print.ts* do the same for generic
+lowering, guarded specialization, and MIR rendering. *module-compile.ts* owns
+whole-graph asynchronous compilation, *compile.ts* composes source compilation,
+and *native.ts* owns native extension contracts. *index.ts* remains the public
+export and composition surface. Automated boundary checks reject cycles in the
+compiler and Babel adapter source graphs.
+
+The Babel adapter isolates raw parser shapes in *babel.ts*, source indexing and
+diagnostics in *locations.ts*, and hint extraction in *hints.ts*. Its
+expression, pattern, statement, function, hoisting, and asynchronous conversion
+remain one mutually recursive unit in *convert.ts*. *modules.ts* owns module
+entry conversion, and *index.ts* is the only public composition surface.
+
 
 Source frontend
 ---------------
@@ -684,6 +701,14 @@ with collection forced at each safepoint. The ordinary gate runs ten native
 cases; the extended task increases both case count and schedule size.
 Each run records the normalized execution host, exact native target, and
 sanitizer modes in its retained failure context.
+
+The native integration command remains *tests/native.ts*. It owns argument
+parsing, deterministic shard selection, orchestration, and stable summaries.
+The immutable fixture contract and ordered semantic families live under
+*tests/native/*; their explicit concatenation order, rather than filesystem
+enumeration or import side effects, determines shard membership. Non-catalog
+module, diagnostic, runtime, and target inspections use shard-owned scenario
+modules under *tests/native/scenarios/*.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of

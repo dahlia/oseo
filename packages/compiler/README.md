@@ -10,6 +10,15 @@ destructuring assignment patterns. Only assignment patterns admit member
 targets, and lexical resolution validates that context independently of binding
 write mode.
 
+Internal ownership follows the compiler pipeline. *source.ts* and *syntax.ts*
+define frontend-neutral inputs, *modules.ts* owns graph construction and
+linking, and the _hir-\*.ts_ and _mir-\*.ts_ families separate representations,
+construction, printing, and guarded specialization. *module-compile.ts* owns
+whole-graph asynchronous compilation, while *compile.ts* composes source
+compilation. *native.ts* contains replaceable backend, runtime, toolchain,
+process, target, and host contracts. *index.ts* is the unchanged public export
+and composition surface. Package-private modules are not package export paths.
+
 Native target descriptions contain immutable artifact facts, including the
 architecture, operating system, ABI, executable format, C standard, and
 sanitizer policy. Stable Oseo target IDs use operating-system, architecture,
