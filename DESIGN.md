@@ -553,6 +553,10 @@ The C backend is downstream of a backend-neutral interface. Oseo may later emit
 LLVM IR, use another code generator, or write object files directly without
 changing source semantics or specialization decisions. Backend-specific
 optimizations must not become prerequisites for correctness.
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md) defines the evidence, replacement
+triggers, and candidate boundaries for that deferred decision. It does not
+schedule a migration or weaken the C11 path as the reference and portability
+backend.
 
 The backend lowers MIR blocks, operations, and terminators directly. HIR is not
 retained in `MirFunction`, and changing a MIR operation changes emitted C. This
@@ -724,7 +728,8 @@ artifact, and evidence gates for that future work. The following questions
 still need decision records before the affected implementation becomes a
 dependency of later milestones:
 
- -  the long-term native code-generation backend;
+ -  the long-term native code-generation backend, as scoped by
+    [*PLAN-BACKEND.md*](./PLAN-BACKEND.md);
  -  the native event-loop and system-library boundary, including the
     completion, cancellation, buffer-lifetime, and fallback decisions scoped by
     [*PLAN-NIO.md*](./PLAN-NIO.md);

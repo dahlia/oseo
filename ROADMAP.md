@@ -46,6 +46,12 @@ state from shareable matcher artifacts, keeps dynamic patterns on the same
 semantic model as literals, and measures ahead-of-time C lowering against a
 compact generic matcher before selecting a backend.
 
+A deferred code-generation track is recorded in
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md). C11 remains the implemented reference
+and portability backend. The track starts a candidate investigation only when
+representative measurements reach a recorded replacement trigger, and it does
+not reserve a milestone or put a backend migration in the M5 queue.
+
 
 Working rules
 -------------
@@ -668,6 +674,10 @@ The roadmap should be revised when evidence changes one of these assumptions:
  -  Native I/O facilities differ by operation, kernel, sandbox, and target. The
     probes and fallbacks in [*PLAN-NIO.md*](./PLAN-NIO.md) keep one fashionable
     backend name from becoming an unmeasured portability requirement.
+ -  C gives a short route to native code but can hide machine-level control and
+    carries semantics that differ from ECMAScript. The retained C11 baseline
+    and replacement triggers in [*PLAN-BACKEND.md*](./PLAN-BACKEND.md) keep a
+    new code generator from becoming an unmeasured requirement.
  -  Self-hosting can drift indefinitely if treated as a final rewrite. The
     compiler profile and host boundaries are enforced from M0 onward.
  -  A stateful REPL requires code and object lifetimes to cross compilation

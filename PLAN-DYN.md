@@ -18,10 +18,10 @@ compiler.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md),
-[*PLAN-REPL.md*](./PLAN-REPL.md), and the accepted records under *docs/adr/*.
-Evidence that changes one of those contracts updates the affected document in
-the same change.
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-REPL.md*](./PLAN-REPL.md), and the
+accepted records under *docs/adr/*. Evidence that changes one of those
+contracts updates the affected document in the same change.
 
 
 Goal
@@ -295,6 +295,9 @@ through a future backend, or use another inspectable artifact boundary. No
 candidate becomes the deployment contract before measuring toolchain
 presence, temporary storage, startup latency, executable size, sandbox
 restrictions, and failure cleanup.
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md) owns any conclusion about Oseo's general
+code-generation path. This plan owns whether a candidate artifact and compiler
+service satisfy dynamic-source capability, validation, and lifetime needs.
 
 Only the generic call ABI is stable across independently compiled units.
 Private specialized entries remain inside one artifact. A loaded unit may call

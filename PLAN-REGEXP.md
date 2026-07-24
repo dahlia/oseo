@@ -19,7 +19,8 @@ contracts.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-PT.md*](./PLAN-PT.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of
 those contracts updates the affected document in the same change.
@@ -217,6 +218,10 @@ provisional. The boundary must nevertheless preserve direction, captures,
 choice priority, character sets, flag-dependent behavior, and source metadata.
 A textual dump or validator should make malformed control flow and capture use
 inspectable before backend lowering.
+The matcher artifact decision belongs to this plan. The program
+code-generation decision belongs to
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md); matcher measurements may inform it
+without selecting it.
 
 ### Ahead-of-time literal path
 

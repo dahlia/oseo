@@ -17,8 +17,9 @@ for M5.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), and
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
+[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-PT.md*](./PLAN-PT.md), and
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Evidence from an
 interactive prototype must update the affected document or decision record
 instead of bypassing its current boundary.
@@ -112,6 +113,9 @@ must not depend on which supported compiler host performs that compilation.
 The loader, validation, and code-lifetime evidence should satisfy the shared
 late-artifact criteria in [*PLAN-DYN.md*](./PLAN-DYN.md) rather than creating a
 REPL-only native format.
+The latency and distribution results also feed
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), but the REPL does not select Oseo's
+general code-generation backend.
 
 
 Session semantics to decide
@@ -160,9 +164,11 @@ The boundary between them must define:
 
 Compiler core continues to define backend-neutral representations and
 interfaces. A concrete backend and loader implement the native artifact
-format. The CLI or a later development-environment package composes the
-compiler, loader, session, and terminal interface; compiler core must not
-import them.
+format. [*PLAN-BACKEND.md*](./PLAN-BACKEND.md) governs any project-wide
+code-generation decision, while this plan governs incremental validation,
+publication, and lifetime. The CLI or a later development-environment package
+composes the compiler, loader, session, and terminal interface; compiler core
+must not import them.
 
 
 Code and object lifetime
