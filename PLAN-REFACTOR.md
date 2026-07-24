@@ -4,13 +4,11 @@ Compiler source decomposition plan
 Status
 ------
 
-Implementation status: in progress. The baseline and decomposition checkpoints
-are complete on the `refactor` branch; closing verification and plan retirement
-remain. This temporary cross-milestone plan decomposes the compiler, Babel
-frontend adapter, and native fixture runner before the next broad M5 language
-and built-in batches. It preserves the current language profile, package
-interfaces, intermediate representations, generated behavior, diagnostics, and
-compatibility classifications.
+Implementation status: complete on the `refactor` branch. The baseline,
+decomposition, and closing verification checkpoints pass. This document remains
+only until the separate retirement change. The completed work preserves the
+current language profile, package interfaces, intermediate representations,
+generated behavior, diagnostics, and compatibility classifications.
 
 The plan is retired after its exit criteria pass and its durable ownership
 rules move into [*DESIGN.md*](./DESIGN.md), package documentation, and the
@@ -174,6 +172,29 @@ positions, and final summaries remain unchanged.
 `mise run test:native` passes with 53 of 53 Node.js, Deno, and
 `linux-x86_64-gnu` output comparisons, 54 `linux-aarch64-musl` cross builds,
 and all configured target assembly inspections.
+
+### Closing verification
+
+The clean closing tree passes `mise run check` and `mise run test`. The
+aggregate gate runs 314 Node.js and 255 Deno package tests, every architecture
+probe, all 53 native execution fixtures, all 54 AArch64 Linux cross builds, and
+the complete reviewed test262 subset. The standards summary remains 635 cases:
+224 passes, 226 expected negatives, and 185 unsupported profile features.
+
+The focused `mise run test:property:native` and
+`mise run test:property:extended` gates also pass. The latter uses the reviewed
+ten-times case budget under both package-test hosts and completes all 16 native
+property observations. The test262 canonical and target-parity digests remain:
+
+ -  `sha256:a682a3872c4213ad7cb6d770b6f54cf35abd03d69bb7e5af43f4717366a5440c`;
+    and
+ -  `sha256:6c185fa2265cdc72222371e48bcbfbde07aea9c0b98313a807523ac1f1efbc05`.
+
+Package dry runs retain the root-only export maps, so package-private source
+files do not become public import paths. Boundary checks report valid package
+dependencies and acyclic compiler and Babel adapter source graphs. The durable
+owners are recorded in [*DESIGN.md*](./DESIGN.md) and the compiler and Babel
+adapter package README files.
 
 
 Ownership rules

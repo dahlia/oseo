@@ -86,11 +86,12 @@ recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
 are implemented, so that work is no longer blocked on them. Delivery
 items 5, 6, 8, and 9 remain open.
 
-Before the next broad M5 syntax and built-in batches,
-[*PLAN-REFACTOR.md*](./PLAN-REFACTOR.md) decomposes the compiler, Babel
-frontend adapter, and native fixture runner into responsibility-owned modules.
-That temporary refactoring preserves the current profile and compatibility
-counts. It does not complete an M5 semantic unit by itself.
+Before the next broad M5 syntax and built-in batches, the compiler, Babel
+frontend adapter, and native fixture runner were decomposed into
+responsibility-owned modules. [*DESIGN.md*](./DESIGN.md) and the compiler and
+Babel adapter package README files record the durable ownership. The completed
+refactoring preserves the current profile and compatibility counts; it does not
+complete an M5 semantic unit by itself.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),

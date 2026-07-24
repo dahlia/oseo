@@ -636,10 +636,10 @@ package-private internal header, an M5-enabling refactor that changes
 no compatibility counts; the error, symbol, and iterator components
 landed with the M5 intrinsics units. The remaining queue is:
 
-1.  Complete the behavior-preserving compiler, Babel frontend, and native
-    fixture decomposition in
-    [*PLAN-REFACTOR.md*](./PLAN-REFACTOR.md). This enabling refactoring changes
-    no language-profile or compatibility count.
+1.  The behavior-preserving compiler, Babel frontend, and native fixture
+    decomposition is complete. [*DESIGN.md*](./DESIGN.md) and the applicable
+    package README files record the resulting ownership. This enabling
+    refactoring changed no language-profile or compatibility count.
 2.  Complete the remaining foundational expressions and coercions after the
     landed errors, symbols, synchronous iterator consumers, spread consumers,
     and array binding declarations.
