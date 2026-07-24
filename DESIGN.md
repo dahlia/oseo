@@ -386,6 +386,9 @@ recursive array or object binding patterns as a standalone declaration.
 Lexical pattern names enter the temporal dead zone before iterator acquisition
 and receive fresh cells before each iteration. A pattern failure closes its
 own nested iterators before closing the outer `for-of` iterator.
+An assignment head may use the corresponding recursive assignment patterns.
+Its identifier and member leaves write existing targets without creating
+cells, and a target failure follows the same inner-before-outer cleanup order.
 
 Array literal spread reuses the same iterator acquisition and step operations
 without creating a cleanup region. Array accumulation never calls
@@ -438,12 +441,25 @@ errors, while member leaves retain their object and key expressions as owned
 assignment references. A member reference evaluates its object and computed-key
 expression before the corresponding iterator step, source property read, or
 default. Property-key conversion and storage occur after the selected value is
-known. The expression produces the original right-hand value. Array patterns
-conditionally close their iterators after an early normal completion or a
-target or default failure. Object patterns check coercibility before computed
-source keys and share the same ordered property reads and
+known. A nullish member base fails before property-key conversion and resumes
+through any active pattern cleanup. The expression produces the original
+right-hand value. Array patterns conditionally close their iterators after an
+early normal completion or a target or default failure. Object patterns check
+coercibility before computed source keys and share the same ordered reads and
 `CopyDataProperties` path. Await inside a member target remains outside the
 admitted continuation positions.
+
+Update expressions retain an owned reference rather than rewriting to an
+ordinary assignment. An identifier target performs one checked read, numeric
+coercion, arithmetic by one, and one checked write. A member target evaluates
+its object and key expression once while retaining the raw key value. It
+converts that value independently for the read and write, because both
+conversions are observable and may select different properties. Prefix forms
+produce the assigned value; postfix forms retain the coerced previous value
+across the checked write. A nullish base fails its object-coercibility check
+after the key expression but before either key conversion. These paths reuse
+existing MIR numeric, property, and binding operations and add no runtime ABI
+operation.
 
 Call argument spread reuses iterator acquisition and step without a cleanup
 region, then appends ordinary and iterated values to a rooted private argument

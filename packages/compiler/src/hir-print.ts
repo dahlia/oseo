@@ -45,6 +45,12 @@ function printHirExpression(expression: HirExpression): string {
       `${expression.operator}= ${printHirExpression(expression.value)}`
     );
   }
+  if (expression.kind === "binding-step") {
+    const target = `%b${expression.bindingId} ${expression.name}`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
+  }
   if (expression.kind === "destructuring-set") {
     return (
       `write ${printHirBindingPattern(expression.pattern)} = ` +
@@ -143,6 +149,14 @@ function printHirExpression(expression: HirExpression): string {
       `${printHirExpression(expression.key)}] ${expression.operator}= ` +
       printHirExpression(expression.value)
     );
+  }
+  if (expression.kind === "property-step") {
+    const target =
+      `update ${printHirExpression(expression.object)}[` +
+      `${printHirExpression(expression.key)}]`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
   }
   if (expression.kind === "module-namespace") {
     return `module-namespace {${expression.entries
@@ -325,10 +339,12 @@ function appendHirStatement(
         : statement.target.kind === "pattern-declaration"
           ? `${statement.target.declarationKind} ` +
             printHirBindingPattern(statement.target.pattern)
-          : statement.target.kind === "binding"
-            ? `%b${statement.target.bindingId} ${statement.target.name}`
-            : `${printHirExpression(statement.target.object)}[` +
-              `${printHirExpression(statement.target.key)}]`;
+          : statement.target.kind === "assignment-pattern"
+            ? printHirBindingPattern(statement.target.pattern)
+            : statement.target.kind === "binding"
+              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              : `${printHirExpression(statement.target.object)}[` +
+                `${printHirExpression(statement.target.key)}]`;
     lines.push(
       `${indent}for (${target} of ` +
         `${printHirExpression(statement.iterable)})${location}`,

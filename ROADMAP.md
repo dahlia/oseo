@@ -620,6 +620,13 @@ identifier or member reference across every arithmetic, bitwise, shift, and
 logical operator. Generated and fixed native evidence covers all 15 operators,
 short-circuiting, write errors, and identifier function-name inference. The 42
 selected `for-of` binding cases whose loop bodies use `+=` now pass. The same
+identifier and member reference paths now admit prefix and postfix `++` and
+`--`. Generated and fixed native evidence covers Number coercion, result
+selection, distinct read and write key conversions, immutable failure, both
+specialization policies, and forced collection. Four new reviewed standards
+cases cover the four forms, two parse negatives retain strict `arguments`
+early errors, and a classic `for` update promotes one existing exponentiation
+case to pass. The same
 recursive paths also admit standalone destructuring assignment with
 existing identifier and member leaves. Generated and fixed native evidence
 covers defaults, rest, result identity, member-reference evaluation order,
@@ -628,7 +635,12 @@ direct awaited right operands, both specialization policies, and forced
 collection. Fourteen reviewed standards cases cover identifier and member
 writes, nested patterns, defaults, rest, result identity, nullish and
 immutable-target errors, and function-name inference. Await inside a member
-target remains a separate continuation unit. The intrinsics
+target remains a separate continuation unit. Synchronous `for-of` assignment
+heads now reuse those recursive patterns and existing targets. Generated and
+fixed native evidence covers defaults, rest, member leaves, nullish and
+immutable failure, and inner-before-outer iterator cleanup. Six reviewed
+standards cases cover identifier, member, default, and array-rest heads. The
+intrinsics
 stream has landed the named error family as runtime-owned constructor
 values with typed catchable runtime errors;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C

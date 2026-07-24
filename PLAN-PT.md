@@ -566,11 +566,32 @@ values, and no filtering. The extended tier runs ten times the ordinary budget
 through the shared replay controls. Fixed native fixtures retain function-name
 inference, member object, key, conversion, read, and default order,
 member-target failure cleanup, step failure without close, immutable-target
-failure with close, computed-key suppression for nullish object input, and
-direct awaited right operands. Eleven reviewed test262 cases pin identifier
-writes, nested patterns, defaults, rest, result identity, nullish and
-immutable-target errors, and function-name inference under both strictness and
-specialization policies.
+failure with close, computed-key suppression for nullish source inputs and
+member bases, and direct awaited right operands. Fourteen reviewed test262
+cases pin identifier writes, nested patterns, defaults, rest, result identity,
+nullish and immutable-target errors, and function-name inference under both
+strictness and specialization policies.
+
+
+M5 for-of assignment properties
+-------------------------------
+
+The `for-of` assignment property generates an array or object assignment
+pattern with existing identifier or member leaves, defaults, and rest. Two
+outer iterations vary present, missing, and nullish inputs. Its independent
+model predicts the final targets, retained rest values, accumulated body
+result, or escaped `TypeError`, together with the outer iterator close count.
+Each case compares the model with Node.js, Deno, specialization-disabled native
+execution, and specialization-enabled execution with collection forced at
+every safepoint.
+
+The ordinary suite uses seed `0x5eed000e`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+identifier and member targets, defaults, object rest, immutable-target failure,
+nullish member key-conversion suppression, and inner-before-outer iterator
+cleanup. Six reviewed test262 cases pin identifier, member, default, and
+array-rest heads.
 
 
 M5 compound assignment properties
@@ -593,6 +614,27 @@ retain every operator, expression results, logical short-circuiting, identifier
 function-name inference, unnamed property functions, member-reference order,
 observable read and write key conversions, and immutable-target failure.
 Forty-two reviewed test262 cases pin `+=` inside `for-of` binding loops.
+
+
+M5 update expression properties
+-------------------------------
+
+The update expression property generates prefix or postfix `++` or `--` with
+an identifier or computed member target. Inputs vary across bounded numbers,
+numeric strings, booleans, and null. Its independent model predicts the
+coerced previous value, stored value, expression result, object and key
+evaluation counts, and separate read and write key conversion counts. Each
+case compares the model with Node.js, Deno, specialization-disabled native
+execution, and specialization-enabled native execution with collection forced
+at every safepoint.
+
+The ordinary suite uses seed `0x5eed000f`, ten successful cases, one update per
+program, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain all
+four forms, numeric-string coercion, negative zero, infinities, `NaN`, distinct
+read and write properties, member-reference order, nullish-base key-conversion
+suppression, and immutable-target failure. Four reviewed test262 cases cover
+the four forms, and two parse negatives retain strict `arguments` early errors.
 
 
 Test placement and package boundaries

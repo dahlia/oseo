@@ -394,6 +394,34 @@ export function expression(
       ? undefined
       : { ...located, ...member, kind: "property-set", value: assigned };
   }
+  if (value.type === "UpdateExpression") {
+    const argument = unparenthesizedExpression(value.argument);
+    if (argument == null) return unsupported(context, value);
+    const operator = value.operator;
+    if (operator !== "++" && operator !== "--") {
+      return unsupported(context, value, "This update is unsupported.");
+    }
+    const name = identifierName(argument);
+    if (name != null) {
+      return {
+        ...located,
+        kind: "binding-step",
+        name,
+        operator,
+        prefix: value.prefix === true,
+      };
+    }
+    const member = memberParts(context, argument);
+    return member == null
+      ? undefined
+      : {
+          ...located,
+          ...member,
+          kind: "property-step",
+          operator,
+          prefix: value.prefix === true,
+        };
+  }
   if (value.type === "LogicalExpression") {
     const operator = value.operator;
     if (operator !== "&&" && operator !== "||" && operator !== "??") {
@@ -1177,6 +1205,17 @@ export function statement(
           name,
           range: location(context, left).range,
         };
+      } else if (
+        assignmentTarget.type === "ArrayPattern" ||
+        assignmentTarget.type === "ObjectPattern"
+      ) {
+        const pattern = bindingPattern(context, assignmentTarget, true);
+        if (pattern == null) return undefined;
+        target = {
+          kind: "assignment-pattern",
+          pattern,
+          range: location(context, left).range,
+        };
       } else {
         const member = memberParts(context, assignmentTarget);
         if (member != null) {
@@ -1193,7 +1232,7 @@ export function statement(
       return unsupported(
         context,
         left,
-        "A for-of head needs an identifier or member assignment target.",
+        "A for-of head needs an assignment target.",
       );
     }
     const iterable = expression(context, rightNode);

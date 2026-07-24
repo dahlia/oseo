@@ -135,6 +135,28 @@ function resolveExpression(
               : value,
         };
   }
+  if (expression.kind === "binding-step") {
+    const binding = findBinding(scopes, expression.name);
+    if (binding == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          `Unknown binding '${expression.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    return {
+      ...expression,
+      bindingId: binding.id,
+      ...(binding.functionNameBinding === true
+        ? { functionNameBinding: true }
+        : {}),
+      ...(binding.importedBinding === true ? { importedBinding: true } : {}),
+      mutable: binding.mutable,
+    };
+  }
   if (expression.kind === "destructuring-set") {
     const value = resolveExpression(expression.value, scopes, state);
     const pattern = resolveBindingPattern(
@@ -324,6 +346,13 @@ function resolveExpression(
     return object == null || key == null || value == null
       ? undefined
       : { ...expression, key, object, value };
+  }
+  if (expression.kind === "property-step") {
+    const object = resolveExpression(expression.object, scopes, state);
+    const key = resolveExpression(expression.key, scopes, state);
+    return object == null || key == null
+      ? undefined
+      : { ...expression, key, object };
   }
   if (expression.kind === "new") {
     const argumentsValue: HirCallArgument[] = [];
@@ -770,7 +799,8 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
   }
   if (
     expression.kind === "property-delete" ||
-    expression.kind === "property-get"
+    expression.kind === "property-get" ||
+    expression.kind === "property-step"
   ) {
     return (
       hirExpressionHasAwait(expression.object) ||
@@ -1516,6 +1546,17 @@ function resolveStatement(
         state,
         lexical ? "declare" : "write",
         false,
+      );
+      if (pattern != null) {
+        target = { ...statement.target, pattern };
+      }
+    } else if (statement.target.kind === "assignment-pattern") {
+      const pattern = resolveBindingPattern(
+        statement.target.pattern,
+        scopes,
+        state,
+        "write",
+        true,
       );
       if (pattern != null) {
         target = { ...statement.target, pattern };

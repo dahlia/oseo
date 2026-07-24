@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 266
-passes, 226 expected negatives, and 143 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 277
+passes, 228 expected negatives, and 142 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -73,7 +73,9 @@ catch cells, iterator cleanup, and abrupt propagation through `finally`.
 Synchronous `for-of` declaration heads now admit those recursive patterns for
 `const`, `let`, and `var`, preserving lexical temporal dead zones, fresh
 per-iteration cells, `var` hoisting, nested cleanup, and outer iterator close
-on pattern failure. Standalone destructuring assignment now admits
+on pattern failure. Its non-declaration heads also admit recursive array and
+object assignment patterns with existing identifier or member leaves.
+Standalone destructuring assignment now admits
 recursive array and object patterns whose leaves and rest targets are existing
 identifiers or member references. It evaluates the right operand once, returns
 that original value, preserves default and rest behavior, conditionally closes
@@ -86,6 +88,13 @@ The target reference and current value are evaluated once, logical assignments
 skip both the right operand and write on their short branch, and checked writes
 retain immutable and imported binding errors. This unit promotes the 42
 reviewed `for-of` binding cases whose loop bodies use `+=`.
+Prefix and postfix `++` and `--` now admit identifier and member references.
+They coerce the previous value through the admitted Number path, preserve the
+distinct prefix and postfix results, and reuse checked writes. Member targets
+evaluate their object and key expressions once, then perform the observable
+read and write key conversions in order. Four new passing test262 cases cover
+the four forms, and the admitted classic `for` update promotes one existing
+exponentiation case to pass.
 Awaited member targets, parameter patterns, and classic `for` head
 destructuring remain later work. The runtime component boundaries
 recorded in [*docs/runtime-components.md*](./docs/runtime-components.md)
@@ -280,19 +289,34 @@ operand evaluates once before pattern work and remains the assignment
 expression result. A member leaf evaluates its object and computed-key
 expression before the corresponding iterator step, source property read, or
 default, then converts the key and stores only after selecting the assigned
-value. Defaults, nested patterns, array and object rest, computed source keys,
-conditional `IteratorClose`, immutable-binding errors, imported-binding
-errors, and abrupt completion reuse the declaration paths without creating
-cells. The generated property suite uses seed `0x5eed000c` across identifier
-and member targets, array and object patterns, present, missing, and nullish
-inputs, both native specialization policies, and forced collection. Fixed
-native fixtures retain expression-result identity, function-name inference,
-member-reference order, step failure without close, target failure with close,
-and computed-key suppression on nullish object input. Await inside a member
-target remains unsupported until it joins the admitted continuation positions.
+value. A nullish member base fails before key conversion and resumes through
+any active pattern cleanup. Defaults, nested patterns, array and object rest,
+computed source keys, conditional `IteratorClose`, immutable-binding errors,
+imported-binding errors, and abrupt completion reuse the declaration paths
+without creating cells. The generated property suite uses seed `0x5eed000c`
+across identifier and member targets, array and object patterns, present,
+missing, and nullish inputs, both native specialization policies, and forced
+collection. Fixed native fixtures retain expression-result identity,
+function-name inference, member-reference order, step failure without close,
+target failure with close, and computed-key suppression for nullish source
+inputs and member bases. Await inside a member target remains unsupported until
+it joins the admitted continuation positions.
 Fourteen reviewed test262 cases pin identifier and member writes, nested
 patterns, defaults, rest, result identity, nullish and immutable-target errors,
 and function-name inference under both strictness and specialization policies.
+
+Synchronous `for-of` assignment heads now accept the same recursive array and
+object patterns. Each outer step writes existing identifier or member leaves
+without creating cells. Defaults, nesting, rest, nullish failure, immutable
+target errors, and member-reference evaluation reuse standalone destructuring
+assignment. A pattern failure closes any active inner array iterator before
+closing the outer `for-of` iterator. The generated property suite uses seed
+`0x5eed000e` across array and object patterns, identifier and member targets,
+present, missing, and nullish inputs, both native specialization policies, and
+forced collection. Fixed native fixtures retain multiple iterations, object
+rest, immutable failure, nullish member key-conversion suppression, and the
+inner-before-outer cleanup order. Six reviewed test262 cases pin identifier,
+member, default, and array-rest paths.
 
 Compound assignment now accepts `+=`, `-=`, `*=`, `/=`, `%=`, `**=`, `<<=`,
 `>>=`, `>>>=`, `&=`, `^=`, `|=`, `&&=`, `||=`, and `??=` for existing
@@ -318,6 +342,29 @@ function-name inference, and immutable failure. Forty-two reviewed test262
 lowering. Await inside a compound assignment remains unsupported until
 continuation extraction can retain the already-read target value across
 suspension.
+
+Prefix and postfix update expressions now accept `++` and `--` on existing
+identifier and static or computed member targets. Each form reads the target
+once, applies Number coercion before adding or subtracting one, performs one
+checked write, and returns the assigned value for a prefix form or the coerced
+previous value for a postfix form. This Number path is complete for the current
+admitted value profile; BigInt update semantics remain with the later BigInt
+unit.
+
+A member target evaluates its object and property-key expression once. The raw
+key value converts for the read and converts again for the write, so the two
+conversions may select different properties. Immutable binding failure occurs
+after operand coercion and retains the resulting side effects. The generated
+property suite uses seed `0x5eed000f` across both operators, both result forms,
+identifier and member targets, numbers, numeric strings, booleans, and null.
+It compares an independent model with Node.js, Deno, both native
+specialization policies, and forced collection. Fixed native evidence retains
+all four forms, negative zero, infinities, `NaN`, object and key evaluation
+counts, distinct read and write key conversions, key-conversion suppression for
+a nullish base, and immutable-target failure. Four reviewed test262 cases cover
+the four forms across whitespace boundaries, two parse negatives retain the
+strict `arguments` early errors, and the admitted classic `for` update promotes
+one existing exponentiation case to pass.
 
 ### Intrinsics and built-in objects
 

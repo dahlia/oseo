@@ -69,13 +69,17 @@ Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
 lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the
 outer iterator close block after a pattern failure.
+Assignment-pattern heads reuse the existing-target path without creating
+cells. Their identifier and member leaves run after each outer iterator step,
+and a failure resumes through nested pattern cleanup before that outer close.
 Destructuring assignment evaluates its right operand once, then sends the same
 recursive patterns through checked writes to existing identifier cells or
 owned member references. Member object and key expressions lower before the
 corresponding iterator step, source read, or default; key conversion and
-storage lower after value selection. The expression retains the original
-right-hand value, nested array cleanup stays inside out, and imported and
-immutable leaves keep their ordinary errors.
+storage lower after value selection. A nullish member base fails before key
+conversion and resumes through active nested and outer iterator cleanup. The
+expression retains the original right-hand value, nested array cleanup stays
+inside out, and imported and immutable leaves keep their ordinary errors.
 Compound assignment retains one identifier read or one member object,
 property-key expression, converted key, and property read before evaluating its
 right operand. The retained raw key value is converted again on the write path
@@ -84,6 +88,14 @@ before a checked write. Logical forms lower through explicit branches, so the
 skipped path performs no right evaluation, second key conversion, or write.
 Await inside a compound assignment remains unsupported until module
 continuation extraction can preserve that retained current value.
+Update expressions retain a binding reference or one member object and raw key
+value. They apply numeric coercion and arithmetic by one before a checked
+write. Member steps convert the raw key independently for the read and write.
+Prefix forms return the assigned value, while postfix forms keep the coerced
+previous value rooted across the write. A nullish base fails before either key
+conversion. The path reuses existing MIR operations and the module continuation
+extractor can rebuild a member step around an admitted await in its object or
+key expression.
 Non-strict duplicate parameters share one binding while retaining every
 argument position. Repeated declarations resolve to one function binding whose
 body comes from the last declaration. Named function expressions retain a

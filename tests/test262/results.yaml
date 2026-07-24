@@ -4412,8 +4412,9 @@ results:
     observation:
       detail: 'test/language/expressions/await/await-non-promise-thenable.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/await/await-non-promise-thenable.js:120:3:
-        error[OSEO1001]: UpdateExpression is outside the M1 profile.\n"'
+        stderr="test/language/expressions/await/await-non-promise-thenable.js:125:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -4957,17 +4958,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/exponentiation/applying-the-exp-operator_A1.js:92:35:
-        error[OSEO1001]: UpdateExpression is outside the M1 profile.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -5631,6 +5640,180 @@ results:
     classification: pass
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/postfix-decrement/whitespace.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/postfix-increment/11.3.1-2-1gs.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/postfix-increment/whitespace.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/prefix-decrement/11.4.5-2-2gs.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/prefix-decrement/whitespace.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/prefix-increment/whitespace.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -13131,6 +13314,156 @@ results:
         - generated
       includes: []
       mode: script
+      path: test/language/statements/for-of/dstr/array-elem-put-prop-ref.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/array-elem-target-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/array-rest-after-element.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/array-rest-put-prop-ref.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
       path: test/language/statements/for-of/dstr/const-ary-name-iter-val.js
       strictness:
         - non-strict
@@ -14329,6 +14662,78 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/obj-id-init-simple-no-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/obj-prop-put-prop-ref.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -17885,11 +18290,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 226
+  expectedNegatives: 228
   harnessFailures: 0
-  passes: 266
+  passes: 277
   semanticFailures: 0
-  unsupportedProfileFeatures: 143
+  unsupportedProfileFeatures: 142
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -17906,13 +18311,13 @@ summary:
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
-      passes: 55
+      passes: 61
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: destructuring-bindings
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 126
+      passes: 132
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: dynamic-source
@@ -17928,13 +18333,13 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: expression-operators
-      expectedNegatives: 10
+      expectedNegatives: 12
       harnessFailures: 0
-      passes: 53
+      passes: 64
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 12
     - dependency: functions
-      expectedNegatives: 9
+      expectedNegatives: 11
       harnessFailures: 0
       passes: 48
       semanticFailures: 0
@@ -17942,13 +18347,13 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 106
+      passes: 112
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
       expectedNegatives: 12
       harnessFailures: 0
-      passes: 89
+      passes: 95
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: module-linking
@@ -17960,7 +18365,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 76
+      passes: 80
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: promise-settlement
@@ -17984,7 +18389,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 47
+      passes: 51
       semanticFailures: 0
       unsupportedProfileFeatures: 0
   groups:
@@ -18019,11 +18424,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 42
+      expectedNegatives: 44
       harnessFailures: 0
-      passes: 49
+      passes: 54
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 26
     - group: language/module-code
       expectedNegatives: 136
       harnessFailures: 0
@@ -18033,6 +18438,6 @@ summary:
     - group: language/statements
       expectedNegatives: 48
       harnessFailures: 0
-      passes: 142
+      passes: 148
       semanticFailures: 0
       unsupportedProfileFeatures: 16
