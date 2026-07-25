@@ -2489,20 +2489,10 @@ export function functionDeclaration(
     );
   });
   const defaultParameters = defaultParameterIndex >= 0;
-  const restParameters = restParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
   const parameterExpressions = parameterNodes.some(
     rawParameterContainsExpression,
   );
-  const nonSimpleParameters = parameterEnvironment || restParameters;
-  if (nonSimpleParameters && value.async === true) {
-    return unsupported(
-      context,
-      value,
-      "Binding-pattern, default, and rest parameters in asynchronous " +
-        "functions are unsupported.",
-    );
-  }
   const strict =
     context.strictStack.at(-1) === true ||
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
@@ -2674,6 +2664,34 @@ export function functionDeclaration(
     context.strictStack.pop();
     return undefined;
   }
+  const parameterizedBody = (
+    executionBody: readonly (SyntaxFunction | SyntaxStatement)[],
+  ): readonly (SyntaxFunction | SyntaxStatement)[] => {
+    if (!parameterEnvironment) return executionBody;
+    const range = location(context, value).range;
+    const parameterCopies: SyntaxStatement[] = [];
+    for (const declaration of hoisted) {
+      if (declaration.kind !== "let") continue;
+      const copiedName = copiedParameterNames.get(declaration.name);
+      if (copiedName == null) continue;
+      parameterCopies.push({
+        hint: undefined,
+        initializer: identifierExpression(declaration.name, declaration.range),
+        kind: "let",
+        name: copiedName,
+        range: declaration.range,
+      });
+    }
+    return [
+      ...parameterInitializers,
+      ...parameterCopies,
+      {
+        body: executionBody,
+        kind: "block",
+        range,
+      },
+    ];
+  };
   if (value.async === true) {
     if (!validateAsyncContinuationCount(context, children)) {
       context.functionStack.pop();
@@ -2687,7 +2705,7 @@ export function functionDeclaration(
         context,
         range,
         [],
-        [...hoisted, ...executionBody],
+        parameterizedBody([...hoisted, ...executionBody]),
       );
       body.push({
         expression: asyncCall(execution, range),
@@ -2714,32 +2732,7 @@ export function functionDeclaration(
       }
       executionBody.push(converted);
     }
-    if (parameterEnvironment) {
-      const range = location(context, value).range;
-      const parameterCopies: SyntaxStatement[] = [];
-      for (const declaration of hoisted) {
-        if (declaration.kind !== "let") continue;
-        const copiedName = copiedParameterNames.get(declaration.name);
-        if (copiedName == null) continue;
-        parameterCopies.push({
-          hint: undefined,
-          initializer: identifierExpression(
-            declaration.name,
-            declaration.range,
-          ),
-          kind: "let",
-          name: copiedName,
-          range: declaration.range,
-        });
-      }
-      body.push(...parameterInitializers, ...parameterCopies, {
-        body: executionBody,
-        kind: "block",
-        range,
-      });
-    } else {
-      body.push(...executionBody);
-    }
+    body.push(...parameterizedBody(executionBody));
   }
   context.functionStack.pop();
   context.strictStack.pop();

@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 675 reviewed cases: 304 passes, 245 expected
+The current manifest contains 681 reviewed cases: 310 passes, 245 expected
 negatives, and 126 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -472,15 +472,15 @@ its deliberate boundary and its evidence:
     function-name inference, forced collection, and body `var` declarations
     that share parameter names. A list containing a parameter expression gives
     a shared name distinct parameter and body cells, while a list without
-    parameter expressions reuses the parameter cell. Twenty-one reviewed
+    parameter expressions reuses the parameter cell. Asynchronous functions
+    and arrows run the same initialization inside their owned asynchronous
+    executor, so an abrupt initializer rejects the returned promise without
+    entering the body or throwing from the call. Twenty-seven reviewed
     test262 cases cover array values, nested defaults and rest, abrupt
     completion, top-level fallback and suffix selection, prior references,
-    function length, and the parameter and body environment split.
-    Enabling the rest feature also promotes nine preexisting asynchronous
-    non-simple strict-body parse negatives from unsupported to expected
-    negative without admitting asynchronous execution. Structured TypeScript
-    annotations on binding-pattern parameters remain a source-located
-    unsupported boundary.
+    function length, the parameter and body environment split, asynchronous
+    default selection, and promise rejection. Structured TypeScript annotations
+    on binding-pattern parameters remain a source-located unsupported boundary.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -535,9 +535,8 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Asynchronous non-simple parameters, classes, generators, big integers,
-    regular expressions, and the remaining expression grammar are outside the
-    admitted syntax. Owner: the
+ -  Classes, generators, big integers, regular expressions, and the remaining
+    expression grammar are outside the admitted syntax. Owner: the
     core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by

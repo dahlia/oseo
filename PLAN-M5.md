@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 304
+honest unsupported classifications. The current reviewed manifest records 310
 passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 
@@ -136,11 +136,16 @@ lists, continue to reuse the parameter cell. Generated evidence uses seed
 bindings, both specialization policies, and forced collection. Fixed evidence
 also covers arrows and rest-only lists. Six reviewed test262 cases pin the
 separate parameter and body environments.
-Asynchronous non-simple parameters remain unsupported, but enabling the rest
-feature promotes nine preexisting strict-body parse negatives from unsupported
-to expected negative. Structured TypeScript annotations on binding-pattern
-parameters remain an explicit boundary. Awaited member targets remain later
-work. The runtime
+Asynchronous functions and arrows run default and binding-pattern
+initialization inside the owned asynchronous executor. Rest collection retains
+the ordinary call ABI, and abrupt initializers reject the returned promise
+without entering the body or throwing synchronously. The generated
+binding-pattern property now varies synchronous and asynchronous functions.
+Fixed native evidence covers defaults, patterns, rest, same-name body `var`,
+and abrupt rejection. Six reviewed test262 cases pin default selection, prior
+references, and rejection. Structured TypeScript annotations on
+binding-pattern parameters remain an explicit boundary. Awaited member targets
+remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -377,10 +382,8 @@ seed `0x5eed0013` across zero to three fixed parameters, bounded argument
 lists, both specialization policies, and forced collection. Fixed evidence
 retains empty and nonempty suffixes, heap-valued arguments, fresh identity,
 arrows, constructors, array and object patterns, and function length. Six
-reviewed test262 cases pin syntax, patterns, collection, and length. Enabling
-the rest feature promotes
-nine preexisting asynchronous non-simple strict-body parse negatives from
-unsupported to expected negative without admitting asynchronous execution.
+reviewed test262 cases pin syntax, patterns, collection, and length. Nine
+asynchronous non-simple strict-body parse negatives remain expected negatives.
 Body `var` declarations may share parameter names. A parameter list containing
 an expression receives separate parameter and body cells, with the body cell
 initialized from the completed parameter binding before body execution. This
@@ -392,6 +395,14 @@ policies, and forced collection. Fixed evidence adds arrows and rest-only
 lists. Six reviewed test262 cases pin the environment split. TypeScript and
 structured TypeScript annotations on binding-pattern parameters remain a
 source-located unsupported boundary.
+Asynchronous functions and arrows create that parameter environment inside the
+owned asynchronous executor. Defaults and patterns therefore finish before the
+body begins, while an abrupt initializer rejects the returned promise instead
+of throwing from the call. The generated property with seed `0x5eed0011` now
+varies synchronous and asynchronous functions without filtering. Fixed native
+evidence covers defaults, patterns, rest, same-name body `var`, and rejection.
+Six reviewed test262 cases pin default selection, prior references, and abrupt
+rejection.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

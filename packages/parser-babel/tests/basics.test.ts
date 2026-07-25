@@ -225,33 +225,6 @@ test("separates parameter-expression bindings from body var bindings", () => {
   assert.equal(hir.match(/oseo-parameter-copy/gu)?.length, 2);
 });
 
-test("keeps unsupported parameter boundaries explicit", () => {
-  for (const [name, source, message] of [
-    [
-      "async pattern",
-      "async function value([input]) {}",
-      /asynchronous functions/u,
-    ],
-    [
-      "async default",
-      "async function value(input = 1) {}",
-      /asynchronous functions/u,
-    ],
-    [
-      "async rest",
-      "async function value(...input) {}",
-      /asynchronous functions/u,
-    ],
-  ] as const) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: `${name}.ts`,
-    });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", message);
-  }
-});
-
 test("retains script and function strictness in owned IR", () => {
   const script = compileSource(babelFrontend, {
     source: '"use strict"; function outer() { function inner() {} }',

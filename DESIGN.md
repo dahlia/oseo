@@ -469,8 +469,10 @@ parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer
 therefore retains the parameter cell when the body later writes its `var`
 cell. Lists without parameter expressions reuse the parameter cell.
-Asynchronous non-simple parameters remain rejected until their continuation
-ownership has a direct representation.
+An asynchronous function creates the same parameter environment inside its
+owned asynchronous executor. Defaults, patterns, and rest collection therefore
+complete before the body begins, while an abrupt initializer rejects the
+returned promise instead of escaping synchronously from the call.
 
 Destructuring assignment reuses those recursive array and object operations
 after evaluating its right operand once. Identifier leaves write existing

@@ -30,6 +30,7 @@ type HintKind = "absent" | "false" | "truthful";
 type PatternKind = "array" | "object";
 
 interface ParameterBindingCase {
+  readonly asynchronous: boolean;
   readonly fallback: number;
   readonly hintKind: HintKind;
   readonly inputKind: InputKind;
@@ -50,6 +51,7 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 const caseArbitrary: fc.Arbitrary<ParameterBindingCase> = fc.record({
+  asynchronous: fc.boolean(),
   fallback: fc.integer({ max: 20, min: -20 }),
   hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
@@ -84,16 +86,24 @@ function printCase(testCase: ParameterBindingCase): string {
       : `/** @param {${
           testCase.hintKind === "truthful" ? "number" : "string"
         }} bound */`;
-  return `
-${hint}
-function consume(${patternSource(testCase)}) {
-  console.log("result", bound, ${restValue});
-}
-try {
-  consume(${inputSource(testCase)});
+  const invocation = `consume(${inputSource(testCase)})`;
+  const call = testCase.asynchronous
+    ? `${invocation}.then(undefined, function (error) {
+  console.log("error", error.name);
+});`
+    : `try {
+  ${invocation};
 } catch (error) {
   console.log("error", error.name);
+}`;
+  return `
+${hint}
+${testCase.asynchronous ? "async " : ""}function consume(${patternSource(
+    testCase,
+  )}) {
+  console.log("result", bound, ${restValue});
 }
+${call}
 `;
 }
 
@@ -149,6 +159,7 @@ async function references(source: string): Promise<
 test("parameter binding model rejects null before entering the body", () => {
   assert.deepEqual(
     expected({
+      asynchronous: false,
       fallback: 2,
       hintKind: "absent",
       inputKind: "null",
@@ -221,9 +232,9 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "array and object function parameters with defaults, rest, " +
-          "present, missing, and nullish inputs plus absent, truthful, " +
-          "and false JSDoc hints",
+          "synchronous and asynchronous array and object function " +
+          "parameters with defaults, rest, present, missing, and nullish " +
+          "inputs plus absent, truthful, and false JSDoc hints",
         numRuns: 10,
         profile: "M5 function binding patterns",
         seed: 0x5eed_0011,

@@ -485,6 +485,9 @@ tests:
   - path: test/language/expressions/async-function/named-await-as-label-identifier.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
@@ -505,6 +508,9 @@ tests:
     dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
     expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/nameless-dflt-params-ref-prior.js
+    expectedClassification: pass
     dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/nameless-dflt-params-rest.js
     expectedClassification: expected-negative
@@ -1416,8 +1422,17 @@ tests:
   - path: test/language/statements/async-function/await-as-label-identifier.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/statements/async-function/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/dflt-params-duplicates.js
     expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/dflt-params-ref-prior.js
+    expectedClassification: pass
     dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/dflt-params-rest.js
     expectedClassification: expected-negative
@@ -1476,6 +1491,9 @@ tests:
   - path: test/language/statements/async-function/evaluation-body-that-throws.js
     expectedClassification: pass
     dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-default-that-throws.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/let-newline-await-in-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions]

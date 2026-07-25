@@ -53,6 +53,24 @@ test("lowers async functions into owned continuations", () => {
   assert.ok(functionKinds.has("arrow"));
 });
 
+test("lowers non-simple async parameters inside the async execution", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "async function defaults(value = 1) { return value; }",
+      "async function patterns({ value }, [other]) {",
+      "  return value + other;",
+      "}",
+      "const rest = async (...values) => values.length;",
+      "defaults();",
+      "patterns({ value: 2 }, [3]);",
+      "rest(4, 5);",
+    ].join("\n"),
+    sourceId: "async-parameters.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+});
+
 test("diagnoses excessive async continuation depth", () => {
   const accepted = compileSource(babelFrontend, {
     source: `async function deep() {\n${"await 0;\n".repeat(256)}}`,
