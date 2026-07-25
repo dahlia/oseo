@@ -29,11 +29,11 @@ host, while `canExecuteTarget` rejects mismatched pairs before process
 execution.
 
 MIR is self-contained: constants, lexical binding reads and writes, MIR-owned
-parameters and hints, operators, call targets, control-flow blocks, and
-terminators do not retain HIR nodes. M3 bindings use shared mutable cells in
-traced environments, so escaped closures retain binding identity. MIR also owns
-dynamic calls, receiver and constructor operations, ordinary properties,
-arrays, and explicit completion state for `catch` and `finally`.
+parameters, rest markers, and hints, operators, call targets, control-flow
+blocks, and terminators do not retain HIR nodes. M3 bindings use shared mutable
+cells in traced environments, so escaped closures retain binding identity. MIR
+also owns dynamic calls, receiver and constructor operations, ordinary
+properties, arrays, and explicit completion state for `catch` and `finally`.
 Binding reads retain runtime temporal-dead-zone checks, and every collecting
 operation has an explicit safepoint.
 Synchronous `for-of` adds backend-neutral iterator get, next, and close

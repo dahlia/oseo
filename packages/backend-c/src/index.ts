@@ -1544,6 +1544,30 @@ function emitFunction(
     const setter = initializedParameters.has(parameter.bindingId)
       ? "oseo_cell_set"
       : "oseo_cell_initialize";
+    if (parameter.rest === true) {
+      line(state, `roots[${temporarySlot}] = result.value;`);
+      line(state, "result = oseo_array_create(context, 0u);");
+      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+      line(
+        state,
+        `result = ${setter}(context, roots[${temporarySlot}], result.value);`,
+      );
+      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+      line(
+        state,
+        `for (size_t rest_index_${index} = ${index}u; ` +
+          `rest_index_${index} < argument_count; rest_index_${index} += 1u) {`,
+      );
+      line(
+        state,
+        `    result = oseo_array_append(context, result.value, ` +
+          `arguments[rest_index_${index}]);`,
+      );
+      line(state, "    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+      line(state, "}");
+      initializedParameters.add(parameter.bindingId);
+      continue;
+    }
     line(
       state,
       `result = ${setter}(context, result.value, ` +

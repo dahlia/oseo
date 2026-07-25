@@ -3965,15 +3965,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4186,15 +4187,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4211,15 +4213,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - rest-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4260,15 +4263,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4337,15 +4341,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -4362,15 +4367,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - rest-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -11567,6 +11573,194 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/rest-parameters/array-pattern.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - functions
+      - rest-parameters
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/language/rest-parameters/arrow-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - rest-parameters
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/rest-parameters/expected-argument-count.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - rest-parameters
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/rest-parameters/object-pattern.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - functions
+      - object-properties
+      - rest-parameters
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/rest-parameters/position-invalid.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - rest-parameters
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/rest-parameters/rest-index.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - rest-parameters
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -11581,15 +11775,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -12269,15 +12464,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - destructuring-bindings
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -12294,15 +12490,16 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - async-functions
+      - rest-parameters
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - rest-parameters
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -18885,11 +19082,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 235
+  expectedNegatives: 245
   harnessFailures: 0
-  passes: 293
+  passes: 298
   semanticFailures: 0
-  unsupportedProfileFeatures: 135
+  unsupportedProfileFeatures: 126
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -18898,11 +19095,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 7
     - dependency: async-functions
-      expectedNegatives: 56
+      expectedNegatives: 65
       harnessFailures: 0
       passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 11
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
@@ -18916,9 +19113,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: destructuring-bindings
-      expectedNegatives: 0
+      expectedNegatives: 6
       harnessFailures: 0
-      passes: 143
+      passes: 145
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: dynamic-source
@@ -18940,9 +19137,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 12
     - dependency: functions
-      expectedNegatives: 12
+      expectedNegatives: 13
       harnessFailures: 0
-      passes: 57
+      passes: 62
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: iterator-protocol
@@ -18966,7 +19163,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 86
+      passes: 87
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: promise-settlement
@@ -18975,6 +19172,12 @@ summary:
       passes: 2
       semanticFailures: 0
       unsupportedProfileFeatures: 35
+    - dependency: rest-parameters
+      expectedNegatives: 4
+      harnessFailures: 0
+      passes: 5
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - dependency: symbols
       expectedNegatives: 0
       harnessFailures: 0
@@ -19025,20 +19228,26 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 49
+      expectedNegatives: 55
       harnessFailures: 0
       passes: 57
       semanticFailures: 0
-      unsupportedProfileFeatures: 21
+      unsupportedProfileFeatures: 15
     - group: language/module-code
       expectedNegatives: 136
       harnessFailures: 0
       passes: 17
       semanticFailures: 0
       unsupportedProfileFeatures: 65
+    - group: language/rest-parameters
+      expectedNegatives: 1
+      harnessFailures: 0
+      passes: 5
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 50
+      expectedNegatives: 53
       harnessFailures: 0
       passes: 161
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 11

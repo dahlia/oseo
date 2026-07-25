@@ -30,9 +30,18 @@ function printTerminator(terminator: MirTerminator): string {
 }
 
 function appendMirFunction(lines: string[], functionValue: MirFunction): void {
+  const restParameters = functionValue.parameters
+    .map((parameter, index) =>
+      parameter.rest === true ? `...${index}:${parameter.name}` : undefined,
+    )
+    .filter((parameter) => parameter != null);
+  const restText =
+    restParameters.length === 0 ? "" : ` rest=[${restParameters.join()}]`;
   lines.push(
     `function @f${functionValue.id} ${functionValue.name} roots=` +
-      `${functionValue.rootSlotCount} @${rangeText(functionValue.range)}`,
+      `${functionValue.rootSlotCount}` +
+      restText +
+      ` @${rangeText(functionValue.range)}`,
   );
   if (functionValue.specialization != null) {
     const specialization = functionValue.specialization;

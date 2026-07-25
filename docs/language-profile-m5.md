@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 663 reviewed cases: 293 passes, 235 expected
-negatives, and 135 unsupported profile features. It records no semantic or
+The current manifest contains 669 reviewed cases: 298 passes, 245 expected
+negatives, and 126 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -449,26 +449,30 @@ its deliberate boundary and its evidence:
     non-enumerable omission. Assignment member targets,
     `export var`, pattern type annotations, and `await` inside a property name
     or default remain outside this object declaration syntax unit.
- -  Synchronous function binding-pattern and default parameters. Function
+ -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
-    patterns plus top-level defaults. The frontend retains plain hidden ABI
-    parameters and performs `BindingInitialization` in a parameter environment
-    outside the function body. Initializers therefore run from left to right,
-    later parameters remain in their temporal dead zones, and body declarations
-    are not visible to defaults. A top-level default runs only for `undefined`;
-    identifier parameters retain their TypeScript and JSDoc hints. Ordinary
+    patterns plus top-level defaults and rest. The frontend retains plain
+    hidden ABI parameters for patterns and performs `BindingInitialization` in
+    a parameter environment outside the function body. Initializers therefore
+    run from left to right, later parameters remain in their temporal dead
+    zones, and body declarations are not visible to defaults. A top-level
+    default runs only for `undefined`. A rest parameter collects every unbound
+    generic call argument into a fresh array before any pattern initialization.
+    Identifier parameters retain their TypeScript and JSDoc hints. Ordinary
     functions retain dynamic `this`, arrows retain lexical `this`, and
     constructors initialize their receiver before parameter work. JavaScript
     function length is retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
-    `0x5eed0011` and `0x5eed0012` cover both pattern families, supplied,
-    missing, explicit `undefined`, and nullish inputs, abrupt initializers, both
-    specialization policies, function-name inference, and forced collection.
-    Nine reviewed test262 cases cover array values, nested defaults, rest,
-    abrupt completion, top-level fallback selection, prior references, and
-    function length.
-    Top-level rest parameters, asynchronous non-simple parameters, TypeScript
-    and JSDoc hints on pattern-bound names, and `var` declarations sharing any
+    `0x5eed0011`, `0x5eed0012`, and `0x5eed0013` cover both pattern families,
+    supplied, missing, explicit `undefined`, and nullish inputs, abrupt
+    initializers, bounded and heap-valued rest suffixes, both specialization
+    policies, function-name inference, and forced collection. Fifteen reviewed
+    test262 cases cover array values, nested defaults and rest, abrupt
+    completion, top-level fallback and suffix selection, prior references, and
+    function length. Enabling the rest feature also promotes nine preexisting
+    asynchronous non-simple strict-body parse negatives from unsupported to
+    expected negative without admitting asynchronous execution. TypeScript and
+    JSDoc hints on pattern-bound names, and `var` declarations sharing any
     parameter in a non-simple parameter list remain source-located unsupported
     boundaries.
  -  Catch binding patterns. A catch parameter admits every array and object
@@ -525,9 +529,9 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Top-level rest parameters, asynchronous non-simple parameters, classes,
-    generators, big integers, regular expressions, and the remaining expression
-    grammar are outside the admitted syntax. Owner: the
+ -  Asynchronous non-simple parameters, classes, generators, big integers,
+    regular expressions, and the remaining expression grammar are outside the
+    admitted syntax. Owner: the
     core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by

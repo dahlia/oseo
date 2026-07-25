@@ -200,6 +200,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-bindings" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
+    fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "typeof-void-remainder" ||

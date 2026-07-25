@@ -583,6 +583,26 @@ isolation, abrupt initializers, constructors, arrows, function-name inference,
 and function length.
 
 
+M5 rest parameter properties
+----------------------------
+
+The rest parameter property generates a synchronous function with zero to
+three fixed identifier parameters followed by one rest parameter. The call
+supplies zero to six bounded integer arguments. Its independent model slices
+the argument list at the fixed-parameter count and predicts the fresh array's
+length, first value, last value, and the function length. Each case compares
+Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled native execution with collection forced at every
+safepoint.
+
+The ordinary suite uses seed `0x5eed0013`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain empty
+and nonempty suffixes, heap-valued arguments under forced collection, fresh
+identity, arrows, constructors, array and object binding patterns, and function
+length.
+
+
 M5 for-of binding properties
 ----------------------------
 

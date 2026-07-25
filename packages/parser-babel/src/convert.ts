@@ -2395,21 +2395,35 @@ export function functionDeclaration(
   const defaultParameterIndex = parameterNodes.findIndex(
     (parameterNode) => parameterNode.type === "AssignmentPattern",
   );
-  const functionLength =
-    defaultParameterIndex < 0 ? parameterNodes.length : defaultParameterIndex;
-  const bindingPatternParameters = parameterNodes.some(
-    (parameterNode) =>
-      parameterNode.type === "ArrayPattern" ||
-      parameterNode.type === "ObjectPattern",
+  const restParameterIndex = parameterNodes.findIndex(
+    (parameterNode) => parameterNode.type === "RestElement",
   );
+  const firstLengthBoundary = [defaultParameterIndex, restParameterIndex]
+    .filter((index) => index >= 0)
+    .toSorted((left, right) => left - right)[0];
+  const functionLength =
+    firstLengthBoundary == null ? parameterNodes.length : firstLengthBoundary;
+  const bindingPatternParameters = parameterNodes.some((parameterNode) => {
+    const pattern =
+      parameterNode.type === "AssignmentPattern"
+        ? node(parameterNode.left)
+        : parameterNode.type === "RestElement"
+          ? node(parameterNode.argument)
+          : parameterNode;
+    return (
+      pattern?.type === "ArrayPattern" || pattern?.type === "ObjectPattern"
+    );
+  });
   const defaultParameters = defaultParameterIndex >= 0;
+  const restParameters = restParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
-  if (parameterEnvironment && value.async === true) {
+  const nonSimpleParameters = parameterEnvironment || restParameters;
+  if (nonSimpleParameters && value.async === true) {
     return unsupported(
       context,
       value,
-      "Binding-pattern and default parameters in asynchronous functions are " +
-        "unsupported.",
+      "Binding-pattern, default, and rest parameters in asynchronous " +
+        "functions are unsupported.",
     );
   }
   const strict =
@@ -2417,17 +2431,13 @@ export function functionDeclaration(
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const functionProvidesThis = value.type !== "ArrowFunctionExpression";
   for (const parameterNode of parameterNodes) {
-    if (parameterNode.type === "RestElement") {
-      return unsupported(
-        context,
-        parameterNode,
-        "Top-level rest parameters are unsupported.",
-      );
-    }
+    const rest = parameterNode.type === "RestElement";
     const parameterPattern =
       parameterNode.type === "AssignmentPattern"
         ? node(parameterNode.left)
-        : parameterNode;
+        : rest
+          ? node(parameterNode.argument)
+          : parameterNode;
     const defaultNode =
       parameterNode.type === "AssignmentPattern"
         ? node(parameterNode.right)
@@ -2489,7 +2499,12 @@ export function functionDeclaration(
         parameterName == null ? undefined : jsdoc.parameters.get(parameterName);
       if (jsdocHint != null) hints.push(jsdocHint);
       const hiddenName = syntheticName(context, "parameter");
-      parameters.push({ hints, name: hiddenName, range: pattern.range });
+      parameters.push({
+        hints,
+        name: hiddenName,
+        range: pattern.range,
+        ...(rest ? { rest: true as const } : {}),
+      });
       const input = identifierExpression(hiddenName, pattern.range);
       const initializer =
         defaultInitializer == null
@@ -2526,7 +2541,12 @@ export function functionDeclaration(
       );
     }
     const hints: Hint[] = [];
-    const typescriptHint = typeHint(context, parameterPattern.typeAnnotation);
+    const typescriptHint = typeHint(
+      context,
+      rest
+        ? (parameterNode.typeAnnotation ?? parameterPattern.typeAnnotation)
+        : parameterPattern.typeAnnotation,
+    );
     if (typescriptHint != null) hints.push(typescriptHint);
     const jsdocHint = jsdoc.parameters.get(parameterName);
     if (jsdocHint != null) hints.push(jsdocHint);
@@ -2534,6 +2554,7 @@ export function functionDeclaration(
       ...location(context, parameterNode),
       hints,
       name: parameterName,
+      ...(rest ? { rest: true as const } : {}),
     });
     parameterNames.push(parameterName);
   }
@@ -2565,7 +2586,7 @@ export function functionDeclaration(
     context,
     children,
     new Set([...parameterNames, ...varScopedFunctionNames(children)]),
-    parameterEnvironment ? new Set(parameterNames) : new Set<string>(),
+    nonSimpleParameters ? new Set(parameterNames) : new Set<string>(),
   );
   if (hoisted == null) {
     context.functionStack.pop();

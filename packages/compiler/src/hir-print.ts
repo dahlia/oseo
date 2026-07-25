@@ -386,7 +386,8 @@ export function printHir(program: HirProgram): string {
     const parameters = functionValue.parameters
       .map(
         (parameter) =>
-          `%b${parameter.bindingId} ${parameter.name}` +
+          `${parameter.rest === true ? "..." : ""}%b` +
+          `${parameter.bindingId} ${parameter.name}` +
           hintText(parameter.hints),
       )
       .join(", ");
