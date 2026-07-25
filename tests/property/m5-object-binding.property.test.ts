@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printHir,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -29,6 +30,7 @@ type DeclarationKind = "const" | "let" | "var";
 type HintKind = "absent" | "false" | "truthful";
 type Shape =
   | "computed"
+  | "computed-literal"
   | "default"
   | "nested-array"
   | "nested-object"
@@ -79,8 +81,8 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
   {
     arbitrary: fc.record({
       ...sharedArbitraries,
-      hintKind: fc.constant("absent" as const),
-      shape: fc.constant("computed" as const),
+      hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+      shape: fc.constantFrom<Shape>("computed", "computed-literal"),
     }),
     weight: 1,
   },
@@ -110,6 +112,9 @@ function patternSource(testCase: ObjectBindingCase): string {
     pattern =
       `{ [(order = order + "e", keyObject)]: bound = ` +
       `(order = order + "d", ${testCase.fallback}) }`;
+  } else if (testCase.shape === "computed-literal") {
+    const fallback = testCase.fallback;
+    pattern = `{ ["value"]: bound = (order = order + "d", ${fallback}) }`;
   } else if (testCase.shape === "nested-array") {
     pattern = `{ nested: [bound = ${testCase.fallback}] = [] }`;
   } else {
@@ -172,7 +177,12 @@ function expected(testCase: ObjectBindingCase): ModelResult {
   let value: number | undefined = present ? testCase.value : undefined;
   if (value === undefined && testCase.shape !== "static") {
     value = testCase.fallback;
-    if (testCase.shape === "computed") order += "d";
+    if (
+      testCase.shape === "computed" ||
+      testCase.shape === "computed-literal"
+    ) {
+      order += "d";
+    }
     if (testCase.shape === "default") order += "d";
   }
   return { order, result: `result ${String(value)}` };
@@ -253,11 +263,26 @@ test(
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
-            { source, sourceId: "generated-m5-object-binding.js" },
+            { source, sourceId: "generated-m5-object-binding.ts" },
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.hir != null);
           assert.ok(compiled.mir != null);
+          const hir = printHir(compiled.hir);
+          if (
+            testCase.hintKind === "absent" ||
+            testCase.shape === "computed" ||
+            testCase.shape === "computed-literal"
+          ) {
+            assert.doesNotMatch(hir, /bound hints=/u);
+          } else {
+            const type = testCase.hintKind === "truthful" ? "number" : "string";
+            assert.match(
+              hir,
+              new RegExp(`bound hints=\\[typescript:${type}\\]`, "u"),
+            );
+          }
           if (specialization === "enabled") {
             process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           }
@@ -291,10 +316,10 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "const, let, and var object patterns with static, computed, " +
-          "defaulted, nested, primitive, and nullish inputs plus absent, " +
-          "truthful, or false TypeScript hints on static keys; computed " +
-          "keys remain unhinted",
+          "const, let, and var object patterns with static, computed " +
+          "literal, computed dynamic, defaulted, nested, primitive, and " +
+          "nullish inputs plus absent, truthful, or false TypeScript hints; " +
+          "computed keys remain unhinted",
         numRuns: 10,
         profile: "M5 object binding declarations",
         seed: 0x5eed_0008,

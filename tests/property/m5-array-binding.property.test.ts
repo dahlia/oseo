@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printHir,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -26,12 +27,14 @@ const { assertAsyncProperty, propertySize } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type AnnotationKind = "array" | "tuple-rest";
 type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
 type Value = number | undefined;
 
 interface ArrayBindingCase {
+  readonly annotationKind: AnnotationKind;
   readonly declarationKind: DeclarationKind;
   readonly defaultThrows: boolean;
   readonly hintKind: HintKind;
@@ -75,6 +78,7 @@ const valuesArbitrary = fc.array(valueArbitrary, {
   maxLength: large ? 9 : 5,
 });
 const bindingArbitraries = {
+  annotationKind: fc.constantFrom<AnnotationKind>("array", "tuple-rest"),
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
   hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
@@ -146,8 +150,11 @@ function patternSource(testCase: ArrayBindingCase): string {
   }
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
-  return testCase.shape === "nested"
-    ? `${pattern}: [[${type}, ${type}]]`
+  if (testCase.shape === "nested") {
+    return `${pattern}: [[${type}, ${type}]]`;
+  }
+  return testCase.annotationKind === "tuple-rest"
+    ? `${pattern}: [${type}, ...${type}[]]`
     : `${pattern}: ${type}[]`;
 }
 
@@ -159,6 +166,29 @@ function resultSource(shape: Shape): string {
     return 'a + ":" + rest.length + ":" + (rest[0] ?? -99)';
   }
   return 'a + ":" + b + ":" + c';
+}
+
+function hintedBindingNames(shape: Shape): readonly string[] {
+  if (shape === "head" || shape === "rest-id") return ["a"];
+  if (shape === "default-elision" || shape === "nested") return ["a", "b"];
+  return ["a", "b", "c"];
+}
+
+function assertGeneratedHints(testCase: ArrayBindingCase, hir: string): void {
+  if (testCase.hintKind === "absent") {
+    assert.doesNotMatch(hir, / hints=/u);
+    return;
+  }
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
+  for (const name of hintedBindingNames(testCase.shape)) {
+    assert.match(
+      hir,
+      new RegExp(`${name} hints=\\[typescript:${type}\\]`, "u"),
+    );
+  }
+  if (testCase.shape === "rest-id") {
+    assert.doesNotMatch(hir, /rest hints=/u);
+  }
 }
 
 function failureStep(testCase: ArrayBindingCase): number | undefined {
@@ -316,6 +346,7 @@ function expected(testCase: ArrayBindingCase): ModelResult {
 test("array binding model ignores custom iterator controls", () => {
   assert.deepEqual(
     expected({
+      annotationKind: "array",
       declarationKind: "const",
       defaultThrows: false,
       hintKind: "absent",
@@ -394,11 +425,13 @@ test(
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
-            { source, sourceId: "generated-m5-array-binding.js" },
+            { source, sourceId: "generated-m5-array-binding.ts" },
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.hir != null);
           assert.ok(compiled.mir != null);
+          assertGeneratedHints(testCase, printHir(compiled.hir));
           if (specialization === "enabled") {
             process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           }
@@ -434,7 +467,8 @@ test(
         domain:
           "const, let, and var array patterns with defaults, elision, " +
           "nesting, rest, arrays, custom iterators, abrupt steps, and " +
-          "absent, truthful, or false TypeScript hints",
+          "absent, truthful, or false homogeneous array and tuple-rest " +
+          "TypeScript hints",
         numRuns: 10,
         profile: "M5 array binding declarations",
         seed: 0x5eed_0007,

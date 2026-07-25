@@ -469,12 +469,15 @@ its deliberate boundary and its evidence:
     array TypeScript annotations map syntactically visible primitive member
     types to the corresponding binding leaves without invoking a TypeScript
     type checker. The same mapping covers standalone declarations and classic
-    `for` declaration heads. Optional members remain unhinted. Type references
-    that require alias or interface resolution remain a source-located
-    unsupported boundary. Ordinary functions retain dynamic `this`, arrows
-    retain lexical `this`, and constructors initialize their receiver before
-    parameter work. JavaScript function length is retained independently from
-    the ABI parameter count.
+    `for` declaration heads. Optional members remain unhinted. Array element
+    types continue through unambiguous nested array rest targets; object targets
+    inside an array rest remain unhinted. Computed object properties remain
+    unhinted even when their source key is a literal. Type references that
+    require alias or interface resolution remain a source-located unsupported
+    boundary. Ordinary functions retain dynamic `this`, arrows retain lexical
+    `this`, and constructors initialize their receiver before parameter work.
+    JavaScript function length is retained independently from the ABI parameter
+    count.
     Native differential fixtures and generated properties with seeds
     `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish

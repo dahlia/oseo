@@ -35,7 +35,10 @@ owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
 Inline object, tuple, and array TypeScript annotations map syntactically visible
 primitive member types to the same leaves without invoking a type checker.
 The mapping also covers standalone declarations and classic `for` declaration
-heads. Optional members remain unhinted.
+heads. Optional members remain unhinted. Array element types continue through
+unambiguous nested array rest targets; object targets inside an array rest
+remain unhinted. Computed object properties remain unhinted even when their
+source key is a literal.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and

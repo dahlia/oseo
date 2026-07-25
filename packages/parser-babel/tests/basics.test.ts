@@ -190,6 +190,84 @@ test("maps structured annotations in declaration binding contexts", () => {
   assert.doesNotMatch(hir, /maybe hints=/u);
 });
 
+test("maps array annotations through nested rest patterns", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [head, ...[middle, tail]]: number[] = [1, 2, 3];\n" +
+      "console.log(head, middle, tail);\n",
+    sourceId: "nested-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:number\]/u);
+  assert.match(hir, /middle hints=\[typescript:number\]/u);
+  assert.match(hir, /tail hints=\[typescript:number\]/u);
+});
+
+test("maps tuple annotations through nested rest conservatively", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [first, second, ...[trailing]]:\n" +
+      "  [number, ...string[]] = [1, 'two', 'three'];\n" +
+      "const [ambiguousHead, ...[ambiguousRest]]:\n" +
+      "  [...number[], string] = [1, 2, 'three'];\n" +
+      "const [referenceHead, referenceMiddle, ...[referenceRest]]:\n" +
+      "  [number, ...Array<string>] = [1, 'two', 'three'];\n" +
+      "const [spreadHead, spreadMiddle, ...[spreadRest]]:\n" +
+      "  [number, ...[string, boolean]] = [1, 'two', true];\n" +
+      "console.log(\n" +
+      "  first, second, trailing, ambiguousHead, ambiguousRest,\n" +
+      "  referenceHead, referenceMiddle, referenceRest,\n" +
+      "  spreadHead, spreadMiddle, spreadRest,\n" +
+      ");\n",
+    sourceId: "nested-tuple-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /first hints=\[typescript:number\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+  assert.match(hir, /trailing hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /ambiguousHead hints=/u);
+  assert.doesNotMatch(hir, /ambiguousRest hints=/u);
+  assert.match(hir, /referenceHead hints=\[typescript:number\]/u);
+  assert.doesNotMatch(hir, /referenceMiddle hints=/u);
+  assert.doesNotMatch(hir, /referenceRest hints=/u);
+  assert.match(hir, /spreadHead hints=\[typescript:number\]/u);
+  assert.match(hir, /spreadMiddle hints=\[typescript:string\]/u);
+  assert.match(hir, /spreadRest hints=\[typescript:boolean\]/u);
+});
+
+test("keeps object targets in array rest unhinted", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [head, ...{ length: count }]: number[] = [1, 2, 3];\n" +
+      "console.log(head, count);\n",
+    sourceId: "object-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:number\]/u);
+  assert.doesNotMatch(hir, /count hints=/u);
+});
+
+test("keeps computed object binding keys unhinted", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const { ["value"]: computed }: { value: number } = { value: 1 };\n' +
+      "const { value: fixed }: { value: number } = { value: 2 };\n" +
+      "console.log(computed, fixed);\n",
+    sourceId: "computed-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /computed hints=/u);
+  assert.match(hir, /fixed hints=\[typescript:number\]/u);
+});
+
 test("rejects pattern annotations that require type resolution", () => {
   for (const [name, source] of [
     [

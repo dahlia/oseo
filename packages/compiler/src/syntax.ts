@@ -339,6 +339,8 @@ export interface SyntaxArrayBindingPattern<
 export interface SyntaxObjectBindingProperty<
   Pattern = SyntaxBindingPattern,
 > extends LocatedSyntax {
+  /** Preserve whether the source property name used computed syntax. */
+  readonly computed?: true;
   readonly initializer?: SyntaxExpression;
   readonly key: SyntaxExpression;
   readonly pattern: Pattern;

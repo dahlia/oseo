@@ -837,6 +837,7 @@ export function bindingPattern(
       }
       properties.push({
         ...location(context, property),
+        ...(property.computed === true ? { computed: true as const } : {}),
         ...(initializer == null ? {} : { initializer }),
         key,
         pattern,
@@ -1053,6 +1054,33 @@ function annotationElementType(
     : annotationElementType(restType, index - restIndex);
 }
 
+function annotationArrayRestType(
+  typeNode: BabelNode,
+  index: number,
+): BabelNode | undefined {
+  if (typeNode.type === "TSArrayType") return typeNode;
+  if (typeNode.type !== "TSTupleType") return undefined;
+  const elementTypes = nodes(typeNode.elementTypes);
+  const restIndex = elementTypes.findIndex(
+    (elementType) => elementType.type === "TSRestType",
+  );
+  if (restIndex >= 0 && restIndex !== elementTypes.length - 1) {
+    return index < restIndex
+      ? { ...typeNode, elementTypes: elementTypes.slice(index) }
+      : undefined;
+  }
+  if (restIndex >= 0 && index > restIndex) {
+    const restType = annotationType(elementTypes[restIndex]?.typeAnnotation);
+    return restType == null
+      ? undefined
+      : annotationArrayRestType(restType, index - restIndex);
+  }
+  return {
+    ...typeNode,
+    elementTypes: elementTypes.slice(index),
+  };
+}
+
 /**
  * Map syntactically visible tuple, array, and object type members to the
  * binding leaves they describe without invoking TypeScript's type checker.
@@ -1084,7 +1112,9 @@ function bindingPatternTypeHints(
       ...pattern,
       properties: pattern.properties.map((property) => {
         const propertyName =
-          property.key.kind === "string" ? property.key.value : undefined;
+          property.computed !== true && property.key.kind === "string"
+            ? property.key.value
+            : undefined;
         const propertyType =
           propertyName == null
             ? undefined
@@ -1126,6 +1156,15 @@ function bindingPatternTypeHints(
             ),
           };
     }),
+    ...(pattern.rest?.kind !== "array-binding-pattern"
+      ? {}
+      : {
+          rest: bindingPatternTypeHints(
+            context,
+            pattern.rest,
+            annotationArrayRestType(typeNode, pattern.elements.length),
+          ),
+        }),
   };
 }
 

@@ -485,10 +485,14 @@ declaration with one recursive array pattern. Shapes cover an ordinary head,
 an elision with an `undefined` default, a nested array, an identifier rest, and
 a nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
 throwing defaults, and absent, truthful, or deliberately false TypeScript
-hints. Its independent model predicts the bound value, step count, close count,
-and thrown error identity. Each case compares Node.js, Deno,
+hints from homogeneous array and tuple-rest annotations. Its independent model
+predicts the bound value, step count, close count, thrown error identity, and
+the exact binding leaves that receive hints, including unambiguous leaves
+inside a nested array rest. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
-execution with collection forced at every safepoint.
+execution with collection forced at every safepoint. Fixed frontend regressions
+retain ambiguous tuple rests and object targets inside an array rest as
+unhinted.
 
 The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -509,8 +513,9 @@ properties. Inputs vary across ordinary objects, strings, numbers, `null`,
 independent model predicts the bound value, computed-key and default order, and
 nullish `TypeError`. Each case compares Node.js, Deno, specialization-disabled
 native execution, and specialization-enabled execution with collection forced
-at every safepoint. Computed properties remain unhinted because the structural
-mapping does not resolve their keys.
+at every safepoint. Generated computed properties include literal and dynamic
+keys with absent, truthful, and false annotations. They remain unhinted because
+the structural mapping admits only noncomputed source properties.
 
 The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
