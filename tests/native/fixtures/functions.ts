@@ -188,6 +188,54 @@ console.log(inferredDefault(), inferredArrowDefault());
 `,
   },
   {
+    name: "function-rest-parameters",
+    source: `
+function collect(first, ...rest) {
+  return [first, rest.length, rest[0], rest[rest.length - 1], rest];
+}
+const empty = collect(1);
+const values = collect(2, 3, 4);
+console.log(empty[0], empty[1], empty[2], empty[3]);
+console.log(values[0], values[1], values[2], values[3]);
+console.log(empty[4] !== values[4], collect(3)[4] !== collect(3)[4]);
+const heapValues = collect(
+  "prefix",
+  { marker: "object" },
+  "heap string",
+  [16],
+);
+console.log(
+  heapValues[4][0].marker,
+  heapValues[4][1],
+  heapValues[4][2][0],
+);
+const arrow = (...rest) => [rest.length, rest[0]];
+console.log(arrow(), arrow(5, 6));
+function RestConstructor(first, ...rest) {
+  this.first = first;
+  this.rest = rest;
+}
+const constructed = new RestConstructor(7, 8, 9);
+console.log(
+  constructed.first,
+  constructed.rest.length,
+  constructed.rest[0],
+  constructed.rest[1],
+);
+function arrayRest(...[first, ...tail]) {
+  return [first, tail.length, tail[0]];
+}
+console.log(arrayRest(10, 11, 12));
+function objectRest(...{ 0: first, ...remaining }) {
+  return [first, remaining[1], Object.keys(remaining).length];
+}
+console.log(objectRest(13, 14, 15));
+function lengthTwo(first, second, ...rest) {}
+function lengthZero(...rest) {}
+console.log(lengthTwo.length, lengthZero.length);
+`,
+  },
+  {
     name: "function-name-assignment",
     nonStrictScript: true,
     source: `

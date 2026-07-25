@@ -70,6 +70,8 @@ export interface MirParameter {
   readonly hints: readonly MirHint[];
   readonly name: string;
   readonly range: SourceRange;
+  /** Collect every remaining call argument into a fresh array. */
+  readonly rest?: true;
 }
 
 /** One script-owned lexical binding shared by declared functions. */

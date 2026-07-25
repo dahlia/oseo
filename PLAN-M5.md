@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 293
-passes, 235 expected negatives, and 135 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 298
+passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 
 Delivery item 7 is resolved for dynamic source:
@@ -117,10 +117,18 @@ supplied and missing bounded integer values, both specialization policies, and
 forced collection. Fixed evidence covers explicit `undefined`, null, prior and
 later references, body isolation, abrupt initializers, constructors, arrows,
 function-name inference, and function length. Five reviewed test262 cases pin
-fallback selection, prior references, and length. Top-level rest parameters,
-asynchronous non-simple parameters, hints on pattern-bound names, and `var`
-declarations that share any parameter in a non-simple parameter list remain
-explicit boundaries.
+fallback selection, prior references, and length. Synchronous top-level rest
+parameters collect the unbound argument suffix into a fresh array without
+changing the generic call ABI. Generated evidence uses seed `0x5eed0013`
+across zero to three fixed parameters, bounded argument lists, both
+specialization policies, and forced collection. Fixed evidence covers empty
+and nonempty suffixes, heap-valued arguments, fresh identity, arrows,
+constructors, array and object binding patterns, and function length. Six
+reviewed test262 cases pin syntax, patterns, collection, and length.
+Asynchronous non-simple parameters remain unsupported, but enabling the rest
+feature promotes nine preexisting strict-body parse negatives from unsupported
+to expected negative. Hints on pattern-bound names and `var` declarations that
+share any parameter in a non-simple parameter list remain explicit boundaries.
 Awaited member targets remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
@@ -348,10 +356,20 @@ values, both specialization policies, and forced collection. Fixed evidence
 retains explicit `undefined`, null, prior and later references, body isolation,
 abrupt initializers, constructors, arrows, identifier hints, function-name
 inference, and function length. Five reviewed test262 cases pin fallback
-selection, prior references, and length. Top-level rest parameters,
-asynchronous non-simple parameters, TypeScript and JSDoc hints on pattern-bound
-names, and `var` declarations that share any parameter in a non-simple
-parameter list remain source-located unsupported boundaries.
+selection, prior references, and length. Synchronous top-level rest parameters
+retain an explicit HIR and MIR marker, and the C backend copies every remaining
+generic call argument into a fresh array. The generated property suite uses
+seed `0x5eed0013` across zero to three fixed parameters, bounded argument
+lists, both specialization policies, and forced collection. Fixed evidence
+retains empty and nonempty suffixes, heap-valued arguments, fresh identity,
+arrows, constructors, array and object patterns, and function length. Six
+reviewed test262 cases pin syntax, patterns, collection, and length. Enabling
+the rest feature promotes
+nine preexisting asynchronous non-simple strict-body parse negatives from
+unsupported to expected negative without admitting asynchronous execution.
+TypeScript and JSDoc hints on pattern-bound names, and `var` declarations that
+share any parameter in a non-simple parameter list remain source-located
+unsupported boundaries.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

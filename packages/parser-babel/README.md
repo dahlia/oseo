@@ -19,13 +19,14 @@ declarations admit the same array and object binding patterns. `for-in` and
 Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
 Synchronous functions, constructors, and arrows admit recursive array and
-object binding-pattern parameters plus top-level default parameters. The
-adapter gives the compiler plain hidden ABI parameters, then emits owned
-binding initialization before a private lexical body block. This preserves the
-separate parameter environment, left-to-right temporal dead zones,
-ordinary-function receivers, lexical arrow receivers, and function `length`
-independently from the ABI parameter count. Top-level rest parameters,
-asynchronous non-simple parameters, optional parameters, TypeScript `this`
+object binding-pattern parameters plus top-level default and rest parameters.
+The adapter gives the compiler plain hidden ABI parameters for patterns, then
+emits owned binding initialization before a private lexical body block. Rest
+parameters retain an owned marker so the backend collects the unbound argument
+suffix into a fresh array. This preserves the separate parameter environment,
+left-to-right temporal dead zones, ordinary-function receivers, lexical arrow
+receivers, and function `length` independently from the ABI parameter count.
+Asynchronous non-simple parameters, optional parameters, TypeScript `this`
 parameters, hints on pattern-bound names, and `var` declarations sharing any
 parameter in a non-simple parameter list remain explicit boundaries.
 Call type arguments and other withheld forms are also rejected here. Source

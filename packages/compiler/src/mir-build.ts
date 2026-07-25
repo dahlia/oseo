@@ -3403,6 +3403,7 @@ function buildMirFunction(
         end: { ...parameter.range.end },
         start: { ...parameter.range.start },
       },
+      ...(parameter.rest === true ? { rest: true as const } : {}),
     }),
   );
   return {

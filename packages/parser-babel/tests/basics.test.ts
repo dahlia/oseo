@@ -167,9 +167,42 @@ test("converts synchronous default parameters through owned syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.hir), /AssignmentPattern/u);
 });
 
+test("converts synchronous rest parameters through owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function collect(first, ...rest) { return rest; }\n" +
+      "const arrow = (...[first, ...rest]) => [first, rest];\n" +
+      "function object(...{ 0: first, ...remaining }) {\n" +
+      "  return [first, remaining];\n" +
+      "}\n",
+    sourceId: "rest-parameters.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.equal(result.mir.functions[0]?.functionLength, 1);
+  assert.equal(result.mir.functions[0]?.parameterCount, 2);
+  assert.equal(result.mir.functions[0]?.parameters[1]?.rest, true);
+  assert.equal(result.mir.functions[1]?.functionLength, 0);
+  assert.equal(result.mir.functions[1]?.parameters[0]?.rest, true);
+  assert.equal(result.mir.functions[2]?.parameters[0]?.rest, true);
+  const hir = printHir(result.hir);
+  assert.match(hir, /collect\(%b\d+ first, \.\.\.%b\d+ rest\)/u);
+  assert.ok(
+    hir
+      .split("\n")
+      .some(
+        (line) =>
+          line.includes("...%b") && line.includes("\u0000oseo-parameter"),
+      ),
+  );
+  const mir = printMir(result.mir);
+  assert.match(mir, /function @f0 collect .* rest=\[\.\.\.1:rest\]/u);
+  assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
+});
+
 test("keeps unsupported parameter boundaries explicit", () => {
   for (const [name, source, message] of [
-    ["top-level rest", "function value(...input) {}", /rest parameters/u],
     [
       "async pattern",
       "async function value([input]) {}",
@@ -178,6 +211,11 @@ test("keeps unsupported parameter boundaries explicit", () => {
     [
       "async default",
       "async function value(input = 1) {}",
+      /asynchronous functions/u,
+    ],
+    [
+      "async rest",
+      "async function value(...input) {}",
       /asynchronous functions/u,
     ],
     [
@@ -193,6 +231,11 @@ test("keeps unsupported parameter boundaries explicit", () => {
     [
       "shared default var",
       "function value(input = 1) { var input; }",
+      /non-simple parameter list/u,
+    ],
+    [
+      "shared rest var",
+      "function value(...input) { var input; }",
       /non-simple parameter list/u,
     ],
   ] as const) {

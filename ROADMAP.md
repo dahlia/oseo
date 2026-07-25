@@ -682,7 +682,13 @@ environment. Generated and fixed native evidence covers missing, explicit
 initializers, constructors, arrows, TypeScript hints, function length, both
 specialization policies, and forced collection. Five reviewed standards cases
 pin fallback selection, prior references, and length. Top-level rest
-parameters, asynchronous non-simple parameters, pattern-bound hints, and `var`
+parameters now collect the unbound argument suffix into a fresh array without
+changing the generic call ABI. Generated and fixed evidence covers bounded
+suffixes, empty and nonempty calls, heap-valued arguments, fresh identity,
+patterns, arrows, constructors, function length, both specialization policies,
+and forced collection. Six reviewed standards cases pin syntax, patterns,
+collection, and length. Asynchronous non-simple parameters, pattern-bound
+hints, and `var`
 declarations sharing any parameter in a non-simple parameter list remain
 explicit next units. The intrinsics
 stream has landed the

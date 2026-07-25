@@ -214,7 +214,8 @@ iterator acquisition, stepping, closing, and consumers.
 assignment semantics independently from the declaration kind that owns the
 bound names. `default-parameters` identifies function parameter
 initialization whose fallback expressions and reported function length differ
-from a simple parameter list.
+from a simple parameter list. `rest-parameters` identifies function parameter
+initialization that collects the unbound argument suffix into a fresh array.
 
 
 Alternatives considered

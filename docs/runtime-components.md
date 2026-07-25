@@ -84,6 +84,10 @@ execution into the backend.
 Array binding declarations reuse iterator get, next, and close without
 adding a runtime ABI entry point. Generated control flow owns the per-pattern
 done state and conditional cleanup, and rest targets reuse array append.
+Function rest parameters also reuse array creation and append without changing
+the generic function call ABI. Generated code copies the unbound suffix while
+the caller retains the argument vector and the function environment roots the
+fresh array.
 Object binding declarations use the `oseo_require_object_coercible`
 generated-code ABI operation owned by *runtime\_object.c*, followed by the
 existing property-key conversion and property-read operations. The compiler

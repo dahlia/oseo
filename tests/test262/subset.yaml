@@ -10,6 +10,7 @@ supportedFeatures:
   - for-of
   - let
   - object-rest
+  - rest-parameters
   - Symbol
   - Symbol.iterator
   - Symbol.toPrimitive
@@ -458,8 +459,8 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions, functions]
   - path: test/language/expressions/async-function/named-array-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/named-await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -485,17 +486,17 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-object-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/named-rest-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, rest-parameters]
   - path: test/language/expressions/async-function/named-rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
   - path: test/language/expressions/async-function/nameless-array-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
@@ -503,11 +504,11 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/nameless-object-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/nameless-rest-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, rest-parameters]
   - path: test/language/expressions/async-function/nameless-rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -1363,9 +1364,28 @@ tests:
   - path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, top-level-await]
+  - path: test/language/rest-parameters/array-pattern.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions, rest-parameters]
+  - path: test/language/rest-parameters/arrow-function.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/expected-argument-count.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/object-pattern.js
+    expectedClassification: pass
+    dependencies:
+      [destructuring-bindings, functions, object-properties, rest-parameters]
+  - path: test/language/rest-parameters/position-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/rest-index.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
   - path: test/language/statements/async-function/array-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/statements/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -1448,11 +1468,11 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-functions]
   - path: test/language/statements/async-function/object-destructuring-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings]
   - path: test/language/statements/async-function/rest-param-strict-body.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions]
+    expectedClassification: expected-negative
+    dependencies: [async-functions, rest-parameters]
   - path: test/language/statements/async-function/rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]

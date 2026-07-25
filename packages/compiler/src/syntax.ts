@@ -300,6 +300,8 @@ export type SyntaxExpression =
 export interface SyntaxParameter extends LocatedSyntax {
   readonly hints: readonly Hint[];
   readonly name: string;
+  /** Collect every remaining call argument into a fresh array. */
+  readonly rest?: true;
 }
 
 /** One identifier leaf in an owned binding pattern. */
