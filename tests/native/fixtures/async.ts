@@ -62,6 +62,29 @@ async function finalThrow() {
     throw "final throw";
   }
 }
+let readAsyncParameter;
+async function asyncDefaults(
+  value = (readAsyncParameter = () => value, 26),
+) {
+  var value = 27;
+  console.log("async default", value, readAsyncParameter());
+  return value;
+}
+async function asyncPatterns(
+  { value: first = 28 },
+  [second = 29],
+) {
+  console.log("async patterns", first, second);
+  return first + second;
+}
+const asyncRest = async (...values) => {
+  console.log("async rest", values.length, values[0], values[1]);
+  return values.length;
+};
+function failAsyncParameter() { throw "async parameter"; }
+async function asyncAbrupt(value = failAsyncParameter()) {
+  console.log("incorrect async parameter body", value);
+}
 const internallyAwaited = Promise.resolve(24);
 internallyAwaited.then = function overriddenAwait() {
   console.log("incorrect await override");
@@ -99,6 +122,19 @@ hoistedAcrossAwait().then(function (value) {
 tdzAcrossAwait().then(function (value) { console.log("tdz", value); });
 finalReturn().then(function (value) { console.log("final return", value); });
 finalThrow().catch(function (reason) { console.log("final throw", reason); });
+asyncDefaults();
+asyncPatterns({ value: 30 }, []);
+asyncRest(31, 32);
+let returnedAsyncAbruptly = false;
+try {
+  const failedParameter = asyncAbrupt();
+  returnedAsyncAbruptly = true;
+  failedParameter.catch(function (reason) {
+    console.log("async parameter rejected", reason, returnedAsyncAbruptly);
+  });
+} catch (error) {
+  console.log("incorrect synchronous parameter throw", error);
+}
 awaitInternally().then(function (value) {
   console.log("internal await", value);
 });

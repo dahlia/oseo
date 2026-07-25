@@ -25,22 +25,14 @@ const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-type InputKind = "missing" | "null" | "present";
-type HintKind = "absent" | "false" | "truthful";
-type PatternKind = "array" | "object";
+type ParameterForm = "array" | "default" | "object" | "plain-sibling";
+type BodyBinding = "function" | "var";
 
-interface ParameterBindingCase {
-  readonly asynchronous: boolean;
-  readonly fallback: number;
-  readonly hintKind: HintKind;
-  readonly inputKind: InputKind;
-  readonly patternKind: PatternKind;
-  readonly value: number;
-}
-
-interface ModelResult {
-  readonly restValue?: number;
-  readonly result?: number;
+interface ParameterVarCase {
+  readonly bodyBinding: BodyBinding;
+  readonly bodyValue: number;
+  readonly parameterForm: ParameterForm;
+  readonly parameterValue: number;
 }
 
 const host = createNodeHost();
@@ -50,70 +42,59 @@ const nativeTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 );
-const caseArbitrary: fc.Arbitrary<ParameterBindingCase> = fc.record({
-  asynchronous: fc.boolean(),
-  fallback: fc.integer({ max: 20, min: -20 }),
-  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
-  inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
-  patternKind: fc.constantFrom<PatternKind>("array", "object"),
-  value: fc.integer({ max: 20, min: -20 }),
+const caseArbitrary: fc.Arbitrary<ParameterVarCase> = fc.record({
+  bodyBinding: fc.constantFrom<BodyBinding>("function", "var"),
+  bodyValue: fc.integer({ max: 20, min: -20 }),
+  parameterForm: fc.constantFrom<ParameterForm>(
+    "array",
+    "default",
+    "object",
+    "plain-sibling",
+  ),
+  parameterValue: fc.integer({ max: 20, min: -20 }),
 });
 
-function patternSource(testCase: ParameterBindingCase): string {
-  if (testCase.patternKind === "array") {
-    return `[bound = ${testCase.fallback}, ...rest]`;
+function parameterSource(testCase: ParameterVarCase): string {
+  const value = testCase.parameterValue;
+  const initializer = `(readParameter = () => value, ${value})`;
+  if (testCase.parameterForm === "array") {
+    return `[value = ${initializer}]`;
   }
-  return `{ value: bound = ${testCase.fallback}, ...rest }`;
+  if (testCase.parameterForm === "object") {
+    return `{ value = ${initializer} }`;
+  }
+  if (testCase.parameterForm === "plain-sibling") {
+    return (
+      `_ = (readParameter = () => value, 0), ` +
+      `value = ${testCase.parameterValue}`
+    );
+  }
+  return `value = ${initializer}`;
 }
 
-function inputSource(testCase: ParameterBindingCase): string {
-  if (testCase.inputKind === "null") return "null";
-  if (testCase.patternKind === "array") {
-    const value =
-      testCase.inputKind === "present" ? String(testCase.value) : "undefined";
-    return `[${value}, 7]`;
-  }
-  const value =
-    testCase.inputKind === "present" ? `value: ${testCase.value}, ` : "";
-  return `{ ${value}extra: 7 }`;
+function argumentSource(testCase: ParameterVarCase): string {
+  if (testCase.parameterForm === "array") return "[]";
+  if (testCase.parameterForm === "object") return "{}";
+  return "";
 }
 
-function printCase(testCase: ParameterBindingCase): string {
-  const restValue = testCase.patternKind === "array" ? "rest[0]" : "rest.extra";
-  const hint =
-    testCase.hintKind === "absent"
-      ? ""
-      : `/** @param {${
-          testCase.hintKind === "truthful" ? "number" : "string"
-        }} bound */`;
-  const invocation = `consume(${inputSource(testCase)})`;
-  const call = testCase.asynchronous
-    ? `${invocation}.then(undefined, function (error) {
-  console.log("error", error.name);
-});`
-    : `try {
-  ${invocation};
-} catch (error) {
-  console.log("error", error.name);
-}`;
+function printCase(testCase: ParameterVarCase): string {
+  const body =
+    testCase.bodyBinding === "function"
+      ? `
+  function value() { return ${testCase.bodyValue}; }
+  var value;
+  console.log("result", value(), readParameter());`
+      : `
+  var value = ${testCase.bodyValue};
+  console.log("result", value, readParameter());`;
   return `
-${hint}
-${testCase.asynchronous ? "async " : ""}function consume(${patternSource(
-    testCase,
-  )}) {
-  console.log("result", bound, ${restValue});
+let readParameter;
+function consume(${parameterSource(testCase)}) {
+${body}
 }
-${call}
+consume(${argumentSource(testCase)});
 `;
-}
-
-function expected(testCase: ParameterBindingCase): ModelResult {
-  if (testCase.inputKind === "null") return {};
-  return {
-    restValue: 7,
-    result:
-      testCase.inputKind === "present" ? testCase.value : testCase.fallback,
-  };
 }
 
 async function references(source: string): Promise<
@@ -131,7 +112,7 @@ async function references(source: string): Promise<
   ]
 > {
   const directory = await host.makeTemporaryDirectory(
-    "oseo-parameter-binding-property-",
+    "oseo-parameter-var-property-",
   );
   const sourcePath = `${directory}/case.js`;
   let succeeded = false;
@@ -156,36 +137,18 @@ async function references(source: string): Promise<
   }
 }
 
-test("parameter binding model rejects null before entering the body", () => {
-  assert.deepEqual(
-    expected({
-      asynchronous: false,
-      fallback: 2,
-      hintKind: "absent",
-      inputKind: "null",
-      patternKind: "object",
-      value: 1,
-    }),
-    {},
-  );
-});
-
 test(
-  "generated parameter bindings match the M5 property model",
+  "generated parameter and body var cells match the M5 property model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "parameter bindings preserve generated values and rest",
+      "body var bindings do not replace captured parameter cells",
       fc.asyncProperty(caseArbitrary, async (testCase) => {
         const source = printCase(testCase);
-        const modeled = expected(testCase);
         const expectedObservation = {
           exitStatus: 0,
           stderr: "",
-          stdout:
-            modeled.result == null
-              ? "error TypeError\n"
-              : `result ${modeled.result} ${modeled.restValue}\n`,
+          stdout: `result ${testCase.bodyValue} ${testCase.parameterValue}\n`,
         };
         assertMatchingObservations([
           expectedObservation,
@@ -194,7 +157,7 @@ test(
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
-            { source, sourceId: "generated-m5-parameter-binding.js" },
+            { source, sourceId: "generated-m5-parameter-var.js" },
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
@@ -232,13 +195,12 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "synchronous and asynchronous array and object function " +
-          "parameters with defaults, rest, present, missing, and nullish " +
-          "inputs plus absent, truthful, and false JSDoc hints",
+          "default and binding-pattern parameters with one captured " +
+          "parameter cell and a same-name body var or function binding",
         numRuns: 10,
-        profile: "M5 function binding patterns",
-        seed: 0x5eed_0011,
-        sizeLimit: "one binding, one rest value, and bounded integers",
+        profile: "M5 parameter and body var environments",
+        seed: 0x5eed_0014,
+        sizeLimit: "two parameter bindings and bounded integers",
         timeLimitMilliseconds: 180_000,
       },
     );

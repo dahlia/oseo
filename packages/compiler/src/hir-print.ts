@@ -208,7 +208,7 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
     );
   }
   if (pattern.kind === "binding-identifier") {
-    return `%b${pattern.bindingId} ${pattern.name}`;
+    return `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}`;
   }
   if (pattern.kind === "object-binding-pattern") {
     const properties = pattern.properties.map(

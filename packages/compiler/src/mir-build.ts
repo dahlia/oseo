@@ -2833,6 +2833,7 @@ function forDeclarationBindings(
   return [
     {
       bindingId: declaration.bindingId,
+      hints: [],
       kind: "binding-identifier",
       mutable: declaration.declarationKind !== "const",
       name: declaration.name,

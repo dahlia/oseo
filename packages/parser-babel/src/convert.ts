@@ -7,6 +7,7 @@ import type {
   SyntaxAssignmentPattern,
   SyntaxAssignmentTarget,
   SyntaxArrayElement,
+  SyntaxBindingIdentifier,
   SyntaxBindingPattern,
   SyntaxCallArgument,
   SyntaxCallTarget,
@@ -675,7 +676,12 @@ export function bindingPattern(
         "Binding identifiers cannot be optional.",
       );
     }
-    return { ...location(context, value), kind: "binding-identifier", name };
+    return {
+      ...location(context, value),
+      hints: [],
+      kind: "binding-identifier",
+      name,
+    };
   }
   if (value.type === "MemberExpression") {
     if (!assignment) {
@@ -894,6 +900,53 @@ export function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
   ];
 }
 
+/**
+ * Attach name-based JSDoc hints to the bindings created by a parameter
+ * pattern. The hidden aggregate ABI parameter remains unhinted.
+ */
+function parameterIdentifierHints(
+  pattern: SyntaxBindingIdentifier,
+  hints: ReadonlyMap<string, Hint>,
+): SyntaxBindingIdentifier {
+  const hint = hints.get(pattern.name);
+  return { ...pattern, hints: hint == null ? [] : [hint] };
+}
+
+function parameterPatternHints(
+  pattern: SyntaxBindingPattern,
+  hints: ReadonlyMap<string, Hint>,
+): SyntaxBindingPattern {
+  if (pattern.kind === "binding-identifier") {
+    return parameterIdentifierHints(pattern, hints);
+  }
+  if (pattern.kind === "object-binding-pattern") {
+    return {
+      ...pattern,
+      properties: pattern.properties.map((property) => ({
+        ...property,
+        pattern: parameterPatternHints(property.pattern, hints),
+      })),
+      ...(pattern.rest == null
+        ? {}
+        : { rest: parameterIdentifierHints(pattern.rest, hints) }),
+    };
+  }
+  return {
+    ...pattern,
+    elements: pattern.elements.map((element) =>
+      element == null
+        ? undefined
+        : {
+            ...element,
+            pattern: parameterPatternHints(element.pattern, hints),
+          },
+    ),
+    ...(pattern.rest == null
+      ? {}
+      : { rest: parameterPatternHints(pattern.rest, hints) }),
+  };
+}
+
 export function rawPatternNames(value: BabelNode): readonly string[] {
   const name = identifierName(value);
   if (name != null) return [name];
@@ -914,6 +967,30 @@ export function rawPatternNames(value: BabelNode): readonly string[] {
     });
   }
   return [];
+}
+
+function rawParameterContainsExpression(value: BabelNode): boolean {
+  if (value.type === "AssignmentPattern") return true;
+  if (value.type === "RestElement") {
+    const argument = node(value.argument);
+    return argument != null && rawParameterContainsExpression(argument);
+  }
+  if (value.type === "ArrayPattern") {
+    return nodes(value.elements).some(rawParameterContainsExpression);
+  }
+  if (value.type === "ObjectPattern") {
+    return nodes(value.properties).some((property) => {
+      if (property.type === "RestElement") {
+        return rawParameterContainsExpression(property);
+      }
+      if (property.computed === true) return true;
+      const propertyValue = node(property.value);
+      return (
+        propertyValue != null && rawParameterContainsExpression(propertyValue)
+      );
+    });
+  }
+  return false;
 }
 
 export function statement(
@@ -2297,14 +2374,16 @@ export function collectVarStatement(
  * ordinary assignments, so the pair preserves var semantics for the
  * admitted profile without a separate binding kind. Names owned by
  * parameters or var-scoped function declarations are skipped so bare
- * redeclarations do not reset them. A caller may instead reject names whose
- * sharing semantics require an environment representation it does not own.
+ * redeclarations do not reset them. Skipped names already have an owning
+ * binding and always take precedence over a supplied copy. A caller may
+ * provide an outer parameter copy when a parameter-expression environment
+ * requires a distinct body var binding with the parameter's initial value.
  */
 export function hoistedVarDeclarations(
   context: ConvertContext,
   values: readonly BabelNode[],
   skipNames: ReadonlySet<string>,
-  rejectedNames: ReadonlySet<string> = new Set<string>(),
+  copiedNames: ReadonlyMap<string, string> = new Map<string, string>(),
 ): SyntaxStatement[] | undefined {
   const collected = new Map<string, HoistedVar>();
   const blockFunctions = new Set<string>();
@@ -2332,22 +2411,18 @@ export function hoistedVarDeclarations(
           `'${name}' is outside the admitted profile.`,
       );
     }
-    if (rejectedNames.has(name)) {
-      return unsupported(
-        context,
-        info.declarator,
-        `A var declaration sharing parameter '${name}' in a ` +
-          "non-simple parameter list is outside the admitted profile.",
-      );
-    }
     if (skipNames.has(name)) continue;
+    const copiedName = copiedNames.get(name);
     hoisted.push({
       // A zero-width leading byte range keeps hoisted bindings ahead of
       // every source-ordered statement when module lowering sorts by
       // byte offset.
       byteRange: { end: 0, start: 0 },
       hint: info.hint,
-      initializer: undefinedExpression(info.range),
+      initializer:
+        copiedName == null
+          ? undefinedExpression(info.range)
+          : identifierExpression(copiedName, info.range),
       kind: "let",
       name,
       range: info.range,
@@ -2415,17 +2490,10 @@ export function functionDeclaration(
     );
   });
   const defaultParameters = defaultParameterIndex >= 0;
-  const restParameters = restParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
-  const nonSimpleParameters = parameterEnvironment || restParameters;
-  if (nonSimpleParameters && value.async === true) {
-    return unsupported(
-      context,
-      value,
-      "Binding-pattern, default, and rest parameters in asynchronous " +
-        "functions are unsupported.",
-    );
-  }
+  const parameterExpressions = parameterNodes.some(
+    rawParameterContainsExpression,
+  );
   const strict =
     context.strictStack.at(-1) === true ||
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
@@ -2464,12 +2532,15 @@ export function functionDeclaration(
       context.functionStack.push(
         functionProvidesThis ? true : context.functionStack.at(-1) === true,
       );
-      const pattern = bindingPattern(context, parameterPattern);
+      let pattern = bindingPattern(context, parameterPattern);
       let defaultInitializer =
         defaultNode == null ? undefined : expression(context, defaultNode);
       context.functionStack.pop();
       context.strictStack.pop();
       if (pattern == null) return undefined;
+      if (parameterName == null) {
+        pattern = parameterPatternHints(pattern, jsdoc.parameters);
+      }
       if (defaultNode != null && defaultInitializer == null) return undefined;
       const names = patternNames(pattern);
       if (
@@ -2481,16 +2552,6 @@ export function functionDeclaration(
           ...defaultInitializer,
           inferredName: parameterName,
         };
-      }
-      if (
-        parameterName == null &&
-        names.some((bindingName) => jsdoc.parameters.has(bindingName))
-      ) {
-        return unsupported(
-          context,
-          parameterNode,
-          "JSDoc hints on binding-pattern parameters are unsupported.",
-        );
       }
       const hints: Hint[] = [];
       const parameterHint = typeHint(context, parameterPattern.typeAnnotation);
@@ -2582,17 +2643,62 @@ export function functionDeclaration(
           } satisfies BabelNode,
         ]
       : nodes(bodyNode?.body);
+  const copiedParameterNames = new Map<string, string>();
+  if (parameterExpressions) {
+    for (const parameterName of parameterNames) {
+      if (!copiedParameterNames.has(parameterName)) {
+        copiedParameterNames.set(
+          parameterName,
+          syntheticName(context, "parameter-copy"),
+        );
+      }
+    }
+  }
+  const skippedHoistedNames = new Set(varScopedFunctionNames(children));
+  if (!parameterExpressions) {
+    for (const parameterName of parameterNames) {
+      skippedHoistedNames.add(parameterName);
+    }
+  }
   const hoisted = hoistedVarDeclarations(
     context,
     children,
-    new Set([...parameterNames, ...varScopedFunctionNames(children)]),
-    nonSimpleParameters ? new Set(parameterNames) : new Set<string>(),
+    skippedHoistedNames,
+    copiedParameterNames,
   );
   if (hoisted == null) {
     context.functionStack.pop();
     context.strictStack.pop();
     return undefined;
   }
+  const parameterizedBody = (
+    executionBody: readonly (SyntaxFunction | SyntaxStatement)[],
+  ): readonly (SyntaxFunction | SyntaxStatement)[] => {
+    if (!parameterEnvironment) return executionBody;
+    const range = location(context, value).range;
+    const parameterCopies: SyntaxStatement[] = [];
+    for (const declaration of hoisted) {
+      if (declaration.kind !== "let") continue;
+      const copiedName = copiedParameterNames.get(declaration.name);
+      if (copiedName == null) continue;
+      parameterCopies.push({
+        hint: undefined,
+        initializer: identifierExpression(declaration.name, declaration.range),
+        kind: "let",
+        name: copiedName,
+        range: declaration.range,
+      });
+    }
+    return [
+      ...parameterInitializers,
+      ...parameterCopies,
+      {
+        body: executionBody,
+        kind: "block",
+        range,
+      },
+    ];
+  };
   if (value.async === true) {
     if (!validateAsyncContinuationCount(context, children)) {
       context.functionStack.pop();
@@ -2606,7 +2712,7 @@ export function functionDeclaration(
         context,
         range,
         [],
-        [...hoisted, ...executionBody],
+        parameterizedBody([...hoisted, ...executionBody]),
       );
       body.push({
         expression: asyncCall(execution, range),
@@ -2633,16 +2739,7 @@ export function functionDeclaration(
       }
       executionBody.push(converted);
     }
-    if (parameterEnvironment) {
-      const range = location(context, value).range;
-      body.push(...parameterInitializers, {
-        body: executionBody,
-        kind: "block",
-        range,
-      });
-    } else {
-      body.push(...executionBody);
-    }
+    body.push(...parameterizedBody(executionBody));
   }
   context.functionStack.pop();
   context.strictStack.pop();

@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 298
+honest unsupported classifications. The current reviewed manifest records 310
 passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 
@@ -107,8 +107,10 @@ object binding-pattern parameters. Parameter initialization runs in source
 order in an environment outside the function body, so later parameters retain
 their temporal dead zones and body declarations do not leak into defaults.
 Generated evidence uses seed `0x5eed0011` across both pattern families,
-present, missing, and nullish inputs, both specialization policies, and forced
-collection. Four reviewed test262 cases pin array values, defaults, nesting,
+present, missing, and nullish inputs, absent, truthful, and false JSDoc hints,
+both specialization policies, and forced collection. Name-based JSDoc hints
+attach to the pattern binding they describe rather than the hidden aggregate
+ABI parameter. Four reviewed test262 cases pin array values, defaults, nesting,
 rest, and abrupt completion. Synchronous top-level default parameters now use
 the same separate parameter environment and preserve hints on identifier
 parameters. HIR and MIR retain JavaScript function length independently from
@@ -125,11 +127,29 @@ specialization policies, and forced collection. Fixed evidence covers empty
 and nonempty suffixes, heap-valued arguments, fresh identity, arrows,
 constructors, array and object binding patterns, and function length. Six
 reviewed test262 cases pin syntax, patterns, collection, and length.
-Asynchronous non-simple parameters remain unsupported, but enabling the rest
-feature promotes nine preexisting strict-body parse negatives from unsupported
-to expected negative. Hints on pattern-bound names and `var` declarations that
-share any parameter in a non-simple parameter list remain explicit boundaries.
-Awaited member targets remain later work. The runtime
+Body `var` declarations may now share parameter names. When the parameter list
+contains an expression, the frontend initializes each matching body cell from
+an outer parameter copy so closures created by parameter initializers retain
+the parameter cell. Lists without parameter expressions, including rest-only
+lists, continue to reuse the parameter cell. When a top-level body function
+declaration and `var` share that name, the function declaration owns the body
+binding and no parameter-copy binding is synthesized. Generated evidence uses
+seed
+`0x5eed0014` across default, array-pattern, object-pattern, and plain sibling
+bindings, `var`-owned and function-owned body cells, both specialization
+policies, and forced collection. Fixed evidence also covers arrows and
+rest-only lists. Six reviewed test262 cases pin the separate parameter and body
+environments.
+Asynchronous functions and arrows run default and binding-pattern
+initialization inside the owned asynchronous executor. Rest collection retains
+the ordinary call ABI, and abrupt initializers reject the returned promise
+without entering the body or throwing synchronously. The generated
+binding-pattern property now varies synchronous and asynchronous functions.
+Fixed native evidence covers defaults, patterns, rest, same-name body `var`,
+and abrupt rejection. Six reviewed test262 cases pin default selection, prior
+references, and rejection. Structured TypeScript annotations on
+binding-pattern parameters remain an explicit boundary. Awaited member targets
+remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -345,10 +365,13 @@ left-to-right initialization, later-parameter temporal dead zones, conditional
 iterator close, object coercibility, default and rest behavior, lexical arrow
 receivers, and function `length`. The generated property suite uses seed
 `0x5eed0011` across both pattern families, present, missing, and nullish inputs,
-both native specialization policies, and forced collection. Fixed native
-fixtures retain nested defaults and rest, arrows, constructors, parameter
-temporal dead zones, iterator cleanup, and function length. Four reviewed
-test262 cases pin array values, nesting, defaults, rest, and abrupt completion.
+absent, truthful, and false JSDoc hints, both native specialization policies,
+and forced collection. Name-based JSDoc hints remain on their pattern binding
+through owned syntax and HIR, while the hidden aggregate ABI parameter remains
+unhinted. Fixed native fixtures retain nested defaults and rest, arrows,
+constructors, parameter temporal dead zones, iterator cleanup, and function
+length. Four reviewed test262 cases pin array values, nesting, defaults, rest,
+and abrupt completion.
 Synchronous top-level default parameters use the same parameter environment
 and retain JavaScript function length separately from the ABI parameter count.
 The generated property suite uses seed `0x5eed0012` across supplied and missing
@@ -363,13 +386,30 @@ seed `0x5eed0013` across zero to three fixed parameters, bounded argument
 lists, both specialization policies, and forced collection. Fixed evidence
 retains empty and nonempty suffixes, heap-valued arguments, fresh identity,
 arrows, constructors, array and object patterns, and function length. Six
-reviewed test262 cases pin syntax, patterns, collection, and length. Enabling
-the rest feature promotes
-nine preexisting asynchronous non-simple strict-body parse negatives from
-unsupported to expected negative without admitting asynchronous execution.
-TypeScript and JSDoc hints on pattern-bound names, and `var` declarations that
-share any parameter in a non-simple parameter list remain source-located
-unsupported boundaries.
+reviewed test262 cases pin syntax, patterns, collection, and length. Nine
+asynchronous non-simple strict-body parse negatives remain expected negatives.
+Body `var` declarations may share parameter names. A parameter list containing
+an expression receives separate parameter and body cells, with the body cell
+initialized from the completed parameter binding before body execution. This
+keeps closures created by parameter initializers attached to the parameter
+cell. Lists without parameter expressions reuse the parameter cell. A
+same-name top-level function declaration owns the body binding when `var` also
+redeclares it, without creating a second synthetic binding. The generated
+property suite uses seed `0x5eed0014` across default, array-pattern,
+object-pattern, and plain sibling bindings, `var`-owned and function-owned body
+cells, both native specialization policies, and forced collection. Fixed
+evidence adds arrows, rest-only lists, and the function-owned binding. Six
+reviewed test262 cases pin the environment split. TypeScript and structured
+TypeScript annotations on binding-pattern parameters remain a source-located
+unsupported boundary.
+Asynchronous functions and arrows create that parameter environment inside the
+owned asynchronous executor. Defaults and patterns therefore finish before the
+body begins, while an abrupt initializer rejects the returned promise instead
+of throwing from the call. The generated property with seed `0x5eed0011` now
+varies synchronous and asynchronous functions without filtering. Fixed native
+evidence covers defaults, patterns, rest, same-name body `var`, and rejection.
+Six reviewed test262 cases pin default selection, prior references, and abrupt
+rejection.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

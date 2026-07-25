@@ -331,6 +331,12 @@ tests:
   - path: test/language/expressions/arrow-function/prototype-rules.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/scope-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/scope-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -479,6 +485,9 @@ tests:
   - path: test/language/expressions/async-function/named-await-as-label-identifier.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
@@ -499,6 +508,9 @@ tests:
     dependencies: [async-functions, destructuring-bindings]
   - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
     expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/nameless-dflt-params-ref-prior.js
+    expectedClassification: pass
     dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/nameless-dflt-params-rest.js
     expectedClassification: expected-negative
@@ -629,6 +641,12 @@ tests:
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/function/scope-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/function/scope-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
   - path: test/language/expressions/in/rhs-yield-absent-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -1404,8 +1422,17 @@ tests:
   - path: test/language/statements/async-function/await-as-label-identifier.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/statements/async-function/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/dflt-params-duplicates.js
     expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/dflt-params-ref-prior.js
+    expectedClassification: pass
     dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/dflt-params-rest.js
     expectedClassification: expected-negative
@@ -1464,6 +1491,9 @@ tests:
   - path: test/language/statements/async-function/evaluation-body-that-throws.js
     expectedClassification: pass
     dependencies: [async-functions]
+  - path: test/language/statements/async-function/evaluation-default-that-throws.js
+    expectedClassification: pass
+    dependencies: [async-functions, default-parameters]
   - path: test/language/statements/async-function/let-newline-await-in-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -2350,6 +2380,12 @@ tests:
   - path: test/language/statements/function/param-duplicated-strict-1.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/language/statements/function/scope-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/statements/function/scope-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, var-bindings]
   - path: test/language/statements/labeled/continue.js
     expectedClassification: expected-negative
     dependencies: [control-flow]

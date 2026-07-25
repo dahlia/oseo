@@ -18,17 +18,25 @@ declarations admit the same array and object binding patterns. `for-in` and
 `for-await-of` remain owned profile failures.
 Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
-Synchronous functions, constructors, and arrows admit recursive array and
-object binding-pattern parameters plus top-level default and rest parameters.
+Functions, constructors, and arrows admit recursive array and object
+binding-pattern parameters plus top-level default and rest parameters.
 The adapter gives the compiler plain hidden ABI parameters for patterns, then
 emits owned binding initialization before a private lexical body block. Rest
 parameters retain an owned marker so the backend collects the unbound argument
 suffix into a fresh array. This preserves the separate parameter environment,
 left-to-right temporal dead zones, ordinary-function receivers, lexical arrow
 receivers, and function `length` independently from the ABI parameter count.
-Asynchronous non-simple parameters, optional parameters, TypeScript `this`
-parameters, hints on pattern-bound names, and `var` declarations sharing any
-parameter in a non-simple parameter list remain explicit boundaries.
+When a parameter list contains an expression, a same-name body `var` receives
+a separate cell initialized from the parameter binding. A list without
+parameter expressions reuses the parameter cell. A same-name top-level
+function declaration owns the body binding when `var` also redeclares it.
+Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
+owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
+Asynchronous functions and arrows run non-simple parameter initialization
+inside their owned asynchronous executor, so abrupt initialization rejects the
+returned promise. Optional parameters, TypeScript `this` parameters, and
+structured TypeScript annotations on binding patterns remain explicit
+boundaries.
 Call type arguments and other withheld forms are also rejected here. Source
 positions and UTF-8 byte offsets are indexed once for linear-time conversion.
 The script frontend uses non-strict script parsing. The module frontend uses

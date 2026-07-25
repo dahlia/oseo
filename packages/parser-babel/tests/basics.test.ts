@@ -95,6 +95,7 @@ test("preserves non-strict script parameter bindings", () => {
 test("converts function binding patterns through owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
+      "/** @param {number} first @param {string} value */\n" +
       "function read([first, second = 2, ...rest], " +
       "{ value, ...remaining }, scale: number) {\n" +
       "  return [first, second, rest, value, remaining, scale];\n" +
@@ -114,8 +115,11 @@ test("converts function binding patterns through owned syntax", () => {
     ["typescript"],
   );
   const hir = printHir(result.hir);
-  assert.match(hir, /\[%b\d+ first, %b\d+ second = 2, \.\.\.%b\d+ rest\]/u);
-  assert.match(hir, /\{"value": %b\d+ value, \.\.\.%b\d+ remaining\}/u);
+  assert.match(hir, /\[%b\d+ first hints=\[jsdoc:number\], %b\d+ second = 2/u);
+  assert.match(
+    hir,
+    /\{"value": %b\d+ value hints=\[jsdoc:string\], \.\.\.%b\d+ remaining\}/u,
+  );
   assert.doesNotMatch(
     JSON.stringify(result.hir),
     /ArrayPattern|ObjectPattern|RestElement/u,
@@ -201,51 +205,30 @@ test("converts synchronous rest parameters through owned syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
 });
 
-test("keeps unsupported parameter boundaries explicit", () => {
-  for (const [name, source, message] of [
-    [
-      "async pattern",
-      "async function value([input]) {}",
-      /asynchronous functions/u,
-    ],
-    [
-      "async default",
-      "async function value(input = 1) {}",
-      /asynchronous functions/u,
-    ],
-    [
-      "async rest",
-      "async function value(...input) {}",
-      /asynchronous functions/u,
-    ],
-    [
-      "shared var",
-      "function value([input]) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared plain var",
-      "function value([pattern], input) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared default var",
-      "function value(input = 1) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared rest var",
-      "function value(...input) { var input; }",
-      /non-simple parameter list/u,
-    ],
-  ] as const) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: `${name}.ts`,
-    });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", message);
-  }
+test("separates parameter-expression bindings from body var bindings", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let capture;\n" +
+      "function value(input = (capture = () => input, 1)) {\n" +
+      "  var input = 2;\n" +
+      "  return [input, capture()];\n" +
+      "}\n" +
+      "function pattern([input]) { var input; return input; }\n" +
+      "function rest(...input) { var input; return input.length; }\n" +
+      "function declarationOwner(input = 1) {\n" +
+      "  function input() { return 9; }\n" +
+      "  var input;\n" +
+      "  return input();\n" +
+      "}\n",
+    sourceId: "parameter-var.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /function @f\d+ value/u);
+  assert.match(hir, /function @f\d+ declarationOwner/u);
+  assert.match(hir, /oseo-parameter-copy/u);
+  assert.equal(hir.match(/oseo-parameter-copy/gu)?.length, 2);
 });
 
 test("retains script and function strictness in owned IR", () => {

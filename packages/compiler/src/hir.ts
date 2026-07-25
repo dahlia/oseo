@@ -15,6 +15,7 @@ import type {
 export interface HirBindingIdentifier extends LocatedSyntax {
   readonly bindingId: number;
   readonly functionNameBinding?: true;
+  readonly hints: readonly Hint[];
   readonly importedBinding?: true;
   readonly kind: "binding-identifier";
   readonly mutable: boolean;

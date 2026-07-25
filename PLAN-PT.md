@@ -548,20 +548,23 @@ when catch parameter initialization completes abruptly.
 M5 function binding properties
 ------------------------------
 
-The function parameter binding property generates an array or object parameter
-with a default and rest target. Inputs vary between a present value, a missing
-value, and `null`. Its independent model predicts the selected bound value,
-retained rest value, or escaped nullish `TypeError`. Each case compares
-Node.js, Deno, specialization-disabled native execution, and
-specialization-enabled native execution with collection forced at every
-safepoint.
+The function parameter binding property generates a synchronous or asynchronous
+function with an array or object parameter containing a default and rest
+target. Inputs vary between a present value, a missing value, and `null`, plus
+an absent, truthful, or deliberately false name-based JSDoc hint. Its
+independent model predicts the selected bound value, retained rest value, or
+observed nullish `TypeError`; asynchronous cases observe that error through
+promise rejection. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed0011`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
-budget through the shared replay controls. Fixed native fixtures retain nested
-defaults and rest, arrows, constructors, later-parameter temporal dead zones,
-iterator cleanup after a default failure, body-declaration isolation, and
-function length.
+budget through the shared replay controls. The asynchronous and hint dimensions
+use the same direct structured generation and shrinking. Fixed native fixtures
+retain nested defaults and rest, arrows, asynchronous rejection, constructors,
+later-parameter temporal dead zones, iterator cleanup after a default failure,
+body-declaration isolation, and function length.
 
 
 M5 default parameter properties
@@ -601,6 +604,26 @@ budget through the shared replay controls. Fixed native fixtures retain empty
 and nonempty suffixes, heap-valued arguments under forced collection, fresh
 identity, arrows, constructors, array and object binding patterns, and function
 length.
+
+
+M5 parameter and body var properties
+------------------------------------
+
+The parameter and body `var` property generates a synchronous function whose
+default, array-pattern, object-pattern, or plain sibling parameter is captured
+by a parameter initializer. The body either writes a same-name `var`, or gives
+the binding to a top-level function declaration with a same-name `var`
+redeclaring it. Its independent model predicts the distinct body value and
+captured parameter value. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint.
+
+The ordinary suite uses seed `0x5eed0014`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+default and binding-pattern captures, a plain sibling binding, an arrow, and a
+rest-only list that reuses its parameter cell. They also retain a top-level
+function declaration that owns the body binding beside a same-name `var`.
 
 
 M5 for-of binding properties

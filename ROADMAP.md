@@ -687,10 +687,22 @@ changing the generic call ABI. Generated and fixed evidence covers bounded
 suffixes, empty and nonempty calls, heap-valued arguments, fresh identity,
 patterns, arrows, constructors, function length, both specialization policies,
 and forced collection. Six reviewed standards cases pin syntax, patterns,
-collection, and length. Asynchronous non-simple parameters, pattern-bound
-hints, and `var`
-declarations sharing any parameter in a non-simple parameter list remain
-explicit next units. The intrinsics
+collection, and length. Name-based JSDoc hints now remain attached to their
+pattern binding through owned syntax and HIR; generated evidence covers absent,
+truthful, and false hints without changing behavior. Asynchronous functions and
+arrows now run non-simple parameter initialization inside their asynchronous
+executor, so abrupt defaults reject the returned promise. Six reviewed
+standards cases pin default selection, prior references, and rejection.
+Structured TypeScript annotations on binding patterns remain an explicit next
+unit. Body `var` declarations may now share parameter names:
+parameter-expression lists receive distinct parameter and body cells, while
+lists without expressions reuse the parameter cell. A same-name top-level
+function declaration owns the body binding when `var` also redeclares it.
+Generated and fixed evidence covers captured defaults, binding patterns, plain
+sibling parameters, arrows, rest-only lists, both specialization policies, and
+forced collection. It also covers the function-declaration-owned body binding.
+Six reviewed standards cases pin the environment split. The
+intrinsics
 stream has landed the
 named error family as runtime-owned constructor values with typed catchable
 runtime errors;
