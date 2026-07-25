@@ -153,10 +153,15 @@ and abrupt rejection. Six reviewed test262 cases pin default selection, prior
 references, and rejection. The same structural annotation mapping now covers
 standalone declarations and classic `for` declaration heads. Optional members
 remain unhinted. Array element types continue through unambiguous nested array
-rest targets; object targets inside an array rest remain unhinted. Computed
-object properties also remain unhinted even when their key is a literal. Type
-references that require type resolution remain an explicit boundary. Awaited
-member targets remain later work. The runtime component boundaries recorded in
+rest targets. Direct fixed-length tuple spreads expand before mapping, so their
+members and following suffix retain their syntactic positions. Expanded members
+follow the ordinary primitive-hint and unsupported-type rules. Variadic array
+rests and type-reference spreads remain unhinted where their length makes a
+position ambiguous. Object targets inside an array rest remain unhinted.
+Computed object properties also remain unhinted even when their key is a
+literal. Type references that require type resolution remain an explicit
+boundary. Awaited member targets remain later work. The runtime component
+boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
 remain open.
@@ -410,10 +415,14 @@ array TypeScript annotations map their syntactically visible required primitive
 member types to the corresponding binding leaves in parameters, standalone
 declarations, and classic `for` declaration heads. Optional members remain
 unhinted. Array element types continue through unambiguous nested array rest
-targets; object targets inside an array rest remain unhinted. Computed object
-properties remain unhinted even when their source key is a literal. Type
-references that require alias or interface resolution remain source-located
-unsupported boundaries.
+targets. Direct fixed-length tuple spreads expand before mapping, so their
+members and following suffix retain their syntactic positions. Expanded members
+follow the ordinary primitive-hint and unsupported-type rules. Variadic array
+rests and type-reference spreads remain unhinted where their length makes a
+position ambiguous. Object targets inside an array rest remain unhinted.
+Computed object properties remain unhinted even when their source key is a
+literal. Type references that require alias or interface resolution remain
+source-located unsupported boundaries.
 Asynchronous functions and arrows create that parameter environment inside the
 owned asynchronous executor. Defaults and patterns therefore finish before the
 body begins, while an abrupt initializer rejects the returned promise instead

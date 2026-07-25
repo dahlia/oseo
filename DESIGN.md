@@ -467,10 +467,14 @@ types to binding-identifier leaves. This mapping does not resolve aliases or
 interfaces and does not invoke the TypeScript type checker. Standalone
 declarations and classic `for` declaration heads reuse the mapping. Optional
 members remain unhinted. Array element types continue through unambiguous nested
-array rest targets; object targets inside an array rest remain unhinted. Object
-member types map only through noncomputed source properties, so even a computed
-literal key remains unhinted. An annotation that requires type resolution
-remains an owned unsupported boundary.
+array rest targets. Direct fixed-length tuple spreads expand before mapping, so
+their members and following suffix retain their syntactic positions. Expanded
+members follow the ordinary primitive-hint and unsupported-type rules. Variadic
+array rests and type-reference spreads remain unhinted where their length makes
+a position ambiguous. Object targets inside an array rest remain unhinted.
+Object member types map only through noncomputed source properties, so even a
+computed literal key remains unhinted. An annotation that requires type
+resolution remains an owned unsupported boundary.
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer

@@ -694,14 +694,18 @@ array TypeScript annotations now map syntactically visible primitive member
 types to their binding leaves without a type checker. This mapping covers
 parameters, standalone declarations, and classic `for` declaration heads.
 Optional members remain unhinted. Array element types continue through
-unambiguous nested array rest targets; object targets inside an array rest
-remain unhinted. Computed object properties remain unhinted even for literal
-keys. The generated domains vary truthful and false TypeScript hints. Type
-references remain an explicit boundary. Asynchronous functions and arrows now
-run non-simple parameter initialization inside their asynchronous executor, so
-abrupt defaults reject the returned promise. Six reviewed standards cases pin
-default selection, prior references, and rejection. Body `var` declarations may
-now share parameter names:
+unambiguous nested array rest targets. Direct fixed-length tuple spreads expand
+before mapping, so their members and following suffix retain their syntactic
+positions. Expanded members follow the ordinary primitive-hint and
+unsupported-type rules. Variadic array rests and type-reference spreads remain
+unhinted where their length makes a position ambiguous. Object targets inside
+an array rest remain unhinted. Computed object properties remain unhinted even
+for literal keys. The generated domains vary truthful and false TypeScript
+hints. Type references remain an explicit boundary. Asynchronous functions and
+arrows now run non-simple parameter initialization inside their asynchronous
+executor, so abrupt defaults reject the returned promise. Six reviewed
+standards cases pin default selection, prior references, and rejection. Body
+`var` declarations may now share parameter names:
 parameter-expression lists receive distinct parameter and body cells, while
 lists without expressions reuse the parameter cell. A same-name top-level
 function declaration owns the body binding when `var` also redeclares it.

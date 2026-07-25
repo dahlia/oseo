@@ -36,9 +36,13 @@ Inline object, tuple, and array TypeScript annotations map syntactically visible
 primitive member types to the same leaves without invoking a type checker.
 The mapping also covers standalone declarations and classic `for` declaration
 heads. Optional members remain unhinted. Array element types continue through
-unambiguous nested array rest targets; object targets inside an array rest
-remain unhinted. Computed object properties remain unhinted even when their
-source key is a literal.
+unambiguous nested array rest targets. Direct fixed-length tuple spreads expand
+before mapping, so their members and following suffix retain their syntactic
+positions. Expanded members follow the ordinary primitive-hint and
+unsupported-type rules. Variadic array rests and type-reference spreads remain
+unhinted where their length makes a position ambiguous. Object targets inside
+an array rest remain unhinted. Computed object properties remain unhinted even
+when their source key is a literal.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and

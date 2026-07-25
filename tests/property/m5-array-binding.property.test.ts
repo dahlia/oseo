@@ -27,7 +27,7 @@ const { assertAsyncProperty, propertySize } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
-type AnnotationKind = "array" | "tuple-rest";
+type AnnotationKind = "array" | "tuple-fixed-spread" | "tuple-rest";
 type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
@@ -78,7 +78,11 @@ const valuesArbitrary = fc.array(valueArbitrary, {
   maxLength: large ? 9 : 5,
 });
 const bindingArbitraries = {
-  annotationKind: fc.constantFrom<AnnotationKind>("array", "tuple-rest"),
+  annotationKind: fc.constantFrom<AnnotationKind>(
+    "array",
+    "tuple-fixed-spread",
+    "tuple-rest",
+  ),
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
   hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
@@ -151,7 +155,14 @@ function patternSource(testCase: ArrayBindingCase): string {
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested") {
-    return `${pattern}: [[${type}, ${type}]]`;
+    const annotation =
+      testCase.annotationKind === "tuple-fixed-spread"
+        ? `[...[[${type}, ${type}]]]`
+        : `[[${type}, ${type}]]`;
+    return `${pattern}: ${annotation}`;
+  }
+  if (testCase.annotationKind === "tuple-fixed-spread") {
+    return `${pattern}: [...[${type}, ${type}], ${type}]`;
   }
   return testCase.annotationKind === "tuple-rest"
     ? `${pattern}: [${type}, ...${type}[]]`
@@ -467,8 +478,8 @@ test(
         domain:
           "const, let, and var array patterns with defaults, elision, " +
           "nesting, rest, arrays, custom iterators, abrupt steps, and " +
-          "absent, truthful, or false homogeneous array and tuple-rest " +
-          "TypeScript hints",
+          "absent, truthful, or false homogeneous array, fixed tuple-" +
+          "spread, and tuple-rest TypeScript hints",
         numRuns: 10,
         profile: "M5 array binding declarations",
         seed: 0x5eed_0007,

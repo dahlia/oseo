@@ -1030,6 +1030,33 @@ function annotationPropertyType(
   return undefined;
 }
 
+/**
+ * Flatten tuple spreads whose lengths are explicit in the annotation syntax.
+ *
+ * Optional elements, array rests, and type references do not prove a fixed
+ * length without type checking, so encountering one keeps the tuple
+ * conservative.
+ */
+function fixedTupleElementTypes(
+  typeNode: BabelNode,
+): readonly BabelNode[] | undefined {
+  if (typeNode.type !== "TSTupleType") return undefined;
+  const result: BabelNode[] = [];
+  for (const elementType of nodes(typeNode.elementTypes)) {
+    if (elementType.type !== "TSRestType") {
+      if (annotationType(elementType) == null) return undefined;
+      result.push(elementType);
+      continue;
+    }
+    const spreadType = annotationType(elementType.typeAnnotation);
+    const spreadElements =
+      spreadType == null ? undefined : fixedTupleElementTypes(spreadType);
+    if (spreadElements == null) return undefined;
+    result.push(...spreadElements);
+  }
+  return result;
+}
+
 function annotationElementType(
   typeNode: BabelNode,
   index: number,
@@ -1039,6 +1066,10 @@ function annotationElementType(
   }
   if (typeNode.type !== "TSTupleType") return undefined;
   const elementTypes = nodes(typeNode.elementTypes);
+  const fixedElementTypes = fixedTupleElementTypes(typeNode);
+  if (fixedElementTypes != null) {
+    return annotationType(fixedElementTypes[index]);
+  }
   const restIndex = elementTypes.findIndex(
     (elementType) => elementType.type === "TSRestType",
   );
@@ -1061,6 +1092,10 @@ function annotationArrayRestType(
   if (typeNode.type === "TSArrayType") return typeNode;
   if (typeNode.type !== "TSTupleType") return undefined;
   const elementTypes = nodes(typeNode.elementTypes);
+  const fixedElementTypes = fixedTupleElementTypes(typeNode);
+  if (fixedElementTypes != null) {
+    return { ...typeNode, elementTypes: fixedElementTypes.slice(index) };
+  }
   const restIndex = elementTypes.findIndex(
     (elementType) => elementType.type === "TSRestType",
   );

@@ -422,9 +422,12 @@ its deliberate boundary and its evidence:
     iterators, function-name inference, nested patterns, rest, and iterator
     done-state handling. Inline array and tuple TypeScript annotations map
     syntactically visible required primitive members to binding leaves.
-    Optional members remain unhinted. Assignment member targets, `export var`,
-    and `await` inside a default remain outside this array declaration syntax
-    unit.
+    Direct fixed-length tuple spreads expand before mapping, including members
+    before a following suffix. Expanded members follow the ordinary
+    primitive-hint and unsupported-type rules. Optional members and ambiguous
+    positions after a variadic array rest or type-reference spread remain
+    unhinted. Assignment member targets, `export var`, and `await` inside a
+    default remain outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -470,14 +473,18 @@ its deliberate boundary and its evidence:
     types to the corresponding binding leaves without invoking a TypeScript
     type checker. The same mapping covers standalone declarations and classic
     `for` declaration heads. Optional members remain unhinted. Array element
-    types continue through unambiguous nested array rest targets; object targets
-    inside an array rest remain unhinted. Computed object properties remain
-    unhinted even when their source key is a literal. Type references that
-    require alias or interface resolution remain a source-located unsupported
-    boundary. Ordinary functions retain dynamic `this`, arrows retain lexical
-    `this`, and constructors initialize their receiver before parameter work.
-    JavaScript function length is retained independently from the ABI parameter
-    count.
+    types continue through unambiguous nested array rest targets. Direct
+    fixed-length tuple spreads expand before mapping, so their members and
+    following suffix retain their syntactic positions. Expanded members follow
+    the ordinary primitive-hint and unsupported-type rules. Variadic array rests
+    and type-reference spreads remain unhinted where their length makes a
+    position ambiguous. Object targets inside an array rest remain unhinted.
+    Computed object properties remain unhinted even when their source key is a
+    literal. Type references that require alias or interface resolution remain
+    a source-located unsupported boundary. Ordinary functions retain dynamic
+    `this`, arrows retain lexical `this`, and constructors initialize their
+    receiver before parameter work. JavaScript function length is retained
+    independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
     `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish

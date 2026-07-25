@@ -169,6 +169,54 @@ test("maps tuple rest annotations to following binding elements", () => {
   assert.match(hir, /tail hints=\[typescript:number\]/u);
 });
 
+test("maps fixed tuple spreads before following binding elements", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [first, second, third]:\n" +
+      "  [...[number, string], boolean] = [1, 'two', true];\n" +
+      "const [variable, variableSuffix]:\n" +
+      "  [...number[], boolean] = [1, true];\n" +
+      "const [reference, referenceSuffix]:\n" +
+      "  [...Array<number>, boolean] = [1, true];\n" +
+      "const [restHead, ...[restMiddle, restTail]]:\n" +
+      "  [...[number, string], boolean] = [1, 'two', true];\n" +
+      "console.log(\n" +
+      "  first, second, third, variable, variableSuffix,\n" +
+      "  reference, referenceSuffix, restHead, restMiddle, restTail,\n" +
+      ");\n",
+    sourceId: "fixed-tuple-spread-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /first hints=\[typescript:number\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+  assert.match(hir, /third hints=\[typescript:boolean\]/u);
+  assert.doesNotMatch(hir, /variable hints=/u);
+  assert.doesNotMatch(hir, /variableSuffix hints=/u);
+  assert.doesNotMatch(hir, /reference hints=/u);
+  assert.doesNotMatch(hir, /referenceSuffix hints=/u);
+  assert.match(hir, /restHead hints=\[typescript:number\]/u);
+  assert.match(hir, /restMiddle hints=\[typescript:string\]/u);
+  assert.match(hir, /restTail hints=\[typescript:boolean\]/u);
+});
+
+test("rejects unsupported members exposed by fixed tuple spreads", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const input = [1, 'two', true];\n" +
+      "const [first, unresolved, third]:\n" +
+      "  [...[number, Value], boolean] = input;\n",
+    sourceId: "fixed-tuple-spread-unsupported-hints.ts",
+  });
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "This TypeScript type is not an M1 hint.",
+  );
+});
+
 test("maps structured annotations in declaration binding contexts", () => {
   const result = compileSource(babelFrontend, {
     source:
