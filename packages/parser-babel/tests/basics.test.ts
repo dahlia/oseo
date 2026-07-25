@@ -169,16 +169,79 @@ test("maps tuple rest annotations to following binding elements", () => {
   assert.match(hir, /tail hints=\[typescript:number\]/u);
 });
 
-test("rejects pattern annotations that require type resolution", () => {
+test("maps structured annotations in declaration binding contexts", () => {
   const result = compileSource(babelFrontend, {
-    source: "function read({ value }: Parameters) { return value; }\n",
-    sourceId: "resolved-parameter-hints.ts",
+    source:
+      "const { top }: { top: number } = { top: 1 };\n" +
+      "const { optional }: { optional?: number } = {};\n" +
+      "const [maybe]: [number?] = [];\n" +
+      "for (\n" +
+      "  let [{ flag }]: [{ flag: boolean }] = [{ flag: true }];\n" +
+      "  false;\n" +
+      ") {}\n",
+    sourceId: "structured-binding-hints.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    result.diagnostics[0]?.message,
-    "An object binding annotation must be an inline object type.",
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /top hints=\[typescript:number\]/u);
+  assert.match(hir, /flag hints=\[typescript:boolean\]/u);
+  assert.doesNotMatch(hir, /optional hints=/u);
+  assert.doesNotMatch(hir, /maybe hints=/u);
+});
+
+test("rejects pattern annotations that require type resolution", () => {
+  for (const [name, source] of [
+    [
+      "resolved-parameter-hints",
+      "function read({ value }: Parameters) { return value; }\n",
+    ],
+    [
+      "resolved-declaration-hints",
+      "const input = { value: 1 };\nconst { value }: Parameters = input;\n",
+    ],
+    [
+      "resolved-var-hints",
+      "const input = { value: 1 };\nvar { value }: Parameters = input;\n",
+    ],
+    [
+      "resolved-for-hints",
+      "const input = { value: 1 };\n" +
+        "for (let { value }: Parameters = input; false; ) {}\n",
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics.length, 1);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(
+      result.diagnostics[0]?.message,
+      "An object binding annotation must be an inline object type.",
+    );
+  }
+});
+
+test("rejects annotations outside declaration binding contexts", () => {
+  for (const [name, source] of [
+    [
+      "for-of-pattern-hints",
+      "const input = [{ value: 1 }];\n" +
+        "for (const { value }: { value: number } of input) {}\n",
+    ],
+    ["catch-pattern-hints", "try {} catch ({ value }: { value: number }) {}\n"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(
+      result.diagnostics[0]?.message,
+      "TypeScript annotations on binding patterns are unsupported.",
+    );
+  }
 });
 
 test("converts synchronous default parameters through owned syntax", () => {

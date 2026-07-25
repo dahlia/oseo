@@ -464,8 +464,10 @@ that leaf metadata so adding, removing, or falsifying it cannot alter binding
 initialization. Inline object, tuple, and array TypeScript annotations use a
 frontend-owned structural mapping from syntactically visible primitive member
 types to binding-identifier leaves. This mapping does not resolve aliases or
-interfaces and does not invoke the TypeScript type checker. An annotation that
-requires such resolution remains an owned unsupported boundary.
+interfaces and does not invoke the TypeScript type checker. Standalone
+declarations and classic `for` declaration heads reuse the mapping. Optional
+members remain unhinted. An annotation that requires type resolution remains an
+owned unsupported boundary.
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer

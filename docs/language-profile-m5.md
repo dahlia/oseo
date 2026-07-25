@@ -338,8 +338,9 @@ its deliberate boundary and its evidence:
     computed member target, or an array or object assignment pattern whose
     leaves are existing targets. Transparent parentheses around existing
     identifier and member targets are normalized before classification.
-    Declaration patterns reuse every binding form admitted for standalone
-    declarations. Lexical names create their TDZ before the iterable expression
+    Declaration patterns reuse every binding pattern form admitted for
+    standalone declarations. Pattern type annotations remain outside this
+    syntax unit. Lexical names create their TDZ before the iterable expression
     and receive a fresh cell for each iteration; `var` leaves write their
     existing hoisted cells. Nested array patterns close from the inside out,
     then a default, target, or object-coercibility failure closes the outer
@@ -419,9 +420,11 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment member targets, `export var`,
-    pattern type annotations, and `await` inside a default remain outside this
-    array declaration syntax unit.
+    done-state handling. Inline array and tuple TypeScript annotations map
+    syntactically visible required primitive members to binding leaves.
+    Optional members remain unhinted. Assignment member targets, `export var`,
+    and `await` inside a default remain outside this array declaration syntax
+    unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -446,9 +449,11 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment member targets,
-    `export var`, pattern type annotations, and `await` inside a property name
-    or default remain outside this object declaration syntax unit.
+    non-enumerable omission. Inline object TypeScript annotations map
+    syntactically visible required primitive members to binding leaves.
+    Optional members remain unhinted. Assignment member targets, `export var`,
+    and `await` inside a property name or default remain outside this object
+    declaration syntax unit.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
     patterns plus top-level defaults and rest. The frontend retains plain
@@ -463,9 +468,10 @@ its deliberate boundary and its evidence:
     rather than the hidden aggregate ABI parameter. Inline object, tuple, and
     array TypeScript annotations map syntactically visible primitive member
     types to the corresponding binding leaves without invoking a TypeScript
-    type checker. Type references that require alias or interface resolution
-    and pattern annotations outside parameter lists remain source-located
-    unsupported boundaries. Ordinary functions retain dynamic `this`, arrows
+    type checker. The same mapping covers standalone declarations and classic
+    `for` declaration heads. Optional members remain unhinted. Type references
+    that require alias or interface resolution remain a source-located
+    unsupported boundary. Ordinary functions retain dynamic `this`, arrows
     retain lexical `this`, and constructors initialize their receiver before
     parameter work. JavaScript function length is retained independently from
     the ABI parameter count.

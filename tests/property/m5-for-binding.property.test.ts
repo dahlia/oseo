@@ -26,6 +26,7 @@ const { assertAsyncProperty } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type HintKind = "absent" | "false" | "truthful";
 type InputKind = "missing" | "null" | "present";
 type PatternKind = "array" | "object";
 
@@ -33,6 +34,7 @@ interface ForBindingCase {
   readonly declarationKind: DeclarationKind;
   readonly extra: number;
   readonly fallback: number;
+  readonly hintKind: HintKind;
   readonly inputKind: InputKind;
   readonly patternKind: PatternKind;
   readonly value: number;
@@ -54,15 +56,22 @@ const caseArbitrary: fc.Arbitrary<ForBindingCase> = fc.record({
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   extra: fc.integer({ max: 20, min: -20 }),
   fallback: fc.integer({ max: 20, min: -20 }),
+  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 function patternSource(testCase: ForBindingCase): string {
+  const pattern =
+    testCase.patternKind === "array"
+      ? `[bound = ${testCase.fallback}, ...rest]`
+      : `{ value: bound = ${testCase.fallback}, ...rest }`;
+  if (testCase.hintKind === "absent") return pattern;
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
   return testCase.patternKind === "array"
-    ? `[bound = ${testCase.fallback}, ...rest]`
-    : `{ value: bound = ${testCase.fallback}, ...rest }`;
+    ? `${pattern}: [${type}, ...number[]]`
+    : `${pattern}: { value: ${type}; extra: number }`;
 }
 
 function inputSource(testCase: ForBindingCase): string {
@@ -134,7 +143,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-for-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -161,6 +170,7 @@ test("classic for binding model distinguishes lexical and var cells", () => {
   const base = {
     extra: 4,
     fallback: 2,
+    hintKind: "absent",
     inputKind: "present",
     patternKind: "array",
     value: 3,
@@ -242,7 +252,8 @@ test(
               ],
         domain:
           "const, let, and var classic for array or object bindings with " +
-          "defaults, rest, present, missing, and nullish inputs",
+          "defaults, rest, present, missing, and nullish inputs plus " +
+          "absent, truthful, or false TypeScript hints",
         numRuns: 10,
         profile: "M5 classic for binding patterns",
         seed: 0x5eed_0010,

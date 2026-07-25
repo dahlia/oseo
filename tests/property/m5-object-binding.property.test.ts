@@ -26,6 +26,7 @@ const { assertAsyncProperty } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type HintKind = "absent" | "false" | "truthful";
 type Shape =
   | "computed"
   | "default"
@@ -43,6 +44,7 @@ type SourceKind =
 interface ObjectBindingCase {
   readonly declarationKind: DeclarationKind;
   readonly fallback: number;
+  readonly hintKind: HintKind;
   readonly shape: Shape;
   readonly sourceKind: SourceKind;
   readonly value: number;
@@ -60,16 +62,9 @@ const nativeTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 );
-const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.record({
+const sharedArbitraries = {
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   fallback: fc.integer({ max: 20, min: -20 }),
-  shape: fc.constantFrom<Shape>(
-    "computed",
-    "default",
-    "nested-array",
-    "nested-object",
-    "static",
-  ),
   sourceKind: fc.constantFrom<SourceKind>(
     "missing",
     "null",
@@ -79,23 +74,56 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.record({
     "undefined",
   ),
   value: fc.integer({ max: 20, min: -20 }),
-});
+};
+const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
+  {
+    arbitrary: fc.record({
+      ...sharedArbitraries,
+      hintKind: fc.constant("absent" as const),
+      shape: fc.constant("computed" as const),
+    }),
+    weight: 1,
+  },
+  {
+    arbitrary: fc.record({
+      ...sharedArbitraries,
+      hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+      shape: fc.constantFrom<Shape>(
+        "default",
+        "nested-array",
+        "nested-object",
+        "static",
+      ),
+    }),
+    weight: 4,
+  },
+);
 
 function patternSource(testCase: ObjectBindingCase): string {
-  if (testCase.shape === "static") return "{ value: bound }";
-  if (testCase.shape === "default") {
-    return `{ value: bound = (order = order + "d", ${testCase.fallback}) }`;
-  }
-  if (testCase.shape === "computed") {
-    return (
+  let pattern: string;
+  if (testCase.shape === "static") {
+    pattern = "{ value: bound }";
+  } else if (testCase.shape === "default") {
+    const fallback = testCase.fallback;
+    pattern = `{ value: bound = (order = order + "d", ${fallback}) }`;
+  } else if (testCase.shape === "computed") {
+    pattern =
       `{ [(order = order + "e", keyObject)]: bound = ` +
-      `(order = order + "d", ${testCase.fallback}) }`
-    );
+      `(order = order + "d", ${testCase.fallback}) }`;
+  } else if (testCase.shape === "nested-array") {
+    pattern = `{ nested: [bound = ${testCase.fallback}] = [] }`;
+  } else {
+    pattern = `{ nested: { value: bound = ${testCase.fallback} } = {} }`;
   }
+  if (testCase.hintKind === "absent") return pattern;
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested-array") {
-    return `{ nested: [bound = ${testCase.fallback}] = [] }`;
+    return `${pattern}: { nested: ${type}[] }`;
   }
-  return `{ nested: { value: bound = ${testCase.fallback} } = {} }`;
+  if (testCase.shape === "nested-object") {
+    return `${pattern}: { nested: { value: ${type} } }`;
+  }
+  return `${pattern}: { value: ${type} }`;
 }
 
 function sourceValue(testCase: ObjectBindingCase): string {
@@ -167,7 +195,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-object-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -195,6 +223,7 @@ test("object binding model checks nullish inputs before computed keys", () => {
     expected({
       declarationKind: "const",
       fallback: 2,
+      hintKind: "absent",
       shape: "computed",
       sourceKind: "null",
       value: 1,
@@ -263,7 +292,9 @@ test(
               ],
         domain:
           "const, let, and var object patterns with static, computed, " +
-          "defaulted, nested, primitive, and nullish inputs",
+          "defaulted, nested, primitive, and nullish inputs plus absent, " +
+          "truthful, or false TypeScript hints on static keys; computed " +
+          "keys remain unhinted",
         numRuns: 10,
         profile: "M5 object binding declarations",
         seed: 0x5eed_0008,

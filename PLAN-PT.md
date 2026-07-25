@@ -484,10 +484,11 @@ The array binding property generates a standalone `const`, `let`, or `var`
 declaration with one recursive array pattern. Shapes cover an ordinary head,
 an elision with an `undefined` default, a nested array, an identifier rest, and
 a nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
-and throwing defaults. Its independent model predicts the bound value, step
-count, close count, and thrown error identity. Each case compares Node.js,
-Deno, specialization-disabled native execution, and specialization-enabled
-native execution with collection forced at every safepoint.
+throwing defaults, and absent, truthful, or deliberately false TypeScript
+hints. Its independent model predicts the bound value, step count, close count,
+and thrown error identity. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -503,11 +504,13 @@ M5 object binding properties
 
 The object binding property generates a standalone `const`, `let`, or `var`
 declaration with static, computed, defaulted, nested object, or nested array
-properties. Inputs vary across ordinary objects, strings, numbers, `null`, and
-`undefined`. Its independent model predicts the bound value, computed-key and
-default order, and nullish `TypeError`. Each case compares Node.js, Deno,
-specialization-disabled native execution, and specialization-enabled execution
-with collection forced at every safepoint.
+properties. Inputs vary across ordinary objects, strings, numbers, `null`,
+`undefined`, and absent, truthful, or deliberately false TypeScript hints. Its
+independent model predicts the bound value, computed-key and default order, and
+nullish `TypeError`. Each case compares Node.js, Deno, specialization-disabled
+native execution, and specialization-enabled execution with collection forced
+at every safepoint. Computed properties remain unhinted because the structural
+mapping does not resolve their keys.
 
 The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
@@ -675,11 +678,12 @@ M5 classic for binding properties
 
 The classic `for` binding property generates a `const`, `let`, or `var`
 declaration head with an array or object pattern, default, and rest target.
-Inputs vary between present, missing, and nullish values. Its independent cell
-model predicts constant observations, fresh per-iteration `let` closures, the
-one shared final `var` cell, or an escaped nullish `TypeError`. Each case
-compares Node.js, Deno, specialization-disabled native execution, and
-specialization-enabled execution with collection forced at every safepoint.
+Inputs vary between present, missing, and nullish values plus absent, truthful,
+or deliberately false TypeScript hints. Its independent cell model predicts
+constant observations, fresh per-iteration `let` closures, the one shared final
+`var` cell, or an escaped nullish `TypeError`. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed0010`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary

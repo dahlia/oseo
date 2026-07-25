@@ -645,27 +645,50 @@ export function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
   assignment: true,
+  structuredAnnotations?: false,
 ): SyntaxAssignmentPattern | undefined;
 export function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
   assignment?: false,
+  structuredAnnotations?: boolean,
 ): SyntaxBindingPattern | undefined;
 export function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
   assignment: boolean,
+  structuredAnnotations?: boolean,
 ): SyntaxAssignmentPattern | undefined;
 export function bindingPattern(
   context: ConvertContext,
   value: BabelNode,
   assignment = false,
+  structuredAnnotations = false,
 ): SyntaxAssignmentPattern | undefined {
   if (value.type === "ParenthesizedExpression") {
     const inner = node(value.expression);
     return inner == null
       ? unsupported(context, value)
-      : bindingPattern(context, inner, assignment);
+      : bindingPattern(context, inner, assignment, structuredAnnotations);
+  }
+  const bindingAnnotation =
+    structuredAnnotations &&
+    (value.type === "ArrayPattern" || value.type === "ObjectPattern")
+      ? node(value.typeAnnotation)
+      : undefined;
+  if (bindingAnnotation != null) {
+    const unannotated = { ...value, typeAnnotation: undefined };
+    const diagnosticCount = context.diagnostics.length;
+    const pattern = bindingPattern(context, unannotated);
+    const hinted =
+      pattern == null
+        ? undefined
+        : bindingPatternTypeHints(context, pattern, bindingAnnotation);
+    return pattern == null
+      ? undefined
+      : context.diagnostics.length === diagnosticCount
+        ? hinted
+        : undefined;
   }
   if (value.type === "Identifier") {
     const name = identifierName(value);
@@ -953,13 +976,12 @@ function parameterPatternHints(
 function annotationType(value: unknown): BabelNode | undefined {
   const valueNode = node(value);
   if (valueNode == null) return undefined;
-  if (
-    valueNode.type === "TSTypeAnnotation" ||
-    valueNode.type === "TSOptionalType"
-  ) {
+  if (valueNode.type === "TSTypeAnnotation") {
     return annotationType(valueNode.typeAnnotation);
   }
+  if (valueNode.type === "TSOptionalType") return undefined;
   if (valueNode.type === "TSNamedTupleMember") {
+    if (valueNode.optional === true) return undefined;
     return annotationType(valueNode.elementType);
   }
   if (valueNode.type === "TSParenthesizedType") {
@@ -992,7 +1014,11 @@ function annotationPropertyType(
 ): BabelNode | undefined {
   if (typeNode.type !== "TSTypeLiteral") return undefined;
   for (const member of nodes(typeNode.members)) {
-    if (member.type !== "TSPropertySignature" || member.computed === true) {
+    if (
+      member.type !== "TSPropertySignature" ||
+      member.computed === true ||
+      member.optional === true
+    ) {
       continue;
     }
     const key = node(member.key);
@@ -1031,7 +1057,7 @@ function annotationElementType(
  * Map syntactically visible tuple, array, and object type members to the
  * binding leaves they describe without invoking TypeScript's type checker.
  */
-function parameterPatternTypeHints(
+function bindingPatternTypeHints(
   context: ConvertContext,
   pattern: SyntaxBindingPattern,
   annotationValue: unknown,
@@ -1067,7 +1093,7 @@ function parameterPatternTypeHints(
           ? property
           : {
               ...property,
-              pattern: parameterPatternTypeHints(
+              pattern: bindingPatternTypeHints(
                 context,
                 property.pattern,
                 propertyType,
@@ -1093,7 +1119,7 @@ function parameterPatternTypeHints(
         ? element
         : {
             ...element,
-            pattern: parameterPatternTypeHints(
+            pattern: bindingPatternTypeHints(
               context,
               element.pattern,
               elementType,
@@ -1187,7 +1213,7 @@ export function statement(
               "A binding pattern declaration needs an initializer.",
             );
           }
-          const pattern = bindingPattern(context, identifier);
+          const pattern = bindingPattern(context, identifier, false, true);
           const initializer = expression(context, initializerNode);
           if (pattern == null || initializer == null) {
             return undefined;
@@ -1260,7 +1286,7 @@ export function statement(
           "A binding pattern declaration needs an initializer.",
         );
       }
-      const pattern = bindingPattern(context, identifier);
+      const pattern = bindingPattern(context, identifier, false, true);
       const initializer = expression(context, initializerNode);
       return pattern == null || initializer == null
         ? undefined
@@ -1549,7 +1575,7 @@ export function statement(
             "A binding pattern declaration needs an initializer.",
           );
         }
-        const pattern = bindingPattern(context, identifier);
+        const pattern = bindingPattern(context, identifier, false, true);
         const initializer = expression(context, initializerNode);
         if (pattern == null || initializer == null) return undefined;
         declarations.push({
@@ -1947,7 +1973,7 @@ export function awaitPoint(
   }
   const pattern =
     identifier.type === "ArrayPattern" || identifier.type === "ObjectPattern"
-      ? bindingPattern(context, identifier)
+      ? bindingPattern(context, identifier, false, true)
       : undefined;
   if (name == null && pattern == null) {
     return undefined;
@@ -1996,7 +2022,10 @@ export function asyncScopePlaceholder(
       },
     ];
   }
-  const pattern = bindingPattern(context, identifier);
+  const pattern = bindingPattern(context, {
+    ...identifier,
+    typeAnnotation: undefined,
+  });
   if (pattern == null) return undefined;
   const declarationKind = value.kind === "const" ? "const" : "let";
   return patternNames(pattern).map((bindingName) => ({
@@ -2322,7 +2351,10 @@ export function collectVarStatement(
         identifier.type === "ArrayPattern" ||
         identifier.type === "ObjectPattern"
       ) {
-        const pattern = bindingPattern(context, identifier);
+        const pattern = bindingPattern(context, {
+          ...identifier,
+          typeAnnotation: undefined,
+        });
         if (pattern == null) return false;
         names = patternNames(pattern);
       } else {
@@ -2697,11 +2729,7 @@ export function functionDeclaration(
       context.strictStack.pop();
       if (pattern == null) return undefined;
       if (parameterName == null) {
-        pattern = parameterPatternTypeHints(
-          context,
-          pattern,
-          patternAnnotation,
-        );
+        pattern = bindingPatternTypeHints(context, pattern, patternAnnotation);
         pattern = parameterPatternHints(pattern, jsdoc.parameters);
       }
       if (defaultNode != null && defaultInitializer == null) return undefined;

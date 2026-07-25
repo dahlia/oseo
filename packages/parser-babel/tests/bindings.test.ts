@@ -573,19 +573,6 @@ test("converts catch binding patterns to owned syntax", () => {
   );
 });
 
-test("keeps later binding consumers outside the profile", () => {
-  for (const [name, source] of [
-    ["pattern annotation", "const [value]: [number] = [1];"],
-  ] as const) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: `${name}.ts`,
-    });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.equal(result.mir, undefined);
-  }
-});
-
 test("rejects ambient declare declarations", () => {
   const result = compileSource(babelFrontend, {
     source: "declare var ambient: number;",

@@ -691,9 +691,10 @@ collection, and length. Name-based JSDoc hints now remain attached to their
 pattern binding through owned syntax and HIR; generated evidence covers absent,
 truthful, and false hints without changing behavior. Inline object, tuple, and
 array TypeScript annotations now map syntactically visible primitive member
-types to their binding leaves without a type checker. The same generated domain
-varies truthful and false TypeScript hints. Type references and pattern
-annotations outside parameter lists remain explicit boundaries. Asynchronous
+types to their binding leaves without a type checker. This mapping covers
+parameters, standalone declarations, and classic `for` declaration heads.
+Optional members remain unhinted. The generated domains vary truthful and false
+TypeScript hints. Type references remain an explicit boundary. Asynchronous
 functions and arrows now run non-simple parameter initialization inside their
 asynchronous executor, so abrupt defaults reject the returned promise. Six
 reviewed standards cases pin default selection, prior references, and

@@ -34,6 +34,8 @@ Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
 owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
 Inline object, tuple, and array TypeScript annotations map syntactically visible
 primitive member types to the same leaves without invoking a type checker.
+The mapping also covers standalone declarations and classic `for` declaration
+heads. Optional members remain unhinted.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and
@@ -56,9 +58,9 @@ final identifier rest target. Catch parameters and synchronous `for-of`
 declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
-assignment heads reuse that assignment target conversion. Await inside a
-member target, pattern type annotations, and `for-in` and `for-await-of` heads
-remain explicit boundaries.
+assignment heads reuse that assignment target conversion. Await inside a member
+target, pattern type annotations on assignment, `for-of`, and catch targets,
+and `for-in` and `for-await-of` heads remain explicit boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its

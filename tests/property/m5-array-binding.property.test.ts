@@ -26,6 +26,7 @@ const { assertAsyncProperty, propertySize } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
 type Value = number | undefined;
@@ -33,6 +34,7 @@ type Value = number | undefined;
 interface ArrayBindingCase {
   readonly declarationKind: DeclarationKind;
   readonly defaultThrows: boolean;
+  readonly hintKind: HintKind;
   readonly iterableKind: IterableKind;
   readonly nestedMissing: boolean;
   readonly nestedValues: readonly Value[];
@@ -75,6 +77,7 @@ const valuesArbitrary = fc.array(valueArbitrary, {
 const bindingArbitraries = {
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
+  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
   nestedMissing: fc.boolean(),
   nestedValues: valuesArbitrary,
   shape: fc.constantFrom<Shape>(
@@ -129,17 +132,23 @@ function patternSource(testCase: ArrayBindingCase): string {
   const firstDefault = testCase.defaultThrows
     ? '(function () { throw new RangeError("default"); })()'
     : "31";
-  if (testCase.shape === "head") return `[a = ${firstDefault}]`;
-  if (testCase.shape === "default-elision") {
-    return `[a = ${firstDefault}, , b = 32]`;
+  let pattern: string;
+  if (testCase.shape === "head") {
+    pattern = `[a = ${firstDefault}]`;
+  } else if (testCase.shape === "default-elision") {
+    pattern = `[a = ${firstDefault}, , b = 32]`;
+  } else if (testCase.shape === "nested") {
+    pattern = `[[a = ${firstDefault}, b = 32] = [33, 34]]`;
+  } else if (testCase.shape === "rest-id") {
+    pattern = `[a = ${firstDefault}, ...rest]`;
+  } else {
+    pattern = `[a = ${firstDefault}, ...[b = 32, c = 33]]`;
   }
-  if (testCase.shape === "nested") {
-    return `[[a = ${firstDefault}, b = 32] = [33, 34]]`;
-  }
-  if (testCase.shape === "rest-id") {
-    return `[a = ${firstDefault}, ...rest]`;
-  }
-  return `[a = ${firstDefault}, ...[b = 32, c = 33]]`;
+  if (testCase.hintKind === "absent") return pattern;
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
+  return testCase.shape === "nested"
+    ? `${pattern}: [[${type}, ${type}]]`
+    : `${pattern}: ${type}[]`;
 }
 
 function resultSource(shape: Shape): string {
@@ -309,6 +318,7 @@ test("array binding model ignores custom iterator controls", () => {
     expected({
       declarationKind: "const",
       defaultThrows: false,
+      hintKind: "absent",
       iterableKind: "array",
       nestedMissing: false,
       nestedValues: [],
@@ -338,7 +348,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-array-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -423,7 +433,8 @@ test(
               ],
         domain:
           "const, let, and var array patterns with defaults, elision, " +
-          "nesting, rest, arrays, custom iterators, and abrupt steps",
+          "nesting, rest, arrays, custom iterators, abrupt steps, and " +
+          "absent, truthful, or false TypeScript hints",
         numRuns: 10,
         profile: "M5 array binding declarations",
         seed: 0x5eed_0007,
