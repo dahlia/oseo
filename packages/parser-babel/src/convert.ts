@@ -2374,9 +2374,10 @@ export function collectVarStatement(
  * ordinary assignments, so the pair preserves var semantics for the
  * admitted profile without a separate binding kind. Names owned by
  * parameters or var-scoped function declarations are skipped so bare
- * redeclarations do not reset them. A caller may provide an outer parameter
- * copy when a parameter-expression environment requires a distinct body var
- * binding with the parameter's initial value.
+ * redeclarations do not reset them. Skipped names already have an owning
+ * binding and always take precedence over a supplied copy. A caller may
+ * provide an outer parameter copy when a parameter-expression environment
+ * requires a distinct body var binding with the parameter's initial value.
  */
 export function hoistedVarDeclarations(
   context: ConvertContext,
@@ -2410,8 +2411,8 @@ export function hoistedVarDeclarations(
           `'${name}' is outside the admitted profile.`,
       );
     }
+    if (skipNames.has(name)) continue;
     const copiedName = copiedNames.get(name);
-    if (skipNames.has(name) && copiedName == null) continue;
     hoisted.push({
       // A zero-width leading byte range keeps hoisted bindings ahead of
       // every source-ordered statement when module lowering sorts by
@@ -2653,10 +2654,16 @@ export function functionDeclaration(
       }
     }
   }
+  const skippedHoistedNames = new Set(varScopedFunctionNames(children));
+  if (!parameterExpressions) {
+    for (const parameterName of parameterNames) {
+      skippedHoistedNames.add(parameterName);
+    }
+  }
   const hoisted = hoistedVarDeclarations(
     context,
     children,
-    new Set([...parameterNames, ...varScopedFunctionNames(children)]),
+    skippedHoistedNames,
     copiedParameterNames,
   );
   if (hoisted == null) {

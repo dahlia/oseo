@@ -26,8 +26,10 @@ const { assertAsyncProperty } = await import(
 );
 
 type ParameterForm = "array" | "default" | "object" | "plain-sibling";
+type BodyBinding = "function" | "var";
 
 interface ParameterVarCase {
+  readonly bodyBinding: BodyBinding;
   readonly bodyValue: number;
   readonly parameterForm: ParameterForm;
   readonly parameterValue: number;
@@ -41,6 +43,7 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 const caseArbitrary: fc.Arbitrary<ParameterVarCase> = fc.record({
+  bodyBinding: fc.constantFrom<BodyBinding>("function", "var"),
   bodyValue: fc.integer({ max: 20, min: -20 }),
   parameterForm: fc.constantFrom<ParameterForm>(
     "array",
@@ -76,11 +79,19 @@ function argumentSource(testCase: ParameterVarCase): string {
 }
 
 function printCase(testCase: ParameterVarCase): string {
+  const body =
+    testCase.bodyBinding === "function"
+      ? `
+  function value() { return ${testCase.bodyValue}; }
+  var value;
+  console.log("result", value(), readParameter());`
+      : `
+  var value = ${testCase.bodyValue};
+  console.log("result", value, readParameter());`;
   return `
 let readParameter;
 function consume(${parameterSource(testCase)}) {
-  var value = ${testCase.bodyValue};
-  console.log("result", value, readParameter());
+${body}
 }
 consume(${argumentSource(testCase)});
 `;
@@ -185,7 +196,7 @@ test(
               ],
         domain:
           "default and binding-pattern parameters with one captured " +
-          "parameter cell and one same-name body var cell",
+          "parameter cell and a same-name body var or function binding",
         numRuns: 10,
         profile: "M5 parameter and body var environments",
         seed: 0x5eed_0014,

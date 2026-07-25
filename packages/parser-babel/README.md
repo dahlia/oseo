@@ -28,7 +28,8 @@ left-to-right temporal dead zones, ordinary-function receivers, lexical arrow
 receivers, and function `length` independently from the ABI parameter count.
 When a parameter list contains an expression, a same-name body `var` receives
 a separate cell initialized from the parameter binding. A list without
-parameter expressions reuses the parameter cell.
+parameter expressions reuses the parameter cell. A same-name top-level
+function declaration owns the body binding when `var` also redeclares it.
 Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
 owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
 Asynchronous functions and arrows run non-simple parameter initialization

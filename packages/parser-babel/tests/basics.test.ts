@@ -214,13 +214,19 @@ test("separates parameter-expression bindings from body var bindings", () => {
       "  return [input, capture()];\n" +
       "}\n" +
       "function pattern([input]) { var input; return input; }\n" +
-      "function rest(...input) { var input; return input.length; }\n",
+      "function rest(...input) { var input; return input.length; }\n" +
+      "function declarationOwner(input = 1) {\n" +
+      "  function input() { return 9; }\n" +
+      "  var input;\n" +
+      "  return input();\n" +
+      "}\n",
     sourceId: "parameter-var.ts",
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   const hir = printHir(result.hir);
   assert.match(hir, /function @f\d+ value/u);
+  assert.match(hir, /function @f\d+ declarationOwner/u);
   assert.match(hir, /oseo-parameter-copy/u);
   assert.equal(hir.match(/oseo-parameter-copy/gu)?.length, 2);
 });

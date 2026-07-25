@@ -266,6 +266,12 @@ function sharedRest(...value) {
   return value.length;
 }
 console.log(sharedRest(9, 10));
+function functionOwned(value = 11) {
+  function value() { return 12; }
+  var value;
+  return value();
+}
+console.log(functionOwned());
 `,
   },
   {

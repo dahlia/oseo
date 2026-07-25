@@ -131,11 +131,15 @@ Body `var` declarations may now share parameter names. When the parameter list
 contains an expression, the frontend initializes each matching body cell from
 an outer parameter copy so closures created by parameter initializers retain
 the parameter cell. Lists without parameter expressions, including rest-only
-lists, continue to reuse the parameter cell. Generated evidence uses seed
+lists, continue to reuse the parameter cell. When a top-level body function
+declaration and `var` share that name, the function declaration owns the body
+binding and no parameter-copy binding is synthesized. Generated evidence uses
+seed
 `0x5eed0014` across default, array-pattern, object-pattern, and plain sibling
-bindings, both specialization policies, and forced collection. Fixed evidence
-also covers arrows and rest-only lists. Six reviewed test262 cases pin the
-separate parameter and body environments.
+bindings, `var`-owned and function-owned body cells, both specialization
+policies, and forced collection. Fixed evidence also covers arrows and
+rest-only lists. Six reviewed test262 cases pin the separate parameter and body
+environments.
 Asynchronous functions and arrows run default and binding-pattern
 initialization inside the owned asynchronous executor. Rest collection retains
 the ordinary call ABI, and abrupt initializers reject the returned promise
@@ -388,13 +392,16 @@ Body `var` declarations may share parameter names. A parameter list containing
 an expression receives separate parameter and body cells, with the body cell
 initialized from the completed parameter binding before body execution. This
 keeps closures created by parameter initializers attached to the parameter
-cell. Lists without parameter expressions reuse the parameter cell. The
-generated property suite uses seed `0x5eed0014` across default, array-pattern,
-object-pattern, and plain sibling bindings, both native specialization
-policies, and forced collection. Fixed evidence adds arrows and rest-only
-lists. Six reviewed test262 cases pin the environment split. TypeScript and
-structured TypeScript annotations on binding-pattern parameters remain a
-source-located unsupported boundary.
+cell. Lists without parameter expressions reuse the parameter cell. A
+same-name top-level function declaration owns the body binding when `var` also
+redeclares it, without creating a second synthetic binding. The generated
+property suite uses seed `0x5eed0014` across default, array-pattern,
+object-pattern, and plain sibling bindings, `var`-owned and function-owned body
+cells, both native specialization policies, and forced collection. Fixed
+evidence adds arrows, rest-only lists, and the function-owned binding. Six
+reviewed test262 cases pin the environment split. TypeScript and structured
+TypeScript annotations on binding-pattern parameters remain a source-located
+unsupported boundary.
 Asynchronous functions and arrows create that parameter environment inside the
 owned asynchronous executor. Defaults and patterns therefore finish before the
 body begins, while an abrupt initializer rejects the returned promise instead

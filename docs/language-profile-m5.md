@@ -472,10 +472,13 @@ its deliberate boundary and its evidence:
     function-name inference, forced collection, and body `var` declarations
     that share parameter names. A list containing a parameter expression gives
     a shared name distinct parameter and body cells, while a list without
-    parameter expressions reuses the parameter cell. Asynchronous functions
-    and arrows run the same initialization inside their owned asynchronous
-    executor, so an abrupt initializer rejects the returned promise without
-    entering the body or throwing from the call. Twenty-seven reviewed
+    parameter expressions reuses the parameter cell. When a top-level body
+    function declaration and `var` share that name, the function declaration
+    owns the body binding without a second synthetic declaration. Asynchronous
+    functions and arrows run the same initialization inside their owned
+    asynchronous executor, so an abrupt initializer rejects the returned
+    promise without entering the body or throwing from the call. Twenty-seven
+    reviewed
     test262 cases cover array values, nested defaults and rest, abrupt
     completion, top-level fallback and suffix selection, prior references,
     function length, the parameter and body environment split, asynchronous

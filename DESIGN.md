@@ -468,7 +468,10 @@ When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer
 therefore retains the parameter cell when the body later writes its `var`
-cell. Lists without parameter expressions reuse the parameter cell.
+cell. Lists without parameter expressions reuse the parameter cell. A
+top-level body function declaration owns its body binding even when a
+same-name `var` also appears, so that declaration suppresses a synthetic
+parameter-copy binding.
 An asynchronous function creates the same parameter environment inside its
 owned asynchronous executor. Defaults, patterns, and rest collection therefore
 complete before the body begins, while an abrupt initializer rejects the

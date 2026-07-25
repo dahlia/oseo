@@ -696,10 +696,12 @@ standards cases pin default selection, prior references, and rejection.
 Structured TypeScript annotations on binding patterns remain an explicit next
 unit. Body `var` declarations may now share parameter names:
 parameter-expression lists receive distinct parameter and body cells, while
-lists without expressions reuse the parameter cell.
+lists without expressions reuse the parameter cell. A same-name top-level
+function declaration owns the body binding when `var` also redeclares it.
 Generated and fixed evidence covers captured defaults, binding patterns, plain
 sibling parameters, arrows, rest-only lists, both specialization policies, and
-forced collection. Six reviewed standards cases pin the environment split. The
+forced collection. It also covers the function-declaration-owned body binding.
+Six reviewed standards cases pin the environment split. The
 intrinsics
 stream has landed the
 named error family as runtime-owned constructor values with typed catchable
