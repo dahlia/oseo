@@ -26,10 +26,12 @@ const { assertAsyncProperty } = await import(
 );
 
 type InputKind = "missing" | "null" | "present";
+type HintKind = "absent" | "false" | "truthful";
 type PatternKind = "array" | "object";
 
 interface ParameterBindingCase {
   readonly fallback: number;
+  readonly hintKind: HintKind;
   readonly inputKind: InputKind;
   readonly patternKind: PatternKind;
   readonly value: number;
@@ -49,6 +51,7 @@ const nativeTarget = targetForExecutionHost(
 );
 const caseArbitrary: fc.Arbitrary<ParameterBindingCase> = fc.record({
   fallback: fc.integer({ max: 20, min: -20 }),
+  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
   value: fc.integer({ max: 20, min: -20 }),
@@ -75,7 +78,14 @@ function inputSource(testCase: ParameterBindingCase): string {
 
 function printCase(testCase: ParameterBindingCase): string {
   const restValue = testCase.patternKind === "array" ? "rest[0]" : "rest.extra";
+  const hint =
+    testCase.hintKind === "absent"
+      ? ""
+      : `/** @param {${
+          testCase.hintKind === "truthful" ? "number" : "string"
+        }} bound */`;
   return `
+${hint}
 function consume(${patternSource(testCase)}) {
   console.log("result", bound, ${restValue});
 }
@@ -140,6 +150,7 @@ test("parameter binding model rejects null before entering the body", () => {
   assert.deepEqual(
     expected({
       fallback: 2,
+      hintKind: "absent",
       inputKind: "null",
       patternKind: "object",
       value: 1,
@@ -211,7 +222,8 @@ test(
               ],
         domain:
           "array and object function parameters with defaults, rest, " +
-          "present, missing, and nullish inputs",
+          "present, missing, and nullish inputs plus absent, truthful, " +
+          "and false JSDoc hints",
         numRuns: 10,
         profile: "M5 function binding patterns",
         seed: 0x5eed_0011,

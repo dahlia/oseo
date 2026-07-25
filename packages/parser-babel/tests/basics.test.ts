@@ -95,6 +95,7 @@ test("preserves non-strict script parameter bindings", () => {
 test("converts function binding patterns through owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
+      "/** @param {number} first @param {string} value */\n" +
       "function read([first, second = 2, ...rest], " +
       "{ value, ...remaining }, scale: number) {\n" +
       "  return [first, second, rest, value, remaining, scale];\n" +
@@ -114,8 +115,11 @@ test("converts function binding patterns through owned syntax", () => {
     ["typescript"],
   );
   const hir = printHir(result.hir);
-  assert.match(hir, /\[%b\d+ first, %b\d+ second = 2, \.\.\.%b\d+ rest\]/u);
-  assert.match(hir, /\{"value": %b\d+ value, \.\.\.%b\d+ remaining\}/u);
+  assert.match(hir, /\[%b\d+ first hints=\[jsdoc:number\], %b\d+ second = 2/u);
+  assert.match(
+    hir,
+    /\{"value": %b\d+ value hints=\[jsdoc:string\], \.\.\.%b\d+ remaining\}/u,
+  );
   assert.doesNotMatch(
     JSON.stringify(result.hir),
     /ArrayPattern|ObjectPattern|RestElement/u,

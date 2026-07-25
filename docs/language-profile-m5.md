@@ -458,25 +458,29 @@ its deliberate boundary and its evidence:
     zones, and body declarations are not visible to defaults. A top-level
     default runs only for `undefined`. A rest parameter collects every unbound
     generic call argument into a fresh array before any pattern initialization.
-    Identifier parameters retain their TypeScript and JSDoc hints. Ordinary
-    functions retain dynamic `this`, arrows retain lexical `this`, and
-    constructors initialize their receiver before parameter work. JavaScript
-    function length is retained independently from the ABI parameter count.
+    Identifier parameters retain their TypeScript and JSDoc hints. Name-based
+    JSDoc hints for a pattern-bound name attach to that owned binding leaf
+    rather than the hidden aggregate ABI parameter. Ordinary functions retain
+    dynamic `this`, arrows retain lexical `this`, and constructors initialize
+    their receiver before parameter work. JavaScript function length is
+    retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
     `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish
-    inputs, abrupt initializers, bounded and heap-valued rest suffixes, both
-    specialization policies, function-name inference, forced collection, and
-    body `var` declarations that share parameter names. A list containing a
-    parameter expression gives a shared name distinct parameter and body
-    cells, while a list without parameter expressions reuses the parameter
-    cell. Twenty-one reviewed test262 cases cover array values, nested defaults
-    and rest, abrupt completion, top-level fallback and suffix selection, prior
-    references, function length, and the parameter and body environment split.
+    inputs, abrupt initializers, bounded and heap-valued rest suffixes, absent,
+    truthful, and false pattern-bound JSDoc hints, both specialization policies,
+    function-name inference, forced collection, and body `var` declarations
+    that share parameter names. A list containing a parameter expression gives
+    a shared name distinct parameter and body cells, while a list without
+    parameter expressions reuses the parameter cell. Twenty-one reviewed
+    test262 cases cover array values, nested defaults and rest, abrupt
+    completion, top-level fallback and suffix selection, prior references,
+    function length, and the parameter and body environment split.
     Enabling the rest feature also promotes nine preexisting asynchronous
     non-simple strict-body parse negatives from unsupported to expected
-    negative without admitting asynchronous execution. TypeScript and JSDoc
-    hints on pattern-bound names remain a source-located unsupported boundary.
+    negative without admitting asynchronous execution. Structured TypeScript
+    annotations on binding-pattern parameters remain a source-located
+    unsupported boundary.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound

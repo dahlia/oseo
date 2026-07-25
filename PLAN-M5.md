@@ -107,8 +107,10 @@ object binding-pattern parameters. Parameter initialization runs in source
 order in an environment outside the function body, so later parameters retain
 their temporal dead zones and body declarations do not leak into defaults.
 Generated evidence uses seed `0x5eed0011` across both pattern families,
-present, missing, and nullish inputs, both specialization policies, and forced
-collection. Four reviewed test262 cases pin array values, defaults, nesting,
+present, missing, and nullish inputs, absent, truthful, and false JSDoc hints,
+both specialization policies, and forced collection. Name-based JSDoc hints
+attach to the pattern binding they describe rather than the hidden aggregate
+ABI parameter. Four reviewed test262 cases pin array values, defaults, nesting,
 rest, and abrupt completion. Synchronous top-level default parameters now use
 the same separate parameter environment and preserve hints on identifier
 parameters. HIR and MIR retain JavaScript function length independently from
@@ -136,8 +138,9 @@ also covers arrows and rest-only lists. Six reviewed test262 cases pin the
 separate parameter and body environments.
 Asynchronous non-simple parameters remain unsupported, but enabling the rest
 feature promotes nine preexisting strict-body parse negatives from unsupported
-to expected negative. Hints on pattern-bound names remain an explicit
-boundary. Awaited member targets remain later work. The runtime
+to expected negative. Structured TypeScript annotations on binding-pattern
+parameters remain an explicit boundary. Awaited member targets remain later
+work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -353,10 +356,13 @@ left-to-right initialization, later-parameter temporal dead zones, conditional
 iterator close, object coercibility, default and rest behavior, lexical arrow
 receivers, and function `length`. The generated property suite uses seed
 `0x5eed0011` across both pattern families, present, missing, and nullish inputs,
-both native specialization policies, and forced collection. Fixed native
-fixtures retain nested defaults and rest, arrows, constructors, parameter
-temporal dead zones, iterator cleanup, and function length. Four reviewed
-test262 cases pin array values, nesting, defaults, rest, and abrupt completion.
+absent, truthful, and false JSDoc hints, both native specialization policies,
+and forced collection. Name-based JSDoc hints remain on their pattern binding
+through owned syntax and HIR, while the hidden aggregate ABI parameter remains
+unhinted. Fixed native fixtures retain nested defaults and rest, arrows,
+constructors, parameter temporal dead zones, iterator cleanup, and function
+length. Four reviewed test262 cases pin array values, nesting, defaults, rest,
+and abrupt completion.
 Synchronous top-level default parameters use the same parameter environment
 and retain JavaScript function length separately from the ABI parameter count.
 The generated property suite uses seed `0x5eed0012` across supplied and missing
@@ -384,8 +390,8 @@ generated property suite uses seed `0x5eed0014` across default, array-pattern,
 object-pattern, and plain sibling bindings, both native specialization
 policies, and forced collection. Fixed evidence adds arrows and rest-only
 lists. Six reviewed test262 cases pin the environment split. TypeScript and
-JSDoc hints on pattern-bound names remain a source-located unsupported
-boundary.
+structured TypeScript annotations on binding-pattern parameters remain a
+source-located unsupported boundary.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

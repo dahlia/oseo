@@ -458,14 +458,19 @@ parameter initializers, and adds no observable call. It also preserves dynamic
 `this` for ordinary functions and lexical `this` for arrows. HIR and MIR retain
 JavaScript function length separately from the ABI parameter count, so the
 first default or rest parameter truncates only the reported `length`.
+Name-based JSDoc parameter hints attach to the binding-identifier leaf they
+describe, not the hidden aggregate ABI parameter. Owned syntax and HIR retain
+that leaf metadata so adding, removing, or falsifying it cannot alter binding
+initialization. Structured TypeScript annotations on a whole binding pattern
+remain unsupported until a frontend-owned structural mapping can assign hints
+without invoking the TypeScript type checker.
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer
 therefore retains the parameter cell when the body later writes its `var`
 cell. Lists without parameter expressions reuse the parameter cell.
-Asynchronous non-simple parameters and hints on pattern-bound names remain
-rejected until their continuation and hint ownership have direct
-representations.
+Asynchronous non-simple parameters remain rejected until their continuation
+ownership has a direct representation.
 
 Destructuring assignment reuses those recursive array and object operations
 after evaluating its right operand once. Identifier leaves write existing

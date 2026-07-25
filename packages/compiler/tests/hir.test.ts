@@ -64,6 +64,7 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
 
 test("rejects duplicate names in owned catch binding patterns", () => {
   const identifier = {
+    hints: [],
     kind: "binding-identifier",
     name: "value",
     range,

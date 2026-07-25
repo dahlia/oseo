@@ -564,6 +564,7 @@ test("lowers linked modules through shared live binding identities", () => {
               elements: [
                 {
                   pattern: {
+                    hints: [],
                     kind: "binding-identifier" as const,
                     name: "value",
                     range,
@@ -865,6 +866,7 @@ test("rejects await in top-level binding-pattern keys", () => {
                   range,
                 },
                 pattern: {
+                  hints: [],
                   kind: "binding-identifier" as const,
                   name: "value",
                   range,

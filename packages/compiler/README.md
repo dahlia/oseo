@@ -8,7 +8,9 @@ contracts without becoming compiler-core dependencies.
 The exported syntax contract separates declaration binding patterns from
 destructuring assignment patterns. Only assignment patterns admit member
 targets, and lexical resolution validates that context independently of binding
-write mode.
+write mode. Binding-identifier leaves retain their own hint metadata so a
+frontend can attach name-based parameter hints without annotating an aggregate
+ABI parameter.
 
 Internal ownership follows the compiler pipeline. *source.ts* and *syntax.ts*
 define frontend-neutral inputs, *modules.ts* owns graph construction and

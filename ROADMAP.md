@@ -687,10 +687,13 @@ changing the generic call ABI. Generated and fixed evidence covers bounded
 suffixes, empty and nonempty calls, heap-valued arguments, fresh identity,
 patterns, arrows, constructors, function length, both specialization policies,
 and forced collection. Six reviewed standards cases pin syntax, patterns,
-collection, and length. Asynchronous non-simple parameters, pattern-bound
-hints remain explicit next units. Body `var` declarations may now share
-parameter names: parameter-expression lists receive distinct parameter and
-body cells, while lists without expressions reuse the parameter cell.
+collection, and length. Name-based JSDoc hints now remain attached to their
+pattern binding through owned syntax and HIR; generated evidence covers absent,
+truthful, and false hints without changing behavior. Asynchronous non-simple
+parameters and structured TypeScript annotations on binding patterns remain
+explicit next units. Body `var` declarations may now share parameter names:
+parameter-expression lists receive distinct parameter and body cells, while
+lists without expressions reuse the parameter cell.
 Generated and fixed evidence covers captured defaults, binding patterns, plain
 sibling parameters, arrows, rest-only lists, both specialization policies, and
 forced collection. Six reviewed standards cases pin the environment split. The

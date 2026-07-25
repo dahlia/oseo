@@ -29,8 +29,11 @@ receivers, and function `length` independently from the ABI parameter count.
 When a parameter list contains an expression, a same-name body `var` receives
 a separate cell initialized from the parameter binding. A list without
 parameter expressions reuses the parameter cell.
+Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
+owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
 Asynchronous non-simple parameters, optional parameters, TypeScript `this`
-parameters, and hints on pattern-bound names remain explicit boundaries.
+parameters, and structured TypeScript annotations on binding patterns remain
+explicit boundaries.
 Call type arguments and other withheld forms are also rejected here. Source
 positions and UTF-8 byte offsets are indexed once for linear-time conversion.
 The script frontend uses non-strict script parsing. The module frontend uses

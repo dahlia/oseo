@@ -7,6 +7,7 @@ import type {
   SyntaxAssignmentPattern,
   SyntaxAssignmentTarget,
   SyntaxArrayElement,
+  SyntaxBindingIdentifier,
   SyntaxBindingPattern,
   SyntaxCallArgument,
   SyntaxCallTarget,
@@ -675,7 +676,12 @@ export function bindingPattern(
         "Binding identifiers cannot be optional.",
       );
     }
-    return { ...location(context, value), kind: "binding-identifier", name };
+    return {
+      ...location(context, value),
+      hints: [],
+      kind: "binding-identifier",
+      name,
+    };
   }
   if (value.type === "MemberExpression") {
     if (!assignment) {
@@ -892,6 +898,53 @@ export function patternNames(pattern: SyntaxBindingPattern): readonly string[] {
     ),
     ...(pattern.rest == null ? [] : patternNames(pattern.rest)),
   ];
+}
+
+/**
+ * Attach name-based JSDoc hints to the bindings created by a parameter
+ * pattern. The hidden aggregate ABI parameter remains unhinted.
+ */
+function parameterIdentifierHints(
+  pattern: SyntaxBindingIdentifier,
+  hints: ReadonlyMap<string, Hint>,
+): SyntaxBindingIdentifier {
+  const hint = hints.get(pattern.name);
+  return { ...pattern, hints: hint == null ? [] : [hint] };
+}
+
+function parameterPatternHints(
+  pattern: SyntaxBindingPattern,
+  hints: ReadonlyMap<string, Hint>,
+): SyntaxBindingPattern {
+  if (pattern.kind === "binding-identifier") {
+    return parameterIdentifierHints(pattern, hints);
+  }
+  if (pattern.kind === "object-binding-pattern") {
+    return {
+      ...pattern,
+      properties: pattern.properties.map((property) => ({
+        ...property,
+        pattern: parameterPatternHints(property.pattern, hints),
+      })),
+      ...(pattern.rest == null
+        ? {}
+        : { rest: parameterIdentifierHints(pattern.rest, hints) }),
+    };
+  }
+  return {
+    ...pattern,
+    elements: pattern.elements.map((element) =>
+      element == null
+        ? undefined
+        : {
+            ...element,
+            pattern: parameterPatternHints(element.pattern, hints),
+          },
+    ),
+    ...(pattern.rest == null
+      ? {}
+      : { rest: parameterPatternHints(pattern.rest, hints) }),
+  };
 }
 
 export function rawPatternNames(value: BabelNode): readonly string[] {
@@ -2488,12 +2541,15 @@ export function functionDeclaration(
       context.functionStack.push(
         functionProvidesThis ? true : context.functionStack.at(-1) === true,
       );
-      const pattern = bindingPattern(context, parameterPattern);
+      let pattern = bindingPattern(context, parameterPattern);
       let defaultInitializer =
         defaultNode == null ? undefined : expression(context, defaultNode);
       context.functionStack.pop();
       context.strictStack.pop();
       if (pattern == null) return undefined;
+      if (parameterName == null) {
+        pattern = parameterPatternHints(pattern, jsdoc.parameters);
+      }
       if (defaultNode != null && defaultInitializer == null) return undefined;
       const names = patternNames(pattern);
       if (
@@ -2505,16 +2561,6 @@ export function functionDeclaration(
           ...defaultInitializer,
           inferredName: parameterName,
         };
-      }
-      if (
-        parameterName == null &&
-        names.some((bindingName) => jsdoc.parameters.has(bindingName))
-      ) {
-        return unsupported(
-          context,
-          parameterNode,
-          "JSDoc hints on binding-pattern parameters are unsupported.",
-        );
       }
       const hints: Hint[] = [];
       const parameterHint = typeHint(context, parameterPattern.typeAnnotation);

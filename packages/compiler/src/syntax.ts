@@ -306,6 +306,7 @@ export interface SyntaxParameter extends LocatedSyntax {
 
 /** One identifier leaf in an owned binding pattern. */
 export interface SyntaxBindingIdentifier extends LocatedSyntax {
+  readonly hints: readonly Hint[];
   readonly kind: "binding-identifier";
   readonly name: string;
 }
