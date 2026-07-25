@@ -700,10 +700,14 @@ positions. Expanded members follow the ordinary primitive-hint and
 unsupported-type rules. Variadic array rests and type-reference spreads remain
 unhinted where their length makes a position ambiguous. Object targets inside
 an array rest remain unhinted. Computed object properties remain unhinted even
-for literal keys. The generated domains vary truthful and false TypeScript
-hints. Type references remain an explicit boundary. Asynchronous functions and
-arrows now run non-simple parameter initialization inside their asynchronous
-executor, so abrupt defaults reject the returned promise. Six reviewed
+for literal keys. A nested array or object binding subtree whose inline
+annotation has another container shape remains unhinted without rejecting the
+program, while sibling mappings continue. Root container mismatches and type
+annotations that require resolution remain explicit boundaries. The generated
+domains vary truthful, false, and nested shape-mismatched TypeScript hints.
+Asynchronous functions and arrows now run non-simple parameter initialization
+inside their asynchronous executor, so abrupt defaults reject the returned
+promise. Six reviewed
 standards cases pin default selection, prior references, and rejection. Body
 `var` declarations may now share parameter names:
 parameter-expression lists receive distinct parameter and body cells, while

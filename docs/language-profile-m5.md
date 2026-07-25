@@ -426,7 +426,11 @@ its deliberate boundary and its evidence:
     before a following suffix. Expanded members follow the ordinary
     primitive-hint and unsupported-type rules. Optional members and ambiguous
     positions after a variadic array rest or type-reference spread remain
-    unhinted. Assignment member targets, `export var`, and `await` inside a
+    unhinted. If an inline annotation gives a nested array binding subtree
+    another container shape, that subtree remains unhinted without a diagnostic
+    while matching siblings continue to map. Root container mismatches and type
+    annotations that require resolution remain source-located unsupported
+    boundaries. Assignment member targets, `export var`, and `await` inside a
     default remain outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
@@ -454,8 +458,13 @@ its deliberate boundary and its evidence:
     and covered expressions, plus rest exclusions, fresh data descriptors, and
     non-enumerable omission. Inline object TypeScript annotations map
     syntactically visible required primitive members to binding leaves.
-    Optional members remain unhinted. Assignment member targets, `export var`,
-    and `await` inside a property name or default remain outside this object
+    Optional members remain unhinted. If an inline annotation gives a nested
+    array or object binding subtree another container shape, that subtree
+    remains unhinted without a diagnostic while matching siblings continue to
+    map. Root container mismatches and type annotations that require resolution
+    or otherwise lack an admitted concrete syntactic shape remain source-located
+    unsupported boundaries. Assignment member targets, `export var`, and
+    `await` inside a property name or default remain outside this object
     declaration syntax unit.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
@@ -480,11 +489,14 @@ its deliberate boundary and its evidence:
     and type-reference spreads remain unhinted where their length makes a
     position ambiguous. Object targets inside an array rest remain unhinted.
     Computed object properties remain unhinted even when their source key is a
-    literal. Type references that require alias or interface resolution remain
-    a source-located unsupported boundary. Ordinary functions retain dynamic
-    `this`, arrows retain lexical `this`, and constructors initialize their
-    receiver before parameter work. JavaScript function length is retained
-    independently from the ABI parameter count.
+    literal. A nested array or object binding subtree whose inline annotation
+    has another container shape remains unhinted without a diagnostic, while
+    matching siblings continue to map. Root container mismatches and type
+    annotations that require resolution, including alias or interface
+    references, remain source-located unsupported boundaries. Ordinary
+    functions retain dynamic `this`, arrows retain lexical `this`, and
+    constructors initialize their receiver before parameter work. JavaScript
+    function length is retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
     `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish

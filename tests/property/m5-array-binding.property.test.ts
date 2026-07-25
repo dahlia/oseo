@@ -39,6 +39,7 @@ interface ArrayBindingCase {
   readonly defaultThrows: boolean;
   readonly hintKind: HintKind;
   readonly iterableKind: IterableKind;
+  readonly nestedAnnotationMatches: boolean;
   readonly nestedMissing: boolean;
   readonly nestedValues: readonly Value[];
   readonly shape: Shape;
@@ -86,6 +87,7 @@ const bindingArbitraries = {
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
   hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+  nestedAnnotationMatches: fc.boolean(),
   nestedMissing: fc.boolean(),
   nestedValues: valuesArbitrary,
   shape: fc.constantFrom<Shape>(
@@ -155,6 +157,9 @@ function patternSource(testCase: ArrayBindingCase): string {
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested") {
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: [${type}]`;
+    }
     const annotation =
       testCase.annotationKind === "tuple-fixed-spread"
         ? `[...[[${type}, ${type}]]]`
@@ -186,7 +191,10 @@ function hintedBindingNames(shape: Shape): readonly string[] {
 }
 
 function assertGeneratedHints(testCase: ArrayBindingCase, hir: string): void {
-  if (testCase.hintKind === "absent") {
+  if (
+    testCase.hintKind === "absent" ||
+    (testCase.shape === "nested" && !testCase.nestedAnnotationMatches)
+  ) {
     assert.doesNotMatch(hir, / hints=/u);
     return;
   }
@@ -362,6 +370,7 @@ test("array binding model ignores custom iterator controls", () => {
       defaultThrows: false,
       hintKind: "absent",
       iterableKind: "array",
+      nestedAnnotationMatches: true,
       nestedMissing: false,
       nestedValues: [],
       shape: "default-elision",
@@ -479,7 +488,8 @@ test(
           "const, let, and var array patterns with defaults, elision, " +
           "nesting, rest, arrays, custom iterators, abrupt steps, and " +
           "absent, truthful, or false homogeneous array, fixed tuple-" +
-          "spread, and tuple-rest TypeScript hints",
+          "spread, and tuple-rest TypeScript hints, including nested " +
+          "shape mismatches that remain unhinted",
         numRuns: 10,
         profile: "M5 array binding declarations",
         seed: 0x5eed_0007,

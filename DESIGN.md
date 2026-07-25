@@ -474,7 +474,12 @@ array rests and type-reference spreads remain unhinted where their length makes
 a position ambiguous. Object targets inside an array rest remain unhinted.
 Object member types map only through noncomputed source properties, so even a
 computed literal key remains unhinted. An annotation that requires type
-resolution remains an owned unsupported boundary.
+resolution remains an owned unsupported boundary. When an inline annotation's
+container shape disagrees with a nested binding subtree, mapping stops only for
+that subtree and leaves its binding leaves unhinted without a diagnostic.
+Sibling mappings continue. A root container mismatch and a type reference that
+requires alias or interface resolution, or another type without an admitted
+concrete syntactic shape, remain source-located unsupported boundaries.
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer

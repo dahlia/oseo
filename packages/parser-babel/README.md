@@ -42,7 +42,12 @@ positions. Expanded members follow the ordinary primitive-hint and
 unsupported-type rules. Variadic array rests and type-reference spreads remain
 unhinted where their length makes a position ambiguous. Object targets inside
 an array rest remain unhinted. Computed object properties remain unhinted even
-when their source key is a literal.
+when their source key is a literal. When an inline annotation gives a nested
+array or object binding subtree another container shape, mapping stops only for
+that subtree and leaves it unhinted without a diagnostic. Matching siblings
+continue to map. Root container mismatches and type references that require
+alias or interface resolution, or otherwise lack an admitted concrete syntactic
+shape, remain explicit boundaries.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and

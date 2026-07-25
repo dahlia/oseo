@@ -489,12 +489,14 @@ hints from homogeneous array, fixed tuple-spread, and tuple-rest annotations.
 Its independent model predicts the bound value, step count, close count, thrown
 error identity, and the exact binding leaves that receive hints, including
 unambiguous leaves inside a nested array rest and members or suffixes after a
-fixed tuple spread. Each case compares Node.js, Deno, specialization-disabled
-native execution, and specialization-enabled native execution with collection
-forced at every safepoint. Fixed frontend regressions retain variadic array
-rests, type-reference spreads, and object targets inside an array rest as
-unhinted. They also pin the ordinary unsupported-type diagnostic for a member
-exposed by fixed spread expansion.
+fixed tuple spread. Nested array patterns also vary matching and scalar
+annotation members; a scalar mismatch leaves that subtree unhinted without
+changing the modeled execution. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint. Fixed frontend regressions
+retain variadic array rests, type-reference spreads, and object targets inside
+an array rest as unhinted. They also pin the ordinary unsupported-type
+diagnostic for a member exposed by fixed spread expansion.
 
 The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -517,7 +519,10 @@ nullish `TypeError`. Each case compares Node.js, Deno, specialization-disabled
 native execution, and specialization-enabled execution with collection forced
 at every safepoint. Generated computed properties include literal and dynamic
 keys with absent, truthful, and false annotations. They remain unhinted because
-the structural mapping admits only noncomputed source properties.
+the structural mapping admits only noncomputed source properties. Nested array
+and object properties also vary matching and scalar annotation members; a
+scalar mismatch leaves that subtree unhinted without changing the modeled
+execution.
 
 The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
@@ -563,9 +568,10 @@ function with an array or object parameter containing a default and rest
 target. Inputs vary between a present value, a missing value, and `null`, plus
 an absent, truthful, or deliberately false name-based JSDoc or structurally
 mapped TypeScript hint. Its independent model predicts the selected bound
-value, retained rest value, or observed nullish `TypeError`; asynchronous
-cases observe that error through promise rejection. Each case compares
-Node.js, Deno,
+value, retained rest value, or observed nullish `TypeError`. TypeScript cases
+also generate nested container mismatches that remain unhinted without changing
+the modeled execution. Asynchronous cases observe errors through promise
+rejection. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
 execution with collection forced at every safepoint.
 

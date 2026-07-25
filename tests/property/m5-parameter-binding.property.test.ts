@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printHir,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -39,6 +40,7 @@ interface ParameterBindingCase {
   readonly fallback: number;
   readonly hintKind: HintKind;
   readonly inputKind: InputKind;
+  readonly nestedAnnotationMatches: boolean;
   readonly patternKind: PatternKind;
   readonly value: number;
 }
@@ -66,6 +68,7 @@ const caseArbitrary: fc.Arbitrary<ParameterBindingCase> = fc.record({
     "typescript-truthful",
   ),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
+  nestedAnnotationMatches: fc.boolean(),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
   value: fc.integer({ max: 20, min: -20 }),
 });
@@ -77,11 +80,25 @@ function patternSource(testCase: ParameterBindingCase): string {
       : testCase.hintKind === "typescript-false"
         ? "string"
         : undefined;
+  const nestedMismatch =
+    typescript != null && !testCase.nestedAnnotationMatches;
   if (testCase.patternKind === "array") {
+    if (nestedMismatch) {
+      return (
+        `[[bound = ${testCase.fallback}], ...rest]: ` +
+        `[${typescript}, ...number[]]`
+      );
+    }
     const pattern = `[bound = ${testCase.fallback}, ...rest]`;
     return typescript == null
       ? pattern
       : `${pattern}: [${typescript}, ...number[]]`;
+  }
+  if (nestedMismatch) {
+    return (
+      `{ value: { nested: bound = ${testCase.fallback} } = {}, ...rest }:` +
+      ` { value: ${typescript}; extra: number }`
+    );
   }
   const pattern = `{ value: bound = ${testCase.fallback}, ...rest }`;
   return typescript == null
@@ -91,13 +108,20 @@ function patternSource(testCase: ParameterBindingCase): string {
 
 function inputSource(testCase: ParameterBindingCase): string {
   if (testCase.inputKind === "null") return "null";
+  const nestedMismatch =
+    testCase.hintKind.startsWith("typescript-") &&
+    !testCase.nestedAnnotationMatches;
   if (testCase.patternKind === "array") {
     const value =
       testCase.inputKind === "present" ? String(testCase.value) : "undefined";
-    return `[${value}, 7]`;
+    return nestedMismatch ? `[[${value}], 7]` : `[${value}, 7]`;
   }
   const value =
-    testCase.inputKind === "present" ? `value: ${testCase.value}, ` : "";
+    testCase.inputKind === "present"
+      ? nestedMismatch
+        ? `value: { nested: ${testCase.value} }, `
+        : `value: ${testCase.value}, `
+      : "";
   return `{ ${value}extra: 7 }`;
 }
 
@@ -186,6 +210,7 @@ test("parameter binding model rejects null before entering the body", () => {
       fallback: 2,
       hintKind: "absent",
       inputKind: "null",
+      nestedAnnotationMatches: true,
       patternKind: "object",
       value: 1,
     }),
@@ -221,7 +246,26 @@ test(
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.hir != null);
           assert.ok(compiled.mir != null);
+          const hir = printHir(compiled.hir);
+          const hint =
+            testCase.hintKind === "jsdoc-truthful"
+              ? "jsdoc:number"
+              : testCase.hintKind === "jsdoc-false"
+                ? "jsdoc:string"
+                : testCase.hintKind === "typescript-truthful" &&
+                    testCase.nestedAnnotationMatches
+                  ? "typescript:number"
+                  : testCase.hintKind === "typescript-false" &&
+                      testCase.nestedAnnotationMatches
+                    ? "typescript:string"
+                    : undefined;
+          if (hint == null) {
+            assert.doesNotMatch(hir, /bound hints=/u);
+          } else {
+            assert.match(hir, new RegExp(`bound hints=\\[${hint}\\]`, "u"));
+          }
           if (specialization === "enabled") {
             process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           }
@@ -258,7 +302,8 @@ test(
           "synchronous and asynchronous array and object function " +
           "parameters with defaults, rest, present, missing, and nullish " +
           "inputs plus absent, truthful, and false JSDoc or TypeScript " +
-          "hints",
+          "hints, including nested TypeScript shape mismatches that remain " +
+          "unhinted",
         numRuns: 10,
         profile: "M5 function binding patterns",
         seed: 0x5eed_0011,

@@ -1009,6 +1009,22 @@ function annotationPropertyName(value: BabelNode): string | undefined {
   return undefined;
 }
 
+function annotationHasConcreteShape(typeNode: BabelNode): boolean {
+  return (
+    typeNode.type === "TSAnyKeyword" ||
+    typeNode.type === "TSBooleanKeyword" ||
+    typeNode.type === "TSNullKeyword" ||
+    typeNode.type === "TSNumberKeyword" ||
+    typeNode.type === "TSStringKeyword" ||
+    typeNode.type === "TSUndefinedKeyword" ||
+    typeNode.type === "TSUnknownKeyword" ||
+    typeNode.type === "TSLiteralType" ||
+    typeNode.type === "TSTypeLiteral" ||
+    typeNode.type === "TSArrayType" ||
+    typeNode.type === "TSTupleType"
+  );
+}
+
 /**
  * Index required noncomputed members once for one object binding pattern.
  *
@@ -1169,11 +1185,16 @@ function annotationArrayRestType(
 /**
  * Map syntactically visible tuple, array, and object type members to the
  * binding leaves they describe without invoking TypeScript's type checker.
+ *
+ * Root container mismatches and types without a concrete syntactic shape
+ * retain owned diagnostics. A concrete nested container mismatch stops only
+ * that subtree's mapping.
  */
 function bindingPatternTypeHints(
   context: ConvertContext,
   pattern: SyntaxBindingPattern,
   annotationValue: unknown,
+  atRoot = true,
 ): SyntaxBindingPattern {
   const typeNode = annotationType(annotationValue);
   if (typeNode == null) return pattern;
@@ -1186,11 +1207,13 @@ function bindingPatternTypeHints(
   }
   if (pattern.kind === "object-binding-pattern") {
     if (typeNode.type !== "TSTypeLiteral") {
-      unsupported(
-        context,
-        typeNode,
-        "An object binding annotation must be an inline object type.",
-      );
+      if (atRoot || !annotationHasConcreteShape(typeNode)) {
+        unsupported(
+          context,
+          typeNode,
+          "An object binding annotation must be an inline object type.",
+        );
+      }
       return pattern;
     }
     const propertyTypes = annotationPropertyTypes(typeNode);
@@ -1211,17 +1234,20 @@ function bindingPatternTypeHints(
                 context,
                 property.pattern,
                 propertyType,
+                false,
               ),
             };
       }),
     };
   }
   if (typeNode.type !== "TSArrayType" && typeNode.type !== "TSTupleType") {
-    unsupported(
-      context,
-      typeNode,
-      "An array binding annotation must be an array or tuple type.",
-    );
+    if (atRoot || !annotationHasConcreteShape(typeNode)) {
+      unsupported(
+        context,
+        typeNode,
+        "An array binding annotation must be an array or tuple type.",
+      );
+    }
     return pattern;
   }
   const arrayTypes = annotationArrayTypes(typeNode);
@@ -1239,6 +1265,7 @@ function bindingPatternTypeHints(
               context,
               element.pattern,
               elementType,
+              false,
             ),
           };
     }),
@@ -1249,6 +1276,7 @@ function bindingPatternTypeHints(
             context,
             pattern.rest,
             annotationArrayRestType(arrayTypes, pattern.elements.length),
+            false,
           ),
         }),
   };

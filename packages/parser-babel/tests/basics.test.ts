@@ -238,6 +238,55 @@ test("maps structured annotations in declaration binding contexts", () => {
   assert.doesNotMatch(hir, /maybe hints=/u);
 });
 
+test("ignores nested structured annotation shape mismatches", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [[arrayValue], arraySibling]: [number, string] = " +
+      "[[1], 'two'];\n" +
+      "const [{ propertyValue }]: [number] = [{ propertyValue: 2 }];\n" +
+      "const { nested: { objectValue }, objectSibling }:\n" +
+      "  { nested: number; objectSibling: string } =\n" +
+      "  { nested: { objectValue: 3 }, objectSibling: 'four' };\n" +
+      "const { list: [listValue] }: { list: { value: number } } =\n" +
+      "  { list: [5] };\n" +
+      "console.log(\n" +
+      "  arrayValue, arraySibling, propertyValue,\n" +
+      "  objectValue, objectSibling, listValue,\n" +
+      ");\n",
+    sourceId: "nested-annotation-shape-mismatches.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /arrayValue hints=/u);
+  assert.match(hir, /arraySibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /propertyValue hints=/u);
+  assert.doesNotMatch(hir, /objectValue hints=/u);
+  assert.match(hir, /objectSibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /listValue hints=/u);
+});
+
+test("ignores nested parameter annotation shape mismatches", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function read(\n" +
+      "  [[arrayValue], arraySibling]: [number, string],\n" +
+      "  { nested: { objectValue }, objectSibling }:\n" +
+      "    { nested: number; objectSibling: string },\n" +
+      ") {\n" +
+      "  return [arrayValue, arraySibling, objectValue, objectSibling];\n" +
+      "}\n",
+    sourceId: "nested-parameter-annotation-shape-mismatches.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /arrayValue hints=/u);
+  assert.match(hir, /arraySibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /objectValue hints=/u);
+  assert.match(hir, /objectSibling hints=\[typescript:string\]/u);
+});
+
 test("maps array annotations through nested rest patterns", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -335,6 +384,30 @@ test("rejects pattern annotations that require type resolution", () => {
       "const input = { value: 1 };\n" +
         "for (let { value }: Parameters = input; false; ) {}\n",
     ],
+    [
+      "resolved-array-hints",
+      "const input = [1];\nconst [value]: Values = input;\n",
+    ],
+    [
+      "resolved-nested-object-hints",
+      "const { nested: { value } }: { nested: Parameters } = " +
+        "{ nested: { value: 1 } };\n",
+    ],
+    ["resolved-nested-array-hints", "const [[value]]: [Values] = [[1]];\n"],
+    [
+      "resolved-nested-array-query-hints",
+      "const values = [1];\nconst [[value]]: [typeof values] = [[1]];\n",
+    ],
+    [
+      "resolved-nested-array-union-hints",
+      "const [[value]]: [number | number[]] = [[1]];\n",
+    ],
+    [
+      "resolved-nested-object-union-hints",
+      "const { nested: { value } }:\n" +
+        "  { nested: number | { value: number } } =\n" +
+        "  { nested: { value: 1 } };\n",
+    ],
   ] as const) {
     const result = compileSource(babelFrontend, {
       source,
@@ -344,8 +417,46 @@ test("rejects pattern annotations that require type resolution", () => {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001");
     assert.equal(
       result.diagnostics[0]?.message,
-      "An object binding annotation must be an inline object type.",
+      name === "resolved-array-hints" ||
+        name === "resolved-nested-array-hints" ||
+        name === "resolved-nested-array-query-hints" ||
+        name === "resolved-nested-array-union-hints"
+        ? "An array binding annotation must be an array or tuple type."
+        : "An object binding annotation must be an inline object type.",
     );
+  }
+});
+
+test("rejects root structured annotation shape mismatches", () => {
+  for (const [name, source, message] of [
+    [
+      "array-with-object-annotation",
+      "const [value]: { value: number } = [1];\n",
+      "An array binding annotation must be an array or tuple type.",
+    ],
+    [
+      "object-with-array-annotation",
+      "const { value }: number[] = { value: 1 };\n",
+      "An object binding annotation must be an inline object type.",
+    ],
+    [
+      "parameter-array-with-object-annotation",
+      "function read([value]: { value: number }) { return value; }\n",
+      "An array binding annotation must be an array or tuple type.",
+    ],
+    [
+      "parameter-object-with-array-annotation",
+      "function read({ value }: number[]) { return value; }\n",
+      "An object binding annotation must be an inline object type.",
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics.length, 1);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(result.diagnostics[0]?.message, message);
   }
 });
 

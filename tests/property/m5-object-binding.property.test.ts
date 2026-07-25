@@ -47,6 +47,7 @@ interface ObjectBindingCase {
   readonly declarationKind: DeclarationKind;
   readonly fallback: number;
   readonly hintKind: HintKind;
+  readonly nestedAnnotationMatches: boolean;
   readonly shape: Shape;
   readonly sourceKind: SourceKind;
   readonly value: number;
@@ -67,6 +68,7 @@ const nativeTarget = targetForExecutionHost(
 const sharedArbitraries = {
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   fallback: fc.integer({ max: 20, min: -20 }),
+  nestedAnnotationMatches: fc.boolean(),
   sourceKind: fc.constantFrom<SourceKind>(
     "missing",
     "null",
@@ -123,9 +125,15 @@ function patternSource(testCase: ObjectBindingCase): string {
   if (testCase.hintKind === "absent") return pattern;
   const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested-array") {
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: { nested: ${type} }`;
+    }
     return `${pattern}: { nested: ${type}[] }`;
   }
   if (testCase.shape === "nested-object") {
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: { nested: ${type} }`;
+    }
     return `${pattern}: { nested: { value: ${type} } }`;
   }
   return `${pattern}: { value: ${type} }`;
@@ -234,6 +242,7 @@ test("object binding model checks nullish inputs before computed keys", () => {
       declarationKind: "const",
       fallback: 2,
       hintKind: "absent",
+      nestedAnnotationMatches: true,
       shape: "computed",
       sourceKind: "null",
       value: 1,
@@ -273,7 +282,10 @@ test(
           if (
             testCase.hintKind === "absent" ||
             testCase.shape === "computed" ||
-            testCase.shape === "computed-literal"
+            testCase.shape === "computed-literal" ||
+            ((testCase.shape === "nested-array" ||
+              testCase.shape === "nested-object") &&
+              !testCase.nestedAnnotationMatches)
           ) {
             assert.doesNotMatch(hir, /bound hints=/u);
           } else {
@@ -319,7 +331,7 @@ test(
           "const, let, and var object patterns with static, computed " +
           "literal, computed dynamic, defaulted, nested, primitive, and " +
           "nullish inputs plus absent, truthful, or false TypeScript hints; " +
-          "computed keys remain unhinted",
+          "computed keys and nested shape mismatches remain unhinted",
         numRuns: 10,
         profile: "M5 object binding declarations",
         seed: 0x5eed_0008,
