@@ -26,7 +26,12 @@ const { assertAsyncProperty } = await import(
 );
 
 type InputKind = "missing" | "null" | "present";
-type HintKind = "absent" | "false" | "truthful";
+type HintKind =
+  | "absent"
+  | "jsdoc-false"
+  | "jsdoc-truthful"
+  | "typescript-false"
+  | "typescript-truthful";
 type PatternKind = "array" | "object";
 
 interface ParameterBindingCase {
@@ -53,17 +58,35 @@ const nativeTarget = targetForExecutionHost(
 const caseArbitrary: fc.Arbitrary<ParameterBindingCase> = fc.record({
   asynchronous: fc.boolean(),
   fallback: fc.integer({ max: 20, min: -20 }),
-  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+  hintKind: fc.constantFrom<HintKind>(
+    "absent",
+    "jsdoc-false",
+    "jsdoc-truthful",
+    "typescript-false",
+    "typescript-truthful",
+  ),
   inputKind: fc.constantFrom<InputKind>("missing", "null", "present"),
   patternKind: fc.constantFrom<PatternKind>("array", "object"),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 function patternSource(testCase: ParameterBindingCase): string {
+  const typescript =
+    testCase.hintKind === "typescript-truthful"
+      ? "number"
+      : testCase.hintKind === "typescript-false"
+        ? "string"
+        : undefined;
   if (testCase.patternKind === "array") {
-    return `[bound = ${testCase.fallback}, ...rest]`;
+    const pattern = `[bound = ${testCase.fallback}, ...rest]`;
+    return typescript == null
+      ? pattern
+      : `${pattern}: [${typescript}, ...number[]]`;
   }
-  return `{ value: bound = ${testCase.fallback}, ...rest }`;
+  const pattern = `{ value: bound = ${testCase.fallback}, ...rest }`;
+  return typescript == null
+    ? pattern
+    : `${pattern}: { value: ${typescript}; extra: number }`;
 }
 
 function inputSource(testCase: ParameterBindingCase): string {
@@ -81,11 +104,11 @@ function inputSource(testCase: ParameterBindingCase): string {
 function printCase(testCase: ParameterBindingCase): string {
   const restValue = testCase.patternKind === "array" ? "rest[0]" : "rest.extra";
   const hint =
-    testCase.hintKind === "absent"
-      ? ""
-      : `/** @param {${
-          testCase.hintKind === "truthful" ? "number" : "string"
-        }} bound */`;
+    testCase.hintKind === "jsdoc-truthful"
+      ? "/** @param {number} bound */"
+      : testCase.hintKind === "jsdoc-false"
+        ? "/** @param {string} bound */"
+        : "";
   const invocation = `consume(${inputSource(testCase)})`;
   const call = testCase.asynchronous
     ? `${invocation}.then(undefined, function (error) {
@@ -133,7 +156,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-parameter-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -234,7 +257,8 @@ test(
         domain:
           "synchronous and asynchronous array and object function " +
           "parameters with defaults, rest, present, missing, and nullish " +
-          "inputs plus absent, truthful, and false JSDoc hints",
+          "inputs plus absent, truthful, and false JSDoc or TypeScript " +
+          "hints",
         numRuns: 10,
         profile: "M5 function binding patterns",
         seed: 0x5eed_0011,

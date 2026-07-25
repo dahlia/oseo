@@ -909,7 +909,10 @@ function parameterIdentifierHints(
   hints: ReadonlyMap<string, Hint>,
 ): SyntaxBindingIdentifier {
   const hint = hints.get(pattern.name);
-  return { ...pattern, hints: hint == null ? [] : [hint] };
+  return {
+    ...pattern,
+    hints: hint == null ? pattern.hints : [...pattern.hints, hint],
+  };
 }
 
 function parameterPatternHints(
@@ -944,6 +947,159 @@ function parameterPatternHints(
     ...(pattern.rest == null
       ? {}
       : { rest: parameterPatternHints(pattern.rest, hints) }),
+  };
+}
+
+function annotationType(value: unknown): BabelNode | undefined {
+  const valueNode = node(value);
+  if (valueNode == null) return undefined;
+  if (
+    valueNode.type === "TSTypeAnnotation" ||
+    valueNode.type === "TSOptionalType"
+  ) {
+    return annotationType(valueNode.typeAnnotation);
+  }
+  if (valueNode.type === "TSNamedTupleMember") {
+    return annotationType(valueNode.elementType);
+  }
+  if (valueNode.type === "TSParenthesizedType") {
+    return annotationType(valueNode.typeAnnotation);
+  }
+  if (
+    valueNode.type === "TSTypeOperator" &&
+    valueNode.operator === "readonly"
+  ) {
+    return annotationType(valueNode.typeAnnotation);
+  }
+  return valueNode;
+}
+
+function annotationPropertyName(value: BabelNode): string | undefined {
+  const identifier = identifierName(value);
+  if (identifier != null) return identifier;
+  if (
+    (value.type === "StringLiteral" || value.type === "NumericLiteral") &&
+    (typeof value.value === "string" || typeof value.value === "number")
+  ) {
+    return String(value.value);
+  }
+  return undefined;
+}
+
+function annotationPropertyType(
+  typeNode: BabelNode,
+  propertyName: string,
+): BabelNode | undefined {
+  if (typeNode.type !== "TSTypeLiteral") return undefined;
+  for (const member of nodes(typeNode.members)) {
+    if (member.type !== "TSPropertySignature" || member.computed === true) {
+      continue;
+    }
+    const key = node(member.key);
+    if (key != null && annotationPropertyName(key) === propertyName) {
+      return annotationType(member.typeAnnotation);
+    }
+  }
+  return undefined;
+}
+
+function annotationElementType(
+  typeNode: BabelNode,
+  index: number,
+): BabelNode | undefined {
+  if (typeNode.type === "TSArrayType") {
+    return annotationType(typeNode.elementType);
+  }
+  if (typeNode.type !== "TSTupleType") return undefined;
+  const elementTypes = nodes(typeNode.elementTypes);
+  const restIndex = elementTypes.findIndex(
+    (elementType) => elementType.type === "TSRestType",
+  );
+  if (restIndex < 0 || index < restIndex) {
+    return annotationType(elementTypes[index]);
+  }
+  if (restIndex + 1 < elementTypes.length) {
+    return undefined;
+  }
+  const restType = annotationType(elementTypes[restIndex]?.typeAnnotation);
+  return restType == null
+    ? undefined
+    : annotationElementType(restType, index - restIndex);
+}
+
+/**
+ * Map syntactically visible tuple, array, and object type members to the
+ * binding leaves they describe without invoking TypeScript's type checker.
+ */
+function parameterPatternTypeHints(
+  context: ConvertContext,
+  pattern: SyntaxBindingPattern,
+  annotationValue: unknown,
+): SyntaxBindingPattern {
+  const typeNode = annotationType(annotationValue);
+  if (typeNode == null) return pattern;
+  if (pattern.kind === "binding-identifier") {
+    const hint = typeHint(context, typeNode);
+    return {
+      ...pattern,
+      hints: hint == null ? pattern.hints : [...pattern.hints, hint],
+    };
+  }
+  if (pattern.kind === "object-binding-pattern") {
+    if (typeNode.type !== "TSTypeLiteral") {
+      unsupported(
+        context,
+        typeNode,
+        "An object binding annotation must be an inline object type.",
+      );
+      return pattern;
+    }
+    return {
+      ...pattern,
+      properties: pattern.properties.map((property) => {
+        const propertyName =
+          property.key.kind === "string" ? property.key.value : undefined;
+        const propertyType =
+          propertyName == null
+            ? undefined
+            : annotationPropertyType(typeNode, propertyName);
+        return propertyType == null
+          ? property
+          : {
+              ...property,
+              pattern: parameterPatternTypeHints(
+                context,
+                property.pattern,
+                propertyType,
+              ),
+            };
+      }),
+    };
+  }
+  if (typeNode.type !== "TSArrayType" && typeNode.type !== "TSTupleType") {
+    unsupported(
+      context,
+      typeNode,
+      "An array binding annotation must be an array or tuple type.",
+    );
+    return pattern;
+  }
+  return {
+    ...pattern,
+    elements: pattern.elements.map((element, index) => {
+      if (element == null) return undefined;
+      const elementType = annotationElementType(typeNode, index);
+      return elementType == null
+        ? element
+        : {
+            ...element,
+            pattern: parameterPatternTypeHints(
+              context,
+              element.pattern,
+              elementType,
+            ),
+          };
+    }),
   };
 }
 
@@ -2520,25 +2676,32 @@ export function functionDeclaration(
       );
     }
     if (parameterEnvironment) {
-      if (parameterName == null && parameterPattern.typeAnnotation != null) {
-        return unsupported(
-          context,
-          parameterPattern,
-          "TypeScript annotations on binding-pattern parameters are " +
-            "unsupported.",
-        );
-      }
+      const patternAnnotation =
+        parameterName == null
+          ? rest
+            ? (parameterNode.typeAnnotation ?? parameterPattern.typeAnnotation)
+            : parameterPattern.typeAnnotation
+          : undefined;
+      const conversionPattern =
+        patternAnnotation == null
+          ? parameterPattern
+          : { ...parameterPattern, typeAnnotation: undefined };
       context.strictStack.push(strict);
       context.functionStack.push(
         functionProvidesThis ? true : context.functionStack.at(-1) === true,
       );
-      let pattern = bindingPattern(context, parameterPattern);
+      let pattern = bindingPattern(context, conversionPattern);
       let defaultInitializer =
         defaultNode == null ? undefined : expression(context, defaultNode);
       context.functionStack.pop();
       context.strictStack.pop();
       if (pattern == null) return undefined;
       if (parameterName == null) {
+        pattern = parameterPatternTypeHints(
+          context,
+          pattern,
+          patternAnnotation,
+        );
         pattern = parameterPatternHints(pattern, jsdoc.parameters);
       }
       if (defaultNode != null && defaultInitializer == null) return undefined;
@@ -2554,7 +2717,10 @@ export function functionDeclaration(
         };
       }
       const hints: Hint[] = [];
-      const parameterHint = typeHint(context, parameterPattern.typeAnnotation);
+      const parameterHint =
+        parameterName == null
+          ? undefined
+          : typeHint(context, parameterPattern.typeAnnotation);
       if (parameterHint != null) hints.push(parameterHint);
       const jsdocHint =
         parameterName == null ? undefined : jsdoc.parameters.get(parameterName);

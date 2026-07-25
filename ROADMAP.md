@@ -689,12 +689,15 @@ patterns, arrows, constructors, function length, both specialization policies,
 and forced collection. Six reviewed standards cases pin syntax, patterns,
 collection, and length. Name-based JSDoc hints now remain attached to their
 pattern binding through owned syntax and HIR; generated evidence covers absent,
-truthful, and false hints without changing behavior. Asynchronous functions and
-arrows now run non-simple parameter initialization inside their asynchronous
-executor, so abrupt defaults reject the returned promise. Six reviewed
-standards cases pin default selection, prior references, and rejection.
-Structured TypeScript annotations on binding patterns remain an explicit next
-unit. Body `var` declarations may now share parameter names:
+truthful, and false hints without changing behavior. Inline object, tuple, and
+array TypeScript annotations now map syntactically visible primitive member
+types to their binding leaves without a type checker. The same generated domain
+varies truthful and false TypeScript hints. Type references and pattern
+annotations outside parameter lists remain explicit boundaries. Asynchronous
+functions and arrows now run non-simple parameter initialization inside their
+asynchronous executor, so abrupt defaults reject the returned promise. Six
+reviewed standards cases pin default selection, prior references, and
+rejection. Body `var` declarations may now share parameter names:
 parameter-expression lists receive distinct parameter and body cells, while
 lists without expressions reuse the parameter cell. A same-name top-level
 function declaration owns the body binding when `var` also redeclares it.

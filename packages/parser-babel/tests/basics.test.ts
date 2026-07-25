@@ -126,6 +126,61 @@ test("converts function binding patterns through owned syntax", () => {
   );
 });
 
+test("maps structured parameter annotations to binding hints", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "/** @param {string} count */\n" +
+      "function read(\n" +
+      "  [count, { label: renamed }]: [number, { label: string }],\n" +
+      "  { enabled, nested: [value] }:\n" +
+      "    { enabled: boolean; nested: [number] },\n" +
+      "  [first, second]: readonly string[],\n" +
+      ") {\n" +
+      "  return [count, renamed, enabled, value, first, second];\n" +
+      "}\n",
+    sourceId: "structured-parameter-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /count hints=\[typescript:number,jsdoc:string\]/u);
+  assert.match(hir, /renamed hints=\[typescript:string\]/u);
+  assert.match(hir, /enabled hints=\[typescript:boolean\]/u);
+  assert.match(hir, /value hints=\[typescript:number\]/u);
+  assert.match(hir, /first hints=\[typescript:string\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+});
+
+test("maps tuple rest annotations to following binding elements", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function read(\n" +
+      "  [head, middle, tail]: [string, ...number[]],\n" +
+      ") {\n" +
+      "  return [head, middle, tail];\n" +
+      "}\n",
+    sourceId: "tuple-rest-parameter-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:string\]/u);
+  assert.match(hir, /middle hints=\[typescript:number\]/u);
+  assert.match(hir, /tail hints=\[typescript:number\]/u);
+});
+
+test("rejects pattern annotations that require type resolution", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function read({ value }: Parameters) { return value; }\n",
+    sourceId: "resolved-parameter-hints.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "An object binding annotation must be an inline object type.",
+  );
+});
+
 test("converts synchronous default parameters through owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:

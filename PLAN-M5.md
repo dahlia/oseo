@@ -144,12 +144,15 @@ Asynchronous functions and arrows run default and binding-pattern
 initialization inside the owned asynchronous executor. Rest collection retains
 the ordinary call ABI, and abrupt initializers reject the returned promise
 without entering the body or throwing synchronously. The generated
-binding-pattern property now varies synchronous and asynchronous functions.
+binding-pattern property now varies synchronous and asynchronous functions,
+plus absent, truthful, and false JSDoc or TypeScript hints. Inline object,
+tuple, and array annotations map syntactically visible primitive member types
+to the binding leaves they describe without invoking a TypeScript type checker.
 Fixed native evidence covers defaults, patterns, rest, same-name body `var`,
 and abrupt rejection. Six reviewed test262 cases pin default selection, prior
-references, and rejection. Structured TypeScript annotations on
-binding-pattern parameters remain an explicit boundary. Awaited member targets
-remain later work. The runtime
+references, and rejection. Type references that require type resolution and
+pattern annotations outside parameter lists remain explicit boundaries.
+Awaited member targets remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -399,15 +402,18 @@ property suite uses seed `0x5eed0014` across default, array-pattern,
 object-pattern, and plain sibling bindings, `var`-owned and function-owned body
 cells, both native specialization policies, and forced collection. Fixed
 evidence adds arrows, rest-only lists, and the function-owned binding. Six
-reviewed test262 cases pin the environment split. TypeScript and structured
-TypeScript annotations on binding-pattern parameters remain a source-located
-unsupported boundary.
+reviewed test262 cases pin the environment split. Inline object, tuple, and
+array TypeScript annotations map their syntactically visible primitive member
+types to the corresponding binding leaves. Type references that require alias
+or interface resolution and pattern annotations outside parameter lists remain
+source-located unsupported boundaries.
 Asynchronous functions and arrows create that parameter environment inside the
 owned asynchronous executor. Defaults and patterns therefore finish before the
 body begins, while an abrupt initializer rejects the returned promise instead
 of throwing from the call. The generated property with seed `0x5eed0011` now
-varies synchronous and asynchronous functions without filtering. Fixed native
-evidence covers defaults, patterns, rest, same-name body `var`, and rejection.
+varies synchronous and asynchronous functions plus absent, truthful, and false
+JSDoc or TypeScript hints without filtering. Fixed native evidence covers
+defaults, patterns, rest, same-name body `var`, and rejection.
 Six reviewed test262 cases pin default selection, prior references, and abrupt
 rejection.
 

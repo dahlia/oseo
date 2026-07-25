@@ -32,10 +32,12 @@ parameter expressions reuses the parameter cell. A same-name top-level
 function declaration owns the body binding when `var` also redeclares it.
 Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
 owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
+Inline object, tuple, and array TypeScript annotations map syntactically visible
+primitive member types to the same leaves without invoking a type checker.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and
-structured TypeScript annotations on binding patterns remain explicit
+type references that require alias or interface resolution remain explicit
 boundaries.
 Call type arguments and other withheld forms are also rejected here. Source
 positions and UTF-8 byte offsets are indexed once for linear-time conversion.
