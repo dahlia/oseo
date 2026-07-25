@@ -17,7 +17,7 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 298
+honest unsupported classifications. The current reviewed manifest records 304
 passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 
@@ -125,11 +125,19 @@ specialization policies, and forced collection. Fixed evidence covers empty
 and nonempty suffixes, heap-valued arguments, fresh identity, arrows,
 constructors, array and object binding patterns, and function length. Six
 reviewed test262 cases pin syntax, patterns, collection, and length.
+Body `var` declarations may now share parameter names. When the parameter list
+contains an expression, the frontend initializes each matching body cell from
+an outer parameter copy so closures created by parameter initializers retain
+the parameter cell. Lists without parameter expressions, including rest-only
+lists, continue to reuse the parameter cell. Generated evidence uses seed
+`0x5eed0014` across default, array-pattern, object-pattern, and plain sibling
+bindings, both specialization policies, and forced collection. Fixed evidence
+also covers arrows and rest-only lists. Six reviewed test262 cases pin the
+separate parameter and body environments.
 Asynchronous non-simple parameters remain unsupported, but enabling the rest
 feature promotes nine preexisting strict-body parse negatives from unsupported
-to expected negative. Hints on pattern-bound names and `var` declarations that
-share any parameter in a non-simple parameter list remain explicit boundaries.
-Awaited member targets remain later work. The runtime
+to expected negative. Hints on pattern-bound names remain an explicit
+boundary. Awaited member targets remain later work. The runtime
 component boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
 so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
@@ -367,9 +375,17 @@ reviewed test262 cases pin syntax, patterns, collection, and length. Enabling
 the rest feature promotes
 nine preexisting asynchronous non-simple strict-body parse negatives from
 unsupported to expected negative without admitting asynchronous execution.
-TypeScript and JSDoc hints on pattern-bound names, and `var` declarations that
-share any parameter in a non-simple parameter list remain source-located
-unsupported boundaries.
+Body `var` declarations may share parameter names. A parameter list containing
+an expression receives separate parameter and body cells, with the body cell
+initialized from the completed parameter binding before body execution. This
+keeps closures created by parameter initializers attached to the parameter
+cell. Lists without parameter expressions reuse the parameter cell. The
+generated property suite uses seed `0x5eed0014` across default, array-pattern,
+object-pattern, and plain sibling bindings, both native specialization
+policies, and forced collection. Fixed evidence adds arrows and rest-only
+lists. Six reviewed test262 cases pin the environment split. TypeScript and
+JSDoc hints on pattern-bound names remain a source-located unsupported
+boundary.
 
 Standalone destructuring assignment now accepts recursive array and object
 patterns with existing identifier or member leaves and rest targets. The right

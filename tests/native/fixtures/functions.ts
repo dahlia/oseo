@@ -236,6 +236,39 @@ console.log(lengthTwo.length, lengthZero.length);
 `,
   },
   {
+    name: "function-parameter-var-bindings",
+    source: `
+let readDefault;
+function sharedDefault(value = (readDefault = () => value, 1)) {
+  var value = 2;
+  return [value, readDefault()];
+}
+console.log(sharedDefault());
+let readPattern;
+function sharedPattern([value = (readPattern = () => value, 3)]) {
+  var value = 4;
+  return [value, readPattern()];
+}
+console.log(sharedPattern([]));
+let readPlain;
+function sharedPlain(_ = (readPlain = () => value, 0), value = 5) {
+  var value = 6;
+  return [value, readPlain()];
+}
+console.log(sharedPlain());
+const sharedArrow = (value = 7) => {
+  var value = 8;
+  return value;
+};
+console.log(sharedArrow());
+function sharedRest(...value) {
+  var value;
+  return value.length;
+}
+console.log(sharedRest(9, 10));
+`,
+  },
+  {
     name: "function-name-assignment",
     nonStrictScript: true,
     source: `

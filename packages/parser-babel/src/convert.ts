@@ -916,6 +916,30 @@ export function rawPatternNames(value: BabelNode): readonly string[] {
   return [];
 }
 
+function rawParameterContainsExpression(value: BabelNode): boolean {
+  if (value.type === "AssignmentPattern") return true;
+  if (value.type === "RestElement") {
+    const argument = node(value.argument);
+    return argument != null && rawParameterContainsExpression(argument);
+  }
+  if (value.type === "ArrayPattern") {
+    return nodes(value.elements).some(rawParameterContainsExpression);
+  }
+  if (value.type === "ObjectPattern") {
+    return nodes(value.properties).some((property) => {
+      if (property.type === "RestElement") {
+        return rawParameterContainsExpression(property);
+      }
+      if (property.computed === true) return true;
+      const propertyValue = node(property.value);
+      return (
+        propertyValue != null && rawParameterContainsExpression(propertyValue)
+      );
+    });
+  }
+  return false;
+}
+
 export function statement(
   context: ConvertContext,
   value: BabelNode,
@@ -2297,14 +2321,15 @@ export function collectVarStatement(
  * ordinary assignments, so the pair preserves var semantics for the
  * admitted profile without a separate binding kind. Names owned by
  * parameters or var-scoped function declarations are skipped so bare
- * redeclarations do not reset them. A caller may instead reject names whose
- * sharing semantics require an environment representation it does not own.
+ * redeclarations do not reset them. A caller may provide an outer parameter
+ * copy when a parameter-expression environment requires a distinct body var
+ * binding with the parameter's initial value.
  */
 export function hoistedVarDeclarations(
   context: ConvertContext,
   values: readonly BabelNode[],
   skipNames: ReadonlySet<string>,
-  rejectedNames: ReadonlySet<string> = new Set<string>(),
+  copiedNames: ReadonlyMap<string, string> = new Map<string, string>(),
 ): SyntaxStatement[] | undefined {
   const collected = new Map<string, HoistedVar>();
   const blockFunctions = new Set<string>();
@@ -2332,22 +2357,18 @@ export function hoistedVarDeclarations(
           `'${name}' is outside the admitted profile.`,
       );
     }
-    if (rejectedNames.has(name)) {
-      return unsupported(
-        context,
-        info.declarator,
-        `A var declaration sharing parameter '${name}' in a ` +
-          "non-simple parameter list is outside the admitted profile.",
-      );
-    }
-    if (skipNames.has(name)) continue;
+    const copiedName = copiedNames.get(name);
+    if (skipNames.has(name) && copiedName == null) continue;
     hoisted.push({
       // A zero-width leading byte range keeps hoisted bindings ahead of
       // every source-ordered statement when module lowering sorts by
       // byte offset.
       byteRange: { end: 0, start: 0 },
       hint: info.hint,
-      initializer: undefinedExpression(info.range),
+      initializer:
+        copiedName == null
+          ? undefinedExpression(info.range)
+          : identifierExpression(copiedName, info.range),
       kind: "let",
       name,
       range: info.range,
@@ -2417,6 +2438,9 @@ export function functionDeclaration(
   const defaultParameters = defaultParameterIndex >= 0;
   const restParameters = restParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
+  const parameterExpressions = parameterNodes.some(
+    rawParameterContainsExpression,
+  );
   const nonSimpleParameters = parameterEnvironment || restParameters;
   if (nonSimpleParameters && value.async === true) {
     return unsupported(
@@ -2582,11 +2606,22 @@ export function functionDeclaration(
           } satisfies BabelNode,
         ]
       : nodes(bodyNode?.body);
+  const copiedParameterNames = new Map<string, string>();
+  if (parameterExpressions) {
+    for (const parameterName of parameterNames) {
+      if (!copiedParameterNames.has(parameterName)) {
+        copiedParameterNames.set(
+          parameterName,
+          syntheticName(context, "parameter-copy"),
+        );
+      }
+    }
+  }
   const hoisted = hoistedVarDeclarations(
     context,
     children,
     new Set([...parameterNames, ...varScopedFunctionNames(children)]),
-    nonSimpleParameters ? new Set(parameterNames) : new Set<string>(),
+    copiedParameterNames,
   );
   if (hoisted == null) {
     context.functionStack.pop();
@@ -2635,7 +2670,23 @@ export function functionDeclaration(
     }
     if (parameterEnvironment) {
       const range = location(context, value).range;
-      body.push(...parameterInitializers, {
+      const parameterCopies: SyntaxStatement[] = [];
+      for (const declaration of hoisted) {
+        if (declaration.kind !== "let") continue;
+        const copiedName = copiedParameterNames.get(declaration.name);
+        if (copiedName == null) continue;
+        parameterCopies.push({
+          hint: undefined,
+          initializer: identifierExpression(
+            declaration.name,
+            declaration.range,
+          ),
+          kind: "let",
+          name: copiedName,
+          range: declaration.range,
+        });
+      }
+      body.push(...parameterInitializers, ...parameterCopies, {
         body: executionBody,
         kind: "block",
         range,

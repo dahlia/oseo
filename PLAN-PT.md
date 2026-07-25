@@ -603,6 +603,24 @@ identity, arrows, constructors, array and object binding patterns, and function
 length.
 
 
+M5 parameter and body var properties
+------------------------------------
+
+The parameter and body `var` property generates a synchronous function whose
+default, array-pattern, object-pattern, or plain sibling parameter is captured
+by a parameter initializer. The body declares and writes a same-name `var`.
+Its independent model predicts the distinct body value and captured parameter
+value. Each case compares Node.js, Deno, specialization-disabled native
+execution, and specialization-enabled native execution with collection forced
+at every safepoint.
+
+The ordinary suite uses seed `0x5eed0014`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+default and binding-pattern captures, a plain sibling binding, an arrow, and a
+rest-only list that reuses its parameter cell.
+
+
 M5 for-of binding properties
 ----------------------------
 

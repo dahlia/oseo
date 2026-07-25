@@ -201,6 +201,26 @@ test("converts synchronous rest parameters through owned syntax", () => {
   assert.doesNotMatch(JSON.stringify(result.hir), /RestElement/u);
 });
 
+test("separates parameter-expression bindings from body var bindings", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let capture;\n" +
+      "function value(input = (capture = () => input, 1)) {\n" +
+      "  var input = 2;\n" +
+      "  return [input, capture()];\n" +
+      "}\n" +
+      "function pattern([input]) { var input; return input; }\n" +
+      "function rest(...input) { var input; return input.length; }\n",
+    sourceId: "parameter-var.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /function @f\d+ value/u);
+  assert.match(hir, /oseo-parameter-copy/u);
+  assert.equal(hir.match(/oseo-parameter-copy/gu)?.length, 2);
+});
+
 test("keeps unsupported parameter boundaries explicit", () => {
   for (const [name, source, message] of [
     [
@@ -217,26 +237,6 @@ test("keeps unsupported parameter boundaries explicit", () => {
       "async rest",
       "async function value(...input) {}",
       /asynchronous functions/u,
-    ],
-    [
-      "shared var",
-      "function value([input]) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared plain var",
-      "function value([pattern], input) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared default var",
-      "function value(input = 1) { var input; }",
-      /non-simple parameter list/u,
-    ],
-    [
-      "shared rest var",
-      "function value(...input) { var input; }",
-      /non-simple parameter list/u,
     ],
   ] as const) {
     const result = compileSource(babelFrontend, {

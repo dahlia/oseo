@@ -458,9 +458,13 @@ parameter initializers, and adds no observable call. It also preserves dynamic
 `this` for ordinary functions and lexical `this` for arrows. HIR and MIR retain
 JavaScript function length separately from the ABI parameter count, so the
 first default or rest parameter truncates only the reported `length`.
-Asynchronous non-simple parameters, hints on pattern-bound names, and `var`
-sharing with any parameter in a non-simple parameter list remain rejected
-until their environment and continuation interactions have direct
+When a parameter list contains an expression, a body `var` that shares a
+parameter name receives a distinct body cell initialized from an outer copy of
+the completed parameter binding. A closure created by a parameter initializer
+therefore retains the parameter cell when the body later writes its `var`
+cell. Lists without parameter expressions reuse the parameter cell.
+Asynchronous non-simple parameters and hints on pattern-bound names remain
+rejected until their continuation and hint ownership have direct
 representations.
 
 Destructuring assignment reuses those recursive array and object operations

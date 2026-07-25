@@ -26,9 +26,11 @@ parameters retain an owned marker so the backend collects the unbound argument
 suffix into a fresh array. This preserves the separate parameter environment,
 left-to-right temporal dead zones, ordinary-function receivers, lexical arrow
 receivers, and function `length` independently from the ABI parameter count.
+When a parameter list contains an expression, a same-name body `var` receives
+a separate cell initialized from the parameter binding. A list without
+parameter expressions reuses the parameter cell.
 Asynchronous non-simple parameters, optional parameters, TypeScript `this`
-parameters, hints on pattern-bound names, and `var` declarations sharing any
-parameter in a non-simple parameter list remain explicit boundaries.
+parameters, and hints on pattern-bound names remain explicit boundaries.
 Call type arguments and other withheld forms are also rejected here. Source
 positions and UTF-8 byte offsets are indexed once for linear-time conversion.
 The script frontend uses non-strict script parsing. The module frontend uses

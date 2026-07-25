@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 669 reviewed cases: 298 passes, 245 expected
+The current manifest contains 675 reviewed cases: 304 passes, 245 expected
 negatives, and 126 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -463,18 +463,20 @@ its deliberate boundary and its evidence:
     constructors initialize their receiver before parameter work. JavaScript
     function length is retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
-    `0x5eed0011`, `0x5eed0012`, and `0x5eed0013` cover both pattern families,
-    supplied, missing, explicit `undefined`, and nullish inputs, abrupt
-    initializers, bounded and heap-valued rest suffixes, both specialization
-    policies, function-name inference, and forced collection. Fifteen reviewed
-    test262 cases cover array values, nested defaults and rest, abrupt
-    completion, top-level fallback and suffix selection, prior references, and
-    function length. Enabling the rest feature also promotes nine preexisting
-    asynchronous non-simple strict-body parse negatives from unsupported to
-    expected negative without admitting asynchronous execution. TypeScript and
-    JSDoc hints on pattern-bound names, and `var` declarations sharing any
-    parameter in a non-simple parameter list remain source-located unsupported
-    boundaries.
+    `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
+    pattern families, supplied, missing, explicit `undefined`, and nullish
+    inputs, abrupt initializers, bounded and heap-valued rest suffixes, both
+    specialization policies, function-name inference, forced collection, and
+    body `var` declarations that share parameter names. A list containing a
+    parameter expression gives a shared name distinct parameter and body
+    cells, while a list without parameter expressions reuses the parameter
+    cell. Twenty-one reviewed test262 cases cover array values, nested defaults
+    and rest, abrupt completion, top-level fallback and suffix selection, prior
+    references, function length, and the parameter and body environment split.
+    Enabling the rest feature also promotes nine preexisting asynchronous
+    non-simple strict-body parse negatives from unsupported to expected
+    negative without admitting asynchronous execution. TypeScript and JSDoc
+    hints on pattern-bound names remain a source-located unsupported boundary.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
