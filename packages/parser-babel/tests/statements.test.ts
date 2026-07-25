@@ -486,3 +486,74 @@ test("converts large files without rescanning every source prefix", () => {
   assert.ok(result.parsed);
   assert.ok(elapsed < 1_500, `frontend conversion took ${elapsed} ms`);
 });
+
+test("indexes wide structured annotations once per pattern", () => {
+  const sizes = [5_000, 15_000] as const;
+  const observations = sizes.flatMap((size) => {
+    const names = Array.from({ length: size }, (_, index) => `v${index}`);
+    const values = names.map(() => "0");
+    const cases = [
+      [
+        "array",
+        `const [${names}]: ` +
+          `[...[${names.map(() => "number")}]] = [${values}];`,
+      ],
+      [
+        "object",
+        `const {${names}}: {${names.map((name) => `${name}: number`)}} = ` +
+          `{${names.map((name) => `${name}: 0`)}};`,
+      ],
+    ] as const;
+    return cases.map(([name, source]) => {
+      const started = performance.now();
+      const result = babelFrontend.parse({
+        source,
+        sourceId: `wide-${name}-hints.ts`,
+      });
+      return {
+        elapsed: performance.now() - started,
+        name,
+        result,
+        size,
+      };
+    });
+  });
+  for (const { name, result, size } of observations) {
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.parsed);
+    const statement = result.program?.body[0];
+    assert.ok(statement != null && statement.kind === "binding-pattern");
+    const pattern = statement.pattern;
+    const leaves =
+      name === "array" && pattern.kind === "array-binding-pattern"
+        ? [pattern.elements[0]?.pattern, pattern.elements.at(-1)?.pattern]
+        : name === "object" && pattern.kind === "object-binding-pattern"
+          ? [pattern.properties[0]?.pattern, pattern.properties.at(-1)?.pattern]
+          : [];
+    assert.equal(leaves.length, 2);
+    for (const leaf of leaves) {
+      assert.ok(leaf != null && leaf.kind === "binding-identifier");
+      assert.deepEqual(
+        leaf.hints.map(({ name: hintName, provenance }) => ({
+          name: hintName,
+          provenance,
+        })),
+        [{ name: "number", provenance: "typescript" }],
+        `${name} ${size}-leaf pattern lost an endpoint hint`,
+      );
+    }
+  }
+  for (const name of ["array", "object"] as const) {
+    const small = observations.find(
+      (observation) =>
+        observation.name === name && observation.size === sizes[0],
+    );
+    const large = observations.find(
+      (observation) =>
+        observation.name === name && observation.size === sizes[1],
+    );
+    assert.ok(small != null && large != null);
+    const ratio = large.elapsed / small.elapsed;
+    assert.ok(ratio < 6, `${name} hint scaling ratio was ${ratio.toFixed(2)}`);
+  }
+});

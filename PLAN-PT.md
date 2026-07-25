@@ -484,10 +484,19 @@ The array binding property generates a standalone `const`, `let`, or `var`
 declaration with one recursive array pattern. Shapes cover an ordinary head,
 an elision with an `undefined` default, a nested array, an identifier rest, and
 a nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
-and throwing defaults. Its independent model predicts the bound value, step
-count, close count, and thrown error identity. Each case compares Node.js,
-Deno, specialization-disabled native execution, and specialization-enabled
-native execution with collection forced at every safepoint.
+throwing defaults, and absent, truthful, or deliberately false TypeScript
+hints from homogeneous array, fixed tuple-spread, and tuple-rest annotations.
+Its independent model predicts the bound value, step count, close count, thrown
+error identity, and the exact binding leaves that receive hints, including
+unambiguous leaves inside a nested array rest and members or suffixes after a
+fixed tuple spread. Nested array patterns also vary matching and scalar
+annotation members; a scalar mismatch leaves that subtree unhinted without
+changing the modeled execution. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled native
+execution with collection forced at every safepoint. Fixed frontend regressions
+retain variadic array rests, type-reference spreads, and object targets inside
+an array rest as unhinted. They also pin the ordinary unsupported-type
+diagnostic for a member exposed by fixed spread expansion.
 
 The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -503,11 +512,17 @@ M5 object binding properties
 
 The object binding property generates a standalone `const`, `let`, or `var`
 declaration with static, computed, defaulted, nested object, or nested array
-properties. Inputs vary across ordinary objects, strings, numbers, `null`, and
-`undefined`. Its independent model predicts the bound value, computed-key and
-default order, and nullish `TypeError`. Each case compares Node.js, Deno,
-specialization-disabled native execution, and specialization-enabled execution
-with collection forced at every safepoint.
+properties. Inputs vary across ordinary objects, strings, numbers, `null`,
+`undefined`, and absent, truthful, or deliberately false TypeScript hints. Its
+independent model predicts the bound value, computed-key and default order, and
+nullish `TypeError`. Each case compares Node.js, Deno, specialization-disabled
+native execution, and specialization-enabled execution with collection forced
+at every safepoint. Generated computed properties include literal and dynamic
+keys with absent, truthful, and false annotations. They remain unhinted because
+the structural mapping admits only noncomputed source properties. Nested array
+and object properties also vary matching and scalar annotation members; a
+scalar mismatch leaves that subtree unhinted without changing the modeled
+execution.
 
 The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
@@ -551,20 +566,24 @@ M5 function binding properties
 The function parameter binding property generates a synchronous or asynchronous
 function with an array or object parameter containing a default and rest
 target. Inputs vary between a present value, a missing value, and `null`, plus
-an absent, truthful, or deliberately false name-based JSDoc hint. Its
-independent model predicts the selected bound value, retained rest value, or
-observed nullish `TypeError`; asynchronous cases observe that error through
-promise rejection. Each case compares Node.js, Deno,
+an absent, truthful, or deliberately false name-based JSDoc or structurally
+mapped TypeScript hint. Its independent model predicts the selected bound
+value, retained rest value, or observed nullish `TypeError`. TypeScript cases
+also generate nested container mismatches that remain unhinted without changing
+the modeled execution. Asynchronous cases observe errors through promise
+rejection. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
 execution with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed0011`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. The asynchronous and hint dimensions
-use the same direct structured generation and shrinking. Fixed native fixtures
-retain nested defaults and rest, arrows, asynchronous rejection, constructors,
-later-parameter temporal dead zones, iterator cleanup after a default failure,
-body-declaration isolation, and function length.
+use the same direct structured generation and shrinking. TypeScript cases use
+inline object and tuple annotations whose primitive member hints map directly
+to binding leaves. Fixed native fixtures retain nested defaults and rest,
+arrows, asynchronous rejection, constructors, later-parameter temporal dead
+zones, iterator cleanup after a default failure, body-declaration isolation,
+and function length.
 
 
 M5 default parameter properties
@@ -672,11 +691,12 @@ M5 classic for binding properties
 
 The classic `for` binding property generates a `const`, `let`, or `var`
 declaration head with an array or object pattern, default, and rest target.
-Inputs vary between present, missing, and nullish values. Its independent cell
-model predicts constant observations, fresh per-iteration `let` closures, the
-one shared final `var` cell, or an escaped nullish `TypeError`. Each case
-compares Node.js, Deno, specialization-disabled native execution, and
-specialization-enabled execution with collection forced at every safepoint.
+Inputs vary between present, missing, and nullish values plus absent, truthful,
+or deliberately false TypeScript hints. Its independent cell model predicts
+constant observations, fresh per-iteration `let` closures, the one shared final
+`var` cell, or an escaped nullish `TypeError`. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint.
 
 The ordinary suite uses seed `0x5eed0010`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary

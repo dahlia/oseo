@@ -32,10 +32,26 @@ parameter expressions reuses the parameter cell. A same-name top-level
 function declaration owns the body binding when `var` also redeclares it.
 Name-based JSDoc hints for pattern-bound parameters attach to the corresponding
 owned binding leaf, while the hidden aggregate ABI parameter remains unhinted.
+Inline object, tuple, and array TypeScript annotations map syntactically visible
+primitive member types to the same leaves without invoking a type checker.
+The mapping also covers standalone declarations and classic `for` declaration
+heads. Optional members remain unhinted. Array element types continue through
+unambiguous nested array rest targets. Direct fixed-length tuple spreads expand
+before mapping, so their members and following suffix retain their syntactic
+positions. Expanded members follow the ordinary primitive-hint and
+unsupported-type rules. Variadic array rests and type-reference spreads remain
+unhinted where their length makes a position ambiguous. Object targets inside
+an array rest remain unhinted. Computed object properties remain unhinted even
+when their source key is a literal. When an inline annotation gives a nested
+array or object binding subtree another container shape, mapping stops only for
+that subtree and leaves it unhinted without a diagnostic. Matching siblings
+continue to map. Root container mismatches and type references that require
+alias or interface resolution, or otherwise lack an admitted concrete syntactic
+shape, remain explicit boundaries.
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects the
 returned promise. Optional parameters, TypeScript `this` parameters, and
-structured TypeScript annotations on binding patterns remain explicit
+type references that require alias or interface resolution remain explicit
 boundaries.
 Call type arguments and other withheld forms are also rejected here. Source
 positions and UTF-8 byte offsets are indexed once for linear-time conversion.
@@ -54,9 +70,9 @@ final identifier rest target. Catch parameters and synchronous `for-of`
 declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
-assignment heads reuse that assignment target conversion. Await inside a
-member target, pattern type annotations, and `for-in` and `for-await-of` heads
-remain explicit boundaries.
+assignment heads reuse that assignment target conversion. Await inside a member
+target, pattern type annotations on assignment, `for-of`, and catch targets,
+and `for-in` and `for-await-of` heads remain explicit boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its

@@ -10,7 +10,9 @@ destructuring assignment patterns. Only assignment patterns admit member
 targets, and lexical resolution validates that context independently of binding
 write mode. Binding-identifier leaves retain their own hint metadata so a
 frontend can attach name-based parameter hints without annotating an aggregate
-ABI parameter.
+ABI parameter. The Babel frontend also maps primitive members from inline
+object, tuple, and array TypeScript annotations to those leaves without making
+compiler core depend on TypeScript syntax or type resolution.
 
 Internal ownership follows the compiler pipeline. *source.ts* and *syntax.ts*
 define frontend-neutral inputs, *modules.ts* owns graph construction and

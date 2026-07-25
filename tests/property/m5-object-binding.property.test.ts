@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printHir,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -26,8 +27,10 @@ const { assertAsyncProperty } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type HintKind = "absent" | "false" | "truthful";
 type Shape =
   | "computed"
+  | "computed-literal"
   | "default"
   | "nested-array"
   | "nested-object"
@@ -43,6 +46,8 @@ type SourceKind =
 interface ObjectBindingCase {
   readonly declarationKind: DeclarationKind;
   readonly fallback: number;
+  readonly hintKind: HintKind;
+  readonly nestedAnnotationMatches: boolean;
   readonly shape: Shape;
   readonly sourceKind: SourceKind;
   readonly value: number;
@@ -60,16 +65,10 @@ const nativeTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 );
-const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.record({
+const sharedArbitraries = {
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   fallback: fc.integer({ max: 20, min: -20 }),
-  shape: fc.constantFrom<Shape>(
-    "computed",
-    "default",
-    "nested-array",
-    "nested-object",
-    "static",
-  ),
+  nestedAnnotationMatches: fc.boolean(),
   sourceKind: fc.constantFrom<SourceKind>(
     "missing",
     "null",
@@ -79,23 +78,65 @@ const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.record({
     "undefined",
   ),
   value: fc.integer({ max: 20, min: -20 }),
-});
+};
+const caseArbitrary: fc.Arbitrary<ObjectBindingCase> = fc.oneof(
+  {
+    arbitrary: fc.record({
+      ...sharedArbitraries,
+      hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+      shape: fc.constantFrom<Shape>("computed", "computed-literal"),
+    }),
+    weight: 1,
+  },
+  {
+    arbitrary: fc.record({
+      ...sharedArbitraries,
+      hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+      shape: fc.constantFrom<Shape>(
+        "default",
+        "nested-array",
+        "nested-object",
+        "static",
+      ),
+    }),
+    weight: 4,
+  },
+);
 
 function patternSource(testCase: ObjectBindingCase): string {
-  if (testCase.shape === "static") return "{ value: bound }";
-  if (testCase.shape === "default") {
-    return `{ value: bound = (order = order + "d", ${testCase.fallback}) }`;
-  }
-  if (testCase.shape === "computed") {
-    return (
+  let pattern: string;
+  if (testCase.shape === "static") {
+    pattern = "{ value: bound }";
+  } else if (testCase.shape === "default") {
+    const fallback = testCase.fallback;
+    pattern = `{ value: bound = (order = order + "d", ${fallback}) }`;
+  } else if (testCase.shape === "computed") {
+    pattern =
       `{ [(order = order + "e", keyObject)]: bound = ` +
-      `(order = order + "d", ${testCase.fallback}) }`
-    );
+      `(order = order + "d", ${testCase.fallback}) }`;
+  } else if (testCase.shape === "computed-literal") {
+    const fallback = testCase.fallback;
+    pattern = `{ ["value"]: bound = (order = order + "d", ${fallback}) }`;
+  } else if (testCase.shape === "nested-array") {
+    pattern = `{ nested: [bound = ${testCase.fallback}] = [] }`;
+  } else {
+    pattern = `{ nested: { value: bound = ${testCase.fallback} } = {} }`;
   }
+  if (testCase.hintKind === "absent") return pattern;
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested-array") {
-    return `{ nested: [bound = ${testCase.fallback}] = [] }`;
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: { nested: ${type} }`;
+    }
+    return `${pattern}: { nested: ${type}[] }`;
   }
-  return `{ nested: { value: bound = ${testCase.fallback} } = {} }`;
+  if (testCase.shape === "nested-object") {
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: { nested: ${type} }`;
+    }
+    return `${pattern}: { nested: { value: ${type} } }`;
+  }
+  return `${pattern}: { value: ${type} }`;
 }
 
 function sourceValue(testCase: ObjectBindingCase): string {
@@ -144,7 +185,12 @@ function expected(testCase: ObjectBindingCase): ModelResult {
   let value: number | undefined = present ? testCase.value : undefined;
   if (value === undefined && testCase.shape !== "static") {
     value = testCase.fallback;
-    if (testCase.shape === "computed") order += "d";
+    if (
+      testCase.shape === "computed" ||
+      testCase.shape === "computed-literal"
+    ) {
+      order += "d";
+    }
     if (testCase.shape === "default") order += "d";
   }
   return { order, result: `result ${String(value)}` };
@@ -167,7 +213,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-object-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -195,6 +241,8 @@ test("object binding model checks nullish inputs before computed keys", () => {
     expected({
       declarationKind: "const",
       fallback: 2,
+      hintKind: "absent",
+      nestedAnnotationMatches: true,
       shape: "computed",
       sourceKind: "null",
       value: 1,
@@ -224,11 +272,29 @@ test(
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
-            { source, sourceId: "generated-m5-object-binding.js" },
+            { source, sourceId: "generated-m5-object-binding.ts" },
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.hir != null);
           assert.ok(compiled.mir != null);
+          const hir = printHir(compiled.hir);
+          if (
+            testCase.hintKind === "absent" ||
+            testCase.shape === "computed" ||
+            testCase.shape === "computed-literal" ||
+            ((testCase.shape === "nested-array" ||
+              testCase.shape === "nested-object") &&
+              !testCase.nestedAnnotationMatches)
+          ) {
+            assert.doesNotMatch(hir, /bound hints=/u);
+          } else {
+            const type = testCase.hintKind === "truthful" ? "number" : "string";
+            assert.match(
+              hir,
+              new RegExp(`bound hints=\\[typescript:${type}\\]`, "u"),
+            );
+          }
           if (specialization === "enabled") {
             process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           }
@@ -262,8 +328,10 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "const, let, and var object patterns with static, computed, " +
-          "defaulted, nested, primitive, and nullish inputs",
+          "const, let, and var object patterns with static, computed " +
+          "literal, computed dynamic, defaulted, nested, primitive, and " +
+          "nullish inputs plus absent, truthful, or false TypeScript hints; " +
+          "computed keys and nested shape mismatches remain unhinted",
         numRuns: 10,
         profile: "M5 object binding declarations",
         seed: 0x5eed_0008,

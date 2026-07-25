@@ -10,6 +10,7 @@ import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  printHir,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -26,14 +27,19 @@ const { assertAsyncProperty, propertySize } = await import(
 );
 
 type DeclarationKind = "const" | "let" | "var";
+type AnnotationKind = "array" | "tuple-fixed-spread" | "tuple-rest";
+type HintKind = "absent" | "false" | "truthful";
 type IterableKind = "array" | "custom";
 type Shape = "default-elision" | "head" | "nested" | "rest-array" | "rest-id";
 type Value = number | undefined;
 
 interface ArrayBindingCase {
+  readonly annotationKind: AnnotationKind;
   readonly declarationKind: DeclarationKind;
   readonly defaultThrows: boolean;
+  readonly hintKind: HintKind;
   readonly iterableKind: IterableKind;
+  readonly nestedAnnotationMatches: boolean;
   readonly nestedMissing: boolean;
   readonly nestedValues: readonly Value[];
   readonly shape: Shape;
@@ -73,8 +79,15 @@ const valuesArbitrary = fc.array(valueArbitrary, {
   maxLength: large ? 9 : 5,
 });
 const bindingArbitraries = {
+  annotationKind: fc.constantFrom<AnnotationKind>(
+    "array",
+    "tuple-fixed-spread",
+    "tuple-rest",
+  ),
   declarationKind: fc.constantFrom<DeclarationKind>("const", "let", "var"),
   defaultThrows: fc.boolean(),
+  hintKind: fc.constantFrom<HintKind>("absent", "false", "truthful"),
+  nestedAnnotationMatches: fc.boolean(),
   nestedMissing: fc.boolean(),
   nestedValues: valuesArbitrary,
   shape: fc.constantFrom<Shape>(
@@ -129,17 +142,36 @@ function patternSource(testCase: ArrayBindingCase): string {
   const firstDefault = testCase.defaultThrows
     ? '(function () { throw new RangeError("default"); })()'
     : "31";
-  if (testCase.shape === "head") return `[a = ${firstDefault}]`;
-  if (testCase.shape === "default-elision") {
-    return `[a = ${firstDefault}, , b = 32]`;
+  let pattern: string;
+  if (testCase.shape === "head") {
+    pattern = `[a = ${firstDefault}]`;
+  } else if (testCase.shape === "default-elision") {
+    pattern = `[a = ${firstDefault}, , b = 32]`;
+  } else if (testCase.shape === "nested") {
+    pattern = `[[a = ${firstDefault}, b = 32] = [33, 34]]`;
+  } else if (testCase.shape === "rest-id") {
+    pattern = `[a = ${firstDefault}, ...rest]`;
+  } else {
+    pattern = `[a = ${firstDefault}, ...[b = 32, c = 33]]`;
   }
+  if (testCase.hintKind === "absent") return pattern;
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
   if (testCase.shape === "nested") {
-    return `[[a = ${firstDefault}, b = 32] = [33, 34]]`;
+    if (!testCase.nestedAnnotationMatches) {
+      return `${pattern}: [${type}]`;
+    }
+    const annotation =
+      testCase.annotationKind === "tuple-fixed-spread"
+        ? `[...[[${type}, ${type}]]]`
+        : `[[${type}, ${type}]]`;
+    return `${pattern}: ${annotation}`;
   }
-  if (testCase.shape === "rest-id") {
-    return `[a = ${firstDefault}, ...rest]`;
+  if (testCase.annotationKind === "tuple-fixed-spread") {
+    return `${pattern}: [...[${type}, ${type}], ${type}]`;
   }
-  return `[a = ${firstDefault}, ...[b = 32, c = 33]]`;
+  return testCase.annotationKind === "tuple-rest"
+    ? `${pattern}: [${type}, ...${type}[]]`
+    : `${pattern}: ${type}[]`;
 }
 
 function resultSource(shape: Shape): string {
@@ -150,6 +182,32 @@ function resultSource(shape: Shape): string {
     return 'a + ":" + rest.length + ":" + (rest[0] ?? -99)';
   }
   return 'a + ":" + b + ":" + c';
+}
+
+function hintedBindingNames(shape: Shape): readonly string[] {
+  if (shape === "head" || shape === "rest-id") return ["a"];
+  if (shape === "default-elision" || shape === "nested") return ["a", "b"];
+  return ["a", "b", "c"];
+}
+
+function assertGeneratedHints(testCase: ArrayBindingCase, hir: string): void {
+  if (
+    testCase.hintKind === "absent" ||
+    (testCase.shape === "nested" && !testCase.nestedAnnotationMatches)
+  ) {
+    assert.doesNotMatch(hir, / hints=/u);
+    return;
+  }
+  const type = testCase.hintKind === "truthful" ? "number" : "string";
+  for (const name of hintedBindingNames(testCase.shape)) {
+    assert.match(
+      hir,
+      new RegExp(`${name} hints=\\[typescript:${type}\\]`, "u"),
+    );
+  }
+  if (testCase.shape === "rest-id") {
+    assert.doesNotMatch(hir, /rest hints=/u);
+  }
 }
 
 function failureStep(testCase: ArrayBindingCase): number | undefined {
@@ -307,9 +365,12 @@ function expected(testCase: ArrayBindingCase): ModelResult {
 test("array binding model ignores custom iterator controls", () => {
   assert.deepEqual(
     expected({
+      annotationKind: "array",
       declarationKind: "const",
       defaultThrows: false,
+      hintKind: "absent",
       iterableKind: "array",
+      nestedAnnotationMatches: true,
       nestedMissing: false,
       nestedValues: [],
       shape: "default-elision",
@@ -338,7 +399,7 @@ async function references(source: string): Promise<
   const directory = await host.makeTemporaryDirectory(
     "oseo-array-binding-property-",
   );
-  const sourcePath = `${directory}/case.js`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
     await host.writeTextFile(sourcePath, source);
@@ -384,11 +445,13 @@ test(
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
-            { source, sourceId: "generated-m5-array-binding.js" },
+            { source, sourceId: "generated-m5-array-binding.ts" },
             { specialization },
           );
           assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.hir != null);
           assert.ok(compiled.mir != null);
+          assertGeneratedHints(testCase, printHir(compiled.hir));
           if (specialization === "enabled") {
             process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           }
@@ -423,7 +486,10 @@ test(
               ],
         domain:
           "const, let, and var array patterns with defaults, elision, " +
-          "nesting, rest, arrays, custom iterators, and abrupt steps",
+          "nesting, rest, arrays, custom iterators, abrupt steps, and " +
+          "absent, truthful, or false homogeneous array, fixed tuple-" +
+          "spread, and tuple-rest TypeScript hints, including nested " +
+          "shape mismatches that remain unhinted",
         numRuns: 10,
         profile: "M5 array binding declarations",
         seed: 0x5eed_0007,

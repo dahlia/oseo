@@ -126,6 +126,361 @@ test("converts function binding patterns through owned syntax", () => {
   );
 });
 
+test("maps structured parameter annotations to binding hints", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "/** @param {string} count */\n" +
+      "function read(\n" +
+      "  [count, { label: renamed }]: [number, { label: string }],\n" +
+      "  { enabled, nested: [value] }:\n" +
+      "    { enabled: boolean; nested: [number] },\n" +
+      "  [first, second]: readonly string[],\n" +
+      ") {\n" +
+      "  return [count, renamed, enabled, value, first, second];\n" +
+      "}\n",
+    sourceId: "structured-parameter-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /count hints=\[typescript:number,jsdoc:string\]/u);
+  assert.match(hir, /renamed hints=\[typescript:string\]/u);
+  assert.match(hir, /enabled hints=\[typescript:boolean\]/u);
+  assert.match(hir, /value hints=\[typescript:number\]/u);
+  assert.match(hir, /first hints=\[typescript:string\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+});
+
+test("maps tuple rest annotations to following binding elements", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function read(\n" +
+      "  [head, middle, tail]: [string, ...number[]],\n" +
+      ") {\n" +
+      "  return [head, middle, tail];\n" +
+      "}\n",
+    sourceId: "tuple-rest-parameter-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:string\]/u);
+  assert.match(hir, /middle hints=\[typescript:number\]/u);
+  assert.match(hir, /tail hints=\[typescript:number\]/u);
+});
+
+test("maps fixed tuple spreads before following binding elements", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [first, second, third]:\n" +
+      "  [...[number, string], boolean] = [1, 'two', true];\n" +
+      "const [variable, variableSuffix]:\n" +
+      "  [...number[], boolean] = [1, true];\n" +
+      "const [reference, referenceSuffix]:\n" +
+      "  [...Array<number>, boolean] = [1, true];\n" +
+      "const [restHead, ...[restMiddle, restTail]]:\n" +
+      "  [...[number, string], boolean] = [1, 'two', true];\n" +
+      "console.log(\n" +
+      "  first, second, third, variable, variableSuffix,\n" +
+      "  reference, referenceSuffix, restHead, restMiddle, restTail,\n" +
+      ");\n",
+    sourceId: "fixed-tuple-spread-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /first hints=\[typescript:number\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+  assert.match(hir, /third hints=\[typescript:boolean\]/u);
+  assert.doesNotMatch(hir, /variable hints=/u);
+  assert.doesNotMatch(hir, /variableSuffix hints=/u);
+  assert.doesNotMatch(hir, /reference hints=/u);
+  assert.doesNotMatch(hir, /referenceSuffix hints=/u);
+  assert.match(hir, /restHead hints=\[typescript:number\]/u);
+  assert.match(hir, /restMiddle hints=\[typescript:string\]/u);
+  assert.match(hir, /restTail hints=\[typescript:boolean\]/u);
+});
+
+test("rejects unsupported members exposed by fixed tuple spreads", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const input = [1, 'two', true];\n" +
+      "const [first, unresolved, third]:\n" +
+      "  [...[number, Value], boolean] = input;\n",
+    sourceId: "fixed-tuple-spread-unsupported-hints.ts",
+  });
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "This TypeScript type is not an M1 hint.",
+  );
+});
+
+test("maps structured annotations in declaration binding contexts", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const { top }: { top: number } = { top: 1 };\n" +
+      "const { optional }: { optional?: number } = {};\n" +
+      "const [maybe]: [number?] = [];\n" +
+      "for (\n" +
+      "  let [{ flag }]: [{ flag: boolean }] = [{ flag: true }];\n" +
+      "  false;\n" +
+      ") {}\n",
+    sourceId: "structured-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /top hints=\[typescript:number\]/u);
+  assert.match(hir, /flag hints=\[typescript:boolean\]/u);
+  assert.doesNotMatch(hir, /optional hints=/u);
+  assert.doesNotMatch(hir, /maybe hints=/u);
+});
+
+test("ignores nested structured annotation shape mismatches", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [[arrayValue], arraySibling]: [number, string] = " +
+      "[[1], 'two'];\n" +
+      "const [{ propertyValue }]: [number] = [{ propertyValue: 2 }];\n" +
+      "const { nested: { objectValue }, objectSibling }:\n" +
+      "  { nested: number; objectSibling: string } =\n" +
+      "  { nested: { objectValue: 3 }, objectSibling: 'four' };\n" +
+      "const { list: [listValue] }: { list: { value: number } } =\n" +
+      "  { list: [5] };\n" +
+      "console.log(\n" +
+      "  arrayValue, arraySibling, propertyValue,\n" +
+      "  objectValue, objectSibling, listValue,\n" +
+      ");\n",
+    sourceId: "nested-annotation-shape-mismatches.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /arrayValue hints=/u);
+  assert.match(hir, /arraySibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /propertyValue hints=/u);
+  assert.doesNotMatch(hir, /objectValue hints=/u);
+  assert.match(hir, /objectSibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /listValue hints=/u);
+});
+
+test("ignores nested parameter annotation shape mismatches", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function read(\n" +
+      "  [[arrayValue], arraySibling]: [number, string],\n" +
+      "  { nested: { objectValue }, objectSibling }:\n" +
+      "    { nested: number; objectSibling: string },\n" +
+      ") {\n" +
+      "  return [arrayValue, arraySibling, objectValue, objectSibling];\n" +
+      "}\n",
+    sourceId: "nested-parameter-annotation-shape-mismatches.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /arrayValue hints=/u);
+  assert.match(hir, /arraySibling hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /objectValue hints=/u);
+  assert.match(hir, /objectSibling hints=\[typescript:string\]/u);
+});
+
+test("maps array annotations through nested rest patterns", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [head, ...[middle, tail]]: number[] = [1, 2, 3];\n" +
+      "console.log(head, middle, tail);\n",
+    sourceId: "nested-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:number\]/u);
+  assert.match(hir, /middle hints=\[typescript:number\]/u);
+  assert.match(hir, /tail hints=\[typescript:number\]/u);
+});
+
+test("maps tuple annotations through nested rest conservatively", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [first, second, ...[trailing]]:\n" +
+      "  [number, ...string[]] = [1, 'two', 'three'];\n" +
+      "const [ambiguousHead, ...[ambiguousRest]]:\n" +
+      "  [...number[], string] = [1, 2, 'three'];\n" +
+      "const [referenceHead, referenceMiddle, ...[referenceRest]]:\n" +
+      "  [number, ...Array<string>] = [1, 'two', 'three'];\n" +
+      "const [spreadHead, spreadMiddle, ...[spreadRest]]:\n" +
+      "  [number, ...[string, boolean]] = [1, 'two', true];\n" +
+      "console.log(\n" +
+      "  first, second, trailing, ambiguousHead, ambiguousRest,\n" +
+      "  referenceHead, referenceMiddle, referenceRest,\n" +
+      "  spreadHead, spreadMiddle, spreadRest,\n" +
+      ");\n",
+    sourceId: "nested-tuple-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /first hints=\[typescript:number\]/u);
+  assert.match(hir, /second hints=\[typescript:string\]/u);
+  assert.match(hir, /trailing hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /ambiguousHead hints=/u);
+  assert.doesNotMatch(hir, /ambiguousRest hints=/u);
+  assert.match(hir, /referenceHead hints=\[typescript:number\]/u);
+  assert.doesNotMatch(hir, /referenceMiddle hints=/u);
+  assert.doesNotMatch(hir, /referenceRest hints=/u);
+  assert.match(hir, /spreadHead hints=\[typescript:number\]/u);
+  assert.match(hir, /spreadMiddle hints=\[typescript:string\]/u);
+  assert.match(hir, /spreadRest hints=\[typescript:boolean\]/u);
+});
+
+test("keeps object targets in array rest unhinted", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [head, ...{ length: count }]: number[] = [1, 2, 3];\n" +
+      "console.log(head, count);\n",
+    sourceId: "object-rest-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /head hints=\[typescript:number\]/u);
+  assert.doesNotMatch(hir, /count hints=/u);
+});
+
+test("keeps computed object binding keys unhinted", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'const { ["value"]: computed }: { value: number } = { value: 1 };\n' +
+      "const { value: fixed }: { value: number } = { value: 2 };\n" +
+      "console.log(computed, fixed);\n",
+    sourceId: "computed-binding-hints.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.doesNotMatch(hir, /computed hints=/u);
+  assert.match(hir, /fixed hints=\[typescript:number\]/u);
+});
+
+test("rejects pattern annotations that require type resolution", () => {
+  for (const [name, source] of [
+    [
+      "resolved-parameter-hints",
+      "function read({ value }: Parameters) { return value; }\n",
+    ],
+    [
+      "resolved-declaration-hints",
+      "const input = { value: 1 };\nconst { value }: Parameters = input;\n",
+    ],
+    [
+      "resolved-var-hints",
+      "const input = { value: 1 };\nvar { value }: Parameters = input;\n",
+    ],
+    [
+      "resolved-for-hints",
+      "const input = { value: 1 };\n" +
+        "for (let { value }: Parameters = input; false; ) {}\n",
+    ],
+    [
+      "resolved-array-hints",
+      "const input = [1];\nconst [value]: Values = input;\n",
+    ],
+    [
+      "resolved-nested-object-hints",
+      "const { nested: { value } }: { nested: Parameters } = " +
+        "{ nested: { value: 1 } };\n",
+    ],
+    ["resolved-nested-array-hints", "const [[value]]: [Values] = [[1]];\n"],
+    [
+      "resolved-nested-array-query-hints",
+      "const values = [1];\nconst [[value]]: [typeof values] = [[1]];\n",
+    ],
+    [
+      "resolved-nested-array-union-hints",
+      "const [[value]]: [number | number[]] = [[1]];\n",
+    ],
+    [
+      "resolved-nested-object-union-hints",
+      "const { nested: { value } }:\n" +
+        "  { nested: number | { value: number } } =\n" +
+        "  { nested: { value: 1 } };\n",
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics.length, 1);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(
+      result.diagnostics[0]?.message,
+      name === "resolved-array-hints" ||
+        name === "resolved-nested-array-hints" ||
+        name === "resolved-nested-array-query-hints" ||
+        name === "resolved-nested-array-union-hints"
+        ? "An array binding annotation must be an array or tuple type."
+        : "An object binding annotation must be an inline object type.",
+    );
+  }
+});
+
+test("rejects root structured annotation shape mismatches", () => {
+  for (const [name, source, message] of [
+    [
+      "array-with-object-annotation",
+      "const [value]: { value: number } = [1];\n",
+      "An array binding annotation must be an array or tuple type.",
+    ],
+    [
+      "object-with-array-annotation",
+      "const { value }: number[] = { value: 1 };\n",
+      "An object binding annotation must be an inline object type.",
+    ],
+    [
+      "parameter-array-with-object-annotation",
+      "function read([value]: { value: number }) { return value; }\n",
+      "An array binding annotation must be an array or tuple type.",
+    ],
+    [
+      "parameter-object-with-array-annotation",
+      "function read({ value }: number[]) { return value; }\n",
+      "An object binding annotation must be an inline object type.",
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics.length, 1);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(result.diagnostics[0]?.message, message);
+  }
+});
+
+test("rejects annotations outside declaration binding contexts", () => {
+  for (const [name, source] of [
+    [
+      "for-of-pattern-hints",
+      "const input = [{ value: 1 }];\n" +
+        "for (const { value }: { value: number } of input) {}\n",
+    ],
+    ["catch-pattern-hints", "try {} catch ({ value }: { value: number }) {}\n"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: `${name}.ts`,
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+    assert.equal(
+      result.diagnostics[0]?.message,
+      "TypeScript annotations on binding patterns are unsupported.",
+    );
+  }
+});
+
 test("converts synchronous default parameters through owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:

@@ -338,8 +338,9 @@ its deliberate boundary and its evidence:
     computed member target, or an array or object assignment pattern whose
     leaves are existing targets. Transparent parentheses around existing
     identifier and member targets are normalized before classification.
-    Declaration patterns reuse every binding form admitted for standalone
-    declarations. Lexical names create their TDZ before the iterable expression
+    Declaration patterns reuse every binding pattern form admitted for
+    standalone declarations. Pattern type annotations remain outside this
+    syntax unit. Lexical names create their TDZ before the iterable expression
     and receive a fresh cell for each iteration; `var` leaves write their
     existing hoisted cells. Nested array patterns close from the inside out,
     then a default, target, or object-coercibility failure closes the outer
@@ -419,9 +420,18 @@ its deliberate boundary and its evidence:
     policies, and forced collection. Twenty-four reviewed test262 cases cover
     all three declaration kinds, values, defaults for holes and exhausted
     iterators, function-name inference, nested patterns, rest, and iterator
-    done-state handling. Assignment member targets, `export var`,
-    pattern type annotations, and `await` inside a default remain outside this
-    array declaration syntax unit.
+    done-state handling. Inline array and tuple TypeScript annotations map
+    syntactically visible required primitive members to binding leaves.
+    Direct fixed-length tuple spreads expand before mapping, including members
+    before a following suffix. Expanded members follow the ordinary
+    primitive-hint and unsupported-type rules. Optional members and ambiguous
+    positions after a variadic array rest or type-reference spread remain
+    unhinted. If an inline annotation gives a nested array binding subtree
+    another container shape, that subtree remains unhinted without a diagnostic
+    while matching siblings continue to map. Root container mismatches and type
+    annotations that require resolution remain source-located unsupported
+    boundaries. Assignment member targets, `export var`, and `await` inside a
+    default remain outside this array declaration syntax unit.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -446,9 +456,16 @@ its deliberate boundary and its evidence:
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
     and covered expressions, plus rest exclusions, fresh data descriptors, and
-    non-enumerable omission. Assignment member targets,
-    `export var`, pattern type annotations, and `await` inside a property name
-    or default remain outside this object declaration syntax unit.
+    non-enumerable omission. Inline object TypeScript annotations map
+    syntactically visible required primitive members to binding leaves.
+    Optional members remain unhinted. If an inline annotation gives a nested
+    array or object binding subtree another container shape, that subtree
+    remains unhinted without a diagnostic while matching siblings continue to
+    map. Root container mismatches and type annotations that require resolution
+    or otherwise lack an admitted concrete syntactic shape remain source-located
+    unsupported boundaries. Assignment member targets, `export var`, and
+    `await` inside a property name or default remain outside this object
+    declaration syntax unit.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
     patterns plus top-level defaults and rest. The frontend retains plain
@@ -460,17 +477,34 @@ its deliberate boundary and its evidence:
     generic call argument into a fresh array before any pattern initialization.
     Identifier parameters retain their TypeScript and JSDoc hints. Name-based
     JSDoc hints for a pattern-bound name attach to that owned binding leaf
-    rather than the hidden aggregate ABI parameter. Ordinary functions retain
-    dynamic `this`, arrows retain lexical `this`, and constructors initialize
-    their receiver before parameter work. JavaScript function length is
-    retained independently from the ABI parameter count.
+    rather than the hidden aggregate ABI parameter. Inline object, tuple, and
+    array TypeScript annotations map syntactically visible primitive member
+    types to the corresponding binding leaves without invoking a TypeScript
+    type checker. The same mapping covers standalone declarations and classic
+    `for` declaration heads. Optional members remain unhinted. Array element
+    types continue through unambiguous nested array rest targets. Direct
+    fixed-length tuple spreads expand before mapping, so their members and
+    following suffix retain their syntactic positions. Expanded members follow
+    the ordinary primitive-hint and unsupported-type rules. Variadic array rests
+    and type-reference spreads remain unhinted where their length makes a
+    position ambiguous. Object targets inside an array rest remain unhinted.
+    Computed object properties remain unhinted even when their source key is a
+    literal. A nested array or object binding subtree whose inline annotation
+    has another container shape remains unhinted without a diagnostic, while
+    matching siblings continue to map. Root container mismatches and type
+    annotations that require resolution, including alias or interface
+    references, remain source-located unsupported boundaries. Ordinary
+    functions retain dynamic `this`, arrows retain lexical `this`, and
+    constructors initialize their receiver before parameter work. JavaScript
+    function length is retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
     `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish
     inputs, abrupt initializers, bounded and heap-valued rest suffixes, absent,
-    truthful, and false pattern-bound JSDoc hints, both specialization policies,
-    function-name inference, forced collection, and body `var` declarations
-    that share parameter names. A list containing a parameter expression gives
+    truthful, and false pattern-bound JSDoc and TypeScript hints, both
+    specialization policies, function-name inference, forced collection, and
+    body `var` declarations that share parameter names. A list containing a
+    parameter expression gives
     a shared name distinct parameter and body cells, while a list without
     parameter expressions reuses the parameter cell. When a top-level body
     function declaration and `var` share that name, the function declaration
@@ -482,8 +516,7 @@ its deliberate boundary and its evidence:
     test262 cases cover array values, nested defaults and rest, abrupt
     completion, top-level fallback and suffix selection, prior references,
     function length, the parameter and body environment split, asynchronous
-    default selection, and promise rejection. Structured TypeScript annotations
-    on binding-pattern parameters remain a source-located unsupported boundary.
+    default selection, and promise rejection.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
