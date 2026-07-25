@@ -49,9 +49,11 @@ Workers, Deno Deploy, and Vercel Edge Functions have spent several years
 proving that a JavaScript runtime doesn't need full Node.js compatibility,
 let alone Node-API native addon support, to be useful in production. Their
 shared surface, `fetch`, `Request` and `Response`, streams, the Web Crypto
-API, is documented and tested as WinterTC's Common Minimal API, with a
-conformance suite that gives a new runtime a bounded, testable target
-instead of an open-ended compatibility chase.
+API, is documented and tested as WinterTC's
+[Minimum common web API], with a conformance suite that gives a new runtime
+a bounded, testable target instead of an open-ended compatibility chase.
+
+[Minimum common web API]: https://min-common-api.proposal.wintertc.org/
 
 
 Current non-goals
@@ -77,13 +79,19 @@ JSDoc comments at the syntax level and stops there. This is partly a matter
 of principle (annotations affect which native path gets picked, never
 whether the program's behavior is correct) and partly circumstance: as of
 mid-2026, `tsc` itself is mid-transition, from a JavaScript-based compiler
-with a long-stable programmatic API to a Go-based native port that shipped
-its 7.0 release without a public programmatic API, deferring that to a
-future 7.1. Building hint extraction against either side of that transition
-would mean waiting on an API that doesn't exist yet, or depending on a
-compatibility shim over a codebase Microsoft has already signaled it will
-eventually retire. Reading syntax directly, independent of whichever `tsc`
-version happens to be installed, sidesteps the question entirely.
+with a long-stable programmatic API to a Go-based native port. The
+[TypeScript 7.0 announcement] describes that release as shipping without an
+API and expects a new one in 7.1. The package nevertheless exposes an
+explicitly unstable surface that a compiler can use today, as
+[scriptc's TypeScript frontend] does through `typescript/unstable/sync`.
+Depending on it would couple Oseo's hint extraction to an interface that is
+still changing. Depending on the legacy compiler or a compatibility shim
+would bind Oseo to the other side of the same transition. Reading syntax
+directly, independent of whichever `tsc` version happens to be installed,
+avoids both dependencies.
+
+[TypeScript 7.0 announcement]: https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
+[scriptc's TypeScript frontend]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/packages/compiler/src/frontend/ts7/program.ts#L1-L27
 
 
 The roadmap

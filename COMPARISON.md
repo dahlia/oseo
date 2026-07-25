@@ -21,8 +21,8 @@ The shortest accurate description is therefore not “TypeScript to native.”
 Oseo compiles both the dynamic answer and selected checked shortcuts before the
 program starts.
 
-This comparison reflects Oseo at commit `4241575` and the public sources
-inspected on 25 July 2026. Version-sensitive observations below identify the
+This comparison reflects Oseo at commit `9eb7de2` and the public sources
+inspected on 26 July 2026. Version-sensitive observations below identify the
 source or revision used.
 
 That distinction is already implemented in a deliberately narrow but real
@@ -42,21 +42,22 @@ What the comparison is actually comparing
 The projects below overlap in syntax, output format, or use case. They do not
 all occupy the same layer.
 
-| Project        | Source language                                                | Execution model                                                            | Role of types                                                      | Primary boundary or goal                                  |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------- |
-| Node.js        | JavaScript, with TypeScript normally erased before execution   | V8 interpreter and several JIT tiers                                       | No role in V8 after ordinary TypeScript erasure                    | A general server runtime and the Node.js API ecosystem    |
-| AssemblyScript | A strictly typed TypeScript-like language                      | Ahead-of-time compilation to WebAssembly                                   | Types define what programs mean and which programs are valid       | Small, efficient WebAssembly modules                      |
-| Perry          | A practical TypeScript and JavaScript subset                   | Ahead-of-time LLVM native code, with an optional JavaScript evaluator path | Types are erased; compiler inference guides native code generation | Native applications and broad practical API compatibility |
-| Porffor        | An experimental JavaScript/TypeScript sub- and superset        | Ahead-of-time WebAssembly, with a separate IR-to-C native path             | Annotations can be enabled as unchecked optimization input         | Tiny, from-scratch AOT JavaScript research                |
-| Static Hermes  | A sound typed JavaScript subset plus untyped JavaScript        | Native compilation for typed code alongside evolving VM tiers              | Typed annotations are enforced with compile-time and checked casts | High-performance typed JavaScript and React Native        |
-| QuickJS        | JavaScript                                                     | Stack bytecode interpreted by QuickJS                                      | No TypeScript optimization contract                                | A small embeddable JavaScript engine                      |
-| Oseo           | An explicit JavaScript profile plus erasable TypeScript syntax | Generic native code plus guarded specialized native code                   | Annotations are fallible hints and must not affect behavior        | A standards-measured, whole-program native server runtime |
+| Project        | Source language                                                         | Execution model                                                            | Role of types                                                           | Primary boundary or goal                                               |
+| -------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Node.js        | JavaScript, with TypeScript normally erased before execution            | V8 interpreter and several JIT tiers                                       | No role in V8 after ordinary TypeScript erasure                         | A general server runtime and the Node.js API ecosystem                 |
+| AssemblyScript | A strictly typed TypeScript-like language                               | Ahead-of-time compilation to WebAssembly                                   | Types define what programs mean and which programs are valid            | Small, efficient WebAssembly modules                                   |
+| Perry          | A practical TypeScript and JavaScript subset                            | Ahead-of-time LLVM native code, with an optional JavaScript evaluator path | Types are erased; compiler inference guides native code generation      | Native applications and broad practical API compatibility              |
+| scriptc        | TypeScript and JavaScript checked against a compiler-owned type surface | Typed LLVM or C native code, with an opt-in QuickJS-ng island              | Checker results choose representations; dynamic crossings are validated | Small native programs with practical Node.js and package compatibility |
+| Porffor        | An experimental JavaScript/TypeScript sub- and superset                 | Ahead-of-time WebAssembly, with a separate IR-to-C native path             | Annotations can be enabled as unchecked optimization input              | Tiny, from-scratch AOT JavaScript research                             |
+| Static Hermes  | A sound typed JavaScript subset plus untyped JavaScript                 | Native compilation for typed code alongside evolving VM tiers              | Typed annotations are enforced with compile-time and checked casts      | High-performance typed JavaScript and React Native                     |
+| QuickJS        | JavaScript                                                              | Stack bytecode interpreted by QuickJS                                      | No TypeScript optimization contract                                     | A small embeddable JavaScript engine                                   |
+| Oseo           | An explicit JavaScript profile plus erasable TypeScript syntax          | Generic native code plus guarded specialized native code                   | Annotations are fallible hints and must not affect behavior             | A standards-measured, whole-program native server runtime              |
 
 This table describes architectural intent, not maturity. Node.js is a mature
 runtime. AssemblyScript is an established language and toolchain. Perry is
-shipping a fast-moving product. Porffor, Static Hermes, and Oseo are still
-research or active implementation efforts in relevant respects. Oseo cannot
-yet run the broad programs that its M6 and M7 plans target.
+shipping a fast-moving product, as is scriptc. Porffor, Static Hermes, and Oseo
+are still research or active implementation efforts in relevant respects.
+Oseo cannot yet run the broad programs that its M6 and M7 plans target.
 
 
 Node.js: the runtime Oseo declines to carry
@@ -170,8 +171,8 @@ without retaining a JavaScript VM tier.
 [AssemblyScript concepts guide]: https://www.assemblyscript.org/concepts.html
 
 
-Perry: the nearest product comparison
--------------------------------------
+Perry: a broad native application compiler
+------------------------------------------
 
 Perry is the easiest project to mistake for Oseo from a feature list. It parses
 TypeScript with SWC, lowers through its own HIR, emits native code through LLVM,
@@ -224,6 +225,101 @@ unsupported cases into passes.
 [memory model]: https://docs.perryts.com/internals/memory-model.html
 [runtime opt-in policy]: https://docs.perryts.com/cli/allow-js-runtime.html
 [CLI flag reference]: https://docs.perryts.com/cli/flags.html
+
+
+scriptc: typed native code with an explicit VM boundary
+-------------------------------------------------------
+
+scriptc is a direct product comparison because its default artifact looks much
+like the artifact Oseo eventually wants to ship: a small native executable,
+compiled ahead of time, without Node.js, V8, or a JavaScript engine. At
+scriptc commit [`ee1f869`], TypeScript 7 parses and checks the program, the
+compiler converts the checker output into a typed IR, and the default backend
+lowers that IR through LLVM. A C emitter remains as a reference and fallback
+backend. The executable links only the feature-selected parts of scriptc's C
+runtime.
+
+That last detail gives “zero-runtime TypeScript” a precise meaning. A static
+scriptc artifact has no general JavaScript engine, but it does have a native
+runtime for strings, collections, memory management, asynchronous work,
+networking, and other selected features. This is close to Oseo's deployment
+goal and unlike a QuickJS bytecode executable. It is not the same compilation
+contract.
+
+The largest difference is what types are allowed to prove. scriptc's typed IR
+records a concrete type on every expression. It has monomorphic arrays, exact
+records, tagged unions, and distinct representations for values that cross its
+dynamic boundary. The compiler can monomorphize generic code and select native
+operations for supported generic functions because the TypeScript checker
+result is part of the admitted program. Its [documented limitations] make the
+consequences explicit: structures are exact, arrays are dense, several
+JavaScript coercions and reflection cases are rejected or differ, and a false
+assertion can fail a runtime validation.
+
+Oseo reads the same annotation as fallible provenance. A `number` annotation
+may justify adding a guarded numeric path, but it cannot remove the generic
+JavaScript path or make a false assertion throw merely because the assertion
+was false. scriptc preserves familiar TypeScript syntax and tooling while
+defining a compiler-owned type and runtime model. Oseo is instead trying to
+preserve the behavior of its declared ECMAScript profile when annotations are
+erased, added, or falsified.
+
+scriptc handles code outside its static type model through an explicit second
+choice. The `--dynamic` flag links QuickJS-ng for npm packages that ship
+JavaScript and for values typed as `any`. Values are copied and validated when
+they cross the boundary, and the island has its own heap and microtask queue.
+This makes the compatibility cost visible and opt-in. It also means scriptc
+does not require a compiled generic ECMAScript path beside every typed native
+function. Oseo's closed profile excludes this VM tier. Its generic fallback
+must be native code in the same artifact, while any future runtime source
+compiler must also produce native code as an explicit capability.
+
+scriptc's LLVM-to-C fallback should not be confused with that dynamic island.
+Both backends consume the same typed IR and produce native code. When the
+default LLVM backend does not yet cover an IR feature, the compiler retries
+only emission through C; it does not repeat the frontend or switch the program
+to interpreted JavaScript. Pinning the LLVM backend turns the same limitation
+into a diagnostic. The execution-model boundary is between the static compiler
+and opt-in QuickJS-ng, not between the LLVM and C emitters.
+
+The runtimes reflect the two semantic models. scriptc uses typed layouts,
+reference counting with a synchronous cycle collector, stackful fibers, and a
+native server stack. Oseo uses a tagged generic value ABI, tracing collection,
+and explicit continuation frames so that generic JavaScript values can survive
+calls, suspension, and guard failure without changing representation. scriptc
+already exposes a substantially broader server and package surface. Oseo is
+spending more of its current effort on the generic semantic substrate that
+scriptc's type contract lets it narrow.
+
+Their compatibility evidence also answers different questions. scriptc's
+[architecture guide] says correctness means matching Node.js on differential
+tests, not claiming that a feature has been implemented directly from the
+specification. The [scriptc overview] reports more than 800 differential
+tests, along with sanitizer and reference-counting audits. Oseo compares with
+Node.js and Deno too, but M5 additionally pins an ECMA-262 edition and test262
+revision and records every reviewed pass, negative, and unsupported case in a
+manifest. scriptc is measuring whether its supported programs behave like
+Node.js. Oseo is building a versioned standards claim before broadening its
+host APIs.
+
+Finally, scriptc demonstrates why Oseo's lack of a `tsc` dependency is a
+choice rather than a technical impossibility. The compiler pins TypeScript
+7.0.2 and its [TypeScript frontend adapter] imports
+`typescript/unstable/sync`. That gives scriptc authoritative checker types at
+the cost of tracking an explicitly unstable API. Oseo avoids that dependency
+because checker authority would conflict with its false-hint invariant, and
+because syntax-level hints are enough for the guarded optimizations it permits.
+
+This comparison uses scriptc 0.0.14 at the fixed revision above. It compares
+contracts rather than benchmark results: scriptc is already much broader as a
+native TypeScript product, while Oseo currently implements a smaller
+ECMAScript profile with a stricter generic-fallback requirement.
+
+[`ee1f869`]: https://github.com/vercel-labs/scriptc/tree/ee1f8697b800d00f0cc674f806b4960aa5f9e291
+[documented limitations]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/docs/src/app/limitations/page.mdx
+[architecture guide]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/docs/src/app/how-it-works/page.mdx
+[scriptc overview]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/README.md
+[TypeScript frontend adapter]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/packages/compiler/src/frontend/ts7/program.ts#L1-L27
 
 
 Porffor: the nearest compiler research comparison
@@ -380,7 +476,8 @@ from JavaScript VMs.
 
 AssemblyScript and Static Hermes gain power by making types part of the
 language contract. Porffor's current type optimization can affect behavior.
-Perry uses inference to shape native code but does not make
+scriptc lets checker results determine IR representations and validates
+dynamic crossings. Perry uses inference to shape native code but does not make
 specialization-disabled equivalence the center of its public model. Oseo's
 stronger and more restrictive rule is:
 
@@ -436,25 +533,27 @@ static compiler has, then recover by deoptimizing when it was wrong.
 
 Oseo is also choosing the longest compatibility route. AssemblyScript can omit
 dynamic behavior by defining another language. Perry can prioritize the
-packages and APIs that unlock applications. QuickJS can rely on one compact
-bytecode engine. Oseo intends to implement generic ECMAScript behavior,
-native object and collector semantics, a web-compatible server host, selected
-Node.js APIs, and self-hosting while keeping the no-interpreter guarantee.
-Dynamic source, proxies, regular expressions, WebAssembly, TLS, streams, and
-package resolution each expose a large independent design problem.
+packages and APIs that unlock applications. scriptc can use a typed static
+profile and route explicitly dynamic dependencies through an optional engine.
+QuickJS can rely on one compact bytecode engine. Oseo intends to implement
+generic ECMAScript behavior, native object and collector semantics, a
+web-compatible server host, selected Node.js APIs, and self-hosting while
+keeping the no-interpreter guarantee. Dynamic source, proxies, regular
+expressions, WebAssembly, TLS, streams, and package resolution each expose a
+large independent design problem.
 
 The present status should be read with that cost in mind. Oseo has completed
 its M4 closed module, promise, asynchronous continuation, timer, and scheduler
 work. M5 is active. The current
-[*PLAN-M5.md*](./PLAN-M5.md) reports 266 passes, 226 expected negatives, and
-143 unsupported profile features in its reviewed test262 subset, with no
+[*PLAN-M5.md*](./PLAN-M5.md) reports 310 passes, 245 expected negatives, and
+126 unsupported profile features in its reviewed test262 subset, with no
 semantic or harness failures. Linux on AMD64 and macOS on AArch64 execute the
 native corpus; AArch64 Linux is a compile-link and inspection target.
 
 The Minimum common web API, real native I/O, selected Node.js compatibility,
 broad package support, and self-hosting are plans, not current features. Oseo
-should therefore be compared with Node.js or Perry on architectural commitments,
-not present-day capability or benchmark totals.
+should therefore be compared with Node.js, Perry, or scriptc on architectural
+commitments, not present-day capability or benchmark totals.
 
 If Oseo succeeds, its contribution will not be that JavaScript can be put in a
 native file. Several projects already do that in several senses. It will be a
