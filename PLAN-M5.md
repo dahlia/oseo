@@ -180,8 +180,11 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
-[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), the frozen language profiles, and
-accepted records under *docs/adr/*. The completed
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), [*PLAN-GATE.md*](./PLAN-GATE.md), the
+frozen language profiles, and
+accepted records under *docs/adr/*. The reviewed evidence gate cost that every
+semantic unit pays is owned by [*PLAN-GATE.md*](./PLAN-GATE.md) and measured in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). The completed
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) provides the
 component boundaries that large intrinsic tables and built-in families build
@@ -728,6 +731,18 @@ documents in the same change.
 
 Exit criteria
 -------------
+
+M5 is reported as the three checkpoints recorded in
+[*ROADMAP.md*](./ROADMAP.md). M5a admits the core language apart from the
+dynamic source family that ADR 0016 excludes, M5b adds the built-in families,
+and M5c closes against the applicable-test inventory.
+
+The first three criteria below cannot currently be satisfied together, because
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps the dynamic source
+family unsupported inside the claim boundary that
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) defines.
+[ADR 0019](./docs/adr/0019-m5-claim-closure.md) proposes replacing them. They
+stand as written until that record is accepted.
 
 M5 is complete only when:
 

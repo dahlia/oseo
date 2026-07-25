@@ -52,6 +52,13 @@ and portability backend. The track starts a candidate investigation only when
 representative measurements reach a recorded replacement trigger, and it does
 not reserve a milestone or put a backend migration in the M5 queue.
 
+An evidence gate throughput track is recorded in
+[*PLAN-GATE.md*](./PLAN-GATE.md). It keeps the cost of the reviewed standards
+and property gates usable as the reviewed corpus grows, measured against
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). It changes no
+semantics and reserves no milestone, and it is a prerequisite of the M5b
+checkpoint.
+
 A garbage-collector evolution track is recorded in
 [*PLAN-GC.md*](./PLAN-GC.md). The precise non-moving collector remains the
 reference while its first checkpoint adds ordinary automatic collection,
@@ -445,11 +452,61 @@ implementation task.
  -  identify constructs that fundamentally challenge ahead-of-time compilation
     and settle them through architecture decisions.
 
+### Checkpoints
+
+M5 is large enough that one exit gate hides its remaining scope. It is
+therefore reported as three checkpoints. They are capability gates, not
+calendar phases, and later checkpoints may begin as soon as their
+prerequisites are stable.
+
+These checkpoints report progress; they do not by themselves complete M5.
+M5c closes results against records that authorize an exclusion, which the
+active exit criterion below does not yet permit. Completing all three
+checkpoints completes M5 only once
+[ADR 0019](./docs/adr/0019-m5-claim-closure.md) is accepted.
+
+| Checkpoint | Result                                                        |
+| ---------- | ------------------------------------------------------------- |
+| M5a        | The admitted core language, and the applicable-test inventory |
+| M5b        | Built-in object and intrinsic families in dependency order    |
+| M5c        | Every result inside the inventory closed or authorized        |
+
+M5a completes the remaining expression, declaration, function, class,
+generator, and asynchronous syntax through traced environment and continuation
+records. It does not admit the dynamic source family, which
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps outside the
+profile even though `eval` and the `Function` constructor are normative core.
+Those cases enter the inventory as unsupported results and wait for M5c.
+
+M5a also publishes the complete applicable-test inventory that
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
+inventory is what makes the remaining scope measurable, and producing it after
+the built-in families would hide their size until the end.
+
+M5b adds the intrinsic graph, the global object, and the built-in families,
+including the regular expression family owned by
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) and the `Date` family that depends on the
+clock gate in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c closes the remaining results
+in the inventory or covers them with a record that authorizes the exclusion.
+
+The reviewed evidence gates grow with the corpus these checkpoints admit.
+[*PLAN-GATE.md*](./PLAN-GATE.md) owns that cost and is a prerequisite of M5b
+rather than a separate milestone.
+
 ### Exit criteria
 
 M5 is complete only when Oseo can make and substantiate an ECMA-262 conformance
 claim for a named edition. Intermediate releases publish exact coverage and
 known gaps without using the conformance label.
+
+That criterion is currently unreachable.
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps the dynamic source
+family explicitly unsupported inside the edition
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) claims, and no work in
+the M5 queue closes that gap.
+[ADR 0019](./docs/adr/0019-m5-claim-closure.md) proposes completing M5 against
+a checked-in applicable-test inventory and moving the label to a later gate.
+The criterion above stands until that record is accepted.
 
 
 M6: Minimum common web API
