@@ -1009,11 +1009,17 @@ function annotationPropertyName(value: BabelNode): string | undefined {
   return undefined;
 }
 
-function annotationPropertyType(
+/**
+ * Index required noncomputed members once for one object binding pattern.
+ *
+ * The first eligible declaration retains the previous ordered-scan behavior,
+ * including an absent or unsupported member annotation.
+ */
+function annotationPropertyTypes(
   typeNode: BabelNode,
-  propertyName: string,
-): BabelNode | undefined {
-  if (typeNode.type !== "TSTypeLiteral") return undefined;
+): ReadonlyMap<string, BabelNode | undefined> {
+  const result = new Map<string, BabelNode | undefined>();
+  if (typeNode.type !== "TSTypeLiteral") return result;
   for (const member of nodes(typeNode.members)) {
     if (
       member.type !== "TSPropertySignature" ||
@@ -1023,11 +1029,12 @@ function annotationPropertyType(
       continue;
     }
     const key = node(member.key);
-    if (key != null && annotationPropertyName(key) === propertyName) {
-      return annotationType(member.typeAnnotation);
+    const propertyName = key == null ? undefined : annotationPropertyName(key);
+    if (propertyName != null && !result.has(propertyName)) {
+      result.set(propertyName, annotationType(member.typeAnnotation));
     }
   }
-  return undefined;
+  return result;
 }
 
 /**
@@ -1037,82 +1044,125 @@ function annotationPropertyType(
  * length without type checking, so encountering one keeps the tuple
  * conservative.
  */
-function fixedTupleElementTypes(
-  typeNode: BabelNode,
-): readonly BabelNode[] | undefined {
-  if (typeNode.type !== "TSTupleType") return undefined;
-  const result: BabelNode[] = [];
-  for (const elementType of nodes(typeNode.elementTypes)) {
+function appendFixedTupleElementTypes(
+  elementTypes: readonly BabelNode[],
+  result: BabelNode[],
+): boolean {
+  for (const elementType of elementTypes) {
     if (elementType.type !== "TSRestType") {
-      if (annotationType(elementType) == null) return undefined;
+      if (annotationType(elementType) == null) return false;
       result.push(elementType);
       continue;
     }
     const spreadType = annotationType(elementType.typeAnnotation);
-    const spreadElements =
-      spreadType == null ? undefined : fixedTupleElementTypes(spreadType);
-    if (spreadElements == null) return undefined;
-    result.push(...spreadElements);
+    if (
+      spreadType?.type !== "TSTupleType" ||
+      !appendFixedTupleElementTypes(nodes(spreadType.elementTypes), result)
+    ) {
+      return false;
+    }
   }
-  return result;
+  return true;
+}
+
+/**
+ * Array annotation analysis shared by every leaf in one binding pattern.
+ */
+interface AnnotationArrayTypes {
+  readonly elementType: BabelNode | undefined;
+  readonly elementTypes: readonly BabelNode[];
+  readonly fixedElementTypes: readonly BabelNode[] | undefined;
+  readonly restIndex: number;
+  readonly restTypes: AnnotationArrayTypes | undefined;
+  readonly typeNode: BabelNode;
+}
+
+/**
+ * Materialize tuple structure once so leaf lookup stays constant-time.
+ */
+function annotationArrayTypes(
+  typeNode: BabelNode,
+): AnnotationArrayTypes | undefined {
+  if (typeNode.type === "TSArrayType") {
+    return {
+      elementType: annotationType(typeNode.elementType),
+      elementTypes: [],
+      fixedElementTypes: undefined,
+      restIndex: -1,
+      restTypes: undefined,
+      typeNode,
+    };
+  }
+  if (typeNode.type !== "TSTupleType") return undefined;
+  const elementTypes = nodes(typeNode.elementTypes);
+  const fixedElementTypes: BabelNode[] = [];
+  const fixed = appendFixedTupleElementTypes(elementTypes, fixedElementTypes);
+  const restIndex = elementTypes.findIndex(
+    (elementType) => elementType.type === "TSRestType",
+  );
+  const restType = annotationType(elementTypes[restIndex]?.typeAnnotation);
+  return {
+    elementType: undefined,
+    elementTypes,
+    fixedElementTypes: fixed ? fixedElementTypes : undefined,
+    restIndex,
+    restTypes:
+      fixed || restType == null ? undefined : annotationArrayTypes(restType),
+    typeNode,
+  };
 }
 
 function annotationElementType(
-  typeNode: BabelNode,
+  types: AnnotationArrayTypes,
   index: number,
 ): BabelNode | undefined {
-  if (typeNode.type === "TSArrayType") {
-    return annotationType(typeNode.elementType);
+  if (types.typeNode.type === "TSArrayType") {
+    return types.elementType;
   }
-  if (typeNode.type !== "TSTupleType") return undefined;
-  const elementTypes = nodes(typeNode.elementTypes);
-  const fixedElementTypes = fixedTupleElementTypes(typeNode);
-  if (fixedElementTypes != null) {
-    return annotationType(fixedElementTypes[index]);
+  if (types.fixedElementTypes != null) {
+    return annotationType(types.fixedElementTypes[index]);
   }
-  const restIndex = elementTypes.findIndex(
-    (elementType) => elementType.type === "TSRestType",
-  );
-  if (restIndex < 0 || index < restIndex) {
-    return annotationType(elementTypes[index]);
+  if (types.restIndex < 0 || index < types.restIndex) {
+    return annotationType(types.elementTypes[index]);
   }
-  if (restIndex + 1 < elementTypes.length) {
+  if (types.restIndex + 1 < types.elementTypes.length) {
     return undefined;
   }
-  const restType = annotationType(elementTypes[restIndex]?.typeAnnotation);
-  return restType == null
+  return types.restTypes == null
     ? undefined
-    : annotationElementType(restType, index - restIndex);
+    : annotationElementType(types.restTypes, index - types.restIndex);
 }
 
 function annotationArrayRestType(
-  typeNode: BabelNode,
+  types: AnnotationArrayTypes,
   index: number,
 ): BabelNode | undefined {
-  if (typeNode.type === "TSArrayType") return typeNode;
-  if (typeNode.type !== "TSTupleType") return undefined;
-  const elementTypes = nodes(typeNode.elementTypes);
-  const fixedElementTypes = fixedTupleElementTypes(typeNode);
-  if (fixedElementTypes != null) {
-    return { ...typeNode, elementTypes: fixedElementTypes.slice(index) };
+  if (types.typeNode.type === "TSArrayType") return types.typeNode;
+  if (types.fixedElementTypes != null) {
+    return {
+      ...types.typeNode,
+      elementTypes: types.fixedElementTypes.slice(index),
+    };
   }
-  const restIndex = elementTypes.findIndex(
-    (elementType) => elementType.type === "TSRestType",
-  );
-  if (restIndex >= 0 && restIndex !== elementTypes.length - 1) {
-    return index < restIndex
-      ? { ...typeNode, elementTypes: elementTypes.slice(index) }
+  if (
+    types.restIndex >= 0 &&
+    types.restIndex !== types.elementTypes.length - 1
+  ) {
+    return index < types.restIndex
+      ? {
+          ...types.typeNode,
+          elementTypes: types.elementTypes.slice(index),
+        }
       : undefined;
   }
-  if (restIndex >= 0 && index > restIndex) {
-    const restType = annotationType(elementTypes[restIndex]?.typeAnnotation);
-    return restType == null
+  if (types.restIndex >= 0 && index > types.restIndex) {
+    return types.restTypes == null
       ? undefined
-      : annotationArrayRestType(restType, index - restIndex);
+      : annotationArrayRestType(types.restTypes, index - types.restIndex);
   }
   return {
-    ...typeNode,
-    elementTypes: elementTypes.slice(index),
+    ...types.typeNode,
+    elementTypes: types.elementTypes.slice(index),
   };
 }
 
@@ -1143,6 +1193,7 @@ function bindingPatternTypeHints(
       );
       return pattern;
     }
+    const propertyTypes = annotationPropertyTypes(typeNode);
     return {
       ...pattern,
       properties: pattern.properties.map((property) => {
@@ -1151,9 +1202,7 @@ function bindingPatternTypeHints(
             ? property.key.value
             : undefined;
         const propertyType =
-          propertyName == null
-            ? undefined
-            : annotationPropertyType(typeNode, propertyName);
+          propertyName == null ? undefined : propertyTypes.get(propertyName);
         return propertyType == null
           ? property
           : {
@@ -1175,11 +1224,13 @@ function bindingPatternTypeHints(
     );
     return pattern;
   }
+  const arrayTypes = annotationArrayTypes(typeNode);
+  if (arrayTypes == null) return pattern;
   return {
     ...pattern,
     elements: pattern.elements.map((element, index) => {
       if (element == null) return undefined;
-      const elementType = annotationElementType(typeNode, index);
+      const elementType = annotationElementType(arrayTypes, index);
       return elementType == null
         ? element
         : {
@@ -1197,7 +1248,7 @@ function bindingPatternTypeHints(
           rest: bindingPatternTypeHints(
             context,
             pattern.rest,
-            annotationArrayRestType(typeNode, pattern.elements.length),
+            annotationArrayRestType(arrayTypes, pattern.elements.length),
           ),
         }),
   };
