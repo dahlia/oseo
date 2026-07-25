@@ -130,7 +130,9 @@ Links
 -----
 
  -  [ADR 0013](./0013-m5-edition-and-manifest.md) defines the claim
-    boundary this record narrows.
+    boundary against which this record leaves an explicit gap. Narrowing that
+    boundary would require the later decision this record's own consequences
+    name.
  -  [*PLAN-M5.md*](../../PLAN-M5.md) names the checkpoint this record
     resolves.
  -  [*DESIGN.md*](../../DESIGN.md) records the module and whole-program
