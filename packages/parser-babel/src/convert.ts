@@ -17,6 +17,7 @@ import type {
   SyntaxFunction,
   SyntaxModuleSpecifier,
   SyntaxObjectBindingPattern,
+  SyntaxObjectProperty,
   SyntaxParameter,
   SyntaxProgram,
   SyntaxStatement,
@@ -279,12 +280,20 @@ export function expression(
       : { ...located, argument, kind: "unary", operator: value.operator };
   }
   if (value.type === "ObjectExpression") {
-    const properties: {
-      readonly accessorKind?: "get" | "set";
-      readonly key: SyntaxExpression;
-      readonly value: SyntaxExpression;
-    }[] = [];
+    const properties: SyntaxObjectProperty[] = [];
     for (const property of nodes(value.properties)) {
+      if (property.type === "SpreadElement") {
+        const spreadArgument = node(property.argument);
+        if (spreadArgument == null) return unsupported(context, property);
+        const argument = expression(context, spreadArgument);
+        if (argument == null) return undefined;
+        properties.push({
+          ...location(context, property),
+          argument,
+          kind: "spread",
+        });
+        continue;
+      }
       if (
         property.type !== "ObjectProperty" &&
         property.type !== "ObjectMethod"
@@ -292,9 +301,7 @@ export function expression(
         return unsupported(
           context,
           property,
-          property.type === "SpreadElement"
-            ? "Object spread properties are unsupported."
-            : "This object property is unsupported.",
+          "This object property is unsupported.",
         );
       }
       const keyNode = node(property.key);
@@ -363,6 +370,7 @@ export function expression(
       properties.push({
         ...(accessorKind == null ? {} : { accessorKind }),
         key,
+        kind: "definition",
         value: propertyValue,
       });
     }

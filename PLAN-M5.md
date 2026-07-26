@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 310
-passes, 245 expected negatives, and 126 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 639
+passes, 254 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -200,23 +200,49 @@ lookup and assignment paths already built for other property kinds. An
 accessor property is always configurable and enumerable, and a later
 accessor or data property for the same key replaces an earlier one in
 source order, matching the existing last-definition-wins rule for data
-properties. Object spread properties and the Annex B `__proto__`
-property-name special case remain rejected with a source-located diagnostic
-in every syntactic form, including shorthand and method keys. The generated
-property suite uses seed `0x5eed0015` across zero to four data, shorthand,
-method, getter, and setter properties and bounded integer values, comparing
-an independent key-order and evaluation-order model with Node.js, Deno, and
-both native specialization policies with forced collection on the enabled
-path. Fixed native fixtures retain the empty object, single and multiple
-data properties, shorthand from a local binding and from a parameter, a
-method's `this` reference and non-constructible identity, getter-only and
-setter-only accessors, an accessor pair's shared descriptor, nested object
-literals, left-to-right evaluation order, abrupt completion in a property
-value, and forced collection across property safepoints. Three hundred
-fourteen reviewed test262 cases newly pass, covering property-name forms,
-method definitions, non-constructible method identity, getter and setter
-accessor forms, and the destructuring parameter patterns their method
-bodies already supported.
+properties. Object spread properties are now admitted as well: a spread
+copies every own enumerable property of its source, including symbol keys,
+into the object under construction as a writable, enumerable, configurable
+data property, in the source's own-key order and at the spread's position
+in source order. A getter on the source is invoked once and its result
+stored as data. A nullish source copies nothing rather than throwing,
+unlike an object binding rest, and a non-nullish primitive source copies
+the own enumerable properties its wrapper exposes, so a string source
+contributes its index properties and every other primitive contributes
+none. The runtime shares one `CopyDataProperties` helper between object
+binding rest, which copies into a fresh object with excluded keys, and
+object spread, which copies into the literal's object with no excluded
+keys. The Annex B `__proto__` property-name special case remains rejected
+with a source-located diagnostic in every syntactic form, including
+shorthand and method keys, and a spread preceding a later top-level await
+point is rejected for the same evaluation-order reason as array, call, and
+constructor spread. The generated property suite uses seed `0x5eed0015`
+across zero to four data, shorthand, method, getter, setter, object spread,
+and nullish spread properties over a shared five-name key pool and bounded
+integer values, comparing an independent key-order, last-definition, and
+evaluation-order model with Node.js, Deno, and both native specialization
+policies with forced collection on the enabled path. Fixed native fixtures
+retain the empty object, single and multiple data properties, shorthand
+from a local binding and from a parameter, a method's `this` reference and
+non-constructible identity, getter-only and setter-only accessors, an
+accessor pair's shared descriptor, nested object literals, left-to-right
+evaluation order, abrupt completion in a property value, and forced
+collection across property safepoints, and add empty, plain, getter-backed,
+interleaved, overwriting, integer-key, nullish, primitive, array,
+function, prototype-chain, non-enumerable, and symbol-keyed spread sources
+plus an abrupt spread source and a spread-driven growth loop. Three hundred
+thirty-eight reviewed test262 cases newly pass, twenty-four of them object
+spread cases covering identifier, null, undefined, multiple, getter
+descriptor, getter initialization, immutable override, and
+previous-property override sources.
+
+V8 enumerates an accessor defined after an object literal spread property
+last instead of in property-creation order, so Node.js and Deno cannot act
+as references for that one combination. The generated suite rewrites such
+an accessor as a data property, and the fixed
+*tests/fixtures/object-spread-accessor-order.js* native scenario asserts
+the ECMA-262 order directly without a reference observation, alongside the
+accessor-before-spread order both references do agree with.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),

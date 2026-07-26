@@ -246,6 +246,68 @@ test("rejects array spread before a top-level await point", () => {
   assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
 });
 
+test("rejects object spread before a top-level await point", () => {
+  const sourceId = "file:///app/object-spread-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "const base = { a: 1 };\n" +
+      "export const value = { ...base, b: await Promise.resolve(3) };",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "object-spread-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.equal(compiled.mir, undefined);
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
+  assert.equal(
+    compiled.diagnostics[0]?.message,
+    "Object spread before a top-level await point is unsupported.",
+  );
+  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+});
+
+test("accepts object spread after a top-level await point", () => {
+  const sourceId = "file:///app/object-spread-after-await.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "const base = { a: 1 };\n" +
+      "export const value = { b: await Promise.resolve(3), ...base };",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "object-spread-after-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+});
+
 test("rejects call spread before a top-level await point", () => {
   const sourceId = "file:///app/call-spread-await.js";
   const result = babelModuleFrontend.parseModule({

@@ -10,6 +10,7 @@ supportedFeatures:
   - for-of
   - let
   - object-rest
+  - object-spread
   - rest-parameters
   - Symbol
   - Symbol.iterator
@@ -560,6 +561,42 @@ tests:
   - path: test/language/expressions/call/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-mult-obj-ident.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/call/spread-mult-obj-null.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-mult-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-getter-descriptor.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/call/spread-obj-getter-init.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-mult-spread-getter.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-mult-spread.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-null.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-override-immutable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/call/spread-obj-overrides-prev-properties.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-sngl-obj-ident.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
   - path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -677,6 +714,42 @@ tests:
   - path: test/language/expressions/new/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/new/spread-mult-obj-ident.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/new/spread-mult-obj-null.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-mult-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-getter-descriptor.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/new/spread-obj-getter-init.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-mult-spread-getter.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-mult-spread.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-null.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-override-immutable.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/new/spread-obj-overrides-prev-properties.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/new/spread-sngl-obj-ident.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, object-properties]
   - path: test/language/expressions/object/11.1.5-2gs.js
     expectedClassification: pass
     dependencies: [object-literals]

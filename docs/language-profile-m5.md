@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 957 reviewed cases: 586 passes, 245 expected
+The current manifest contains 1,019 reviewed cases: 639 passes, 254 expected
 negatives, and 126 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -586,24 +586,50 @@ its deliberate boundary and its evidence:
     always configurable and enumerable, and a later accessor or data
     property for the same key replaces an earlier one in source order,
     matching the existing last-definition-wins rule for data properties.
-    Deliberate boundaries, each rejected with a source-located diagnostic
-    in every syntactic form including shorthand and method keys: object
-    spread properties and the Annex B `__proto__` property-name special
-    case. Native differential fixtures retain the empty object, single and
-    multiple data properties, shorthand from a local binding and from a
-    parameter, a method's `this` reference and non-constructible identity,
-    getter-only and setter-only accessors, an accessor pair's shared
-    descriptor, a data property redefined to an accessor and back, nested
-    object literals, left-to-right evaluation order, abrupt completion in a
-    property value, and forced collection across property safepoints. A
-    generated property with seed `0x5eed0015` covers zero to four data,
-    shorthand, method, getter, and setter properties and bounded integer
-    values across Node.js, Deno, both specialization policies, and forced
-    collection on the enabled path. Three hundred fourteen reviewed
-    test262 cases cover property-name forms, method definitions,
-    non-constructible method identity, getter and setter accessor forms,
-    and the destructuring parameter patterns their method bodies already
-    supported.
+    Object spread properties are also admitted: a spread evaluates its
+    source expression at its position in source order and copies every own
+    enumerable property of that source, including symbol keys, into the
+    object under construction as a writable, enumerable, configurable data
+    property, in the source's own-key order. A getter on the source is
+    invoked once and its result stored as data, and a later property or
+    spread replaces an earlier key's value while keeping the key's first
+    insertion position. A nullish source copies nothing rather than
+    throwing, unlike an object binding rest, and a non-nullish primitive
+    source copies the own enumerable properties its wrapper exposes, so a
+    string source contributes its index properties and every other
+    primitive contributes none. The runtime shares one
+    `CopyDataProperties` helper between object binding rest, which copies
+    into a fresh object with excluded keys, and object spread, which
+    copies into the literal's object with no excluded keys. Deliberate
+    boundaries: the Annex B `__proto__` property-name special case is
+    rejected with a source-located diagnostic in every syntactic form
+    including shorthand and method keys, and an object spread preceding a
+    later top-level await point is rejected for the same evaluation-order
+    reason as array, call, and constructor spread. Native differential
+    fixtures retain the empty object, single and multiple data properties,
+    shorthand from a local binding and from a parameter, a method's `this`
+    reference and non-constructible identity, getter-only and setter-only
+    accessors, an accessor pair's shared descriptor, a data property
+    redefined to an accessor and back, nested object literals,
+    left-to-right evaluation order, abrupt completion in a property value,
+    and forced collection across property safepoints, and add empty,
+    plain, getter-backed, interleaved, overwriting, integer-key, nullish,
+    primitive, array, function, prototype-chain, non-enumerable, and
+    symbol-keyed spread sources plus an abrupt spread source and a
+    spread-driven growth loop. A generated property with seed
+    `0x5eed0015` covers zero to four data, shorthand, method, getter,
+    setter, object spread, and nullish spread properties over a shared
+    five-name key pool and bounded integer values across Node.js, Deno,
+    both specialization policies, and forced collection on the enabled
+    path. V8 enumerates an accessor defined after a spread property last
+    instead of in property-creation order, so the generated suite rewrites
+    such an accessor as a data property and the fixed
+    *tests/fixtures/object-spread-accessor-order.js* native scenario
+    asserts the ECMA-262 order without a reference observation. Three
+    hundred thirty-eight reviewed test262 cases cover property-name forms,
+    method definitions, non-constructible method identity, getter and
+    setter accessor forms, object spread sources, and the destructuring
+    parameter patterns their method bodies already supported.
 
 
 Known gaps inside the claim

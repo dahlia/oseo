@@ -936,6 +936,26 @@ test("accepts uninitialized let as undefined", () => {
   );
 });
 
+test("lowers object literal spread through CopyDataProperties", () => {
+  const result = compileSource(babelFrontend, {
+    source: `const base = { a: 1 };
+const value = { ...base, b: 2 };`,
+    sourceId: "object-spread.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /object\{\.\.\.%b\d+\(base\), "b": 2\}/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /object-create ordinary object with null prototype/u);
+  assert.match(mir, /safepoint object spread copy/u);
+  assert.match(
+    mir,
+    /object-spread CopyDataProperties for object literal spread/u,
+  );
+  assert.match(mir, /property-define-data create data property/u);
+});
+
 test("rejects only noncomputed __proto__ literals", () => {
   const rejected = compileSource(babelFrontend, {
     source: "const value = { __proto__: null };",

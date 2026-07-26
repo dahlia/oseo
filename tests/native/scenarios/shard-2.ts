@@ -21,6 +21,31 @@ export async function runNativeScenario2(
   assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
   assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
 
+  // The object-spread-accessor-order fixture explains why this check bypasses
+  // both references: V8 enumerates an accessor defined after an object
+  // literal spread property last instead of in property-creation order.
+  const spreadAccessorEntry = [
+    root,
+    "tests/fixtures/object-spread-accessor-order.js",
+  ].join("/");
+  const nativeSpreadAccessor = await runNativeCli(
+    {
+      args: [spreadAccessorEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nativeSpreadAccessor.exitStatus, 0, nativeSpreadAccessor.stderr);
+  assert.equal(
+    nativeSpreadAccessor.stdout,
+    "base,shown,tail,\n" +
+      "1 2 3\n" +
+      "first,later,last,\n" +
+      "9 undefined\n" +
+      "shown,tail,\n" +
+      "shown,copied,tail,\n",
+  );
+
   const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
   const nativeModule = await runNativeCli(
     {

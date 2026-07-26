@@ -361,6 +361,11 @@ OseoResult oseo_object_rest(
     size_t excluded_count,
     const OseoValue *excluded_keys
 );
+OseoResult oseo_object_spread(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source
+);
 OseoResult oseo_property_key(OseoContext *context, OseoValue value);
 OseoResult oseo_object_define(
     OseoContext *context,

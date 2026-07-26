@@ -139,6 +139,7 @@ export interface MirOperation {
     | "object-coercible"
     | "object-create"
     | "object-rest"
+    | "object-spread"
     | "property-key"
     | "property-define-accessor"
     | "property-define-data"

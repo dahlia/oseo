@@ -117,11 +117,14 @@ function printHirExpression(expression: HirExpression): string {
     return (
       "object{" +
       expression.properties
-        .map(
-          (property) =>
-            (property.accessorKind == null ? "" : `${property.accessorKind} `) +
-            `${printHirExpression(property.key)}: ` +
-            printHirExpression(property.value),
+        .map((property) =>
+          property.kind === "spread"
+            ? `...${printHirExpression(property.argument)}`
+            : (property.accessorKind == null
+                ? ""
+                : `${property.accessorKind} `) +
+              `${printHirExpression(property.key)}: ` +
+              printHirExpression(property.value),
         )
         .join(", ") +
       "}"
