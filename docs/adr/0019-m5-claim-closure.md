@@ -92,8 +92,9 @@ directories ADR 0013 excludes hold 1,086 in *annexB/*, 3,341 in *intl402/*,
 and 1,482 in *staging/*, of which 1,406 are the *staging/sm/* files ADR 0013
 names separately.
 
-Not every remaining file is inside the 16th edition. *built-ins/Temporal*
-alone holds 4,603 files for a proposal outside that edition.
+Not every remaining file is inside the 16th edition.
+*test/built-ins/Temporal/* alone holds 4,603 files for a proposal outside that
+edition.
 
 The checked-in manifest at commit `0bd5f38` records 681 reviewed paths: 310
 passes, 245 expected negatives, and 126 unsupported profile features.
@@ -102,15 +103,14 @@ passes, 245 expected negatives, and 126 unsupported profile features.
 Observed results
 ----------------
 
-The reviewed corpus is near 1.4 percent of the unexcluded upstream
-directories. The exact denominator is not yet known, because the complete
-applicable-test inventory that ADR 0013 requires before the label is used has
-not been checked in. Coverage can therefore be reported only as an absolute
-reviewed count.
+[ADR 0020](./0020-m5-applicable-test-inventory.md) now classifies all 47,381
+candidate paths. It includes 41,091 paths inside the 16th edition and excludes
+6,290 proposal, post-edition, or Annex B paths. The 681 reviewed result rows
+therefore cover 1.66 percent of the exact denominator.
 
-These are two independent problems. The missing inventory prevents an exact
-coverage denominator. ADR 0016 separately prevents use of the unqualified
-label. This record addresses the first and reassigns the second.
+The denominator and label remain independent. The checked-in inventory makes
+coverage measurable. ADR 0016 separately prevents use of the unqualified
+label.
 
 
 Decision
@@ -197,6 +197,8 @@ Links
     creates the conflict. This record removes M5 completion's dependence on the
     later decision ADR 0016 requests; it does not supply that decision, and the
     dynamic source boundary stays open.
+ -  [ADR 0020](./0020-m5-applicable-test-inventory.md) defines the classifier
+    and checked-in denominator required by this record.
  -  [*PLAN-M5.md*](../../PLAN-M5.md) and [*ROADMAP.md*](../../ROADMAP.md) hold
     the exit criteria this record changes.
  -  [*PLAN-DYN.md*](../../PLAN-DYN.md) owns the deferred capability the label

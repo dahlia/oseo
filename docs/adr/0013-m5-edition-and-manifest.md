@@ -252,10 +252,10 @@ The M5 language profile document names the claim boundary and tracks each
 group's status against it. Coverage reports become comparable across M5
 checkpoints because the boundary definition, counting rule, and record
 format are fixed; the reviewed subset still grows checkpoint by checkpoint,
-and the complete applicable-test inventory for the claim is checked in
-before the conformance label is used. Renaming the classification is a
-breaking manifest change and lands together with the schema expansion so
-the manifest never mixes vocabularies.
+and [ADR 0020](./0020-m5-applicable-test-inventory.md) maps the pinned corpus
+to a separate complete applicable-test inventory. Renaming the result
+classification is a breaking manifest change and lands together with the
+schema expansion so the manifest never mixes vocabularies.
 
 
 Failure modes and replacement triggers
@@ -277,6 +277,8 @@ Links
     record freezes.
  -  [*language-profile-m5.md*](../language-profile-m5.md) tracks the profile
     against this boundary.
+ -  [ADR 0020](./0020-m5-applicable-test-inventory.md) defines the reviewed
+    edition-mapping rule and the separate denominator artifact.
  -  [ADR 0009](./0009-module-identity-and-linking.md) through
     [ADR 0012](./0012-native-event-loop.md) define the M4 semantics the
     first expanded measurements observe.

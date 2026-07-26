@@ -1,0 +1,31 @@
+formatVersion: 1
+edition: 16
+editionYear: 2025
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+candidateRoots:
+  - test/built-ins
+  - test/language
+annexBPathPrefixes:
+  - test/built-ins/Object/prototype/__defineGetter__/
+  - test/built-ins/Object/prototype/__defineSetter__/
+  - test/built-ins/Object/prototype/__lookupGetter__/
+  - test/built-ins/Object/prototype/__lookupSetter__/
+  - test/built-ins/Object/prototype/__proto__/
+annexBPaths:
+  - test/built-ins/WeakRef/prototype/constructor.js
+sources:
+  edition: https://github.com/tc39/ecma262/tree/84b38ad852ff426795fa29cebc06949027336c64
+  featureRegistry: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/features.txt
+  finishedProposals: https://github.com/tc39/proposals/blob/1eb7ced36bcb794e75af0b0a24c8199fba6bc6f3/finished-proposals.md
+postEditionFeatures:
+  Array.fromAsync: 2026
+  Atomics.pause: 2027
+  Error.isError: 2026
+  Math.sumPrecise: 2026
+  Temporal: 2027
+  explicit-resource-management: 2027
+  iterator-sequencing: 2026
+  joint-iteration: 2027
+  json-parse-with-source: 2026
+  uint8array-base64: 2026
+  upsert: 2026

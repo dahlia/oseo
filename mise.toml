@@ -39,6 +39,7 @@ depends = [
   "check:actions",
   "check:boundaries",
   "check:fmt",
+  "check:test262-inventory",
   "check:lines",
   "check:lint",
   "check:packages",
@@ -77,6 +78,10 @@ run = '''
 node tools/check-packages.ts
 deno publish --dry-run --allow-dirty
 '''
+
+[tasks."check:test262-inventory"]
+description = "Validate the pinned ECMA-262 applicable-test inventory"
+run = "node tools/test262-inventory.ts"
 
 [tasks."check:types"]
 depends = ["build"]
@@ -214,3 +219,7 @@ run = "node tools/test262.ts"
 description = "Regenerate the pinned reviewed test262 result manifest"
 depends = ["build"]
 run = "node tools/test262.ts --update"
+
+[tasks."test262:inventory:update"]
+description = "Regenerate the pinned ECMA-262 applicable-test inventory"
+run = "node tools/test262-inventory.ts --update"
