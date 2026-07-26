@@ -276,9 +276,9 @@ other heavy test task ran at the same time.
 
 | Task                               |   Wall |   User | System | CPU / wall |
 | ---------------------------------- | -----: | -----: | -----: | ---------: |
-| `mise run check:test262-inventory` | 5.02 s | 4.63 s | 1.16 s |       1.15 |
+| `mise run check:test262-inventory` | 4.89 s | 4.56 s | 1.09 s |       1.15 |
 
-The process peaked at 364,128 KiB of resident memory. The exact-regeneration
+The process peaked at 359,492 KiB of resident memory. The exact-regeneration
 check is retained because it detects changes to candidate paths, frontmatter,
 the edition policy, and the generated index in one invariant. If it enters the
 default check's critical path as the corpus grows, the replacement keeps exact

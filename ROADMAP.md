@@ -477,9 +477,9 @@ M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
 inventory is what makes the remaining scope measurable, and producing it after
 the built-in families would hide their size until the end.
-[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) classifies 41,161
-of 47,381 candidate paths inside the 16th edition and 6,220 outside it. The
-included paths comprise 22,998 language tests and 18,163 built-in tests.
+[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) classifies 41,092
+of 47,381 candidate paths inside the 16th edition and 6,289 outside it. The
+included paths comprise 22,998 language tests and 18,094 built-in tests.
 The separate compact index records the denominator without duplicating the
 result manifest's observations.
 
@@ -665,7 +665,7 @@ the candidate edition boundary and manifest schema are frozen, the test262
 harness observes module and asynchronous execution, and the
 dependency-indexed baseline is published.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) also checks in the
-41,161-path edition denominator without expanding the result manifest.
+41,092-path edition denominator without expanding the result manifest.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
 source challenge features through explicit unsupported classifications, while
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence

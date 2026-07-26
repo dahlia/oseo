@@ -18,6 +18,7 @@ export type Test262InventoryBoundary = "excluded" | "included";
 
 /** Rules mapping the pinned Test262 corpus to one ECMA-262 edition. */
 export interface Test262InventoryPolicy {
+  readonly annexBPathPrefixes: readonly string[];
   readonly candidateRoots: readonly string[];
   readonly edition: number;
   readonly editionYear: number;
@@ -141,11 +142,30 @@ export function parseInventoryPolicy(text: string): Test262InventoryPolicy {
       );
     }
   }
+  const candidateRoots = sortedUnique(
+    stringArray(root.candidateRoots, "test262 candidate roots"),
+    "test262 candidate roots",
+  );
+  const annexBPathPrefixes = sortedUnique(
+    stringArray(root.annexBPathPrefixes, "test262 Annex B path prefixes"),
+    "test262 Annex B path prefixes",
+  );
+  for (const prefix of annexBPathPrefixes) {
+    if (
+      !prefix.endsWith("/") ||
+      !candidateRoots.some((candidateRoot) =>
+        prefix.startsWith(`${candidateRoot}/`),
+      )
+    ) {
+      throw new Error(
+        `test262 Annex B path prefix ${prefix} must be a candidate ` +
+          "subdirectory.",
+      );
+    }
+  }
   return {
-    candidateRoots: sortedUnique(
-      stringArray(root.candidateRoots, "test262 candidate roots"),
-      "test262 candidate roots",
-    ),
+    annexBPathPrefixes,
+    candidateRoots,
     edition: positiveInteger(root.edition, "test262 inventory edition"),
     editionYear,
     formatVersion: positiveInteger(
@@ -244,7 +264,6 @@ export function classifyInventoryEntry(
   if (path.includes("\t") || path.includes("\n") || path.includes("\r")) {
     throw new Error("test262 inventory paths cannot contain line separators.");
   }
-  const reasons: string[] = [];
   for (const feature of features) {
     if (!registry.all.has(feature)) {
       throw new Error(`${path} uses unknown test262 feature ${feature}.`);
@@ -255,6 +274,17 @@ export function classifyInventoryEntry(
         `${feature} cannot be both proposed and assigned to an edition.`,
       );
     }
+  }
+  if (policy.annexBPathPrefixes.some((prefix) => path.startsWith(prefix))) {
+    return {
+      basis: "optional-section:annex-b",
+      boundary: "excluded",
+      path,
+    };
+  }
+  const reasons: string[] = [];
+  for (const feature of features) {
+    const postEditionYear = policy.postEditionFeatures.get(feature);
     if (registry.proposed.has(feature)) {
       reasons.push(`proposal:${feature}`);
     } else if (postEditionYear != null) {
@@ -386,6 +416,11 @@ async function createInventory(
   const paths = absolutePaths
     .map((path) => relative(root, path).split(sep).join("/"))
     .toSorted();
+  for (const prefix of policy.annexBPathPrefixes) {
+    if (!paths.some((path) => path.startsWith(prefix))) {
+      throw new Error(`Test262 Annex B path prefix ${prefix} matched no path.`);
+    }
+  }
   const entries: Test262InventoryEntry[] = [];
   for (const path of paths) {
     const features = parseTest262Features(

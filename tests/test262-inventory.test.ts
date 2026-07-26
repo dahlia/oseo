@@ -15,6 +15,8 @@ edition: 16
 editionYear: 2025
 suiteRevision: test-revision
 candidateRoots: [test/built-ins, test/language]
+annexBPathPrefixes:
+  - test/built-ins/Object/prototype/__proto__/
 sources:
   edition: https://github.com/tc39/ecma262/tree/test-edition
   featureRegistry: https://github.com/tc39/test262/blob/test/features.txt
@@ -31,6 +33,7 @@ decorators
 ## Standard language features
 class
 Temporal
+__proto__
 
 ## Test-Harness Features
 host-gc-required
@@ -48,6 +51,35 @@ test("excludes proposed and post-edition features", () => {
       basis: "edition-2027:Temporal,proposal:decorators",
       boundary: "excluded",
       path: "test/language/example.js",
+    },
+  );
+});
+
+test("excludes reviewed Annex B paths but retains core dependencies", () => {
+  assert.deepEqual(
+    classifyInventoryEntry(
+      "test/built-ins/Object/prototype/__proto__/prop-desc.js",
+      ["__proto__"],
+      registry,
+      policy,
+    ),
+    {
+      basis: "optional-section:annex-b",
+      boundary: "excluded",
+      path: "test/built-ins/Object/prototype/__proto__/prop-desc.js",
+    },
+  );
+  assert.deepEqual(
+    classifyInventoryEntry(
+      "test/language/core-depending-on-annex-b.js",
+      ["__proto__"],
+      registry,
+      policy,
+    ),
+    {
+      basis: "edition-2025",
+      boundary: "included",
+      path: "test/language/core-depending-on-annex-b.js",
     },
   );
 });

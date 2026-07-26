@@ -22,7 +22,7 @@ That count is not the edition denominator. *test/built-ins/Temporal/* alone
 contains 4,603 files for a proposal assigned after the 16th edition. Upstream
 *features.txt* distinguishes proposed features from standard features, but
 its standard section does not state the edition in which each feature was
-published.
+published or whether a standard feature is normative optional.
 
 The suite also contains tests with no `features` frontmatter. A rule that
 requires a feature tag would silently omit core grammar and long-standing
@@ -60,9 +60,10 @@ Alternatives considered
 1.  **Include all 47,381 candidate files.** Rejected. It includes Temporal
     and other proposals published after ECMAScript 2025, so the denominator
     would not describe the edition ADR 0013 names.
-2.  **Classify by directory.** Rejected. Proposal tests cross directory
-    boundaries, and one directory can hold tests for several proposal
-    dependencies. A path prefix alone is not an edition source.
+2.  **Classify the edition by directory alone.** Rejected. Proposal tests
+    cross directory boundaries, and one directory can hold tests for several
+    proposal dependencies. Reviewed path prefixes remain appropriate for
+    normative optional APIs that Test262 places outside *annexB/*.
 3.  **Map every `esid` to the published specification.** Rejected. Not every
     test carries an `esid`, proposal suites may use identifiers that resemble
     future specification clauses, and one test can depend on several features.
@@ -89,6 +90,17 @@ The feature registry is
 [*features.txt*]
 at the pinned Test262 revision. Its proposal policy says tests for proposed
 language features should carry a dedicated flag so consumers can omit them.
+
+The 16th edition marks `Object.prototype.__proto__` and the four legacy
+`Object.prototype` accessor methods as normative optional. Test262 places
+their 69 direct tests under five directories in *test/built-ins/* rather than
+under *annexB/*. The registered `__proto__`, `__getter__`, and `__setter__`
+flags cannot be excluded wholesale: five other tests use those flags while
+testing another feature or core behavior that merely depends on an Annex B
+facility. They retain their independent classification: three are edition
+core, while two are already excluded with the `error-stack-accessor` proposal.
+ADR 0013 assigns any unsupported observation for an included dependency to
+the result manifest.
 
 The reviewed publication-year map comes from TC39's
 [*finished-proposals.md*]
@@ -124,21 +136,21 @@ The generated inventory contains:
 | Candidate root    | Included | Excluded |  Total |
 | ----------------- | -------: | -------: | -----: |
 | *test/language/*  |   22,998 |      715 | 23,713 |
-| *test/built-ins/* |   18,163 |    5,505 | 23,668 |
-| Total             |   41,161 |    6,220 | 47,381 |
+| *test/built-ins/* |   18,094 |    5,574 | 23,668 |
+| Total             |   41,092 |    6,289 | 47,381 |
 
 The post-edition flag rule matches 5,434 paths. The proposed-feature rule
 matches 798 paths, and 12 paths match both, producing 6,220 unique
-exclusions. The 41,161 included paths are the exact M5 denominator at the
-pinned revision.
+edition exclusions. The Annex B path rule excludes 69 additional paths. The
+41,092 included paths are the exact M5 denominator at the pinned revision.
 
-The compact inventory occupies 47,390 lines and 4,821,288 bytes: nine header
+The compact inventory occupies 47,390 lines and 4,822,116 bytes: nine header
 lines and one tab-separated row per candidate. It records no execution
 variants or observations.
 
-An isolated `mise run check:test262-inventory` sample completed in 5.02 s of
-wall time, 4.63 s of user time, and 1.16 s of system time, for a 1.15
-processor-time-to-wall ratio. Peak resident memory was 364,128 KiB. The host
+An isolated `mise run check:test262-inventory` sample completed in 4.89 s of
+wall time, 4.56 s of user time, and 1.09 s of system time, for a 1.15
+processor-time-to-wall ratio. Peak resident memory was 359,492 KiB. The host
 facts and reproduction command are recorded in
 [*gate-cost-baseline.md*](../gate-cost-baseline.md).
 
@@ -149,22 +161,27 @@ Decision
 The machine-readable policy is
 *tests/test262/inventory-policy.yaml*. It pins the edition, suite revision,
 candidate roots, authoritative sources, and the reviewed post-edition feature
-map.
+map. It also pins the five Annex B path prefixes that Test262 stores in a
+candidate root.
 
 The classifier applies these rules in order:
 
 1.  Enumerate sorted non-fixture *.js* paths under *test/built-ins/* and
     *test/language/*. The ADR 0013 directory exclusions never enter this
     candidate set.
-2.  Exclude a path when any frontmatter feature belongs to the proposed
+2.  Exclude a path beneath a reviewed Annex B prefix. Record the reason as
+    `optional-section:annex-b`. Validate its feature metadata, but do not use
+    the broad `__proto__`, `__getter__`, or `__setter__` flags to exclude
+    core tests that only depend on the optional behavior.
+3.  Exclude a path when any frontmatter feature belongs to the proposed
     section of the pinned *features.txt*. Record each such reason as
     `proposal:<feature>`.
-3.  Exclude a path when any frontmatter feature belongs to the reviewed
+4.  Exclude a path when any frontmatter feature belongs to the reviewed
     post-edition map. Record each reason as
     `edition-<year>:<feature>`.
-4.  Include every other path. A tagged path records `edition-2025`; a path
+5.  Include every other path. A tagged path records `edition-2025`; a path
     with no feature flag records `edition-2025:unflagged-core`.
-5.  Reject an unknown feature flag, malformed frontmatter, duplicate path,
+6.  Reject an unknown feature flag, malformed frontmatter, duplicate path,
     policy mismatch, or reviewed subset path outside the edition instead of
     guessing.
 
@@ -199,13 +216,13 @@ Consequences
 ------------
 
 M5 coverage can now report the reviewed result count, the exact denominator
-of 41,161, and owned exclusions separately. The current 681 reviewed paths
-cover 1.65 percent of that denominator; the percentage does not imply that
+of 41,092, and owned exclusions separately. The current 681 reviewed paths
+cover 1.66 percent of that denominator; the percentage does not imply that
 unreviewed paths have passed or failed.
 
 The inventory resolves the denominator-size problem without resolving the
 result-manifest partitioning checkpoint. Expanding measured results toward
-41,161 rows still requires the partitioned observation format in
+41,092 rows still requires the partitioned observation format in
 [*PLAN-GATE.md*](../../PLAN-GATE.md).
 
 The default for an unflagged path relies on Test262's proposal-tagging policy.
@@ -225,6 +242,9 @@ Failure modes and replacement triggers
     reviewed in one change.
  -  A TC39 publication-year correction changes the reviewed map and regenerates
     the complete inventory.
+ -  Finding another normative optional API outside Test262's excluded
+    directories extends the reviewed optional-section path map and
+    regenerates every affected count.
  -  Adopting another Test262 revision re-reviews every added, removed, or
     metadata-changed path and updates every affected result classification in
     the same change, as ADR 0013 requires.
