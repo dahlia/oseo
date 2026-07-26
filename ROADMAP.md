@@ -471,7 +471,41 @@ records. It does not admit the dynamic source family, which
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps outside the
 profile even though `eval` and the `Function` constructor are normative core.
 Those cases remain inside the inventory; their result rows remain unsupported
-and wait for M5c.
+and wait for M5c. The *eval-code/*, *built-ins/eval/*, and *dynamic-import/*
+directories hold 977 of the 41,091 included paths. Source-compiling cases in
+the `Function`, `GeneratorFunction`, `AsyncFunction`, and
+`AsyncGeneratorFunction` families are closed for the same reason and are not
+counted here, because separating them from the non-compiling members of those
+families needs the per-case review M5c performs.
+
+Its remaining families are ordered by dependency, using inventory counts only
+to break ties:
+
+| Order | Family                 | Inventory paths |
+| ----- | ---------------------- | --------------- |
+| 1     | Object literals        | 1,170           |
+| 2     | Synchronous generators | 640             |
+| 3     | Classes                | 8,494           |
+| 4     | Asynchronous iteration | 2,231           |
+
+Each count is the deduplicated set of included paths under the directories that
+family owns. Classes cover *expressions/class/*, *statements/class/*, and
+*expressions/super/*. Asynchronous iteration covers *for-await-of/*, both
+*async-generator/* directories, and the `AsyncGeneratorPrototype`,
+`AsyncGeneratorFunction`, and `AsyncIteratorPrototype` intrinsics.
+
+Object literals come first because their accessors, computed keys, and
+shorthand methods share lowering with class elements. Synchronous generators
+precede asynchronous iteration because the asynchronous forms extend their
+suspension records. Classes are the largest family in the checkpoint, near
+four times the next one, and they decompose into many units covering methods,
+accessors, static members, fields, private names, static blocks, `super`, and
+inheritance; the count is what those units eventually reach together, not one
+checkpoint.
+
+A count is an upper bound on direct promotion rather than a forecast. Many
+class expression cases also require machinery outside the family, so a family
+rarely promotes its whole count when it lands.
 
 M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
