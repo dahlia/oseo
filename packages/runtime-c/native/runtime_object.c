@@ -672,15 +672,6 @@ OseoResult oseo_object_set(
     bool extends_array = is_array(object_value) &&
         array_index(key, &receiver_index) &&
         receiver_index >= receiver->array_length;
-    if (extends_array && !receiver->length_writable) {
-        if (strict) {
-            return type_error(
-                context,
-                "Cannot extend an array with a read-only length."
-            );
-        }
-        return normal(value);
-    }
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoOrdinaryObject *owner = ordinary_object(current);
@@ -737,6 +728,15 @@ OseoResult oseo_object_set(
             break;
         }
         current = owner->prototype;
+    }
+    if (extends_array && !receiver->length_writable) {
+        if (strict) {
+            return type_error(
+                context,
+                "Cannot extend an array with a read-only length."
+            );
+        }
+        return normal(value);
     }
     OseoResult grown = grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;

@@ -621,6 +621,27 @@ setTimeout(task, delay);
     /error\[OSEO2001\]: TypeError: Cannot extend an array with a/u,
   );
 
+  const inheritedSetterRunsBeforeLengthCheck = await runNativeCli(
+    {
+      args: ["inherited-setter-runs-before-length-check.ts"],
+      source:
+        "const array = [1, 2];" +
+        'Object.defineProperty(array, "length", { writable: false });' +
+        "let received = 0;" +
+        "const proto = { set 5(value) { received = value; } };" +
+        "Object.setPrototypeOf(array, proto);" +
+        "array[5] = 9;" +
+        'const descriptor = Object.getOwnPropertyDescriptor(array, "5");' +
+        "console.log(array.length, received, descriptor === undefined);",
+      sourceId: "inherited-setter-runs-before-length-check.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.exitStatus, 0);
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.stdout, "2 9 true\n");
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.stderr, "");
+
   const accessorForArrayLength = await runNativeCli(
     {
       args: ["accessor-for-array-length.ts"],
