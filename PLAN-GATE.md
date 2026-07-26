@@ -256,11 +256,11 @@ size the claim requires, one checked-in file holds a number of records that no
 reviewer can inspect and that every concurrent unit conflicts on.
 
 The M5a inventory does not create that file. ADR 0020 stores 47,381 candidate
-paths in a separate 47,390-line tab-separated index, of which 41,092 form the
+paths in a separate 47,390-line tab-separated index, of which 41,091 form the
 edition denominator. The index records only path, boundary, and basis, while
 *results.yaml* remains the source of truth for observations. This keeps
 enumeration reviewable without satisfying or bypassing this checkpoint.
-The isolated exact-regeneration check takes 4.89 s with a 1.15
+The isolated exact-regeneration check takes 4.93 s with a 1.15
 processor-time-to-wall ratio, as recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 

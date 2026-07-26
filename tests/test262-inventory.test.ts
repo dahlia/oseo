@@ -17,6 +17,8 @@ suiteRevision: test-revision
 candidateRoots: [test/built-ins, test/language]
 annexBPathPrefixes:
   - test/built-ins/Object/prototype/__proto__/
+annexBPaths:
+  - test/built-ins/WeakRef/prototype/constructor.js
 sources:
   edition: https://github.com/tc39/ecma262/tree/test-edition
   featureRegistry: https://github.com/tc39/test262/blob/test/features.txt
@@ -33,6 +35,7 @@ decorators
 ## Standard language features
 class
 Temporal
+WeakRef
 __proto__
 
 ## Test-Harness Features
@@ -67,6 +70,19 @@ test("excludes reviewed Annex B paths but retains core dependencies", () => {
       basis: "optional-section:annex-b",
       boundary: "excluded",
       path: "test/built-ins/Object/prototype/__proto__/prop-desc.js",
+    },
+  );
+  assert.deepEqual(
+    classifyInventoryEntry(
+      "test/built-ins/WeakRef/prototype/constructor.js",
+      ["WeakRef"],
+      registry,
+      policy,
+    ),
+    {
+      basis: "optional-section:annex-b",
+      boundary: "excluded",
+      path: "test/built-ins/WeakRef/prototype/constructor.js",
     },
   );
   assert.deepEqual(

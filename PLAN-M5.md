@@ -21,8 +21,8 @@ honest unsupported classifications. The current reviewed manifest records 310
 passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
-M5a denominator at 41,092 paths from 47,381 candidates: 22,998 language tests
-and 18,094 built-in tests are inside the 16th edition, while 6,289 proposal,
+M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
+and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
@@ -716,7 +716,7 @@ Delivery order
     functions, and top-level await already implemented in M4.
 3.  Publish a dependency-indexed baseline that names every supported and
     unsupported group without inflating passes.
-4.  Publish the 41,092-path applicable-test inventory under the reviewed
+4.  Publish the 41,091-path applicable-test inventory under the reviewed
     edition-mapping rule in
     [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md).
 5.  Complete foundational expressions, coercions, bindings, errors, symbols,

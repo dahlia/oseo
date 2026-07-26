@@ -104,8 +104,8 @@ Observed results
 ----------------
 
 [ADR 0020](./0020-m5-applicable-test-inventory.md) now classifies all 47,381
-candidate paths. It includes 41,092 paths inside the 16th edition and excludes
-6,289 proposal, post-edition, or Annex B paths. The 681 reviewed result rows
+candidate paths. It includes 41,091 paths inside the 16th edition and excludes
+6,290 proposal, post-edition, or Annex B paths. The 681 reviewed result rows
 therefore cover 1.66 percent of the exact denominator.
 
 The denominator and label remain independent. The checked-in inventory makes

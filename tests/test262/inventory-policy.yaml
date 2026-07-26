@@ -11,6 +11,8 @@ annexBPathPrefixes:
   - test/built-ins/Object/prototype/__lookupGetter__/
   - test/built-ins/Object/prototype/__lookupSetter__/
   - test/built-ins/Object/prototype/__proto__/
+annexBPaths:
+  - test/built-ins/WeakRef/prototype/constructor.js
 sources:
   edition: https://github.com/tc39/ecma262/tree/84b38ad852ff426795fa29cebc06949027336c64
   featureRegistry: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/features.txt

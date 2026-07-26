@@ -19,6 +19,7 @@ export type Test262InventoryBoundary = "excluded" | "included";
 /** Rules mapping the pinned Test262 corpus to one ECMA-262 edition. */
 export interface Test262InventoryPolicy {
   readonly annexBPathPrefixes: readonly string[];
+  readonly annexBPaths: readonly string[];
   readonly candidateRoots: readonly string[];
   readonly edition: number;
   readonly editionYear: number;
@@ -163,8 +164,28 @@ export function parseInventoryPolicy(text: string): Test262InventoryPolicy {
       );
     }
   }
+  const annexBPaths = sortedUnique(
+    stringArray(root.annexBPaths, "test262 Annex B paths"),
+    "test262 Annex B paths",
+  );
+  for (const path of annexBPaths) {
+    if (
+      !path.endsWith(".js") ||
+      !candidateRoots.some((candidateRoot) =>
+        path.startsWith(`${candidateRoot}/`),
+      )
+    ) {
+      throw new Error(
+        `test262 Annex B path ${path} must be a candidate JavaScript file.`,
+      );
+    }
+    if (annexBPathPrefixes.some((prefix) => path.startsWith(prefix))) {
+      throw new Error(`test262 Annex B path ${path} repeats a path prefix.`);
+    }
+  }
   return {
     annexBPathPrefixes,
+    annexBPaths,
     candidateRoots,
     edition: positiveInteger(root.edition, "test262 inventory edition"),
     editionYear,
@@ -275,7 +296,10 @@ export function classifyInventoryEntry(
       );
     }
   }
-  if (policy.annexBPathPrefixes.some((prefix) => path.startsWith(prefix))) {
+  if (
+    policy.annexBPaths.includes(path) ||
+    policy.annexBPathPrefixes.some((prefix) => path.startsWith(prefix))
+  ) {
     return {
       basis: "optional-section:annex-b",
       boundary: "excluded",
@@ -419,6 +443,11 @@ async function createInventory(
   for (const prefix of policy.annexBPathPrefixes) {
     if (!paths.some((path) => path.startsWith(prefix))) {
       throw new Error(`Test262 Annex B path prefix ${prefix} matched no path.`);
+    }
+  }
+  for (const path of policy.annexBPaths) {
+    if (!paths.includes(path)) {
+      throw new Error(`Test262 Annex B path ${path} does not exist.`);
     }
   }
   const entries: Test262InventoryEntry[] = [];

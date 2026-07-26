@@ -102,6 +102,11 @@ core, while two are already excluded with the `error-stack-accessor` proposal.
 ADR 0013 assigns any unsupported observation for an included dependency to
 the result manifest.
 
+The 16th edition also marks `WeakRef.prototype.constructor` normative
+optional, and its Test262 frontmatter says to treat the clause identically to
+Annex B. It is one exact file among otherwise required WeakRef tests, so a
+directory prefix would be too broad.
+
 The reviewed publication-year map comes from TC39's
 [*finished-proposals.md*]
 at revision `1eb7ced36bcb794e75af0b0a24c8199fba6bc6f3`, the last change to
@@ -136,21 +141,21 @@ The generated inventory contains:
 | Candidate root    | Included | Excluded |  Total |
 | ----------------- | -------: | -------: | -----: |
 | *test/language/*  |   22,998 |      715 | 23,713 |
-| *test/built-ins/* |   18,094 |    5,574 | 23,668 |
-| Total             |   41,092 |    6,289 | 47,381 |
+| *test/built-ins/* |   18,093 |    5,575 | 23,668 |
+| Total             |   41,091 |    6,290 | 47,381 |
 
 The post-edition flag rule matches 5,434 paths. The proposed-feature rule
 matches 798 paths, and 12 paths match both, producing 6,220 unique
-edition exclusions. The Annex B path rule excludes 69 additional paths. The
-41,092 included paths are the exact M5 denominator at the pinned revision.
+edition exclusions. The Annex B path rules exclude 70 additional paths. The
+41,091 included paths are the exact M5 denominator at the pinned revision.
 
-The compact inventory occupies 47,390 lines and 4,822,116 bytes: nine header
+The compact inventory occupies 47,390 lines and 4,822,128 bytes: nine header
 lines and one tab-separated row per candidate. It records no execution
 variants or observations.
 
-An isolated `mise run check:test262-inventory` sample completed in 4.89 s of
-wall time, 4.56 s of user time, and 1.09 s of system time, for a 1.15
-processor-time-to-wall ratio. Peak resident memory was 359,492 KiB. The host
+An isolated `mise run check:test262-inventory` sample completed in 4.93 s of
+wall time, 4.61 s of user time, and 1.06 s of system time, for a 1.15
+processor-time-to-wall ratio. Peak resident memory was 364,616 KiB. The host
 facts and reproduction command are recorded in
 [*gate-cost-baseline.md*](../gate-cost-baseline.md).
 
@@ -161,18 +166,19 @@ Decision
 The machine-readable policy is
 *tests/test262/inventory-policy.yaml*. It pins the edition, suite revision,
 candidate roots, authoritative sources, and the reviewed post-edition feature
-map. It also pins the five Annex B path prefixes that Test262 stores in a
-candidate root.
+map. It also pins the five Annex B path prefixes and one exact normative
+optional path that Test262 stores in a candidate root.
 
 The classifier applies these rules in order:
 
 1.  Enumerate sorted non-fixture *.js* paths under *test/built-ins/* and
     *test/language/*. The ADR 0013 directory exclusions never enter this
     candidate set.
-2.  Exclude a path beneath a reviewed Annex B prefix. Record the reason as
+2.  Exclude a path when it matches a reviewed exact Annex B path or lies
+    beneath a reviewed Annex B prefix. Record the reason as
     `optional-section:annex-b`. Validate its feature metadata, but do not use
-    the broad `__proto__`, `__getter__`, or `__setter__` flags to exclude
-    core tests that only depend on the optional behavior.
+    the broad `__proto__`, `__getter__`, or `__setter__` flags to exclude core
+    tests that only depend on the optional behavior.
 3.  Exclude a path when any frontmatter feature belongs to the proposed
     section of the pinned *features.txt*. Record each such reason as
     `proposal:<feature>`.
@@ -216,13 +222,13 @@ Consequences
 ------------
 
 M5 coverage can now report the reviewed result count, the exact denominator
-of 41,092, and owned exclusions separately. The current 681 reviewed paths
+of 41,091, and owned exclusions separately. The current 681 reviewed paths
 cover 1.66 percent of that denominator; the percentage does not imply that
 unreviewed paths have passed or failed.
 
 The inventory resolves the denominator-size problem without resolving the
 result-manifest partitioning checkpoint. Expanding measured results toward
-41,092 rows still requires the partitioned observation format in
+41,091 rows still requires the partitioned observation format in
 [*PLAN-GATE.md*](../../PLAN-GATE.md).
 
 The default for an unflagged path relies on Test262's proposal-tagging policy.

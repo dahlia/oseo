@@ -3,8 +3,8 @@
 # edition: 16
 # edition-year: 2025
 # candidates: 47381
-# included: 41092
-# excluded: 6289
+# included: 41091
+# excluded: 6290
 # featureless-included: 16027
 path	boundary	basis
 test/built-ins/AbstractModuleSource/length.js	excluded	proposal:source-phase-imports
@@ -23215,7 +23215,7 @@ test/built-ins/WeakRef/prototype-from-newtarget-abrupt.js	included	edition-2025
 test/built-ins/WeakRef/prototype-from-newtarget-custom.js	included	edition-2025
 test/built-ins/WeakRef/prototype-from-newtarget.js	included	edition-2025
 test/built-ins/WeakRef/prototype/Symbol.toStringTag.js	included	edition-2025
-test/built-ins/WeakRef/prototype/constructor.js	included	edition-2025
+test/built-ins/WeakRef/prototype/constructor.js	excluded	optional-section:annex-b
 test/built-ins/WeakRef/prototype/deref/custom-this.js	included	edition-2025
 test/built-ins/WeakRef/prototype/deref/length.js	included	edition-2025
 test/built-ins/WeakRef/prototype/deref/name.js	included	edition-2025
