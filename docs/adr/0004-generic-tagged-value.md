@@ -105,9 +105,14 @@ addresses, top-byte-ignore metadata, pointer authentication, or other pointer
 forms that do not fit the checked 48-bit payload. Reopen it if sanitizers expose
 an invalid pointer round trip, a moving collector needs incompatible metadata,
 or measured M1 code shows that canonicalization or tag checks outweigh avoided
-number allocation. The named follow-up is “M1 target-address validation,” which
-allocates at every runtime heap boundary and rejects a target before any address
-is truncated.
+number allocation. The named follow-up is “M1 target-address validation,”
+which allocates at every runtime heap boundary and rejects a target before any
+address is truncated.
+
+Reopen the decision also before adopting a capability-checked C target such as
+Fil-C: in this layout a heap reference reloaded from a stored `OseoValue` word
+is an integer load that carries no pointer capability, so it could not be
+dereferenced.
 
 
 Links
@@ -117,3 +122,6 @@ Links
 limits accepted execution to x86-64.
 [*0006-root-stack-and-safepoints.md*](./0006-root-stack-and-safepoints.md)
 defines how tagged heap references become roots.
+[*docs/fil-c-observations.md*](../fil-c-observations.md) records the Fil-C
+evidence behind the capability-checked target trigger and its watch
+conditions.
