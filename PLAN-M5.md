@@ -9,7 +9,7 @@ live bindings, promises, asynchronous continuations, top-level await, and a
 deterministic native scheduler. M5 expands that documented subset through
 measured compatibility work rather than treating ECMAScript as one feature.
 
-The first three delivery items are complete.
+The first four delivery items are complete.
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
 edition, optional-section policy, and manifest schema, and
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) is the living
@@ -20,15 +20,20 @@ errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records 310
 passes, 245 expected negatives, and 126 unsupported profile features with no
 semantic or harness failures.
+[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
+M5a denominator at 41,161 paths from 47,381 candidates: 22,998 language tests
+and 18,163 built-in tests are inside the 16th edition, while 6,220 proposal or
+post-edition paths are outside it. The compact inventory remains separate from
+the result manifest.
 
-Delivery item 7 is resolved for dynamic source:
+Delivery item 8 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
 `Function` constructor, and dynamic import explicitly unsupported with owned
 diagnostics and the `dynamic-source` manifest tag.
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
 track without reopening the M5 decision. Realms, agents, and shared memory
 remain classified through missing harness capabilities.
-Delivery item 4 is substantially in progress. The admitted syntax now
+Delivery item 5 is substantially in progress. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
@@ -166,7 +171,7 @@ annotations that require resolution remain explicit boundaries. Awaited member
 targets remain later work. The runtime component
 boundaries recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) are implemented,
-so that work is no longer blocked on them. Delivery items 5, 6, 8, and 9
+so that work is no longer blocked on them. Delivery items 6, 7, 9, and 10
 remain open.
 
 Before the next broad M5 syntax and built-in batches, the compiler, Babel
@@ -711,17 +716,20 @@ Delivery order
     functions, and top-level await already implemented in M4.
 3.  Publish a dependency-indexed baseline that names every supported and
     unsupported group without inflating passes.
-4.  Complete foundational expressions, coercions, bindings, errors, symbols,
+4.  Publish the 41,161-path applicable-test inventory under the reviewed
+    edition-mapping rule in
+    [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md).
+5.  Complete foundational expressions, coercions, bindings, errors, symbols,
     and iterator protocols required by multiple later families.
-5.  Add built-in object families in dependency order with descriptor,
+6.  Add built-in object families in dependency order with descriptor,
     collector, differential, and property evidence.
-6.  Broaden function, class, generator, asynchronous, and module syntax through
+7.  Broaden function, class, generator, asynchronous, and module syntax through
     traced environment and continuation records.
-7.  Resolve ahead-of-time challenge features through accepted decisions or
+8.  Resolve ahead-of-time challenge features through accepted decisions or
     explicit unsupported classifications.
-8.  Increase the reviewed standards corpus and grammar-generated corpus while
+9.  Increase the reviewed standards corpus and grammar-generated corpus while
     keeping ordinary and extended gates within published budgets.
-9.  Close or explicitly authorize every result inside the checked-in
+10. Close or explicitly authorize every result inside the checked-in
     applicable-test inventory, and publish the reproducible coverage evidence.
     The unqualified conformance label belongs to the later gate that
     [ADR 0019](./docs/adr/0019-m5-claim-closure.md) defines.

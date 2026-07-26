@@ -262,6 +262,30 @@ pool bound, and total retries appear in run output and failure metadata, never
 in the canonical manifest.
 
 
+Applicable-test inventory check
+-------------------------------
+
+ADR 0020 adds `mise run check:test262-inventory` to the default check gate.
+The task walks the 47,381 candidate paths, parses their frontmatter, regenerates
+the complete path index in memory, and compares it with the checked-in
+inventory. It executes no standards case.
+
+The isolated sample ran on the same operating system, processor, memory,
+storage, and tool versions as the concurrent sample above. No native build or
+other heavy test task ran at the same time.
+
+| Task                               |   Wall |   User | System | CPU / wall |
+| ---------------------------------- | -----: | -----: | -----: | ---------: |
+| `mise run check:test262-inventory` | 5.02 s | 4.63 s | 1.16 s |       1.15 |
+
+The process peaked at 364,128 KiB of resident memory. The exact-regeneration
+check is retained because it detects changes to candidate paths, frontmatter,
+the edition policy, and the generated index in one invariant. If it enters the
+default check's critical path as the corpus grows, the replacement keeps exact
+regeneration while using bounded reads or a separate CI comparison rather than
+weakening the inventory validation.
+
+
 Load sensitivity
 ----------------
 
@@ -314,6 +338,7 @@ Reproduction
 mise run test:test262
 OSEO_RUNTIME_ARCHIVE_REUSE=disabled mise run test:test262
 mise run test:property:native
+mise run check:test262-inventory
 ~~~~
 
 The decomposition used `zig cc` directly with the flags the toolchain
