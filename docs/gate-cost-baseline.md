@@ -219,20 +219,31 @@ negatives. No semantic failure occurred in either run.
 
 The run 2 failures are contiguous in reviewed order rather than distributed by
 feature, and they are `OSEO3001` native infrastructure diagnostics rather than
-semantic mismatches or compile diagnostics. `OSEO3001` does not name a cause,
-and this baseline did not measure peak resident memory or peak temporary
-storage, so the exhausted resource is not identified. The host facts above are
-snapshots, not measurements taken during the failing window.
+semantic mismatches or compile diagnostics. `OSEO3001` did not name a cause,
+and the baseline runs did not measure their peak resident memory or peak
+temporary storage. The host facts above are snapshots, not measurements taken
+during those failing windows, so the baseline observations alone do not
+identify the cause of either failure.
 
 What the runs do establish is narrower. No semantic failure occurred. Every
 affected path reported its expected classification when executed alone. The
 command-line entry point removes its working directory on the failure path as
 well as the success path, so the run did not accumulate directories.
 
-`OSEO3001` currently maps a resource failure and a harness defect to one
-classification. Before enabling concurrent execution, measure peak resident
-memory and peak temporary storage for one execution, since concurrency
-multiplies whatever working set each execution holds.
+The later archive-reuse checkpoint measured one reused execution at 47.8 MiB
+peak process-tree resident memory and 4.40 MiB peak allocated temporary
+storage. Its excluded bypass sample also observed a specific resource failure:
+a competing eight-worker Node.js test drove memory in use to 55 GiB, exhausted
+all 8 GiB of swap, and raised the load average above 70 before unrelated
+expected passes were reported as harness failures. That observation identifies
+memory and swap exhaustion for the excluded sample. It does not establish that
+the earlier baseline failures had the same cause.
+
+`OSEO3001` still maps a resource failure and a harness defect to one
+classification. Bounded concurrency therefore uses the measured reused
+footprint, records its aggregate bound, and runs without unrelated heavy load.
+It must also narrow the diagnostic before retrying only a named retryable
+resource failure.
 
 
 Reproduction
