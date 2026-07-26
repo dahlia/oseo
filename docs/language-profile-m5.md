@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 681 reviewed cases: 310 passes, 245 expected
+The current manifest contains 957 reviewed cases: 586 passes, 245 expected
 negatives, and 126 unsupported profile features. It records no semantic or
 harness failures.
 
@@ -563,6 +563,38 @@ its deliberate boundary and its evidence:
     assignment heads reuse this pattern and target contract. Pattern type
     annotations and `await` inside a source property name, default, or member
     target remain outside this syntax unit.
+ -  Basic object literal expressions. An object literal creates a fresh
+    ordinary object and adds each data property, shorthand property, and
+    method definition as an own writable, enumerable, configurable data
+    property in source order, reusing the generic object allocation and
+    property write paths already built for object rest destructuring. Each
+    property value evaluates left to right, and its storage growth is a
+    declared MIR safepoint. A shorthand property reads the value of an
+    existing binding with the same name as its key. A method definition
+    creates a function whose dynamic `this` binds the call-site receiver
+    like any other function and reuses the existing anonymous-function name
+    inference so its name matches its key, but whose distinct runtime
+    function kind keeps it non-constructible and without an own `prototype`
+    property, unlike the constructible functions created by function
+    declarations and function expressions; arrow functions remain
+    non-constructible and prototype-less for the separate reason that they
+    already bind lexical `this`. Computed property keys were already
+    admitted by prior work. Deliberate boundaries, each rejected with a
+    source-located diagnostic in every syntactic form including shorthand
+    and method keys:
+    getter and setter accessors, object spread properties, and the Annex B
+    `__proto__` property-name special case. Native differential fixtures
+    retain the empty object, single and multiple data properties, shorthand
+    from a local binding and from a parameter, a method's `this` reference
+    and non-constructible identity, nested object literals, left-to-right
+    evaluation order, abrupt completion in a property value, and forced
+    collection across property safepoints. A generated property with seed
+    `0x5eed0015` covers zero to four data, shorthand, and method properties
+    and bounded integer values across Node.js, Deno, both specialization
+    policies, and forced collection on the enabled path. Two hundred
+    seventy-six reviewed test262 cases cover property-name forms, method
+    definitions, non-constructible method identity, and the destructuring
+    parameter patterns their method bodies already supported.
 
 
 Known gaps inside the claim

@@ -138,6 +138,7 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_ASYNC:
         case OSEO_FUNCTION_ASYNC_ARROW:
         case OSEO_FUNCTION_INTERNAL:
+        case OSEO_FUNCTION_METHOD:
             break;
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");

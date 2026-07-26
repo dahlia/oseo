@@ -814,6 +814,7 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     arrow: "OSEO_FUNCTION_ARROW",
     async: "OSEO_FUNCTION_ASYNC",
     "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
+    method: "OSEO_FUNCTION_METHOD",
     ordinary: "OSEO_FUNCTION_ORDINARY",
   } as const;
   const units = utf16Units(operation.functionName);
