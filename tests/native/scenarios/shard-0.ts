@@ -85,6 +85,7 @@ export async function runNativeScenario0(
         keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
         operation: "execute",
         runtime: multiSourceRuntime,
+        runtimeArchiveReuse: "disabled",
         target: nativeTarget,
         toolchain: zigToolchain,
       },
@@ -102,7 +103,7 @@ export async function runNativeScenario0(
         assert.equal(compileLines.length, expectedNames.length);
         expectedNames.forEach((name, index) => {
           assert.ok(
-            compileLines[index]?.includes(`/${name} `),
+            compileLines[index]?.includes(` -c ${name} -o `),
             `compile request ${index} covers ${name}`,
           );
         });

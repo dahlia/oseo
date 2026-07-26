@@ -86,6 +86,10 @@ const executionTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 )?.name;
+const runtimeArchiveReuse =
+  process.env.OSEO_RUNTIME_ARCHIVE_REUSE === "disabled"
+    ? "disabled"
+    : "enabled";
 const parityTargets = [canonicalTarget, "macos-aarch64"] as const;
 
 interface FrontmatterNegative {
@@ -1170,6 +1174,9 @@ const nativeExecutor: Test262Executor = {
     const args = [
       ...(request.mode === "module" ? ["--module"] : []),
       ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
+      ...(runtimeArchiveReuse === "disabled"
+        ? ["--no-runtime-archive-reuse"]
+        : []),
       ...(executionTarget == null ? [] : ["--target", executionTarget]),
       entry,
     ];

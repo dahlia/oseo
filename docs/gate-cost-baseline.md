@@ -99,15 +99,112 @@ What the samples do show is that linking and running a trivial program against
 an existing archive costs 20-43 ms, while building the archive costs 333 to
 641 ms. Across the recorded pairs that is a factor of roughly 8 to 32. The
 archive depends on the reviewed runtime sources and headers, the compile flags,
-the toolchain version, and the target and sanitizer selection. None of those
-change between reviewed cases in one gate run, and the archive is rebuilt for
-every execution.
+the resolved toolchain identity, one immutable admitted-environment snapshot,
+the exact inherited environment policy, and the target and sanitizer
+selection. Ambient compiler inputs outside that policy are removed. None of
+those change between reviewed cases in one gate run, and the archive is rebuilt
+for every execution.
+
+
+Per-execution footprint before archive reuse
+--------------------------------------------
+
+The runtime archive checkpoint first measured one complete `runNativeCli`
+execution of `const x = 1 + 1;` at commit `9eb7de2`. The execution ran alone
+in a transient user systemd service with memory accounting enabled. The
+service cgroup reported the peak resident memory for the Node.js process and
+all of its native toolchain children.
+
+The new _oseo-cli-\*_ working directory was sampled every 5 ms from creation
+through the final pre-removal observation. Allocated storage is the sum of
+filesystem blocks reported by `lstat`; apparent storage is the sum of file
+and directory sizes. Preexisting _oseo-cli-\*_ directories were excluded.
+
+| Measurement                   | Peak                      |
+| ----------------------------- | ------------------------- |
+| Resident memory, process tree | 192.9 MiB                 |
+| Temporary storage, allocated  | 7,786,496 bytes, 7.43 MiB |
+| Temporary storage, apparent   | 7,731,724 bytes, 7.37 MiB |
+
+The service completed successfully. Its 1.567 s service runtime and 1.555 s
+processor time include the 5 ms filesystem sampler and are not gate-duration
+measurements. The gate comparison below measures wall and processor time
+without that sampler.
+
+The same source, sampler, and cgroup measurement were repeated after the
+runtime archive checkpoint with a valid archive already present:
+
+| Measurement                   | Before                    | Reuse                     | Reduction |
+| ----------------------------- | ------------------------- | ------------------------- | --------- |
+| Resident memory, process tree | 192.9 MiB                 | 47.8 MiB                  | 75.2%     |
+| Temporary storage, allocated  | 7,786,496 bytes, 7.43 MiB | 4,616,192 bytes, 4.40 MiB | 40.7%     |
+| Temporary storage, apparent   | 7,731,724 bytes, 7.37 MiB | 4,610,180 bytes, 4.40 MiB | 40.4%     |
+
+The reuse measurement completed successfully in 238 ms of service runtime and
+210 ms of processor time. Those durations still include the sampler and remain
+outside the unsampled gate comparison. The footprint reduction is the input to
+the later bounded-concurrency decision; the persistent 1,438,318-byte archive
+is shared cache state rather than per-execution temporary storage.
+
+
+Runtime archive reuse checkpoint
+--------------------------------
+
+The checkpoint comparison ran on the same operating system, processor, target,
+and tool versions as the baseline. Host pressure differed between the two
+test262 samples and is recorded rather than normalized away:
+
+| Fact                      | Reuse sample       | Bypass sample      |
+| ------------------------- | ------------------ | ------------------ |
+| Memory available at start | 6.1 GiB            | 23.9 GiB           |
+| */tmp* capacity           | 31 GiB             | 31 GiB             |
+| */tmp* use at start       | 80 percent         | 18 percent         |
+| Load average at start     | 11.18/9.67/9.98    | 13.34/39.73/47.90  |
+| Nearby CPU I/O wait       | about 25 percent   | 25 percent         |
+| Oseo target               | `linux-x86_64-gnu` | `linux-x86_64-gnu` |
+| Sanitizers                | address, undefined | address, undefined |
+| Zig                       | 0.16.0             | 0.16.0             |
+| Node.js                   | 24.18.0            | 24.18.0            |
+| Deno                      | 2.9.2              | 2.9.2              |
+
+The bypass sample began only after a competing eight-worker Node.js test had
+finished and memory had recovered. Both successful test262 samples executed
+the same 681 reviewed paths and reported 310 passes, 245 expected negatives,
+126 unsupported profile features, and no semantic or harness failures.
+
+| Task and path                            | Wall       | User     | System   | CPU / wall |
+| ---------------------------------------- | ---------- | -------- | -------- | ---------- |
+| `mise run test:test262`, reuse           | 270.64 s   | 216.75 s | 76.21 s  | 1.08       |
+| `mise run test:test262`, explicit bypass | 1,180.85 s | 783.15 s | 396.83 s | 1.00       |
+| `mise run test:property:native`, reuse   | 8.93 s     | 67.31 s  | 30.13 s  | 10.91      |
+
+The successful bypass is the same-checkout control for the test262 result.
+Reuse removed 910.21 s of wall clock, 77.1 percent of the bypass duration, and
+887.02 processor-seconds, 75.2 percent of the bypass processor time. The gate
+was 4.36 times faster with reuse. Compared with the older baseline, native
+property wall clock fell from 42.8 s to 8.93 s and its processor time fell from
+420.9 s to 97.44 s.
+
+The test262 difference establishes the net share of the complete runtime
+archive rebuild path that reuse removes. It includes avoiding runtime source
+copies and includes the new key calculation and cache lookup overhead, so it
+does not claim that 77.1 percent is isolated `zig cc` time. It does establish
+that repeated runtime preparation, rather than the generated-program link and
+execution alone, occupied most of the gate.
+
+One earlier bypass attempt is excluded from the table. A competing
+eight-worker Node.js test started during that run; the host reached 55 GiB in
+use, exhausted all 8 GiB of swap, and exceeded a load average of 70. The Oseo
+run then reported many unrelated expected passes as harness failures after
+1,098.22 s. No Oseo or Zig child remained afterward. The successful isolated
+bypass above replaces that load-contaminated sample rather than averaging it
+into the checkpoint result.
 
 
 Load sensitivity
 ----------------
 
-Neither full-corpus run of the reviewed subset completed without
+Neither baseline full-corpus run of the reviewed subset completed without
 infrastructure failures on this host.
 
 | Run | Commit    | Competing load       | Result                  |
@@ -143,6 +240,7 @@ Reproduction
 
 ~~~~ sh
 mise run test:test262
+OSEO_RUNTIME_ARCHIVE_REUSE=disabled mise run test:test262
 mise run test:property:native
 ~~~~
 

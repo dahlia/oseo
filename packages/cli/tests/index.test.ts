@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { CompilerHost } from "@oseo/compiler";
+import { cRuntimeProvider } from "@oseo/runtime-c";
 
 import { runCli, runNativeCli } from "../src/index.ts";
 
@@ -10,6 +11,7 @@ test("prints deterministic MIR and C for accepted source", () => {
   assert.ok(help.stdout.includes("--emit-c"));
   assert.ok(help.stdout.includes("--dump-mir"));
   assert.ok(help.stdout.includes("--no-specialization"));
+  assert.ok(help.stdout.includes("--no-runtime-archive-reuse"));
   assert.ok(help.stdout.includes("--target"));
   const mir = runCli({
     args: ["--dump-mir", "fixture.ts"],
@@ -557,6 +559,302 @@ test("cleans temporary artifacts after native execution fails", async () => {
   assert.equal(result.exitStatus, 1);
   assert.equal(result.stderr, "runtime failure\n");
   assert.equal(cleanupCount, 1);
+});
+
+test("reuses a cached archive and preserves an explicit bypass", async () => {
+  let directoryIndex = 0;
+  let cached = false;
+  let cacheChecks = 0;
+  let publications = 0;
+  let cacheSetupFails = false;
+  let cacheLockFails = false;
+  let cacheLookupFails = false;
+  let publicationFails = false;
+  let runtimeWriteFails = false;
+  let environmentUnavailable = false;
+  let activeLocks = 0;
+  let capturedEnvironment:
+    | {
+        readonly variables: Readonly<Record<string, string>>;
+      }
+    | undefined;
+  const requests: string[][] = [];
+  const writes: string[][] = [];
+  let currentWrites: string[] = [];
+  const host: CompilerHost = {
+    cache: {
+      acquireFileLock() {
+        if (cacheLockFails) {
+          return Promise.reject(new Error("cache lock unavailable"));
+        }
+        activeLocks += 1;
+        let released = false;
+        return Promise.resolve({
+          release() {
+            if (!released) {
+              activeLocks -= 1;
+              released = true;
+            }
+            return Promise.resolve();
+          },
+        });
+      },
+      getDirectory() {
+        if (cacheSetupFails) {
+          return Promise.reject(new Error("cache directory unavailable"));
+        }
+        return Promise.resolve("/cache/runtime-archives");
+      },
+      hasFile() {
+        if (cacheLookupFails) {
+          return Promise.reject(new Error("cache lookup unavailable"));
+        }
+        cacheChecks += 1;
+        return Promise.resolve(cached);
+      },
+      publishFile() {
+        if (publicationFails) {
+          return Promise.reject(new Error("cache publication unavailable"));
+        }
+        cached = true;
+        publications += 1;
+        return Promise.resolve();
+      },
+    },
+    captureEnvironment() {
+      const environment = {
+        variables: {
+          HOME: "/home/test",
+          PATH: "/opt/zig/bin",
+        },
+      };
+      capturedEnvironment = environmentUnavailable ? undefined : environment;
+      return Promise.resolve(capturedEnvironment);
+    },
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
+    makeTemporaryDirectory() {
+      directoryIndex += 1;
+      currentWrites = [];
+      writes.push(currentWrites);
+      return Promise.resolve(`/temporary/oseo-cli-${directoryIndex}`);
+    },
+    readTextFile() {
+      return Promise.resolve("");
+    },
+    remove() {
+      return Promise.resolve();
+    },
+    run(request) {
+      if (request.command === "zig") {
+        assert.equal(request.environment, capturedEnvironment);
+      }
+      requests.push([request.command, ...request.args]);
+      return Promise.resolve({
+        exitStatus: 0,
+        stderr: "",
+        stdout:
+          request.command === "zig" && request.args[0] === "env"
+            ? "zig_exe=/opt/zig/zig\nZIG_LIBC=null\n"
+            : "",
+      });
+    },
+    writeTextFile(path) {
+      currentWrites.push(path);
+      return runtimeWriteFails && !path.endsWith("generated.c")
+        ? Promise.reject(new Error("runtime write unavailable"))
+        : Promise.resolve();
+    },
+  };
+  const invoke = async (args: readonly string[] = ["fixture.ts"]) =>
+    await runNativeCli(
+      {
+        args,
+        source: "console.log(42);",
+        sourceId: "fixture.ts",
+        version: "0.0.0",
+      },
+      host,
+    );
+  assert.equal((await invoke()).exitStatus, 0);
+  assert.equal(cached, true);
+  assert.equal(publications, 1);
+  const firstRequestCount = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const secondRequests = requests.slice(firstRequestCount);
+  assert.ok(
+    secondRequests.every(
+      (request) => request[1] !== "ar" && !request.includes("-c"),
+    ),
+    JSON.stringify(secondRequests),
+  );
+  const runtimeSourceNames = new Set(
+    cRuntimeProvider
+      .getRuntimeInput()
+      .assets.filter((asset) => asset.kind === "source")
+      .map((asset) => asset.name),
+  );
+  assert.ok(
+    writes[1]?.every(
+      (path) => !runtimeSourceNames.has(path.slice(path.lastIndexOf("/") + 1)),
+    ),
+  );
+  assert.equal(cacheChecks, 2);
+  assert.equal(publications, 1);
+
+  cacheSetupFails = true;
+  const setupFallbackStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const setupFallbackRequests = requests.slice(setupFallbackStart);
+  assert.ok(setupFallbackRequests.some((request) => request[1] === "ar"));
+  assert.ok(setupFallbackRequests.some((request) => request.includes("-c")));
+  cacheSetupFails = false;
+
+  cacheLockFails = true;
+  const lockFallbackStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const lockFallbackRequests = requests.slice(lockFallbackStart);
+  assert.ok(lockFallbackRequests.some((request) => request[1] === "ar"));
+  assert.ok(lockFallbackRequests.some((request) => request.includes("-c")));
+  cacheLockFails = false;
+
+  cacheLookupFails = true;
+  const lookupFallbackStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const lookupFallbackRequests = requests.slice(lookupFallbackStart);
+  assert.ok(lookupFallbackRequests.some((request) => request[1] === "ar"));
+  assert.ok(lookupFallbackRequests.some((request) => request.includes("-c")));
+  cacheLookupFails = false;
+
+  cached = false;
+  publicationFails = true;
+  const publicationFallbackStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const publicationFallbackRequests = requests.slice(publicationFallbackStart);
+  assert.ok(publicationFallbackRequests.some((request) => request[1] === "ar"));
+  assert.ok(
+    publicationFallbackRequests.some((request) => request.includes("-c")),
+  );
+  assert.equal(publications, 1);
+  publicationFails = false;
+
+  cached = false;
+  runtimeWriteFails = true;
+  assert.equal((await invoke()).exitStatus, 1);
+  assert.equal(activeLocks, 0);
+  runtimeWriteFails = false;
+
+  const bypassStart = requests.length;
+  assert.equal(
+    (await invoke(["--no-runtime-archive-reuse", "fixture.ts"])).exitStatus,
+    0,
+  );
+  const bypassRequests = requests.slice(bypassStart);
+  assert.ok(bypassRequests.some((request) => request[1] === "ar"));
+  assert.ok(bypassRequests.some((request) => request.includes("-c")));
+  assert.equal(cacheChecks, 4);
+  assert.equal(publications, 1);
+
+  environmentUnavailable = true;
+  const unavailableStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  const unavailableRequests = requests.slice(unavailableStart);
+  assert.ok(unavailableRequests.some((request) => request[1] === "ar"));
+  assert.ok(unavailableRequests.some((request) => request.includes("-c")));
+  assert.equal(cacheChecks, 4);
+});
+
+test("retries a failed Zig identity probe", async () => {
+  let cached = false;
+  let identityProbes = 0;
+  let publications = 0;
+  const requests: string[][] = [];
+  const host: CompilerHost = {
+    cache: {
+      acquireFileLock() {
+        return Promise.resolve({
+          release() {
+            return Promise.resolve();
+          },
+        });
+      },
+      getDirectory() {
+        return Promise.resolve("/cache/runtime-archives");
+      },
+      hasFile() {
+        return Promise.resolve(cached);
+      },
+      publishFile() {
+        cached = true;
+        publications += 1;
+        return Promise.resolve();
+      },
+    },
+    captureEnvironment() {
+      return Promise.resolve({
+        variables: {
+          HOME: "/home/test",
+          PATH: "/opt/zig/bin",
+        },
+      });
+    },
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
+    makeTemporaryDirectory() {
+      return Promise.resolve("/temporary/oseo-cli-retry");
+    },
+    readTextFile() {
+      return Promise.resolve("");
+    },
+    remove() {
+      return Promise.resolve();
+    },
+    run(request) {
+      requests.push([request.command, ...request.args]);
+      if (request.command === "zig" && request.args[0] === "env") {
+        identityProbes += 1;
+        return Promise.resolve({
+          exitStatus: identityProbes === 1 ? 1 : 0,
+          stderr: "",
+          stdout:
+            identityProbes === 1 ? "" : "zig_exe=/opt/zig/zig\nZIG_LIBC=null\n",
+        });
+      }
+      return Promise.resolve({ exitStatus: 0, stderr: "", stdout: "" });
+    },
+    writeTextFile() {
+      return Promise.resolve();
+    },
+  };
+  const invoke = async () =>
+    await runNativeCli(
+      {
+        args: ["fixture.ts"],
+        source: "console.log(42);",
+        sourceId: "fixture.ts",
+        version: "0.0.0",
+      },
+      host,
+    );
+  assert.equal((await invoke()).exitStatus, 0);
+  assert.equal(publications, 0);
+  assert.ok(requests.some((request) => request[1] === "ar"));
+  const retryStart = requests.length;
+  assert.equal((await invoke()).exitStatus, 0);
+  assert.equal(identityProbes, 2);
+  assert.equal(publications, 1);
+  assert.ok(
+    requests
+      .slice(retryStart)
+      .some((request) => request[0] === "zig" && request[1] === "env"),
+  );
+  assert.equal((await invoke()).exitStatus, 0);
+  assert.equal(identityProbes, 3);
+  assert.equal(publications, 1);
 });
 
 test("waits for pending runtime asset writes before cleanup", async () => {

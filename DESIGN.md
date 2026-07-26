@@ -685,6 +685,66 @@ the future capability requirement graph and retained manifest that can select a
 reviewed component closure. Static-linker dead stripping alone is not a
 capability contract.
 
+Runtime archive reuse preserves the same package direction. The concrete
+toolchain adapter calculates the reuse key and accepts a prebuilt archive in
+place of runtime source paths. Its key covers the ordered runtime source and
+header names, kinds, and contents, the runtime ABI version, its complete
+compile, archive, and link invocations, the observed toolchain identity and
+environment snapshot and policy, and the complete target and sanitizer
+description. The host captures the adapter-owned allowlist once for a native
+workflow. The identity probe and every Zig build request use that immutable
+snapshot, which is also included directly in the reuse key. Unlisted ambient
+inputs such as `CPATH` and `SDKROOT` cannot affect compilation. Mutable
+compiler-input overrides such as `ZIG_LIBC`, `ZIG_LIB_DIR`,
+`C_INCLUDE_PATH`, and Nix compiler flags are also excluded instead of treating
+their path strings as content identities. The supported targets use the pinned
+Zig installation and reviewed Oseo runtime assets.
+Temporary build paths are represented by stable placeholders so relocating one
+build does not change the artifact identity. Runtime objects are compiled from
+their stable relative source names with the runtime directory as the process
+working directory and a relative include path. A file-prefix map remains for
+compiler metadata that canonicalizes the working directory. Source and header
+paths embedded in sanitizer records therefore never name the deleted producer
+directory, and equivalent builds in different temporary directories produce
+identical archives.
+Each workflow observes a nonempty toolchain identity against its own snapshot.
+A host that cannot read its environment, including a Deno host without
+`--allow-env`, disables archive reuse for that workflow and builds with ordinary
+child inheritance.
+
+The host adapter owns the persistent cache directory, its lifetime, existence
+checks, per-artifact leases, and atomic publication. Linux follows
+`XDG_CACHE_HOME` with a *~/.cache* fallback, while macOS uses
+*~/Library/Caches*. Both place archives under an Oseo-owned namespace. The
+selected root is resolved to an absolute normalized path before clients
+receive it, so a toolchain process with a different working directory observes
+the same archive. The
+namespace API accepts portable leaf names other than `.` and `..`, so a cache
+client cannot select a parent or sibling namespace. The lease serializes the
+check-through-publication interval for one key, so
+concurrent cold callers build that archive once. Each lease records an owner
+token and renewable expiration time in a token-specific state file. An active
+owner advances that expiration while it holds the lease. Release and stale
+reclamation first rename the exact observed state file, so only the process
+that atomically claims that state may move the complete lock directory to a
+unique disposal path before deleting it. A replacement can then use the stable
+path without any earlier remover targeting it. Renewal overwrites only its
+already-claimed state file without permission to recreate a missing path. If a
+reclaimer replaces the directory, a suspended renewal therefore loses
+ownership instead of joining or removing the replacement lease. An exclusive
+state file protects the ownerless interval between directory creation and
+initial owner publication. A host without cache support, or one whose cache
+setup, lookup, lease, or publication fails, continues through the rebuilding
+path. The
+CLI's `--no-runtime-archive-reuse` option selects that same path deliberately
+when staleness is under investigation. A cache hit still copies the reviewed
+public runtime header needed to compile generated C, but it does not copy
+runtime source translation units or create their objects in the execution
+working directory. Content-addressed archives remain until the operating
+system or user removes the Oseo cache namespace. This checkpoint does not add
+automatic age or count pruning. Removing the archive namespace is safe and
+causes the next native execution to rebuild it.
+
 A future regular expression component follows the same rule. Literal-only
 programs may retain immutable matcher artifacts and shared execution primitives
 without retaining the dynamic pattern parser and compiler. Reachable dynamic

@@ -13,6 +13,20 @@ after both successful and failed workflows.
 Runtime assets are copied sequentially so every started read or write settles
 before temporary-directory cleanup begins.
 
+Native execution reuses a host-cached runtime archive when the host and
+toolchain expose that capability. A cache hit reads every reviewed runtime
+asset for key calculation, copies only the headers needed by generated C, and
+links without compiling the runtime translation units again. The
+`--no-runtime-archive-reuse` option is the deliberate rebuild path for
+investigating suspected staleness. Concurrent cold executions serialize one
+archive build per key. Cache setup, lookup, lease, and publication failures are
+optional optimization failures, so execution continues with a temporary
+uncached build. Each execution captures one compiler environment snapshot and
+uses it for the identity probe, key, and build requests. A failed or empty
+identity observation is not retained. An unavailable snapshot, including under
+Deno without `--allow-env`, disables reuse but preserves ordinary native
+compilation.
+
 The command line is defined with [Optique]. Its parser requires exactly one
 source path, keeps `--dump-mir` and `--emit-c` mutually exclusive, and rejects
 unknown or duplicate options before compilation. Optique also derives help,

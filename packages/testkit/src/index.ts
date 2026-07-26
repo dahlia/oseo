@@ -1,9 +1,11 @@
 import type {
+  CompilerCacheLock,
   CompilerHost,
   ExecutionHostDescription,
   NativeBackend,
   NativeToolchain,
   MirProgram,
+  ProcessEnvironment,
   ProcessObservation,
   ProcessRequest,
   RuntimeInputProvider,
@@ -42,6 +44,7 @@ export interface NativeFixtureOptions {
   readonly keepArtifacts?: boolean;
   readonly operation: NativeFixtureOperation;
   readonly runtime: RuntimeInputProvider;
+  readonly runtimeArchiveReuse?: "disabled" | "enabled";
   readonly target: TargetDescription;
   readonly toolchain: NativeToolchain;
 }
@@ -193,6 +196,44 @@ interface ProcessStepObservation {
 
 function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
+}
+
+function toolchainIdentity(
+  host: CompilerHost,
+  toolchain: NativeToolchain,
+  workingDirectory: string,
+  environment: ProcessEnvironment,
+): Promise<string> {
+  const reuse = toolchain.runtimeArchiveReuse;
+  if (reuse == null) {
+    return Promise.reject(
+      new Error("The native toolchain does not support archive reuse."),
+    );
+  }
+  const identityRequest = reuse.createIdentityRequest(
+    workingDirectory,
+    environment,
+  );
+  return host.run(identityRequest).then((observation) => {
+    if (observation.exitStatus !== 0) {
+      throw failedProcess(identityRequest, observation);
+    }
+    const identity = observation.stdout.trim();
+    if (identity === "") {
+      throw new Error("The native toolchain reported an empty identity.");
+    }
+    return identity;
+  });
+}
+
+async function releaseCacheLock(
+  lock: CompilerCacheLock | undefined,
+): Promise<void> {
+  try {
+    await lock?.release();
+  } catch {
+    // Cache cleanup cannot turn a usable native fixture into a failure.
+  }
 }
 
 /**
@@ -451,6 +492,7 @@ export async function withNativeFixture<T>(
   let compilerInvocation: readonly string[] = [];
   let emittedC: string | undefined;
   let nativeObservation: NativeFixtureObservation | undefined;
+  let cacheLock: CompilerCacheLock | undefined;
   const steps: ProcessStepObservation[] = [];
   let succeeded = false;
   try {
@@ -465,25 +507,94 @@ export async function withNativeFixture<T>(
     const generatedSourcePath = join(directory, emitted.sourceName);
     await options.host.writeTextFile(generatedSourcePath, emitted.source);
 
-    const copiedAssets = await Promise.all(
-      runtimeInput.assets.map(async (asset) => {
-        const destination = join(directory, asset.name);
-        await options.host.writeTextFile(
-          destination,
-          await options.host.readTextFile(asset.url),
+    const loadedAssets = await Promise.all(
+      runtimeInput.assets.map(async (asset) => ({
+        asset,
+        contents: await options.host.readTextFile(asset.url),
+      })),
+    );
+    if (!loadedAssets.some((entry) => entry.asset.kind === "source")) {
+      throw new Error("Runtime input did not contain a C source asset.");
+    }
+    const reuse = options.toolchain.runtimeArchiveReuse;
+    let toolchainEnvironment: ProcessEnvironment | undefined;
+    const environmentPolicy = options.toolchain.environment;
+    if (environmentPolicy != null && options.host.captureEnvironment != null) {
+      try {
+        toolchainEnvironment =
+          await options.host.captureEnvironment(environmentPolicy);
+      } catch {
+        // An unavailable snapshot keeps compilation on ordinary inheritance.
+      }
+    }
+    const cache =
+      options.runtimeArchiveReuse !== "disabled" &&
+      reuse != null &&
+      toolchainEnvironment != null
+        ? options.host.cache
+        : undefined;
+    let cachedArchivePath: string | undefined;
+    let publishArchivePath: string | undefined;
+    if (cache != null && reuse != null && toolchainEnvironment != null) {
+      try {
+        const identity = await toolchainIdentity(
+          options.host,
+          options.toolchain,
+          directory,
+          toolchainEnvironment,
         );
+        const key = await reuse.createKey({
+          runtimeAbiVersion: runtimeInput.abiVersion,
+          runtimeAssets: loadedAssets.map((entry) => ({
+            contents: entry.contents,
+            kind: entry.asset.kind,
+            name: entry.asset.name,
+          })),
+          target: options.target,
+          toolchainEnvironment,
+          toolchainIdentity: identity,
+        });
+        const cacheDirectory = await cache.getDirectory("runtime-archives");
+        const candidate = join(cacheDirectory, `liboseo-runtime-${key}.a`);
+        cacheLock = await cache.acquireFileLock(candidate);
+        if (await cache.hasFile(candidate)) {
+          cachedArchivePath = candidate;
+          await releaseCacheLock(cacheLock);
+          cacheLock = undefined;
+        } else {
+          publishArchivePath = candidate;
+        }
+      } catch {
+        await releaseCacheLock(cacheLock);
+        cacheLock = undefined;
+      }
+    }
+    const copiedAssets = await Promise.all(
+      loadedAssets.map(async (entry) => {
+        if (cachedArchivePath != null && entry.asset.kind === "source") {
+          return undefined;
+        }
+        const asset = entry.asset;
+        const destination = join(directory, asset.name);
+        await options.host.writeTextFile(destination, entry.contents);
         return { asset, destination };
       }),
     );
-    const runtimeSourcePaths = copiedAssets
-      .filter((entry) => entry.asset.kind === "source")
-      .map((entry) => entry.destination);
-    if (runtimeSourcePaths.length === 0) {
+    const runtimeSourcePaths = copiedAssets.flatMap((entry) =>
+      entry?.asset.kind === "source" ? [entry.destination] : [],
+    );
+    if (runtimeSourcePaths.length === 0 && cachedArchivePath == null) {
       throw new Error("Runtime input did not contain a C source asset.");
     }
 
     const plan = options.toolchain.createBuildPlan({
+      ...(toolchainEnvironment == null
+        ? {}
+        : { environment: toolchainEnvironment }),
       generatedSourcePath,
+      ...(cachedArchivePath == null
+        ? {}
+        : { prebuiltRuntimeArchivePath: cachedArchivePath }),
       runtimeDirectory: directory,
       runtimeSourcePaths,
       target: options.target,
@@ -495,6 +606,19 @@ export async function withNativeFixture<T>(
       const result = await options.host.run(request);
       steps.push({ observation: result, request });
       if (result.exitStatus !== 0) throw failedProcess(request, result);
+    }
+    if (
+      publishArchivePath != null &&
+      plan.runtimeArchivePath != null &&
+      cache != null
+    ) {
+      try {
+        await cache.publishFile(plan.runtimeArchivePath, publishArchivePath);
+      } catch {
+        // The completed fixture remains usable when optional publication fails.
+      }
+      await releaseCacheLock(cacheLock);
+      cacheLock = undefined;
     }
 
     let observation: ProcessObservation;
@@ -563,6 +687,7 @@ export async function withNativeFixture<T>(
       cause: error,
     });
   } finally {
+    await releaseCacheLock(cacheLock);
     if (succeeded && options.keepArtifacts !== true) {
       await options.host.remove(directory);
     }

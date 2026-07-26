@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { describeTarget } from "@oseo/compiler";
+import type { ProcessEnvironment } from "@oseo/compiler";
 
 import {
   assertMatchingObservations,
@@ -275,6 +276,238 @@ test("passes runtime sources to the toolchain in asset order", async () => {
       "/tmp/oseo-native-test/runtime_memory.c",
     ],
   ]);
+});
+
+test("serializes concurrent builds for one cold archive key", async () => {
+  let directoryIndex = 0;
+  let cached = false;
+  let compileBuilds = 0;
+  let publications = 0;
+  let lockTail = Promise.resolve();
+  const host: Host = {
+    cache: {
+      async acquireFileLock() {
+        const predecessor = lockTail;
+        let releaseLock: (() => void) | undefined;
+        lockTail = new Promise<void>((resolve) => {
+          releaseLock = resolve;
+        });
+        await predecessor;
+        return {
+          release() {
+            releaseLock?.();
+            return Promise.resolve();
+          },
+        };
+      },
+      getDirectory() {
+        return Promise.resolve("/cache/runtime-archives");
+      },
+      hasFile() {
+        return Promise.resolve(cached);
+      },
+      publishFile() {
+        cached = true;
+        publications += 1;
+        return Promise.resolve();
+      },
+    },
+    captureEnvironment() {
+      return Promise.resolve({ variables: { PATH: "/opt/zig/bin" } });
+    },
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
+    makeTemporaryDirectory() {
+      directoryIndex += 1;
+      return Promise.resolve(`/tmp/oseo-native-${directoryIndex}`);
+    },
+    readTextFile() {
+      return Promise.resolve("runtime input");
+    },
+    remove() {
+      return Promise.resolve();
+    },
+    run(request) {
+      if (request.args[0] === "env") {
+        return Promise.resolve({
+          exitStatus: 0,
+          stderr: "",
+          stdout: "zig_exe=/opt/zig/zig\nZIG_LIBC=null\n",
+        });
+      }
+      if (request.args.includes("-c")) compileBuilds += 1;
+      return Promise.resolve({ exitStatus: 0, stderr: "", stdout: "" });
+    },
+    writeTextFile() {
+      return Promise.resolve();
+    },
+  };
+  const base = fixtureOptions(host, []);
+  const toolchain = {
+    createBuildPlan(
+      input: Parameters<typeof base.toolchain.createBuildPlan>[0],
+    ) {
+      const archivePath = `${input.workingDirectory}/runtime.a`;
+      return {
+        executablePath: `${input.workingDirectory}/fixture`,
+        requests:
+          input.prebuiltRuntimeArchivePath == null
+            ? [
+                {
+                  args: ["cc", "-c", input.runtimeSourcePaths[0] ?? ""],
+                  command: "zig",
+                  cwd: input.workingDirectory,
+                },
+                {
+                  args: ["ar", archivePath],
+                  command: "zig",
+                  cwd: input.workingDirectory,
+                },
+                {
+                  args: ["cc", archivePath],
+                  command: "zig",
+                  cwd: input.workingDirectory,
+                },
+              ]
+            : [
+                {
+                  args: ["cc", input.prebuiltRuntimeArchivePath],
+                  command: "zig",
+                  cwd: input.workingDirectory,
+                },
+              ],
+        ...(input.prebuiltRuntimeArchivePath == null
+          ? { runtimeArchivePath: archivePath }
+          : {}),
+        target: input.target,
+      };
+    },
+    environment: { inherit: ["PATH"] },
+    runtimeArchiveReuse: {
+      createIdentityRequest(
+        workingDirectory: string,
+        environment: ProcessEnvironment,
+      ) {
+        return {
+          args: ["env"],
+          command: "zig",
+          cwd: workingDirectory,
+          environment,
+        };
+      },
+      createKey() {
+        return Promise.resolve("shared-key");
+      },
+    },
+  };
+  await Promise.all([
+    withNativeFixture({ ...base, toolchain }, () => {}),
+    withNativeFixture({ ...base, toolchain }, () => {}),
+  ]);
+  assert.equal(compileBuilds, 1);
+  assert.equal(publications, 1);
+});
+
+test("retries a failed toolchain identity probe", async () => {
+  let cached = false;
+  let identityProbes = 0;
+  let publications = 0;
+  const host: Host = {
+    cache: {
+      acquireFileLock() {
+        return Promise.resolve({
+          release() {
+            return Promise.resolve();
+          },
+        });
+      },
+      getDirectory() {
+        return Promise.resolve("/cache/runtime-archives");
+      },
+      hasFile() {
+        return Promise.resolve(cached);
+      },
+      publishFile() {
+        cached = true;
+        publications += 1;
+        return Promise.resolve();
+      },
+    },
+    captureEnvironment() {
+      return Promise.resolve({ variables: { PATH: "/opt/zig/bin" } });
+    },
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
+    makeTemporaryDirectory() {
+      return Promise.resolve("/tmp/oseo-native-retry");
+    },
+    readTextFile() {
+      return Promise.resolve("runtime input");
+    },
+    remove() {
+      return Promise.resolve();
+    },
+    run(request) {
+      if (request.args[0] === "env") {
+        identityProbes += 1;
+        return Promise.resolve({
+          exitStatus: identityProbes === 1 ? 1 : 0,
+          stderr: "",
+          stdout:
+            identityProbes === 1 ? "" : "zig_exe=/opt/zig/zig\nZIG_LIBC=null\n",
+        });
+      }
+      return Promise.resolve({ exitStatus: 0, stderr: "", stdout: "" });
+    },
+    writeTextFile() {
+      return Promise.resolve();
+    },
+  };
+  const base = fixtureOptions(host, []);
+  const toolchain = {
+    createBuildPlan(
+      input: Parameters<typeof base.toolchain.createBuildPlan>[0],
+    ) {
+      const archivePath = `${input.workingDirectory}/runtime.a`;
+      return {
+        executablePath: `${input.workingDirectory}/fixture`,
+        requests: [],
+        ...(input.prebuiltRuntimeArchivePath == null
+          ? { runtimeArchivePath: archivePath }
+          : {}),
+        target: input.target,
+      };
+    },
+    environment: { inherit: ["PATH"] },
+    runtimeArchiveReuse: {
+      createIdentityRequest(
+        workingDirectory: string,
+        environment: ProcessEnvironment,
+      ) {
+        return {
+          args: ["env"],
+          command: "zig",
+          cwd: workingDirectory,
+          environment,
+        };
+      },
+      createKey() {
+        return Promise.resolve("retry-key");
+      },
+    },
+  };
+  await withNativeFixture({ ...base, toolchain }, () => {});
+  assert.equal(publications, 0);
+  await withNativeFixture({ ...base, toolchain }, () => {});
+  assert.equal(identityProbes, 2);
+  assert.equal(publications, 1);
+  await withNativeFixture({ ...base, toolchain }, () => {});
+  assert.equal(identityProbes, 3);
+  assert.equal(publications, 1);
 });
 
 test("rejects a runtime input with duplicate asset names", async () => {

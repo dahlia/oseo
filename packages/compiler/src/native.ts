@@ -60,11 +60,24 @@ export interface RuntimeInputProvider {
   getRuntimeInput(): RuntimeInput;
 }
 
+/**
+ * Host-variable names a toolchain permits one of its subprocesses to inherit.
+ */
+export interface ProcessEnvironmentPolicy {
+  readonly inherit: readonly string[];
+}
+
+/** Immutable host environment captured for one native workflow. */
+export interface ProcessEnvironment {
+  readonly variables: Readonly<Record<string, string>>;
+}
+
 /** One process request created by a native toolchain adapter. */
 export interface ProcessRequest {
   readonly args: readonly string[];
   readonly command: string;
   readonly cwd: string;
+  readonly environment?: ProcessEnvironment;
 }
 
 /** Host-independent subprocess observation. */
@@ -78,7 +91,33 @@ export interface ProcessObservation {
 export interface NativeBuildPlan {
   readonly executablePath: string;
   readonly requests: readonly ProcessRequest[];
+  readonly runtimeArchivePath?: string;
   readonly target: TargetDescription;
+}
+
+/** Runtime asset contents covered by one toolchain-owned archive key. */
+export interface RuntimeArchiveAsset {
+  readonly contents: string;
+  readonly kind: RuntimeAsset["kind"];
+  readonly name: string;
+}
+
+/** Complete semantic and tool inputs covered by one runtime archive key. */
+export interface RuntimeArchiveKeyInput {
+  readonly runtimeAbiVersion: string;
+  readonly runtimeAssets: readonly RuntimeArchiveAsset[];
+  readonly target: TargetDescription;
+  readonly toolchainEnvironment: ProcessEnvironment;
+  readonly toolchainIdentity: string;
+}
+
+/** Optional archive-reuse capability implemented by a native toolchain. */
+export interface RuntimeArchiveReuse {
+  createKey(input: RuntimeArchiveKeyInput): Promise<string>;
+  createIdentityRequest(
+    workingDirectory: string,
+    environment: ProcessEnvironment,
+  ): ProcessRequest;
 }
 
 /**
@@ -88,7 +127,9 @@ export interface NativeBuildPlan {
  * filesystem enumeration never selects sources or archive layout.
  */
 export interface NativeBuildInput {
+  readonly environment?: ProcessEnvironment;
   readonly generatedSourcePath: string;
+  readonly prebuiltRuntimeArchivePath?: string;
   readonly runtimeDirectory: string;
   readonly runtimeSourcePaths: readonly string[];
   readonly target: TargetDescription;
@@ -98,11 +139,30 @@ export interface NativeBuildInput {
 /** Toolchain boundary that constructs commands without executing them. */
 export interface NativeToolchain {
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan;
+  readonly environment?: ProcessEnvironmentPolicy;
+  readonly runtimeArchiveReuse?: RuntimeArchiveReuse;
+}
+
+/** Exclusive lease over one host-owned compiler cache path. */
+export interface CompilerCacheLock {
+  release(): Promise<void>;
+}
+
+/** Persistent cache storage whose location and lifetime belong to one host. */
+export interface CompilerCache {
+  acquireFileLock(path: string): Promise<CompilerCacheLock>;
+  getDirectory(name: string): Promise<string>;
+  hasFile(path: string): Promise<boolean>;
+  publishFile(sourcePath: string, destinationPath: string): Promise<void>;
 }
 
 /** Narrow host boundary used by compiler adapters and test infrastructure. */
 export interface CompilerHost {
+  readonly cache?: CompilerCache;
   canonicalizeFile?(path: string): Promise<string>;
+  captureEnvironment?(
+    policy: ProcessEnvironmentPolicy,
+  ): Promise<ProcessEnvironment | undefined>;
   readonly executionHost?: ExecutionHostDescription;
   makeTemporaryDirectory(prefix: string): Promise<string>;
   readTextFile(path: string | URL): Promise<string>;

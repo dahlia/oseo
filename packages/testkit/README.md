@@ -14,6 +14,15 @@ Each fixture declares whether it needs compilation or execution. Execution
 fixtures validate the injected host against the selected target before a build
 starts. Retained observations and property failures include both normalized
 host and target identities so a replay does not silently change environments.
+When both injected adapters support it, fixtures share the same host-cached
+runtime archive as CLI execution. `runtimeArchiveReuse: "disabled"` retains a
+direct rebuild path for a replay that suspects stale cache state. Same-key cold
+fixtures serialize archive publication, and an unavailable cache operation
+falls back to a temporary rebuild. Failed toolchain identity observations are
+not retained, so a recovered toolchain can rejoin archive reuse. Each fixture
+uses one captured compiler environment for its identity, key, and build
+requests. A fixture whose host cannot capture that environment rebuilds without
+archive reuse.
 
 When compiler observation is enabled, the harness removes the runtime's private
 counter record from stderr and exposes typed guard, overflow, generic-addition,

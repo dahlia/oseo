@@ -1,11 +1,13 @@
 import { cBackend } from "@oseo/backend-c";
 import type {
+  CompilerCacheLock,
   CompilerHost,
   Diagnostic,
   MirProgram,
   ModuleSourceFrontend,
   NativeBackend,
   NativeToolchain,
+  ProcessEnvironment,
   ProcessObservation,
   ProcessRequest,
   RuntimeInputProvider,
@@ -71,6 +73,16 @@ const specializationParser = withDefault(
   "enabled" as const,
 );
 
+const runtimeArchiveReuseParser = withDefault(
+  map(
+    flag("--no-runtime-archive-reuse", {
+      description: message`Rebuild the C runtime archive for this execution.`,
+    }),
+    () => "disabled" as const,
+  ),
+  "enabled" as const,
+);
+
 const moduleParser = withDefault(
   map(
     flag("--module", {
@@ -98,6 +110,7 @@ const targetParser = optional(
 const cliParser = object({
   module: moduleParser,
   mode: modeParser,
+  runtimeArchiveReuse: runtimeArchiveReuseParser,
   sourceId: argument(stringValue({ metavar: "SOURCE" }), {
     description: message`Source file to compile.`,
   }),
@@ -155,6 +168,13 @@ export const defaultComponents: DefaultComponents = {
   runtime: cRuntimeProvider,
   toolchain: zigToolchain,
 };
+
+let sharedNodeHost: CompilerHost | undefined;
+
+function defaultNodeHost(): CompilerHost {
+  sharedNodeHost ??= defaultComponents.createNodeHost();
+  return sharedNodeHost;
+}
 
 function hostDiagnostic(
   sourceId: string,
@@ -379,6 +399,15 @@ export function runCli(request: CliRequest): CliResult {
       ),
     );
   }
+  if (parsed.value.runtimeArchiveReuse === "disabled") {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        "The --no-runtime-archive-reuse option applies only to " +
+          "asynchronous native execution.",
+      ),
+    );
+  }
   if (parsed.value.module) {
     return diagnosticResult(
       hostDiagnostic(
@@ -397,6 +426,34 @@ export function runCli(request: CliRequest): CliResult {
 
 function join(directory: string, name: string): string {
   return `${directory.replace(/\/$/u, "")}/${name}`;
+}
+
+function observeToolchainIdentity(
+  host: CompilerHost,
+  toolchain: NativeToolchain,
+  workingDirectory: string,
+  environment: ProcessEnvironment,
+): Promise<string | undefined> {
+  const reuse = toolchain.runtimeArchiveReuse;
+  if (reuse == null) return Promise.resolve(undefined);
+  return observeProcess(
+    host,
+    reuse.createIdentityRequest(workingDirectory, environment),
+  ).then((observation) => {
+    if (observation == null || observation.exitStatus !== 0) return undefined;
+    const identity = observation.stdout.trim();
+    return identity === "" ? undefined : identity;
+  });
+}
+
+async function releaseCacheLock(
+  lock: CompilerCacheLock | undefined,
+): Promise<void> {
+  try {
+    await lock?.release();
+  } catch {
+    // Cache cleanup cannot turn a usable native build into a failure.
+  }
 }
 
 /**
@@ -434,6 +491,7 @@ async function executeNativeWorkflow(
   directory: string,
   mir: MirProgram,
   target: TargetDescription,
+  archiveReuse: CliInvocation["runtimeArchiveReuse"],
 ): Promise<CliResult> {
   const emitted = defaultComponents.backend.emit(mir);
   const generatedSourcePath = join(directory, emitted.sourceName);
@@ -471,55 +529,177 @@ async function executeNativeWorkflow(
     }
     assetNames.add(folded);
   }
-  const copiedAssets = [];
-  for (const asset of runtime.assets) {
-    const destination = join(directory, asset.name);
-    // eslint-disable-next-line no-await-in-loop -- Copies must settle in order.
-    const contents = await host.readTextFile(asset.url);
-    // eslint-disable-next-line no-await-in-loop -- Copies must settle in order.
-    await host.writeTextFile(destination, contents);
-    copiedAssets.push({ asset, destination });
-  }
-  const runtimeSourcePaths = copiedAssets
-    .filter((entry) => entry.asset.kind === "source")
-    .map((entry) => entry.destination);
-  if (runtimeSourcePaths.length === 0) {
+  if (!runtime.assets.some((asset) => asset.kind === "source")) {
     return diagnosticResult(
       hostDiagnostic(sourceId, "The C runtime source is unavailable."),
     );
   }
-  const plan = defaultComponents.toolchain.createBuildPlan({
-    generatedSourcePath,
-    runtimeDirectory: directory,
-    runtimeSourcePaths,
-    target,
-    workingDirectory: directory,
-  });
-  for (const processRequest of plan.requests) {
-    // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
-    const observation = await observeProcess(host, processRequest);
-    if (observation == null) {
-      return diagnosticResult(
-        hostDiagnostic(
-          sourceId,
-          `The native toolchain for target '${target.name}' ` +
-            "could not be started.",
-        ),
-      );
+  const reuse = defaultComponents.toolchain.runtimeArchiveReuse;
+  let toolchainEnvironment: ProcessEnvironment | undefined;
+  const environmentPolicy = defaultComponents.toolchain.environment;
+  if (environmentPolicy != null && host.captureEnvironment != null) {
+    try {
+      toolchainEnvironment = await host.captureEnvironment(environmentPolicy);
+    } catch {
+      // An unavailable snapshot keeps compilation on ordinary inheritance.
     }
-    if (observation.exitStatus !== 0) {
-      return diagnosticResult(
-        hostDiagnostic(
-          sourceId,
-          `The native toolchain for target '${target.name}' failed ` +
-            `(exit ${observation.exitStatus}).`,
-        ),
-      );
+  }
+  const cache =
+    archiveReuse === "enabled" && reuse != null && toolchainEnvironment != null
+      ? host.cache
+      : undefined;
+  let cachedArchivePath: string | undefined;
+  let publishArchivePath: string | undefined;
+  let cacheLock: CompilerCacheLock | undefined;
+  let loadedAssets:
+    | {
+        readonly asset: (typeof runtime.assets)[number];
+        readonly contents: string;
+      }[]
+    | undefined;
+  const copiedAssets: {
+    readonly asset: (typeof runtime.assets)[number];
+    readonly destination: string;
+  }[] = [];
+  if (cache != null && reuse != null && toolchainEnvironment != null) {
+    loadedAssets = [];
+    for (const asset of runtime.assets) {
+      // eslint-disable-next-line no-await-in-loop -- Reads settle in order.
+      const contents = await host.readTextFile(asset.url);
+      loadedAssets.push({ asset, contents });
     }
+    try {
+      const identity = await observeToolchainIdentity(
+        host,
+        defaultComponents.toolchain,
+        directory,
+        toolchainEnvironment,
+      );
+      if (identity == null) {
+        throw new Error("The native toolchain identity is unavailable.");
+      }
+      const key = await reuse.createKey({
+        runtimeAbiVersion: runtime.abiVersion,
+        runtimeAssets: loadedAssets.map((entry) => ({
+          contents: entry.contents,
+          kind: entry.asset.kind,
+          name: entry.asset.name,
+        })),
+        target,
+        toolchainEnvironment,
+        toolchainIdentity: identity,
+      });
+      const cacheDirectory = await cache.getDirectory("runtime-archives");
+      const candidate = join(cacheDirectory, `liboseo-runtime-${key}.a`);
+      cacheLock = await cache.acquireFileLock(candidate);
+      if (await cache.hasFile(candidate)) {
+        cachedArchivePath = candidate;
+        await releaseCacheLock(cacheLock);
+        cacheLock = undefined;
+      } else {
+        publishArchivePath = candidate;
+      }
+    } catch {
+      await releaseCacheLock(cacheLock);
+      cacheLock = undefined;
+    }
+  }
+  try {
+    if (loadedAssets != null) {
+      for (const entry of loadedAssets) {
+        if (cachedArchivePath != null && entry.asset.kind === "source") {
+          continue;
+        }
+        const destination = join(directory, entry.asset.name);
+        // eslint-disable-next-line no-await-in-loop -- Writes settle in order.
+        await host.writeTextFile(destination, entry.contents);
+        copiedAssets.push({ asset: entry.asset, destination });
+      }
+    } else {
+      for (const asset of runtime.assets) {
+        const destination = join(directory, asset.name);
+        // eslint-disable-next-line no-await-in-loop -- Copies settle in order.
+        const contents = await host.readTextFile(asset.url);
+        // eslint-disable-next-line no-await-in-loop -- Copies settle in order.
+        await host.writeTextFile(destination, contents);
+        copiedAssets.push({ asset, destination });
+      }
+    }
+  } catch (error) {
+    await releaseCacheLock(cacheLock);
+    cacheLock = undefined;
+    throw error;
+  }
+  const runtimeSourcePaths = copiedAssets
+    .filter((entry) => entry.asset.kind === "source")
+    .map((entry) => entry.destination);
+  if (runtimeSourcePaths.length === 0 && cachedArchivePath == null) {
+    await releaseCacheLock(cacheLock);
+    cacheLock = undefined;
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The C runtime source is unavailable."),
+    );
+  }
+  let executablePath: string | undefined;
+  try {
+    const plan = defaultComponents.toolchain.createBuildPlan({
+      ...(toolchainEnvironment == null
+        ? {}
+        : { environment: toolchainEnvironment }),
+      generatedSourcePath,
+      ...(cachedArchivePath == null
+        ? {}
+        : { prebuiltRuntimeArchivePath: cachedArchivePath }),
+      runtimeDirectory: directory,
+      runtimeSourcePaths,
+      target,
+      workingDirectory: directory,
+    });
+    executablePath = plan.executablePath;
+    for (const processRequest of plan.requests) {
+      // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
+      const observation = await observeProcess(host, processRequest);
+      if (observation == null) {
+        return diagnosticResult(
+          hostDiagnostic(
+            sourceId,
+            `The native toolchain for target '${target.name}' ` +
+              "could not be started.",
+          ),
+        );
+      }
+      if (observation.exitStatus !== 0) {
+        return diagnosticResult(
+          hostDiagnostic(
+            sourceId,
+            `The native toolchain for target '${target.name}' failed ` +
+              `(exit ${observation.exitStatus}).`,
+          ),
+        );
+      }
+    }
+    if (
+      publishArchivePath != null &&
+      plan.runtimeArchivePath != null &&
+      cache != null
+    ) {
+      try {
+        await cache.publishFile(plan.runtimeArchivePath, publishArchivePath);
+      } catch {
+        // The completed build remains usable when optional publication fails.
+      }
+    }
+  } finally {
+    await releaseCacheLock(cacheLock);
+  }
+  if (executablePath == null) {
+    return diagnosticResult(
+      hostDiagnostic(sourceId, "The native executable is unavailable."),
+    );
   }
   const observation = await observeProcess(host, {
     args: [],
-    command: plan.executablePath,
+    command: executablePath,
     cwd: directory,
   });
   if (observation == null) {
@@ -579,8 +759,9 @@ function selectExecutionTarget(
 /** Compile and execute one source invocation through the native toolchain. */
 export async function runNativeCli(
   request: CliRequest,
-  host: CompilerHost = defaultComponents.createNodeHost(),
+  host?: CompilerHost,
 ): Promise<CliResult> {
+  host ??= defaultNodeHost();
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
   const sourceId = request.sourceId ?? parsed.value.sourceId;
@@ -589,6 +770,18 @@ export async function runNativeCli(
       hostDiagnostic(
         sourceId,
         "The --target option applies only to native execution.",
+      ),
+    );
+  }
+  if (
+    parsed.value.mode !== "execute" &&
+    parsed.value.runtimeArchiveReuse === "disabled"
+  ) {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The --no-runtime-archive-reuse option applies only to native " +
+          "execution.",
       ),
     );
   }
@@ -674,6 +867,7 @@ export async function runNativeCli(
       directory,
       mir,
       selected.target,
+      parsed.value.runtimeArchiveReuse,
     );
   } catch {
     result = diagnosticResult(

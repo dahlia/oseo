@@ -4,11 +4,12 @@ Evidence gate throughput plan
 Status
 ------
 
-Implementation status: planned. This plan defines the cost contract for the
-reviewed evidence gates and the checkpoints that keep that cost usable as the
-reviewed corpus grows. It does not change any language semantic, any
-classification vocabulary by itself, or the amount of evidence a semantic unit
-must supply.
+Implementation status: in progress. The runtime archive reuse checkpoint is
+complete, while the later checkpoints remain planned. This plan defines the
+cost contract for the reviewed evidence gates and the checkpoints that keep
+that cost usable as the reviewed corpus grows. It does not change any language
+semantic, any classification vocabulary by itself, or the amount of evidence a
+semantic unit must supply.
 
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
@@ -105,30 +106,70 @@ against [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
 ### Runtime archive reuse
 
+Checkpoint status: complete.
+
 The toolchain adapter accepts a prebuilt runtime archive instead of compiling
 11 translation units for every execution. The reuse key covers every input that
 can change the artifact: the reviewed runtime sources and headers, the runtime
-ABI version, the complete compile and link flags, the toolchain identity and
-version, the target and ABI facts, and the sanitizer selection. The CLI stops
-copying the reviewed runtime sources into a fresh working directory when a
-valid archive for that key already exists.
+ABI version, the complete compile and link flags, the exact Zig subprocess
+environment policy and immutable snapshot, the identity reported by `zig env`,
+the target and ABI facts, and the sanitizer selection. The host captures the
+snapshot before the identity probe and reuses it for every build request.
+Ambient compiler inputs outside the allowlist, including `CPATH`, are removed
+by the host. Mutable path-based overrides such as `ZIG_LIBC`,
+`C_INCLUDE_PATH`, and Nix compiler flags are excluded rather than keyed by
+path alone. The CLI stops copying the reviewed runtime sources into a fresh
+working directory when a valid archive for that key already exists.
 
-The baseline does not establish the archive build's share of a gate execution,
-so no residual figure is projected. This checkpoint measures it: the gate is
-run once with reuse and once through the bypass path, and both durations are
-recorded as wall clock and processor time. The same reuse applies to the two
-native builds each property case performs.
+The toolchain adapter owns the artifact key because it owns the concrete
+commands and target mapping that produce the archive. The host adapter owns the
+cache directory, lifetime, existence checks, and atomic publication because
+those are host filesystem policy. The CLI composes the two capabilities and
+keeps `--no-runtime-archive-reuse` as the deliberate rebuild path.
+Host cache directories are absolute normalized paths, including when an
+embedding supplies a relative cache root.
+Per-key host leases serialize cold cache publication across concurrent callers.
+They record ownership and expiry so an interrupted build cannot leave a
+permanent lock. Active owners renew their expiry. Release and reclamation
+atomically rename the exact observed state file, then move the complete lock
+directory to a unique disposal path before deletion. An exclusive state file
+protects the initial ownerless directory interval. These transitions prevent
+concurrent reclaimers or an expired owner from targeting a replacement lease.
+Renewal may overwrite only its already-claimed state file and cannot recreate
+that path after a reclaimer replaces the directory.
+An unavailable cache or environment-snapshot operation falls back to that same
+usable rebuild path. Deno without `--allow-env` retains ordinary
+inherited-environment compilation.
+Cached runtime objects compile from stable relative source and include paths.
+The adapter normalizes dot segments before deriving those relative arguments.
+A file-prefix map covers remaining compiler metadata, and an archive-content
+regression proves that sanitized builds in different temporary directories are
+byte-identical and contain neither producer path. Every workflow observes its
+toolchain identity against its captured snapshot. Cache namespace names reject
+`.` and `..` before host path construction.
+Content-addressed archives remain until the operating system or user removes
+the Oseo cache namespace. This checkpoint does not add automatic pruning;
+removal is safe and the next native workflow rebuilds the archive.
+
+The successful test262 comparison recorded 270.64 s with reuse and 1,180.85 s
+through the bypass. Reuse removed 910.21 s, or 77.1 percent of the bypass wall
+clock, and 887.02 processor-seconds, or 75.2 percent of its processor time.
+Both runs preserved all 681 reviewed classifications. The native property task
+passed all 29 tests in 8.93 s with reuse. The complete measurements, host
+conditions, and one excluded load-contaminated bypass run are recorded in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
 Archive reuse precedes concurrency because it removes the largest measured
 wall-time component of a native execution and reduces each worker's runtime
-build artifacts. The baseline did not record processor time for the other
-components, and it did not measure the per-execution footprint, so this
-ordering is a precaution rather than a demonstrated dependency.
+build artifacts. One reused execution reduced process-tree peak resident memory
+from 192.9 MiB to 47.8 MiB and peak allocated temporary storage from 7.43 MiB
+to 4.40 MiB. These measurements establish the footprint used to select the
+later worker bound.
 
-It must land with its bypass path and a test that proves a changed runtime
+The checkpoint includes its bypass path and tests that prove a changed runtime
 source produces a different key.
 
-Owner: the toolchain and runtime package boundaries in
+Owner: the toolchain and host adapter boundaries in
 [*DESIGN.md*](./DESIGN.md).
 
 ### Concurrent reviewed execution
