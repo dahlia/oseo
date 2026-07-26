@@ -57,7 +57,7 @@ dispatched by the generic conversion. The synchronous iterator
 protocol is implemented as an owned runtime surface with a first-class
 array iterator, and `Promise.all` and `Promise.race` consume any
 object iterable through it, closing the iterator when a combinator
-rejects after a step, completing the delivery item 4 groundwork; the
+rejects after a step, completing the delivery item 5 groundwork; the
 `for-of` statement now consumes the same object-iterator protocol with
 lexical, assignment, and cleanup semantics. Array literal spread now consumes
 that protocol through dynamic own-property accumulation, preserving holes,
