@@ -336,6 +336,7 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly kind: "object";
       readonly properties: readonly {
+        readonly accessorKind?: "get" | "set";
         readonly key: HirExpression;
         readonly value: HirExpression;
       }[];

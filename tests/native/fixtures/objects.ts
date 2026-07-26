@@ -1067,4 +1067,119 @@ while (cursor !== null) {
 console.log(steps, chain.depth, chain.extra.marker);
 `,
   },
+  {
+    name: "object-literal-accessors",
+    source: `
+const getterOnly = { get item() { return 5; } };
+console.log(getterOnly.item);
+
+let stored;
+const setterOnly = { set item(value) { stored = value; } };
+setterOnly.item = 9;
+console.log(stored, setterOnly.item);
+
+let backing = 1;
+const pair = {
+  get item() { return backing; },
+  set item(value) { backing = value * 2; },
+};
+console.log(pair.item);
+pair.item = 3;
+console.log(pair.item, backing);
+
+const descriptor = Object.getOwnPropertyDescriptor(pair, "item");
+console.log(
+  typeof descriptor.get,
+  typeof descriptor.set,
+  descriptor.enumerable,
+  descriptor.configurable,
+  "value" in descriptor,
+  "writable" in descriptor,
+);
+
+const getterDescriptor = Object.getOwnPropertyDescriptor(
+  getterOnly,
+  "item",
+);
+console.log(typeof getterDescriptor.get, getterDescriptor.set);
+const setterDescriptor = Object.getOwnPropertyDescriptor(
+  setterOnly,
+  "item",
+);
+console.log(setterDescriptor.get, typeof setterDescriptor.set);
+
+const named = { get item() {}, set other(value) {} };
+console.log(
+  Object.getOwnPropertyDescriptor(named, "item").get.name,
+  Object.getOwnPropertyDescriptor(named, "other").set.name,
+  Object.getOwnPropertyDescriptor(named, "item").get.length,
+  Object.getOwnPropertyDescriptor(named, "other").set.length,
+);
+function computeKey() { return "computed"; }
+const computedName = {
+  get [computeKey()]() {},
+  set [computeKey()](value) {},
+};
+console.log(
+  Object.getOwnPropertyDescriptor(computedName, "computed").get.name,
+  Object.getOwnPropertyDescriptor(computedName, "computed").set.name,
+);
+
+const redefinedToAccessor = { item: 1, get item() { return 2; } };
+console.log(redefinedToAccessor.item);
+const redefinedToData = { get item() { return 1; }, item: 2 };
+console.log(redefinedToData.item);
+const redefinedDescriptor = Object.getOwnPropertyDescriptor(
+  redefinedToAccessor,
+  "item",
+);
+console.log("value" in redefinedDescriptor, typeof redefinedDescriptor.get);
+const dataDescriptor = Object.getOwnPropertyDescriptor(
+  redefinedToData,
+  "item",
+);
+console.log("get" in dataDescriptor, dataDescriptor.value);
+
+function strictSetterOnly() {
+  "use strict";
+  try {
+    getterOnly.item = 1;
+    console.log("no throw");
+  } catch (error) {
+    console.log("threw", error instanceof TypeError);
+  }
+}
+strictSetterOnly();
+console.log(setterOnly.item);
+
+let getterCalls = 0;
+const cachedGetter = { get item() { getterCalls = getterCalls + 1;
+  return getterCalls; } };
+function readThreeTimes(target) {
+  return [target.item, target.item, target.item];
+}
+const readTimes = readThreeTimes(cachedGetter);
+console.log(readTimes[0], readTimes[1], readTimes[2]);
+
+function allocateAccessorChain(depth) {
+  let current = { depth: depth, next: null };
+  for (let i = 0; i < depth; i = i + 1) {
+    const previous = current;
+    current = {
+      get depth() { return i; },
+      get next() { return previous; },
+    };
+  }
+  return current;
+}
+const accessorChain = allocateAccessorChain(20);
+let accessorSteps = 0;
+let accessorCursor = accessorChain;
+while (accessorCursor !== null) {
+  accessorSteps = accessorSteps + 1;
+  accessorCursor = accessorCursor.next;
+}
+console.log(accessorSteps, accessorChain.depth);
+`,
+  },
 ];

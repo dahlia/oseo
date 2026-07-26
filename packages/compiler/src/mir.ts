@@ -88,6 +88,12 @@ export interface MirControlTarget {
 
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
+  /**
+   * Selects the accessor slot for `property-define-accessor` and the
+   * `SetFunctionName` prefix for the accessor closure created by
+   * `function-create`.
+   */
+  readonly accessorKind?: "get" | "set";
   readonly argumentListId?: number;
   readonly arguments: readonly number[];
   readonly arrayLength?: number;
@@ -134,6 +140,8 @@ export interface MirOperation {
     | "object-create"
     | "object-rest"
     | "property-key"
+    | "property-define-accessor"
+    | "property-define-data"
     | "property-delete"
     | "property-get"
     | "property-set"

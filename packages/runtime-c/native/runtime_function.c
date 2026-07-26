@@ -117,6 +117,47 @@ OseoResult oseo_argument_list_view(
     return normal(list_value);
 }
 
+/*
+ * SetFunctionName's "get "/"set " prefix, applied to whatever base
+ * name the static or computed key path already resolved, mirroring
+ * oseo_internal_symbol_name's bracket-wrapping for a symbol key.
+ */
+static OseoResult accessor_function_name(
+    OseoContext *context,
+    OseoValue base_name,
+    bool setter
+) {
+    size_t base_length = string_object(base_name)->length;
+    if (base_length > SIZE_MAX / sizeof(uint16_t) - 4u) {
+        return failure(context, "OSEO2001", "String allocation is too large.");
+    }
+    size_t length = base_length + 4u;
+    uint16_t *units = malloc(length * sizeof(uint16_t));
+    if (units == NULL) {
+        return failure(context, "OSEO2001", "String allocation failed.");
+    }
+    static const char get_prefix[] = "get ";
+    static const char set_prefix[] = "set ";
+    const char *prefix = setter ? set_prefix : get_prefix;
+    for (size_t index = 0u; index < 4u; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)prefix[index];
+    }
+    if (base_length > 0u) {
+        memcpy(
+            units + 4u,
+            string_object(base_name)->units,
+            base_length * sizeof(uint16_t)
+        );
+    }
+    OseoValue slots[1] = {base_name};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_allocate_string(context, units, length);
+    oseo_roots_pop(context, &frame);
+    free(units);
+    return result;
+}
+
 OseoResult oseo_function_create(
     OseoContext *context,
     size_t code_id,
@@ -126,7 +167,8 @@ OseoResult oseo_function_create(
     size_t parameter_count,
     OseoFunctionKind function_kind,
     OseoValue lexical_this,
-    OseoValue inferred_name
+    OseoValue inferred_name,
+    OseoFunctionNamePrefix name_prefix
 ) {
     if (!is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
@@ -215,7 +257,7 @@ OseoResult oseo_function_create(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoPropertyAttributes attributes = {true, false, false};
+        OseoPropertyAttributes attributes = {true, false, false, false};
         result = oseo_object_define(
             context,
             frame.slots[2],
@@ -261,8 +303,21 @@ OseoResult oseo_function_create(
     if (result.status == OSEO_STATUS_NORMAL && !is_string(frame.slots[5])) {
         result = failure(context, "OSEO2001", "Invalid function name.");
     }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        name_prefix != OSEO_FUNCTION_NAME_PREFIX_NONE) {
+        result = accessor_function_name(
+            context,
+            frame.slots[5],
+            name_prefix == OSEO_FUNCTION_NAME_PREFIX_SET
+        );
+        frame.slots[5] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            context->observe_specialization && context->allocations > 0u) {
+            context->allocations -= 1u;
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoPropertyAttributes attributes = {true, false, false};
+        OseoPropertyAttributes attributes = {true, false, false, false};
         result = oseo_object_define(
             context,
             frame.slots[2],
@@ -287,7 +342,7 @@ OseoResult oseo_function_create(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoPropertyAttributes attributes = {true, false, true};
+        OseoPropertyAttributes attributes = {true, false, true, false};
         result = oseo_object_define(
             context,
             frame.slots[1],

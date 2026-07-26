@@ -52,6 +52,8 @@ static void trace_object(
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
             mark_value(ordinary->properties[index].key, worklist);
             mark_value(ordinary->properties[index].value, worklist);
+            mark_value(ordinary->properties[index].getter, worklist);
+            mark_value(ordinary->properties[index].setter, worklist);
         }
         if (object->kind == OSEO_HEAP_FUNCTION) {
             OseoFunction *function = (OseoFunction *)object;

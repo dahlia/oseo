@@ -280,17 +280,11 @@ export function expression(
   }
   if (value.type === "ObjectExpression") {
     const properties: {
+      readonly accessorKind?: "get" | "set";
       readonly key: SyntaxExpression;
       readonly value: SyntaxExpression;
     }[] = [];
     for (const property of nodes(value.properties)) {
-      if (property.type === "ObjectMethod" && property.kind !== "method") {
-        return unsupported(
-          context,
-          property,
-          "Object literal accessors are unsupported.",
-        );
-      }
       if (
         property.type !== "ObjectProperty" &&
         property.type !== "ObjectMethod"
@@ -333,6 +327,11 @@ export function expression(
         }
       }
       let propertyValue: SyntaxExpression | undefined;
+      const accessorKind =
+        property.type === "ObjectMethod" &&
+        (property.kind === "get" || property.kind === "set")
+          ? property.kind
+          : undefined;
       if (property.type === "ObjectMethod") {
         const functionValue = functionDeclaration(
           context,
@@ -361,7 +360,11 @@ export function expression(
         propertyValue = expression(context, valueNode);
       }
       if (key == null || propertyValue == null) return undefined;
-      properties.push({ key, value: propertyValue });
+      properties.push({
+        ...(accessorKind == null ? {} : { accessorKind }),
+        key,
+        value: propertyValue,
+      });
     }
     return { ...located, kind: "object", properties };
   }

@@ -193,22 +193,30 @@ keeps a method non-constructible and without an own `prototype` property,
 distinct from the constructible functions created by function declarations
 and function expressions; arrow functions remain non-constructible and
 prototype-less for the separate reason that they already bind lexical
-`this`. Computed property keys were already admitted by prior work;
-getter and setter accessors, object spread properties, and the Annex B
-`__proto__` property-name special case remain rejected with a source-located
-diagnostic in every syntactic form, including shorthand and method keys. The
-generated property suite uses seed `0x5eed0015` across zero to four data,
-shorthand, and method properties and bounded integer values, comparing an
-independent key-order and evaluation-order model with Node.js, Deno, and both
-native specialization policies with forced collection on the enabled path.
-Fixed native fixtures retain the empty object, single and multiple data
-properties, shorthand from a local binding and from a parameter, a method's
-`this` reference and non-constructible identity, nested object literals,
-left-to-right evaluation order, abrupt completion in a property value, and
-forced collection across property safepoints. Two hundred seventy-six
-reviewed test262 cases newly pass, covering property-name forms, method
-definitions, non-constructible method identity, and the destructuring
-parameter patterns their method bodies already supported.
+`this`. Computed property keys were already admitted by prior work. Getter and
+setter accessors are now admitted: each accessor evaluates its key and
+installs a runtime accessor property that dispatches through the property
+lookup and assignment paths already built for other property kinds. An
+accessor property is always configurable and enumerable, and a later
+accessor or data property for the same key replaces an earlier one in
+source order, matching the existing last-definition-wins rule for data
+properties. Object spread properties and the Annex B `__proto__`
+property-name special case remain rejected with a source-located diagnostic
+in every syntactic form, including shorthand and method keys. The generated
+property suite uses seed `0x5eed0015` across zero to four data, shorthand,
+method, getter, and setter properties and bounded integer values, comparing
+an independent key-order and evaluation-order model with Node.js, Deno, and
+both native specialization policies with forced collection on the enabled
+path. Fixed native fixtures retain the empty object, single and multiple
+data properties, shorthand from a local binding and from a parameter, a
+method's `this` reference and non-constructible identity, getter-only and
+setter-only accessors, an accessor pair's shared descriptor, nested object
+literals, left-to-right evaluation order, abrupt completion in a property
+value, and forced collection across property safepoints. Three hundred
+fourteen reviewed test262 cases newly pass, covering property-name forms,
+method definitions, non-constructible method identity, getter and setter
+accessor forms, and the destructuring parameter patterns their method
+bodies already supported.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),

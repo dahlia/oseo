@@ -306,6 +306,7 @@ function resolveExpression(
   }
   if (expression.kind === "object") {
     const properties: {
+      readonly accessorKind?: "get" | "set";
       readonly key: HirExpression;
       readonly value: HirExpression;
     }[] = [];
@@ -314,6 +315,9 @@ function resolveExpression(
       const value = resolveExpression(property.value, scopes, state);
       if (key == null || value == null) return undefined;
       properties.push({
+        ...(property.accessorKind == null
+          ? {}
+          : { accessorKind: property.accessorKind }),
         key,
         value:
           key.kind === "string" ? inferFunctionName(value, key.value) : value,

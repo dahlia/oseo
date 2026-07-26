@@ -179,7 +179,7 @@ OseoResult oseo_module_namespace_create(
             frame.slots[0],
             frame.slots[1],
             frame.slots[2],
-            (OseoPropertyAttributes){false, true, true}
+            (OseoPropertyAttributes){false, true, true, false}
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
