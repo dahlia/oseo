@@ -459,12 +459,6 @@ therefore reported as three checkpoints. They are capability gates, not
 calendar phases, and later checkpoints may begin as soon as their
 prerequisites are stable.
 
-These checkpoints report progress; they do not by themselves complete M5.
-M5c closes results against records that authorize an exclusion, which the
-active exit criterion below does not yet permit. Completing all three
-checkpoints completes M5 only once
-[ADR 0019](./docs/adr/0019-m5-claim-closure.md) is accepted.
-
 | Checkpoint | Result                                                        |
 | ---------- | ------------------------------------------------------------- |
 | M5a        | The admitted core language, and the applicable-test inventory |
@@ -495,18 +489,19 @@ rather than a separate milestone.
 
 ### Exit criteria
 
-M5 is complete only when Oseo can make and substantiate an ECMA-262 conformance
-claim for a named edition. Intermediate releases publish exact coverage and
-known gaps without using the conformance label.
+M5 is complete when the applicable-test inventory that
+[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires is checked in
+and every result inside it is a pass, an expected negative, or an unsupported
+result covered by an accepted record that explicitly authorizes an M5 exclusion
+and bounds its surface. Naming a record as owner is not sufficient;
+[ADR 0019](./docs/adr/0019-m5-claim-closure.md) states what an authorizing
+record must say.
 
-That criterion is currently unreachable.
+The unqualified ECMA-262 conformance label is a separate later gate under that
+same record, because
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps the dynamic source
-family explicitly unsupported inside the edition
-[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) claims, and no work in
-the M5 queue closes that gap.
-[ADR 0019](./docs/adr/0019-m5-claim-closure.md) proposes completing M5 against
-a checked-in applicable-test inventory and moving the label to a later gate.
-The criterion above stands until that record is accepted.
+family unsupported inside the claimed edition. Intermediate releases publish
+exact coverage and known gaps without using the label.
 
 
 M6: Minimum common web API
@@ -797,8 +792,10 @@ landed with the M5 intrinsics units. The remaining queue is:
     The regular expression family follows
     [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), including the generic matcher before
     ahead-of-time literal lowering and measured fast paths.
-4.  Close the named edition with reproducible standards and generated
-    evidence.
+4.  Close or explicitly authorize every result inside the checked-in
+    applicable-test inventory, with reproducible standards and generated
+    evidence. The conformance label follows at its own later gate under
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md).
 
 M5 preserves every earlier generic-fallback, forced-collection, sanitizer,
 dual-execution-target, cross-target, package, standards, and property gate. It

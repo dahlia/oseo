@@ -4,7 +4,8 @@ M5 completion and the conformance label
 Status
 ------
 
-Proposed.
+Accepted. This record defines the M5 completion condition and moves the
+unqualified ECMA-262 conformance label to a separate later gate.
 
 
 Context
@@ -115,7 +116,7 @@ label. This record addresses the first and reassigns the second.
 Decision
 --------
 
-Proposed: separate the milestone from the label.
+M5 is separated from the label.
 
 M5 completes when the complete applicable-test inventory is checked in and
 every result inside it is a pass, an expected negative, or an unsupported
@@ -193,7 +194,9 @@ Links
  -  [ADR 0013](./0013-m5-edition-and-manifest.md) defines the claim boundary,
     the counting rule, and the inventory requirement.
  -  [ADR 0016](./0016-dynamic-source-boundary.md) records the exclusion that
-    creates the conflict and names the later decision this record supplies.
+    creates the conflict. This record removes M5 completion's dependence on the
+    later decision ADR 0016 requests; it does not supply that decision, and the
+    dynamic source boundary stays open.
  -  [*PLAN-M5.md*](../../PLAN-M5.md) and [*ROADMAP.md*](../../ROADMAP.md) hold
     the exit criteria this record changes.
  -  [*PLAN-DYN.md*](../../PLAN-DYN.md) owns the deferred capability the label

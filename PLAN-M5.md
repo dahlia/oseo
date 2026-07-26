@@ -721,8 +721,10 @@ Delivery order
     explicit unsupported classifications.
 8.  Increase the reviewed standards corpus and grammar-generated corpus while
     keeping ordinary and extended gates within published budgets.
-9.  Close every gap inside the selected edition and publish the reproducible
-    conformance evidence.
+9.  Close or explicitly authorize every result inside the checked-in
+    applicable-test inventory, and publish the reproducible coverage evidence.
+    The unqualified conformance label belongs to the later gate that
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md) defines.
 
 Each checkpoint lands as a coherent semantic unit. It updates the active
 profile, manifest, generated domain, package documentation, and living design
@@ -737,21 +739,18 @@ M5 is reported as the three checkpoints recorded in
 dynamic source family that ADR 0016 excludes, M5b adds the built-in families,
 and M5c closes against the applicable-test inventory.
 
-The first three criteria below cannot currently be satisfied together, because
-[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps the dynamic source
-family unsupported inside the claim boundary that
-[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) defines.
-[ADR 0019](./docs/adr/0019-m5-claim-closure.md) proposes replacing them. They
-stand as written until that record is accepted.
-
 M5 is complete only when:
 
  -  one named ECMA-262 edition and optional-section policy define the claim;
- -  the checked-in manifest covers every applicable test in that boundary at an
-    exact upstream revision;
- -  no semantic failure, harness failure, or unsupported result, including
-    one caused only by a missing observation capability, remains inside the
-    claim;
+ -  the complete applicable-test inventory that
+    [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires is checked
+    in at an exact upstream revision, and the manifest covers every test in it;
+ -  no semantic failure, harness failure, or unauthorized unsupported result
+    remains inside that inventory. An unsupported result covered by an accepted
+    record that explicitly authorizes an M5 exclusion and bounds its surface is
+    recorded rather than closed, under
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md). The unqualified
+    conformance label is a separate later gate under that same record;
  -  every admitted syntax and built-in has generic semantics, negative cases,
     collector coverage, and source-located diagnostics;
  -  module, promise, asynchronous, and scheduler tests exercise the expanded

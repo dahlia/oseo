@@ -4,18 +4,20 @@ Recorded evidence coverage for admitted families
 Status
 ------
 
-Proposed.
+Accepted. This record makes the existing evidence applicability judgment
+auditable by recording it per family in the language profile.
 
 
 Context
 -------
 
-An earlier draft of this record claimed that
-[*CONTRIBUTING.md*](../../CONTRIBUTING.md) requires every semantic unit to
-supply every evidence class. That reading is wrong. The rule introduces its
-list with “Depending on the work, this may include,” and the property rule
-says to use property tests “when a semantic unit has a useful generated domain
-or state model.” Evidence is already scaled to the work.
+[*CONTRIBUTING.md*](../../CONTRIBUTING.md) already scales evidence to the work.
+It introduces its list of classes with “Depending on the work, this may
+include,” and the property rule says to use property tests “when a semantic
+unit has a useful generated domain or state model.” An earlier draft of this
+record claimed the rule was uniform and proposed replacing it. That reading was
+wrong, and the correction is retained here so the same framing is not proposed
+again.
 
 What the repository does not have is a record of that judgment. The choice of
 which classes apply is made once, by whoever writes the change, and it survives
@@ -106,8 +108,8 @@ Nothing in the profile records it.
 Decision
 --------
 
-Proposed: the evidence judgment is recorded per family in the language
-profile. This record does not change what any unit must prove.
+The evidence judgment is recorded per family in the language profile. This
+record does not change what any unit must prove.
 
 A family records the evidence classes that cover it. When a class listed in
 *CONTRIBUTING.md* does not apply, the family records which class was omitted
@@ -119,10 +121,19 @@ observable evaluation order, a cleanup or suspension schedule, a collector
 interaction, or a specialization guard. Omitting a generated domain for such a
 family requires a stated reason rather than a default.
 
+This record authorizes no omission. It requires that an omission be recorded
+with the evidence that replaces it, and the applicability rule in
+*CONTRIBUTING.md* continues to decide which classes a given family owes.
 Differential execution against Node.js and Deno, execution under both
 specialization policies, forced collection, and the applicable standards cases
-are not omitted by this record for any family. An admitted family with no
-recorded judgment is read as covered by every class.
+are the classes whose recorded omission deserves the most scrutiny in review,
+because a family that genuinely cannot use one of them is rare.
+
+A family admitted after the profile template exists, and recorded with no
+omission, is read as covered by every class. A family admitted before the
+template exists is `unassessed` until it is annotated. `unassessed` is not a
+claim of coverage and not a claim of absence; it means the judgment has not
+been written down yet.
 
 
 Consequences
@@ -132,6 +143,14 @@ The profile template gains an evidence field, which the per-family evidence
 lanes checkpoint in [*PLAN-GATE.md*](../../PLAN-GATE.md) defines alongside the
 rest of that template. *CONTRIBUTING.md* gains a sentence requiring the record;
 its list of classes does not change.
+
+Accepting this record changes no unit's obligations today. Until that
+checkpoint defines the field, there is nowhere to write the judgment, so units
+in flight are unaffected and no existing family is retroactively annotated.
+Every family admitted before the checkpoint therefore enters `unassessed`, and
+the restructuring annotates them. The conformance claim cannot be audited
+through this record while any family inside the inventory remains
+`unassessed`.
 
 Review gains a question: whether a recorded omission is the one the family
 actually justifies. That question is the point of the record.

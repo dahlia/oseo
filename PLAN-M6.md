@@ -307,8 +307,12 @@ M6 is complete only when:
  -  documented deviations satisfy that edition's rules for server
     runtimes;
  -  the underlying ECMAScript implementation meets the ECMA-262 requirement
-    named by the standard, through the completed
-    [*PLAN-M5.md*](./PLAN-M5.md) claim or a recorded boundary decision;
+    named by the standard, through the conformance label gate that
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md) defines or a recorded
+    boundary decision that demonstrates conformance to that exact requirement.
+    Completing [*PLAN-M5.md*](./PLAN-M5.md) is not sufficient by itself,
+    because M5 may complete with authorized unsupported results inside the
+    claimed edition;
  -  every API group lives in an owned runtime component with complete
     tracing, rooting, forced-collection, and failure-injection coverage;
  -  the platform event adapter keeps deterministic test execution and records

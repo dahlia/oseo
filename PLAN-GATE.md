@@ -50,8 +50,9 @@ Non-goals
 ---------
 
 This plan does not reduce required evidence. Making the existing
-applicability judgment auditable is a separate question owned by
-[ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md).
+applicability judgment auditable is a separate question decided by
+[ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md); this plan only
+carries the profile template that records it.
 
 It does not replace the toolchain adapter, the C backend, or the collector, and
 it does not introduce a second test runner or a second property framework.
@@ -268,9 +269,12 @@ reviewed status prose in [*PLAN-M5.md*](./PLAN-M5.md),
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) grows by append,
 and the profile is the only one of the three with a normative record.
 
-The profile becomes the single per-family record under a fixed template. The
-plan and roadmap status sections reference it instead of paraphrasing it. Only
-then do concurrent family lanes stop serializing on documentation.
+The profile becomes the single per-family record under a fixed template. That
+template carries the evidence field
+[ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md) requires, so this
+checkpoint is where that accepted record takes effect. The plan and roadmap
+status sections reference the profile instead of paraphrasing it. Only then do
+concurrent family lanes stop serializing on documentation.
 
 Owner: [*PLAN-M5.md*](./PLAN-M5.md) and the M5 language profile.
 

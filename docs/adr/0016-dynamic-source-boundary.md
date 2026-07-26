@@ -133,6 +133,9 @@ Links
     boundary against which this record leaves an explicit gap. Narrowing that
     boundary would require the later decision this record's own consequences
     name.
+ -  [ADR 0019](./0019-m5-claim-closure.md) removes M5 completion's dependence
+    on the later decision this record requests, and moves the conformance label
+    to its own gate. It does not supply that decision.
  -  [*PLAN-M5.md*](../../PLAN-M5.md) names the checkpoint this record
     resolves.
  -  [*DESIGN.md*](../../DESIGN.md) records the module and whole-program
