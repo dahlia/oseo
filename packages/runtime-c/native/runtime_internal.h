@@ -129,7 +129,12 @@ typedef struct {
 typedef struct {
     OseoPropertyAttributes attributes;
     OseoValue key;
+    /* Unused, and left undefined, when attributes.accessor is true. */
     OseoValue value;
+    /* [[Get]] and [[Set]], each undefined when absent. Unused, and left
+     * undefined, when attributes.accessor is false. */
+    OseoValue getter;
+    OseoValue setter;
 } OseoProperty;
 
 typedef struct {
@@ -404,11 +409,20 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/*
+ * Reads the own property descriptor named by key, including the
+ * synthetic `prototype`, array `length`, and module namespace cell
+ * descriptors. *value is the data value, or undefined for an accessor
+ * property; *getter and *setter are each undefined unless the
+ * property is an accessor with that slot present.
+ */
 bool oseo_internal_own_descriptor(
     OseoValue object_value,
     OseoValue key,
     OseoValue *value,
-    OseoPropertyAttributes *attributes
+    OseoPropertyAttributes *attributes,
+    OseoValue *getter,
+    OseoValue *setter
 );
 OseoResult oseo_internal_promise_aggregate_settle(
     OseoContext *context,

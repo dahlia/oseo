@@ -88,7 +88,8 @@ static OseoValue function(
         1u,
         OSEO_FUNCTION_ORDINARY,
         oseo_undefined(),
-        oseo_undefined()
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
     );
     assert(result.status == OSEO_STATUS_NORMAL);
     return result.value;
@@ -202,7 +203,7 @@ int main(void) {
         frame.slots[13],
         frame.slots[14],
         frame.slots[12],
-        (OseoPropertyAttributes){true, true, true}
+        (OseoPropertyAttributes){true, true, true, false}
     );
     assert(result.status == OSEO_STATUS_NORMAL);
     result = oseo_promise_resolve(&context, frame.slots[13]);

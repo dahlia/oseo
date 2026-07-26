@@ -82,7 +82,7 @@ static OseoResult error_intrinsic_pair(
         OseoResult base = error_intrinsic_pair(context, OSEO_ERROR_ERROR);
         if (base.status != OSEO_STATUS_NORMAL) return base;
     }
-    const OseoPropertyAttributes hidden = {true, false, true};
+    const OseoPropertyAttributes hidden = {true, false, true, false};
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -136,7 +136,8 @@ static OseoResult error_intrinsic_pair(
                 0u,
                 OSEO_FUNCTION_INTERNAL,
                 oseo_undefined(),
-                oseo_undefined()
+                oseo_undefined(),
+                OSEO_FUNCTION_NAME_PREFIX_NONE
             );
             frame.slots[3] = result.value;
         }
@@ -170,7 +171,8 @@ static OseoResult error_intrinsic_pair(
             1u,
             OSEO_FUNCTION_ORDINARY,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[3] = result.value;
     }
@@ -236,7 +238,7 @@ OseoResult oseo_internal_throw_error(
         result = ascii_runtime_string(context, message);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        const OseoPropertyAttributes hidden = {true, false, true};
+        const OseoPropertyAttributes hidden = {true, false, true, false};
         result = define_ascii_property(
             context,
             slots[1],
@@ -264,7 +266,7 @@ OseoResult oseo_internal_error_construct(
 ) {
     OseoErrorKind kind =
         (OseoErrorKind)(OSEO_ERROR_CONSTRUCT_LAST_CODE_ID - code_id);
-    const OseoPropertyAttributes hidden = {true, false, true};
+    const OseoPropertyAttributes hidden = {true, false, true, false};
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;

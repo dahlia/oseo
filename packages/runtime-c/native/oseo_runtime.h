@@ -19,9 +19,23 @@ typedef enum {
     OSEO_FUNCTION_ASYNC_ARROW = 3,
     OSEO_FUNCTION_INTERNAL = 4,
     /* Dynamic `this`, like ordinary, but never constructible and without
-     * an own `prototype` property, matching MethodDefinition semantics. */
+     * an own `prototype` property, matching MethodDefinition semantics.
+     * Getter and setter closures share this kind: SetFunctionName's
+     * "get "/"set " prefix is orthogonal to constructibility and is
+     * requested separately through OseoFunctionNamePrefix. */
     OSEO_FUNCTION_METHOD = 5,
 } OseoFunctionKind;
+
+/*
+ * The SetFunctionName prefix applied to an accessor closure's `name`
+ * after the ordinary static-key or computed-key name resolves, so both
+ * paths share one prefixing step.
+ */
+typedef enum {
+    OSEO_FUNCTION_NAME_PREFIX_NONE = 0,
+    OSEO_FUNCTION_NAME_PREFIX_GET = 1,
+    OSEO_FUNCTION_NAME_PREFIX_SET = 2,
+} OseoFunctionNamePrefix;
 
 typedef struct {
     OseoStatus status;
@@ -66,7 +80,10 @@ typedef enum {
 typedef struct {
     bool configurable;
     bool enumerable;
+    /* Meaningless when accessor is true; an accessor descriptor has
+     * [[Get]]/[[Set]] instead of [[Writable]]. */
     bool writable;
+    bool accessor;
 } OseoPropertyAttributes;
 
 typedef struct {
@@ -272,7 +289,8 @@ OseoResult oseo_function_create(
     size_t parameter_count,
     OseoFunctionKind function_kind,
     OseoValue lexical_this,
-    OseoValue inferred_name
+    OseoValue inferred_name,
+    OseoFunctionNamePrefix name_prefix
 );
 OseoResult oseo_function_environment(
     OseoContext *context,
@@ -349,6 +367,27 @@ OseoResult oseo_object_define(
     OseoValue object,
     OseoValue key,
     OseoValue value,
+    OseoPropertyAttributes attributes
+);
+/*
+ * Defines an accessor property descriptor, generalizing
+ * PropertyDefinitionEvaluation for an object literal getter or setter
+ * clause (has_getter xor has_setter, attributes always
+ * {true, true, false, true}) and Object.defineProperty's accessor
+ * descriptors (either slot present, explicit attributes). When the
+ * existing own property is already an accessor, an absent slot is
+ * preserved from it; otherwise, including when converting an existing
+ * data property, an absent slot starts undefined. attributes.accessor
+ * must be true and attributes.writable is ignored.
+ */
+OseoResult oseo_object_define_accessor(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue key,
+    OseoValue getter,
+    OseoValue setter,
+    bool has_getter,
+    bool has_setter,
     OseoPropertyAttributes attributes
 );
 OseoResult oseo_object_delete(

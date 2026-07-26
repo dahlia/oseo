@@ -82,7 +82,8 @@ OseoResult oseo_internal_iterator_method(
             0u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) *cache = result.value;
@@ -128,7 +129,7 @@ static OseoResult iterator_result(
     OseoResult result = oseo_object_literal_create(context);
     if (result.status == OSEO_STATUS_NORMAL) {
         slots[1] = result.value;
-        const OseoPropertyAttributes plain = {true, true, true};
+        const OseoPropertyAttributes plain = {true, true, true, false};
         result = ascii_iterator_string(context, "value");
         slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {

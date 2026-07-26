@@ -440,6 +440,7 @@ function moduleExpressionParts(
       rebuild: (rebuilt) => ({
         ...expression,
         properties: expression.properties.map((property, index) => ({
+          ...property,
           key: rebuilt[index * 2] ?? property.key,
           value: rebuilt[index * 2 + 1] ?? property.value,
         })),

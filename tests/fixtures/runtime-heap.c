@@ -143,7 +143,7 @@ static void test_ordinary_properties(
         require_normal(oseo_object_get(context, roots[1], roots[2])) ==
         oseo_number(2.0)
     );
-    OseoPropertyAttributes fixed = {false, false, false};
+    OseoPropertyAttributes fixed = {false, false, false, false};
     (void)require_normal(
         oseo_object_define(
             context,
@@ -238,7 +238,7 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
         require_normal(oseo_object_has_own(context, roots[0], roots[2])) ==
         oseo_boolean(false)
     );
-    OseoPropertyAttributes fixed = {false, true, true};
+    OseoPropertyAttributes fixed = {false, true, true, false};
     (void)require_normal(
         oseo_object_define(
             context,
@@ -270,8 +270,8 @@ static void test_arrays(OseoContext *context, OseoValue *roots) {
     roots[1] = make_text(context, "4");
     roots[2] = make_text(context, "2");
     roots[3] = make_text(context, "length");
-    OseoPropertyAttributes retained = {false, true, true};
-    OseoPropertyAttributes removable = {true, true, true};
+    OseoPropertyAttributes retained = {false, true, true, false};
+    OseoPropertyAttributes removable = {true, true, true, false};
     (void)require_normal(
         oseo_object_define(
             context,
@@ -361,7 +361,7 @@ static void test_array_accumulation(
         oseo_array_append_hole(context, roots[5]).status ==
         OSEO_STATUS_THROW
     );
-    OseoPropertyAttributes fixed = {false, true, true};
+    OseoPropertyAttributes fixed = {false, true, true, false};
     (void)require_normal(oseo_object_define(
         context,
         roots[5],
@@ -490,7 +490,8 @@ static void test_function_cells(OseoContext *context, OseoValue *roots) {
         0u,
         OSEO_FUNCTION_ORDINARY,
         oseo_undefined(),
-        oseo_undefined()
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
     ));
     roots[3] = require_normal(oseo_environment_clone(context, roots[0]));
     roots[4] = require_normal(oseo_environment_get(context, roots[3], 0u));
@@ -792,6 +793,129 @@ static void test_iterators(OseoContext *context, OseoValue *roots) {
     context->collect_every_safepoint = false;
 }
 
+/* Each call allocates a fresh object tagged with the call index, so a
+ * later call's own allocation-triggered collection can be observed
+ * corrupting or freeing an earlier call's unrooted result. */
+static size_t accessor_gc_probe_calls = 0u;
+
+static OseoResult accessor_gc_probe_dispatcher(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    accessor_gc_probe_calls += 1u;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult allocated = oseo_roots_allocate(context, &frame, 2u);
+    if (allocated.status != OSEO_STATUS_NORMAL) return allocated;
+    OseoResult created = oseo_object_create(context, oseo_null());
+    frame.slots[0] = created.value;
+    if (created.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return created;
+    }
+    frame.slots[1] = make_text(context, "tag");
+    OseoResult tagged = oseo_object_set(
+        context,
+        frame.slots[0],
+        frame.slots[1],
+        oseo_number((double)accessor_gc_probe_calls),
+        true
+    );
+    OseoValue result = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    if (tagged.status != OSEO_STATUS_NORMAL) return tagged;
+    return (OseoResult){OSEO_STATUS_NORMAL, result};
+}
+
+/* Object.defineProperty's descriptor argument can itself carry
+ * accessor-valued fields (a getter for "value", "writable", and so
+ * on). Each field read that invokes such a getter can allocate, and
+ * under the forced-collection policy every allocation collects. An
+ * earlier field's freshly returned heap value must stay reachable
+ * through a later field's getter call and its own allocations. */
+static void test_accessor_descriptor_gc_safety(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    static const uint16_t getter_name[] = {'g', 'e', 't', 't', 'e', 'r'};
+    accessor_gc_probe_calls = 0u;
+    oseo_context_set_function_dispatcher(
+        context,
+        accessor_gc_probe_dispatcher
+    );
+    roots[0] = require_normal(oseo_environment_create(context, 0u));
+    roots[1] = require_normal(oseo_function_create(
+        context,
+        200u,
+        roots[0],
+        getter_name,
+        sizeof(getter_name) / sizeof(*getter_name),
+        0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+    roots[2] = require_normal(oseo_function_create(
+        context,
+        201u,
+        roots[0],
+        getter_name,
+        sizeof(getter_name) / sizeof(*getter_name),
+        0u,
+        OSEO_FUNCTION_ORDINARY,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
+    ));
+    roots[3] = require_normal(oseo_object_create(context, oseo_null()));
+    (void)require_normal(oseo_object_define_accessor(
+        context,
+        roots[3],
+        make_text(context, "value"),
+        roots[1],
+        oseo_undefined(),
+        true,
+        false,
+        (OseoPropertyAttributes){true, true, false, true}
+    ));
+    (void)require_normal(oseo_object_define_accessor(
+        context,
+        roots[3],
+        make_text(context, "writable"),
+        roots[2],
+        oseo_undefined(),
+        true,
+        false,
+        (OseoPropertyAttributes){true, true, false, true}
+    ));
+    roots[4] = require_normal(oseo_object_create(context, oseo_null()));
+    roots[5] = make_text(context, "item");
+    OseoValue arguments[3] = {roots[4], roots[5], roots[3]};
+    context->collect_every_safepoint = true;
+    OseoResult defined =
+        oseo_object_builtin_define_property(context, 3u, arguments);
+    context->collect_every_safepoint = false;
+    (void)require_normal(defined);
+    OseoValue item = require_normal(
+        oseo_object_get(context, roots[4], roots[5])
+    );
+    OseoValue tag = require_normal(
+        oseo_object_get(context, item, make_text(context, "tag"))
+    );
+    assert(tag == oseo_number(1.0));
+    assert(accessor_gc_probe_calls == 2u);
+    oseo_context_set_function_dispatcher(context, NULL);
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -812,6 +936,7 @@ int main(void) {
     test_error_intrinsics(&context, frame.slots);
     test_symbols(&context, frame.slots);
     test_iterators(&context, frame.slots);
+    test_accessor_descriptor_gc_safety(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

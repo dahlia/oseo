@@ -131,7 +131,7 @@ static OseoResult define_symbol_property(
     OseoResult result = oseo_string_from_units(context, units, name_length);
     if (result.status == OSEO_STATUS_NORMAL) {
         slots[2] = result.value;
-        const OseoPropertyAttributes fixed = {false, false, false};
+        const OseoPropertyAttributes fixed = {false, false, false, false};
         result = oseo_object_define(
             context,
             slots[0],
@@ -176,7 +176,8 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
             0u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         frame.slots[1] = result.value;
     }

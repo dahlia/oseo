@@ -242,6 +242,9 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly kind: "object";
       readonly properties: readonly {
+        /** A get or set accessor; absent for a data, shorthand, or method
+         * property. */
+        readonly accessorKind?: "get" | "set";
         readonly key: SyntaxExpression;
         readonly value: SyntaxExpression;
       }[];

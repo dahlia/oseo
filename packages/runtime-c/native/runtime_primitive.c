@@ -456,12 +456,16 @@ static bool conversion_property_exists(
     OseoValue current = object_value;
     while (is_object(current)) {
         OseoValue property_value = oseo_undefined();
-        OseoPropertyAttributes attributes = {false, false, false};
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue ignored_getter = oseo_undefined();
+        OseoValue ignored_setter = oseo_undefined();
         if (oseo_internal_own_descriptor(
                 current,
                 key,
                 &property_value,
-                &attributes
+                &attributes,
+                &ignored_getter,
+                &ignored_setter
             )) {
             return true;
         }
@@ -1405,9 +1409,12 @@ OseoResult oseo_has_property(
     OseoValue current = slots[1];
     while (is_object(current)) {
         OseoValue value = oseo_undefined();
-        OseoPropertyAttributes attributes = {false, false, false};
+        OseoPropertyAttributes attributes = {false, false, false, false};
+        OseoValue ignored_getter = oseo_undefined();
+        OseoValue ignored_setter = oseo_undefined();
         if (oseo_internal_own_descriptor(
-            current, property, &value, &attributes)) {
+            current, property, &value, &attributes,
+            &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
         OseoOrdinaryObject *object = ordinary_object(current);

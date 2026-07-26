@@ -892,6 +892,7 @@ function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
   inferredFunctionName?: number,
+  accessorNamePrefix?: "get" | "set",
 ): number {
   if (expression.kind === "module-namespace") {
     appendMirMetadata(
@@ -973,6 +974,9 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
+      ...(accessorNamePrefix == null
+        ? {}
+        : { accessorKind: accessorNamePrefix }),
       arguments: inferredFunctionName == null ? [] : [inferredFunctionName],
       detail:
         `function @f${expression.functionId} ` +
@@ -1399,6 +1403,7 @@ function lowerExpression(
         property.value.kind === "function" && property.value.name === ""
           ? key
           : undefined,
+        property.accessorKind,
       );
       appendMirMetadata(
         builder,
@@ -1409,13 +1414,24 @@ function lowerExpression(
       );
       const result = builder.nextValue;
       builder.nextValue += 1;
-      builder.current.operations.push({
-        arguments: [id, key, value],
-        detail: "create data property",
-        id: result,
-        kind: "property-set",
-        range: expression.range,
-      });
+      builder.current.operations.push(
+        property.accessorKind == null
+          ? {
+              arguments: [id, key, value],
+              detail: "create data property",
+              id: result,
+              kind: "property-define-data",
+              range: expression.range,
+            }
+          : {
+              accessorKind: property.accessorKind,
+              arguments: [id, key, value],
+              detail: `define ${property.accessorKind} accessor property`,
+              id: result,
+              kind: "property-define-accessor",
+              range: expression.range,
+            },
+      );
       appendMirMetadata(
         builder,
         "check-status",

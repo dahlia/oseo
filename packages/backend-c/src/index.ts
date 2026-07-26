@@ -696,6 +696,30 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(state, `result = oseo_property_key(context, roots[${input}]);`);
+  } else if (operation.kind === "property-define-data") {
+    const object = operationArgument(operation, 0);
+    const key = operationArgument(operation, 1);
+    const value = operationArgument(operation, 2);
+    line(
+      state,
+      `result = oseo_object_define(context, roots[${object}], ` +
+        `roots[${key}], roots[${value}], ` +
+        "(OseoPropertyAttributes){true, true, true, false});",
+    );
+  } else if (operation.kind === "property-define-accessor") {
+    const object = operationArgument(operation, 0);
+    const key = operationArgument(operation, 1);
+    const value = operationArgument(operation, 2);
+    const isSetter = operation.accessorKind === "set";
+    line(
+      state,
+      `result = oseo_object_define_accessor(context, roots[${object}], ` +
+        `roots[${key}], ` +
+        `${isSetter ? "oseo_undefined()" : `roots[${value}]`}, ` +
+        `${isSetter ? `roots[${value}]` : "oseo_undefined()"}, ` +
+        `${isSetter ? "false" : "true"}, ${isSetter ? "true" : "false"}, ` +
+        "(OseoPropertyAttributes){true, true, false, true});",
+    );
   } else {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
@@ -828,6 +852,14 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     operation.arguments[0] == null
       ? "oseo_undefined()"
       : `roots[${operation.arguments[0]}]`;
+  const namePrefixes = {
+    get: "OSEO_FUNCTION_NAME_PREFIX_GET",
+    set: "OSEO_FUNCTION_NAME_PREFIX_SET",
+  } as const;
+  const namePrefix =
+    operation.accessorKind == null
+      ? "OSEO_FUNCTION_NAME_PREFIX_NONE"
+      : namePrefixes[operation.accessorKind];
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
@@ -835,7 +867,8 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     `result = oseo_function_create(context, ${operation.functionId}u, ` +
       `roots[${state.environmentSlot}], ${nameInput}, ${units.length}u, ` +
       `${operation.functionLength}u, ` +
-      `${functionKinds[operation.functionKind]}, receiver, ${inferredName});`,
+      `${functionKinds[operation.functionKind]}, receiver, ${inferredName}, ` +
+      `${namePrefix});`,
   );
   line(state, `roots[${operation.id}] = result.value;`);
 }
@@ -1088,6 +1121,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "object-create" ||
     operation.kind === "object-rest" ||
     operation.kind === "property-key" ||
+    operation.kind === "property-define-accessor" ||
+    operation.kind === "property-define-data" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||
     operation.kind === "property-set"

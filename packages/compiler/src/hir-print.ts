@@ -119,6 +119,7 @@ function printHirExpression(expression: HirExpression): string {
       expression.properties
         .map(
           (property) =>
+            (property.accessorKind == null ? "" : `${property.accessorKind} `) +
             `${printHirExpression(property.key)}: ` +
             printHirExpression(property.value),
         )

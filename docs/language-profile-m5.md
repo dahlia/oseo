@@ -579,22 +579,31 @@ its deliberate boundary and its evidence:
     declarations and function expressions; arrow functions remain
     non-constructible and prototype-less for the separate reason that they
     already bind lexical `this`. Computed property keys were already
-    admitted by prior work. Deliberate boundaries, each rejected with a
-    source-located diagnostic in every syntactic form including shorthand
-    and method keys:
-    getter and setter accessors, object spread properties, and the Annex B
-    `__proto__` property-name special case. Native differential fixtures
-    retain the empty object, single and multiple data properties, shorthand
-    from a local binding and from a parameter, a method's `this` reference
-    and non-constructible identity, nested object literals, left-to-right
-    evaluation order, abrupt completion in a property value, and forced
-    collection across property safepoints. A generated property with seed
-    `0x5eed0015` covers zero to four data, shorthand, and method properties
-    and bounded integer values across Node.js, Deno, both specialization
-    policies, and forced collection on the enabled path. Two hundred
-    seventy-six reviewed test262 cases cover property-name forms, method
-    definitions, non-constructible method identity, and the destructuring
-    parameter patterns their method bodies already supported.
+    admitted by prior work. Getter and setter accessors are also admitted:
+    each accessor evaluates its key and installs a runtime accessor
+    property that dispatches through the property lookup and assignment
+    paths already built for other property kinds. An accessor property is
+    always configurable and enumerable, and a later accessor or data
+    property for the same key replaces an earlier one in source order,
+    matching the existing last-definition-wins rule for data properties.
+    Deliberate boundaries, each rejected with a source-located diagnostic
+    in every syntactic form including shorthand and method keys: object
+    spread properties and the Annex B `__proto__` property-name special
+    case. Native differential fixtures retain the empty object, single and
+    multiple data properties, shorthand from a local binding and from a
+    parameter, a method's `this` reference and non-constructible identity,
+    getter-only and setter-only accessors, an accessor pair's shared
+    descriptor, a data property redefined to an accessor and back, nested
+    object literals, left-to-right evaluation order, abrupt completion in a
+    property value, and forced collection across property safepoints. A
+    generated property with seed `0x5eed0015` covers zero to four data,
+    shorthand, method, getter, and setter properties and bounded integer
+    values across Node.js, Deno, both specialization policies, and forced
+    collection on the enabled path. Three hundred fourteen reviewed
+    test262 cases cover property-name forms, method definitions,
+    non-constructible method identity, getter and setter accessor forms,
+    and the destructuring parameter patterns their method bodies already
+    supported.
 
 
 Known gaps inside the claim

@@ -462,19 +462,18 @@ setTimeout(task, delay);
     {
       args: ["accessor-descriptor.ts"],
       source:
-        'Object.defineProperty({}, "item", {' +
-        " get: function () { return 42; } });",
+        "const value = {};" +
+        'Object.defineProperty(value, "item", {' +
+        " get: function () { return 42; } });" +
+        "console.log(value.item);",
       sourceId: "accessor-descriptor.ts",
       version: "0.1.0",
     },
     host,
   );
-  assert.equal(accessorDescriptor.exitStatus, 1);
-  assert.equal(accessorDescriptor.stdout, "");
-  assert.match(
-    accessorDescriptor.stderr,
-    /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
-  );
+  assert.equal(accessorDescriptor.exitStatus, 0);
+  assert.equal(accessorDescriptor.stdout, "42\n");
+  assert.equal(accessorDescriptor.stderr, "");
 
   const inheritedAccessorDescriptor = await runNativeCli(
     {
@@ -482,16 +481,269 @@ setTimeout(task, delay);
       source:
         "const descriptor = Object.create({ " +
         "get: function () { return 42; } }); " +
-        'Object.defineProperty({}, "item", descriptor);',
+        "const value = {};" +
+        'Object.defineProperty(value, "item", descriptor);' +
+        "console.log(value.item);",
       sourceId: "inherited-accessor-descriptor.ts",
       version: "0.1.0",
     },
     host,
   );
-  assert.equal(inheritedAccessorDescriptor.exitStatus, 1);
-  assert.equal(inheritedAccessorDescriptor.stdout, "");
-  assert.match(
-    inheritedAccessorDescriptor.stderr,
-    /error\[OSEO2001\].*Accessor property descriptors are unsupported/u,
+  assert.equal(inheritedAccessorDescriptor.exitStatus, 0);
+  assert.equal(inheritedAccessorDescriptor.stdout, "42\n");
+  assert.equal(inheritedAccessorDescriptor.stderr, "");
+
+  const accessorToDataConversion = await runNativeCli(
+    {
+      args: ["accessor-to-data-conversion.ts"],
+      source:
+        "const value = {};" +
+        'Object.defineProperty(value, "item", ' +
+        "{ get: function () { return 1; }, configurable: true });" +
+        'Object.defineProperty(value, "item", { value: 2 });' +
+        "console.log(value.item);",
+      sourceId: "accessor-to-data-conversion.ts",
+      version: "0.1.0",
+    },
+    host,
   );
+  assert.equal(accessorToDataConversion.exitStatus, 0);
+  assert.equal(accessorToDataConversion.stdout, "2\n");
+  assert.equal(accessorToDataConversion.stderr, "");
+
+  const nonConfigurableAccessorToData = await runNativeCli(
+    {
+      args: ["non-configurable-accessor-to-data.ts"],
+      source:
+        "const value = {};" +
+        'Object.defineProperty(value, "item", ' +
+        "{ get: function () { return 1; }, configurable: false });" +
+        'Object.defineProperty(value, "item", { value: 2 });',
+      sourceId: "non-configurable-accessor-to-data.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nonConfigurableAccessorToData.exitStatus, 1);
+  assert.equal(nonConfigurableAccessorToData.stdout, "");
+  assert.match(
+    nonConfigurableAccessorToData.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot redefine a non-configurable/u,
+  );
+
+  const nonConfigurableDataToAccessor = await runNativeCli(
+    {
+      args: ["non-configurable-data-to-accessor.ts"],
+      source:
+        "const value = {};" +
+        'Object.defineProperty(value, "item", ' +
+        "{ value: 1, configurable: false });" +
+        'Object.defineProperty(value, "item", ' +
+        "{ get: function () { return 2; } });",
+      sourceId: "non-configurable-data-to-accessor.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nonConfigurableDataToAccessor.exitStatus, 1);
+  assert.equal(nonConfigurableDataToAccessor.stdout, "");
+  assert.match(
+    nonConfigurableDataToAccessor.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot redefine a non-configurable/u,
+  );
+
+  const nullGetterField = await runNativeCli(
+    {
+      args: ["null-getter-field.ts"],
+      source: 'Object.defineProperty({}, "item", { get: null });',
+      sourceId: "null-getter-field.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nullGetterField.exitStatus, 1);
+  assert.equal(nullGetterField.stdout, "");
+  assert.match(
+    nullGetterField.stderr,
+    /error\[OSEO2001\]: TypeError: A property descriptor 'get' field must/u,
+  );
+
+  const nullSetterField = await runNativeCli(
+    {
+      args: ["null-setter-field.ts"],
+      source: 'Object.defineProperty({}, "item", { set: null });',
+      sourceId: "null-setter-field.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(nullSetterField.exitStatus, 1);
+  assert.equal(nullSetterField.stdout, "");
+  assert.match(
+    nullSetterField.stderr,
+    /error\[OSEO2001\]: TypeError: A property descriptor 'set' field must/u,
+  );
+
+  const accessorGrowsArrayLength = await runNativeCli(
+    {
+      args: ["accessor-grows-array-length.ts"],
+      source:
+        "const array = [1, 2];" +
+        'Object.defineProperty(array, "5", ' +
+        "{ get: function () { return 9; } });" +
+        "console.log(array.length, array[5]);",
+      sourceId: "accessor-grows-array-length.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorGrowsArrayLength.exitStatus, 0);
+  assert.equal(accessorGrowsArrayLength.stdout, "6 9\n");
+  assert.equal(accessorGrowsArrayLength.stderr, "");
+
+  const accessorBlockedByReadOnlyLength = await runNativeCli(
+    {
+      args: ["accessor-blocked-by-read-only-length.ts"],
+      source:
+        "const array = [1, 2];" +
+        'Object.defineProperty(array, "length", { writable: false });' +
+        'Object.defineProperty(array, "5", ' +
+        "{ get: function () { return 9; } });",
+      sourceId: "accessor-blocked-by-read-only-length.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorBlockedByReadOnlyLength.exitStatus, 1);
+  assert.equal(accessorBlockedByReadOnlyLength.stdout, "");
+  assert.match(
+    accessorBlockedByReadOnlyLength.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot extend an array with a/u,
+  );
+
+  const inheritedSetterRunsBeforeLengthCheck = await runNativeCli(
+    {
+      args: ["inherited-setter-runs-before-length-check.ts"],
+      source:
+        "const array = [1, 2];" +
+        'Object.defineProperty(array, "length", { writable: false });' +
+        "let received = 0;" +
+        "const proto = { set 5(value) { received = value; } };" +
+        "Object.setPrototypeOf(array, proto);" +
+        "array[5] = 9;" +
+        'const descriptor = Object.getOwnPropertyDescriptor(array, "5");' +
+        "console.log(array.length, received, descriptor === undefined);",
+      sourceId: "inherited-setter-runs-before-length-check.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.exitStatus, 0);
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.stdout, "2 9 true\n");
+  assert.equal(inheritedSetterRunsBeforeLengthCheck.stderr, "");
+
+  const accessorForArrayLength = await runNativeCli(
+    {
+      args: ["accessor-for-array-length.ts"],
+      source:
+        "const array = [1, 2];" +
+        'Object.defineProperty(array, "length", ' +
+        "{ get: function () { return 9; } });",
+      sourceId: "accessor-for-array-length.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorForArrayLength.exitStatus, 1);
+  assert.equal(accessorForArrayLength.stdout, "");
+  assert.match(
+    accessorForArrayLength.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot redefine the array length/u,
+  );
+
+  const accessorForFunctionPrototype = await runNativeCli(
+    {
+      args: ["accessor-for-function-prototype.ts"],
+      source:
+        "function Ctor() {}" +
+        'Object.defineProperty(Ctor, "prototype", ' +
+        "{ get: function () { return {}; } });",
+      sourceId: "accessor-for-function-prototype.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorForFunctionPrototype.exitStatus, 1);
+  assert.equal(accessorForFunctionPrototype.stdout, "");
+  assert.match(
+    accessorForFunctionPrototype.stderr,
+    /error\[OSEO2001\]: TypeError: Cannot redefine the prototype/u,
+  );
+
+  const accessorBackedDescriptorField = await runNativeCli(
+    {
+      args: ["accessor-backed-descriptor-field.ts"],
+      source:
+        "const value = {};" +
+        "const descriptor = { get value() { return 7; }, " +
+        "enumerable: true, configurable: true, writable: true };" +
+        'Object.defineProperty(value, "item", descriptor);' +
+        "console.log(value.item);",
+      sourceId: "accessor-backed-descriptor-field.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorBackedDescriptorField.exitStatus, 0);
+  assert.equal(accessorBackedDescriptorField.stdout, "7\n");
+  assert.equal(accessorBackedDescriptorField.stderr, "");
+
+  const accessorBackedDescriptorFieldThrows = await runNativeCli(
+    {
+      args: ["accessor-backed-descriptor-field-throws.ts"],
+      source:
+        "const descriptor = { get value() { " +
+        'throw new TypeError("boom"); } };' +
+        'Object.defineProperty({}, "item", descriptor);',
+      sourceId: "accessor-backed-descriptor-field-throws.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(accessorBackedDescriptorFieldThrows.exitStatus, 1);
+  assert.equal(accessorBackedDescriptorFieldThrows.stdout, "");
+  assert.match(
+    accessorBackedDescriptorFieldThrows.stderr,
+    /error\[OSEO2001\]: TypeError: boom/u,
+  );
+
+  const descriptorFieldReadOrder = await runNativeCli(
+    {
+      args: ["descriptor-field-read-order.ts"],
+      source:
+        "const value = {};" +
+        'let order = "";' +
+        "const descriptor = {" +
+        'get enumerable() { order = order + "e"; return true; },' +
+        'get configurable() { order = order + "c"; return true; },' +
+        'get value() { order = order + "v"; return 1; },' +
+        'get writable() { order = order + "w"; return true; },' +
+        'get get() { order = order + "g"; return undefined; },' +
+        'get set() { order = order + "s"; return undefined; },' +
+        "};" +
+        "try {" +
+        '  Object.defineProperty(value, "item", descriptor);' +
+        '  console.log("no throw");' +
+        "} catch (error) {" +
+        '  console.log("threw", error instanceof TypeError);' +
+        "}" +
+        "console.log(order);",
+      sourceId: "descriptor-field-read-order.ts",
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(descriptorFieldReadOrder.exitStatus, 0);
+  assert.equal(descriptorFieldReadOrder.stdout, "threw true\necvwgs\n");
+  assert.equal(descriptorFieldReadOrder.stderr, "");
 }

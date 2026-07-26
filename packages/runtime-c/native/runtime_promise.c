@@ -97,7 +97,8 @@ OseoResult oseo_internal_promise_method_function(
             code_id == OSEO_PROMISE_THEN_CODE_ID ? 2u : 1u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) *cache = result.value;
@@ -331,7 +332,8 @@ static OseoResult resolving_function_create(
             1u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
     }
     oseo_roots_release(context, &frame);
@@ -526,7 +528,8 @@ static OseoResult promise_aggregate_function_create(
         1u,
         OSEO_FUNCTION_INTERNAL,
         oseo_undefined(),
-        oseo_undefined()
+        oseo_undefined(),
+        OSEO_FUNCTION_NAME_PREFIX_NONE
     );
     oseo_roots_release(context, &frame);
     return result;
@@ -861,7 +864,8 @@ static OseoResult promise_finally_function_create(
             1u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
     }
     oseo_roots_release(context, &frame);
@@ -905,7 +909,8 @@ OseoResult oseo_internal_promise_finally_continuation_create(
             0u,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
-            oseo_undefined()
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
         );
     }
     oseo_roots_release(context, &frame);

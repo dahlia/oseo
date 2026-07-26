@@ -25,7 +25,7 @@ const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-type PropertyKind = "data" | "method" | "shorthand";
+type PropertyKind = "data" | "get" | "method" | "set" | "shorthand";
 
 interface PropertySpec {
   readonly kind: PropertyKind;
@@ -45,7 +45,13 @@ const nativeTarget = targetForExecutionHost(
 );
 
 const propertyArbitrary: fc.Arbitrary<PropertySpec> = fc.record({
-  kind: fc.constantFrom<PropertyKind>("data", "method", "shorthand"),
+  kind: fc.constantFrom<PropertyKind>(
+    "data",
+    "get",
+    "method",
+    "set",
+    "shorthand",
+  ),
   value: fc.integer({ max: 20, min: -20 }),
 });
 const caseArbitrary: fc.Arbitrary<ObjectLiteralCase> = fc.record({
@@ -58,20 +64,33 @@ function printCase(testCase: ObjectLiteralCase): string {
   const reads: string[] = [];
   testCase.properties.forEach((property, index) => {
     const name = `p${index}`;
+    const store = `s${index}`;
     if (property.kind === "shorthand") {
       bindings.push(`const ${name} = ${property.value};`);
       tokens.push(name);
     } else if (property.kind === "data") {
       tokens.push(`${name}: (order = order + "${index}", ${property.value})`);
+    } else if (property.kind === "get") {
+      tokens.push(`get ${name}() { return ${property.value}; }`);
+    } else if (property.kind === "set") {
+      bindings.push(`let ${store};`);
+      tokens.push(`set ${name}(v) { ${store} = v; }`);
     } else {
       tokens.push(`${name}() { return ${property.value}; }`);
     }
-    reads.push(
-      property.kind === "method"
-        ? `console.log("${name}", typeof o.${name}, o.${name}(), ` +
-            `o.${name}.name, "prototype" in o.${name});`
-        : `console.log("${name}", o.${name});`,
-    );
+    if (property.kind === "method") {
+      reads.push(
+        `console.log("${name}", typeof o.${name}, o.${name}(), ` +
+          `o.${name}.name, "prototype" in o.${name});`,
+      );
+    } else if (property.kind === "set") {
+      reads.push(
+        `o.${name} = ${property.value};\n` +
+          `console.log("${name}", ${store});`,
+      );
+    } else {
+      reads.push(`console.log("${name}", o.${name});`);
+    }
   });
   return `
 let order = "";
