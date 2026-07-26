@@ -201,6 +201,67 @@ bypass above replaces that load-contaminated sample rather than averaging it
 into the checkpoint result.
 
 
+Concurrent reviewed execution checkpoint
+----------------------------------------
+
+The concurrent checkpoint ran on the same operating system, processor, target,
+and tool versions as the reuse sample. No unrelated native build or other heavy
+test task ran at the same time.
+
+| Fact                      | Concurrent sample                      |
+| ------------------------- | -------------------------------------- |
+| Operating system          | Linux 7.1.4-200.fc44.x86\_64           |
+| Processor                 | AMD Ryzen 7 7700X, 8 cores, 16 threads |
+| Memory available at start | 25 GiB                                 |
+| Swap at start             | 8.0 GiB used, 104 KiB free             |
+| */tmp* capacity           | 31 GiB                                 |
+| */tmp* use at start       | 32 percent                             |
+| Load average at start     | 0.71/0.39/0.80                         |
+| Oseo target               | `linux-x86_64-gnu`                     |
+| Sanitizers                | address, undefined                     |
+| Zig                       | 0.16.0                                 |
+| Node.js                   | 24.18.0                                |
+| Deno                      | 2.9.2                                  |
+
+The worker bound is eight, one for each physical core. A host with less
+available parallelism uses and reports that lower effective bound. The measured
+reused footprint makes the resource comparison explicit:
+
+| Resource          | Per execution | Eight-worker aggregate | Constrained successful capacity |
+| ----------------- | ------------- | ---------------------- | ------------------------------- |
+| Resident memory   | 47.8 MiB      | 382.4 MiB              | 6.1 GiB available               |
+| Temporary storage | 4.40 MiB      | 35.2 MiB               | about 6.2 GiB available         |
+
+The capacity column uses the more constrained successful reuse sample rather
+than the less constrained concurrent sample. Both capacities admit more than
+eight measured working sets. The processor has eight physical cores, so CPU
+rather than memory or temporary storage sets the bound. The 16 logical threads
+do not double the physical execution resources available to the CPU-intensive
+compiler and linker work.
+
+The complete reviewed subset retained 310 passes, 245 expected negatives, 126
+unsupported profile features, and no semantic or harness failures. Its
+serialized canonical manifest matched the checked-in sequential manifest byte
+for byte, so *results.yaml* and the digest in *target-parity.yaml* did not
+change. The run performed no retry.
+
+| Task and path                                 | Wall    | User     | System  | CPU / wall |
+| --------------------------------------------- | ------- | -------- | ------- | ---------- |
+| `mise run test:test262`, reuse, eight workers | 44.57 s | 256.73 s | 89.23 s | 7.76       |
+
+Derived from the observations, concurrent execution removed 226.07 s from the
+270.64 s sequential reuse path, a reduction of 83.5 percent. The gate was 6.07
+times faster, and its processor-time-to-wall ratio rose from 1.08 to 7.76.
+
+The CLI narrows a process-start failure caused by temporary host process
+resource exhaustion before the harness considers a retry. Only that diagnostic
+is retried, once at most for each native variant. Deterministic toolchain
+failure, temporary-directory failure, ordinary executable-launch failure, and
+cleanup failure remain first-attempt harness failures. Duration, the effective
+pool bound, and total retries appear in run output and failure metadata, never
+in the canonical manifest.
+
+
 Load sensitivity
 ----------------
 

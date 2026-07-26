@@ -517,6 +517,48 @@ test("normalizes process spawn failures into host diagnostics", async () => {
   assert.equal(cleanupCount, 1);
 });
 
+test("names temporary process resource exhaustion", async () => {
+  const host: CompilerHost = {
+    executionHost: {
+      architecture: "x86_64",
+      operatingSystem: "linux",
+    },
+    makeTemporaryDirectory() {
+      return Promise.resolve("/temporary/oseo-cli");
+    },
+    readTextFile() {
+      return Promise.resolve("");
+    },
+    remove() {
+      return Promise.resolve();
+    },
+    run() {
+      return Promise.reject(
+        Object.assign(new Error("spawn zig EAGAIN"), { code: "EAGAIN" }),
+      );
+    },
+    writeTextFile() {
+      return Promise.resolve();
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["fixture.ts"],
+      source: "console.log(42);",
+      sourceId: "fixture.ts",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.exitStatus, 1);
+  assert.ok(
+    result.stderr.includes(
+      "could not be started because the host temporarily exhausted " +
+        "process resources.",
+    ),
+  );
+});
+
 test("cleans temporary artifacts after native execution fails", async () => {
   let cleanupCount = 0;
   const host: CompilerHost = {

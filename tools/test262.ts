@@ -1,12 +1,17 @@
-/* eslint-disable no-await-in-loop -- Reviewed native cases run in order. */
+/* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { availableParallelism } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { performance } from "node:perf_hooks";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { runNativeCli } from "../packages/cli/src/index.ts";
+import {
+  processResourceExhaustionDiagnosticSuffix,
+  runNativeCli,
+} from "../packages/cli/src/index.ts";
 import type { CliResult } from "../packages/cli/src/index.ts";
 import {
   buildModuleGraph,
@@ -91,6 +96,12 @@ const runtimeArchiveReuse =
     ? "disabled"
     : "enabled";
 const parityTargets = [canonicalTarget, "macos-aarch64"] as const;
+const measuredExecutionPoolLimit = 8;
+const reviewedExecutionPoolLimit = Math.min(
+  measuredExecutionPoolLimit,
+  availableParallelism(),
+);
+const reviewedExecutionRetryLimit = 1;
 
 interface FrontmatterNegative {
   readonly phase: Test262FailurePhase;
@@ -125,6 +136,36 @@ export interface ReviewedTest262Manifest {
   readonly results: readonly Test262Result[];
   readonly suiteRevision: string;
   readonly summary: Test262Summary;
+}
+
+/** Host-varying facts reported outside the canonical manifest. */
+export interface ReviewedTest262RunMetadata {
+  readonly durationMilliseconds: number;
+  readonly poolLimit: number;
+  readonly retries: number;
+}
+
+/** One reviewed run and its noncanonical operational metadata. */
+export interface ReviewedTest262Run {
+  readonly manifest: ReviewedTest262Manifest;
+  readonly metadata: ReviewedTest262RunMetadata;
+}
+
+/** Test-only overrides for the fixed production pool and retry limits. */
+export interface ReviewedTest262RunOptions {
+  readonly poolLimit?: number;
+  readonly retryLimit?: number;
+}
+
+/** A reviewed run failure carrying reproducible operational metadata. */
+export class ReviewedTest262RunError extends Error {
+  readonly metadata: ReviewedTest262RunMetadata;
+
+  constructor(cause: unknown, metadata: ReviewedTest262RunMetadata) {
+    super(errorMessage(cause), { cause });
+    this.name = "ReviewedTest262RunError";
+    this.metadata = metadata;
+  }
 }
 
 /** Inputs passed to an injected native executor. */
@@ -377,6 +418,14 @@ export function diagnosticCode(stderr: string): string | undefined {
 
 function infrastructureFailure(result: CliResult): boolean {
   return diagnosticCode(result.stderr) === "OSEO3001";
+}
+
+function retryableInfrastructureFailure(result: CliResult): boolean {
+  if (!infrastructureFailure(result)) return false;
+  const match = /^.+?:\d+:\d+: error\[OSEO3001\]: (.+)$/mu.exec(result.stderr);
+  return (
+    match?.[1]?.endsWith(processResourceExhaustionDiagnosticSuffix) ?? false
+  );
 }
 
 /** The exact untyped-throw diagnostic the native host renders. */
@@ -1104,16 +1153,27 @@ export function serializeTest262Manifest(
   return stringifyYaml(manifest, { lineWidth: 72 });
 }
 
-function validateReviewedResults(
+export function validateReviewedResults(
   subset: ReviewedTest262Subset,
   results: readonly Test262Result[],
 ): void {
   const failures: string[] = [];
+  if (results.length !== subset.tests.length) {
+    failures.push(
+      `Expected ${subset.tests.length} reviewed results, received ` +
+        `${results.length}.`,
+    );
+  }
   for (let index = 0; index < subset.tests.length; index += 1) {
     const expected = subset.tests[index];
     const actual = results[index];
     if (expected == null || actual == null) {
       failures.push(`Missing reviewed result at index ${index}.`);
+    } else if (actual.case.path !== expected.path) {
+      failures.push(
+        `Reviewed result at index ${index} expected path ${expected.path}, ` +
+          `received ${actual.case.path}.`,
+      );
     } else if (actual.classification !== expected.expectedClassification) {
       failures.push(
         `${expected.path}: expected ${expected.expectedClassification}, ` +
@@ -1189,37 +1249,124 @@ const nativeExecutor: Test262Executor = {
   },
 };
 
+function positiveInteger(value: number, description: string): number {
+  if (!Number.isSafeInteger(value) || value < 1) {
+    throw new Error(`${description} must be a positive integer.`);
+  }
+  return value;
+}
+
+function runMetadata(
+  startedAt: number,
+  poolLimit: number,
+  retries: number,
+): ReviewedTest262RunMetadata {
+  return {
+    durationMilliseconds:
+      Math.round((performance.now() - startedAt) * 100) / 100,
+    poolLimit,
+    retries,
+  };
+}
+
 /** Run every explicitly reviewed source path at the pinned revision. */
 export async function createReviewedManifest(
   subset: ReviewedTest262Subset,
   root: string,
   harnesses: Test262Harnesses,
   executor: Test262Executor = nativeExecutor,
-): Promise<ReviewedTest262Manifest> {
+  options: ReviewedTest262RunOptions = {},
+): Promise<ReviewedTest262Run> {
+  const startedAt = performance.now();
+  const configuredPoolLimit = positiveInteger(
+    options.poolLimit ?? reviewedExecutionPoolLimit,
+    "Reviewed test262 pool limit",
+  );
+  const retryLimit = positiveInteger(
+    options.retryLimit ?? reviewedExecutionRetryLimit,
+    "Reviewed test262 retry limit",
+  );
+  const poolLimit = Math.min(configuredPoolLimit, subset.tests.length);
   const supportedFeatures = new Set(subset.supportedFeatures);
-  const results: Test262Result[] = [];
-  for (const entry of subset.tests) {
-    const sourcePath = join(root, entry.path);
-    const source = await readFile(sourcePath, "utf8");
-    const parsed = parseTest262Case(source, entry.path, subset.suiteRevision);
-    results.push(
-      await executeTest262Case(
-        source,
-        parsed,
-        supportedFeatures,
-        harnesses,
-        executor,
-        entry.dependencies,
-        { rootPath: root, sourcePath },
-      ),
+  const pendingResults: (Test262Result | undefined)[] = Array(
+    subset.tests.length,
+  );
+  const failures: (unknown | undefined)[] = Array(subset.tests.length);
+  let nextIndex = 0;
+  let retries = 0;
+  let aborted = false;
+  const retryingExecutor: Test262Executor = {
+    ...(executor.target == null ? {} : { target: executor.target }),
+    async execute(request): Promise<CliResult> {
+      let result = await executor.execute(request);
+      for (
+        let retry = 0;
+        retry < retryLimit && retryableInfrastructureFailure(result);
+        retry += 1
+      ) {
+        retries += 1;
+        result = await executor.execute(request);
+      }
+      return result;
+    },
+  };
+  const worker = async (): Promise<void> => {
+    while (true) {
+      if (aborted) return;
+      const index = nextIndex;
+      nextIndex += 1;
+      const entry = subset.tests[index];
+      if (entry == null) return;
+      try {
+        const sourcePath = join(root, entry.path);
+        const source = await readFile(sourcePath, "utf8");
+        const parsed = parseTest262Case(
+          source,
+          entry.path,
+          subset.suiteRevision,
+        );
+        pendingResults[index] = await executeTest262Case(
+          source,
+          parsed,
+          supportedFeatures,
+          harnesses,
+          retryingExecutor,
+          entry.dependencies,
+          { rootPath: root, sourcePath },
+        );
+      } catch (error) {
+        failures[index] = error;
+        aborted = true;
+      }
+    }
+  };
+  try {
+    await Promise.all(
+      Array.from({ length: poolLimit }, async () => await worker()),
+    );
+    const failure = failures.find((entry) => entry != null);
+    if (failure != null) throw failure;
+    const results = pendingResults.map((result, index) => {
+      if (result == null) {
+        throw new Error(`Missing reviewed result at index ${index}.`);
+      }
+      return result;
+    });
+    validateReviewedResults(subset, results);
+    return {
+      manifest: {
+        results,
+        suiteRevision: subset.suiteRevision,
+        summary: summarizeTest262(results),
+      },
+      metadata: runMetadata(startedAt, poolLimit, retries),
+    };
+  } catch (error) {
+    throw new ReviewedTest262RunError(
+      error,
+      runMetadata(startedAt, poolLimit, retries),
     );
   }
-  validateReviewedResults(subset, results);
-  return {
-    results,
-    suiteRevision: subset.suiteRevision,
-    summary: summarizeTest262(results),
-  };
 }
 
 function requireSupportedHost(): void {
@@ -1362,13 +1509,14 @@ async function main(): Promise<void> {
   const harnesses = await readHarnesses();
   const previousGc = process.env.OSEO_GC_EVERY_SAFEPOINT;
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-  let manifest: ReviewedTest262Manifest;
+  let run: ReviewedTest262Run;
   try {
-    manifest = await createReviewedManifest(selectedSubset, root, harnesses);
+    run = await createReviewedManifest(selectedSubset, root, harnesses);
   } finally {
     if (previousGc == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
     else process.env.OSEO_GC_EVERY_SAFEPOINT = previousGc;
   }
+  const { manifest, metadata } = run;
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);
   if (cliArguments.update) {
@@ -1406,7 +1554,9 @@ async function main(): Promise<void> {
       `tests=${selectedSubset.tests.length}/${subset.tests.length} ` +
       `pass=${manifest.summary.passes} ` +
       `expected-negative=${manifest.summary.expectedNegatives} ` +
-      `unsupported=${manifest.summary.unsupportedProfileFeatures}`,
+      `unsupported=${manifest.summary.unsupportedProfileFeatures} ` +
+      `duration=${metadata.durationMilliseconds}ms ` +
+      `pool=${metadata.poolLimit} retries=${metadata.retries}`,
   );
 }
 

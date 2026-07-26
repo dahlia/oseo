@@ -4,12 +4,12 @@ Evidence gate throughput plan
 Status
 ------
 
-Implementation status: in progress. The runtime archive reuse checkpoint is
-complete, while the later checkpoints remain planned. This plan defines the
-cost contract for the reviewed evidence gates and the checkpoints that keep
-that cost usable as the reviewed corpus grows. It does not change any language
-semantic, any classification vocabulary by itself, or the amount of evidence a
-semantic unit must supply.
+Implementation status: in progress. The runtime archive reuse and concurrent
+reviewed execution checkpoints are complete, while the later checkpoints
+remain planned. This plan defines the cost contract for the reviewed evidence
+gates and the checkpoints that keep that cost usable as the reviewed corpus
+grows. It does not change any language semantic, any classification vocabulary
+by itself, or the amount of evidence a semantic unit must supply.
 
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
@@ -174,34 +174,51 @@ Owner: the toolchain and host adapter boundaries in
 
 ### Concurrent reviewed execution
 
+Checkpoint status: complete.
+
 The reviewed subset executes through a bounded worker pool instead of one
 sequential loop in *tools/test262.ts*. Results are collected into reviewed
 subset order, not completion order. The pool bound is explicit and recorded in
 failure metadata so that a concurrency-dependent observation is reproducible.
 
-The bound is chosen against measured peak resident memory and temporary
-storage, not only against the processor count. Concurrency multiplies whatever
-working set each execution holds, and the baseline records two runs that
-reported native infrastructure failures at a concurrency of one without
-identifying the exhausted resource.
+The bound is eight workers, one for each physical core on the measurement host.
+The runner also caps this value at the execution host's available parallelism,
+so a smaller host reports and uses its lower effective bound.
+One reused execution peaked at 47.8 MiB of process-tree resident memory and
+4.40 MiB of allocated temporary storage. Eight simultaneous executions
+therefore bound the measured aggregate footprint at 382.4 MiB of resident
+memory and 35.2 MiB of temporary storage. Even the more constrained successful
+reuse sample began with 6.1 GiB of memory available and about 6.2 GiB free on
+*/tmp*. Those capacities would admit more than eight measured working sets, so
+the physical core count is the tighter bound. The host exposes 16 logical
+threads, but the native compiler and linker work is CPU-intensive; simultaneous
+multithreading is not treated as another physical-core budget.
 
 `OSEO3001` also covers deterministic toolchain, temporary-directory,
 executable-launch, and cleanup failures, so retrying every occurrence would
-mask real defects. This checkpoint first narrows the diagnostic to name a
-retryable cause, then retries only that cause a bounded number of times.
+mask real defects. The CLI now distinguishes a process that could not start
+because the host temporarily exhausted process resources from an unavailable
+toolchain or executable. Only that named resource failure is retried, at most
+once for each native variant. A nonzero toolchain exit, temporary-directory
+failure, ordinary executable-launch failure, and cleanup failure are not
+retried.
 
-The retry count is reported in the run output and in failure metadata, not in
-the canonical manifest. *target-parity.yaml* pins one digest over that
+The duration, effective pool bound, and total retry count are reported in the
+run output. A failed run carries the same fields in its error metadata. None
+enters the canonical manifest. *target-parity.yaml* pins one digest over that
 manifest, so a field that varies with host conditions would change the digest
 on every run. Keeping retry counts outside it also means this checkpoint adds
-no manifest field and changes no classification vocabulary, so it needs no
-ADR 0013 amendment.
+no manifest field and changes no classification vocabulary, so it needs no ADR
+0013 amendment.
 
-No wall-clock target is projected here. The 9.84 ratio belongs to a different
-workload, and the remaining work does not necessarily parallelize with the same
-efficiency. The bound and the expected effect are selected from the processor
-time, peak resident memory, and peak temporary storage measured after archive
-reuse lands.
+The isolated full-corpus run completed in 44.57 s with 256.73 s of user time,
+89.23 s of system time, and a processor-time-to-wall ratio of 7.76. It retained
+all 681 sequential classifications, matched the checked-in canonical manifest
+byte for byte, and used no retry. The prior reuse path took 270.64 s with a
+ratio of 1.08. Concurrent execution removed 226.07 s, or 83.5 percent of that
+wall clock, and made the gate 6.07 times faster. The complete host facts and
+measurement table are recorded in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
 Owner: the standards harness expansion in [*PLAN-M5.md*](./PLAN-M5.md).
 

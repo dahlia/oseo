@@ -9,6 +9,7 @@ import type { CliResult } from "../packages/cli/src/index.ts";
 import type { Test262Case } from "../packages/testkit/src/index.ts";
 import {
   assembleTest262Source,
+  createReviewedManifest,
   executeTest262Case,
   normalizeReviewedManifestText,
   parseReviewedManifest,
@@ -17,11 +18,15 @@ import {
   selectManifestShard,
   serializeTest262Manifest,
   serializeTargetParity,
+  validateReviewedResults,
 } from "../tools/test262.ts";
 import type {
+  ReviewedTest262Entry,
+  ReviewedTest262Subset,
   Test262ExecutionRequest,
   Test262Executor,
 } from "../tools/test262.ts";
+import type { Test262Result } from "../packages/testkit/src/index.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
 const harnesses = {
@@ -155,6 +160,243 @@ test("requires reviewed dependency tags from the frozen vocabulary", () => {
       ),
     /repeats a dependency tag/u,
   );
+});
+
+function reviewedSubset(paths: readonly string[]): ReviewedTest262Subset {
+  return {
+    suiteRevision: revision,
+    supportedFeatures: [],
+    tests: paths.map(
+      (path): ReviewedTest262Entry => ({
+        dependencies: ["functions"],
+        expectedClassification: "pass",
+        path,
+      }),
+    ),
+  };
+}
+
+function passingTest262Result(path: string): Test262Result {
+  return {
+    case: {
+      async: false,
+      features: [],
+      flags: ["noStrict"],
+      includes: [],
+      mode: "script",
+      path,
+      strictness: ["non-strict"],
+      suiteRevision: revision,
+    },
+    classification: "pass",
+    dependencies: ["functions"],
+    observation: { harnessFailed: false, passed: true },
+    unsupportedFeatures: [],
+  };
+}
+
+test("validates each reviewed result path at the same index", () => {
+  const subset = reviewedSubset(["test/a.js", "test/b.js"]);
+  assert.throws(
+    () =>
+      validateReviewedResults(subset, [
+        passingTest262Result("test/b.js"),
+        passingTest262Result("test/a.js"),
+      ]),
+    /index 0.*expected path test\/a\.js.*received test\/b\.js/u,
+  );
+});
+
+test("bounds reviewed workers and retains subset result order", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-pool-"));
+  const paths = ["a.js", "b.js", "c.js"];
+  let active = 0;
+  let maximumActive = 0;
+  let releaseFirst: (() => void) | undefined;
+  const firstBlocked = new Promise<void>((resolve) => {
+    releaseFirst = resolve;
+  });
+  let markFirstStarted: (() => void) | undefined;
+  const firstStarted = new Promise<void>((resolve) => {
+    markFirstStarted = resolve;
+  });
+  let thirdStarted: (() => void) | undefined;
+  const thirdStart = new Promise<void>((resolve) => {
+    thirdStarted = resolve;
+  });
+  try {
+    await Promise.all(
+      paths.map(async (path) => {
+        const sourcePath = join(directory, path);
+        await writeFile(sourcePath, "/*---\nflags: [noStrict]\n---*/\n");
+      }),
+    );
+    const calls = new Map<string, number>();
+    const executor: Test262Executor = {
+      async execute(request): Promise<CliResult> {
+        active += 1;
+        maximumActive = Math.max(maximumActive, active);
+        const call = (calls.get(request.sourceId) ?? 0) + 1;
+        calls.set(request.sourceId, call);
+        try {
+          if (request.sourceId === "a.js" && call === 1) {
+            markFirstStarted?.();
+            await firstBlocked;
+          }
+          if (request.sourceId === "c.js" && call === 1) {
+            await firstStarted;
+            thirdStarted?.();
+          }
+          return successfulResult();
+        } finally {
+          active -= 1;
+        }
+      },
+    };
+    const runPromise = createReviewedManifest(
+      reviewedSubset(paths),
+      directory,
+      harnesses,
+      executor,
+      { poolLimit: 2 },
+    );
+    await thirdStart;
+    releaseFirst?.();
+    const run = await runPromise;
+    assert.equal(maximumActive, 2);
+    assert.equal(run.metadata.poolLimit, 2);
+    assert.deepEqual(
+      run.manifest.results.map((result) => result.case.path),
+      paths,
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("retries only named temporary process exhaustion", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-retry-"));
+  const path = "retry.js";
+  const sourcePath = join(directory, path);
+  try {
+    await writeFile(sourcePath, "/*---\nflags: [noStrict]\n---*/\n");
+    let calls = 0;
+    const executor: Test262Executor = {
+      execute(): Promise<CliResult> {
+        calls += 1;
+        if (calls === 1) {
+          return Promise.resolve({
+            exitStatus: 1,
+            stderr:
+              `${path}:1:1: error[OSEO3001]: The native toolchain for ` +
+              "target 'linux-x86_64-gnu' " +
+              "could not be started because the host temporarily " +
+              "exhausted process resources.\n",
+            stdout: "",
+          });
+        }
+        return Promise.resolve(successfulResult());
+      },
+    };
+    const run = await createReviewedManifest(
+      reviewedSubset([path]),
+      directory,
+      harnesses,
+      executor,
+      { poolLimit: 1 },
+    );
+    assert.equal(calls, 3);
+    assert.equal(run.metadata.retries, 1);
+    assert.equal(run.manifest.results[0]?.classification, "pass");
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+for (const deterministicFailure of [
+  "The native toolchain for target 'linux-x86_64-gnu' failed (exit 1).",
+  "The native temporary directory could not be created.",
+  "The native executable could not be started.",
+  "The native temporary directory could not be removed.",
+] as const) {
+  test(`does not retry ${deterministicFailure}`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "oseo-test262-no-retry-"));
+    const path = "no-retry.js";
+    try {
+      await writeFile(
+        join(directory, path),
+        "/*---\nflags: [noStrict]\n---*/\n",
+      );
+      let calls = 0;
+      const executor: Test262Executor = {
+        execute(): Promise<CliResult> {
+          calls += 1;
+          return Promise.resolve({
+            exitStatus: 1,
+            stderr: `${path}:1:1: error[OSEO3001]: ${deterministicFailure}\n`,
+            stdout: "",
+          });
+        },
+      };
+      await assert.rejects(
+        createReviewedManifest(
+          reviewedSubset([path]),
+          directory,
+          harnesses,
+          executor,
+          { poolLimit: 1 },
+        ),
+        (error: unknown) => {
+          assert.ok(error instanceof Error);
+          const metadata = Reflect.get(error, "metadata") as
+            | Record<string, unknown>
+            | undefined;
+          assert.ok(metadata);
+          assert.equal(metadata.poolLimit, 1);
+          assert.equal(metadata.retries, 0);
+          return true;
+        },
+      );
+      assert.equal(calls, 1);
+    } finally {
+      await rm(directory, { force: true, recursive: true });
+    }
+  });
+}
+
+test("stops assigning reviewed work after a worker failure", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-abort-"));
+  const paths = ["a.js", "b.js", "c.js"];
+  try {
+    await Promise.all(
+      paths.slice(1).map(async (path) => {
+        await writeFile(
+          join(directory, path),
+          "/*---\nflags: [noStrict]\n---*/\n",
+        );
+      }),
+    );
+    let calls = 0;
+    const executor: Test262Executor = {
+      execute(): Promise<CliResult> {
+        calls += 1;
+        return Promise.resolve(successfulResult());
+      },
+    };
+    await assert.rejects(
+      createReviewedManifest(
+        reviewedSubset(paths),
+        directory,
+        harnesses,
+        executor,
+        { poolLimit: 1 },
+      ),
+      /ENOENT/u,
+    );
+    assert.equal(calls, 0);
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
 });
 
 test("assembles strict source with reviewed includes in order", () => {

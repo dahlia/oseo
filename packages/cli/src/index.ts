@@ -439,8 +439,9 @@ function observeToolchainIdentity(
   return observeProcess(
     host,
     reuse.createIdentityRequest(workingDirectory, environment),
-  ).then((observation) => {
-    if (observation == null || observation.exitStatus !== 0) return undefined;
+  ).then((attempt) => {
+    if ("failure" in attempt || attempt.exitStatus !== 0) return undefined;
+    const observation = attempt;
     const identity = observation.stdout.trim();
     return identity === "" ? undefined : identity;
   });
@@ -474,15 +475,54 @@ function sourceReadLocation(sourceId: string): string | URL {
   }
 }
 
+interface ProcessStartFailure {
+  readonly failure: "resource-exhaustion" | "unknown";
+}
+
+function processStartFailure(error: unknown): ProcessStartFailure {
+  if (error != null && typeof error === "object") {
+    const code = Reflect.get(error, "code");
+    const name = Reflect.get(error, "name");
+    if (
+      code === "EAGAIN" ||
+      code === "ENOMEM" ||
+      name === "Busy" ||
+      name === "WouldBlock"
+    ) {
+      return { failure: "resource-exhaustion" };
+    }
+  }
+  return { failure: "unknown" };
+}
+
+/**
+ * Stable OSEO3001 suffix identifying retryable process-start exhaustion.
+ */
+export const processResourceExhaustionDiagnosticSuffix: string =
+  "could not be started because the host temporarily exhausted process " +
+  "resources.";
+
 async function observeProcess(
   host: CompilerHost,
   request: ProcessRequest,
-): Promise<ProcessObservation | undefined> {
+): Promise<ProcessObservation | ProcessStartFailure> {
   try {
     return await host.run(request);
-  } catch {
-    return undefined;
+  } catch (error) {
+    return processStartFailure(error);
   }
+}
+
+function processStartDiagnostic(
+  sourceId: string,
+  subject: string,
+  failure: ProcessStartFailure,
+): CliResult {
+  const diagnostic =
+    failure.failure === "resource-exhaustion"
+      ? `${subject} ${processResourceExhaustionDiagnosticSuffix}`
+      : `${subject} could not be started.`;
+  return diagnosticResult(hostDiagnostic(sourceId, diagnostic));
 }
 
 async function executeNativeWorkflow(
@@ -658,16 +698,15 @@ async function executeNativeWorkflow(
     executablePath = plan.executablePath;
     for (const processRequest of plan.requests) {
       // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
-      const observation = await observeProcess(host, processRequest);
-      if (observation == null) {
-        return diagnosticResult(
-          hostDiagnostic(
-            sourceId,
-            `The native toolchain for target '${target.name}' ` +
-              "could not be started.",
-          ),
+      const attempt = await observeProcess(host, processRequest);
+      if ("failure" in attempt) {
+        return processStartDiagnostic(
+          sourceId,
+          `The native toolchain for target '${target.name}'`,
+          attempt,
         );
       }
+      const observation = attempt;
       if (observation.exitStatus !== 0) {
         return diagnosticResult(
           hostDiagnostic(
@@ -697,16 +736,15 @@ async function executeNativeWorkflow(
       hostDiagnostic(sourceId, "The native executable is unavailable."),
     );
   }
-  const observation = await observeProcess(host, {
+  const attempt = await observeProcess(host, {
     args: [],
     command: executablePath,
     cwd: directory,
   });
-  if (observation == null) {
-    return diagnosticResult(
-      hostDiagnostic(sourceId, "The native executable could not be started."),
-    );
+  if ("failure" in attempt) {
+    return processStartDiagnostic(sourceId, "The native executable", attempt);
   }
+  const observation = attempt;
   return {
     exitStatus: observation.exitStatus,
     stderr: observation.stderr,
