@@ -443,7 +443,12 @@ export type SyntaxForOfTarget =
     };
 
 /** Runtime call and construction identity retained for every function. */
-export type FunctionKind = "arrow" | "async" | "async-arrow" | "ordinary";
+export type FunctionKind =
+  | "arrow"
+  | "async"
+  | "async-arrow"
+  | "method"
+  | "ordinary";
 
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =

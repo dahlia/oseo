@@ -18,6 +18,9 @@ typedef enum {
     OSEO_FUNCTION_ASYNC = 2,
     OSEO_FUNCTION_ASYNC_ARROW = 3,
     OSEO_FUNCTION_INTERNAL = 4,
+    /* Dynamic `this`, like ordinary, but never constructible and without
+     * an own `prototype` property, matching MethodDefinition semantics. */
+    OSEO_FUNCTION_METHOD = 5,
 } OseoFunctionKind;
 
 typedef struct {

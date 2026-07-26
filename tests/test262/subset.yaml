@@ -677,9 +677,837 @@ tests:
   - path: test/language/expressions/new/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/object/11.1.5-2gs.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/11.1.5_5-4-1.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/S11.1.5_A3.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/S11.1.5_A4.1.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/S11.1.5_A4.2.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/S11.1.5_A4.3.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/computed-property-name-topropertykey-before-value-evaluation.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-break-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-case-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-catch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-class-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-const-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-continue-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-debugger-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-default-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-default.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-delete-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-do-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-else-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-enum-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-export-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-extends-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-extends-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-extends.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-finally-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-for-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-function-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-if-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-implements-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-import-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-in-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-instanceof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-interface-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-let-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-new-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-package-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-private-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-protected-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-public-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-return-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-static-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-super-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-switch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-this-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-throw-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-try-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-typeof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-var-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-void-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-while-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/covered-ident-name-prop-name-literal-with-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-init-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-dflt-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-init-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/dstr/meth-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, object-literals]
+  - path: test/language/expressions/object/fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-break-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-case-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-catch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-class-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-const-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-continue-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-debugger-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-default-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-default.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-delete-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-do-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-else-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-enum-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-export-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-extends-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-extends-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-extends.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-finally-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-for-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-function-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-if-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-implements-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-import-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-in-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-instanceof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-interface-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-let-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-new-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-package-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-private-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-protected-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-public-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-return-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-static-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-super-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-switch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-this-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-throw-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-try-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-typeof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-var-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-void-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-while-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-method-def-with-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-break-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-case-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-catch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-class-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-const-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-continue-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-debugger-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-default-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-default.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-delete-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-do-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-else-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-enum-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-export-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-extends-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-extends-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-extends.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-finally-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-for-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-function-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-if-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-implements-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-import-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-in-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-instanceof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-interface-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-let-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-new-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-package-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-private-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-protected-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-public-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-return-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-static-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-super-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-switch-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-this-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-throw-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-try-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-typeof-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-var-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-void-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-while-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-with-escaped.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/identifier-shorthand-await-strict-mode.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/let-non-strict-access.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/let-non-strict-syntax.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-meth-params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-returns-async-arrow.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-returns-async-function.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/meth-params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-invoke-ctor.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-invoke-fn-no-strict.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-invoke-fn-strict.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-length-dflt.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-length.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-name-prop-string.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-name-prop-symbol.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-param-id-yield.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-param-init-yield.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-params.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-prop-name-eval-error.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/name-property-desc.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/prop-def-id-valid.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/prop-dup-data-data.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/properties-names-eval-arguments.js
+    expectedClassification: pass
+    dependencies: [object-literals]
   - path: test/language/expressions/object/property-name-yield.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/expressions/object/scope-meth-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/scope-meth-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/yield-non-strict-access.js
+    expectedClassification: pass
+    dependencies: [object-literals]
+  - path: test/language/expressions/object/yield-non-strict-syntax.js
+    expectedClassification: pass
+    dependencies: [object-literals]
   - path: test/language/expressions/postfix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]

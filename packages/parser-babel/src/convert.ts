@@ -284,17 +284,27 @@ export function expression(
       readonly value: SyntaxExpression;
     }[] = [];
     for (const property of nodes(value.properties)) {
-      if (property.type !== "ObjectProperty" || property.shorthand === true) {
+      if (property.type === "ObjectMethod" && property.kind !== "method") {
         return unsupported(
           context,
           property,
-          "This object property is unsupported.",
+          "Object literal accessors are unsupported.",
+        );
+      }
+      if (
+        property.type !== "ObjectProperty" &&
+        property.type !== "ObjectMethod"
+      ) {
+        return unsupported(
+          context,
+          property,
+          property.type === "SpreadElement"
+            ? "Object spread properties are unsupported."
+            : "This object property is unsupported.",
         );
       }
       const keyNode = node(property.key);
-      const valueNode = node(property.value);
-      if (keyNode == null || valueNode == null)
-        return unsupported(context, property);
+      if (keyNode == null) return unsupported(context, property);
       let key: SyntaxExpression | undefined;
       if (property.computed === true) {
         key = expression(context, keyNode);
@@ -307,7 +317,7 @@ export function expression(
           return unsupported(
             context,
             property,
-            "Noncomputed __proto__ literals are unsupported.",
+            "The __proto__ property name is unsupported.",
           );
         }
         if (name != null) {
@@ -322,7 +332,34 @@ export function expression(
           key = expression(context, keyNode);
         }
       }
-      const propertyValue = expression(context, valueNode);
+      let propertyValue: SyntaxExpression | undefined;
+      if (property.type === "ObjectMethod") {
+        const functionValue = functionDeclaration(
+          context,
+          property,
+          false,
+          true,
+        );
+        propertyValue =
+          functionValue == null
+            ? undefined
+            : {
+                ...location(context, property),
+                functionValue,
+                kind: "function",
+              };
+      } else {
+        const valueNode = node(property.value);
+        if (valueNode == null) return unsupported(context, property);
+        if (property.shorthand === true && valueNode.type !== "Identifier") {
+          return unsupported(
+            context,
+            property,
+            "This object property is unsupported.",
+          );
+        }
+        propertyValue = expression(context, valueNode);
+      }
       if (key == null || propertyValue == null) return undefined;
       properties.push({ key, value: propertyValue });
     }
@@ -2776,6 +2813,7 @@ export function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
   requireName = true,
+  isMethod = false,
 ): SyntaxFunction | undefined {
   if (value.generator === true) {
     return unsupported(context, value, "Generator functions are unsupported.");
@@ -3102,7 +3140,9 @@ export function functionDeclaration(
           : "arrow"
         : value.async === true
           ? "async"
-          : "ordinary",
+          : isMethod
+            ? "method"
+            : "ordinary",
     kind: "function",
     name,
     parameters,

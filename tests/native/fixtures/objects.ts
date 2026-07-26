@@ -983,4 +983,88 @@ console.log(
 );
 `,
   },
+  {
+    name: "object-literals",
+    source: `
+const empty = {};
+console.log(Object.keys(empty).length);
+
+const single = { item: 1 };
+console.log(single.item);
+
+const multiple = { first: 1, second: 2, third: 3 };
+console.log(multiple.first, multiple.second, multiple.third);
+
+const localValue = 5;
+const shorthandFromLocal = { localValue };
+console.log(shorthandFromLocal.localValue);
+
+function withParameterShorthand(paramValue) {
+  return { paramValue };
+}
+console.log(withParameterShorthand(9).paramValue);
+
+const receiver = {
+  base: 10,
+  method(extra) { return this.base + extra; },
+};
+console.log(receiver.method(2));
+console.log(receiver.method.name);
+console.log("prototype" in receiver.method);
+try {
+  new receiver.method();
+  console.log("constructed");
+} catch (error) {
+  console.log("construct rejected", error instanceof TypeError);
+}
+
+const nested = {
+  inner: { deep: { value: 42 } },
+  list: [{ item: 1 }, { item: 2 }],
+};
+console.log(
+  nested.inner.deep.value,
+  nested.list[0].item,
+  nested.list[1].item,
+);
+
+let order = "";
+function track(label, value) { order = order + label; return value; }
+const ordered = {
+  a: track("a", 1),
+  b: track("b", 2),
+  c: track("c", 3),
+};
+console.log(order, ordered.a, ordered.b, ordered.c);
+
+function boom() { throw new RangeError("boom"); }
+let sideEffects = "";
+try {
+  const abrupt = {
+    before: (sideEffects = sideEffects + "before", 1),
+    failing: boom(),
+    after: (sideEffects = sideEffects + "after", 2),
+  };
+  console.log("unreachable");
+} catch (error) {
+  console.log("abrupt", error instanceof RangeError, sideEffects);
+}
+
+function allocateChain(depth) {
+  let current = { depth: depth, next: null };
+  for (let i = 0; i < depth; i = i + 1) {
+    current = { depth: i, next: current, extra: { marker: i } };
+  }
+  return current;
+}
+const chain = allocateChain(20);
+let steps = 0;
+let cursor = chain;
+while (cursor !== null) {
+  steps = steps + 1;
+  cursor = cursor.next;
+}
+console.log(steps, chain.depth, chain.extra.marker);
+`,
+  },
 ];

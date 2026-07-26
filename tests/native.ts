@@ -198,6 +198,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "arrays" ||
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
+    fixture.name === "object-literals" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "function-rest-parameters" ||
