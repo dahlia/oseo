@@ -1239,6 +1239,9 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, `goto bb${terminator.whenFalse};`);
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
+    // The saved-throw branch below always emits `goto abrupt`, so the label
+    // must exist even when no other operation in the body can be abrupt.
+    state.usesAbrupt = true;
     const slot = terminator.completionSlot;
     if (terminator.outerAbrupt != null) {
       const target = terminator.outerAbrupt.blockId;

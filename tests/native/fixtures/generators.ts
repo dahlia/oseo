@@ -236,6 +236,33 @@ while (!growerStep.done) {
   growerStep = grower.next();
 }
 console.log(growerText, growerStep.value);
+
+function* returnsThroughYieldingFinally() {
+  try {
+    return 1;
+  } finally {
+    yield 2;
+  }
+}
+const returning = returnsThroughYieldingFinally();
+console.log(returning.next().value, returning.next().value);
+console.log(returning.next().value, returning.next().done);
+
+function* throwsThroughYieldingFinally() {
+  try {
+    throw new TypeError("saved");
+  } finally {
+    yield "cleanup";
+  }
+}
+const throwing = throwsThroughYieldingFinally();
+console.log(throwing.next().value);
+try {
+  throwing.next();
+} catch (error) {
+  console.log("resumed", error instanceof TypeError, error.message);
+}
+console.log(throwing.next().done);
 `,
   },
 ];
