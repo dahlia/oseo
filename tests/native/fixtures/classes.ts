@@ -282,6 +282,179 @@ console.log(new Nested().outerMethod(), strictOrder);
 `,
   },
   {
+    name: "class-accessors",
+    source: `
+class Box {
+  constructor(start) {
+    this.stored = start;
+  }
+  get item() {
+    return this.stored;
+  }
+  set item(value) {
+    this.stored = value * 2;
+  }
+  get doubled() {
+    return this.stored + this.stored;
+  }
+  set only(value) {
+    this.written = value;
+  }
+  plain() {
+    return this.stored;
+  }
+}
+const box = new Box(3);
+console.log(box.item, box.doubled, box.plain());
+box.item = 5;
+console.log(box.item, box.stored);
+box.only = 7;
+console.log(box.written, box.only);
+console.log(Object.keys(box).length, Object.keys(Box.prototype).length);
+const pair = Object.getOwnPropertyDescriptor(Box.prototype, "item");
+console.log(
+  typeof pair.get,
+  typeof pair.set,
+  pair.enumerable,
+  pair.configurable,
+  "value" in pair,
+  "writable" in pair,
+);
+const getterOnly = Object.getOwnPropertyDescriptor(Box.prototype, "doubled");
+console.log(typeof getterOnly.get, getterOnly.set);
+const setterOnly = Object.getOwnPropertyDescriptor(Box.prototype, "only");
+console.log(setterOnly.get, typeof setterOnly.set);
+console.log(pair.get.name, pair.set.name, pair.get.length, pair.set.length);
+console.log("prototype" in pair.get, "prototype" in pair.set);
+try {
+  new pair.get();
+} catch (error) {
+  console.log("accessor construct", error instanceof TypeError);
+}
+// A class body is strict everywhere, so writing a getter-only accessor
+// from a method rejects without depending on the script's strictness.
+class Writer {
+  write(target) {
+    try {
+      target.doubled = 1;
+      return "assigned";
+    } catch (error) {
+      return error instanceof TypeError ? "rejected" : "other";
+    }
+  }
+}
+console.log(new Writer().write(box), box.doubled);
+const second = new Box(1);
+console.log(second.item, box.item);
+console.log(
+  Object.getOwnPropertyDescriptor(Box.prototype, "item").get ===
+    Object.getOwnPropertyDescriptor(second.constructor.prototype, "item").get,
+);
+const Anonymous = class {
+  get value() {
+    return "anonymous";
+  }
+};
+console.log(new Anonymous().value, Anonymous.name);
+`,
+  },
+  {
+    name: "class-accessor-names",
+    source: `
+let order = "";
+function key(name) {
+  order = order + name;
+  return name;
+}
+const iterator = Symbol.iterator;
+class Named {
+  get plain() {
+    return "plain";
+  }
+  set "spaced name"(value) {
+    this.spaced = value;
+  }
+  get 7() {
+    return "numeric";
+  }
+  get [key("computed")]() {
+    return "computed";
+  }
+  set [key("written")](value) {
+    this.stored = value;
+  }
+  get [iterator]() {
+    return "symbol";
+  }
+}
+console.log("order", order);
+const proto = Named.prototype;
+console.log(Object.getOwnPropertyDescriptor(proto, "plain").get.name);
+console.log(Object.getOwnPropertyDescriptor(proto, "spaced name").set.name);
+console.log(Object.getOwnPropertyDescriptor(proto, "7").get.name);
+console.log(Object.getOwnPropertyDescriptor(proto, "computed").get.name);
+console.log(Object.getOwnPropertyDescriptor(proto, "written").set.name);
+console.log(Object.getOwnPropertyDescriptor(proto, iterator).get.name);
+const named = new Named();
+console.log(named.plain, named[7], named.computed, named[iterator]);
+named["spaced name"] = 1;
+named.written = 2;
+console.log(named.spaced, named.stored);
+class Replaced {
+  get item() {
+    return "first";
+  }
+  set item(value) {
+    this.written = value;
+  }
+  get item() {
+    return "second";
+  }
+  method() {
+    return "method";
+  }
+  get method() {
+    return "accessor";
+  }
+  get replaced() {
+    return "accessor";
+  }
+  replaced() {
+    return "data";
+  }
+}
+const replaced = new Replaced();
+console.log(replaced.item, replaced.method, replaced.replaced());
+replaced.item = 3;
+console.log(replaced.written);
+const methodDescriptor = Object.getOwnPropertyDescriptor(
+  Replaced.prototype,
+  "method",
+);
+console.log(typeof methodDescriptor.get, "value" in methodDescriptor);
+const replacedDescriptor = Object.getOwnPropertyDescriptor(
+  Replaced.prototype,
+  "replaced",
+);
+console.log(typeof replacedDescriptor.value, replacedDescriptor.get);
+class Deferred {
+  set value([first, second]) {
+    this.parts = first + second;
+  }
+  set fallback(value = 4) {
+    this.taken = value;
+  }
+}
+const deferred = new Deferred();
+deferred.value = [1, 2];
+deferred.fallback = undefined;
+console.log(deferred.parts, deferred.taken);
+console.log(
+  Object.getOwnPropertyDescriptor(Deferred.prototype, "fallback").set.length,
+);
+`,
+  },
+  {
     name: "class-strict-body",
     nonStrictScript: true,
     source: `

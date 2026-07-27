@@ -101,6 +101,12 @@ export interface MirOperation {
   readonly cacheId?: number;
   readonly constant?: MirConstant;
   readonly detail: string;
+  /**
+   * Enumerability of the property a `property-define-accessor` defines.
+   * A class body's accessor is non-enumerable, unlike an object literal's
+   * accessor clause; absent means the enumerable object literal default.
+   */
+  readonly enumerable?: boolean;
   readonly id: number;
   readonly kind:
     | "add-smi-checked"

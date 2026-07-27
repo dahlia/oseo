@@ -811,6 +811,9 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     const key = operationArgument(operation, 1);
     const value = operationArgument(operation, 2);
     const isSetter = operation.accessorKind === "set";
+    // A class body's accessor is non-enumerable, unlike an object
+    // literal's accessor clause; both stay configurable.
+    const enumerable = operation.enumerable !== false;
     line(
       state,
       `result = oseo_object_define_accessor(context, roots[${object}], ` +
@@ -818,7 +821,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         `${isSetter ? "oseo_undefined()" : `roots[${value}]`}, ` +
         `${isSetter ? `roots[${value}]` : "oseo_undefined()"}, ` +
         `${isSetter ? "false" : "true"}, ${isSetter ? "true" : "false"}, ` +
-        "(OseoPropertyAttributes){true, true, false, true});",
+        `(OseoPropertyAttributes){true, ${enumerable}, false, true});`,
     );
   } else {
     const object = operationArgument(operation, 0);
