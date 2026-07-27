@@ -140,7 +140,9 @@ function printHirExpression(expression: HirExpression): string {
       expression.elements
         .map(
           (element) =>
-            `, ${printHirExpression(element.key)}: ` +
+            ", " +
+            (element.accessorKind == null ? "" : `${element.accessorKind} `) +
+            `${printHirExpression(element.key)}: ` +
             printHirExpression(element.value),
         )
         .join("") +

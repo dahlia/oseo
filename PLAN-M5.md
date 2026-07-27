@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 812
-passes, 363 expected negatives, and 150 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 868
+passes, 364 expected negatives, and 165 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -407,7 +407,7 @@ computed method definitions, `constructor` and `prototype` property
 descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
-unit's boundaries. Getter and setter accessors, static members, class fields,
+unit's boundaries. Static members, class fields,
 private names, static initialization blocks, `extends`, `super`, and
 `export default class` remain rejected with source-located diagnostics.
 Asynchronous class methods are admitted, because they share the object literal
@@ -415,6 +415,46 @@ method path exactly; generator and asynchronous generator methods stay rejected
 with the same diagnostic object literals already use. The manifest moves to 812
 passes, 363 expected negatives, and 150 unsupported profile features with no
 semantic or harness failures.
+
+Class getter and setter accessors are now admitted, the third unit of the
+functions and executable syntax stream. A `get` or `set` class element carries
+its accessor kind through the owned syntax tree and HIR into the
+`property-define-accessor` MIR operation object literal accessor clauses
+already use, so a getter and setter pair under one key becomes one accessor
+property whose absent slot is preserved from the earlier definition. The
+operation gained an enumerability field, because a class accessor is
+configurable and non-enumerable while an object literal accessor clause is
+enumerable; `Object.keys` on a class prototype therefore stays empty. The
+accessor closure reuses the non-constructible method kind and the runtime
+`get ` and `set ` name prefixes already built for object literal accessors,
+so its `name` follows identifier, string literal, numeric literal, computed,
+and symbol keys alike, and `new` on it throws a `TypeError`. The frontend
+rejects a getter with a parameter, a setter without exactly one non-rest
+parameter, a literal-keyed accessor named `constructor`, and static or private
+accessors with source-located diagnostics; a computed key that evaluates to
+`"constructor"` defines an ordinary prototype accessor. Fixed native fixtures
+cover a getter, a setter, a pair and its round trip, both halves' `name` and
+`length`, the accessor descriptor and its attributes, accessor
+non-constructibility, a rejected write to a getter-only accessor from strict
+class-body code, an accessor on an anonymous class expression, name inference
+over every admitted key form, computed accessor key evaluation order, a getter
+replacing a getter while its paired setter survives, an accessor replacing a
+method, a method replacing an accessor, and a setter whose parameter is an
+array pattern or carries a default. The generated class property suite now
+draws each prototype element as a method, a getter, a setter, or a pair, and
+models the accessor descriptor, both names, the setter round trip, and the two
+key evaluations a computed pair performs. Fifty-six reviewed test262 cases
+newly pass, covering computed accessor names, accessor key evaluation errors,
+duplicate computed accessor keys, an accessor named `constructor` through a
+computed key, setter parameter scope, setter `length` under a default
+parameter, and the class-scope name binding observed from a getter and a
+setter. One new expected negative records the early error for a getter that
+declares a parameter, and sixteen deliberately unsupported cases record the
+static accessor boundary and the unresolvable computed key this profile rejects
+before execution. The two `grammar-special-prototype-accessor-meth` cases stay
+out of the reviewed subset until `Object.prototype.hasOwnProperty` exists. The
+manifest moves to 868 passes, 364 expected negatives, and 165 unsupported
+profile features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

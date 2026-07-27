@@ -239,8 +239,13 @@ export interface HirObjectSpreadProperty extends LocatedSyntax {
 /** One defined or spread HIR object literal property. */
 export type HirObjectProperty = HirObjectDefinition | HirObjectSpreadProperty;
 
-/** One resolved prototype method definition in an HIR class body. */
+/**
+ * One resolved prototype method or accessor definition in an HIR class
+ * body.
+ */
 export interface HirClassMethod extends LocatedSyntax {
+  /** A get or set accessor; absent for an ordinary method definition. */
+  readonly accessorKind?: "get" | "set";
   readonly key: HirExpression;
   readonly kind: "method";
   readonly value: HirExpression;

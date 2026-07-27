@@ -1022,6 +1022,63 @@ const origin = new Point(0);`,
   );
 });
 
+test("lowers class accessors to non-enumerable accessor properties", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Box {
+  get item() {
+    return this.stored;
+  }
+  set item(value) {
+    this.stored = value;
+  }
+  read() {
+    return this.stored;
+  }
+}
+const box = new Box();`,
+    sourceId: "class-accessors.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /get "item": function @f\d+ item/u);
+  assert.match(hir, /set "item": function @f\d+ item/u);
+  assert.match(hir, /"read": function @f\d+ read/u);
+  const mir = printMir(result.mir);
+  assert.match(
+    mir,
+    /property-define-accessor define non-enumerable prototype get accessor/u,
+  );
+  assert.match(
+    mir,
+    /property-define-accessor define non-enumerable prototype set accessor/u,
+  );
+  assert.match(
+    mir,
+    /property-define-method define non-enumerable prototype method/u,
+  );
+});
+
+test("rejects accessor definitions with an unusable parameter list", () => {
+  const cases: readonly string[] = [
+    "class C { get x(value) { return value; } }",
+    "class C { set x() {} }",
+    "class C { set x(first, second) {} }",
+    "class C { set x(...rest) {} }",
+    "class C { get constructor() { return 1; } }",
+  ];
+  for (const source of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "class-accessor-rejection.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    assert.equal(result.diagnostics[0]?.range.start.line, 1, source);
+  }
+});
+
 test("binds a class name only inside its own class body", () => {
   const result = compileSource(babelFrontend, {
     source: `const Named = class Inner {
@@ -1047,8 +1104,10 @@ const outer = Named;`,
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     ["class C { static m() {} }", /Static class elements/u],
-    ["class C { get x() { return 1; } }", /getter and setter/u],
-    ["class C { set x(v) {} }", /getter and setter/u],
+    ["class C { static get x() { return 1; } }", /Static class elements/u],
+    ["class C { static set x(v) {} }", /Static class elements/u],
+    ["class C { get #hidden() {} }", /class element is unsupported/u],
+    ["class C { set #hidden(v) {} }", /class element is unsupported/u],
     ["class C extends Base {}", /Class inheritance/u],
     ["class C { field = 1; }", /class element is unsupported/u],
     ["class C { #hidden() {} }", /class element is unsupported/u],

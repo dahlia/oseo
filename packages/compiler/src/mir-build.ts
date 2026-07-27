@@ -1134,7 +1134,8 @@ function anonymousDefinition(expression: HirExpression): boolean {
  * Lowers one class expression in ClassDefinitionEvaluation order: the
  * class-scope cell is created first so every closure the body allocates
  * shares it, then the constructor closure and its prototype object,
- * then each prototype method as a non-enumerable data property, and the
+ * then each prototype method as a non-enumerable data property and each
+ * getter or setter as a non-enumerable accessor property, and the
  * class-scope binding is initialized last. Initializing it last is
  * observable: a computed key that reads the class name reaches the
  * binding in its temporal dead zone.
@@ -1193,23 +1194,40 @@ function lowerClassExpression(
       element.value,
       builder,
       anonymousDefinition(element.value) ? key : undefined,
+      element.accessorKind,
     );
     appendMirMetadata(
       builder,
       "safepoint",
-      "prototype method storage growth",
+      element.accessorKind == null
+        ? "prototype method storage growth"
+        : "prototype accessor storage growth",
       [prototype, key, value],
       element.range,
     );
     const defined = builder.nextValue;
     builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [prototype, key, value],
-      detail: "define non-enumerable prototype method",
-      id: defined,
-      kind: "property-define-method",
-      range: element.range,
-    });
+    builder.current.operations.push(
+      element.accessorKind == null
+        ? {
+            arguments: [prototype, key, value],
+            detail: "define non-enumerable prototype method",
+            id: defined,
+            kind: "property-define-method",
+            range: element.range,
+          }
+        : {
+            accessorKind: element.accessorKind,
+            arguments: [prototype, key, value],
+            detail:
+              `define non-enumerable prototype ${element.accessorKind} ` +
+              "accessor property",
+            enumerable: false,
+            id: defined,
+            kind: "property-define-accessor",
+            range: element.range,
+          },
+    );
     appendMirMetadata(
       builder,
       "check-status",

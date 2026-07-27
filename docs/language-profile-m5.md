@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,325 reviewed cases: 812 passes, 363 expected
-negatives, and 150 unsupported profile features. It records no semantic or
+The current manifest contains 1,397 reviewed cases: 868 passes, 364 expected
+negatives, and 165 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -815,7 +815,7 @@ its deliberate boundary and its evidence:
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
-    boundaries: getter and setter accessors, static members, class fields,
+    boundaries: static members, class fields,
     private names, static initialization blocks, `extends`, `super`, and
     `export default class` are rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
@@ -846,13 +846,60 @@ its deliberate boundary and its evidence:
     `constructor` and `prototype` property descriptors, method default,
     trailing-comma, and rest parameter forms, class-scope name lexical open
     and close observations, and the strict-mode and duplicate-binding early
-    errors. Ten deliberately unsupported cases record the accessor, static,
+    errors. Ten deliberately unsupported cases record the static,
     generator-method, `extends`, and `super` boundaries in the manifest. The
     ten `forbidden-ext` cases that assert a class method has no own `caller`
     or `arguments` property stay out of the reviewed subset until
     `Object.prototype.hasOwnProperty` exists; the property they check already
     holds, but the assertion itself needs an intrinsic this profile does not
     provide.
+ -  Class getter and setter accessors on the prototype. A `get` or `set`
+    class element reuses the `property-define-accessor` MIR operation that
+    object literal accessor clauses already use, so a class getter and
+    setter pair under one key becomes one accessor property whose absent
+    slot is preserved from the earlier definition, an accessor replaces an
+    earlier data property under the same key, and a later method definition
+    replaces the accessor. The operation now carries the enumerability of
+    the property it defines: a class accessor is configurable and
+    non-enumerable, unlike an object literal's enumerable accessor clause,
+    so `Object.keys` on a class prototype stays empty. The accessor closure
+    is the same non-constructible method kind class methods use, so it has
+    no own `prototype` property and `new` on it throws a `TypeError`, and
+    its `name` takes the `get ` or `set ` prefix the runtime already applies
+    to object literal accessors, for identifier, string literal, numeric
+    literal, computed, and symbol keys alike. A getter's parameter list must
+    be empty and a setter's must be exactly one non-rest parameter; the
+    frontend reports the violation, a literal-keyed accessor named
+    `constructor`, and a static or private accessor with a source-located
+    diagnostic, while a computed key that evaluates to `"constructor"`
+    defines an ordinary prototype accessor. Native
+    differential fixtures cover a getter, a setter, a getter and setter
+    pair, the round trip through both halves, `name` and `length` for both
+    halves, the accessor property descriptor and its `enumerable` and
+    `configurable` attributes, accessor non-constructibility, a rejected
+    write to a getter-only accessor from strict class-body code, an
+    accessor on an anonymous class expression, name inference across
+    identifier, string literal, numeric literal, computed, and symbol keys,
+    computed accessor key evaluation order, a getter replacing a getter
+    while its paired setter survives, an accessor replacing a method, a
+    method replacing an accessor, and a setter whose single parameter is an
+    array pattern or carries a default. The generated class property suite
+    now draws each prototype element as a method, a getter, a setter, or a
+    getter and setter pair, and models the accessor descriptor, both
+    accessor names, the setter round trip, and the two key evaluations a
+    computed pair performs. Fifty-six reviewed test262 cases newly pass,
+    covering computed accessor names over identifier, numeric, and string
+    literal forms, accessor key evaluation errors, duplicate computed
+    accessor keys, an accessor named `constructor` through a computed key,
+    setter parameter scope, setter `length` under a default parameter, and
+    the class-scope name binding observed from a getter and a setter. One
+    new expected negative records the early error for a getter that
+    declares a parameter, and
+    sixteen deliberately unsupported cases record the static accessor
+    boundary and the unresolvable computed key that this profile rejects
+    before execution. The two `grammar-special-prototype-accessor-meth`
+    cases stay out of the reviewed subset until
+    `Object.prototype.hasOwnProperty` exists.
 
 
 Known gaps inside the claim
@@ -867,10 +914,10 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Class getter and setter accessors, static members, class fields, private
-    names, static initialization blocks, `extends`, `super`, and
-    `export default class` are outside the admitted class subset. Owner: the
-    functions and executable syntax stream.
+ -  Class static members, class fields, private names, static initialization
+    blocks, `extends`, `super`, and `export default class` are outside the
+    admitted class subset. Owner: the functions and executable syntax
+    stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

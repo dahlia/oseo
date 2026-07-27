@@ -3297,14 +3297,6 @@ export function classExpression(
       unsupported(context, element, "Static class elements are unsupported.");
       break;
     }
-    if (element.kind === "get" || element.kind === "set") {
-      unsupported(
-        context,
-        element,
-        "Class getter and setter accessors are unsupported.",
-      );
-      break;
-    }
     if (element.kind === "constructor") {
       if (constructorFunction != null) {
         unsupported(context, element, "A class defines one constructor.");
@@ -3315,7 +3307,11 @@ export function classExpression(
       constructorFunction = { ...converted, name };
       continue;
     }
-    if (element.kind !== "method") {
+    const accessorKind =
+      element.kind === "get" || element.kind === "set"
+        ? element.kind
+        : undefined;
+    if (element.kind !== "method" && accessorKind == null) {
       unsupported(context, element, "This class element is unsupported.");
       break;
     }
@@ -3324,6 +3320,7 @@ export function classExpression(
     if (key == null || method == null) break;
     elements.push({
       ...location(context, element),
+      ...(accessorKind == null ? {} : { accessorKind }),
       key,
       kind: "method",
       value: method,

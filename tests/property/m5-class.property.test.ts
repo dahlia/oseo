@@ -28,12 +28,21 @@ const { assertAsyncProperty } = await import(
 /** How one generated class binds and names itself. */
 type ClassForm = "anonymous" | "declaration" | "named-expression";
 
-/** What one generated prototype method returns. */
+/** What one generated prototype method or getter returns. */
 type MethodKind = "constant" | "field" | "self";
+
+/**
+ * Which prototype element one generated definition installs. A `pair`
+ * writes a getter and a setter clause under one key, so a computed key
+ * evaluates twice.
+ */
+type ElementKind = "getter" | "method" | "pair" | "setter";
 
 interface MethodSpec {
   /** A computed key evaluates at class-definition time and is ordered. */
   readonly computed: boolean;
+  readonly element: ElementKind;
+  /** Selects the body of a method or getter; a lone setter ignores it. */
   readonly kind: MethodKind;
   readonly value: number;
 }
@@ -55,6 +64,7 @@ const nativeTarget = targetForExecutionHost(
 
 const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
   computed: fc.boolean(),
+  element: fc.constantFrom<ElementKind>("getter", "method", "pair", "setter"),
   kind: fc.constantFrom<MethodKind>("constant", "field", "self"),
   value: fc.integer({ max: 20, min: -20 }),
 });
@@ -84,6 +94,7 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       return unrepresentable
         ? {
             computed: method.computed,
+            element: method.element,
             kind: "constant" as const,
             value: method.value,
           }
@@ -105,13 +116,18 @@ function methodResult(testCase: ClassCase, method: MethodSpec): string {
 
 /**
  * Independent model of the evaluation order marker string: every computed
- * key evaluates in source order while the class is defined, and `c` marks
- * the constructor call that follows.
+ * key evaluates in source order while the class is defined, a getter and
+ * setter pair evaluates its key once per clause, and `c` marks the
+ * constructor call that follows.
  */
 function modelOrder(testCase: ClassCase): string {
   return (
     testCase.methods
-      .map((method, index) => (method.computed ? String(index) : ""))
+      .map((method, index) =>
+        method.computed
+          ? String(index).repeat(method.element === "pair" ? 2 : 1)
+          : "",
+      )
       .join("") + "c"
   );
 }
@@ -129,6 +145,16 @@ function printCase(testCase: ClassCase): string {
         : method.kind === "self"
           ? `${innerName(testCase)} === received`
           : String(method.value);
+    // A getter takes no parameter, so a `self` getter compares the
+    // class-scope binding with the outer binding instead of an argument.
+    const read =
+      method.kind === "self" ? `${innerName(testCase)} === Shape` : returned;
+    const setter = `  set ${key}(value) {\n    this.s${index} = value;\n  }`;
+    if (method.element === "getter" || method.element === "pair") {
+      const getter = `  get ${key}() {\n    return ${read};\n  }`;
+      return method.element === "pair" ? `${getter}\n${setter}` : getter;
+    }
+    if (method.element === "setter") return setter;
     const signature = method.kind === "self" ? "received" : "";
     return `  ${key}(${signature}) {\n    return ${returned};\n  }`;
   });
@@ -149,12 +175,36 @@ function printCase(testCase: ClassCase): string {
   const reads = testCase.methods.map((method, index) => {
     const argument = method.kind === "self" ? "Shape" : "";
     const descriptor = `d${index}`;
-    return (
+    const lookup =
       `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
-      `Shape.prototype, "m${index}");\n` +
-      `console.log("m${index}", instance.m${index}(${argument}), ` +
-      `${descriptor}.writable, ${descriptor}.enumerable, ` +
-      `${descriptor}.configurable, Shape.prototype.m${index}.name);`
+      `Shape.prototype, "m${index}");\n`;
+    const attributes = `${descriptor}.enumerable, ${descriptor}.configurable`;
+    if (method.element === "getter") {
+      return (
+        `${lookup}console.log("m${index}", instance.m${index}, ` +
+        `typeof ${descriptor}.get, ${descriptor}.set, ${attributes}, ` +
+        `${descriptor}.get.name);`
+      );
+    }
+    if (method.element === "setter") {
+      return (
+        `${lookup}instance.m${index} = ${method.value};\n` +
+        `console.log("m${index}", instance.s${index}, ${descriptor}.get, ` +
+        `typeof ${descriptor}.set, ${attributes}, ${descriptor}.set.name);`
+      );
+    }
+    if (method.element === "pair") {
+      return (
+        `${lookup}instance.m${index} = ${method.value};\n` +
+        `console.log("m${index}", instance.m${index}, instance.s${index}, ` +
+        `typeof ${descriptor}.get, typeof ${descriptor}.set, ${attributes}, ` +
+        `${descriptor}.get.name, ${descriptor}.set.name);`
+      );
+    }
+    return (
+      `${lookup}console.log("m${index}", instance.m${index}(${argument}), ` +
+      `${descriptor}.writable, ${attributes}, ` +
+      `Shape.prototype.m${index}.name);`
     );
   });
   const fieldReads = testCase.fields
@@ -206,9 +256,28 @@ function expected(testCase: ClassCase): string {
     }`,
   );
   testCase.methods.forEach((method, index) => {
-    lines.push(
-      `m${index} ${methodResult(testCase, method)} true false true m${index}`,
-    );
+    const result = methodResult(testCase, method);
+    if (method.element === "getter") {
+      lines.push(
+        `m${index} ${result} function undefined false true get m${index}`,
+      );
+      return;
+    }
+    if (method.element === "setter") {
+      lines.push(
+        `m${index} ${method.value} undefined function false true ` +
+          `set m${index}`,
+      );
+      return;
+    }
+    if (method.element === "pair") {
+      lines.push(
+        `m${index} ${result} ${method.value} function function false true ` +
+          `get m${index} set m${index}`,
+      );
+      return;
+    }
+    lines.push(`m${index} ${result} true false true m${index}`);
   });
   lines.push("no-new true");
   lines.push(`order ${order}`);
@@ -259,8 +328,8 @@ test("class model orders computed keys before construction", () => {
       fields: [4],
       form: "declaration",
       methods: [
-        { computed: false, kind: "field", value: 0 },
-        { computed: true, kind: "self", value: 0 },
+        { computed: false, element: "method", kind: "field", value: 0 },
+        { computed: true, element: "method", kind: "self", value: 0 },
       ],
     }),
     "definition 1\n" +
@@ -279,7 +348,9 @@ test("class model reports the inner name of a named expression", () => {
   const testCase: ClassCase = {
     fields: [],
     form: "named-expression",
-    methods: [{ computed: false, kind: "constant", value: 9 }],
+    methods: [
+      { computed: false, element: "method", kind: "constant", value: 9 },
+    ],
   };
   assert.equal(
     expected(testCase),
@@ -293,6 +364,36 @@ test("class model reports the inner name of a named expression", () => {
       "order c\n",
   );
   assert.match(printCase(testCase), /const Shape = class Inner \{/u);
+});
+
+test("class model names accessors and evaluates a pair key twice", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    methods: [
+      { computed: false, element: "getter", kind: "constant", value: 1 },
+      { computed: false, element: "setter", kind: "constant", value: 2 },
+      { computed: true, element: "pair", kind: "constant", value: 3 },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition 22\n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "m0 1 function undefined false true get m0\n" +
+      "m1 2 undefined function false true set m1\n" +
+      "m2 3 3 function function false true get m2 set m2\n" +
+      "no-new true\n" +
+      "order 22c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /get m0\(\) \{/u);
+  assert.match(source, /set m1\(value\) \{/u);
+  assert.match(source, /get \[mark\("m2", 2\)\]\(\) \{/u);
+  assert.match(source, /set \[mark\("m2", 2\)\]\(value\) \{/u);
 });
 
 test(
@@ -356,18 +457,19 @@ test(
         domain:
           "class declarations, named class expressions, and anonymous class " +
           "expressions with zero to two constructor-assigned fields and zero " +
-          "to three prototype methods over static and computed keys, whose " +
-          "bodies return a constant, an instance field, or the class-scope " +
-          "name binding, comparing an independent name, prototype " +
-          "descriptor, and definition-order model with Node.js, Deno, and " +
-          "both native specialization policies with forced collection on " +
-          "the enabled path",
+          "to three prototype elements over static and computed keys, each " +
+          "element a method, a getter, a setter, or a getter and setter " +
+          "pair whose reading body returns a constant, an instance field, " +
+          "or the class-scope name binding, comparing an independent name, " +
+          "prototype descriptor, accessor round-trip, and definition-order " +
+          "model with Node.js, Deno, and both native specialization " +
+          "policies with forced collection on the enabled path",
         numRuns: 15,
-        profile: "M5 basic class declarations and expressions",
+        profile: "M5 class declarations, expressions, and accessors",
         seed: 0x5eed_0017,
         sizeLimit:
-          "zero to two constructor fields, zero to three methods, and " +
-          "bounded integer values",
+          "zero to two constructor fields, zero to three prototype " +
+          "elements, and bounded integer values",
         timeLimitMilliseconds: 180_000,
       },
     );
