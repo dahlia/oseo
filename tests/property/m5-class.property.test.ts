@@ -28,6 +28,13 @@ const { assertAsyncProperty } = await import(
 /** How one generated class binds and names itself. */
 type ClassForm = "anonymous" | "declaration" | "named-expression";
 
+/**
+ * Whether one generated class extends a base class, and whether it
+ * declares the derived constructor or takes the implicit
+ * `constructor(...args) { super(...args); }`.
+ */
+type ClassHeritage = "derived" | "derived-implicit" | "none";
+
 /** What one generated prototype method or getter returns. */
 type MethodKind = "constant" | "field" | "self";
 
@@ -53,6 +60,7 @@ interface ClassCase {
   /** Constructor parameters stored as `f0`, `f1`, ... on the instance. */
   readonly fields: readonly number[];
   readonly form: ClassForm;
+  readonly heritage: ClassHeritage;
   readonly methods: readonly MethodSpec[];
 }
 
@@ -87,27 +95,39 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       "declaration",
       "named-expression",
     ),
+    heritage: fc.constantFrom<ClassHeritage>(
+      "derived",
+      "derived-implicit",
+      "none",
+    ),
     methods: fc.array(methodArbitrary, { maxLength: 3 }),
   })
-  .map((testCase) => ({
-    fields: testCase.fields,
-    form: testCase.form,
-    methods: testCase.methods.map((method) => {
-      const unrepresentable =
-        (method.kind === "self" && testCase.form === "anonymous") ||
-        (method.kind === "field" &&
-          (testCase.fields.length === 0 || method.staticPlacement));
-      return unrepresentable
-        ? {
-            computed: method.computed,
-            element: method.element,
-            kind: "constant" as const,
-            staticPlacement: method.staticPlacement,
-            value: method.value,
-          }
-        : method;
-    }),
-  }));
+  .map((testCase) => {
+    // The implicit derived constructor forwards its arguments without
+    // storing them, so that form carries no constructor-assigned field.
+    const fields =
+      testCase.heritage === "derived-implicit" ? [] : testCase.fields;
+    return {
+      fields,
+      form: testCase.form,
+      heritage: testCase.heritage,
+      methods: testCase.methods.map((method) => {
+        const unrepresentable =
+          (method.kind === "self" && testCase.form === "anonymous") ||
+          (method.kind === "field" &&
+            (fields.length === 0 || method.staticPlacement));
+        return unrepresentable
+          ? {
+              computed: method.computed,
+              element: method.element,
+              kind: "constant" as const,
+              staticPlacement: method.staticPlacement,
+              value: method.value,
+            }
+          : method;
+      }),
+    };
+  });
 
 /** The class-scope binding a `self` method reads, if the form has one. */
 function innerName(testCase: ClassCase): string {
@@ -169,19 +189,46 @@ function printCase(testCase: ClassCase): string {
     const signature = method.kind === "self" ? "received" : "";
     return `  ${modifier}${key}(${signature}) {\n    return ${returned};\n  }`;
   });
+  const implicit = testCase.heritage === "derived-implicit";
   const body = [
-    `  constructor(${parameters}) {`,
-    '    order = order + "c";',
-    ...(assignments === "" ? [] : [assignments]),
-    "  }",
+    ...(implicit
+      ? []
+      : [
+          `  constructor(${parameters}) {`,
+          ...(testCase.heritage === "derived" ? ["    super();"] : []),
+          '    order = order + "c";',
+          ...(assignments === "" ? [] : [assignments]),
+          "  }",
+        ]),
     ...bodies,
   ].join("\n");
+  // The implicit derived constructor runs no generated statement, so the
+  // base class carries the construction marker for that form.
+  const base =
+    testCase.heritage === "none"
+      ? ""
+      : [
+          "class Base {",
+          "  constructor() {",
+          ...(implicit ? ['    order = order + "c";'] : []),
+          "    this.base = 7;",
+          "  }",
+          "  shared() {",
+          '    return "shared";',
+          "  }",
+          "  static inherited() {",
+          '    return "inherited";',
+          "  }",
+          "}",
+          "",
+        ].join("\n");
+  const extendsClause = testCase.heritage === "none" ? "" : " extends Base";
   const head =
     testCase.form === "declaration"
-      ? "class Shape {"
+      ? `class Shape${extendsClause} {`
       : testCase.form === "named-expression"
-        ? "const Shape = class Inner {"
-        : "const Shape = class {";
+        ? `const Shape = class Inner${extendsClause} {`
+        : `const Shape = class${extendsClause} {`;
   const tail = testCase.form === "declaration" ? "}" : "};";
   const reads = testCase.methods.map((method, index) => {
     const argument = method.kind === "self" ? "Shape" : "";
@@ -225,13 +272,18 @@ function printCase(testCase: ClassCase): string {
   const fieldReads = testCase.fields
     .map((_, index) => `instance.f${index}`)
     .join(", ");
+  const inherited =
+    testCase.heritage === "none"
+      ? ""
+      : 'console.log("heritage", instance instanceof Base, instance.base, ' +
+        "instance.shared(), Shape.inherited());\n";
   return `
 let order = "";
 function mark(name, index) {
   order = order + index;
   return name;
 }
-${head}
+${base}${head}
 ${body}
 ${tail}
 console.log("definition", order);
@@ -245,7 +297,7 @@ console.log("constructor", Shape.prototype.constructor === Shape);
 console.log("instance", instance instanceof Shape${
     fieldReads === "" ? "" : `, ${fieldReads}`
   });
-${reads.join("\n")}
+${inherited}${reads.join("\n")}
 try {
   Shape();
 } catch (error) {
@@ -271,6 +323,12 @@ function expected(testCase: ClassCase): string {
       testCase.fields.length === 0 ? "" : ` ${testCase.fields.join(" ")}`
     }`,
   );
+  // A derived class reaches the base instance field and prototype method
+  // through the prototype chain and the base static through the
+  // constructor chain.
+  if (testCase.heritage !== "none") {
+    lines.push("heritage true 7 shared inherited");
+  }
   testCase.methods.forEach((method, index) => {
     const result = methodResult(testCase, method);
     if (method.element === "getter") {
@@ -343,6 +401,7 @@ test("class model orders computed keys before construction", () => {
     expected({
       fields: [4],
       form: "declaration",
+      heritage: "none",
       methods: [
         {
           computed: false,
@@ -376,6 +435,7 @@ test("class model reports the inner name of a named expression", () => {
   const testCase: ClassCase = {
     fields: [],
     form: "named-expression",
+    heritage: "none",
     methods: [
       {
         computed: false,
@@ -404,6 +464,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
   const testCase: ClassCase = {
     fields: [],
     form: "declaration",
+    heritage: "none",
     methods: [
       {
         computed: false,
@@ -452,6 +513,7 @@ test("class model reads a static element through the constructor", () => {
   const testCase: ClassCase = {
     fields: [],
     form: "declaration",
+    heritage: "none",
     methods: [
       {
         computed: true,
@@ -490,6 +552,64 @@ test("class model reads a static element through the constructor", () => {
   assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m0"\)/u);
   assert.match(source, /Shape\.m0\(Shape\)/u);
   assert.match(source, /Shape\.m1 = 6;/u);
+});
+
+test("class model reads inherited members of a derived class", () => {
+  const testCase: ClassCase = {
+    fields: [3],
+    form: "declaration",
+    heritage: "derived",
+    methods: [
+      {
+        computed: false,
+        element: "method",
+        kind: "field",
+        staticPlacement: false,
+        value: 1,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Shape 1\n" +
+      "constructor true\n" +
+      "instance true 3\n" +
+      "heritage true 7 shared inherited\n" +
+      "m0 3 true false true m0\n" +
+      "no-new true\n" +
+      "order c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /class Shape extends Base \{/u);
+  assert.match(source, /^ {4}super\(\);$/mu);
+});
+
+test("class model gives an implicit derived class no own constructor", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "named-expression",
+    heritage: "derived-implicit",
+    methods: [],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Inner 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "heritage true 7 shared inherited\n" +
+      "no-new true\n" +
+      "order c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /const Shape = class Inner extends Base \{\n\n\};/u);
+  // The implicit constructor runs no generated statement, so the base
+  // constructor carries the marker instead.
+  assert.doesNotMatch(source, /super\(\)/u);
+  assert.match(source, /class Base \{\n {2}constructor\(\) \{\n {4}order/u);
 });
 
 test(
@@ -557,16 +677,21 @@ test(
           "method, a getter, a setter, or a getter and setter pair placed on " +
           "the prototype or on the constructor with `static`, whose reading " +
           "body returns a constant, an instance field, or the class-scope " +
-          "name binding, comparing an independent name, own-property " +
-          "descriptor, accessor round-trip, and definition-order model with " +
-          "Node.js, Deno, and both native specialization policies with " +
-          "forced collection on the enabled path",
+          "name binding, each class standing alone, extending a base class " +
+          "through a declared `super()` call, or extending it through the " +
+          "implicit derived constructor, comparing an independent name, " +
+          "own-property descriptor, accessor round-trip, inherited-member, " +
+          "and definition-order model with Node.js, Deno, and both native " +
+          "specialization policies with forced collection on the enabled " +
+          "path",
         numRuns: 15,
-        profile: "M5 class declarations, expressions, accessors, and statics",
+        profile:
+          "M5 class declarations, expressions, accessors, statics, and " +
+          "inheritance",
         seed: 0x5eed_0017,
         sizeLimit:
           "zero to two constructor fields, zero to three class elements, " +
-          "and bounded integer values",
+          "one optional base class, and bounded integer values",
         timeLimitMilliseconds: 180_000,
       },
     );

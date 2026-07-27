@@ -1145,6 +1145,11 @@ function anonymousDefinition(expression: HirExpression): boolean {
  * only chooses a different target for each: a `static` element is
  * defined on the constructor itself, every other element on the
  * prototype object.
+ *
+ * A derived class evaluates its heritage operand first, inside the
+ * class-scope environment, and links both prototype chains before any
+ * element is defined: the constructor inherits from the parent
+ * constructor, and the prototype object from the parent's `prototype`.
  */
 function lowerClassExpression(
   expression: HirExpression & { readonly kind: "class" },
@@ -1160,11 +1165,34 @@ function lowerClassExpression(
       builder,
     );
   }
+  const heritage =
+    expression.heritage == null
+      ? undefined
+      : lowerExpression(expression.heritage, builder);
   const constructorValue = lowerExpression(
     expression.constructorFunction,
     builder,
     inferredFunctionName,
   );
+  if (heritage != null) {
+    const linked = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [constructorValue, heritage],
+      detail: "class heritage",
+      id: linked,
+      kind: "class-heritage",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [linked],
+      expression.range,
+    );
+    recordRoot(builder, linked, expression.range);
+  }
   appendMirMetadata(
     builder,
     "safepoint",
@@ -1381,6 +1409,18 @@ function lowerExpression(
       detail: "this",
       id,
       kind: "receiver",
+      range: expression.range,
+    });
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "new-target") {
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "new.target",
+      id,
+      kind: "new-target",
       range: expression.range,
     });
     return recordRoot(builder, id, expression.range);
@@ -2201,6 +2241,8 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = expression.target.method;
+  } else if (expression.target.kind === "super") {
+    return lowerSuperCall(expression, expression.target.thisBinding, builder);
   } else {
     let callee: number;
     let receiver: number;
@@ -2275,6 +2317,95 @@ function lowerExpression(
     expression.range,
   );
   return recordRoot(builder, id, expression.range);
+}
+
+/**
+ * Lowers one `super()` call. The parent constructor is the running
+ * constructor's own [[Prototype]], so it is read from the callee rather
+ * than from any expression, and it is constructed against the receiver
+ * the `new` expression already allocated from `new.target`'s prototype.
+ * Whatever the parent produced then initializes the derived
+ * constructor's `this` binding, which a second `super()` cannot rebind.
+ */
+function lowerSuperCall(
+  expression: HirExpression & { readonly kind: "call" },
+  thisBinding: { readonly bindingId: number },
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "super constructor lookup",
+    [],
+    expression.range,
+  );
+  const parent = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "super constructor",
+    id: parent,
+    kind: "super-constructor",
+    range: expression.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [parent],
+    expression.range,
+  );
+  recordRoot(builder, parent, expression.range);
+  const lowered = lowerCallArguments(
+    expression.arguments,
+    expression.range,
+    builder,
+  );
+  const callArguments = [parent, ...lowered.ids];
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "super constructor call",
+    lowered.list == null ? callArguments : [...callArguments, lowered.list],
+    expression.range,
+  );
+  const constructed = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
+    arguments: callArguments,
+    detail: "super constructor",
+    id: constructed,
+    kind: "construct",
+    range: expression.range,
+    target: { kind: "super" },
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [constructed],
+    expression.range,
+  );
+  recordRoot(builder, constructed, expression.range);
+  const bound = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [constructed],
+    bindingId: thisBinding.bindingId,
+    detail: `%b${thisBinding.bindingId} this`,
+    id: bound,
+    kind: "this-bind",
+    range: expression.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [bound],
+    expression.range,
+  );
+  return recordRoot(builder, bound, expression.range);
 }
 
 function createMirBlock(builder: MirBuilder): MutableMirBlock {
@@ -3827,6 +3958,37 @@ function lowerSyntheticUndefined(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * Routes every `return` of a derived class constructor through the
+ * `this` binding `super()` initializes. An object result stands as the
+ * constructor's value, `undefined` becomes the bound `this`, and any
+ * other value is a `TypeError`. Rewriting the terminators after the body
+ * is built keeps a `return` inside `try` on the path its `finally`
+ * already defines.
+ */
+function routeDerivedReturns(
+  blocks: readonly MutableMirBlock[],
+  derivedThisBindingId: number,
+  builder: MirBuilder,
+  range: SourceRange,
+): void {
+  for (const block of blocks) {
+    const terminator = block.terminator;
+    if (terminator?.kind !== "return") continue;
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    block.operations.push({
+      arguments: [terminator.value],
+      bindingId: derivedThisBindingId,
+      detail: `%b${derivedThisBindingId} this`,
+      id,
+      kind: "derived-return",
+      range,
+    });
+    block.terminator = { kind: "return", value: id };
+  }
+}
+
 function buildMirFunction(
   id: number,
   name: string,
@@ -3839,6 +4001,7 @@ function buildMirFunction(
   specialization: SpecializationMode,
   strict: boolean,
   generator = false,
+  derivedThisBindingId?: number,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -3862,6 +4025,9 @@ function buildMirFunction(
   if (!returned) {
     const value = lowerSyntheticUndefined(range, builder);
     builder.current.terminator = { kind: "return", value };
+  }
+  if (derivedThisBindingId != null) {
+    routeDerivedReturns(builder.blocks, derivedThisBindingId, builder, range);
   }
   const mirParameters: readonly MirParameter[] = parameters.map(
     (parameter) => ({
@@ -3889,6 +4055,7 @@ function buildMirFunction(
       ...(block.parameters == null ? {} : { parameters: block.parameters }),
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
+    ...(derivedThisBindingId == null ? {} : { derivedThisBindingId }),
     functionLength,
     ...(generator ? { generator: true as const } : {}),
     id,
@@ -3947,6 +4114,7 @@ export function buildMir(
         specialization,
         functionValue.strict === true,
         functionValue.functionKind === "generator",
+        functionValue.derivedThisBindingId,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

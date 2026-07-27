@@ -357,6 +357,7 @@ export function convertModule(
     functionStack: [],
     input,
     locations,
+    receiverStack: [],
     strictStack: [],
     syntheticIndex: 0,
   };

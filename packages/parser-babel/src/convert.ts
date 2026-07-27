@@ -31,6 +31,7 @@ import {
   type AssignmentArrayBindingElement,
   type BabelNode,
   type ConvertContext,
+  type ReceiverContext,
 } from "./babel.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
 import { location, sourceRange, unsupported } from "./locations.ts";
@@ -88,6 +89,19 @@ export function callTarget(
     return inner == null
       ? unsupported(context, value)
       : callTarget(context, inner);
+  }
+  if (value.type === "Super") {
+    const receiver = context.receiverStack.at(-1);
+    if (receiver === "derived-constructor") {
+      return { ...location(context, value), kind: "super" };
+    }
+    return unsupported(
+      context,
+      value,
+      receiver === "arrow-in-derived-constructor"
+        ? "Calling super() from an arrow function is unsupported."
+        : "super() is only valid in a derived class constructor.",
+    );
   }
   const name = identifierName(value);
   if (name === "setTimeout" || name === "clearTimeout") {
@@ -261,6 +275,42 @@ export function expression(
             "function provides it.",
         )
       : { ...located, kind: "this" };
+  }
+  if (value.type === "Super") {
+    return unsupported(
+      context,
+      value,
+      "Property access through super is unsupported.",
+    );
+  }
+  if (value.type === "MetaProperty") {
+    const meta = node(value.meta);
+    const property = node(value.property);
+    if (
+      meta == null ||
+      property == null ||
+      identifierName(meta) !== "new" ||
+      identifierName(property) !== "target"
+    ) {
+      return unsupported(context, value);
+    }
+    const receiver = context.receiverStack.at(-1);
+    if (receiver == null) {
+      return unsupported(
+        context,
+        value,
+        "new.target is only valid inside a function.",
+      );
+    }
+    // An arrow takes new.target from the function that encloses it, which
+    // this profile does not capture yet.
+    return receiver === "arrow" || receiver === "arrow-in-derived-constructor"
+      ? unsupported(
+          context,
+          value,
+          "new.target inside an arrow function is unsupported.",
+        )
+      : { ...located, kind: "new-target" };
   }
   if (value.type === "Identifier") {
     const name = identifierName(value);
@@ -2302,6 +2352,7 @@ export function validateAsyncStatements(
   const validationContext: ConvertContext = {
     ...context,
     functionStack: [...context.functionStack],
+    receiverStack: [...context.receiverStack],
     strictStack: [...context.strictStack],
   };
   for (const value of values) {
@@ -2870,6 +2921,7 @@ export function functionDeclaration(
   value: BabelNode,
   requireName = true,
   memberKind?: "class" | "method",
+  derivedConstructor = false,
 ): SyntaxFunction | undefined {
   const generator = value.generator === true;
   if (generator && (value.async === true || memberKind != null)) {
@@ -2950,6 +3002,15 @@ export function functionDeclaration(
     context.strictStack.at(-1) === true ||
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const functionProvidesThis = value.type !== "ArrowFunctionExpression";
+  const enclosingReceiver = context.receiverStack.at(-1);
+  const receiver: ReceiverContext = functionProvidesThis
+    ? derivedConstructor === true
+      ? "derived-constructor"
+      : "function"
+    : enclosingReceiver === "derived-constructor" ||
+        enclosingReceiver === "arrow-in-derived-constructor"
+      ? "arrow-in-derived-constructor"
+      : "arrow";
   for (const parameterNode of parameterNodes) {
     const rest = parameterNode.type === "RestElement";
     const parameterPattern =
@@ -2986,9 +3047,11 @@ export function functionDeclaration(
       context.functionStack.push(
         functionProvidesThis ? true : context.functionStack.at(-1) === true,
       );
+      context.receiverStack.push(receiver);
       let pattern = bindingPattern(context, conversionPattern);
       let defaultInitializer =
         defaultNode == null ? undefined : expression(context, defaultNode);
+      context.receiverStack.pop();
       context.functionStack.pop();
       context.strictStack.pop();
       if (pattern == null) return undefined;
@@ -3090,6 +3153,7 @@ export function functionDeclaration(
       ? context.functionStack.at(-1) === true
       : true,
   );
+  context.receiverStack.push(receiver);
   const children =
     arrowExpressionBody && bodyNode != null
       ? [
@@ -3125,6 +3189,7 @@ export function functionDeclaration(
     copiedParameterNames,
   );
   if (hoisted == null) {
+    context.receiverStack.pop();
     context.functionStack.pop();
     context.strictStack.pop();
     return undefined;
@@ -3159,6 +3224,7 @@ export function functionDeclaration(
   };
   if (value.async === true) {
     if (!validateAsyncContinuationCount(context, children)) {
+      context.receiverStack.pop();
       context.functionStack.pop();
       context.strictStack.pop();
       return undefined;
@@ -3179,6 +3245,7 @@ export function functionDeclaration(
       });
     }
     if (executionBody == null) {
+      context.receiverStack.pop();
       context.functionStack.pop();
       context.strictStack.pop();
       return undefined;
@@ -3191,6 +3258,7 @@ export function functionDeclaration(
           ? functionDeclaration(context, child, true)
           : statement(context, child, true);
       if (converted == null) {
+        context.receiverStack.pop();
         context.functionStack.pop();
         context.strictStack.pop();
         return undefined;
@@ -3199,6 +3267,7 @@ export function functionDeclaration(
     }
     body.push(...parameterizedBody(executionBody));
   }
+  context.receiverStack.pop();
   context.functionStack.pop();
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
@@ -3251,18 +3320,62 @@ function classElementKey(
 }
 
 /**
+ * The implicit derived constructor `constructor(...args) { super(...args); }`.
+ * Its rest parameter carries a synthetic name so that no class-body or
+ * enclosing binding can capture it, and its `length` is zero, matching a
+ * default constructor's own `length`.
+ */
+function implicitDerivedConstructor(
+  context: ConvertContext,
+  located: { readonly range: SourceRange },
+  name: string | undefined,
+): SyntaxFunction {
+  const range = located.range;
+  const restName = syntheticName(context, "implicit-super-arguments");
+  return {
+    body: [
+      {
+        expression: {
+          arguments: [
+            {
+              argument: identifierExpression(restName, range),
+              kind: "spread",
+              range,
+            },
+          ],
+          kind: "call",
+          range,
+          target: { kind: "super", range },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    functionKind: "class",
+    functionLength: 0,
+    kind: "function",
+    name,
+    parameters: [{ ...syntheticParameter(restName, range), rest: true }],
+    range,
+    returnHints: [],
+    strict: true,
+  };
+}
+
+/**
  * Converts one class declaration or expression into the owned class
  * expression. The class body is strict code, so the strictness stack
  * gains an entry for every element, including computed keys.
+ *
+ * An `extends` operand is evaluated before any class element, inside the
+ * class's own strict scope, so a heritage expression that reads the class
+ * name observes its temporal dead zone.
  */
 export function classExpression(
   context: ConvertContext,
   value: BabelNode,
 ): SyntaxExpression | undefined {
   const located = location(context, value);
-  if (value.superClass != null) {
-    return unsupported(context, value, "Class inheritance is unsupported.");
-  }
   if (value.typeParameters != null || value.superTypeParameters != null) {
     return unsupported(context, value, "Generic classes are unsupported.");
   }
@@ -3285,7 +3398,15 @@ export function classExpression(
   if (identifier != null && name == null) return unsupported(context, value);
   const bodyNode = node(value.body);
   if (bodyNode == null) return unsupported(context, value);
+  const superClassNode = node(value.superClass);
   context.strictStack.push(true);
+  const heritage =
+    superClassNode == null ? undefined : expression(context, superClassNode);
+  if (superClassNode != null && heritage == null) {
+    context.strictStack.pop();
+    return undefined;
+  }
+  const derived = heritage != null;
   const elements: SyntaxClassElement[] = [];
   let constructorFunction: SyntaxFunction | undefined;
   for (const element of nodes(bodyNode.body)) {
@@ -3299,7 +3420,13 @@ export function classExpression(
         unsupported(context, element, "A class defines one constructor.");
         break;
       }
-      const converted = functionDeclaration(context, element, false, "class");
+      const converted = functionDeclaration(
+        context,
+        element,
+        false,
+        "class",
+        derived,
+      );
       if (converted == null) break;
       constructorFunction = { ...converted, name };
       continue;
@@ -3326,20 +3453,24 @@ export function classExpression(
   }
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
+  const implicitConstructor: SyntaxFunction = derived
+    ? implicitDerivedConstructor(context, located, name)
+    : {
+        ...located,
+        body: [],
+        functionKind: "class",
+        functionLength: 0,
+        kind: "function",
+        name,
+        parameters: [],
+        returnHints: [],
+        strict: true,
+      };
   return {
     ...located,
-    constructorFunction: constructorFunction ?? {
-      ...located,
-      body: [],
-      functionKind: "class",
-      functionLength: 0,
-      kind: "function",
-      name,
-      parameters: [],
-      returnHints: [],
-      strict: true,
-    },
+    constructorFunction: constructorFunction ?? implicitConstructor,
     elements,
+    ...(heritage == null ? {} : { heritage }),
     kind: "class",
     ...(name == null ? {} : { nameBinding: name }),
   };

@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,397 reviewed cases: 868 passes, 364 expected
-negatives, and 165 unsupported profile features. It records no semantic or
+The current manifest contains 1,567 reviewed cases: 1,016 passes, 382 expected
+negatives, and 169 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -816,7 +816,7 @@ its deliberate boundary and its evidence:
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
     boundaries: class fields,
-    private names, static initialization blocks, `extends`, `super`, and
+    private names, static initialization blocks, `super` property access, and
     `export default class` are rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use; generator and
@@ -955,6 +955,101 @@ its deliberate boundary and its evidence:
     cases require. The reviewed manifest moves to 950 passes, 379 expected
     negatives, and 156 unsupported profile features with no semantic or
     harness failures.
+ -  Class inheritance through `extends`, the `super()` call, and
+    `new.target`. A class expression carries its `extends` operand as one
+    heritage expression that MIR lowers inside the class-scope environment
+    before the constructor closure exists, so a heritage operand that reads
+    the class name observes its temporal dead zone and a side effect in it
+    runs before any element key. A new `class-heritage` runtime entry point
+    validates the operand and links both chains at once: the constructor's
+    [[Prototype]] becomes the parent constructor and the class `prototype`
+    object's [[Prototype]] becomes `Get(parent, "prototype")`. Static members
+    therefore resolve through the constructor chain and instance members
+    through the prototype chain, `instanceof` walks the whole chain, and both
+    objects stay out of dictionary mode because a class definition allocates
+    them itself. An operand that is neither `null` nor a constructor throws a
+    `TypeError`, as does a constructor whose `prototype` is a primitive; a
+    `null` operand leaves both chains null, which is what an ordinary
+    function's [[Prototype]] already is in this runtime.
+    A derived class constructor owns a `this` binding instead of reading its
+    receiver directly. The binding is a fresh uninitialized cell per
+    invocation, so reading `this` before `super()` throws a `ReferenceError`
+    through the same temporal-dead-zone machinery lexical declarations use,
+    and every arrow function nested in the constructor shares that cell and
+    therefore observes the receiver `super()` bound even when the arrow was
+    created earlier. `super()` reads the running constructor's own
+    [[Prototype]], rejects a non-constructor with a `TypeError`, constructs it
+    against the receiver the `new` expression allocated from `new.target`'s
+    prototype, and binds the result; a second `super()` in one invocation
+    throws a `ReferenceError`. Because the parent's completion value is what
+    gets bound, a base constructor that returns its own object replaces the
+    allocated receiver for the rest of the derived constructor. An error
+    constructor reached through `super()` takes its instance prototype from
+    the same new target rather than from its own `prototype`, so
+    `class AppError extends Error {}` produces instances whose prototype is
+    `AppError.prototype`; a direct `new Error` supplies itself as the new
+    target and is unchanged. A parameter hint never reaches these rules,
+    because the addition specialization declines a derived constructor whose
+    `return` the `this` binding still has to route. Every `return`
+    of a derived constructor leaves through that binding: an object stands as
+    written, `undefined` yields the bound `this` and so throws when `super()`
+    never ran, and any other value is a `TypeError`. MIR rewrites the
+    terminators after the body is built, so a `return` inside `try` still runs
+    its `finally`, including a `finally` that calls `super()`. A class body
+    without a `constructor` gets the implicit
+    `constructor(...args) { super(...args); }` with a synthetic rest parameter
+    name and a `length` of zero. `new.target` is admitted as its own
+    expression that reads the construction target the call ABI already
+    carries: it is the constructed class through every `super()` hop, and
+    `undefined` for an ordinary call, a method call, a generator body, and an
+    asynchronous function, none of which are constructors.
+    Deliberate boundaries: `super.property` access is rejected with a
+    source-located diagnostic, and so are `super()` and `new.target` inside an
+    arrow function, because an arrow takes both from the function enclosing it
+    and this profile captures neither lexically yet. Native differential
+    fixtures cover a two-level and a three-level chain, an inherited method,
+    accessor, and static member, a derived class with no constructor, a
+    derived class expression both named and anonymous, a class extending an
+    ordinary function, derived `name` and `length`, the `prototype` descriptor
+    and empty own keys of a derived class, `this` read before `super()`, a
+    missing `super()`, a double `super()`, a derived constructor returning a
+    number, `undefined`, and an object, a base constructor that returns its
+    own object, `super()` in both branches of a conditional, a `return` inside
+    `try` whose `finally` calls `super()`, an arrow created before `super()`,
+    an ordinary nested function keeping its own `undefined` receiver, a rest
+    parameter forwarded through `super()`, calling a derived class without
+    `new`, heritage and computed-key evaluation order, a class extending
+    itself, every rejected operand form, `extends null` with and without an
+    explicit constructor, a parent whose `prototype` is `null`, a heritage
+    operand read through a getter, per-call derived class identity from a
+    factory, `new.target` in an ordinary function, a class constructor, a
+    method, a static method, a three-level derived chain, a generator, and an
+    asynchronous function, a hinted and an unhinted derived constructor
+    returning a sum, and an `Error` and a `TypeError` subclass including a
+    two-level chain and a subclass that adds its own state after `super()`.
+    The generated class property suite now draws each
+    class standing alone, extending a base class through a declared `super()`
+    call, or extending it through the implicit derived constructor, and models
+    the inherited field, prototype method, and static member. Sixty-six
+    reviewed test262 cases newly pass, covering the `subclass` default and
+    derived-return-override families, `super()` argument and spread
+    evaluation, `BindThisValue` and its second-call rejection, the `super()`
+    expression value, heritage identifier references, heritage class-scope
+    lexical open observations, a rejected arrow, asynchronous, and accessor
+    heritage, a parent `prototype` setter, a static method override,
+    `extends null` prototype wiring, and the `new.target` value through calls,
+    member expressions, `new`, and `super()`. Three new expected negatives
+    record the escaped `new.target` early errors and the module-goal
+    `new.target` early error the added feature tag now reaches. Seventeen new
+    unsupported cases record this unit's boundaries: `super()` from an arrow
+    function, `super.property`, and the `Reflect`, tagged template,
+    `Function.prototype.bind`, typed-array, and `Object` intrinsics that other
+    inheritance cases need. The two `definition/prototype-getter` and
+    `definition/prototype-setter` cases leave the reviewed subset until
+    `Function.prototype.bind` exists, because the heritage they build starts
+    from a bound function. The reviewed manifest moves to 1016 passes, 382
+    expected negatives, and 169 unsupported profile features with no semantic
+    or harness failures.
 
 
 Known gaps inside the claim
@@ -969,9 +1064,20 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Class fields, private names, static initialization blocks, `extends`,
-    `super`, and `export default class` are outside the admitted class
-    subset. Owner: the functions and executable syntax stream.
+ -  Class fields, private names, static initialization blocks, `super`
+    property access, and `export default class` are outside the admitted class
+    subset. `super()` and `new.target` are also rejected inside an arrow
+    function, because this profile does not capture either lexically yet.
+    Owner: the functions and executable syntax stream.
+ -  `super()` runs the parent against the receiver the `new` expression
+    already allocated instead of performing a fresh `Construct` per call, so a
+    second `super()` in one invocation runs the parent a second time against
+    that same receiver rather than a new one. The `ReferenceError` the second
+    call must throw still follows, and the parent still runs exactly twice, so
+    the difference is observable only to a parent that publishes or mutates
+    its receiver during a call that is already doomed. Closing it needs a
+    runtime `Construct` path that allocates at the base-constructor boundary.
+    Owner: the functions and executable syntax stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

@@ -208,6 +208,12 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-name-binding" ||
     fixture.name === "class-evaluation-order" ||
     fixture.name === "class-strict-body" ||
+    fixture.name === "class-inheritance" ||
+    fixture.name === "class-super-binding" ||
+    fixture.name === "class-heritage-values" ||
+    fixture.name === "class-new-target" ||
+    fixture.name === "class-derived-return-hints" ||
+    fixture.name === "class-error-subclass" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

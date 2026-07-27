@@ -31,6 +31,7 @@ export type MirCallTarget =
         | "setPrototypeOf";
     }
   | { readonly kind: "promise-constructor" }
+  | { readonly kind: "super" }
   | {
       readonly kind: "promise-intrinsic";
       readonly method:
@@ -121,12 +122,14 @@ export interface MirOperation {
     | "branch"
     | "call"
     | "check-status"
+    | "class-heritage"
     | "class-prototype"
     | "constant"
     | "caught"
     | "completion-set"
     | "construct"
     | "construct-receiver"
+    | "derived-return"
     | "error-intrinsic"
     | "symbol-intrinsic"
     | "count-guard-hit"
@@ -145,6 +148,7 @@ export interface MirOperation {
     | "join"
     | "load-fixed-slot"
     | "module-namespace-create"
+    | "new-target"
     | "object-coercible"
     | "object-create"
     | "object-rest"
@@ -159,7 +163,9 @@ export interface MirOperation {
     | "read"
     | "receiver"
     | "root-store"
+    | "super-constructor"
     | "safepoint"
+    | "this-bind"
     | "unbox-smi"
     | "unary"
     | "update-property-cache"
@@ -274,6 +280,12 @@ export interface MirSpecialization {
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
   readonly blocks: readonly MirBlock[];
+  /**
+   * The `this` binding of a derived class constructor. Every `return`
+   * leaves through a `derived-return` operation against this binding, so
+   * the constructor cannot produce a receiver that `super()` never bound.
+   */
+  readonly derivedThisBindingId?: number;
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
   /**

@@ -597,7 +597,9 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   const constructing = operation.kind === "construct";
   const callArguments = dynamic
     ? { ...operation, arguments: operation.arguments.slice(2) }
-    : operation;
+    : target.kind === "super"
+      ? { ...operation, arguments: operation.arguments.slice(1) }
+      : operation;
   location(state, operation.range);
   state.usesAbrupt = true;
   const argumentsValue = emitArguments(state, callArguments);
@@ -688,6 +690,23 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       );
       line(state, "}");
     }
+  } else if (target.kind === "super") {
+    // The parent constructor runs against the receiver `new` already
+    // allocated from new.target's prototype and keeps that same new
+    // target, so a base constructor deeper in the chain sees the class
+    // the `new` expression names.
+    const parent = operationArgument(operation, 0);
+    line(
+      state,
+      `result = oseo_call_function(context, roots[${parent}], receiver, ` +
+        `${argumentsValue.count}, ${argumentsValue.name}, new_target);`,
+    );
+    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(
+      state,
+      "    result = oseo_constructor_result(context, result.value, receiver);",
+    );
+    line(state, "}");
   } else {
     const targetRootCount = state.functionRootCounts.get(target.functionId);
     if (targetRootCount == null) {
@@ -1018,6 +1037,88 @@ function emitConstructReceiver(
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
+/**
+ * Links a derived class to its heritage: the constructor inherits from
+ * the parent constructor and the class prototype object from the
+ * parent's `prototype`, so both static and instance lookups walk into
+ * the parent.
+ */
+function emitClassHeritage(state: EmitState, operation: MirOperation): void {
+  const constructorValue = operationArgument(operation, 0);
+  const heritage = operationArgument(operation, 1);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_class_heritage(context, roots[${constructorValue}], ` +
+      `roots[${heritage}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Reads the running constructor's own [[Prototype]], which is the
+ * constructor `super()` invokes.
+ */
+function emitSuperConstructor(state: EmitState, operation: MirOperation): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, "result = oseo_super_constructor(context, callee);");
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/** Binds what `super()` produced to the derived constructor's `this`. */
+function emitThisBind(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(`MIR this-bind %${operation.id} has no binding identity.`);
+  }
+  const value = operationArgument(operation, 0);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(
+    state,
+    `result = oseo_bind_this(context, result.value, roots[${value}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Resolves a derived constructor's completion value: an object stands as
+ * written, `undefined` becomes the bound `this`, and any other value is
+ * a `TypeError`.
+ */
+function emitDerivedReturn(state: EmitState, operation: MirOperation): void {
+  const bindingId = operation.bindingId;
+  if (bindingId == null) {
+    throw new Error(
+      `MIR derived-return %${operation.id} has no binding identity.`,
+    );
+  }
+  const value = operationArgument(operation, 0);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_environment_get(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u);`,
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(
+    state,
+    `result = oseo_derived_constructor_result(context, roots[${value}], ` +
+      "result.value);",
+  );
+  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
 function emitClassPrototype(state: EmitState, operation: MirOperation): void {
   const constructorValue = operationArgument(operation, 0);
   location(state, operation.range);
@@ -1112,6 +1213,14 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitConstructReceiver(state, operation);
   } else if (operation.kind === "class-prototype") {
     emitClassPrototype(state, operation);
+  } else if (operation.kind === "class-heritage") {
+    emitClassHeritage(state, operation);
+  } else if (operation.kind === "super-constructor") {
+    emitSuperConstructor(state, operation);
+  } else if (operation.kind === "this-bind") {
+    emitThisBind(state, operation);
+  } else if (operation.kind === "derived-return") {
+    emitDerivedReturn(state, operation);
   } else if (operation.kind === "error-intrinsic") {
     emitErrorIntrinsic(state, operation);
   } else if (operation.kind === "symbol-intrinsic") {
@@ -1123,6 +1232,14 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {
     line(state, `roots[${operation.id}] = receiver;`);
+  } else if (operation.kind === "new-target") {
+    // A generator body resumes outside any construction, and a generator
+    // function is not a constructor, so its new.target is undefined.
+    line(
+      state,
+      `roots[${operation.id}] = ` +
+        (state.generator ? "oseo_undefined();" : "new_target;"),
+    );
   } else if (operation.kind === "caught") {
     state.usesCompletion = true;
     const slot = operation.completionSlot;

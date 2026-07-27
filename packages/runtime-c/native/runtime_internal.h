@@ -456,6 +456,7 @@ void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
     OseoValue callee,
+    OseoValue new_target,
     size_t code_id,
     size_t argument_count,
     const OseoValue *arguments

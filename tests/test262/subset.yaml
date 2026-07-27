@@ -11,6 +11,7 @@ supportedFeatures:
   - for-of
   - generators
   - let
+  - new.target
   - object-rest
   - object-spread
   - rest-parameters
@@ -938,6 +939,12 @@ tests:
   - path: test/language/expressions/class/getter-param-dflt.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/heritage-arrow-function.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/heritage-async-arrow-function.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
   - path: test/language/expressions/class/ident-name-method-def-break-escaped.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -1179,6 +1186,9 @@ tests:
     expectedClassification: pass
     dependencies: [classes, functions]
   - path: test/language/expressions/class/scope-name-lex-close.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/scope-name-lex-open-heritage.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
   - path: test/language/expressions/class/scope-name-lex-open-no-heritage.js
@@ -1493,6 +1503,39 @@ tests:
   - path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/new.target/asi.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/escaped-new.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/escaped-target.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-call.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-member.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-new.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-reflect-apply.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-reflect-construct.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/language/expressions/new.target/value-via-super-call.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/new.target/value-via-super-property.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/expressions/new.target/value-via-tagged-template.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
   - path: test/language/expressions/new/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -2507,6 +2550,99 @@ tests:
   - path: test/language/expressions/prefix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/super/call-bind-this-value-twice.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/expressions/super/call-bind-this-value.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/expressions/super/call-construct-error.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/expressions/super/call-expr-value.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/expressions/super/call-proto-not-ctor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/expressions/super/call-spread-err-mult-err-expr-throws.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-mult-err-iter-get-value.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-mult-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-mult-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-mult-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-mult-err-itr-value.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-expr-throws.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-itr-get-call.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-itr-get-value.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-itr-step.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-err-sngl-err-itr-value.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/expressions/super/call-spread-mult-obj-ident.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-mult-obj-null.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-mult-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-getter-descriptor.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-getter-init.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-mult-spread-getter.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-mult-spread.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-null.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-override-immutable.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-overrides-prev-properties.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-obj-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/call-spread-sngl-obj-ident.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/super/prop-dot-cls-val.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/expressions/super/prop-expr-obj-val.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-literals]
   - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -2688,7 +2824,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-new-target.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-strict-mode.js
     expectedClassification: expected-negative
@@ -3630,6 +3766,9 @@ tests:
   - path: test/language/statements/class/definition/getters-restricted-ids.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/invalid-extends.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
   - path: test/language/statements/class/definition/methods-gen-return.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, generators]
@@ -3651,14 +3790,8 @@ tests:
   - path: test/language/statements/class/definition/methods-gen-yield-weak-binding.js
     expectedClassification: expected-negative
     dependencies: [classes, generators]
-  - path: test/language/statements/class/definition/prototype-getter.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/prototype-property.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
-  - path: test/language/statements/class/definition/prototype-setter.js
-    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/prototype-wiring.js
     expectedClassification: unsupported-profile-feature
@@ -3672,15 +3805,30 @@ tests:
   - path: test/language/statements/class/definition/setters-restricted-ids.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/side-effects-in-extends.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
   - path: test/language/statements/class/definition/this-access-restriction.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, functions]
   - path: test/language/statements/class/getter-param-dflt.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/ident-name-method-def-extends-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/ident-name-method-def-extends-escaped.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/ident-name-method-def-extends.js
+    expectedClassification: pass
+    dependencies: [classes]
   - path: test/language/statements/class/ident-name-method-def-static-escaped.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/ident-name-method-def-super-escaped.js
+    expectedClassification: pass
+    dependencies: [classes]
   - path: test/language/statements/class/method-static/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [classes, destructuring-bindings]
@@ -3774,6 +3922,12 @@ tests:
   - path: test/language/statements/class/name-binding/basic.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/scope-name-lex-open-heritage.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/scope-name-lex-open-no-heritage.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
   - path: test/language/statements/class/scope-setter-paramsbody-var-close.js
     expectedClassification: pass
     dependencies: [classes, object-properties, var-bindings]
@@ -3810,13 +3964,106 @@ tests:
   - path: test/language/statements/class/strict-mode/with.js
     expectedClassification: expected-negative
     dependencies: [classes]
-  - path: test/language/statements/class/syntax/class-body-has-direct-super-class-heritage.js
+  - path: test/language/statements/class/subclass/builtins.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/class-definition-null-proto-super.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/class-definition-null-proto-this.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/class-definition-parent-proto-null.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/default-constructor-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/subclass/default-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/subclass/derived-class-return-override-catch-finally-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-catch-finally.js
+    expectedClassification: pass
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-catch-super-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-catch-super.js
+    expectedClassification: pass
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-catch.js
+    expectedClassification: pass
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-finally-super-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-finally-super.js
+    expectedClassification: pass
+    dependencies: [classes, abrupt-completion]
+  - path: test/language/statements/class/subclass/derived-class-return-override-for-of-arrow.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/statements/class/subclass/derived-class-return-override-for-of.js
+    expectedClassification: pass
+    dependencies: [classes, iterator-protocol]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-boolean.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-empty.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-null.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-number.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-object.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-string.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-symbol.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-this.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/derived-class-return-override-with-undefined.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/superclass-bound-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/subclass/superclass-prototype-setter-constructor.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/superclass-prototype-setter-method-override.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/subclass/superclass-static-method-override.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/super/in-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-body-has-direct-super-class-heritage.js
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/syntax/class-body-method-definition-super-property.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes]
   - path: test/language/statements/class/syntax/class-declaration-computed-method-definition.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-declaration-heritage-identifier-reference-class-element-list.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-expression-heritage-identifier-reference.js
     expectedClassification: pass
     dependencies: [classes]
   - path: test/language/statements/class/syntax/class-expression.js
