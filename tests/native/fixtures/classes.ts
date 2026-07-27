@@ -1709,4 +1709,389 @@ console.log(leaf.cached(), leaf.near);
       overflowMisses: 0,
     },
   },
+  {
+    name: "class-fields",
+    source: `
+// A field is an own data property of the instance, created in class-body
+// order before the constructor body runs, and never on the prototype.
+class Field {
+  first = 1;
+  second;
+  third = this.first + 1;
+}
+const value = new Field();
+console.log(value.first, value.second, value.third);
+console.log("second" in value, Object.keys(value).length);
+console.log(
+  Object.keys(value)[0],
+  Object.keys(value)[1],
+  Object.keys(value)[2],
+);
+const descriptor = Object.getOwnPropertyDescriptor(value, "first");
+console.log(
+  descriptor.value,
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+);
+console.log(Object.getOwnPropertyDescriptor(Field.prototype, "first"));
+console.log(Object.keys(Field.prototype).length, Field.name, Field.length);
+// Each instance owns its own copy.
+const other = new Field();
+other.first = 9;
+console.log(value.first, other.first);
+class Constructed {
+  before = "field";
+  constructor(argument) {
+    console.log("constructor sees", this.before);
+    this.after = argument;
+  }
+  method() {
+    return this.before + ":" + this.after;
+  }
+}
+const constructed = new Constructed("argument");
+console.log(constructed.method(), Object.keys(constructed).length);
+// A field is defined, not assigned, so an inherited setter never runs and
+// a non-writable inherited property does not reject the definition.
+class Setter {
+  set stored(incoming) {
+    console.log("setter ran", incoming);
+  }
+}
+class DefinesOver extends Setter {
+  stored = "defined";
+}
+const defined = new DefinesOver();
+console.log(defined.stored, Object.keys(defined).length);
+class Locked {}
+Object.defineProperty(Locked.prototype, "fixed", {
+  configurable: false,
+  enumerable: false,
+  value: "prototype",
+  writable: false,
+});
+class OverLocked extends Locked {
+  fixed = "own";
+}
+console.log(new OverLocked().fixed, Locked.prototype.fixed);
+// A field shadows a prototype method of the same name.
+class Shadowing {
+  method = "field";
+}
+Shadowing.prototype.method = "prototype";
+console.log(new Shadowing().method, Shadowing.prototype.method);
+`,
+  },
+  {
+    name: "class-field-order",
+    source: `
+// Every element key is evaluated once, in class-body order, when the
+// class is defined; every initializer runs once per instance, in the
+// same order, and a method or static element only chooses its target.
+let trace = "";
+function step(mark, value) {
+  trace = trace + mark + " ";
+  return value;
+}
+class Ordered {
+  [step("key-a", "alpha")] = step("init-a", 1);
+  [step("key-method", "method")]() {
+    return "method";
+  }
+  [step("key-b", "beta")] = step("init-b", 2);
+  static [step("key-static", "onClass")]() {
+    return "static";
+  }
+  [step("key-c", "gamma")];
+}
+console.log(trace);
+trace = "";
+const first = new Ordered();
+console.log(trace, first.alpha, first.beta, first.gamma);
+trace = "";
+const second = new Ordered();
+console.log(trace, second.alpha);
+console.log(Object.keys(first).length, Object.keys(first)[2]);
+console.log(typeof first.method, typeof Ordered.onClass);
+// A key that completes abruptly stops the class definition before any
+// later key runs, and no instance can exist to run an initializer.
+trace = "";
+try {
+  const Rejected = class {
+    [step("key-first", "kept")] = step("never", 0);
+    [(() => {
+      throw new TypeError("key rejected");
+    })()] = 1;
+    [step("key-last", "unreached")] = 2;
+  };
+  console.log("unreachable", typeof Rejected);
+} catch (error) {
+  console.log(trace, error instanceof TypeError, error.message);
+}
+// An initializer that completes abruptly stops the remaining fields and
+// leaves the instance unreachable.
+class Thrower {
+  before = "set";
+  failing = (() => {
+    throw new RangeError("initializer rejected");
+  })();
+  after = "unreached";
+}
+try {
+  new Thrower();
+} catch (error) {
+  console.log(error instanceof RangeError, error.message);
+}
+`,
+  },
+  {
+    name: "class-field-inheritance",
+    source: `
+// A base class initializes its fields before its constructor body, so a
+// base constructor cannot observe a derived field; a derived class
+// initializes its own where super() returns.
+class Base {
+  baseField = "base";
+  constructor(label) {
+    this.label = label;
+    console.log("base sees", this.baseField, this.derivedField);
+  }
+}
+class Derived extends Base {
+  derivedField = "derived";
+  constructor() {
+    super("from derived");
+    console.log("derived sees", this.baseField, this.derivedField, this.label);
+  }
+}
+const derived = new Derived();
+console.log(Object.keys(derived).length, Object.keys(derived)[0]);
+console.log(Object.keys(derived)[1], Object.keys(derived)[2]);
+// The implicit derived constructor forwards its arguments and still
+// initializes the fields the body declared.
+class Implicit extends Base {
+  implicitField = "implicit";
+}
+const implicit = new Implicit("passed");
+console.log(implicit.label, implicit.implicitField, implicit.baseField);
+// Fields follow whichever super() call the body reached.
+class Late extends Base {
+  lateField = "late";
+  constructor(flag) {
+    if (flag) {
+      super("through if");
+    } else {
+      super("through else");
+    }
+    console.log("late", this.lateField, this.label);
+  }
+}
+new Late(true);
+new Late(false);
+// A derived constructor that replaces its result keeps the fields on the
+// receiver super() produced, which the replacement never carries.
+class Replaced extends Base {
+  replacedField = "replaced";
+  constructor() {
+    super("replaced");
+    return { substitute: true };
+  }
+}
+const replaced = new Replaced();
+console.log(replaced.substitute, replaced.replacedField);
+// A second super() is rejected before it can initialize the fields
+// again, so each field keeps the single value it already has.
+class Twice extends Base {
+  counted = "once";
+  constructor() {
+    super("first");
+    this.counted = "changed";
+    try {
+      super("second");
+    } catch (error) {
+      console.log(error instanceof ReferenceError, this.counted);
+    }
+  }
+}
+new Twice();
+// A base class field initializer runs before parameter defaults, which
+// is where [[Construct]] performs it for a base constructor.
+class Defaulted {
+  seed = 4;
+  constructor(first = this.seed, second = first + 1) {
+    console.log("defaults", first, second);
+  }
+}
+new Defaulted();
+new Defaulted(9);
+`,
+  },
+  {
+    name: "class-field-scope",
+    source: `
+// A field initializer is its own function body: it reads the class
+// scope instead of the constructor parameters, provides the receiver an
+// arrow function nested in it captures, and sees no new target.
+const shared = "outer";
+class Scoped {
+  fromOuter = shared;
+  fromSelf = Scoped.name;
+  fromTarget = new.target;
+  constructor(shared) {
+    this.fromParameter = shared;
+  }
+}
+const scoped = new Scoped("parameter");
+console.log(scoped.fromOuter, scoped.fromSelf, scoped.fromParameter);
+console.log(scoped.fromTarget);
+const Anonymous = class {
+  inner = Anonymous === undefined;
+};
+console.log(new Anonymous().inner, Anonymous.name);
+class Arrows {
+  captured = () => this;
+  nested = () => () => this.captured;
+}
+const arrows = new Arrows();
+console.log(
+  arrows.captured() === arrows,
+  arrows.nested()() === arrows.captured,
+);
+// NamedEvaluation names an anonymous initializer from the field key,
+// including a computed key evaluated once per class evaluation.
+const computed = "dynamic";
+const marker = Symbol("marker");
+class Names {
+  plain = function () {};
+  arrow = (first, second) => first + second;
+  [computed] = function () {};
+  [marker] = class {};
+  [3] = function () {};
+  "quoted name" = class {};
+  wrapped = (0, function () {});
+}
+const names = new Names();
+console.log(names.plain.name, names.arrow.name, names.dynamic.name);
+console.log(names[marker].name, names[3].name, names["quoted name"].name);
+console.log(names.wrapped.name === "", names.arrow.length, names.plain.length);
+class Factory {
+  static make(key) {
+    return class {
+      [key] = function () {};
+    };
+  }
+}
+const madeFirst = new (Factory.make("first"))();
+const madeSecond = new (Factory.make("second"))();
+console.log(madeFirst.first.name, madeSecond.second.name);
+// A field key follows ToPropertyKey, so an ordinary object key becomes
+// its string and a numeric key its number text.
+const coerced = {
+  toString() {
+    return "fromToString";
+  },
+};
+class Keys {
+  0 = "zero";
+  1.5 = "one point five";
+  [coerced] = "coerced";
+}
+const keys = new Keys();
+console.log(keys[0], keys[1.5], keys.fromToString);
+console.log(Object.keys(keys)[0], Object.keys(keys).length);
+`,
+  },
+  {
+    name: "class-field-super",
+    source: `
+// A field initializer carries the class prototype as its home object,
+// so a super reference in it reads the parent's prototype with the
+// instance under construction as the receiver.
+class Base {
+  label = "base";
+  describe() {
+    return "base:" + this.label;
+  }
+  get computedLabel() {
+    return "accessor:" + this.label;
+  }
+}
+class Derived extends Base {
+  label = "derived";
+  fromSuperCall = super.describe();
+  fromSuperAccessor = super.computedLabel;
+  detached = super.describe;
+  own = this.fromSuperCall + "!";
+}
+const derived = new Derived();
+console.log(derived.label, derived.fromSuperCall, derived.fromSuperAccessor);
+console.log(derived.own, typeof derived.detached);
+// A three-level chain reads the nearest parent, and a nested class
+// definition inside an initializer takes its own home object.
+class Middle extends Base {
+  describe() {
+    return "middle:" + this.label;
+  }
+}
+class Leaf extends Middle {
+  label = "leaf";
+  reached = super.describe();
+  nested = new (class extends Base {
+    fromOwnParent = super.describe();
+  })();
+}
+const leaf = new Leaf();
+console.log(leaf.reached, leaf.nested.fromOwnParent);
+`,
+  },
+  {
+    name: "class-field-hints",
+    source: `
+// A constructor that initializes fields keeps them on every path the
+// addition specialization can take, including its guard misses, and an
+// unhinted twin agrees with it.
+class Summed {
+  tag = "summed";
+  constructor(left: number, right: number) {
+    return left + right;
+  }
+}
+class Plain {
+  tag = "plain";
+  constructor(left, right) {
+    return left + right;
+  }
+}
+function report(label, made) {
+  console.log(label, made.tag, typeof made);
+}
+report("hinted numbers", new Summed(1, 2));
+report("plain numbers", new Plain(1, 2));
+report("hinted strings", new Summed("a", "b"));
+report("plain strings", new Plain("a", "b"));
+report("hinted overflow", new Summed(140737488355327, 1));
+report("hinted double", new Summed(0.5, 0.25));
+class Adder {
+  base = 10;
+  add(left: number, right: number) {
+    return left + right;
+  }
+}
+const adder = new Adder();
+console.log(
+  adder.base,
+  adder.add(1, 2),
+  adder.add("x", "y"),
+  adder.add(0.5, 1),
+);
+`,
+    specialization: {
+      genericCallsDisabled: 9,
+      genericCallsEnabled: 7,
+      hits: 2,
+      misses: 11,
+      overflowMisses: 1,
+    },
+  },
 ];

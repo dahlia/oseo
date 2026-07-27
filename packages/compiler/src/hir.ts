@@ -163,6 +163,21 @@ export function errorIntrinsicName(
   return errorIntrinsicNames.find((candidate) => candidate === name);
 }
 
+/**
+ * True for an anonymous function or class definition, which
+ * NamedEvaluation names from the key or binding that stores it. A static
+ * key is already resolved during HIR name inference; this decides
+ * whether a key must also reach the closure at run time.
+ */
+export function anonymousDefinition(expression: HirExpression): boolean {
+  if (expression.kind === "function") return expression.name === "";
+  return (
+    expression.kind === "class" &&
+    expression.constructorFunction.kind === "function" &&
+    expression.constructorFunction.name === ""
+  );
+}
+
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
@@ -263,8 +278,32 @@ export interface HirClassMethod extends LocatedSyntax {
   readonly value: HirExpression;
 }
 
+/**
+ * One resolved field definition in an HIR class body. The initializer
+ * is resolved as its own function, so it reads the class scope instead
+ * of the constructor's parameters and takes the instance under
+ * construction as its receiver.
+ */
+export interface HirClassField extends LocatedSyntax {
+  /**
+   * The closure that produces the field's value, absent for a field
+   * declared without an initializer, whose value is `undefined`.
+   */
+  readonly initializer?: HirExpression;
+  readonly key: HirExpression;
+  /**
+   * Where the evaluated key is stored for the initializer to read,
+   * present only when the initializer is an anonymous definition whose
+   * key is not a static string. The cell is created and filled where
+   * the element appears, so the closure that captures it observes the
+   * one key evaluation the class body performs.
+   */
+  readonly keyNameBindingId?: number;
+  readonly kind: "field";
+}
+
 /** One element admitted by an HIR class body. */
-export type HirClassElement = HirClassMethod;
+export type HirClassElement = HirClassField | HirClassMethod;
 
 /**
  * The immutable binding a named class holds in its own lexical
@@ -631,10 +670,23 @@ export interface HirFunction extends LocatedSyntax {
    * throws a `ReferenceError` instead of producing an unbound receiver.
    */
   readonly derivedThisBindingId?: number;
+  /**
+   * The binding holding the field key that names this class field
+   * initializer's anonymous result, which is ECMA-262's
+   * [[ClassFieldInitializerName]]. Present only on such an initializer.
+   */
+  readonly fieldKeyBindingId?: number;
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
   readonly functionKind: FunctionKind;
   readonly id: number;
+  /**
+   * True on a class constructor whose class declares instance fields.
+   * The constructor runs them against the instance under construction:
+   * a base constructor before its body, and a derived one where
+   * `super()` returns.
+   */
+  readonly initializesInstanceFields?: true;
   readonly kind: "hir-function";
   readonly localBindingIds: readonly number[];
   readonly name: string;

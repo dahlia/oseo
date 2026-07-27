@@ -45,9 +45,25 @@ type MethodKind = "constant" | "field" | "self" | "super";
 /**
  * Which element one generated definition installs. A `pair` writes a
  * getter and a setter clause under one key, so a computed key evaluates
- * twice.
+ * twice. A `field` declares an instance field with an initializer, a
+ * `bare-field` one without, and a `named-field` one whose initializer is
+ * an anonymous function that NamedEvaluation names from the key.
  */
-type ElementKind = "getter" | "method" | "pair" | "setter";
+type ElementKind =
+  | "bare-field"
+  | "field"
+  | "getter"
+  | "method"
+  | "named-field"
+  | "pair"
+  | "setter";
+
+/** True for an element that defines an own property of each instance. */
+function isField(element: ElementKind): boolean {
+  return (
+    element === "bare-field" || element === "field" || element === "named-field"
+  );
+}
 
 interface MethodSpec {
   /** A computed key evaluates at class-definition time and is ordered. */
@@ -84,7 +100,15 @@ const nativeTarget = targetForExecutionHost(
 
 const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
   computed: fc.boolean(),
-  element: fc.constantFrom<ElementKind>("getter", "method", "pair", "setter"),
+  element: fc.constantFrom<ElementKind>(
+    "bare-field",
+    "field",
+    "getter",
+    "method",
+    "named-field",
+    "pair",
+    "setter",
+  ),
   kind: fc.constantFrom<MethodKind>("constant", "field", "self", "super"),
   staticPlacement: fc.boolean(),
   superWrite: fc.boolean(),
@@ -124,16 +148,23 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       form: testCase.form,
       heritage: testCase.heritage,
       methods: testCase.methods.map((method) => {
+        // This profile admits no static field, and a field initializer
+        // runs before the constructor body assigns `f0`, so a field
+        // element carries neither placement nor a `field` body.
+        const staticPlacement =
+          method.staticPlacement && !isField(method.element);
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
           (method.kind === "super" && testCase.heritage === "none") ||
           (method.kind === "field" &&
-            (fields.length === 0 || method.staticPlacement));
+            (fields.length === 0 ||
+              staticPlacement ||
+              isField(method.element)));
         return {
           computed: method.computed,
           element: method.element,
           kind: unrepresentable ? ("constant" as const) : method.kind,
-          staticPlacement: method.staticPlacement,
+          staticPlacement,
           superWrite: method.superWrite && testCase.heritage !== "none",
           value: method.value,
         };
@@ -161,18 +192,35 @@ function methodResult(testCase: ClassCase, method: MethodSpec): string {
 /**
  * Independent model of the evaluation order marker string: every computed
  * key evaluates in source order while the class is defined, a getter and
- * setter pair evaluates its key once per clause, and `c` marks the
- * constructor call that follows.
+ * setter pair evaluates its key once per clause, `i` marks each field
+ * initializer, and `c` marks the constructor body that follows.
+ *
+ * A base class initializes its fields before the constructor body, and a
+ * derived class where `super()` returns, so a declared derived
+ * constructor still marks them first. The implicit derived constructor
+ * runs no marked statement of its own, so the base constructor's marker
+ * precedes the fields for that form alone.
  */
+function modelKeyOrder(testCase: ClassCase): string {
+  return testCase.methods
+    .map((method, index) =>
+      method.computed
+        ? String(index).repeat(method.element === "pair" ? 2 : 1)
+        : "",
+    )
+    .join("");
+}
+
 function modelOrder(testCase: ClassCase): string {
+  const keys = modelKeyOrder(testCase);
+  const initializers = testCase.methods
+    .map((method, index) => (method.element === "field" ? `i${index}` : ""))
+    .join("");
   return (
-    testCase.methods
-      .map((method, index) =>
-        method.computed
-          ? String(index).repeat(method.element === "pair" ? 2 : 1)
-          : "",
-      )
-      .join("") + "c"
+    keys +
+    (testCase.heritage === "derived-implicit"
+      ? `c${initializers}`
+      : `${initializers}c`)
   );
 }
 
@@ -208,6 +256,16 @@ function printCase(testCase: ClassCase): string {
       ? `    super.s${index} = value;`
       : `    this.s${index} = value;`;
     const setter = `  ${modifier}set ${key}(value) {\n${stored}\n  }`;
+    // A field element carries no placement modifier, because this
+    // profile admits instance fields only. Its initializer is marked so
+    // the order string records where it ran, except for the anonymous
+    // function form, whose initializer must stay an anonymous definition
+    // for NamedEvaluation to name it from the key.
+    if (method.element === "bare-field") return `  ${key};`;
+    if (method.element === "named-field") return `  ${key} = function () {};`;
+    if (method.element === "field") {
+      return `  ${key} = note(${index}, ${read});`;
+    }
     if (method.element === "getter" || method.element === "pair") {
       const getter = `  ${modifier}get ${key}() {\n    return ${read};\n  }`;
       return method.element === "pair" ? `${getter}\n${setter}` : getter;
@@ -270,6 +328,22 @@ function printCase(testCase: ClassCase): string {
       `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
       `${owner}, "m${index}");\n`;
     const attributes = `${descriptor}.enumerable, ${descriptor}.configurable`;
+    // A field is an own property of the instance, so its descriptor is
+    // read there and reports the writable, enumerable, configurable
+    // attributes CreateDataProperty gives it.
+    if (isField(method.element)) {
+      const fieldLookup =
+        `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
+        `instance, "m${index}");\n`;
+      const read =
+        method.element === "named-field"
+          ? `typeof instance.m${index}, instance.m${index}.name`
+          : `instance.m${index}`;
+      return (
+        `${fieldLookup}console.log("m${index}", ${read}, ` +
+        `${descriptor}.writable, ${attributes});`
+      );
+    }
     if (method.element === "getter") {
       return (
         `${lookup}console.log("m${index}", ${receiver}.m${index}, ` +
@@ -312,6 +386,10 @@ function mark(name, index) {
   order = order + index;
   return name;
 }
+function note(index, value) {
+  order = order + "i" + index;
+  return value;
+}
 ${base}${head}
 ${body}
 ${tail}
@@ -326,6 +404,11 @@ console.log("constructor", Shape.prototype.constructor === Shape);
 console.log("instance", instance instanceof Shape${
     fieldReads === "" ? "" : `, ${fieldReads}`
   });
+let instanceKeys = "";
+for (const key of Object.keys(instance)) {
+  instanceKeys = instanceKeys + key;
+}
+console.log("instance-keys", instanceKeys);
 ${inherited}${reads.join("\n")}
 try {
   Shape();
@@ -338,9 +421,8 @@ console.log("order", order);
 
 function expected(testCase: ClassCase): string {
   const order = modelOrder(testCase);
-  const definition = order.slice(0, -1);
   const lines: string[] = [];
-  lines.push(`definition ${definition}`);
+  lines.push(`definition ${modelKeyOrder(testCase)}`);
   lines.push("keys ");
   // An anonymous class expression takes the storage binding's name, so
   // only the named expression form reports its own inner name.
@@ -352,6 +434,17 @@ function expected(testCase: ClassCase): string {
       testCase.fields.length === 0 ? "" : ` ${testCase.fields.join(" ")}`
     }`,
   );
+  // Every field is defined before the constructor body assigns its
+  // parameters, so the declared fields lead the instance's own keys in
+  // class-body order. A derived class reaches them only once the base
+  // constructor has returned, so the base's own assignment comes first.
+  const instanceKeys =
+    (testCase.heritage === "none" ? "" : "base") +
+    testCase.methods
+      .map((method, index) => (isField(method.element) ? `m${index}` : ""))
+      .join("") +
+    testCase.fields.map((_, index) => `f${index}`).join("");
+  lines.push(`instance-keys ${instanceKeys}`);
   // A derived class reaches the base instance field and prototype method
   // through the prototype chain and the base static through the
   // constructor chain.
@@ -360,6 +453,18 @@ function expected(testCase: ClassCase): string {
   }
   testCase.methods.forEach((method, index) => {
     const result = methodResult(testCase, method);
+    if (method.element === "bare-field") {
+      lines.push(`m${index} undefined true true true`);
+      return;
+    }
+    if (method.element === "named-field") {
+      lines.push(`m${index} function m${index} true true true`);
+      return;
+    }
+    if (method.element === "field") {
+      lines.push(`m${index} ${result} true true true`);
+      return;
+    }
     if (method.element === "getter") {
       lines.push(
         `m${index} ${result} function undefined false true get m${index}`,
@@ -455,6 +560,7 @@ test("class model orders computed keys before construction", () => {
       "name Shape 1\n" +
       "constructor true\n" +
       "instance true 4\n" +
+      "instance-keys f0\n" +
       "m0 4 true false true m0\n" +
       "m1 true true false true m1\n" +
       "no-new true\n" +
@@ -485,6 +591,7 @@ test("class model reports the inner name of a named expression", () => {
       "name Inner 0\n" +
       "constructor true\n" +
       "instance true\n" +
+      "instance-keys \n" +
       "m0 9 true false true m0\n" +
       "no-new true\n" +
       "order c\n",
@@ -531,6 +638,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
       "name Shape 0\n" +
       "constructor true\n" +
       "instance true\n" +
+      "instance-keys \n" +
       "m0 1 function undefined false true get m0\n" +
       "m1 2 undefined function false true set m1\n" +
       "m2 3 3 function function false true get m2 set m2\n" +
@@ -575,6 +683,7 @@ test("class model reads a static element through the constructor", () => {
       "name Shape 0\n" +
       "constructor true\n" +
       "instance true\n" +
+      "instance-keys \n" +
       "m0 true true false true m0\n" +
       "m1 6 6 function function false true get m1 set m1\n" +
       "no-new true\n" +
@@ -614,6 +723,7 @@ test("class model reads inherited members of a derived class", () => {
       "name Shape 1\n" +
       "constructor true\n" +
       "instance true 3\n" +
+      "instance-keys basef0\n" +
       "heritage true 7 shared inherited\n" +
       "m0 3 true false true m0\n" +
       "no-new true\n" +
@@ -663,6 +773,7 @@ test("class model reads and writes a derived class through super", () => {
       "name Shape 0\n" +
       "constructor true\n" +
       "instance true\n" +
+      "instance-keys base\n" +
       "heritage true 7 shared inherited\n" +
       "m0 sharedb true false true m0\n" +
       "m1 inheriteds function undefined false true get m1\n" +
@@ -679,6 +790,96 @@ test("class model reads and writes a derived class through super", () => {
   assert.match(source, /^ {4}super\.s2 = value;$/mu);
 });
 
+test("class model orders field initializers before the constructor", () => {
+  const testCase: ClassCase = {
+    fields: [5],
+    form: "declaration",
+    heritage: "none",
+    methods: [
+      {
+        computed: true,
+        element: "field",
+        kind: "constant",
+        staticPlacement: false,
+        superWrite: false,
+        value: 8,
+      },
+      {
+        computed: false,
+        element: "bare-field",
+        kind: "constant",
+        staticPlacement: false,
+        superWrite: false,
+        value: 0,
+      },
+      {
+        computed: false,
+        element: "named-field",
+        kind: "constant",
+        staticPlacement: false,
+        superWrite: false,
+        value: 0,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition 0\n" +
+      "keys \n" +
+      "name Shape 1\n" +
+      "constructor true\n" +
+      "instance true 5\n" +
+      "instance-keys m0m1m2f0\n" +
+      "m0 8 true true true\n" +
+      "m1 undefined true true true\n" +
+      "m2 function m2 true true true\n" +
+      "no-new true\n" +
+      "order 0i0c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /^ {2}\[mark\("m0", 0\)\] = note\(0, 8\);$/mu);
+  assert.match(source, /^ {2}m1;$/mu);
+  assert.match(source, /^ {2}m2 = function \(\) \{\};$/mu);
+  assert.match(source, /Object\.getOwnPropertyDescriptor\(instance, "m0"\)/u);
+});
+
+test("class model runs implicit derived fields after the base body", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    heritage: "derived-implicit",
+    methods: [
+      {
+        computed: false,
+        element: "field",
+        kind: "super",
+        staticPlacement: false,
+        superWrite: false,
+        value: 1,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "instance-keys basem0\n" +
+      "heritage true 7 shared inherited\n" +
+      "m0 sharedb true true true\n" +
+      "no-new true\n" +
+      "order ci0\n",
+  );
+  // The initializer reaches the base through the home object the class
+  // definition bound to it, even though no constructor is declared.
+  assert.match(
+    printCase(testCase),
+    /^ {2}m0 = note\(0, super\.shared\(\) \+ super\.badge\);$/mu,
+  );
+});
+
 test("class model gives an implicit derived class no own constructor", () => {
   const testCase: ClassCase = {
     fields: [],
@@ -693,6 +894,7 @@ test("class model gives an implicit derived class no own constructor", () => {
       "name Inner 0\n" +
       "constructor true\n" +
       "instance true\n" +
+      "instance-keys base\n" +
       "heritage true 7 shared inherited\n" +
       "no-new true\n" +
       "order c\n",
@@ -767,8 +969,10 @@ test(
           "class declarations, named class expressions, and anonymous class " +
           "expressions with zero to two constructor-assigned fields and zero " +
           "to three elements over literal and computed keys, each element a " +
-          "method, a getter, a setter, or a getter and setter pair placed on " +
-          "the prototype or on the constructor with `static`, whose reading " +
+          "method, a getter, a setter, a getter and setter pair placed on " +
+          "the prototype or on the constructor with `static`, or an " +
+          "instance field declared with an initializer, without one, or " +
+          "with an anonymous function the key names, whose reading " +
           "body returns a constant, an instance field, the class-scope name " +
           "binding, or a base member reached through `super`, and whose " +
           "setter clause stores through `this` or through `super`, each " +
@@ -776,16 +980,18 @@ test(
           "through a declared `super()` call, or extending it through the " +
           "implicit derived constructor, comparing an independent name, " +
           "own-property descriptor, accessor round-trip, inherited-member, " +
-          "and definition-order model with Node.js, Deno, and both native " +
+          "instance own-key order, and definition and initialization order " +
+          "model with Node.js, Deno, and both native " +
           "specialization policies with forced collection on the enabled " +
           "path",
         numRuns: 15,
         profile:
-          "M5 class declarations, expressions, accessors, statics, and " +
-          "inheritance",
+          "M5 class declarations, expressions, accessors, statics, " +
+          "inheritance, and instance fields",
         seed: 0x5eed_0017,
         sizeLimit:
-          "zero to two constructor fields, zero to three class elements, " +
+          "zero to two constructor parameters, zero to three class " +
+          "elements, " +
           "one optional base class, and bounded integer values",
         timeLimitMilliseconds: 180_000,
       },

@@ -407,8 +407,7 @@ computed method definitions, `constructor` and `prototype` property
 descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
-unit's boundaries. Class fields,
-private names, static initialization blocks, and
+unit's boundaries. Private names, static initialization blocks, and
 `export default class` remain rejected with source-located diagnostics.
 Asynchronous class methods are admitted, because they share the object literal
 method path exactly; generator and asynchronous generator methods stay rejected
@@ -645,6 +644,61 @@ the `Object.freeze`, `Object.setPrototypeOf` ordering, `Object` heritage, and
 `Test262Error` observations the remaining cases need. The manifest moves to
 1034 passes, 382 expected negatives, and 199 unsupported profile features
 with no semantic or harness failures.
+
+Public instance class fields are now admitted, the seventh unit of the
+functions and executable syntax stream. A `field = expression` element pairs
+the key its class body evaluates once with a closure that produces the value
+once per instance, and one new runtime entry point records that pair on the
+constructor in class-body order, which is ECMA-262's [[Fields]]. A second
+entry point runs the list as InitializeInstanceElements against one instance,
+reading the field list from the running constructor rather than from an
+operand, so a base constructor reaches its own class's fields and a derived
+one only the fields its own class declared. MIR emits that operation at the
+entry of a base constructor, before its body and therefore before a parameter
+default can observe the instance, and where `super()` returns in a derived
+one, so a base constructor never observes a derived field and the
+`ReferenceError` a second `super()` reports arrives before the fields could
+run again. Each field becomes an own writable, enumerable, configurable data
+property through CreateDataProperty, so an inherited setter never runs, a
+non-writable inherited property does not reject the definition, and a field
+shadows a prototype method of the same name. HIR builds the initializer
+closure itself rather than resolving a synthesized syntax function, because
+its body is exactly one `return` and it declares nothing: that keeps the
+initializer's scope the class scope instead of the constructor's parameters,
+gives it its own receiver so a derived constructor's `this` binding stops at
+it and a nested arrow captures the instance, and lets the existing static-key
+name inference reach the returned expression. A computed key that names an
+anonymous initializer travels to the closure through a fresh cell the class
+body fills with the one key evaluation it performs, which is ECMA-262's
+[[ClassFieldInitializerName]] without a second evaluation. The initializer
+carries the class prototype as its home object, so `super.x` inside it starts
+at the parent's prototype with the instance as the receiver, including under
+the implicit derived constructor. Deliberate boundaries: a static field, a
+private field, a field named `constructor`, and the TypeScript `declare`,
+`readonly`, `definite`, and optional field modifiers stay rejected with
+source-located diagnostics. Fixed native fixtures cover a field with and
+without an initializer, the own-property descriptor, per-instance copies, an
+inherited setter that does not run, a non-writable inherited property, a
+shadowed prototype method, interleaved key and initializer order across
+methods and static elements, an abrupt key and an abrupt initializer, base
+and derived ordering, the implicit derived constructor, `super()` in both
+branches of a conditional, a replaced derived result, a rejected second
+`super()`, parameter defaults reading a field, the class scope against a
+constructor parameter of the same name, arrow initializers, name inference
+over every admitted key form, per-evaluation naming from a factory,
+ToPropertyKey coercion, `super` calls and accessor reads in initializers over
+a two-level and a three-level chain, and a hinted constructor whose addition
+specialization keeps its fields on every guard path. The generated class
+property suite now draws each element as a field with an initializer, without
+one, or with an anonymous function the key names, and models the instance's
+own key order and the initializer markers. The reviewed subset also gains the
+`arrow-function` feature tag, which the eight arrow-initializer early-error
+cases need and which no reviewed case reclassifies. Forty-three reviewed
+test262 cases newly pass, seventy-eight new expected negatives record the
+`arguments`, `super()`, automatic-semicolon-insertion, and reserved field
+name early errors, and twenty-eight new unsupported cases record this unit's
+boundaries. The manifest moves to 1077 passes, 460 expected negatives, and
+227 unsupported profile features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

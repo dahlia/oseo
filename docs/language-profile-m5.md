@@ -818,8 +818,7 @@ its deliberate boundary and its evidence:
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
-    boundaries: class fields,
-    private names, static initialization blocks, and
+    boundaries: private names, static initialization blocks, and
     `export default class` are rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use; generator and
@@ -1116,6 +1115,70 @@ its deliberate boundary and its evidence:
     observations the remaining cases need. The reviewed manifest moves to
     1034 passes, 382 expected negatives, and 199 unsupported profile features
     with no semantic or harness failures.
+ -  Public instance class fields. A `field = expression` element records the
+    key its class body evaluates once and a closure that produces the value
+    once per instance, in class-body order, on the constructor itself. That
+    pair is ECMA-262's [[Fields]], and the constructor runs it as
+    InitializeInstanceElements: a base constructor before its body, which is
+    where [[Construct]] performs it and therefore before a parameter default
+    can observe the instance, and a derived constructor where `super()`
+    returns, so a base constructor never observes a derived field and a
+    second `super()` is rejected before it can initialize them again. A field
+    declared without an initializer takes `undefined`. Each field becomes an
+    own writable, enumerable, configurable data property through
+    CreateDataProperty, so it is defined rather than assigned: an inherited
+    setter never runs, a non-writable inherited property does not reject it,
+    and a field shadows a prototype method of the same name. The initializer
+    is its own function body, not part of the constructor: it reads the class
+    scope rather than the constructor's parameters, provides the receiver an
+    arrow function nested in it captures, sees `undefined` for `new.target`,
+    and carries the class prototype as its home object, so `super.x` in it
+    starts at the parent's prototype with the instance as the receiver.
+    NamedEvaluation names an anonymous initializer from the field key,
+    including a computed key, which travels to the closure through a cell the
+    class body fills with the one key evaluation it performs. A key follows
+    ToPropertyKey, so a numeric, string literal, computed, or symbol key
+    behaves as it does elsewhere. Deliberate boundaries: a static field, a
+    private field, a field named `constructor`, and the TypeScript `declare`,
+    `readonly`, `definite`, and optional field modifiers are rejected with
+    source-located diagnostics. Native differential fixtures cover a field
+    with and without an initializer, an initializer reading an earlier field,
+    the own-property descriptor, per-instance copies, the absent prototype
+    property, a field the constructor body observes, an inherited setter that
+    does not run, a non-writable inherited property, a shadowed prototype
+    method, interleaved key and initializer evaluation order across methods
+    and static elements, an abrupt key and an abrupt initializer, base and
+    derived ordering, the implicit derived constructor, `super()` in both
+    branches of a conditional, a replaced derived result, a rejected second
+    `super()`, parameter defaults reading a field, the class scope against a
+    constructor parameter of the same name, an anonymous class expression, an
+    arrow initializer and a nested arrow, name inference over every admitted
+    key form, per-evaluation naming from a factory, ToPropertyKey coercion,
+    `super` calls and accessor reads in initializers across a two-level and a
+    three-level chain, a nested class taking its own home object, and a
+    hinted constructor whose addition specialization keeps its fields on
+    every guard path. The generated class property suite now draws each
+    element as a field with an initializer, without one, or with an anonymous
+    function the key names, and models the instance's own key order and the
+    initializer markers. Forty-three reviewed test262 cases newly pass,
+    covering the `fields-asi`, `grammar-field`, `regular-definitions`, and
+    `wrapped-in-sc` field grammar families, computed key `ToPrimitive`
+    errors, incremental key and initializer evaluation, `static` as an
+    instance field name, the constructor called after fields, an abrupt
+    initializer, a `super` initializer's abrupt completion, the `this`
+    temporal dead zone observed from an initializer, and a base-class setter
+    a field definition bypasses. Seventy-eight new expected negatives record
+    the `arguments` and `super()` early errors an initializer reports across
+    every key form, the automatic-semicolon-insertion rejections, and the
+    `constructor`, `static prototype`, and `static constructor` field name
+    early errors. Twenty-eight new unsupported cases record this unit's
+    boundaries and the `eval`, `Object`, `Proxy`, unresolvable computed key,
+    and generator-method observations the remaining cases need. The three
+    `init-value-defined-after-class` and
+    `fields-computed-name-propname-constructor` cases stay out of the
+    reviewed subset until `Object.prototype.hasOwnProperty` exists. The
+    reviewed manifest moves to 1077 passes, 460 expected negatives, and 227
+    unsupported profile features with no semantic or harness failures.
 
 
 Known gaps inside the claim
@@ -1130,7 +1193,7 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Class fields, private names, static initialization blocks, and
+ -  Static fields, private names, static initialization blocks, and
     `export default class` are outside the admitted class subset. `super()`,
     `super.x`, and `new.target` are rejected inside an arrow function, and
     `super.x` is also rejected inside an asynchronous class element, because

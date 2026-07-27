@@ -142,13 +142,17 @@ function printHirExpression(expression: HirExpression): string {
         : ` extends ${printHirExpression(expression.heritage)}`) +
       `{constructor: ${printHirExpression(expression.constructorFunction)}` +
       expression.elements
-        .map(
-          (element) =>
-            ", " +
-            (element.staticPlacement === true ? "static " : "") +
-            (element.accessorKind == null ? "" : `${element.accessorKind} `) +
-            `${printHirExpression(element.key)}: ` +
-            printHirExpression(element.value),
+        .map((element) =>
+          element.kind === "field"
+            ? `, field ${printHirExpression(element.key)}` +
+              (element.initializer == null
+                ? ""
+                : ` = ${printHirExpression(element.initializer)}`)
+            : ", " +
+              (element.staticPlacement === true ? "static " : "") +
+              (element.accessorKind == null ? "" : `${element.accessorKind} `) +
+              `${printHirExpression(element.key)}: ` +
+              printHirExpression(element.value),
         )
         .join("") +
       "}"

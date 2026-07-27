@@ -218,6 +218,11 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-new-target" ||
     fixture.name === "class-derived-return-hints" ||
     fixture.name === "class-error-subclass" ||
+    fixture.name === "class-fields" ||
+    fixture.name === "class-field-order" ||
+    fixture.name === "class-field-inheritance" ||
+    fixture.name === "class-field-scope" ||
+    fixture.name === "class-field-super" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

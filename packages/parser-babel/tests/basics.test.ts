@@ -980,7 +980,7 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class extends Base { field = 1; };",
+    source: "const value = class extends Base { static field = 1; };",
     sourceId: "class-field.ts",
   });
   assert.ok(!result.parsed);
@@ -1147,11 +1147,14 @@ const outer = Named;`,
 
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["class C { static field = 1; }", /class element is unsupported/u],
+    ["class C { static field = 1; }", /Static class fields/u],
     ["class C { static #hidden() {} }", /class element is unsupported/u],
     ["class C { get #hidden() {} }", /class element is unsupported/u],
     ["class C { set #hidden(v) {} }", /class element is unsupported/u],
-    ["class C { field = 1; }", /class element is unsupported/u],
+    ["class C { declare field: number; }", /class field modifiers/u],
+    ["class C { readonly field = 1; }", /class field modifiers/u],
+    ["class C { field?: number; }", /class field modifiers/u],
+    ["class C { #field = 1; }", /class element is unsupported/u],
     ["class C { #hidden() {} }", /class element is unsupported/u],
     ["class C { static {} }", /class element is unsupported/u],
     ["class C { *step() {} }", /method generator functions/u],

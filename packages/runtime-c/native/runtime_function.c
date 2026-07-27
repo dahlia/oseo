@@ -252,6 +252,9 @@ OseoResult oseo_function_create(
     function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
     function->home_object = oseo_undefined();
+    function->fields = NULL;
+    function->field_count = 0u;
+    function->field_capacity = 0u;
     function->code_id = code_id;
     function->function_kind = function_kind;
     /* A class's `prototype` is non-writable, non-enumerable, and
@@ -522,6 +525,117 @@ OseoResult oseo_class_heritage(
         relink_prototype(context, frame.slots[0], frame.slots[1]);
         result = normal(frame.slots[0]);
     }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_class_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue key,
+    OseoValue initializer
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class fields need a class.");
+    }
+    OseoFunction *function = function_object(constructor);
+    if (function->field_count == function->field_capacity) {
+        size_t capacity = function->field_capacity == 0u
+            ? 4u
+            : function->field_capacity * 2u;
+        if (capacity < function->field_capacity ||
+            capacity > SIZE_MAX / sizeof(OseoClassField)) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Class field storage is too large."
+            );
+        }
+        if (context->collect_every_safepoint) oseo_collect(context);
+        context->allocation_attempts += 1u;
+        OseoClassField *fields =
+            context->fail_allocation_at != 0u &&
+            context->allocation_attempts == context->fail_allocation_at
+                ? NULL
+                : malloc(capacity * sizeof(*fields));
+        if (fields == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Class field allocation failed."
+            );
+        }
+        function = function_object(constructor);
+        if (function->field_count > 0u) {
+            memcpy(
+                fields,
+                function->fields,
+                function->field_count * sizeof(*fields)
+            );
+        }
+        free(function->fields);
+        function->fields = fields;
+        function->field_capacity = capacity;
+    }
+    function->fields[function->field_count].key = key;
+    function->fields[function->field_count].initializer = initializer;
+    function->field_count += 1u;
+    return normal(constructor);
+}
+
+OseoResult oseo_initialize_instance_fields(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue instance
+) {
+    if (!is_function(constructor)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Instance fields need a class constructor."
+        );
+    }
+    if (function_object(constructor)->field_count == 0u) {
+        return normal(instance);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = constructor;
+    frame.slots[1] = instance;
+    for (size_t index = 0u;
+         index < function_object(frame.slots[0])->field_count;
+         index += 1u) {
+        /* The list is complete before any instance exists, so re-reading
+         * it only guards against a reallocation this loop cannot cause. */
+        OseoClassField field =
+            function_object(frame.slots[0])->fields[index];
+        frame.slots[2] = field.key;
+        frame.slots[3] = field.initializer;
+        frame.slots[4] = oseo_undefined();
+        if (tag_of(frame.slots[3]) != OSEO_TAG_UNDEFINED) {
+            result = oseo_call_function(
+                context,
+                frame.slots[3],
+                frame.slots[1],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            frame.slots[4] = result.value;
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
+        OseoPropertyAttributes attributes = {true, true, true, false};
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[4],
+            attributes
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[1]);
     oseo_roots_release(context, &frame);
     return result;
 }
