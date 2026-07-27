@@ -21,9 +21,24 @@ interface EmitState {
   readonly scalarKinds: Map<number, "boolean" | "smi">;
   readonly strict: boolean;
   readonly observeSpecialization: boolean;
+  /**
+   * True while emitting a generator body. Its root slots belong to the
+   * generator record rather than a native frame, so leaving the function
+   * must not release a frame that the suspended state still owns.
+   */
+  readonly generator: boolean;
   nextRecursiveTarget: number;
   usesAbrupt: boolean;
   usesCompletion: boolean;
+}
+
+/** Leave a generated function with a normal completion. */
+function emitNormalReturn(state: EmitState, value: string, indent = ""): void {
+  line(state, `${indent}result = (OseoResult){OSEO_STATUS_NORMAL, ${value}};`);
+  if (!state.generator) {
+    line(state, `${indent}oseo_roots_release(context, &frame);`);
+  }
+  line(state, `${indent}return result;`);
 }
 
 function escapeCString(value: string): string {
@@ -417,6 +432,20 @@ function emitBoxSmi(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = oseo_value_box_smi(fast_${argument});`);
 }
 
+/**
+ * The C expression reading one iterator's done flag.
+ *
+ * A generator body may suspend while an iterator operation is still in
+ * progress, and every resumption runs in a fresh C invocation, so an
+ * automatic local would read indeterminate state. Such a body keeps the
+ * flag in the root slot the MIR reserved for it instead.
+ */
+function iteratorDoneRead(state: EmitState, doneState: number): string {
+  return state.generator
+    ? `oseo_to_boolean(roots[${doneState}])`
+    : `iterator_done_${doneState}`;
+}
+
 function emitIteratorOperation(
   state: EmitState,
   operation: MirOperation,
@@ -435,7 +464,13 @@ function emitIteratorOperation(
         `&roots[${nextMethod}]);`,
     );
     if (operation.iteratorDoneState != null) {
-      line(state, `bool iterator_done_${operation.iteratorDoneState} = false;`);
+      const doneState = operation.iteratorDoneState;
+      line(
+        state,
+        state.generator
+          ? `roots[${doneState}] = oseo_boolean(false);`
+          : `bool iterator_done_${doneState} = false;`,
+      );
     }
     line(state, `roots[${operation.id}] = result.value;`);
     return;
@@ -448,34 +483,49 @@ function emitIteratorOperation(
       throw new Error(`MIR iterator next %${operation.id} has no value.`);
     }
     state.scalarKinds.set(operation.id, "boolean");
-    const doneState = operation.iteratorDoneState ?? operation.id;
-    if (operation.iteratorDoneState == null) {
-      line(state, `bool iterator_done_${doneState} = true;`);
-    }
-    if (operation.iteratorDoneState != null) {
-      line(state, `if (iterator_done_${doneState}) {`);
-      line(
-        state,
-        `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
-      );
-      line(state, `    roots[${value}] = oseo_undefined();`);
-      line(state, "} else {");
-      line(
-        state,
-        `    result = oseo_iterator_next(context, roots[${iterator}], ` +
-          `roots[${nextMethod}], &roots[${value}], ` +
-          `&iterator_done_${doneState});`,
-      );
-      line(state, "}");
-    } else {
+    const doneState = operation.iteratorDoneState;
+    if (doneState == null) {
+      // A step with no tracked done state owns the flag for this operation
+      // alone, so it never has to outlive the call that writes it.
+      line(state, `bool iterator_done_${operation.id} = true;`);
       line(
         state,
         `result = oseo_iterator_next(context, roots[${iterator}], ` +
           `roots[${nextMethod}], &roots[${value}], ` +
-          `&iterator_done_${doneState});`,
+          `&iterator_done_${operation.id});`,
       );
+      line(
+        state,
+        `bool fast_${operation.id} = !iterator_done_${operation.id};`,
+      );
+      line(state, `(void)fast_${operation.id};`);
+      return;
     }
-    line(state, `bool fast_${operation.id} = !iterator_done_${doneState};`);
+    // `oseo_iterator_next` writes the flag through a pointer, so a body that
+    // keeps the state in a root slot steps a local copy and stores it back.
+    const step = state.generator
+      ? `iterator_step_done_${operation.id}`
+      : `iterator_done_${doneState}`;
+    if (state.generator) {
+      line(state, `bool ${step} = ${iteratorDoneRead(state, doneState)};`);
+    }
+    line(state, `if (${step}) {`);
+    line(
+      state,
+      `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+    );
+    line(state, `    roots[${value}] = oseo_undefined();`);
+    line(state, "} else {");
+    line(
+      state,
+      `    result = oseo_iterator_next(context, roots[${iterator}], ` +
+        `roots[${nextMethod}], &roots[${value}], &${step});`,
+    );
+    line(state, "}");
+    if (state.generator) {
+      line(state, `roots[${doneState}] = oseo_boolean(${step});`);
+    }
+    line(state, `bool fast_${operation.id} = !${step};`);
     line(state, `(void)fast_${operation.id};`);
     return;
   }
@@ -489,10 +539,11 @@ function emitIteratorOperation(
     line(
       state,
       `result = oseo_iterator_close(context, roots[${iterator}], ` +
-        `completion_kind[${slot}u] == 2);`,
+        `completion[${slot}u].kind == 2);`,
     );
   } else {
-    line(state, `if (iterator_done_${operation.iteratorDoneState}) {`);
+    const done = iteratorDoneRead(state, operation.iteratorDoneState);
+    line(state, `if (${done}) {`);
     line(
       state,
       `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
@@ -501,7 +552,7 @@ function emitIteratorOperation(
     line(
       state,
       `    result = oseo_iterator_close(context, roots[${iterator}], ` +
-        `completion_kind[${slot}u] == 2);`,
+        `completion[${slot}u].kind == 2);`,
     );
     line(state, "}");
   }
@@ -846,6 +897,7 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     arrow: "OSEO_FUNCTION_ARROW",
     async: "OSEO_FUNCTION_ASYNC",
     "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
+    generator: "OSEO_FUNCTION_GENERATOR",
     method: "OSEO_FUNCTION_METHOD",
     ordinary: "OSEO_FUNCTION_ORDINARY",
   } as const;
@@ -1039,22 +1091,22 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
         `MIR completion-set %${operation.id} has no completion slot.`,
       );
     }
-    line(state, `completion_kind[${slot}u] = ${kinds[kind]};`);
+    line(state, `completion[${slot}u].kind = ${kinds[kind]};`);
     if (kind === "throw") {
       location(state, operation.range);
       line(state, "oseo_context_clear_language_error(context);");
-      line(state, `completion_line[${slot}u] = context->line;`);
-      line(state, `completion_column[${slot}u] = context->column;`);
-      line(state, `completion_source_id[${slot}u] = context->source_id;`);
+      line(state, `completion[${slot}u].line = context->line;`);
+      line(state, `completion[${slot}u].column = context->column;`);
+      line(state, `completion[${slot}u].source_id = context->source_id;`);
       line(
         state,
-        `completion_source_id_length[${slot}u] = ` +
+        `completion[${slot}u].source_id_length = ` +
           "context->source_id_length;",
       );
-      line(state, `completion_error_code[${slot}u] = context->error_code;`);
+      line(state, `completion[${slot}u].error_code = context->error_code;`);
       line(
         state,
-        `completion_error_message[${slot}u] = context->error_message;`,
+        `completion[${slot}u].error_message = context->error_message;`,
       );
     }
     if (operation.arguments[0] != null) {
@@ -1067,12 +1119,12 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (operation.completionTarget != null) {
       line(
         state,
-        `completion_target[${slot}u] = ` +
+        `completion[${slot}u].target = ` +
           `${operation.completionTarget.blockId}u;`,
       );
       line(
         state,
-        `completion_depth[${slot}u] = ` +
+        `completion[${slot}u].depth = ` +
           `${operation.completionTarget.cleanupDepth}u;`,
       );
     }
@@ -1145,27 +1197,27 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state.usesCompletion = true;
       line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
       line(state, "    if (context->has_diagnostic) goto abrupt;");
-      line(state, `    completion_kind[${target}u] = 2;`);
+      line(state, `    completion[${target}u].kind = 2;`);
       line(
         state,
         `    roots[${state.completionSlotStart + target}u] = ` +
           "result.value;",
       );
-      line(state, `    completion_line[${target}u] = context->line;`);
-      line(state, `    completion_column[${target}u] = context->column;`);
-      line(state, `    completion_source_id[${target}u] = context->source_id;`);
+      line(state, `    completion[${target}u].line = context->line;`);
+      line(state, `    completion[${target}u].column = context->column;`);
+      line(state, `    completion[${target}u].source_id = context->source_id;`);
       line(
         state,
-        `    completion_source_id_length[${target}u] = ` +
+        `    completion[${target}u].source_id_length = ` +
           "context->source_id_length;",
       );
       line(
         state,
-        `    completion_error_code[${target}u] = context->error_code;`,
+        `    completion[${target}u].error_code = context->error_code;`,
       );
       line(
         state,
-        `    completion_error_message[${target}u] = ` +
+        `    completion[${target}u].error_message = ` +
           "context->error_message;",
       );
       line(state, `    goto bb${target};`);
@@ -1179,55 +1231,27 @@ function emitCompletionCopy(
   source: number,
   target: number,
 ): void {
-  line(state, `    completion_kind[${target}u] = completion_kind[${source}u];`);
+  line(state, `    completion[${target}u] = completion[${source}u];`);
   line(
     state,
     `    roots[${state.completionSlotStart + target}u] = ` +
       `roots[${state.completionSlotStart + source}u];`,
   );
-  line(
-    state,
-    `    completion_target[${target}u] = completion_target[${source}u];`,
-  );
-  line(
-    state,
-    `    completion_depth[${target}u] = completion_depth[${source}u];`,
-  );
-  line(state, `    completion_line[${target}u] = completion_line[${source}u];`);
-  line(
-    state,
-    `    completion_column[${target}u] = completion_column[${source}u];`,
-  );
-  line(
-    state,
-    `    completion_source_id[${target}u] = ` +
-      `completion_source_id[${source}u];`,
-  );
-  line(
-    state,
-    `    completion_source_id_length[${target}u] = ` +
-      `completion_source_id_length[${source}u];`,
-  );
-  line(
-    state,
-    `    completion_error_code[${target}u] = ` +
-      `completion_error_code[${source}u];`,
-  );
-  line(
-    state,
-    `    completion_error_message[${target}u] = ` +
-      `completion_error_message[${source}u];`,
-  );
 }
 
 function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   if (terminator.kind === "return") {
+    emitNormalReturn(state, `roots[${terminator.value}]`);
+  } else if (terminator.kind === "generator-yield") {
+    line(
+      state,
+      `oseo_generator_suspend(context, generator, ${terminator.resume}u);`,
+    );
     line(
       state,
       `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
         `roots[${terminator.value}]};`,
     );
-    line(state, "oseo_roots_release(context, &frame);");
     line(state, "return result;");
   } else if (terminator.kind === "jump") {
     const parameters = state.blockParameters.get(terminator.target) ?? [];
@@ -1251,10 +1275,13 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, `goto bb${terminator.whenFalse};`);
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
+    // The saved-throw branch below always emits `goto abrupt`, so the label
+    // must exist even when no other operation in the body can be abrupt.
+    state.usesAbrupt = true;
     const slot = terminator.completionSlot;
     if (terminator.outerAbrupt != null) {
       const target = terminator.outerAbrupt.blockId;
-      line(state, `if (completion_kind[${slot}u] == 2) {`);
+      line(state, `if (completion[${slot}u].kind == 2) {`);
       emitCompletionCopy(state, slot, target);
       line(state, `    goto bb${target};`);
       line(state, "}");
@@ -1263,35 +1290,33 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
       const target = terminator.outerFinalizer;
       line(
         state,
-        `if (completion_kind[${slot}u] != 0 && ` +
-          `completion_depth[${slot}u] <= ${target.cleanupDepth}u) {`,
+        `if (completion[${slot}u].kind != 0 && ` +
+          `completion[${slot}u].depth <= ${target.cleanupDepth}u) {`,
       );
       emitCompletionCopy(state, slot, target.blockId);
       line(state, `    goto bb${target.blockId};`);
       line(state, "}");
     }
-    line(state, `if (completion_kind[${slot}u] == 1) {`);
-    line(
+    line(state, `if (completion[${slot}u].kind == 1) {`);
+    emitNormalReturn(
       state,
-      `    result = (OseoResult){OSEO_STATUS_NORMAL, ` +
-        `roots[${state.completionSlotStart + slot}u]};`,
+      `roots[${state.completionSlotStart + slot}u]`,
+      "    ",
     );
-    line(state, "    oseo_roots_release(context, &frame);");
-    line(state, "    return result;");
     line(state, "}");
-    line(state, `if (completion_kind[${slot}u] == 2) {`);
-    line(state, `    context->line = completion_line[${slot}u];`);
-    line(state, `    context->column = completion_column[${slot}u];`);
-    line(state, `    context->source_id = completion_source_id[${slot}u];`);
+    line(state, `if (completion[${slot}u].kind == 2) {`);
+    line(state, `    context->line = completion[${slot}u].line;`);
+    line(state, `    context->column = completion[${slot}u].column;`);
+    line(state, `    context->source_id = completion[${slot}u].source_id;`);
     line(
       state,
       `    context->source_id_length = ` +
-        `completion_source_id_length[${slot}u];`,
+        `completion[${slot}u].source_id_length;`,
     );
-    line(state, `    context->error_code = completion_error_code[${slot}u];`);
+    line(state, `    context->error_code = completion[${slot}u].error_code;`);
     line(
       state,
-      `    context->error_message = completion_error_message[${slot}u];`,
+      `    context->error_message = completion[${slot}u].error_message;`,
     );
     line(state, "    context->has_diagnostic = false;");
     line(
@@ -1301,7 +1326,7 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     );
     line(state, "    goto abrupt;");
     line(state, "}");
-    line(state, `switch (completion_target[${slot}u]) {`);
+    line(state, `switch (completion[${slot}u].target) {`);
     for (const target of state.blockParameters.keys()) {
       if (target === 0) continue;
       line(state, `case ${target}u: goto bb${target};`);
@@ -1327,6 +1352,11 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       if (operation.iteratorNextMethodResult != null) {
         maximum = Math.max(maximum, operation.iteratorNextMethodResult);
       }
+      // A generator body keeps its iterator done flags in root slots, so the
+      // flag state survives a suspension taken mid-iteration.
+      if (operation.iteratorDoneState != null) {
+        maximum = Math.max(maximum, operation.iteratorDoneState);
+      }
       if (operation.iteratorValueResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueResult);
       }
@@ -1343,6 +1373,9 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       for (const value of terminator.values ?? []) {
         maximum = Math.max(maximum, value);
       }
+    }
+    if (terminator.kind === "generator-yield") {
+      maximum = Math.max(maximum, terminator.sent, terminator.value);
     }
   }
   return maximum;
@@ -1429,6 +1462,8 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
     reachable.add(id);
     if (block.terminator.kind === "jump") {
       pending.push(block.terminator.target);
+    } else if (block.terminator.kind === "generator-yield") {
+      pending.push(block.terminator.resume, block.terminator.returnResume);
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
     } else if (
@@ -1492,54 +1527,37 @@ function hasSelfCall(functionValue: MirFunction): boolean {
   return calledFunctionIds(functionValue).includes(functionValue.id);
 }
 
-function emitFunction(
+/** Where one suspension continues, by the kind of resumption it receives. */
+interface ResumePoint {
+  /** The block a return completion continues at instead of the resume block. */
+  readonly returnResume: number;
+  /** The slot receiving the value the resumption delivers. */
+  readonly sent: number;
+}
+
+/** Resume block identifiers paired with their resumption continuations. */
+function yieldResumePoints(
+  blocks: readonly MirBlock[],
+): ReadonlyMap<number, ResumePoint> {
+  const points = new Map<number, ResumePoint>();
+  for (const block of blocks) {
+    if (block.terminator.kind !== "generator-yield") continue;
+    points.set(block.terminator.resume, {
+      returnResume: block.terminator.returnResume,
+      sent: block.terminator.sent,
+    });
+  }
+  return points;
+}
+
+function emitPrologue(
+  state: EmitState,
   functionValue: MirFunction,
-  functionRootCounts: ReadonlyMap<number, number>,
+  bindingIdValues: readonly number[],
   totalBindingCount: number,
-  observeSpecialization: boolean,
-): string {
-  if (functionValue.blocks.length === 0) {
-    throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
-  }
-  const blocks = reachableBlocks(functionValue);
-  const completionSlots = completionSlotCount(blocks);
-  const valueSlotCount = maximumValueId(blocks) + 1;
-  const parameters = functionValue.parameters;
-  const bindingIdValues =
-    functionValue.localBindingIds ??
-    bindingIds(functionValue, blocks, new Map<number, number>());
-  const environmentSlot = valueSlotCount;
-  const temporarySlot = valueSlotCount + 1;
-  const baseRootCount = Math.max(
-    functionValue.rootSlotCount,
-    valueSlotCount + 2,
-    32,
-  );
-  const argumentSlots = maximumArgumentCount(blocks);
-  const functionRootCount = functionRootCounts.get(functionValue.id);
-  if (functionRootCount == null) {
-    throw new Error(
-      `MIR function '${functionValue.name}' has no root frame layout.`,
-    );
-  }
-  const state: EmitState = {
-    argumentSlotStart: baseRootCount,
-    blockParameters: new Map(
-      blocks.map((block) => [block.id, block.parameters ?? []]),
-    ),
-    completionSlotStart: baseRootCount + argumentSlots,
-    functionRootCounts,
-    lines: [],
-    environmentSlot,
-    nextRecursiveTarget: 0,
-    observeSpecialization,
-    scalarKinds: new Map(),
-    strict: functionValue.strict === true,
-    usesAbrupt: false,
-    usesCompletion: false,
-    functionId: functionValue.id,
-  };
-  state.usesAbrupt = true;
+  temporarySlot: number,
+): void {
+  const environmentSlot = state.environmentSlot;
   if (functionValue.id < 0) {
     line(
       state,
@@ -1576,6 +1594,7 @@ function emitFunction(
     );
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
   }
+  const parameters = functionValue.parameters;
   const initializedParameters = new Set<number>();
   for (let index = 0; index < parameters.length; index += 1) {
     const parameter = parameters[index];
@@ -1622,12 +1641,168 @@ function emitFunction(
     line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
     initializedParameters.add(parameter.bindingId);
   }
+}
+
+function emitBlocks(
+  state: EmitState,
+  blocks: readonly MirBlock[],
+  resumePoints: ReadonlyMap<number, ResumePoint>,
+): void {
   for (const block of blocks) {
-    if (block.id !== 0) line(state, `bb${block.id}:;`);
+    if (block.id !== 0 || state.generator) line(state, `bb${block.id}:;`);
+    const resume = resumePoints.get(block.id);
+    if (resume != null) {
+      line(state, `roots[${resume.sent}] = oseo_generator_sent(generator);`);
+      // A return completion leaves the body from this suspension point, so
+      // it runs every enclosing `finally` and iterator close on the way out.
+      line(
+        state,
+        `if (oseo_generator_resume_kind(generator) == ` +
+          `OSEO_GENERATOR_RESUME_RETURN) goto bb${resume.returnResume};`,
+      );
+    }
     for (const operation of block.operations) {
       emitOperation(state, operation);
     }
     emitTerminator(state, block.terminator);
+  }
+}
+
+function completionDeclaration(
+  state: EmitState,
+  completionSlots: number,
+): string {
+  if (!state.usesCompletion) return "";
+  if (state.generator) {
+    return (
+      "    OseoCompletionRecord *completion =\n" +
+      "        oseo_generator_completions(generator);\n" +
+      "    (void)completion;\n"
+    );
+  }
+  return (
+    `    OseoCompletionRecord completion[${completionSlots}u] = ` +
+    "{{0, 0u, 0u, 0u, 0u, NULL, 0u, NULL, NULL}};\n" +
+    "    (void)completion;\n"
+  );
+}
+
+/** The C identifier holding one MIR function's generated body code. */
+function generatorBodyName(functionValue: MirFunction): string {
+  return `oseo_generator_body_${functionValue.id}`;
+}
+
+function emitGeneratorBody(
+  functionValue: MirFunction,
+  blocks: readonly MirBlock[],
+  completionSlots: number,
+  base: Omit<EmitState, "generator" | "lines">,
+): string {
+  const state: EmitState = {
+    ...base,
+    generator: true,
+    lines: [],
+    scalarKinds: new Map(),
+  };
+  const resumePoints = yieldResumePoints(blocks);
+  line(state, "switch (oseo_generator_resume_point(generator)) {");
+  for (const resume of [0, ...resumePoints.keys()]) {
+    line(state, `case ${resume}u: goto bb${resume};`);
+  }
+  line(state, "default: abort();");
+  line(state, "}");
+  emitBlocks(state, blocks, resumePoints);
+  if (state.usesAbrupt) {
+    line(state, "abrupt:");
+    line(state, "return result;");
+  }
+  return (
+    `static OseoResult ${generatorBodyName(functionValue)}(\n` +
+    "    OseoContext *context,\n" +
+    "    OseoValue generator\n" +
+    ") {\n" +
+    "    OseoValue *roots = oseo_generator_slots(generator);\n" +
+    "    OseoValue callee = oseo_generator_callee(generator);\n" +
+    "    OseoValue receiver = oseo_generator_receiver(generator);\n" +
+    "    OseoResult result = {OSEO_STATUS_NORMAL, oseo_undefined()};\n" +
+    completionDeclaration(state, completionSlots) +
+    "    (void)context;\n" +
+    "    (void)callee;\n" +
+    "    (void)receiver;\n" +
+    `${state.lines.join("\n")}\n` +
+    "}\n"
+  );
+}
+
+function emitFunction(
+  functionValue: MirFunction,
+  functionRootCounts: ReadonlyMap<number, number>,
+  totalBindingCount: number,
+  observeSpecialization: boolean,
+): string {
+  if (functionValue.blocks.length === 0) {
+    throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
+  }
+  const blocks = reachableBlocks(functionValue);
+  const completionSlots = completionSlotCount(blocks);
+  const valueSlotCount = maximumValueId(blocks) + 1;
+  const bindingIdValues =
+    functionValue.localBindingIds ??
+    bindingIds(functionValue, blocks, new Map<number, number>());
+  const environmentSlot = valueSlotCount;
+  const temporarySlot = valueSlotCount + 1;
+  const baseRootCount = Math.max(
+    functionValue.rootSlotCount,
+    valueSlotCount + 2,
+    32,
+  );
+  const argumentSlots = maximumArgumentCount(blocks);
+  const functionRootCount = functionRootCounts.get(functionValue.id);
+  if (functionRootCount == null) {
+    throw new Error(
+      `MIR function '${functionValue.name}' has no root frame layout.`,
+    );
+  }
+  const generator = functionValue.generator === true;
+  const base: Omit<EmitState, "generator" | "lines"> = {
+    argumentSlotStart: baseRootCount,
+    blockParameters: new Map(
+      blocks.map((block) => [block.id, block.parameters ?? []]),
+    ),
+    completionSlotStart: baseRootCount + argumentSlots,
+    functionRootCounts,
+    environmentSlot,
+    nextRecursiveTarget: 0,
+    observeSpecialization,
+    scalarKinds: new Map(),
+    strict: functionValue.strict === true,
+    usesAbrupt: false,
+    usesCompletion: false,
+    functionId: functionValue.id,
+  };
+  const state: EmitState = { ...base, generator: false, lines: [] };
+  state.usesAbrupt = true;
+  if (generator) {
+    line(
+      state,
+      `result = oseo_generator_create(context, callee, receiver, ` +
+        `${functionRootCount}u, ${completionSlots}u);`,
+    );
+    line(state, "frame.slots[0] = result.value;");
+    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, "roots = oseo_generator_slots(frame.slots[0]);");
+  }
+  emitPrologue(
+    state,
+    functionValue,
+    bindingIdValues,
+    totalBindingCount,
+    temporarySlot,
+  );
+  if (generator) {
+    line(state, "result = (OseoResult){OSEO_STATUS_NORMAL, frame.slots[0]};");
+  } else {
+    emitBlocks(state, blocks, new Map<number, ResumePoint>());
   }
   if (state.usesAbrupt) {
     line(state, "abrupt:");
@@ -1635,7 +1810,7 @@ function emitFunction(
     line(state, "return result;");
   }
   const id = functionValue.id < 0 ? "script" : String(functionValue.id);
-  return (
+  const entry =
     `static OseoResult oseo_function_${id}(\n` +
     "    OseoContext *context,\n" +
     "    OseoValue callee,\n" +
@@ -1647,51 +1822,66 @@ function emitFunction(
     "    OseoRootFrame frame = {NULL, NULL, 0u};\n" +
     "    OseoValue *roots;\n" +
     "    OseoResult result;\n" +
-    (state.usesCompletion
-      ? `    int completion_kind[${completionSlots}u] = {0};\n` +
-        `    size_t completion_target[${completionSlots}u] = {0};\n` +
-        `    size_t completion_depth[${completionSlots}u] = {0};\n` +
-        `    size_t completion_line[${completionSlots}u] = {0};\n` +
-        `    size_t completion_column[${completionSlots}u] = {0};\n` +
-        `    const char *completion_source_id[${completionSlots}u] = ` +
-        `{NULL};\n` +
-        `    size_t completion_source_id_length[${completionSlots}u] = ` +
-        `{0};\n` +
-        `    const char *completion_error_code[${completionSlots}u] = ` +
-        `{NULL};\n` +
-        `    const char *completion_error_message[${completionSlots}u] = ` +
-        `{NULL};\n` +
-        "    (void)completion_kind;\n" +
-        "    (void)completion_target;\n" +
-        "    (void)completion_depth;\n" +
-        "    (void)completion_line;\n" +
-        "    (void)completion_column;\n" +
-        "    (void)completion_source_id;\n" +
-        "    (void)completion_source_id_length;\n" +
-        "    (void)completion_error_code;\n" +
-        "    (void)completion_error_message;\n"
-      : "") +
+    completionDeclaration(state, completionSlots) +
     "    (void)callee;\n" +
     "    (void)receiver;\n" +
     "    (void)argument_count;\n" +
     "    (void)arguments;\n" +
     "    (void)new_target;\n" +
     `    result = oseo_roots_allocate(` +
-    `context, &frame, ${functionRootCount}u);\n` +
+    `context, &frame, ${generator ? 1 : functionRootCount}u);\n` +
     "    if (result.status != OSEO_STATUS_NORMAL) return result;\n" +
     "    roots = frame.slots;\n" +
     `${state.lines.join("\n")}\n` +
-    "}\n"
-  );
+    "}\n";
+  if (!generator) return entry;
+  return `${entry}\n${emitGeneratorBody(
+    functionValue,
+    blocks,
+    completionSlots,
+    base,
+  )}`;
 }
 
 function prototype(functionValue: MirFunction): string {
   const id = functionValue.id < 0 ? "script" : String(functionValue.id);
-  return (
+  const entry =
     `static OseoResult oseo_function_${id}(` +
     "OseoContext *, OseoValue, OseoValue, size_t, " +
-    "const OseoValue *, OseoValue);"
+    "const OseoValue *, OseoValue);";
+  return functionValue.generator === true
+    ? `${entry}\nstatic OseoResult ${generatorBodyName(functionValue)}(` +
+        "OseoContext *, OseoValue);"
+    : entry;
+}
+
+/** Route a resumed generator to the body code its function identity owns. */
+function emitGeneratorDispatcher(
+  functions: readonly MirFunction[],
+): string | undefined {
+  const generators = functions.filter(
+    (functionValue) => functionValue.generator === true,
   );
+  if (generators.length === 0) return undefined;
+  return [
+    "static OseoResult oseo_dispatch_generator(",
+    "    OseoContext *context,",
+    "    OseoValue generator",
+    ") {",
+    "    size_t code_id = 0u;",
+    "    OseoResult result = oseo_function_code_id(",
+    "        context, oseo_generator_callee(generator), &code_id);",
+    "    if (result.status != OSEO_STATUS_NORMAL) return result;",
+    "    switch (code_id) {",
+    ...generators.flatMap((functionValue) => [
+      `    case ${functionValue.id}u:`,
+      `        return ${generatorBodyName(functionValue)}(context, generator);`,
+    ]),
+    "    default:",
+    "        return oseo_unknown_function(context, code_id);",
+    "    }",
+    "}",
+  ].join("\n");
 }
 
 function emitFunctionDispatcher(
@@ -1780,6 +1970,7 @@ export const cBackend: NativeBackend = {
       declaredFunctions,
       functionRootCounts,
     );
+    const generatorDispatcher = emitGeneratorDispatcher(declaredFunctions);
     const functionReferences = declaredFunctions
       .map((functionValue) => `    (void)oseo_function_${functionValue.id};`)
       .join("\n");
@@ -1810,6 +2001,7 @@ export const cBackend: NativeBackend = {
         functionEntryType +
         `${declarations}\n\n` +
         `${dispatcher}\n\n` +
+        (generatorDispatcher == null ? "" : `${generatorDispatcher}\n\n`) +
         `${definitions}\n` +
         "int main(void) {\n" +
         "    OseoContext context;\n" +
@@ -1819,6 +2011,10 @@ export const cBackend: NativeBackend = {
         `        &context, "${sourceId}", ${sourceIdByteLength}u);\n` +
         "    oseo_context_set_function_dispatcher(\n" +
         "        &context, oseo_dispatch_function);\n" +
+        (generatorDispatcher == null
+          ? ""
+          : "    oseo_context_set_generator_dispatcher(\n" +
+            "        &context, oseo_dispatch_generator);\n") +
         (input.observeSpecialization === true
           ? "    context.observe_specialization = true;\n"
           : "") +

@@ -182,6 +182,11 @@ export type SyntaxExpression =
       readonly kind: "await";
     })
   | (LocatedSyntax & {
+      /** Absent for a bare `yield`, which sends `undefined` out. */
+      readonly argument?: SyntaxExpression;
+      readonly kind: "yield";
+    })
+  | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
       readonly value: SyntaxExpression;
@@ -465,6 +470,7 @@ export type FunctionKind =
   | "arrow"
   | "async"
   | "async-arrow"
+  | "generator"
   | "method"
   | "ordinary";
 

@@ -49,6 +49,19 @@ static void trace_object(
         if (ordinary->array_iterator) {
             mark_value(ordinary->iterator_array, worklist);
         }
+        if (ordinary->generator != NULL) {
+            OseoGenerator *generator = ordinary->generator;
+            mark_value(generator->callee, worklist);
+            mark_value(generator->receiver, worklist);
+            mark_value(generator->sent, worklist);
+            /* The suspended body's roots, including its saved
+             * completion values, live only here. */
+            for (size_t index = 0u;
+                 index < generator->slot_count;
+                 index += 1u) {
+                mark_value(generator->slots[index], worklist);
+            }
+        }
         for (size_t index = 0u; index < ordinary->property_count; index += 1u) {
             mark_value(ordinary->properties[index].key, worklist);
             mark_value(ordinary->properties[index].value, worklist);
@@ -99,6 +112,7 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
+        free(ordinary->generator);
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);
     }
@@ -136,6 +150,9 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->iterator_values_function, &worklist);
     mark_value(context->iterator_next_function, &worklist);
     mark_value(context->iterator_self_function, &worklist);
+    mark_value(context->generator_next_function, &worklist);
+    mark_value(context->generator_return_function, &worklist);
+    mark_value(context->generator_prototype, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;

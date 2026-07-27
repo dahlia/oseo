@@ -246,6 +246,11 @@ export type HirExpression =
       readonly kind: "await";
     })
   | (LocatedSyntax & {
+      /** Absent for a bare `yield`, which sends `undefined` out. */
+      readonly argument?: HirExpression;
+      readonly kind: "yield";
+    })
+  | (LocatedSyntax & {
       readonly bindingId: number;
       readonly functionNameBinding?: boolean;
       readonly importedBinding?: boolean;

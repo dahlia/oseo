@@ -54,6 +54,10 @@
     (SIZE_MAX - 13u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_ITERATOR_SELF_CODE_ID \
     (SIZE_MAX - 14u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_GENERATOR_NEXT_CODE_ID \
+    (SIZE_MAX - 15u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_GENERATOR_RETURN_CODE_ID \
+    (SIZE_MAX - 16u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -137,6 +141,42 @@ typedef struct {
     OseoValue setter;
 } OseoProperty;
 
+/* The [[GeneratorState]] values this profile can observe. A suspended
+ * generator leaves through a next or a return resumption, or stays
+ * suspended; `%GeneratorPrototype%.throw` is not admitted yet. */
+typedef enum {
+    OSEO_GENERATOR_SUSPENDED_START = 0,
+    OSEO_GENERATOR_SUSPENDED_YIELD = 1,
+    OSEO_GENERATOR_EXECUTING = 2,
+    OSEO_GENERATOR_COMPLETED = 3,
+} OseoGeneratorState;
+
+/*
+ * [[GeneratorContext]]: the suspended body frame of one generator.
+ * `slots` and `completions` point into the same allocation as the
+ * record, so a generator has one stable interior address for the whole
+ * of its life and generated code can reacquire `roots` after any
+ * safepoint. The collector traces every slot through the owning object.
+ */
+typedef struct {
+    OseoValue callee;
+    OseoValue receiver;
+    /* The value the pending resumption delivers as the yield result. */
+    OseoValue sent;
+    OseoValue *slots;
+    OseoCompletionRecord *completions;
+    size_t slot_count;
+    size_t completion_count;
+    size_t resume_point;
+    /*
+     * OSEO_GENERATOR_RESUME_NEXT or OSEO_GENERATOR_RESUME_RETURN: how the
+     * pending resumption delivers `sent`. Generated code reads it at the
+     * resume point, so it stays valid for exactly one resumption.
+     */
+    size_t resume_kind;
+    OseoGeneratorState state;
+} OseoGenerator;
+
 typedef struct {
     OseoHeapObject header;
     OseoValue prototype;
@@ -156,6 +196,12 @@ typedef struct {
     bool array_iterator;
     OseoValue iterator_array;
     size_t iterator_index;
+    /* A generator function's `prototype` object, which serves the
+     * virtualized %GeneratorPrototype% methods to the generators created
+     * from it. Replacing the object drops the brand with it. */
+    bool generator_prototype;
+    /* Non-NULL exactly on a generator object, which owns the record. */
+    OseoGenerator *generator;
 } OseoOrdinaryObject;
 
 typedef struct {
@@ -339,6 +385,21 @@ static inline bool function_is_constructible(OseoValue value) {
     return is_function(value) &&
         function_object(value)->function_kind == OSEO_FUNCTION_ORDINARY;
 }
+/*
+ * True for the functions that own a synthetic `prototype` data
+ * property. A generator function is not constructible yet still exposes
+ * the object that serves %GeneratorPrototype% to its generators.
+ */
+static inline bool function_has_prototype_property(OseoValue value) {
+    if (!is_function(value)) return false;
+    OseoFunctionKind kind = function_object(value)->function_kind;
+    return kind == OSEO_FUNCTION_ORDINARY || kind == OSEO_FUNCTION_GENERATOR;
+}
+static inline bool is_generator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->generator != NULL;
+}
 static inline bool function_has_lexical_this(OseoValue value) {
     if (!is_function(value)) return false;
     OseoFunctionKind kind = function_object(value)->function_kind;
@@ -472,6 +533,14 @@ OseoResult oseo_internal_symbol_name(
 OseoResult oseo_internal_well_known_symbol(
     OseoContext *context,
     size_t index
+);
+/* The lazily created, permanently rooted %GeneratorPrototype%. */
+OseoResult oseo_internal_generator_prototype(OseoContext *context);
+/* Builds one fresh { value, done } iterator result object. */
+OseoResult oseo_internal_iterator_result(
+    OseoContext *context,
+    OseoValue value,
+    bool done
 );
 OseoResult oseo_internal_array_values(
     OseoContext *context,

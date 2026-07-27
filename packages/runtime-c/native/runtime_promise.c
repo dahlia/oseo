@@ -31,6 +31,8 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.iterator_array = oseo_undefined();
     promise->ordinary.iterator_index = 0u;
     promise->ordinary.default_intrinsics = true;
+    promise->ordinary.generator_prototype = false;
+    promise->ordinary.generator = NULL;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();

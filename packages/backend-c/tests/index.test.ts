@@ -229,7 +229,7 @@ test("emits rooted iterator protocol operations", () => {
   assert.ok(emitted.source.includes("bool fast_4 = !iterator_done_4;"));
   assert.ok(
     emitted.source.includes(
-      "oseo_iterator_close(context, roots[1], completion_kind[0u] == 2)",
+      "oseo_iterator_close(context, roots[1], completion[0u].kind == 2)",
     ),
   );
 });
@@ -540,4 +540,304 @@ test("keeps string constant units out of generated stack frames", () => {
   });
   assert.match(emitted.source, /static const uint16_t string_units_0\[\]/u);
   assert.doesNotMatch(emitted.source, /\(const uint16_t\[\]\)/u);
+});
+
+test("emits a generator entry and a separately resumable body", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "generator.js",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [
+      {
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                constant: { kind: "number", value: 1 },
+                detail: "1",
+                id: 0,
+                kind: "constant",
+                range,
+              },
+            ],
+            terminator: {
+              kind: "generator-yield",
+              resume: 1,
+              returnResume: 2,
+              sent: 1,
+              value: 0,
+            },
+          },
+          {
+            id: 1,
+            operations: [],
+            terminator: { kind: "return", value: 1 },
+          },
+          {
+            id: 2,
+            operations: [],
+            terminator: { kind: "return", value: 1 },
+          },
+        ],
+        functionLength: 0,
+        generator: true,
+        id: 0,
+        kind: "mir-function",
+        localBindingIds: [],
+        name: "counter",
+        parameterCount: 0,
+        parameters: [],
+        range,
+        rootSlotCount: 2,
+      },
+    ],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "counter",
+              functionId: 0,
+              functionKind: "generator",
+              functionLength: 0,
+              functionName: "counter",
+              id: 0,
+              kind: "function-create",
+              range,
+            },
+            {
+              arguments: [],
+              detail: "call counter",
+              id: 1,
+              kind: "call",
+              range,
+              target: { functionId: 0, kind: "function" },
+            },
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "generator.ts",
+    specialization: "disabled",
+  });
+  assert.match(emitted.source, /OSEO_FUNCTION_GENERATOR/u);
+  // The call entry allocates only the frame that roots the new
+  // generator; the body's roots belong to the generator record.
+  assert.match(
+    emitted.source,
+    /oseo_generator_create\(context, callee, receiver, \d+u, 0u\);/u,
+  );
+  assert.match(emitted.source, /roots = oseo_generator_slots\(frame\.slots/u);
+  assert.match(
+    emitted.source,
+    /static OseoResult oseo_generator_body_0\(\n {4}OseoContext \*context/u,
+  );
+  assert.match(
+    emitted.source,
+    new RegExp(
+      "switch \\(oseo_generator_resume_point\\(generator\\)\\) \\{\\n" +
+        " {4}case 0u: goto bb0;\\n {4}case 1u: goto bb1;",
+      "u",
+    ),
+  );
+  assert.match(
+    emitted.source,
+    /oseo_generator_suspend\(context, generator, 1u\);/u,
+  );
+  assert.match(
+    emitted.source,
+    /roots\[1\] = oseo_generator_sent\(generator\);/u,
+  );
+  // A return resumption leaves the body from the suspension point rather
+  // than continuing at the resume block.
+  assert.match(
+    emitted.source,
+    new RegExp(
+      "if \\(oseo_generator_resume_kind\\(generator\\) == " +
+        "OSEO_GENERATOR_RESUME_RETURN\\) goto bb2;",
+      "u",
+    ),
+  );
+  assert.match(emitted.source, /oseo_context_set_generator_dispatcher/u);
+  assert.match(
+    emitted.source,
+    /case 0u:\n {8}return oseo_generator_body_0\(context, generator\);/u,
+  );
+  // A suspended body must not release a native frame it does not own.
+  const bodyStart = emitted.source.indexOf(
+    "static OseoResult oseo_generator_body_0(\n",
+  );
+  const body = emitted.source.slice(
+    bodyStart,
+    emitted.source.indexOf("\nstatic OseoResult ", bodyStart + 1),
+  );
+  assert.doesNotMatch(body, /oseo_roots_release/u);
+});
+
+test("keeps a generator body's iterator done state in its root slots", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "iterator-generator.js",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [
+      {
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                constant: { kind: "undefined" },
+                detail: "iterable",
+                id: 0,
+                kind: "constant",
+                range,
+              },
+              {
+                arguments: [0],
+                detail: "get iterator",
+                id: 1,
+                iteratorDoneState: 3,
+                iteratorNextMethodResult: 2,
+                kind: "iterator-get",
+                range,
+              },
+            ],
+            // The suspension falls between the iterator's creation and its
+            // first step, so a fresh body invocation resumes mid-iteration.
+            terminator: {
+              kind: "generator-yield",
+              resume: 1,
+              returnResume: 2,
+              sent: 4,
+              value: 0,
+            },
+          },
+          {
+            id: 1,
+            operations: [
+              {
+                arguments: [1, 2],
+                detail: "step iterator",
+                id: 5,
+                iteratorDoneState: 3,
+                iteratorValueResult: 6,
+                kind: "iterator-next",
+                range,
+              },
+            ],
+            terminator: { kind: "jump", target: 3 },
+          },
+          {
+            id: 2,
+            operations: [],
+            terminator: { kind: "return", value: 4 },
+          },
+          {
+            id: 3,
+            operations: [
+              {
+                arguments: [1],
+                completionSlot: 0,
+                detail: "close iterator",
+                id: 7,
+                iteratorDoneState: 3,
+                kind: "iterator-close",
+                range,
+              },
+            ],
+            terminator: { kind: "return", value: 6 },
+          },
+        ],
+        functionLength: 0,
+        generator: true,
+        id: 0,
+        kind: "mir-function",
+        localBindingIds: [],
+        name: "steps",
+        parameterCount: 0,
+        parameters: [],
+        range,
+        rootSlotCount: 8,
+      },
+    ],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "steps",
+              functionId: 0,
+              functionKind: "generator",
+              functionLength: 0,
+              functionName: "steps",
+              id: 0,
+              kind: "function-create",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 1,
+    },
+    sourceId: "iterator-generator.ts",
+    specialization: "disabled",
+  });
+  const bodyStart = emitted.source.indexOf(
+    "static OseoResult oseo_generator_body_0(\n",
+  );
+  const body = emitted.source.slice(
+    bodyStart,
+    emitted.source.indexOf("\nstatic OseoResult ", bodyStart + 1),
+  );
+  // An automatic local would read indeterminate state on resumption, so
+  // the flag belongs to the generator record's slots instead.
+  assert.doesNotMatch(body, /bool iterator_done_3\b/u);
+  assert.ok(body.includes("roots[3] = oseo_boolean(false);"));
+  assert.ok(
+    body.includes("bool iterator_step_done_5 = oseo_to_boolean(roots[3]);"),
+  );
+  assert.ok(
+    body.includes(
+      "oseo_iterator_next(context, roots[1], roots[2], &roots[6], " +
+        "&iterator_step_done_5);",
+    ),
+  );
+  assert.ok(body.includes("roots[3] = oseo_boolean(iterator_step_done_5);"));
+  assert.ok(body.includes("if (oseo_to_boolean(roots[3])) {"));
 });

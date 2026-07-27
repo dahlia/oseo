@@ -170,6 +170,11 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "await") {
     return `await ${printHirExpression(expression.argument)}`;
   }
+  if (expression.kind === "yield") {
+    return expression.argument == null
+      ? "yield"
+      : `yield ${printHirExpression(expression.argument)}`;
+  }
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +

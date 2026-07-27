@@ -82,6 +82,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_error.c"],
       ["source", "runtime_symbol.c"],
       ["source", "runtime_iterator.c"],
+      ["source", "runtime_generator.c"],
       ["source", "runtime_primitive.c"],
       ["source", "runtime_promise.c"],
       ["source", "runtime_event_loop.c"],

@@ -130,6 +130,29 @@ The `m5-13` ABI adds `oseo_object_rest` for `CopyDataProperties`. It snapshots
 own keys in ECMAScript order, skips excluded and non-enumerable keys, reads each
 remaining value through the generic property path, and creates ordinary data
 properties on a fresh result object.
+The `m5-14` ABI adds synchronous generator objects and moves a generated
+function's saved abrupt completions into an `OseoCompletionRecord` array.
+`oseo_generator_create` allocates one record that owns the suspended body's
+root slots and completion records, so the collector traces a suspended frame
+through the generator object and no native C frame of a suspended body stays
+alive. Generated code reacquires `oseo_generator_slots` and
+`oseo_generator_completions` on every entry, leaves through
+`oseo_generator_suspend`, and is reentered by the generator dispatcher that
+`oseo_context_set_generator_dispatcher` installs. `oseo_generator_next` is the
+virtualized `%GeneratorPrototype%.next`, served from a generator function's
+`prototype` object alongside `Symbol.iterator`.
+The `m5-15` ABI adds `oseo_generator_return` and `oseo_generator_resume_kind`.
+`oseo_generator_return` is the virtualized `%GeneratorPrototype%.return`,
+served from the same `prototype` object, so `IteratorClose` reaches it whenever
+a consumer abandons a generator. It resumes the body with a return completion,
+which `oseo_generator_resume_kind` reports at the resume point as
+`OSEO_GENERATOR_RESUME_RETURN` so generated code leaves through the enclosing
+`finally` and iterator-close chain instead of continuing at the suspension. The
+kind describes one resumption only and returns to `OSEO_GENERATOR_RESUME_NEXT`
+once the body leaves. A generator body's iterator done state also moves into
+its generator record's root slots, because an automatic C local would not
+survive a suspension taken while a `for-of` or array binding is still
+stepping.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

@@ -196,6 +196,25 @@ export type MirTerminator =
       readonly value: number;
     }
   | {
+      /**
+       * Suspends the enclosing generator: the saved state records `resume`
+       * as the block that continues execution, `value` leaves the generator
+       * as the yielded value, and the next resumption stores the sent value
+       * in `sent` before running `resume`.
+       *
+       * A resumption that delivers a return completion, as
+       * `%GeneratorPrototype%.return` and an implicit `IteratorClose` do,
+       * continues at `returnResume` instead. That block leaves the body the
+       * way a `return` statement written at the suspension point would, so
+       * every enclosing `finally` and iterator close still runs.
+       */
+      readonly kind: "generator-yield";
+      readonly resume: number;
+      readonly returnResume: number;
+      readonly sent: number;
+      readonly value: number;
+    }
+  | {
       readonly completionSlot: number;
       readonly kind: "resume-completion";
       readonly outerAbrupt?: MirControlTarget;
@@ -227,6 +246,12 @@ export interface MirFunction extends LocatedSyntax {
   readonly blocks: readonly MirBlock[];
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
+  /**
+   * A synchronous generator body. Calling the function runs only the
+   * parameter and environment prologue and returns a suspended generator;
+   * the blocks run on resumption and may leave through `generator-yield`.
+   */
+  readonly generator?: true;
   readonly id: number;
   readonly kind: "mir-function";
   readonly localBindingIds?: readonly number[];
@@ -273,6 +298,12 @@ export interface MirBuilder {
   /** Labels waiting for the next loop lowering to claim their targets. */
   readonly pendingLabels: string[];
   readonly finalizers: MirControlTarget[];
+  /**
+   * True while lowering a generator body. Only such a body may end a
+   * block with `generator-yield`, because only its root slots survive
+   * suspension.
+   */
+  readonly generator: boolean;
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;

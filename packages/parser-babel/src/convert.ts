@@ -223,6 +223,21 @@ export function expression(
       ? undefined
       : { ...located, argument, kind: "await" };
   }
+  if (value.type === "YieldExpression") {
+    if (value.delegate === true) {
+      return unsupported(
+        context,
+        value,
+        "The yield* delegation expression is unsupported.",
+      );
+    }
+    const argumentNode = node(value.argument);
+    if (argumentNode == null) return { ...located, kind: "yield" };
+    const argument = expression(context, argumentNode);
+    return argument == null
+      ? undefined
+      : { ...located, argument, kind: "yield" };
+  }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
   }
@@ -2826,8 +2841,13 @@ export function functionDeclaration(
   requireName = true,
   isMethod = false,
 ): SyntaxFunction | undefined {
-  if (value.generator === true) {
-    return unsupported(context, value, "Generator functions are unsupported.");
+  const generator = value.generator === true;
+  if (generator && (value.async === true || isMethod)) {
+    return unsupported(
+      context,
+      value,
+      "Asynchronous and method generator functions are unsupported.",
+    );
   }
   if (value.typeParameters != null) {
     return unsupported(
@@ -2881,6 +2901,18 @@ export function functionDeclaration(
   });
   const defaultParameters = defaultParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
+  if (generator && parameterEnvironment) {
+    // A generator runs FunctionDeclarationInstantiation before it
+    // suspends, but this profile lowers defaults and patterns as body
+    // statements, which the generator body only reaches on the first
+    // resumption. Reject the observable ordering difference instead.
+    return unsupported(
+      context,
+      value,
+      "Generator function default and binding-pattern parameters are " +
+        "unsupported.",
+    );
+  }
   const parameterExpressions = parameterNodes.some(
     rawParameterContainsExpression,
   );
@@ -3151,9 +3183,11 @@ export function functionDeclaration(
           : "arrow"
         : value.async === true
           ? "async"
-          : isMethod
-            ? "method"
-            : "ordinary",
+          : generator
+            ? "generator"
+            : isMethod
+              ? "method"
+              : "ordinary",
     kind: "function",
     name,
     parameters,

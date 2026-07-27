@@ -12,6 +12,13 @@ function printTerminator(terminator: MirTerminator): string {
       `bb${terminator.whenFalse}`
     );
   }
+  if (terminator.kind === "generator-yield") {
+    return (
+      `generator-yield %${terminator.value} ` +
+      `resume bb${terminator.resume} sent %${terminator.sent} ` +
+      `return bb${terminator.returnResume}`
+    );
+  }
   if (terminator.kind === "resume-completion") {
     const completion = `resume-completion bb${terminator.completionSlot}`;
     const destinations = [
@@ -38,7 +45,8 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
   const restText =
     restParameters.length === 0 ? "" : ` rest=[${restParameters.join()}]`;
   lines.push(
-    `function @f${functionValue.id} ${functionValue.name} roots=` +
+    `function${functionValue.generator === true ? "*" : ""} ` +
+      `@f${functionValue.id} ${functionValue.name} roots=` +
       `${functionValue.rootSlotCount}` +
       restText +
       ` @${rangeText(functionValue.range)}`,
