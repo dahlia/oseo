@@ -792,6 +792,101 @@ test("rejects asynchronous module cycles before scheduling", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /asynchronous module/iu);
 });
 
+function forOfStatement(awaited: boolean) {
+  return {
+    ...(awaited ? { awaited: true as const } : {}),
+    body: { body: [], kind: "block" as const, range },
+    iterable: { elements: [], kind: "array" as const, range },
+    kind: "for-of" as const,
+    range,
+    target: {
+      declarationKind: "const" as const,
+      hint: undefined,
+      kind: "declaration" as const,
+      name: "item",
+      range,
+    },
+  };
+}
+
+function selfCyclicModule(
+  name: string,
+  body: readonly SyntaxModule["body"][number][],
+) {
+  const canonicalId = `file:///${name}.js`;
+  const specifier = graphSpecifier(`./${name}.js`, 0);
+  return compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId,
+        dependencies: [{ canonicalId, specifier }],
+        resolutions: [{ canonicalId, specifier }],
+        sourceHash: name,
+        syntax: {
+          ...testModule(canonicalId, ""),
+          body,
+          imports: [
+            {
+              byteRange: specifier.byteRange,
+              importedName: undefined,
+              localName: undefined,
+              range,
+              specifier,
+            },
+          ],
+        },
+      },
+    ],
+  });
+}
+
+// A `for await` head is asynchronous module evaluation even though the loop
+// stays in place instead of becoming a continuation, so it reaches the same
+// cycle rejection an extractable top-level await does, wherever it appears
+// in the module body.
+test("rejects asynchronous module cycles reached through for-await", () => {
+  const nested = [
+    ["direct", forOfStatement(true)],
+    ["block", { body: [forOfStatement(true)], kind: "block" as const, range }],
+    [
+      "switch",
+      {
+        cases: [{ body: [forOfStatement(true)], range }],
+        discriminant: { kind: "number" as const, range, value: 0 },
+        kind: "switch" as const,
+        range,
+      },
+    ],
+    [
+      "labeled",
+      {
+        body: forOfStatement(true),
+        kind: "labeled" as const,
+        label: "outer",
+        range,
+      },
+    ],
+  ] as const;
+  for (const [name, statement] of nested) {
+    const result = selfCyclicModule(`for-await-cycle-${name}`, [statement]);
+    assert.equal(result.mir, undefined, name);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /asynchronous module/iu,
+      name,
+    );
+  }
+});
+
+// A synchronous head keeps the module synchronous, so the same cycle links.
+test("keeps a synchronous for-of module cycle admitted", () => {
+  const result = selfCyclicModule("for-of-cycle", [forOfStatement(false)]);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+});
+
 test("rejects await in object-rest assignment member targets", () => {
   const canonicalId = "file:///object-rest-await.js";
   const module = {

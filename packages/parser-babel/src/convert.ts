@@ -1867,9 +1867,9 @@ export function statement(
     return unsupported(context, value, "for-in statements are unsupported.");
   }
   if (value.type === "ForOfStatement") {
-    if (value.await === true) {
-      return unsupported(context, value, "for-await-of is unsupported.");
-    }
+    // `for await` is a parse error outside an async function or a module
+    // body, so reaching here means the head has an owned await context.
+    const awaited = value.await === true;
     const left = node(value.left);
     const rightNode = node(value.right);
     const bodyNode = node(value.body);
@@ -1972,7 +1972,14 @@ export function statement(
     const body = statement(context, bodyNode, functionBody);
     return iterable == null || body == null
       ? undefined
-      : { ...located, body, iterable, kind: "for-of", target };
+      : {
+          ...located,
+          ...(awaited ? { awaited: true as const } : {}),
+          body,
+          iterable,
+          kind: "for-of",
+          target,
+        };
   }
   if (value.type === "ForStatement") {
     const initNode = node(value.init);

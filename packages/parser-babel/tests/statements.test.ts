@@ -126,7 +126,6 @@ test("converts classic for binding patterns to owned syntax", () => {
 
 const unsupportedForForms = [
   ["for-in", "for (const key in {}) console.log(key);"],
-  ["for-await-of", "async function f() { for await (const x of []) {} }"],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;
 
@@ -156,6 +155,113 @@ test("converts synchronous for-of heads to owned syntax", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.match(printHir(result.hir), /for \(const %b\d+ item of \[\]\)/u);
+});
+
+test("converts for-await-of heads to the asynchronous protocol", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let assigned; const target = {};\n" +
+      "async function consume(source) {\n" +
+      "  for await (const item of source) console.log(item);\n" +
+      "  for await (let item of source) console.log(item);\n" +
+      "  for await (var item of source) console.log(item);\n" +
+      "  for await (assigned of source) console.log(assigned);\n" +
+      "  for await (target.value of source) {}\n" +
+      "  for await (const [first] of source) console.log(first);\n" +
+      "}\n" +
+      "consume([]);\n",
+    sourceId: "for-await-of-forms.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /for await \(const %b\d+ item of %b\d+\(source\)\)/u);
+  assert.match(hir, /for await \(%b\d+\(target\)\["value"\] of/u);
+  assert.match(mir, /GetIterator async/u);
+  assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
+  assert.match(mir, /AsyncIteratorClose/u);
+  assert.match(mir, /for-await-of bb\d+/u);
+  // Destructuring the awaited value is ordinary array binding, so the
+  // pattern head still acquires a synchronous iterator over that value.
+  assert.match(mir, /IteratorClose for array binding/u);
+});
+
+test("keeps the synchronous protocol for a head without await", () => {
+  const result = compileSource(babelFrontend, {
+    source: "async function consume() { for (const item of []) item; }\n",
+    sourceId: "for-of-in-async.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /for \(const %b\d+ item of \[\]\)/u);
+  assert.match(printMir(result.mir), /GetIterator sync/u);
+  assert.doesNotMatch(printMir(result.mir), /GetIterator async/u);
+});
+
+// `for await` is only valid inside an async function or a module body, so
+// the bootstrap parser rejects every other position before conversion.
+test("keeps for-await-of outside an async context a parse failure", () => {
+  for (const source of [
+    "for await (const item of []) {}",
+    "function sync() { for await (const item of []) {} }",
+    "function* generate() { for await (const item of []) {} }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "for-await-of-position.ts",
+    });
+    assert.ok(result.diagnostics.length > 0, source);
+    assert.equal(result.mir, undefined);
+  }
+});
+
+function compileOneModule(source: string, sourceId: string) {
+  const parsed = babelModuleFrontend.parseModule({ source, sourceId });
+  assert.ok(parsed.parsed, sourceId);
+  assert.ok(parsed.module != null);
+  return compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: sourceId,
+        syntax: parsed.module,
+      },
+    ],
+  });
+}
+
+test("lowers a module top-level for-await head", () => {
+  const compiled = compileOneModule(
+    "for await (const item of [1, 2]) console.log(item);\n",
+    "file:///app/module-for-await.js",
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const mir = printMir(compiled.mir);
+  assert.match(mir, /GetIterator async/u);
+  assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
+});
+
+// The loop stays in place instead of splitting into continuations, so an
+// awaited iterable would reach a position the module transform does not
+// own; it keeps the existing rejection rather than approximating one.
+test("rejects an awaited iterable inside a for-await head", () => {
+  const compiled = compileOneModule(
+    "for await (const item of await Promise.resolve([])) {}\n",
+    "file:///app/for-await-awaited-iterable.js",
+  );
+  assert.equal(compiled.mir, undefined);
+  assert.match(
+    compiled.diagnostics[0]?.message ?? "",
+    /control-flow position/u,
+  );
 });
 
 test("converts for-of declaration binding patterns to owned syntax", () => {

@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 2,501 reviewed cases: 1,230 passes, 898 expected
-negatives, and 373 unsupported profile features. It records no semantic or
+The current manifest contains 2,880 reviewed cases: 1,511 passes, 988 expected
+negatives, and 381 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -310,8 +310,9 @@ its deliberate boundary and its evidence:
     everything else to a string. Converting a symbol to a number or
     string throws a catchable `TypeError`, and `console.log` renders a
     symbol as `Symbol(description)` the way the host console does. The
-    well-known `Symbol.iterator`, `Symbol.toPrimitive`, and
-    `Symbol.toStringTag` are fixed non-writable properties of the
+    well-known `Symbol.iterator`, `Symbol.toPrimitive`,
+    `Symbol.toStringTag`, and `Symbol.asyncIterator` are fixed
+    non-writable properties of the
     intrinsic, and `Symbol.toPrimitive` methods participate in generic
     `ToPrimitive`. Deliberate boundaries: `Symbol.for`, `Symbol.keyFor`,
     `Symbol.prototype` methods including `toString` and the
@@ -382,9 +383,8 @@ its deliberate boundary and its evidence:
     `for-of`, array spread, call spread, constructor spread, and array binding
     declarations accept only
     object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and `for-await-of`, array and string
-    iterator prototype identity, and generator-based iterators remain outside
-    the admitted syntax.
+    the generic `%Array.prototype.values%`; and array and string
+    iterator prototype identity remain outside the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -1324,6 +1324,58 @@ its deliberate boundary and its evidence:
     interleaving covered by a native fixture meanwhile. The reviewed manifest
     moves to 1,230 passes, 898 expected negatives, and 373 unsupported
     profile features with no semantic or harness failures.
+ -  The asynchronous iterator protocol and the `for await (... of ...)`
+    statement. `GetIterator(value, async)` reads the value's
+    `Symbol.asyncIterator` method, calls it, and captures the resulting
+    iterator's `next` method once, throwing a catchable `TypeError` for a
+    non-object value, a non-callable method, or a non-object iterator. A
+    value with no such method falls back to `GetIterator(value, sync)` and
+    wraps that record, which is CreateAsyncFromSyncIterator; the wrapper is a
+    runtime-internal record with no prototype and no properties, because
+    nothing outside the loop reaches it. Each step calls the captured `next`
+    method and awaits its result, requires an object, and reads `done` and
+    `value`, while a wrapped synchronous iterator instead awaits the stepped
+    value, so a synchronous iterable of promises yields settled values and a
+    rejected value rejects the step. `AsyncIteratorClose` awaits the `return`
+    method's result and requires an object; the wrapper instead requires the
+    synchronous result to be an object and then reads and awaits its `done`
+    and `value`, and both happen before completion precedence applies, so an
+    in-flight body error still observes those getters. The head reuses the
+    synchronous
+    `for-of` lowering unchanged, so it admits the same `const`, `let`, `var`,
+    existing binding, member target, and array or object pattern forms with
+    the same temporal dead zones, fresh per-iteration cells, `var` hoisting,
+    and nested cleanup, and `break`, `continue`, `return`, labeled transfers,
+    and body throws close the iterator with the same completion precedence:
+    a close failure replaces `break` or `return`, an in-flight throw stays
+    authoritative, and `continue` keeps the iterator open. Destructuring the
+    awaited value is ordinary array or object binding over that value, so it
+    acquires its own synchronous iterator. `for await` is admitted only where
+    the bootstrap parser already allows it, inside an asynchronous function
+    body and at module top level; an awaited iterable expression in the head
+    keeps the existing rejection for an await outside the M4 continuation
+    positions. Native differential fixtures cover the synchronous fallback,
+    generator and user iterables, `Symbol.asyncIterator` preference over
+    `Symbol.iterator`, promised and direct step results, `done` and `value`
+    accessor order, timer-driven steps, every head form, closures over
+    per-iteration cells, the head's dead zone, `break`, `continue`, labeled
+    transfers, `return`, body throws, absent, promised, and throwing `return`
+    methods, nested and `finally`-wrapped loops, and every catchable
+    `TypeError` the protocol defines. A generated property with seed
+    `0x5eed0011` draws asynchronous and synchronous iterator kinds, head
+    forms, transfer positions, and close modes under both specialization
+    policies and forced collection. Two hundred eighty-one reviewed test262
+    cases newly pass, ninety new expected negatives record the head's early
+    errors, and eight new unsupported cases record the asynchronous generator
+    boundary this unit keeps. The reviewed subset gains the `async-iteration`
+    and `Symbol.asyncIterator` feature tags, and the manifest moves to 1,511
+    passes, 988 expected negatives, and 381 unsupported profile features with
+    no semantic or harness failures. Deliberate boundaries: asynchronous
+    generators stay rejected, so the asynchronous generator cases the
+    `async-iteration` tag reaches stay outside the reviewed subset, and a
+    `for await` head over a string still fails, because primitive iteration
+    is unsupported. A suspension inside the loop drains the scheduler instead
+    of returning to the caller, which the gap entry below owns.
 
 
 Known gaps inside the claim
@@ -1386,9 +1438,26 @@ must never shrink by reclassification alone.
     binding is admitted. Owner: the intrinsics and built-in objects
     stream; the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends
     on this unit.
- -  `await` is restricted to the M4 positions; asynchronous generators,
-    `for await`, and asynchronous module cycles are unsupported. Owner: the
+ -  `await` is restricted to the M4 positions; asynchronous generators and
+    asynchronous module cycles are unsupported. Owner: the
     functions and executable syntax stream.
+ -  A `for await` step suspends by draining the scheduler rather than by
+    returning to the caller. The frontend splits an `await` expression into
+    continuations, and a loop has no such split, so each step resolves its
+    promise, runs the queued jobs in order, and advances timers until that
+    promise settles, then resumes the loop directly. Interleaving with jobs
+    already queued is preserved, but the enclosing asynchronous function does
+    not return to its caller at a step, so work sequenced after the call
+    observes the loop's effects first, and a step whose promise can never
+    settle reports the host diagnostic `OSEO3001` instead of leaving the
+    function pending forever. Four test262 cases turn on the difference and
+    stay outside the reviewed subset:
+    *async-from-sync-iterator-continuation-abrupt-completion-get-constructor.js*
+    and the three _ticks-with-\*-constructor-lookup_ cases, which also need
+    `Promise` as a value. Closing it needs a real suspension record for
+    asynchronous function bodies, the same machinery asynchronous generators
+    need, so the two land together. Owner: the functions and executable
+    syntax stream.
  -  `%GeneratorPrototype%.throw`, generator method definitions, and default
     or binding-pattern generator parameters are outside the admitted
     generator subset. Because no throw resumption can reach a body, the

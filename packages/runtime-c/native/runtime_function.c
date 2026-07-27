@@ -248,6 +248,8 @@ OseoResult oseo_function_create(
     function->ordinary.array_iterator = false;
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;
+    function->ordinary.async_from_sync = false;
+    function->ordinary.async_sync_iterator = oseo_undefined();
     function->ordinary.default_intrinsics = true;
     function->ordinary.generator_prototype = false;
     function->ordinary.generator = NULL;

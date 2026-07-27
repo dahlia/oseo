@@ -441,8 +441,8 @@ function appendHirStatement(
               : `${printHirExpression(statement.target.object)}[` +
                 `${printHirExpression(statement.target.key)}]`;
     lines.push(
-      `${indent}for (${target} of ` +
-        `${printHirExpression(statement.iterable)})${location}`,
+      `${indent}for ${statement.awaited === true ? "await " : ""}` +
+        `(${target} of ${printHirExpression(statement.iterable)})${location}`,
     );
     appendHirStatement(lines, statement.body, `${indent}  `);
   } else if (statement.kind === "switch") {

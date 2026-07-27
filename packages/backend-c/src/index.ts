@@ -452,6 +452,10 @@ function emitIteratorOperation(
 ): void {
   location(state, operation.range);
   state.usesAbrupt = true;
+  // An asynchronous step reaches a distinct runtime entry point that
+  // awaits its own result; the emitted control flow is otherwise the
+  // synchronous protocol's, so only the called name changes.
+  const asynchronous = operation.iteratorAsync === true ? "async_" : "";
   if (operation.kind === "iterator-get") {
     const iterable = operationArgument(operation, 0);
     const nextMethod = operation.iteratorNextMethodResult;
@@ -460,8 +464,8 @@ function emitIteratorOperation(
     }
     line(
       state,
-      `result = oseo_iterator_get(context, roots[${iterable}], ` +
-        `&roots[${nextMethod}]);`,
+      `result = oseo_${asynchronous}iterator_get(context, ` +
+        `roots[${iterable}], &roots[${nextMethod}]);`,
     );
     if (operation.iteratorDoneState != null) {
       const doneState = operation.iteratorDoneState;
@@ -519,8 +523,8 @@ function emitIteratorOperation(
       line(state, `bool iterator_done_${operation.id} = true;`);
       line(
         state,
-        `result = oseo_iterator_next(context, roots[${iterator}], ` +
-          `roots[${nextMethod}], &roots[${value}], ` +
+        `result = oseo_${asynchronous}iterator_next(context, ` +
+          `roots[${iterator}], roots[${nextMethod}], &roots[${value}], ` +
           `&iterator_done_${operation.id});`,
       );
       line(
@@ -547,8 +551,9 @@ function emitIteratorOperation(
     line(state, "} else {");
     line(
       state,
-      `    result = oseo_iterator_next(context, roots[${iterator}], ` +
-        `roots[${nextMethod}], &roots[${value}], &${step});`,
+      `    result = oseo_${asynchronous}iterator_next(context, ` +
+        `roots[${iterator}], roots[${nextMethod}], &roots[${value}], ` +
+        `&${step});`,
     );
     line(state, "}");
     if (state.generator) {
@@ -567,8 +572,8 @@ function emitIteratorOperation(
   if (operation.iteratorDoneState == null) {
     line(
       state,
-      `result = oseo_iterator_close(context, roots[${iterator}], ` +
-        `completion[${slot}u].kind == 2);`,
+      `result = oseo_${asynchronous}iterator_close(context, ` +
+        `roots[${iterator}], completion[${slot}u].kind == 2);`,
     );
   } else {
     const done = iteratorDoneRead(state, operation.iteratorDoneState);
@@ -580,8 +585,8 @@ function emitIteratorOperation(
     line(state, "} else {");
     line(
       state,
-      `    result = oseo_iterator_close(context, roots[${iterator}], ` +
-        `completion[${slot}u].kind == 2);`,
+      `    result = oseo_${asynchronous}iterator_close(context, ` +
+        `roots[${iterator}], completion[${slot}u].kind == 2);`,
     );
     line(state, "}");
   }

@@ -105,9 +105,31 @@ function retainModuleSource<T>(value: T, sourceId: string): T {
   ) as T;
 }
 
-function hirStatementHasAwait(statement: HirStatement): boolean {
+/**
+ * Whether one statement contains an await the module continuation
+ * transform can extract. A `for await` head awaits every iteration step
+ * without being such a point, because the loop stays in place, so this
+ * predicate must not report it: it drives both the extraction search and
+ * the rejection of awaits in positions the transform does not own. The
+ * `awaitedIteration` variant instead reports whether the statement makes
+ * its module's evaluation asynchronous at all, which the scheduler and
+ * the cycle check need.
+ */
+function hirStatementAwaits(
+  statement: HirStatement,
+  awaitedIteration: boolean,
+): boolean {
+  const recurse = (child: HirStatement): boolean =>
+    hirStatementAwaits(child, awaitedIteration);
+  if (
+    awaitedIteration &&
+    statement.kind === "for-of" &&
+    statement.awaited === true
+  ) {
+    return true;
+  }
   if (statement.kind === "block") {
-    return statement.body.some(hirStatementHasAwait);
+    return statement.body.some(recurse);
   }
   if (
     statement.kind === "binding-init" ||
@@ -134,20 +156,19 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
   if (statement.kind === "if") {
     return (
       hirExpressionHasAwait(statement.test) ||
-      hirStatementHasAwait(statement.consequent) ||
-      (statement.alternate != null && hirStatementHasAwait(statement.alternate))
+      recurse(statement.consequent) ||
+      (statement.alternate != null && recurse(statement.alternate))
     );
   }
   if (statement.kind === "try") {
     return (
-      hirStatementHasAwait(statement.block) ||
-      (statement.handler != null &&
-        hirStatementHasAwait(statement.handler.body)) ||
-      (statement.finalizer != null && hirStatementHasAwait(statement.finalizer))
+      recurse(statement.block) ||
+      (statement.handler != null && recurse(statement.handler.body)) ||
+      (statement.finalizer != null && recurse(statement.finalizer))
     );
   }
   if (statement.kind === "labeled") {
-    return hirStatementHasAwait(statement.body);
+    return recurse(statement.body);
   }
   if (statement.kind === "switch") {
     return (
@@ -155,7 +176,7 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       statement.cases.some(
         (switchCase) =>
           (switchCase.test != null && hirExpressionHasAwait(switchCase.test)) ||
-          switchCase.body.some(hirStatementHasAwait),
+          switchCase.body.some(recurse),
       )
     );
   }
@@ -167,7 +188,7 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       (statement.init != null && hirExpressionHasAwait(statement.init)) ||
       (statement.test != null && hirExpressionHasAwait(statement.test)) ||
       (statement.update != null && hirExpressionHasAwait(statement.update)) ||
-      hirStatementHasAwait(statement.body)
+      recurse(statement.body)
     );
   }
   if (statement.kind === "for-of") {
@@ -179,18 +200,27 @@ function hirStatementHasAwait(statement: HirStatement): boolean {
       (statement.target.kind === "property" &&
         (hirExpressionHasAwait(statement.target.object) ||
           hirExpressionHasAwait(statement.target.key))) ||
-      hirStatementHasAwait(statement.body)
+      recurse(statement.body)
     );
   }
   return (
     (statement.kind === "while" || statement.kind === "do-while") &&
-    (hirExpressionHasAwait(statement.test) ||
-      hirStatementHasAwait(statement.body))
+    (hirExpressionHasAwait(statement.test) || recurse(statement.body))
   );
 }
 
-function hirStatementsHaveAwait(statements: readonly HirStatement[]): boolean {
-  return statements.some(hirStatementHasAwait);
+function hirStatementHasAwait(statement: HirStatement): boolean {
+  return hirStatementAwaits(statement, false);
+}
+
+function hirStatementIsAsynchronous(statement: HirStatement): boolean {
+  return hirStatementAwaits(statement, true);
+}
+
+function hirStatementsAreAsynchronous(
+  statements: readonly HirStatement[],
+): boolean {
+  return statements.some(hirStatementIsAsynchronous);
 }
 
 function collectHirBindings(
@@ -989,7 +1019,7 @@ export function compileModuleGraph(
 
   const directlyAsync = new Set(
     linked.graph.evaluationOrder.filter((moduleId) =>
-      hirStatementsHaveAwait(moduleBodies.get(moduleId) ?? []),
+      hirStatementsAreAsynchronous(moduleBodies.get(moduleId) ?? []),
     ),
   );
   const asyncModules = new Set(directlyAsync);
@@ -1021,7 +1051,7 @@ export function compileModuleGraph(
       throw new Error(`Asynchronous module '${asyncModuleId}' is missing.`);
     }
     const moduleBody = moduleBodies.get(asyncModuleId) ?? [];
-    const awaitStatement = moduleBody.find(hirStatementHasAwait);
+    const awaitStatement = moduleBody.find(hirStatementIsAsynchronous);
     return {
       diagnostics: [
         sourceDiagnostic(

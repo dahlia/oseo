@@ -671,6 +671,13 @@ export type SyntaxStatement =
       readonly update?: SyntaxExpression;
     })
   | (LocatedSyntax & {
+      /**
+       * `for await (... of ...)`, which acquires the iterator through
+       * `Symbol.asyncIterator` and awaits every step. The flag is absent
+       * on a synchronous head rather than `false`, so the two heads stay
+       * distinguishable by presence in printed and structural evidence.
+       */
+      readonly awaited?: true;
       readonly body: SyntaxStatement;
       readonly iterable: SyntaxExpression;
       readonly kind: "for-of";

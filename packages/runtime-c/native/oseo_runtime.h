@@ -155,7 +155,7 @@ struct OseoContext {
     OseoValue error_prototypes[7];
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
-    OseoValue well_known_symbols[3];
+    OseoValue well_known_symbols[4];
     /* Cached virtualized iterator methods, permanently rooted. */
     OseoValue iterator_values_function;
     OseoValue iterator_next_function;
@@ -795,6 +795,33 @@ OseoResult oseo_iterator_next(
     bool *done
 );
 OseoResult oseo_iterator_close(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error
+);
+/*
+ * The asynchronous iterator protocol a `for await` head consumes. It is
+ * the synchronous protocol's three entry points with an Await on every
+ * result: acquisition reads Symbol.asyncIterator and wraps the
+ * synchronous iterator when that method is absent, and the step and
+ * close entry points accept either an asynchronous iterator or that
+ * wrapper. Each one reports the same `next_method`, `value`, and `done`
+ * contract as its synchronous counterpart, so one loop lowering serves
+ * both heads.
+ */
+OseoResult oseo_async_iterator_get(
+    OseoContext *context,
+    OseoValue iterable,
+    OseoValue *next_method
+);
+OseoResult oseo_async_iterator_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_async_iterator_close(
     OseoContext *context,
     OseoValue iterator,
     bool from_error
