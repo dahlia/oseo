@@ -156,7 +156,9 @@ function printHirExpression(expression: HirExpression): string {
       expression.elements
         .map((element) =>
           element.kind === "field"
-            ? `, field ${printHirClassElementKey(element.key)}` +
+            ? ", " +
+              (element.staticPlacement === true ? "static " : "") +
+              `field ${printHirClassElementKey(element.key)}` +
               (element.initializer == null
                 ? ""
                 : ` = ${printHirExpression(element.initializer)}`)

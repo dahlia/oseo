@@ -228,6 +228,10 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-private-accessors" ||
     fixture.name === "class-private-brand-checks" ||
     fixture.name === "class-private-updates" ||
+    fixture.name === "class-static-fields" ||
+    fixture.name === "class-static-field-order" ||
+    fixture.name === "class-static-private-fields" ||
+    fixture.name === "class-static-field-inheritance" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

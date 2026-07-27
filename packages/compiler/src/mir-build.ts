@@ -1398,28 +1398,40 @@ function lowerFieldInitializerName(
 }
 
 /**
- * Lowers one instance field definition. The key is evaluated here, in
- * class-body order, while the initializer closure it pairs with runs
- * once per instance, so the pair is recorded on the constructor instead
- * of defining a property now. The closure carries the class prototype
- * as its home object, exactly like a prototype method, so `super.x`
- * inside an initializer starts at the parent's prototype.
+ * The evaluated halves of one field element: the key and the closure
+ * that produces the value. ClassDefinitionEvaluation evaluates both in
+ * class-body order but defines a `static` field only once the whole
+ * body is in place, so a static field carries its halves as MIR values
+ * from the element loop to the definition that follows it.
+ */
+interface ClassFieldDefinition {
+  readonly initializer: number;
+  readonly key: number;
+  readonly privateElement: boolean;
+  readonly range: SourceRange;
+}
+
+/**
+ * Lowers the definition half of one field element: the key evaluated
+ * here, in class-body order, and the closure that produces the value.
+ * The closure carries the object the field is defined on as its home
+ * object, exactly like a method of the same placement, so `super.x`
+ * inside an initializer starts at the parent's `prototype` for an
+ * instance field and at the parent constructor for a `static` one.
  *
  * A computed key that names an anonymous initializer is also stored in
  * a fresh cell the closure captures, because NamedEvaluation applies
  * where the initializer runs while the key exists only here.
  *
  * A private field evaluates no key at all: its name is the value the
- * class evaluation created, read from its class-scope binding, so the
- * record it appends is added to the instance rather than defined as a
- * property.
+ * class evaluation created, read from its class-scope binding, so what
+ * it produces is a private element rather than a property.
  */
-function lowerClassField(
+function lowerClassFieldDefinition(
   element: HirClassField,
-  constructorValue: number,
-  prototype: number,
+  home: number,
   builder: MirBuilder,
-): void {
+): ClassFieldDefinition {
   const privateElement = element.key.kind === "private-name";
   let key: number;
   if (element.key.kind === "private-name") {
@@ -1451,36 +1463,97 @@ function lowerClassField(
       ? lowerSyntheticUndefined(element.range, builder)
       : lowerExpression(element.initializer, builder);
   if (element.initializer != null) {
-    lowerHomeObjectBind(initializer, prototype, element.range, builder);
+    lowerHomeObjectBind(initializer, home, element.range, builder);
   }
+  return { initializer, key, privateElement, range: element.range };
+}
+
+/**
+ * Records one instance field definition on the constructor rather than
+ * defining a property now, because the initializer runs once per
+ * instance while the key was evaluated once for the whole class.
+ */
+function lowerInstanceFieldRecord(
+  field: ClassFieldDefinition,
+  constructorValue: number,
+  builder: MirBuilder,
+): void {
   appendMirMetadata(
     builder,
     "safepoint",
-    privateElement
+    field.privateElement
       ? "private field record growth"
       : "instance field record growth",
-    [constructorValue, key, initializer],
-    element.range,
+    [constructorValue, field.key, field.initializer],
+    field.range,
   );
   const recorded = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: [constructorValue, key, initializer],
-    detail: privateElement
+    arguments: [constructorValue, field.key, field.initializer],
+    detail: field.privateElement
       ? "record private instance field"
       : "record instance field",
     id: recorded,
-    kind: privateElement ? "class-private-field-define" : "class-field-define",
-    range: element.range,
+    kind: field.privateElement
+      ? "class-private-field-define"
+      : "class-field-define",
+    range: field.range,
   });
   appendMirMetadata(
     builder,
     "check-status",
     "normal -> continue, abrupt -> return",
     [recorded],
-    element.range,
+    field.range,
   );
-  recordRoot(builder, recorded, element.range);
+  recordRoot(builder, recorded, field.range);
+}
+
+/**
+ * Runs one `static` field's initializer against the constructor and
+ * defines the result on it, which is DefineField with the constructor
+ * as the receiver. A public field becomes an own writable, enumerable,
+ * configurable data property through CreateDataProperty, so it replaces
+ * a configurable own property such as `name` rather than assigning
+ * through it, and a private one becomes a private element the
+ * constructor carries.
+ */
+function lowerStaticFieldDefine(
+  field: ClassFieldDefinition,
+  constructorValue: number,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    field.privateElement
+      ? "static private field initialization"
+      : "static field initialization",
+    [constructorValue, field.key, field.initializer],
+    field.range,
+  );
+  const defined = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [constructorValue, field.key, field.initializer],
+    detail: field.privateElement
+      ? "define static private field"
+      : "define static field",
+    id: defined,
+    kind: field.privateElement
+      ? "class-static-private-field-define"
+      : "class-static-field-define",
+    range: field.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [defined],
+    field.range,
+  );
+  recordRoot(builder, defined, field.range);
 }
 
 /**
@@ -1569,6 +1642,12 @@ function lowerClassPrivateMethod(
  * class-scope environment, and links both prototype chains before any
  * element is defined: the constructor inherits from the parent
  * constructor, and the prototype object from the parent's `prototype`.
+ *
+ * A `static` field takes part in that one loop only with its key and
+ * its initializer closure. Its initializer runs after the loop and
+ * after the class-scope binding is initialized, in source order among
+ * the other static fields, because ClassDefinitionEvaluation defers
+ * every static element until the class is otherwise complete.
  */
 function lowerClassExpression(
   expression: HirExpression & { readonly kind: "class" },
@@ -1678,9 +1757,17 @@ function lowerClassExpression(
   );
   recordRoot(builder, prototype, expression.range);
   lowerHomeObjectBind(constructorValue, prototype, expression.range, builder);
+  const staticFields: ClassFieldDefinition[] = [];
   for (const element of expression.elements) {
     if (element.kind === "field") {
-      lowerClassField(element, constructorValue, prototype, builder);
+      const staticPlacement = element.staticPlacement === true;
+      const field = lowerClassFieldDefinition(
+        element,
+        staticPlacement ? constructorValue : prototype,
+        builder,
+      );
+      if (staticPlacement) staticFields.push(field);
+      else lowerInstanceFieldRecord(field, constructorValue, builder);
       continue;
     }
     if (element.key.kind === "private-name") {
@@ -1762,6 +1849,13 @@ function lowerClassExpression(
       range: expression.range,
     });
     recordRoot(builder, initialized, expression.range);
+  }
+  // The static field initializers run last, after every element is in
+  // place and after the class-scope binding is initialized, so one
+  // reaches a method declared later in the body and reads the class
+  // through its own name rather than in a temporal dead zone.
+  for (const field of staticFields) {
+    lowerStaticFieldDefine(field, constructorValue, builder);
   }
   return constructorValue;
 }

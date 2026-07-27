@@ -234,6 +234,12 @@ export interface SyntaxClassField extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
   readonly key: SyntaxExpression | SyntaxPrivateName;
   readonly kind: "field";
+  /**
+   * True for a `static` field, which the class definition itself defines
+   * on the constructor once rather than on each instance. Its
+   * initializer takes the constructor as its receiver.
+   */
+  readonly staticPlacement?: true;
 }
 
 /** One element admitted by an owned class body. */

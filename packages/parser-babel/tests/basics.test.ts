@@ -980,8 +980,8 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class extends Base { static field = 1; };",
-    sourceId: "class-field.ts",
+    source: "const value = class extends Base { static #hidden() {} };",
+    sourceId: "class-static-private-method.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
@@ -1147,10 +1147,14 @@ const outer = Named;`,
 
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["class C { static field = 1; }", /Static class fields/u],
-    ["class C { static #hidden() {} }", /Static private class elements/u],
-    ["class C { static get #hidden() {} }", /Static private class elements/u],
-    ["class C { static #field = 1; }", /Static private class elements/u],
+    [
+      "class C { static #hidden() {} }",
+      /Static private class methods and accessors/u,
+    ],
+    [
+      "class C { static get #hidden() {} }",
+      /Static private class methods and accessors/u,
+    ],
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
@@ -1231,6 +1235,42 @@ console.log(new Derived().describe(), Derived.of());
   const mir = printMir(result.mir);
   assert.match(mir, /super-base home object prototype/u);
   assert.match(mir, /home-object-bind home object/u);
+});
+
+test("lowers static class fields to definitions on the constructor", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Registry {
+  static count = 0;
+  static missing;
+  static #secret = 1;
+  instance = 2;
+  static reveal() {
+    return this.#secret;
+  }
+}
+console.log(Registry.count, Registry.missing, Registry.reveal());
+`,
+    sourceId: "class-static-field.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  assert.match(text, /static field "count" = /u);
+  assert.match(text, /static field "missing"[,}]/u);
+  assert.match(text, /static field %b\d+ #secret = /u);
+  assert.match(text, /, field "instance" = /u);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /class-static-field-define define static field/u);
+  assert.match(
+    mir,
+    /class-static-private-field-define define static private field/u,
+  );
+  // The static initializers run after the class body is otherwise
+  // complete, so every instance record precedes every static define.
+  const record = mir.indexOf("class-field-define record instance field");
+  const define = mir.indexOf("class-static-field-define");
+  assert.ok(record !== -1 && define !== -1 && record < define);
 });
 
 test("lowers private class elements to per-evaluation names", () => {

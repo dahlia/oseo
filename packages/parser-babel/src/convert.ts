@@ -3573,27 +3573,20 @@ function implicitDerivedConstructor(
 }
 
 /**
- * Converts one instance field definition, public or private. The
- * initializer is converted as its own function body: it provides the
- * receiver the field is defined on, so `this` is admitted there, and it
- * carries the class element home object, so a derived class admits
- * `super.x` in it. It is not a constructor, so `super()` stays rejected
- * with the diagnostic every non-constructor position already reports.
+ * Converts one field definition, public or private and instance or
+ * `static`. The initializer is converted as its own function body: it
+ * provides the receiver the field is defined on, so `this` is admitted
+ * there, and it carries the class element home object, so a derived
+ * class admits `super.x` in it. It is not a constructor, so `super()`
+ * stays rejected with the diagnostic every non-constructor position
+ * already reports.
  */
 function classField(
   context: ConvertContext,
   element: BabelNode,
   derived: boolean,
 ): SyntaxClassField | undefined {
-  if (element.static === true) {
-    return unsupported(
-      context,
-      element,
-      element.type === "ClassPrivateProperty"
-        ? "Static private class elements are unsupported."
-        : "Static class fields are unsupported.",
-    );
-  }
+  const staticPlacement = element.static === true;
   if (
     element.abstract === true ||
     element.declare === true ||
@@ -3614,9 +3607,10 @@ function classField(
   }
   const key = classElementKey(context, element);
   if (key == null) return undefined;
+  const placement = staticPlacement ? { staticPlacement: true as const } : {};
   const valueNode = node(element.value);
   if (valueNode == null) {
-    return { ...location(context, element), key, kind: "field" };
+    return { ...location(context, element), key, kind: "field", ...placement };
   }
   context.functionStack.push(true);
   context.receiverStack.push({
@@ -3627,7 +3621,13 @@ function classField(
   context.receiverStack.pop();
   context.functionStack.pop();
   if (initializer == null) return undefined;
-  return { ...location(context, element), initializer, key, kind: "field" };
+  return {
+    ...location(context, element),
+    initializer,
+    key,
+    kind: "field",
+    ...placement,
+  };
 }
 
 /**
@@ -3699,7 +3699,7 @@ export function classExpression(
       unsupported(
         context,
         element,
-        "Static private class elements are unsupported.",
+        "Static private class methods and accessors are unsupported.",
       );
       break;
     }
@@ -3763,10 +3763,12 @@ export function classExpression(
       };
   // Whichever constructor the class ends up with installs the private
   // methods and runs the field initializers, so the flag is decided once
-  // the whole body is known.
+  // the whole body is known. A `static` element belongs to the class
+  // definition rather than to construction, so it never sets the flag.
   const instanceElements = elements.some(
     (element) =>
-      element.kind === "field" || element.key.kind === "private-name",
+      element.staticPlacement !== true &&
+      (element.kind === "field" || element.key.kind === "private-name"),
   );
   const classConstructor = constructorFunction ?? implicitConstructor;
   return {

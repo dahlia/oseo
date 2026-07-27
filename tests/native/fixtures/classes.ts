@@ -2567,4 +2567,408 @@ console.log(hinted.run(3, 4));
       overflowMisses: 1,
     },
   },
+  {
+    name: "class-static-fields",
+    source: `
+// A static field is an own data property of the constructor, defined
+// once when the class is, and it reaches neither the prototype nor an
+// instance.
+class Registry {
+  static first = 1;
+  static second;
+  static third = Registry.first + 1;
+}
+console.log(Registry.first, Registry.second, Registry.third);
+console.log("second" in Registry, Object.keys(Registry).length);
+console.log(
+  Object.keys(Registry)[0],
+  Object.keys(Registry)[1],
+  Object.keys(Registry)[2],
+);
+const descriptor = Object.getOwnPropertyDescriptor(Registry, "first");
+console.log(
+  descriptor.value,
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+);
+console.log(Object.getOwnPropertyDescriptor(Registry.prototype, "first"));
+console.log(Object.keys(Registry.prototype).length);
+const made = new Registry();
+console.log("first" in made, made.first, Object.keys(made).length);
+// The initializer's receiver is the class, so this reads the
+// constructor and a nested arrow captures it.
+class Receiver {
+  static self = this;
+  static named = this.name;
+  static arrow = () => this;
+  static loose = function () {
+    return typeof this;
+  };
+}
+console.log(
+  Receiver.self === Receiver,
+  Receiver.named,
+  Receiver.arrow() === Receiver,
+);
+// A static field is defined, not assigned, so it replaces the
+// configurable name and length properties a class starts with.
+class Renamed {
+  static name = "replaced";
+  static length = 5;
+}
+const renamed = Object.getOwnPropertyDescriptor(Renamed, "name");
+console.log(
+  Renamed.name,
+  Renamed.length,
+  renamed.writable,
+  renamed.enumerable,
+  renamed.configurable,
+);
+// The property the definition installs stays writable and configurable.
+class Mutable {
+  static counter = 0;
+}
+Mutable.counter = Mutable.counter + 1;
+console.log(Mutable.counter, delete Mutable.counter, Mutable.counter);
+// A subclass inherits a static field it does not redeclare and owns the
+// one it does.
+class Base {
+  static tag = "base";
+}
+class Redefines extends Base {
+  static tag = "sub";
+}
+class Silent extends Base {}
+console.log(Base.tag, Redefines.tag, Silent.tag);
+console.log(Object.getOwnPropertyDescriptor(Silent, "tag"));
+// A static and an instance field of the same name are separate
+// properties of separate objects.
+class Both {
+  shared = "instance";
+  static shared = "static";
+}
+console.log(new Both().shared, Both.shared);
+`,
+  },
+  {
+    name: "class-static-field-order",
+    source: `
+// Every element key evaluates once, in class-body order, while the
+// class is defined. A static field's initializer waits until the whole
+// body is in place, so it runs after every key and every method, in
+// static-element order, and an instance field's initializer waits for
+// construction.
+let trace = "";
+function step(mark, value) {
+  trace = trace + mark + " ";
+  return value;
+}
+class Ordered {
+  [step("key-alpha", "alpha")] = step("init-alpha", 1);
+  static [step("key-beta", "beta")] = step("static-beta", 2);
+  [step("key-method", "method")]() {
+    return "method";
+  }
+  static [step("key-gamma", "gamma")] = step("static-gamma", 3);
+  [step("key-delta", "delta")] = step("init-delta", 4);
+  static [step("key-static-method", "shared")]() {
+    return "shared";
+  }
+}
+console.log("definition", trace);
+trace = "";
+const made = new Ordered();
+console.log("construction", trace);
+console.log(made.alpha, made.delta, Ordered.beta, Ordered.gamma);
+console.log(Ordered.shared(), made.method());
+// A static initializer runs after every method is defined and after the
+// class-scope binding is initialized, so it reaches both.
+class Late {
+  static byName = Late.compute();
+  static byThis = this.compute() + 1;
+  static compute() {
+    return 10;
+  }
+}
+console.log(Late.byName, Late.byThis);
+// An abrupt static initializer stops the class definition where it
+// threw, leaving the earlier definitions performed and the later ones
+// unreached.
+let ran = "";
+function note(mark) {
+  ran = ran + mark + " ";
+  return mark;
+}
+try {
+  class Abrupt {
+    static before = note("before");
+    static bad = undefined.missing;
+    static after = note("after");
+  }
+} catch (error) {
+  console.log("abrupt initializer", error instanceof TypeError, ran);
+}
+// An abrupt static key stops the definition before any initializer runs.
+ran = "";
+try {
+  class AbruptKey {
+    static [note("key")] = note("value");
+    static [undefined.missing] = 1;
+  }
+} catch (error) {
+  console.log("abrupt key", error instanceof TypeError, ran);
+}
+// A static field can name an anonymous definition, exactly as an
+// instance field does, including through a computed key.
+class Names {
+  static plain = function () {};
+  static arrow = () => 1;
+  static ["computed"] = function () {};
+  static #hidden = function () {};
+  static hiddenName() {
+    return this.#hidden.name;
+  }
+}
+console.log(
+  Names.plain.name,
+  Names.arrow.name,
+  Names.computed.name,
+  Names.hiddenName(),
+);
+`,
+  },
+  {
+    name: "class-static-private-fields",
+    source: `
+// A static private field is a private element the constructor itself
+// carries. It is not a property, so no key observation, enumeration, or
+// descriptor read reaches it, and only the declaring class body names
+// it.
+class Counter {
+  static #count = 0;
+  static #label;
+  static read() {
+    return this.#count;
+  }
+  static label() {
+    return this.#label;
+  }
+  static bump() {
+    this.#count = this.#count + 1;
+    return this.#count;
+  }
+}
+console.log(Counter.read(), Counter.label(), Counter.bump(), Counter.bump());
+console.log(Object.keys(Counter).length, "#count" in Counter);
+console.log(Object.getOwnPropertyDescriptor(Counter, "count"));
+// A static private field reads another one declared before it, because
+// the static initializers run in source order.
+class Chained {
+  static #base = 2;
+  static #doubled = this.#base * 2;
+  static report() {
+    return this.#base + ":" + this.#doubled;
+  }
+}
+console.log(Chained.report());
+// Reading a static private field before its own definition runs finds
+// no element, so the brand check reports a TypeError.
+try {
+  class TooEarly {
+    static early = TooEarly.probe();
+    static #later = 1;
+    static probe() {
+      return this.#later;
+    }
+  }
+} catch (error) {
+  console.log("too early", error instanceof TypeError);
+}
+// Each class evaluation creates its own private names, so a constructor
+// from one evaluation never satisfies another's element, and a subclass
+// that inherits the reader carries no element of its own.
+function make(value) {
+  return class {
+    static #brand = value;
+    static read() {
+      return this.#brand;
+    }
+  };
+}
+const first = make("first");
+const second = make("second");
+console.log(first.read(), second.read());
+class Derived extends first {}
+try {
+  Derived.read();
+} catch (error) {
+  console.log("derived brand", error instanceof TypeError);
+}
+// An instance of the declaring class carries no static element, so the
+// same private name read through an instance fails its brand check.
+class Instances {
+  static #only = "class";
+  static read() {
+    return this.#only;
+  }
+  probe() {
+    return this.#only;
+  }
+}
+console.log(Instances.read());
+try {
+  new Instances().probe();
+} catch (error) {
+  console.log("instance brand", error instanceof TypeError);
+}
+// The update operators read and write one static private element once.
+class Steps {
+  static #n = 1;
+  static run() {
+    this.#n++;
+    this.#n += 5;
+    return this.#n;
+  }
+}
+console.log(Steps.run(), Steps.run());
+// A static private field holds any value, including a function the
+// class calls through the same name.
+class Holder {
+  static #fn = function () {
+    return "held";
+  };
+  static #missing;
+  static run() {
+    return this.#fn();
+  }
+  static callMissing() {
+    return this.#missing();
+  }
+}
+console.log(Holder.run());
+try {
+  Holder.callMissing();
+} catch (error) {
+  console.log("not callable", error instanceof TypeError);
+}
+// A static private field and an instance private field of the same
+// class stay separate elements on separate objects.
+class Split {
+  static #shared = "class";
+  #shared2 = "instance";
+  static readStatic() {
+    return this.#shared;
+  }
+  readInstance() {
+    return this.#shared2;
+  }
+}
+console.log(Split.readStatic(), new Split().readInstance());
+`,
+  },
+  {
+    name: "class-static-field-inheritance",
+    source: `
+// A derived class's static fields run after the whole parent class
+// definition, so every parent static field is already in place.
+let trace = "";
+function step(mark, value) {
+  trace = trace + mark + " ";
+  return value;
+}
+class Parent {
+  static one = step("parent-one", 1);
+  static two = step("parent-two", 2);
+  static describe() {
+    return "parent";
+  }
+  static get badge() {
+    return "badge";
+  }
+}
+class Child extends Parent {
+  static three = step("child-three", Child.one + Child.two);
+  static inherited = this.one;
+  static viaSuper = super.describe() + "-child";
+  static badgeCopy = super.badge;
+}
+class Grandchild extends Child {
+  static four = step("grandchild-four", Grandchild.three + 1);
+  static chain = super.describe() + ":" + this.viaSuper;
+}
+console.log("order", trace);
+console.log(Child.three, Child.inherited, Child.viaSuper, Child.badgeCopy);
+console.log(Grandchild.four, Grandchild.chain, Grandchild.one);
+console.log(Parent.viaSuper, Object.getOwnPropertyDescriptor(Parent, "three"));
+// A static field initializer reads through the constructor chain, so a
+// parent static field it does not shadow reports the parent's value and
+// a redeclared one reports its own.
+class Shadowing extends Parent {
+  static one = this.one + 10;
+  static two = super.two;
+}
+console.log(Shadowing.one, Shadowing.two, Parent.one);
+// A static field on a derived class is defined after the parent's, so a
+// parent static method the child calls already sees the parent value.
+class Reporting {
+  static value = "parent";
+  static report() {
+    return this.value;
+  }
+}
+class Reported extends Reporting {
+  static value = "child";
+}
+console.log(Reporting.report(), Reported.report());
+// A class expression as the heritage operand finishes its own static
+// fields before the derived class starts.
+const Derived = class extends class {
+  static seed = step("anonymous-seed", 5);
+} {
+  static grown = step("derived-grown", this.seed * 2);
+};
+console.log(trace, Derived.grown, Derived.seed);
+`,
+  },
+  {
+    name: "class-static-field-hints",
+    source: `
+// Static elements surround a hinted method without changing the
+// specialization it takes: the hinted class and its unhinted twin agree
+// on every guard path, including the misses a string operand, a double
+// operand, and an overflow force.
+class Hinted {
+  static base = 10;
+  static #offset = 5;
+  static bump(left: number, right: number) {
+    return left + right;
+  }
+  static combined = Hinted.bump(Hinted.base, 2);
+  static hidden = Hinted.bump(Hinted.reveal(), 1);
+  static reveal() {
+    return this.#offset;
+  }
+}
+class Plain {
+  static base = 10;
+  static bump(left, right) {
+    return left + right;
+  }
+  static combined = Plain.bump(Plain.base, 2);
+}
+console.log(Hinted.combined, Plain.combined, Hinted.hidden, Hinted.reveal());
+console.log(Hinted.bump(1, 2), Plain.bump(1, 2));
+console.log(Hinted.bump("a", "b"), Plain.bump("a", "b"));
+console.log(Hinted.bump(0.5, 0.25), Plain.bump(0.5, 0.25));
+console.log(Hinted.bump(140737488355327, 1), Plain.bump(140737488355327, 1));
+`,
+    specialization: {
+      genericCallsDisabled: 11,
+      genericCallsEnabled: 8,
+      hits: 3,
+      misses: 7,
+      overflowMisses: 1,
+    },
+  },
 ];

@@ -8745,6 +8745,282 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -8798,6 +9074,108 @@ results:
       failedPhase: parse
       harnessFailed: false
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/class-name-static-initializer-anonymous.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/class-name-static-initializer-decl.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/class-name-static-initializer-expr.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -9523,6 +9901,40 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/fields-computed-name-static-propname-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -9844,6 +10256,186 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js:190:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js:190:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:190:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js:188:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js:188:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:188:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -10284,6 +10876,224 @@ results:
       features:
         - class
         - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-comp-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-comp-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-literal-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-literal-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-private-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-private-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-string-literal-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/nested-static-string-literal-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
       flags:
         - generated
       includes: []
@@ -10430,6 +11240,186 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -11954,12 +12944,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-field-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-field-on-nested-class.js:145:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -11981,12 +12974,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js:146:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -12008,12 +13004,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-method-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-method-on-nested-class.js:146:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -12035,12 +13034,44 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js:146:7:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js:140:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -12067,7 +13098,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -12094,7 +13124,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -12121,7 +13150,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -12148,7 +13176,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -12390,6 +13417,423 @@ results:
   - case:
       async: false
       features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js:130:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js:130:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:130:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - class-fields-public
         - class
       flags:
@@ -12464,6 +13908,389 @@ results:
   - case:
       async: false
       features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/static-as-valid-static-field-assigned.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/static-as-valid-static-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-comp-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-comp-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-field-anonymous-function-length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-field-anonymous-function-name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-field-init-this-inside-arrow-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-field-redeclaration.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-literal-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-literal-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-private-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-private-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - class-static-methods-private
         - class-methods-private
         - class
@@ -12486,6 +14313,60 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-string-literal-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-string-literal-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -12535,6 +14416,37 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-public
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/super-access-from-arrow-func-on-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/super-access-from-arrow-func-on-field.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/super-access-from-arrow-func-on-field.js:92:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -15393,6 +17305,33 @@ results:
       expectedFailurePhase: parse
       features:
         - class-methods-private
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-staticfield.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-methods-private
         - class-fields-private
         - class
       flags:
@@ -15838,6 +17777,58 @@ results:
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
         - class-fields-private
         - class
       flags:
@@ -15925,6 +17916,32 @@ results:
       includes: []
       mode: script
       path: test/language/expressions/class/elements/syntax/early-errors/grammar-special-meth-contains-super-private-method.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/grammar-static-privatename-constructor.js
       strictness:
         - non-strict
         - strict
@@ -17428,6 +19445,237 @@ results:
       includes: []
       mode: script
       path: test/language/expressions/class/elements/wrapped-in-sc-rs-field-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js:132:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js:132:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js:132:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier.js
       strictness:
         - non-strict
         - strict
@@ -20088,6 +22336,40 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-static-fields-private
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/private-static-field-multiple-evaluations-of-class-factory.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -42667,15 +44949,17 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "test/language/module-code/private-identifiers-not-empty.js:87:\
+        3: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -47071,6 +49355,317 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class-fields-public
+        - class-static-fields-public
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/abrupt-completition-on-field-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -47268,6 +49863,41 @@ results:
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-public
+        - class-static-fields-public
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/computed-property-abrupt-completition.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -47912,6 +50542,146 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/fields-computed-name-static-computed-var-propname-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-computed-name-static-computed-var-propname-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/fields-computed-name-static-propname-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-computed-name-static-propname-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -47966,11 +50736,111 @@ results:
       expectedFailurePhase: parse
       features:
         - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-literal-name-static-propname-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-literal-name-static-propname-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
         - class-fields-public
       flags: []
       includes: []
       mode: script
       path: test/language/statements/class/elements/fields-string-name-propname-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-string-name-static-propname-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-string-name-static-propname-prototype.js
       strictness:
         - non-strict
         - strict
@@ -48176,6 +51046,186 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js:190:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js:190:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:190:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js:188:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js:188:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:188:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -48618,6 +51668,224 @@ results:
       features:
         - class
         - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-comp-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-comp-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-literal-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-literal-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-private-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-private-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-string-literal-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/nested-static-string-literal-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
       flags:
         - generated
       includes: []
@@ -48764,6 +52032,186 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -50739,12 +54187,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-field-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-field-on-nested-class.js:145:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -50766,12 +54217,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js:146:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -50793,12 +54247,15 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-method-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-method-on-nested-class.js:146:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -50820,12 +54277,44 @@ results:
       - classes
       - object-properties
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js:146:7:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
-    unsupportedFeatures:
-      - class-static-fields-private
-      - class-static-fields-public
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js:140:14:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -50852,7 +54341,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -50879,7 +54367,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -50906,7 +54393,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       features:
@@ -50933,7 +54419,6 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
-      - class-static-fields-public
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -52119,6 +55604,423 @@ results:
   - case:
       async: false
       features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js:130:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js:130:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:130:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+        - async-functions
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - class-methods-private
         - class
       flags: []
@@ -52331,6 +56233,456 @@ results:
   - case:
       async: false
       features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/static-as-valid-static-field-assigned.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/static-as-valid-static-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-comp-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+        - computed-property-names
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-comp-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-field-anonymous-function-length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-field-anonymous-function-name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-field-init-this-inside-arrow-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-field-initializer-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-field-redeclaration.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-fielddefinition-initializer-abrupt-completion.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-literal-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-literal-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-private-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-private-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - class-static-methods-private
         - class-methods-private
         - class
@@ -52353,6 +56705,60 @@ results:
       passed: false
     unsupportedFeatures:
       - class-static-methods-private
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-string-literal-name-init-err-contains-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-public
+        - class-static-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-string-literal-name-init-err-contains-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -52402,6 +56808,37 @@ results:
     observation:
       errorType: SyntaxError
       failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-public
+        - class-static-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/super-access-from-arrow-func-on-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/super-access-from-arrow-func-on-field.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/super-access-from-arrow-func-on-field.js:92:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
     unsupportedFeatures: []
@@ -55362,6 +59799,33 @@ results:
       expectedFailurePhase: parse
       features:
         - class-methods-private
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-staticfield.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-methods-private
         - class-fields-private
         - class
       flags:
@@ -55807,6 +60271,58 @@ results:
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
         - class-fields-private
         - class
       flags:
@@ -55894,6 +60410,32 @@ results:
       includes: []
       mode: script
       path: test/language/statements/class/elements/syntax/early-errors/grammar-special-meth-contains-super-private-method.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-static-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/syntax/early-errors/grammar-static-privatename-constructor.js
       strictness:
         - non-strict
         - strict
@@ -57451,6 +61993,237 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js:132:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js:132:5:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js:132:12:
+        error[OSEO1001]: A private member is reachable only through
+        this.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -58886,16 +63659,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-fields-public
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -67819,11 +72603,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 826
+  expectedNegatives: 871
   harnessFailures: 0
-  passes: 1161
+  passes: 1203
   semanticFailures: 0
-  unsupportedProfileFeatures: 297
+  unsupportedProfileFeatures: 365
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -67838,11 +72622,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 11
     - dependency: classes
-      expectedNegatives: 492
+      expectedNegatives: 536
       harnessFailures: 0
-      passes: 421
+      passes: 463
       semanticFailures: 0
-      unsupportedProfileFeatures: 167
+      unsupportedProfileFeatures: 236
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
@@ -67882,9 +72666,9 @@ summary:
     - dependency: functions
       expectedNegatives: 39
       harnessFailures: 0
-      passes: 98
+      passes: 104
       semanticFailures: 0
-      unsupportedProfileFeatures: 11
+      unsupportedProfileFeatures: 13
     - dependency: generators
       expectedNegatives: 63
       harnessFailures: 0
@@ -67900,15 +72684,15 @@ summary:
     - dependency: lexical-bindings
       expectedNegatives: 22
       harnessFailures: 0
-      passes: 108
+      passes: 111
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: module-linking
-      expectedNegatives: 165
+      expectedNegatives: 166
       harnessFailures: 0
       passes: 17
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 36
     - dependency: object-literals
       expectedNegatives: 9
       harnessFailures: 0
@@ -67916,11 +72700,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 22
     - dependency: object-properties
-      expectedNegatives: 432
+      expectedNegatives: 476
       harnessFailures: 0
-      passes: 381
+      passes: 423
       semanticFailures: 0
-      unsupportedProfileFeatures: 117
+      unsupportedProfileFeatures: 186
     - dependency: promise-settlement
       expectedNegatives: 0
       harnessFailures: 0
@@ -68001,17 +72785,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 335
+      expectedNegatives: 355
       harnessFailures: 0
-      passes: 660
+      passes: 679
       semanticFailures: 0
-      unsupportedProfileFeatures: 105
+      unsupportedProfileFeatures: 140
     - group: language/module-code
-      expectedNegatives: 164
+      expectedNegatives: 165
       harnessFailures: 0
       passes: 17
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 36
     - group: language/rest-parameters
       expectedNegatives: 1
       harnessFailures: 0
@@ -68019,8 +72803,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 326
+      expectedNegatives: 350
       harnessFailures: 0
-      passes: 391
+      passes: 414
       semanticFailures: 0
-      unsupportedProfileFeatures: 95
+      unsupportedProfileFeatures: 129
