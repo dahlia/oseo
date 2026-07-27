@@ -175,6 +175,16 @@ export type SyntaxObjectProperty =
   | SyntaxObjectDefinition
   | SyntaxObjectSpreadProperty;
 
+/** One prototype method definition in an owned class body. */
+export interface SyntaxClassMethod extends LocatedSyntax {
+  readonly key: SyntaxExpression;
+  readonly kind: "method";
+  readonly value: SyntaxFunction;
+}
+
+/** One element admitted by an owned class body. */
+export type SyntaxClassElement = SyntaxClassMethod;
+
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
@@ -270,6 +280,22 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly arguments: readonly SyntaxCallArgument[];
       readonly kind: "promise-construct";
+    })
+  | (LocatedSyntax & {
+      /**
+       * The class constructor, synthesized with an empty body when the
+       * class body omits one. Its function value carries the class name
+       * and becomes the class itself.
+       */
+      readonly constructorFunction: SyntaxFunction;
+      readonly elements: readonly SyntaxClassElement[];
+      readonly kind: "class";
+      /**
+       * The ClassName bound in the class's own lexical environment. Only
+       * the class body reaches it, and it stays immutable there even when
+       * an outer declaration binding of the same name is assignable.
+       */
+      readonly nameBinding?: string;
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -476,6 +502,7 @@ export type FunctionKind =
   | "arrow"
   | "async"
   | "async-arrow"
+  | "class"
   | "generator"
   | "method"
   | "ordinary";

@@ -389,18 +389,24 @@ static inline bool is_function(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
 }
 static inline bool function_is_constructible(OseoValue value) {
-    return is_function(value) &&
-        function_object(value)->function_kind == OSEO_FUNCTION_ORDINARY;
+    if (!is_function(value)) return false;
+    OseoFunctionKind kind = function_object(value)->function_kind;
+    return kind == OSEO_FUNCTION_ORDINARY || kind == OSEO_FUNCTION_CLASS;
 }
 /*
  * True for the functions that own a synthetic `prototype` data
  * property. A generator function is not constructible yet still exposes
- * the object that serves %GeneratorPrototype% to its generators.
+ * the object that serves %GeneratorPrototype% to its generators, and a
+ * class constructor exposes the object that carries its methods.
+ * `prototype_writable` distinguishes the writable ordinary and generator
+ * property from a class's read-only one.
  */
 static inline bool function_has_prototype_property(OseoValue value) {
     if (!is_function(value)) return false;
     OseoFunctionKind kind = function_object(value)->function_kind;
-    return kind == OSEO_FUNCTION_ORDINARY || kind == OSEO_FUNCTION_GENERATOR;
+    return kind == OSEO_FUNCTION_ORDINARY ||
+        kind == OSEO_FUNCTION_GENERATOR ||
+        kind == OSEO_FUNCTION_CLASS;
 }
 static inline bool is_generator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&

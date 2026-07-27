@@ -8,6 +8,8 @@ import type {
   HirBindingTarget,
   HirCallArgument,
   HirCallTarget,
+  HirClassElement,
+  HirClassNameBinding,
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
@@ -73,13 +75,29 @@ function shadowedMethodTarget(
   };
 }
 
+/**
+ * Applies NamedEvaluation to an anonymous function or class expression.
+ * A class carries its name on the constructor closure, so an anonymous
+ * class takes the storage name the same way an anonymous function does.
+ */
 function inferFunctionName(
   expression: HirExpression,
   name: string,
 ): HirExpression {
-  return expression.kind === "function" && expression.name === ""
-    ? { ...expression, name }
-    : expression;
+  if (expression.kind === "function" && expression.name === "") {
+    return { ...expression, name };
+  }
+  if (
+    expression.kind === "class" &&
+    expression.constructorFunction.kind === "function" &&
+    expression.constructorFunction.name === ""
+  ) {
+    return {
+      ...expression,
+      constructorFunction: { ...expression.constructorFunction, name },
+    };
+  }
+  return expression;
 }
 
 function resolveCallArgument(
@@ -341,6 +359,9 @@ function resolveExpression(
       });
     }
     return { ...expression, properties };
+  }
+  if (expression.kind === "class") {
+    return resolveClassExpression(expression, scopes, state);
   }
   if (
     expression.kind === "property-get" ||
@@ -820,6 +841,13 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
           hirExpressionHasAwait(property.value),
     );
   }
+  if (expression.kind === "class") {
+    // Only a computed element key evaluates in the enclosing context;
+    // the constructor and method bodies are separate functions.
+    return expression.elements.some((element) =>
+      hirExpressionHasAwait(element.key),
+    );
+  }
   if (
     expression.kind === "property-delete" ||
     expression.kind === "property-get" ||
@@ -1012,6 +1040,90 @@ function resolveFunctionExpression(
     functionLength: resolved.functionLength,
     kind: "function",
     name: expression.inferredName ?? functionValue.name ?? "",
+    range: expression.range,
+  };
+}
+
+/**
+ * Resolves one class expression inside its own lexical environment. A
+ * named class binds its name immutably in that environment, so the
+ * constructor and every method reach the class through a binding that
+ * an outer assignment cannot replace. The constructor is resolved
+ * without a function self-binding, because the class-scope binding
+ * already covers the name it would provide.
+ */
+function resolveClassExpression(
+  expression: SyntaxExpression & { readonly kind: "class" },
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirExpression | undefined {
+  const classScope = new Map<string, Binding>();
+  let nameBinding: HirClassNameBinding | undefined;
+  if (expression.nameBinding != null) {
+    nameBinding = {
+      bindingId: state.nextBindingId,
+      name: expression.nameBinding,
+    };
+    state.nextBindingId += 1;
+    classScope.set(nameBinding.name, {
+      id: nameBinding.bindingId,
+      mutable: false,
+      name: nameBinding.name,
+    });
+  }
+  const classScopes = [...scopes, classScope];
+  const constructorId = state.nextFunctionId;
+  state.nextFunctionId += 1;
+  state.functionInfo.set(expression.constructorFunction, { id: constructorId });
+  const resolvedConstructor = resolveFunction(
+    expression.constructorFunction,
+    classScopes,
+    state,
+    constructorId,
+  );
+  const constructorFunction: HirExpression = {
+    functionId: constructorId,
+    functionKind: resolvedConstructor.functionKind,
+    functionLength: resolvedConstructor.functionLength,
+    kind: "function",
+    name: expression.constructorFunction.name ?? "",
+    range: expression.range,
+  };
+  const elements: HirClassElement[] = [];
+  for (const element of expression.elements) {
+    const key = resolveExpression(element.key, classScopes, state);
+    const methodId = state.nextFunctionId;
+    state.nextFunctionId += 1;
+    state.functionInfo.set(element.value, { id: methodId });
+    const resolvedMethod = resolveFunction(
+      element.value,
+      classScopes,
+      state,
+      methodId,
+    );
+    if (key == null) return undefined;
+    const value: HirExpression = {
+      functionId: methodId,
+      functionKind: resolvedMethod.functionKind,
+      functionLength: resolvedMethod.functionLength,
+      kind: "function",
+      name: element.value.name ?? "",
+      range: element.range,
+    };
+    elements.push({
+      ...element,
+      key,
+      value:
+        key.kind === "string" ? inferFunctionName(value, key.value) : value,
+    });
+  }
+  const byteRange = expression.byteRange;
+  return {
+    ...(byteRange == null ? {} : { byteRange }),
+    constructorFunction,
+    elements,
+    kind: "class",
+    ...(nameBinding == null ? {} : { nameBinding }),
     range: expression.range,
   };
 }

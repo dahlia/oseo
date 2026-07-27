@@ -11,6 +11,7 @@ import type {
   SyntaxBindingPattern,
   SyntaxCallArgument,
   SyntaxCallTarget,
+  SyntaxClassElement,
   SyntaxExpression,
   SyntaxForDeclaration,
   SyntaxForOfTarget,
@@ -362,7 +363,7 @@ export function expression(
           context,
           property,
           false,
-          true,
+          "method",
         );
         propertyValue =
           functionValue == null
@@ -402,6 +403,9 @@ export function expression(
     return functionValue == null
       ? undefined
       : { ...located, functionValue, kind: "function" };
+  }
+  if (value.type === "ClassExpression") {
+    return classExpression(context, value);
   }
   if (value.type === "MemberExpression") {
     const member = memberParts(context, value);
@@ -1407,6 +1411,19 @@ export function statement(
     return converted == null
       ? undefined
       : { ...located, expression: converted, kind: "expression" };
+  }
+  if (value.type === "ClassDeclaration") {
+    const identifier = node(value.id);
+    const name = identifier == null ? undefined : identifierName(identifier);
+    if (name == null) {
+      return unsupported(context, value, "A class declaration needs a name.");
+    }
+    // A class declaration binds its name the way `let` does: lexically
+    // scoped, assignable, and unreachable before the declaration runs.
+    const initializer = classExpression(context, value);
+    return initializer == null
+      ? undefined
+      : { ...located, hint: undefined, initializer, kind: "let", name };
   }
   if (value.type === "VariableDeclaration") {
     if (value.declare === true) {
@@ -2524,6 +2541,10 @@ export function gatherLexicalNames(
         if (pattern == null) continue;
         for (const name of rawPatternNames(pattern)) names.add(name);
       }
+    } else if (declaration.type === "ClassDeclaration") {
+      const identifier = node(declaration.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (name != null) names.add(name);
     } else if (includeFunctions && declaration.type === "FunctionDeclaration") {
       const identifier = node(declaration.id);
       const name = identifier == null ? undefined : identifierName(identifier);
@@ -2838,14 +2859,20 @@ export function hoistedVarDeclarations(
   return hoisted;
 }
 
+/**
+ * Converts one function-like node. `memberKind` selects the owned
+ * function kind for the definition forms that are not plain function
+ * declarations or expressions: `"method"` for a MethodDefinition and
+ * `"class"` for a class constructor.
+ */
 export function functionDeclaration(
   context: ConvertContext,
   value: BabelNode,
   requireName = true,
-  isMethod = false,
+  memberKind?: "class" | "method",
 ): SyntaxFunction | undefined {
   const generator = value.generator === true;
-  if (generator && (value.async === true || isMethod)) {
+  if (generator && (value.async === true || memberKind != null)) {
     return unsupported(
       context,
       value,
@@ -3188,14 +3215,138 @@ export function functionDeclaration(
           ? "async"
           : generator
             ? "generator"
-            : isMethod
-              ? "method"
-              : "ordinary",
+            : (memberKind ?? "ordinary"),
     kind: "function",
     name,
     parameters,
     returnHints,
     strict,
+  };
+}
+
+/**
+ * Converts one class element key. Unlike an object literal, a class body
+ * gives `__proto__` no special meaning, so a method named `__proto__`
+ * defines an ordinary own property here.
+ */
+function classElementKey(
+  context: ConvertContext,
+  element: BabelNode,
+): SyntaxExpression | undefined {
+  const keyNode = node(element.key);
+  if (keyNode == null) return unsupported(context, element);
+  if (element.computed === true) return expression(context, keyNode);
+  const name = identifierName(keyNode);
+  if (name != null) {
+    return { ...location(context, keyNode), kind: "string", value: name };
+  }
+  if (keyNode.type === "NumericLiteral") {
+    return {
+      ...location(context, keyNode),
+      kind: "string",
+      value: String(keyNode.value),
+    };
+  }
+  return expression(context, keyNode);
+}
+
+/**
+ * Converts one class declaration or expression into the owned class
+ * expression. The class body is strict code, so the strictness stack
+ * gains an entry for every element, including computed keys.
+ */
+export function classExpression(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  const located = location(context, value);
+  if (value.superClass != null) {
+    return unsupported(context, value, "Class inheritance is unsupported.");
+  }
+  if (value.typeParameters != null || value.superTypeParameters != null) {
+    return unsupported(context, value, "Generic classes are unsupported.");
+  }
+  if (
+    value.abstract === true ||
+    value.declare === true ||
+    value.implements != null
+  ) {
+    return unsupported(
+      context,
+      value,
+      "TypeScript class modifiers are unsupported.",
+    );
+  }
+  if (nodes(value.decorators).length > 0) {
+    return unsupported(context, value, "Class decorators are unsupported.");
+  }
+  const identifier = node(value.id);
+  const name = identifier == null ? undefined : identifierName(identifier);
+  if (identifier != null && name == null) return unsupported(context, value);
+  const bodyNode = node(value.body);
+  if (bodyNode == null) return unsupported(context, value);
+  context.strictStack.push(true);
+  const elements: SyntaxClassElement[] = [];
+  let constructorFunction: SyntaxFunction | undefined;
+  for (const element of nodes(bodyNode.body)) {
+    if (element.type !== "ClassMethod") {
+      unsupported(context, element, "This class element is unsupported.");
+      break;
+    }
+    if (element.static === true) {
+      unsupported(context, element, "Static class elements are unsupported.");
+      break;
+    }
+    if (element.kind === "get" || element.kind === "set") {
+      unsupported(
+        context,
+        element,
+        "Class getter and setter accessors are unsupported.",
+      );
+      break;
+    }
+    if (element.kind === "constructor") {
+      if (constructorFunction != null) {
+        unsupported(context, element, "A class defines one constructor.");
+        break;
+      }
+      const converted = functionDeclaration(context, element, false, "class");
+      if (converted == null) break;
+      constructorFunction = { ...converted, name };
+      continue;
+    }
+    if (element.kind !== "method") {
+      unsupported(context, element, "This class element is unsupported.");
+      break;
+    }
+    const key = classElementKey(context, element);
+    const method = functionDeclaration(context, element, false, "method");
+    if (key == null || method == null) break;
+    elements.push({
+      ...location(context, element),
+      key,
+      kind: "method",
+      value: method,
+    });
+  }
+  context.strictStack.pop();
+  if (context.diagnostics.length > 0) return undefined;
+  return {
+    ...located,
+    constructorFunction: constructorFunction ?? {
+      ...located,
+      body: [],
+      functionKind: "class",
+      functionLength: 0,
+      kind: "function",
+      name,
+      parameters: [],
+      returnHints: [],
+      strict: true,
+    },
+    elements,
+    kind: "class",
+    ...(name == null ? {} : { nameBinding: name }),
   };
 }
 

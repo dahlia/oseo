@@ -980,8 +980,8 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class {};",
-    sourceId: "class.ts",
+    source: "const value = class extends Base {};",
+    sourceId: "class-extends.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
@@ -990,6 +990,81 @@ test("rejects the smallest syntax form outside the profile", () => {
     column: 15,
     line: 1,
   });
+});
+
+test("lowers a class body to a constructor and prototype methods", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Point {
+  constructor(x) {
+    this.x = x;
+  }
+  read() {
+    return this.x;
+  }
+}
+const origin = new Point(0);`,
+    sourceId: "class-body.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(
+    printHir(result.hir),
+    /class Point\{constructor: function @f\d+ Point, /u,
+  );
+  assert.match(printHir(result.hir), /"read": function @f\d+ read\}/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /binding-reset Point cell/u);
+  assert.match(mir, /class-prototype class prototype object/u);
+  assert.match(
+    mir,
+    /property-define-method define non-enumerable prototype method/u,
+  );
+});
+
+test("binds a class name only inside its own class body", () => {
+  const result = compileSource(babelFrontend, {
+    source: `const Named = class Inner {
+  self() {
+    return Inner;
+  }
+};
+const outer = Named;`,
+    sourceId: "class-name-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /class Inner\{/u);
+
+  const escaped = compileSource(babelFrontend, {
+    source: "const Named = class Inner {};\nconst leaked = Inner;",
+    sourceId: "class-name-escape.ts",
+  });
+  assert.equal(escaped.diagnostics[0]?.code, "OSEO1001");
+  assert.match(escaped.diagnostics[0]?.message ?? "", /Unknown binding/u);
+});
+
+test("rejects class elements outside the admitted profile", () => {
+  const cases: readonly (readonly [string, RegExp])[] = [
+    ["class C { static m() {} }", /Static class elements/u],
+    ["class C { get x() { return 1; } }", /getter and setter/u],
+    ["class C { set x(v) {} }", /getter and setter/u],
+    ["class C extends Base {}", /Class inheritance/u],
+    ["class C { field = 1; }", /class element is unsupported/u],
+    ["class C { #hidden() {} }", /class element is unsupported/u],
+    ["class C { static {} }", /class element is unsupported/u],
+    ["class C { *step() {} }", /method generator functions/u],
+    ["class C { constructor() {} constructor() {} }", /one constructor/u],
+  ];
+  for (const [source, message] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "class-rejection.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+  }
 });
 
 test("converts synchronous arrow functions to owned syntax", () => {

@@ -182,6 +182,7 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_INTERNAL:
         case OSEO_FUNCTION_METHOD:
         case OSEO_FUNCTION_GENERATOR:
+        case OSEO_FUNCTION_CLASS:
             break;
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");
@@ -252,7 +253,9 @@ OseoResult oseo_function_create(
     function->prototype_object = frame.slots[1];
     function->code_id = code_id;
     function->function_kind = function_kind;
-    function->prototype_writable = true;
+    /* A class's `prototype` is non-writable, non-enumerable, and
+     * non-configurable, unlike an ordinary function's writable one. */
+    function->prototype_writable = function_kind != OSEO_FUNCTION_CLASS;
     result = oseo_internal_publish_heap(
         context,
         &function->ordinary.header,
@@ -456,6 +459,18 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 ) {
+    /* A class constructor has [[IsClassConstructor]] true, so [[Call]]
+     * always throws; only [[Construct]], which supplies a new target,
+     * reaches its body. */
+    if (is_function(callee) &&
+        function_object(callee)->function_kind == OSEO_FUNCTION_CLASS &&
+        tag_of(new_target) == OSEO_TAG_UNDEFINED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Class constructor cannot be invoked without 'new'."
+        );
+    }
     if (function_has_lexical_this(callee)) {
         receiver = function_object(callee)->lexical_this;
     }

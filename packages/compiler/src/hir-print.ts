@@ -130,6 +130,23 @@ function printHirExpression(expression: HirExpression): string {
       "}"
     );
   }
+  if (expression.kind === "class") {
+    return (
+      "class" +
+      (expression.nameBinding == null
+        ? ""
+        : ` ${expression.nameBinding.name}`) +
+      `{constructor: ${printHirExpression(expression.constructorFunction)}` +
+      expression.elements
+        .map(
+          (element) =>
+            `, ${printHirExpression(element.key)}: ` +
+            printHirExpression(element.value),
+        )
+        .join("") +
+      "}"
+    );
+  }
   if (
     expression.kind === "property-get" ||
     expression.kind === "property-delete"

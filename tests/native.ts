@@ -30,6 +30,7 @@ import {
 import type { Fixture } from "./native/fixture.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
+import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
@@ -75,6 +76,7 @@ Object.defineProperty(globalThis, "console", {
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...objectFixtures,
+  ...classFixtures,
   ...bindingFixtures,
   ...expressionFixtures,
   ...generatorFixtures,
@@ -201,6 +203,11 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
     fixture.name === "object-literals" ||
+    fixture.name === "class-definitions" ||
+    fixture.name === "class-identity" ||
+    fixture.name === "class-name-binding" ||
+    fixture.name === "class-evaluation-order" ||
+    fixture.name === "class-strict-body" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

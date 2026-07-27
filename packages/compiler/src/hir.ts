@@ -239,6 +239,25 @@ export interface HirObjectSpreadProperty extends LocatedSyntax {
 /** One defined or spread HIR object literal property. */
 export type HirObjectProperty = HirObjectDefinition | HirObjectSpreadProperty;
 
+/** One resolved prototype method definition in an HIR class body. */
+export interface HirClassMethod extends LocatedSyntax {
+  readonly key: HirExpression;
+  readonly kind: "method";
+  readonly value: HirExpression;
+}
+
+/** One element admitted by an HIR class body. */
+export type HirClassElement = HirClassMethod;
+
+/**
+ * The immutable binding a named class holds in its own lexical
+ * environment. Only the class body reaches it.
+ */
+export interface HirClassNameBinding {
+  readonly bindingId: number;
+  readonly name: string;
+}
+
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
   | (LocatedSyntax & {
@@ -362,6 +381,21 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly arguments: readonly HirCallArgument[];
       readonly kind: "promise-construct";
+    })
+  | (LocatedSyntax & {
+      /**
+       * The class constructor closure, whose `name` is the class name and
+       * whose value is the class itself.
+       */
+      readonly constructorFunction: HirExpression;
+      readonly elements: readonly HirClassElement[];
+      readonly kind: "class";
+      /**
+       * Present only for a named class. It is initialized after every
+       * element is defined, so a computed key that reads it observes the
+       * temporal dead zone.
+       */
+      readonly nameBinding?: HirClassNameBinding;
     })
   | (LocatedSyntax & {
       readonly kind: "object";
