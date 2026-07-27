@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 1,016
-passes, 382 expected negatives, and 169 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 1,203
+passes, 871 expected negatives, and 365 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -472,7 +472,7 @@ symbol keys, and writable, non-enumerable, configurable placement, so
 property of the constructor, a static element replaces the `name` or `length`
 the class installed, and a computed `"prototype"` key throws a `TypeError`
 against the non-writable, non-configurable `prototype` property. Static
-fields, static initialization blocks, and private static members stay rejected
+initialization blocks and private static methods and accessors stay rejected
 with the class element diagnostic they already had. Fixed native fixtures
 cover a static method, a static getter and setter pair, `this` inside a static
 method called through the class and through a detached reference, the static
@@ -677,32 +677,32 @@ body fills with the one key evaluation it performs, which is ECMA-262's
 [[ClassFieldInitializerName]] without a second evaluation. The initializer
 carries the class prototype as its home object, so `super.x` inside it starts
 at the parent's prototype with the instance as the receiver, including under
-the implicit derived constructor. Deliberate boundaries: a static field, a
-field named `constructor`, and the TypeScript `declare`, `readonly`,
-`definite`, and optional field modifiers stay rejected with source-located
-diagnostics. Fixed native fixtures cover a field with and
-without an initializer, the own-property descriptor, per-instance copies, an
-inherited setter that does not run, a non-writable inherited property, a
-shadowed prototype method, interleaved key and initializer order across
-methods and static elements, an abrupt key and an abrupt initializer, base
-and derived ordering, the implicit derived constructor, `super()` in both
-branches of a conditional, a replaced derived result, a rejected second
-`super()`, parameter defaults reading a field, the class scope against a
-constructor parameter of the same name, arrow initializers, name inference
-over every admitted key form, per-evaluation naming from a factory,
-ToPropertyKey coercion, `super` calls and accessor reads in initializers over
-a two-level and a three-level chain, and a hinted constructor whose addition
-specialization keeps its fields on every guard path. The generated class
-property suite now draws each element as a field with an initializer, without
-one, or with an anonymous function the key names, and models the instance's
-own key order and the initializer markers. The reviewed subset also gains the
-`arrow-function` feature tag, which the eight arrow-initializer early-error
-cases need and which no reviewed case reclassifies. Forty-three reviewed
-test262 cases newly pass, seventy-eight new expected negatives record the
-`arguments`, `super()`, automatic-semicolon-insertion, and reserved field
-name early errors, and twenty-eight new unsupported cases record this unit's
-boundaries. The manifest moves to 1077 passes, 460 expected negatives, and
-227 unsupported profile features with no semantic or harness failures.
+the implicit derived constructor. Deliberate boundaries: a field named
+`constructor` and the TypeScript `declare`, `readonly`, `definite`, and
+optional field modifiers stay rejected with source-located diagnostics. Fixed
+native fixtures cover a field with and without an initializer, the own-property
+descriptor, per-instance copies, an inherited setter that does not run, a
+non-writable inherited property, a shadowed prototype method, interleaved key
+and initializer order across methods and static elements, an abrupt key and an
+abrupt initializer, base and derived ordering, the implicit derived
+constructor, `super()` in both branches of a conditional, a replaced derived
+result, a rejected second `super()`, parameter defaults reading a field, the
+class scope against a constructor parameter of the same name, arrow
+initializers, name inference over every admitted key form, per-evaluation
+naming from a factory, ToPropertyKey coercion, `super` calls and accessor reads
+in initializers over a two-level and a three-level chain, and a hinted
+constructor whose addition specialization keeps its fields on every guard path.
+The generated class property suite now draws each element as a field with an
+initializer, without one, or with an anonymous function the key names, and
+models the instance's own key order and the initializer markers. The reviewed
+subset also gains the `arrow-function` feature tag, which the eight
+arrow-initializer early-error cases need and which no reviewed case
+reclassifies. Forty-three reviewed test262 cases newly pass, seventy-eight new
+expected negatives record the `arguments`, `super()`,
+automatic-semicolon-insertion, and reserved field name early errors, and
+twenty-eight new unsupported cases record this unit's boundaries. The manifest
+moves to 1077 passes, 460 expected negatives, and 227 unsupported profile
+features with no semantic or harness failures.
 
 Private instance class elements are now admitted: a `#name` field, a
 `#name()` method, and a `get #name` or `set #name` accessor declare a private
@@ -721,19 +721,72 @@ inside it. A derived constructor installs its private elements where
 `super()` returns, so a private read before `super()` reports the `this`
 temporal dead zone `ReferenceError` rather than a brand `TypeError`.
 Compound assignment and the update operators read and write the element once
-through the same name. Deliberate boundaries: a static private element,
-`#name in object`, a private reference based on anything other than `this`,
-optional `?.#name` access, and a private reference used as a destructuring or
-`for-of` assignment target stay rejected with source-located diagnostics, and
-`delete this.#name` is reported as an early error. Fixed native fixtures
-cover private fields, methods, accessors, brand checks, updates, the values
-private state can hold, and a hinted method that specializes while private
-elements surround it on every guard path. The generated class property suite
-draws private elements alongside public ones. Eighty-four reviewed test262
-cases newly pass, three hundred sixty-six new expected negatives record the
-private name early errors, and seventy new unsupported cases record this
-unit's boundaries. The manifest moves to 1161 passes, 826 expected negatives,
-and 297 unsupported profile features with no semantic or harness failures.
+through the same name. Deliberate boundaries: a static private method or
+accessor, `#name in object`, a private reference based on anything other
+than `this`, optional `?.#name` access, and a private reference used as a
+destructuring or `for-of` assignment target stay rejected with source-located
+diagnostics, and `delete this.#name` is reported as an early error. Fixed
+native fixtures cover private fields, methods, accessors, brand checks,
+updates, the values private state can hold, and a hinted method that
+specializes while private elements surround it on every guard path. The
+generated class property suite draws private elements alongside public ones.
+Eighty-four reviewed test262 cases newly pass, three hundred sixty-six new
+expected negatives record the private name early errors, and seventy new
+unsupported cases record this unit's boundaries. The manifest moves to 1161
+passes, 826 expected negatives, and 297 unsupported profile features with no
+semantic or harness failures.
+
+Static class fields are now admitted, the ninth unit of the functions and
+executable syntax stream. A `static field = expression` and a
+`static #field = expression` element reuse the whole field pipeline and
+change only where the definition lands: the class definition itself performs
+DefineField against the constructor instead of recording the pair the
+constructor replays for each instance. The class body still evaluates every
+element's key and creates every initializer closure in one source-ordered
+loop, so a computed static key interleaves with a computed instance key by
+position; the static initializers then run after that loop and after the
+class-scope binding is initialized, which is ECMA-262's staticElements step.
+That order is observable: a static initializer reaches a method declared
+later in the body, reads the class through its own name rather than in a
+temporal dead zone, and runs before any instance is constructed. A public
+static field becomes an own writable, enumerable, configurable data property
+through CreateDataProperty, so it replaces the configurable `name` and
+`length` a class starts with rather than assigning through them, and a
+private one becomes a private element the constructor itself carries, which
+no key observation, enumeration, or descriptor read reaches. The initializer
+takes the constructor as its receiver and carries it as the home object, so
+`this` is the class, a nested arrow captures the class, and `super.x` starts
+at the parent constructor. Because a class definition completes before the
+class that extends it begins, a derived class's static fields always run
+after its parent's. Two new runtime entry points perform the public and the
+private definition; the constructor's instance element list stays untouched,
+so a class whose only elements are static declares no instance elements at
+all. Deliberate boundaries: a static private method or accessor, a static
+initialization block, and a static field reached as `C.#name` rather than
+through `this` stay rejected with source-located diagnostics, and a static
+field named `constructor` or `prototype` remains the early error it is.
+Fixed native fixtures cover the own-property descriptor, a field without an
+initializer, the receiver and the nested arrow, replaced `name` and `length`,
+a later assignment and deletion, subclass inheritance and redeclaration,
+interleaved key and initializer order across instance and static elements, an
+abrupt static initializer and an abrupt static key, NamedEvaluation over
+every admitted static key form, static private reads, writes, updates, and
+brand failures across evaluations, subclasses, and instances, a static
+private field holding a function, `super` reads over a two-level and a
+three-level chain, and a hinted method that specializes while static elements
+surround it on every guard path. The generated class property suite now draws
+each field element on either placement and models the constructor's own key
+order and the definition-time initializer markers. Forty-two reviewed test262
+cases newly pass, forty-five new expected negatives record the `arguments`
+and `super` static initializer early errors, and sixty-eight new unsupported
+cases record the `C.#name` boundary this unit keeps. The reviewed subset
+gains the `class-static-fields-public` and `class-static-fields-private`
+feature tags; the remaining cases those tags reach need `String`, further
+`Object` members, `eval`, `Proxy`, `Function`, static private methods, or
+generator and asynchronous methods, and stay outside the reviewed subset
+until the units that own them land. The manifest moves to 1203 passes, 871
+expected negatives, and 365 unsupported profile features with no semantic or
+harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

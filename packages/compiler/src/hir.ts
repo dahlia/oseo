@@ -313,8 +313,9 @@ export interface HirClassMethod extends LocatedSyntax {
 /**
  * One resolved field definition in an HIR class body. The initializer
  * is resolved as its own function, so it reads the class scope instead
- * of the constructor's parameters and takes the instance under
- * construction as its receiver.
+ * of the constructor's parameters and takes the object the field is
+ * defined on as its receiver: the instance under construction for an
+ * instance field and the constructor itself for a `static` one.
  */
 export interface HirClassField extends LocatedSyntax {
   /**
@@ -332,6 +333,12 @@ export interface HirClassField extends LocatedSyntax {
    */
   readonly keyNameBindingId?: number;
   readonly kind: "field";
+  /**
+   * True for a `static` field, which the class definition defines on the
+   * constructor after every element is in place, rather than recording
+   * for each instance the constructor builds.
+   */
+  readonly staticPlacement?: true;
 }
 
 /** One element admitted by an HIR class body. */

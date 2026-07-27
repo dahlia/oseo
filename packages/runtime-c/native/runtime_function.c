@@ -1023,6 +1023,92 @@ OseoResult oseo_initialize_instance_elements(
     return result;
 }
 
+/*
+ * DefineField against a class constructor, which is what a `static`
+ * field definition performs once the class is otherwise complete. The
+ * initializer runs with the constructor as its receiver, so `this`
+ * inside it is the class, and its result is installed as a property or
+ * as a private element the constructor carries.
+ */
+static OseoResult define_static_field(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue key,
+    OseoValue initializer,
+    bool private_element
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class elements need a class.");
+    }
+    if (private_element != is_private_name(key)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A static field key does not match its placement."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = constructor;
+    frame.slots[1] = key;
+    frame.slots[2] = initializer;
+    frame.slots[3] = oseo_undefined();
+    if (tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED) {
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (private_element) {
+            OseoPrivateElement added = {
+                frame.slots[1],
+                frame.slots[3],
+                oseo_undefined(),
+                oseo_undefined(),
+                OSEO_PRIVATE_ELEMENT_FIELD,
+            };
+            result = add_private_element(context, frame.slots[0], added);
+        } else {
+            OseoPropertyAttributes attributes = {true, true, true, false};
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                frame.slots[3],
+                attributes
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[0]);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_class_static_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue key,
+    OseoValue initializer
+) {
+    return define_static_field(context, constructor, key, initializer, false);
+}
+
+OseoResult oseo_class_static_private_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue initializer
+) {
+    return define_static_field(context, constructor, name, initializer, true);
+}
+
 void oseo_bind_home_object(OseoValue function, OseoValue home) {
     if (!is_function(function)) return;
     function_object(function)->home_object = home;

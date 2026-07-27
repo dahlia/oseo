@@ -558,6 +558,31 @@ OseoResult oseo_initialize_instance_elements(
     OseoValue instance
 );
 /*
+ * DefineField with a class constructor as the receiver, which is how a
+ * `static` field is initialized. The initializer, or `undefined` for a
+ * field declared without one, is called with the constructor as its
+ * receiver and no arguments, and the result becomes an own writable,
+ * enumerable, configurable data property of the constructor.
+ */
+OseoResult oseo_class_static_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue key,
+    OseoValue initializer
+);
+/*
+ * The same definition for a `static #name` field, whose result becomes
+ * a private element the constructor itself carries rather than a
+ * property. Only a private reference through the declaring class body
+ * reaches it.
+ */
+OseoResult oseo_class_static_private_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue initializer
+);
+/*
  * Records one class element's [[HomeObject]]: the class prototype
  * object for an instance element and the constructor for a static one.
  * A value that is not a function is ignored, because only a function

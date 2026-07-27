@@ -127,6 +127,8 @@ export interface MirOperation {
     | "class-private-field-define"
     | "class-private-method-define"
     | "class-prototype"
+    | "class-static-field-define"
+    | "class-static-private-field-define"
     | "constant"
     | "caught"
     | "completion-set"

@@ -1253,17 +1253,18 @@ function classElementStaticName(
 }
 
 /**
- * Resolves one instance field definition. The key belongs to the class
- * body and is evaluated where the element appears, while the
- * initializer becomes a separate function that runs once per instance.
- * That function is built here rather than resolved from a synthesized
- * syntax function, because its body is exactly one `return` of the
- * initializer expression and it declares nothing of its own.
+ * Resolves one field definition. The key belongs to the class body and
+ * is evaluated where the element appears, while the initializer becomes
+ * a separate function that runs once per instance, or once for the
+ * whole class when the field is `static`. That function is built here
+ * rather than resolved from a synthesized syntax function, because its
+ * body is exactly one `return` of the initializer expression and it
+ * declares nothing of its own.
  *
  * The initializer's scope is the class scope, so it never reaches the
  * constructor's parameters, and it provides its own receiver, so a
  * derived constructor's `this` binding stops at it and an arrow
- * function inside it captures the instance being initialized.
+ * function inside it captures the object being initialized.
  */
 function resolveClassField(
   element: SyntaxClassField,
@@ -1273,8 +1274,10 @@ function resolveClassField(
   const key = resolveClassElementKey(element.key, classScopes, state);
   if (key == null) return undefined;
   const located = locatedOf(element);
+  const placement =
+    element.staticPlacement === true ? { staticPlacement: true as const } : {};
   if (element.initializer == null) {
-    return { ...located, key, kind: "field" };
+    return { ...located, key, kind: "field", ...placement };
   }
   const initializerId = state.nextFunctionId;
   state.nextFunctionId += 1;
@@ -1327,6 +1330,7 @@ function resolveClassField(
     key,
     ...(keyNameBindingId == null ? {} : { keyNameBindingId }),
     kind: "field",
+    ...placement,
   };
 }
 

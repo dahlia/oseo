@@ -1099,6 +1099,33 @@ function emitClassFieldDefine(state: EmitState, operation: MirOperation): void {
 }
 
 /**
+ * Runs one `static` field initializer against the constructor and
+ * defines the result on it. The public form creates an own writable,
+ * enumerable, configurable data property, and the private form adds a
+ * private element the constructor carries.
+ */
+function emitClassStaticFieldDefine(
+  state: EmitState,
+  operation: MirOperation,
+  privateElement: boolean,
+): void {
+  const constructorValue = operationArgument(operation, 0);
+  const key = operationArgument(operation, 1);
+  const initializer = operationArgument(operation, 2);
+  const entryPoint = privateElement
+    ? "oseo_class_static_private_field_define"
+    : "oseo_class_static_field_define";
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = ${entryPoint}(context, ` +
+      `roots[${constructorValue}], roots[${key}], roots[${initializer}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
  * Creates one private name: the identity a class evaluation gives one
  * declared `#name`. The name itself carries nothing, so the operation
  * takes no operand and the spelled name stays in the MIR detail.
@@ -1412,6 +1439,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitClassPrivateFieldDefine(state, operation);
   } else if (operation.kind === "class-private-method-define") {
     emitClassPrivateMethodDefine(state, operation);
+  } else if (operation.kind === "class-static-field-define") {
+    emitClassStaticFieldDefine(state, operation, false);
+  } else if (operation.kind === "class-static-private-field-define") {
+    emitClassStaticFieldDefine(state, operation, true);
   } else if (operation.kind === "private-get") {
     emitPrivateGet(state, operation);
   } else if (operation.kind === "private-set") {

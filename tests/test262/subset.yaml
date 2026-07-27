@@ -6,6 +6,8 @@ supportedFeatures:
   - class-fields-private
   - class-fields-public
   - class-methods-private
+  - class-static-fields-private
+  - class-static-fields-public
   - coalesce-expression
   - computed-property-names
   - const
@@ -940,12 +942,48 @@ tests:
   - path: test/language/expressions/class/constructor-this-tdz-during-initializers.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/arrow-fnc-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, functions, object-properties]
   - path: test/language/expressions/class/elements/arrow-fnc-init-err-contains-super.js
     expectedClassification: expected-negative
     dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/class-name-static-initializer-anonymous.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings, object-properties]
+  - path: test/language/expressions/class/elements/class-name-static-initializer-decl.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings, object-properties]
+  - path: test/language/expressions/class/elements/class-name-static-initializer-expr.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings, object-properties]
   - path: test/language/expressions/class/elements/comp-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1018,6 +1056,9 @@ tests:
   - path: test/language/expressions/class/elements/fields-asi-same-line-2.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-computed-name-static-propname-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/fields-duplicate-privatenames.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1053,6 +1094,24 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/literal-name-init-err-contains-super.js
     expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/nested-arrow-fnc-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -1102,6 +1161,30 @@ tests:
   - path: test/language/expressions/class/elements/nested-private-typeof-init-err-contains-super.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-literal-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-literal-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-private-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-private-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-static-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/nested-string-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1119,6 +1202,24 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/nested-typeof-init-err-contains-super.js
     expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-accessor-name/inst-private-escape-sequence-ZWJ.js
     expectedClassification: pass
@@ -1276,6 +1377,9 @@ tests:
   - path: test/language/expressions/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-static-method-shadowed-by-field-on-nested-class.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
@@ -1312,14 +1416,95 @@ tests:
   - path: test/language/expressions/class/elements/regular-definitions-rs-field-identifier.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/static-as-valid-instance-field-assigned.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/static-as-valid-instance-field.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-as-valid-static-field-assigned.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-as-valid-static-field.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-field-anonymous-function-length.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/static-field-anonymous-function-name.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/static-field-init-this-inside-arrow-function.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/static-field-redeclaration.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-literal-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-literal-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-private-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-private-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/static-private-method-and-instance-method-brand-check.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/string-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -1327,6 +1512,9 @@ tests:
   - path: test/language/expressions/class/elements/string-literal-name-init-err-contains-super.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/super-access-from-arrow-func-on-field.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/delete/field-delete-covered-err-delete-call-expression-private-method-accessor-get.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1639,6 +1827,9 @@ tests:
   - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-set.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-staticfield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-set-field.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1690,6 +1881,12 @@ tests:
   - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-meth.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field-init.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/grammar-privatenames-same-line-error.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -1700,6 +1897,9 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/grammar-special-meth-contains-super-private-method.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-static-privatename-constructor.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/syntax/early-errors/invalid-names/field-init-call-expression-bad-reference.js
@@ -1859,6 +2059,27 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/wrapped-in-sc-rs-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/gen-method-param-dflt-yield.js
@@ -2107,6 +2328,9 @@ tests:
   - path: test/language/expressions/class/name.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/private-static-field-multiple-evaluations-of-class-factory.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/scope-meth-paramsbody-var-close.js
     expectedClassification: pass
     dependencies: [classes, functions]
@@ -4406,7 +4630,7 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/private-identifiers-not-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/privatename-not-valid-earlyerr-module-1.js
     expectedClassification: expected-negative
@@ -4865,6 +5089,36 @@ tests:
   - path: test/language/statements/class/definition/this-access-restriction.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, functions]
+  - path: test/language/statements/class/elements/abrupt-completition-on-field-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, functions, object-properties]
@@ -4885,6 +5139,9 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/computed-name-toprimitive.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/computed-property-abrupt-completition.js
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/ctor-called-after-fields-init.js
     expectedClassification: pass
@@ -4949,13 +5206,37 @@ tests:
   - path: test/language/statements/class/elements/fields-asi-same-line-2.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-computed-name-static-computed-var-propname-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-computed-name-static-computed-var-propname-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-computed-name-static-propname-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-computed-name-static-propname-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/fields-duplicate-privatenames.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/fields-literal-name-propname-constructor.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-literal-name-static-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-literal-name-static-propname-prototype.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/fields-string-name-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-string-name-static-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-string-name-static-propname-prototype.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/get-access-of-missing-private-getter.js
@@ -4975,6 +5256,24 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/literal-name-init-err-contains-super.js
     expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/nested-arrow-fnc-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -5024,6 +5323,30 @@ tests:
   - path: test/language/statements/class/elements/nested-private-typeof-init-err-contains-super.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-literal-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-literal-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-private-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-private-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-static-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/nested-string-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -5041,6 +5364,24 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/nested-typeof-init-err-contains-super.js
     expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-accessor-is-visible-in-computed-properties.js
     expectedClassification: pass
@@ -5240,6 +5581,9 @@ tests:
   - path: test/language/statements/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-static-method-shadowed-by-field-on-nested-class.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
@@ -5372,6 +5716,45 @@ tests:
   - path: test/language/statements/class/elements/regular-definitions-rs-field-identifier.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/set-access-of-missing-private-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -5390,8 +5773,56 @@ tests:
   - path: test/language/statements/class/elements/static-as-valid-instance-field.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-as-valid-static-field-assigned.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-as-valid-static-field.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-field-anonymous-function-length.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/static-field-anonymous-function-name.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/static-field-init-this-inside-arrow-function.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/static-field-initializer-error.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-field-redeclaration.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-fielddefinition-initializer-abrupt-completion.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-literal-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-literal-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-private-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-private-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/static-private-method-and-instance-method-brand-check.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/string-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -5399,6 +5830,9 @@ tests:
   - path: test/language/statements/class/elements/string-literal-name-init-err-contains-super.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/super-access-from-arrow-func-on-field.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions, object-properties]
   - path: test/language/statements/class/elements/super-access-inside-a-private-getter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -5720,6 +6154,9 @@ tests:
   - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-set.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-meth-staticfield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatemeth-duplicate-set-field.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -5771,6 +6208,12 @@ tests:
   - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-meth.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field-init.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatename-whitespace-error-static-field.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/early-errors/grammar-privatenames-same-line-error.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -5781,6 +6224,9 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/early-errors/grammar-special-meth-contains-super-private-method.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-static-privatename-constructor.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/early-errors/invalid-names/field-init-call-expression-bad-reference.js
@@ -5945,6 +6391,27 @@ tests:
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-field-identifier.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/getter-param-dflt.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters]
@@ -6084,7 +6551,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, default-parameters]
   - path: test/language/statements/class/static-classelementname-abrupt-completion.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/static-method-length-dflt.js
     expectedClassification: pass

@@ -58,7 +58,10 @@ type ElementKind =
   | "pair"
   | "setter";
 
-/** True for an element that defines an own property of each instance. */
+/**
+ * True for a field element, which defines an own property of each
+ * instance, or of the constructor when the field is `static`.
+ */
 function isField(element: ElementKind): boolean {
   return (
     element === "bare-field" || element === "field" || element === "named-field"
@@ -75,8 +78,8 @@ interface MethodSpec {
    * Names the element with a private `#name` instead of a property key.
    * A private element defines no property, so the class exposes it
    * through generated bridge methods and no descriptor observation
-   * reaches it. This profile admits no static or computed private
-   * element, so the flag excludes both.
+   * reaches it. This profile admits no computed private element and no
+   * private static method or accessor, so the flag excludes both.
    */
   readonly privateElement: boolean;
   /** A `static` element is defined on the constructor, not the prototype. */
@@ -157,16 +160,25 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       form: testCase.form,
       heritage: testCase.heritage,
       methods: testCase.methods.map((method) => {
-        // This profile admits no static field, and a field initializer
-        // runs before the constructor body assigns `f0`, so a field
-        // element carries neither placement nor a `field` body. A
-        // private element is neither static nor computed here, so it
-        // drops both.
+        // A field initializer runs before the constructor body assigns
+        // `f0`, so a field element carries no `field` body. This profile
+        // admits a private static field but no private static method or
+        // accessor, and no computed private key at all.
         const privateElement = method.privateElement;
         const staticPlacement =
-          method.staticPlacement && !isField(method.element) && !privateElement;
+          method.staticPlacement &&
+          (!privateElement || isField(method.element));
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
+          // A static field initializer runs while the class expression is
+          // still being evaluated, so the storage binding an expression
+          // form is assigned to is in its temporal dead zone there. Only a
+          // class declaration's `self` body reaches a binding at all,
+          // because the class-scope name shadows the outer one.
+          (method.kind === "self" &&
+            staticPlacement &&
+            isField(method.element) &&
+            testCase.form !== "declaration") ||
           (method.kind === "super" && testCase.heritage === "none") ||
           (method.kind === "field" &&
             (fields.length === 0 ||
@@ -216,10 +228,32 @@ function methodResult(testCase: ClassCase, method: MethodSpec): string {
 }
 
 /**
- * Independent model of the evaluation order marker string: every computed
- * key evaluates in source order while the class is defined, a getter and
- * setter pair evaluates its key once per clause, `i` marks each field
- * initializer, and `c` marks the constructor body that follows.
+ * Independent model of the evaluation order marker string one class
+ * definition leaves: every computed key evaluates in source order, a
+ * getter and setter pair evaluates its key once per clause, and every
+ * `static` field initializer then runs in static-element order, after
+ * the whole body is in place.
+ */
+function modelDefinitionOrder(testCase: ClassCase): string {
+  const keys = testCase.methods
+    .map((method, index) =>
+      method.computed
+        ? String(index).repeat(method.element === "pair" ? 2 : 1)
+        : "",
+    )
+    .join("");
+  const statics = testCase.methods
+    .map((method, index) =>
+      method.element === "field" && method.staticPlacement ? `i${index}` : "",
+    )
+    .join("");
+  return keys + statics;
+}
+
+/**
+ * Independent model of the whole marker string: the class definition
+ * followed by construction, where `i` marks each instance field
+ * initializer and `c` marks the constructor body.
  *
  * A base class initializes its fields before the constructor body, and a
  * derived class where `super()` returns, so a declared derived
@@ -227,23 +261,14 @@ function methodResult(testCase: ClassCase, method: MethodSpec): string {
  * runs no marked statement of its own, so the base constructor's marker
  * precedes the fields for that form alone.
  */
-function modelKeyOrder(testCase: ClassCase): string {
-  return testCase.methods
+function modelOrder(testCase: ClassCase): string {
+  const initializers = testCase.methods
     .map((method, index) =>
-      method.computed
-        ? String(index).repeat(method.element === "pair" ? 2 : 1)
-        : "",
+      method.element === "field" && !method.staticPlacement ? `i${index}` : "",
     )
     .join("");
-}
-
-function modelOrder(testCase: ClassCase): string {
-  const keys = modelKeyOrder(testCase);
-  const initializers = testCase.methods
-    .map((method, index) => (method.element === "field" ? `i${index}` : ""))
-    .join("");
   return (
-    keys +
+    modelDefinitionOrder(testCase) +
     (testCase.heritage === "derived-implicit"
       ? `c${initializers}`
       : `${initializers}c`)
@@ -286,14 +311,15 @@ function printCase(testCase: ClassCase): string {
       ? `    super.s${index} = value;`
       : `    this.s${index} = value;`;
     const setter = `  ${modifier}set ${key}(value) {\n${stored}\n  }`;
-    // A field element carries no placement modifier, because this
-    // profile admits instance fields only. Its initializer is marked so
-    // the order string records where it ran, except for the anonymous
-    // function form, whose initializer must stay an anonymous definition
-    // for NamedEvaluation to name it from the key.
+    // A field element's initializer is marked so the order string
+    // records where it ran, except for the anonymous function form,
+    // whose initializer must stay an anonymous definition for
+    // NamedEvaluation to name it from the key.
     // A private element defines no property, so the class carries the
     // bridges every observation of it goes through: reading one, writing
-    // one, and reading a private method's own `name`.
+    // one, and reading a private method's own `name`. A bridge takes the
+    // placement of the element it reaches, because a `static` private
+    // element is carried by the constructor rather than by an instance.
     const bridges = !method.privateElement
       ? ""
       : "\n" +
@@ -302,23 +328,32 @@ function printCase(testCase: ClassCase): string {
             ? []
             : [
                 method.element === "method"
-                  ? `  read${index}(received) {\n` +
+                  ? `  ${modifier}read${index}(received) {\n` +
                     `    return this.#m${index}(received);\n  }`
-                  : `  read${index}() {\n    return this.#m${index};\n  }`,
+                  : `  ${modifier}read${index}() {\n` +
+                    `    return this.#m${index};\n  }`,
               ]),
           ...(method.element === "setter" || method.element === "pair"
-            ? [`  write${index}(value) {\n    this.#m${index} = value;\n  }`]
+            ? [
+                `  ${modifier}write${index}(value) {\n` +
+                  `    this.#m${index} = value;\n  }`,
+              ]
             : []),
           ...(method.element === "method"
-            ? [`  name${index}() {\n    return this.#m${index}.name;\n  }`]
+            ? [
+                `  ${modifier}name${index}() {\n` +
+                  `    return this.#m${index}.name;\n  }`,
+              ]
             : []),
         ].join("\n");
-    if (method.element === "bare-field") return `  ${key};${bridges}`;
+    if (method.element === "bare-field") {
+      return `  ${modifier}${key};${bridges}`;
+    }
     if (method.element === "named-field") {
-      return `  ${key} = function () {};${bridges}`;
+      return `  ${modifier}${key} = function () {};${bridges}`;
     }
     if (method.element === "field") {
-      return `  ${key} = note(${index}, ${read});${bridges}`;
+      return `  ${modifier}${key} = note(${index}, ${read});${bridges}`;
     }
     if (method.element === "getter" || method.element === "pair") {
       const getter = `  ${modifier}get ${key}() {\n    return ${read};\n  }`;
@@ -379,55 +414,58 @@ function printCase(testCase: ClassCase): string {
   const reads = testCase.methods.map((method, index) => {
     const argument = method.kind === "self" ? "Shape" : "";
     const descriptor = `d${index}`;
+    // A static element is reached through the class and an instance
+    // element through an instance, whichever kind of element it is.
+    const receiver = method.staticPlacement ? "Shape" : "instance";
     // A private element reaches no descriptor and no key list, so its
     // observation goes through the bridges and reports only the values.
     if (method.privateElement) {
       if (method.element === "named-field") {
         return (
-          `console.log("m${index}", typeof instance.read${index}(), ` +
-          `instance.read${index}().name);`
+          `console.log("m${index}", typeof ${receiver}.read${index}(), ` +
+          `${receiver}.read${index}().name);`
         );
       }
       if (method.element === "setter") {
         return (
-          `instance.write${index}(${method.value});\n` +
-          `console.log("m${index}", instance.s${index});`
+          `${receiver}.write${index}(${method.value});\n` +
+          `console.log("m${index}", ${receiver}.s${index});`
         );
       }
       if (method.element === "pair") {
         return (
-          `instance.write${index}(${method.value});\n` +
-          `console.log("m${index}", instance.read${index}(), ` +
-          `instance.s${index});`
+          `${receiver}.write${index}(${method.value});\n` +
+          `console.log("m${index}", ${receiver}.read${index}(), ` +
+          `${receiver}.s${index});`
         );
       }
       if (method.element === "method") {
         return (
-          `console.log("m${index}", instance.read${index}(${argument}), ` +
-          `instance.name${index}());`
+          `console.log("m${index}", ${receiver}.read${index}(${argument}), ` +
+          `${receiver}.name${index}());`
         );
       }
-      return `console.log("m${index}", instance.read${index}());`;
+      return `console.log("m${index}", ${receiver}.read${index}());`;
     }
-    // A static element is an own property of the constructor and is
-    // reached through the class, never through an instance.
+    // A static method or accessor is an own property of the constructor
+    // and an instance one of the prototype object.
     const owner = method.staticPlacement ? "Shape" : "Shape.prototype";
-    const receiver = method.staticPlacement ? "Shape" : "instance";
     const lookup =
       `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
       `${owner}, "m${index}");\n`;
     const attributes = `${descriptor}.enumerable, ${descriptor}.configurable`;
-    // A field is an own property of the instance, so its descriptor is
-    // read there and reports the writable, enumerable, configurable
-    // attributes CreateDataProperty gives it.
+    // A field is an own property of the object it is defined on, the
+    // instance or the constructor, so its descriptor is read there and
+    // reports the writable, enumerable, configurable attributes
+    // CreateDataProperty gives it.
     if (isField(method.element)) {
       const fieldLookup =
         `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
-        `instance, "m${index}");\n`;
+        `${receiver}, "m${index}");\n`;
       const read =
         method.element === "named-field"
-          ? `typeof instance.m${index}, instance.m${index}.name`
-          : `instance.m${index}`;
+          ? `typeof ${receiver}.m${index}, ${receiver}.m${index}.name`
+          : `${receiver}.m${index}`;
       return (
         `${fieldLookup}console.log("m${index}", ${read}, ` +
         `${descriptor}.writable, ${attributes});`
@@ -465,11 +503,17 @@ function printCase(testCase: ClassCase): string {
   // the bridge runs against a plain object, whose class never installed
   // the element, so PrivateGet reports a TypeError instead of undefined.
   const brandIndex = brandCheckIndex(testCase);
+  const brandOwner =
+    brandIndex == null
+      ? ""
+      : testCase.methods[brandIndex]?.staticPlacement === true
+        ? "Shape"
+        : "Shape.prototype";
   const brandCheck =
     brandIndex == null
       ? ""
       : `const bridge = { read${brandIndex}: ` +
-        `Shape.prototype.read${brandIndex} };\n` +
+        `${brandOwner}.read${brandIndex} };\n` +
         "try {\n" +
         `  bridge.read${brandIndex}();\n` +
         "} catch (error) {\n" +
@@ -525,8 +569,19 @@ console.log("order", order);
 function expected(testCase: ClassCase): string {
   const order = modelOrder(testCase);
   const lines: string[] = [];
-  lines.push(`definition ${modelKeyOrder(testCase)}`);
-  lines.push("keys ");
+  lines.push(`definition ${modelDefinitionOrder(testCase)}`);
+  // A method and an accessor are non-enumerable, so only a public
+  // `static` field reaches a key list, in the order the definitions ran.
+  const staticKeys = testCase.methods
+    .map((method, index) =>
+      isField(method.element) &&
+      method.staticPlacement &&
+      !method.privateElement
+        ? `m${index}`
+        : "",
+    )
+    .join("");
+  lines.push(`keys ${staticKeys}`);
   // An anonymous class expression takes the storage binding's name, so
   // only the named expression form reports its own inner name.
   const name = testCase.form === "named-expression" ? "Inner" : "Shape";
@@ -545,7 +600,11 @@ function expected(testCase: ClassCase): string {
     (testCase.heritage === "none" ? "" : "base") +
     testCase.methods
       .map((method, index) =>
-        isField(method.element) && !method.privateElement ? `m${index}` : "",
+        isField(method.element) &&
+        !method.privateElement &&
+        !method.staticPlacement
+          ? `m${index}`
+          : "",
       )
       .join("") +
     testCase.fields.map((_, index) => `f${index}`).join("");
@@ -896,6 +955,70 @@ test("class model reads a static element through the constructor", () => {
   assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m0"\)/u);
   assert.match(source, /Shape\.m0\(Shape\)/u);
   assert.match(source, /Shape\.m1 = 6;/u);
+});
+
+test("class model defines static fields after the whole body", () => {
+  const testCase: ClassCase = {
+    fields: [4],
+    form: "declaration",
+    heritage: "none",
+    methods: [
+      {
+        computed: false,
+        element: "field",
+        kind: "constant",
+        privateElement: false,
+        staticPlacement: false,
+        superWrite: false,
+        value: 1,
+      },
+      {
+        computed: true,
+        element: "field",
+        kind: "constant",
+        privateElement: false,
+        staticPlacement: true,
+        superWrite: false,
+        value: 2,
+      },
+      {
+        computed: false,
+        element: "bare-field",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: true,
+        superWrite: false,
+        value: 3,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    // The static initializer runs while the class is defined, after
+    // every key, so its marker joins the definition line; the instance
+    // initializer waits for construction.
+    "definition 1i1\n" +
+      "keys m1\n" +
+      "name Shape 1\n" +
+      "constructor true\n" +
+      "instance true 4\n" +
+      "instance-keys m0f0\n" +
+      "m0 1 true true true\n" +
+      "m1 2 true true true\n" +
+      "m2 undefined\n" +
+      "brand true\n" +
+      "no-new true\n" +
+      "order 1i1i0c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /static \[mark\("m1", 1\)\] = note\(1, 2\);/u);
+  assert.match(source, /static #m2;/u);
+  assert.match(source, /static read2\(\) \{\n {4}return this\.#m2;/u);
+  // A static field is an own property of the constructor, so both the
+  // descriptor lookup and the observation go through the class.
+  assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m1"\)/u);
+  assert.match(source, /Object\.getOwnPropertyDescriptor\(instance, "m0"\)/u);
+  assert.match(source, /const bridge = \{ read2: Shape\.read2 \};/u);
 });
 
 test("class model reads inherited members of a derived class", () => {
