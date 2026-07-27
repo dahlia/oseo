@@ -794,6 +794,18 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         `roots[${key}], roots[${value}], ` +
         "(OseoPropertyAttributes){true, true, true, false});",
     );
+  } else if (operation.kind === "property-define-method") {
+    const object = operationArgument(operation, 0);
+    const key = operationArgument(operation, 1);
+    const value = operationArgument(operation, 2);
+    // A class prototype method is writable and configurable but not
+    // enumerable, unlike an object literal's method definition.
+    line(
+      state,
+      `result = oseo_object_define(context, roots[${object}], ` +
+        `roots[${key}], roots[${value}], ` +
+        "(OseoPropertyAttributes){true, false, true, false});",
+    );
   } else if (operation.kind === "property-define-accessor") {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
@@ -811,6 +823,9 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
   } else {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
+    // A class body's computed keys are strict even inside a non-strict
+    // function, so the operation may raise the function's strictness.
+    const strict = state.strict || operation.strict === true;
     if (operation.kind === "property-get") {
       line(
         state,
@@ -821,7 +836,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       line(
         state,
         `result = oseo_object_delete(context, roots[${object}], ` +
-          `roots[${key}], ${state.strict ? "true" : "false"});`,
+          `roots[${key}], ${strict ? "true" : "false"});`,
       );
     } else {
       const value = operationArgument(operation, 2);
@@ -829,7 +844,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         state,
         `result = oseo_object_set(context, roots[${object}], ` +
           `roots[${key}], roots[${value}], ` +
-          `${state.strict ? "true" : "false"});`,
+          `${strict ? "true" : "false"});`,
       );
     }
   }
@@ -926,6 +941,7 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     arrow: "OSEO_FUNCTION_ARROW",
     async: "OSEO_FUNCTION_ASYNC",
     "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
+    class: "OSEO_FUNCTION_CLASS",
     generator: "OSEO_FUNCTION_GENERATOR",
     method: "OSEO_FUNCTION_METHOD",
     ordinary: "OSEO_FUNCTION_ORDINARY",
@@ -996,6 +1012,17 @@ function emitConstructReceiver(
   line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
   line(state, "    result = oseo_constructor_receiver(context, result.value);");
   line(state, "}");
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+function emitClassPrototype(state: EmitState, operation: MirOperation): void {
+  const constructorValue = operationArgument(operation, 0);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_function_prototype(context, roots[${constructorValue}]);`,
+  );
   line(state, `roots[${operation.id}] = result.value;`);
 }
 
@@ -1080,6 +1107,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitFunctionCreate(state, operation);
   } else if (operation.kind === "construct-receiver") {
     emitConstructReceiver(state, operation);
+  } else if (operation.kind === "class-prototype") {
+    emitClassPrototype(state, operation);
   } else if (operation.kind === "error-intrinsic") {
     emitErrorIntrinsic(state, operation);
   } else if (operation.kind === "symbol-intrinsic") {
@@ -1215,6 +1244,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "property-key" ||
     operation.kind === "property-define-accessor" ||
     operation.kind === "property-define-data" ||
+    operation.kind === "property-define-method" ||
     operation.kind === "property-delete" ||
     operation.kind === "property-get" ||
     operation.kind === "property-set"
@@ -1995,6 +2025,18 @@ export const cBackend: NativeBackend = {
           totalBindingCount,
           parameter.bindingId + 1,
         );
+      }
+      // A class-scope name binding creates its cell where the class
+      // expression evaluates rather than in a declaration prologue, so
+      // the environment must still reserve its slot.
+      for (const block of functionValue.blocks) {
+        for (const operation of block.operations) {
+          if (operation.bindingId == null) continue;
+          totalBindingCount = Math.max(
+            totalBindingCount,
+            operation.bindingId + 1,
+          );
+        }
       }
     }
     for (const binding of input.globalBindings) {

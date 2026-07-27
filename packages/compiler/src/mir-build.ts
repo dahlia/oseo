@@ -620,6 +620,14 @@ function lowerObjectCoercible(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * Marks one property assignment or deletion as strict when it is lowered
+ * inside a region that is strict regardless of the enclosing function.
+ */
+function strictCodeFlag(builder: MirBuilder): { readonly strict?: true } {
+  return builder.strictCode ? { strict: true } : {};
+}
+
 function lowerPropertyWrite(
   object: number,
   key: number,
@@ -642,6 +650,7 @@ function lowerPropertyWrite(
     id,
     kind: "property-set",
     range,
+    ...strictCodeFlag(builder),
   });
   appendMirMetadata(
     builder,
@@ -1104,6 +1113,126 @@ function lowerYieldDelegation(
   builder.current = exitBlock;
   appendMirMetadata(builder, "join", `yield* bb${stepBlock.id}`, [], range);
   return recordRoot(builder, stepResult, range);
+}
+
+/**
+ * True for an anonymous function or class definition, which
+ * NamedEvaluation names from the key or binding that stores it. A static
+ * key is already resolved during HIR name inference; this decides whether
+ * a computed key must also reach the closure at run time.
+ */
+function anonymousDefinition(expression: HirExpression): boolean {
+  if (expression.kind === "function") return expression.name === "";
+  return (
+    expression.kind === "class" &&
+    expression.constructorFunction.kind === "function" &&
+    expression.constructorFunction.name === ""
+  );
+}
+
+/**
+ * Lowers one class expression in ClassDefinitionEvaluation order: the
+ * class-scope cell is created first so every closure the body allocates
+ * shares it, then the constructor closure and its prototype object,
+ * then each prototype method as a non-enumerable data property, and the
+ * class-scope binding is initialized last. Initializing it last is
+ * observable: a computed key that reads the class name reaches the
+ * binding in its temporal dead zone.
+ */
+function lowerClassExpression(
+  expression: HirExpression & { readonly kind: "class" },
+  builder: MirBuilder,
+  inferredFunctionName?: number,
+): number {
+  const nameBinding = expression.nameBinding;
+  if (nameBinding != null) {
+    resetBinding(
+      nameBinding.bindingId,
+      nameBinding.name,
+      expression.range,
+      builder,
+    );
+  }
+  const constructorValue = lowerExpression(
+    expression.constructorFunction,
+    builder,
+    inferredFunctionName,
+  );
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "class prototype lookup",
+    [constructorValue],
+    expression.range,
+  );
+  const prototype = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [constructorValue],
+    detail: "class prototype object",
+    id: prototype,
+    kind: "class-prototype",
+    range: expression.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [prototype],
+    expression.range,
+  );
+  recordRoot(builder, prototype, expression.range);
+  for (const element of expression.elements) {
+    // A computed element key is class-body code, so it is strict even
+    // when the enclosing function or script is not.
+    const enclosingStrictCode = builder.strictCode;
+    builder.strictCode = true;
+    const key = lowerPropertyKey(element.key, builder);
+    builder.strictCode = enclosingStrictCode;
+    const value = lowerExpression(
+      element.value,
+      builder,
+      anonymousDefinition(element.value) ? key : undefined,
+    );
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "prototype method storage growth",
+      [prototype, key, value],
+      element.range,
+    );
+    const defined = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [prototype, key, value],
+      detail: "define non-enumerable prototype method",
+      id: defined,
+      kind: "property-define-method",
+      range: element.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [defined],
+      element.range,
+    );
+    recordRoot(builder, defined, element.range);
+  }
+  if (nameBinding != null) {
+    const initialized = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [constructorValue],
+      bindingId: nameBinding.bindingId,
+      detail: `%b${nameBinding.bindingId} ${nameBinding.name}`,
+      id: initialized,
+      kind: "initialize",
+      range: expression.range,
+    });
+    recordRoot(builder, initialized, expression.range);
+  }
+  return constructorValue;
 }
 
 function lowerExpression(
@@ -1695,9 +1824,7 @@ function lowerExpression(
       const value = lowerExpression(
         property.value,
         builder,
-        property.value.kind === "function" && property.value.name === ""
-          ? key
-          : undefined,
+        anonymousDefinition(property.value) ? key : undefined,
         property.accessorKind,
       );
       appendMirMetadata(
@@ -1737,6 +1864,9 @@ function lowerExpression(
       recordRoot(builder, result, expression.range);
     }
     return id;
+  }
+  if (expression.kind === "class") {
+    return lowerClassExpression(expression, builder, inferredFunctionName);
   }
   if (
     expression.kind === "property-get" ||
@@ -1781,6 +1911,7 @@ function lowerExpression(
       id,
       kind: expression.kind,
       range: expression.range,
+      ...(expression.kind === "property-delete" ? strictCodeFlag(builder) : {}),
     });
     appendMirMetadata(
       builder,
@@ -1810,6 +1941,7 @@ function lowerExpression(
       id,
       kind: "property-set",
       range: expression.range,
+      ...strictCodeFlag(builder),
     });
     appendMirMetadata(
       builder,
@@ -2457,6 +2589,7 @@ function lowerForOfTarget(
     id,
     kind: "property-set",
     range: target.range,
+    ...strictCodeFlag(builder),
   });
   appendMirMetadata(
     builder,
@@ -2767,6 +2900,7 @@ function lowerBindingTarget(
       id,
       kind: "property-set",
       range: pattern.range,
+      ...strictCodeFlag(builder),
     });
     appendMirMetadata(
       builder,
@@ -3695,6 +3829,7 @@ function buildMirFunction(
     nextValue: 0,
     pendingLabels: [],
     specialization,
+    strictCode: strict,
   };
   const returned = lowerStatements(body, builder);
   if (!returned) {

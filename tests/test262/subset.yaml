@@ -1,6 +1,7 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - async-functions
+  - class
   - coalesce-expression
   - computed-property-names
   - const
@@ -745,6 +746,249 @@ tests:
   - path: test/language/expressions/call/spread-sngl-obj-ident.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/class/class-name-ident-await-escaped-module.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-await-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-await-module.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-await.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-let-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-let.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-static-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-static.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-yield-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators, lexical-bindings]
+  - path: test/language/expressions/class/class-name-ident-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators, lexical-bindings]
+  - path: test/language/expressions/class/gen-method-param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/getter-param-dflt.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/ident-name-method-def-break-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-case-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-catch-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-const-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-continue-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-debugger-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-default-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-default.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-delete-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-do-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-else-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-enum-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-export-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-extends-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-extends-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-extends.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-finally-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-for-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-function-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-if-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-implements-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-import-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-in-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-instanceof-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-interface-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-let-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-new-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-package-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-private-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-protected-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-public-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-return-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-static-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-super-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-switch-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-this-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-throw-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-try-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-typeof-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-var-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-void-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-while-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/ident-name-method-def-with-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/method-length-dflt.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/method-param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/method/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/expressions/class/method/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
+  - path: test/language/expressions/class/method/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/expressions/class/method/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/method/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/method/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, rest-parameters]
+  - path: test/language/expressions/class/method/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, rest-parameters]
+  - path: test/language/expressions/class/name.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/scope-meth-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/scope-meth-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/scope-name-lex-close.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/scope-name-lex-open-no-heritage.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/static-gen-method-param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/static-method-param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters, generators]
   - path: test/language/expressions/coalesce/cannot-chain-head-with-logical-and.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -2960,6 +3204,153 @@ tests:
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/class/definition/accessors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/constructor-property.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/early-errors-class-async-method-duplicate-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-NSPL-with-USD.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-arguments-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-await-in-formals-default.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-await-in-formals.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-body-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-duplicate-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-eval-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-formals-body-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/early-errors-class-method-formals-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/fn-length-static-precedence.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/getters-prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/methods-gen-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-as-function-expression-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-as-identifier-in-nested-function.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-as-logical-or-expression.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-as-parameter.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-star-after-newline.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-gen-yield-weak-binding.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/prototype-property.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/prototype-wiring.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/setters-prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/definition/this-access-restriction.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/method/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/statements/class/method/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
+  - path: test/language/statements/class/method/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/statements/class/method/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/method/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/method/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, rest-parameters]
+  - path: test/language/statements/class/method/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, rest-parameters]
+  - path: test/language/statements/class/name-binding/basic.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/strict-mode/with.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-body-has-direct-super-class-heritage.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-body-method-definition-super-property.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-declaration-computed-method-definition.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-expression.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/syntax/class-method-propname-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/syntax/early-errors/class-definition-evaluation-block-duplicate-binding.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/syntax/early-errors/class-definition-evaluation-scriptbody-duplicate-binding.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
   - path: test/language/statements/const/dstr/ary-name-iter-val.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]

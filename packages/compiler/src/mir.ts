@@ -115,6 +115,7 @@ export interface MirOperation {
     | "branch"
     | "call"
     | "check-status"
+    | "class-prototype"
     | "constant"
     | "caught"
     | "completion-set"
@@ -145,6 +146,7 @@ export interface MirOperation {
     | "property-key"
     | "property-define-accessor"
     | "property-define-data"
+    | "property-define-method"
     | "property-delete"
     | "property-get"
     | "property-set"
@@ -183,6 +185,13 @@ export interface MirOperation {
   readonly iteratorValueResult?: number;
   readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
+  /**
+   * Forces strict-mode property assignment and deletion for one
+   * operation lowered inline into a possibly non-strict function. A
+   * class body's computed element keys are the only such region: they
+   * are strict code even when the enclosing script is not.
+   */
+  readonly strict?: true;
   readonly target?: MirCallTarget;
 }
 
@@ -322,4 +331,10 @@ export interface MirBuilder {
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;
+  /**
+   * True while lowering code that is strict regardless of the enclosing
+   * function's own strictness, so property assignment and deletion report
+   * their failures instead of ignoring them.
+   */
+  strictCode: boolean;
 }

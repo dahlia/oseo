@@ -148,11 +148,12 @@ test("preserves async returns and bindings across await", () => {
 
 test("validates unreachable async statements", () => {
   const loop = compileSource(babelFrontend, {
-    source: "async function invalid() { return 1; class Later {} }",
+    source:
+      "async function invalid() { return 1; class Later extends Base {} }",
     sourceId: "async-unreachable-loop.js",
   });
   assert.equal(loop.mir, undefined);
-  assert.match(loop.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
+  assert.match(loop.diagnostics[0]?.message ?? "", /Class inheritance/u);
 
   const awaitValue = compileSource(babelFrontend, {
     source: "async function invalid() { throw 1; if (true) await 0; }",
@@ -162,11 +163,16 @@ test("validates unreachable async statements", () => {
   assert.match(awaitValue.diagnostics[0]?.message ?? "", /Await/u);
 
   const continuation = compileSource(babelFrontend, {
-    source: "async function invalid() { await 0; return 1; class Later {} }",
+    source:
+      "async function invalid() { await 0; return 1; " +
+      "class Later extends Base {} }",
     sourceId: "async-unreachable-continuation.js",
   });
   assert.equal(continuation.mir, undefined);
-  assert.match(continuation.diagnostics[0]?.message ?? "", /ClassDeclaration/u);
+  assert.match(
+    continuation.diagnostics[0]?.message ?? "",
+    /Class inheritance/u,
+  );
 });
 
 test("rejects nested async await operands", () => {

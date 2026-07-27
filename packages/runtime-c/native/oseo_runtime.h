@@ -29,6 +29,10 @@ typedef enum {
      * generator whose `prototype` object serves the virtualized
      * %GeneratorPrototype% methods. */
     OSEO_FUNCTION_GENERATOR = 6,
+    /* A class constructor: constructible, with a non-writable,
+     * non-enumerable, non-configurable `prototype` object that carries
+     * the class's methods, and never callable without `new`. */
+    OSEO_FUNCTION_CLASS = 7,
 } OseoFunctionKind;
 
 /*

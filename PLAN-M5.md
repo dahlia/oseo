@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 736
-passes, 319 expected negatives, and 140 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 812
+passes, 363 expected negatives, and 150 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -354,6 +354,67 @@ subset until `%GeneratorPrototype%.throw` lands, and `star-string` stays out
 until strings are iterable. The manifest moves to 736 passes, 319 expected
 negatives, and 140 unsupported profile features with no semantic or harness
 failures.
+
+Basic class declarations and class expressions are now admitted, the second
+unit of the functions and executable syntax stream. A class body is lowered
+to one HIR class expression that creates the constructor closure, reads its
+prototype object, defines each prototype method, and initializes the
+class-scope name binding, in ClassDefinitionEvaluation order. The
+constructor uses a new runtime function kind that is constructible like an
+ordinary function but is never callable without `new` and whose `prototype`
+object is non-writable, non-enumerable, and non-configurable; a body that
+omits `constructor` gets a synthesized empty one. Prototype methods reuse
+the non-constructible method kind and the anonymous-function name inference
+already built for object literal method definitions, but install
+non-enumerable data properties through a new
+`property-define-method` MIR operation, so `Object.keys` on a class
+prototype is empty while `prototype.constructor` still points back at the
+class. A named class binds its name immutably in the class's own lexical
+environment: the constructor and every method reach it, an outer
+declaration binding of the same name stays assignable, and the class-scope
+cell is created by the existing `binding-reset` machinery when the class
+expression evaluates and initialized only after every element is defined,
+so a computed key that reads the class name observes its temporal dead
+zone. A class declaration binds its name the way `let` does, so it is
+lexically scoped, assignable, and unreachable before the declaration runs.
+The whole class body is strict code, including computed keys: MIR gained an
+operation-level strictness flag so a computed key's property assignment and
+deletion report their failures even when the enclosing script is not strict,
+and the runtime inferred name that names an anonymous function stored under a
+computed object literal key now names an anonymous class the same way. The
+generated
+property suite uses seed `0x5eed0017` across class declarations, named
+class expressions, and anonymous class expressions with zero to two
+constructor-assigned fields and zero to three prototype methods over static
+and computed keys, comparing an independent name, prototype descriptor, and
+definition-order model with Node.js, Deno, and both native specialization
+policies with forced collection on the enabled path. Fixed native fixtures
+cover the empty class, constructor fields, method `this` and prototype
+placement, `name`, `length`, and descriptor observations for `prototype`,
+`constructor`, and methods, method non-constructibility, the call-without-
+`new` `TypeError`, an object-returning and a primitive-returning
+constructor, per-call class identity from a factory function, anonymous and
+named class expressions, the inner name binding and its immutability, class
+declaration temporal dead zones, computed-key evaluation order and abrupt
+completion, last-definition-wins for a duplicate method name, a nested class
+inside a method, an anonymous class named from a computed object literal key,
+strict-mode rejection inside a class method in a non-strict script, and a
+computed key in a non-strict script that assigns to a non-writable property
+or deletes a non-configurable one. Seventy-six reviewed test262 cases newly
+pass with forty-four new expected negatives, covering class name identifiers
+and their escaped forms, method property names over every reserved word,
+computed method definitions, `constructor` and `prototype` property
+descriptors, method default, trailing-comma, and rest parameter forms,
+class-scope name lexical open and close observations, and the strict-mode and
+duplicate- binding early errors. Ten deliberately unsupported cases record the
+unit's boundaries. Getter and setter accessors, static members, class fields,
+private names, static initialization blocks, `extends`, `super`, and
+`export default class` remain rejected with source-located diagnostics.
+Asynchronous class methods are admitted, because they share the object literal
+method path exactly; generator and asynchronous generator methods stay rejected
+with the same diagnostic object literals already use. The manifest moves to 812
+passes, 363 expected negatives, and 150 unsupported profile features with no
+semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

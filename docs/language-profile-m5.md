@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,195 reviewed cases: 736 passes, 319 expected
-negatives, and 140 unsupported profile features. It records no semantic or
+The current manifest contains 1,325 reviewed cases: 812 passes, 363 expected
+negatives, and 150 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -771,6 +771,88 @@ its deliberate boundary and its evidence:
     *test/built-ins/GeneratorFunction/* cases are recorded as unsupported with
     the `dynamic-source` dependency tag, so the intrinsic boundary stays
     visible in the manifest rather than absent from it.
+ -  Basic class declarations and class expressions. A class body is lowered
+    to one HIR class expression that creates the constructor closure, reads
+    its prototype object, defines each prototype method, and initializes the
+    class-scope name binding, in ClassDefinitionEvaluation order. The
+    constructor is created with a distinct runtime function kind that is
+    constructible like an ordinary function, so `new Foo()` allocates a
+    receiver from `Foo.prototype`, runs the body with that receiver as
+    dynamic `this`, and reports an object the body returns in place of the
+    receiver. Unlike an ordinary function it is never callable without
+    `new`: a plain call throws a `TypeError` before the body runs, matching
+    `[[IsClassConstructor]]`. Its `prototype` object is non-writable,
+    non-enumerable, and non-configurable, and carries the writable,
+    non-enumerable, configurable `constructor` property back to the class. A
+    body that omits `constructor` gets a synthesized empty constructor with
+    a `length` of zero. Each method definition reuses the non-constructible
+    method function kind and the anonymous-function name inference already
+    built for object literal methods, so a method has no own `prototype`
+    property, its `name` matches its key for both static and computed keys,
+    and `new` on one throws a `TypeError`. Unlike an object literal method,
+    a class method is installed as a writable, configurable,
+    non-enumerable data property, so `Object.keys` on a class prototype is
+    empty and a later definition for the same key still replaces an earlier
+    one. A named class binds its name immutably in the class's own lexical
+    environment. The constructor and every method reach that binding, an
+    outer class declaration binding of the same name stays assignable
+    without affecting it, and assigning the inner name from inside the class
+    body throws a `TypeError` because the class body is strict. The
+    class-scope cell is created by the same `binding-reset` machinery
+    per-iteration lexical bindings already use, so a class expression
+    evaluated repeatedly produces one cell per evaluation, and it is
+    initialized only after every element is defined, so a computed key that
+    reads the class name observes its temporal dead zone. A class
+    declaration binds its name the way `let` does: lexically scoped,
+    assignable, and unreachable before the declaration runs, and a `var`
+    sharing its name in the same scope is rejected. A computed element key
+    is class-body code, so it is strict even inside a non-strict script:
+    MIR carries an operation-level strictness flag that raises property
+    assignment and deletion above the enclosing function's own strictness
+    for exactly that region. Named evaluation applies
+    to an anonymous class expression exactly as it does to an anonymous
+    function expression, so `const Foo = class {}` reports a `name` of
+    `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
+    the storage key is a computed object literal key that only reaches the
+    closure at run time. Deliberate
+    boundaries: getter and setter accessors, static members, class fields,
+    private names, static initialization blocks, `extends`, `super`, and
+    `export default class` are rejected with source-located diagnostics.
+    Asynchronous class methods are admitted, because they reach the same
+    lowering object literal async methods already use; generator and
+    asynchronous generator methods stay rejected with that shared
+    diagnostic. Native differential fixtures retain the empty class,
+    constructor-assigned fields, a method's `this` and prototype placement,
+    class `name` and `length`, descriptor observations for `prototype`,
+    `constructor`, and a method, method non-constructibility, the
+    call-without-`new` `TypeError`, an object-returning and a
+    primitive-returning constructor, per-call class identity from a factory
+    function, anonymous and named class expressions, the inner name binding
+    and its immutability, class declaration temporal dead zones,
+    computed-key evaluation order and abrupt completion, last-definition-
+    wins for a duplicate method name, a nested class inside a method, an
+    anonymous class named from a computed object literal key, a
+    strict-mode rejection inside a class method in a non-strict script, and
+    a computed key in a non-strict script that assigns to a non-writable
+    property or deletes a non-configurable one. A
+    generated property with seed `0x5eed0017` covers class declarations,
+    named class expressions, and anonymous class expressions with zero to
+    two constructor-assigned fields and zero to three prototype methods over
+    static and computed keys, across Node.js, Deno, both specialization
+    policies, and forced collection on the enabled path. Seventy-six
+    reviewed test262 cases newly pass and forty-four new expected negatives
+    cover class name identifiers and their escaped forms, method property
+    names over every reserved word, computed method definitions,
+    `constructor` and `prototype` property descriptors, method default,
+    trailing-comma, and rest parameter forms, class-scope name lexical open
+    and close observations, and the strict-mode and duplicate-binding early
+    errors. Ten deliberately unsupported cases record the accessor, static,
+    generator-method, `extends`, and `super` boundaries in the manifest. The
+    ten `forbidden-ext` cases that assert a class method has no own `caller`
+    or `arguments` property stay out of the reviewed subset until
+    `Object.prototype.hasOwnProperty` exists; the property they check already
+    holds, but the assertion itself needs an intrinsic this profile does not
+    provide.
 
 
 Known gaps inside the claim
@@ -779,12 +861,16 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Classes, big integers, regular expressions, and the remaining
-    expression grammar are outside the admitted syntax. Owner: the
+ -  Big integers, regular expressions, and the remaining expression grammar
+    are outside the admitted syntax. Owner: the
     core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+ -  Class getter and setter accessors, static members, class fields, private
+    names, static initialization blocks, `extends`, `super`, and
+    `export default class` are outside the admitted class subset. Owner: the
+    functions and executable syntax stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is
