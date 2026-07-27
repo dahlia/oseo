@@ -1158,7 +1158,6 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
-    ["class C { static {} }", /class element is unsupported/u],
     ["class C { *step() {} }", /method generator functions/u],
     ["class C { static *step() {} }", /method generator functions/u],
     ["class C { constructor() {} constructor() {} }", /one constructor/u],
@@ -1271,6 +1270,52 @@ console.log(Registry.count, Registry.missing, Registry.reveal());
   const record = mir.indexOf("class-field-define record instance field");
   const define = mir.indexOf("class-static-field-define");
   assert.ok(record !== -1 && define !== -1 && record < define);
+});
+
+test("lowers static blocks to calls against the constructor", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Setup {
+  static first = 1;
+  static {
+    this.second = this.first + 1;
+  }
+  static third = Setup.second + 1;
+  static {
+    var scoped = this.third;
+    this.fourth = scoped + 1;
+  }
+  instance = 0;
+}
+console.log(Setup.second, Setup.fourth);
+`,
+    sourceId: "class-static-block.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  assert.equal(text.match(/static block function @f\d+/gu)?.length, 2);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.equal(
+    mir.match(/call static initialization block/gu)?.length,
+    2,
+    "each block becomes one call",
+  );
+  // Every static element is deferred until the class body is otherwise
+  // complete, so the instance record precedes them, and the blocks
+  // interleave with the static fields in source order.
+  const record = mir.indexOf("class-field-define record instance field");
+  const runs = [...mir.matchAll(/(class-static-field-define|call static)/gu)];
+  assert.ok(record !== -1 && record < (runs[0]?.index ?? -1));
+  assert.deepEqual(
+    runs.map((run) => run[0]),
+    [
+      "class-static-field-define",
+      "call static",
+      "class-static-field-define",
+      "call static",
+    ],
+  );
 });
 
 test("lowers private class elements to per-evaluation names", () => {

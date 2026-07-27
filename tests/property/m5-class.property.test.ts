@@ -47,7 +47,10 @@ type MethodKind = "constant" | "field" | "self" | "super";
  * getter and a setter clause under one key, so a computed key evaluates
  * twice. A `field` declares an instance field with an initializer, a
  * `bare-field` one without, and a `named-field` one whose initializer is
- * an anonymous function that NamedEvaluation names from the key.
+ * an anonymous function that NamedEvaluation names from the key. A
+ * `static-block` declares no element at all: it is a statement list the
+ * class definition runs once, whose assignment through `this` leaves the
+ * same own property of the constructor a static field would.
  */
 type ElementKind =
   | "bare-field"
@@ -56,7 +59,8 @@ type ElementKind =
   | "method"
   | "named-field"
   | "pair"
-  | "setter";
+  | "setter"
+  | "static-block";
 
 /**
  * True for a field element, which defines an own property of each
@@ -65,6 +69,19 @@ type ElementKind =
 function isField(element: ElementKind): boolean {
   return (
     element === "bare-field" || element === "field" || element === "named-field"
+  );
+}
+
+/**
+ * True for an element the class definition defers until the whole body
+ * is in place: a `static` field initializer or a static block. Both run
+ * against the constructor, in one source-ordered pass, after the
+ * class-scope binding is initialized.
+ */
+function runsAsStaticElement(method: MethodSpec): boolean {
+  return (
+    method.element === "static-block" ||
+    (method.staticPlacement && isField(method.element))
   );
 }
 
@@ -119,6 +136,7 @@ const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
     "named-field",
     "pair",
     "setter",
+    "static-block",
   ),
   kind: fc.constantFrom<MethodKind>("constant", "field", "self", "super"),
   privateElement: fc.boolean(),
@@ -163,21 +181,26 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
         // A field initializer runs before the constructor body assigns
         // `f0`, so a field element carries no `field` body. This profile
         // admits a private static field but no private static method or
-        // accessor, and no computed private key at all.
-        const privateElement = method.privateElement;
+        // accessor, and no computed private key at all. A static block
+        // names nothing, so it is neither private nor computed and is
+        // always static.
+        const block = method.element === "static-block";
+        const privateElement = method.privateElement && !block;
         const staticPlacement =
-          method.staticPlacement &&
-          (!privateElement || isField(method.element));
+          block ||
+          (method.staticPlacement &&
+            (!privateElement || isField(method.element)));
+        const deferred = block || (staticPlacement && isField(method.element));
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
-          // A static field initializer runs while the class expression is
-          // still being evaluated, so the storage binding an expression
-          // form is assigned to is in its temporal dead zone there. Only a
-          // class declaration's `self` body reaches a binding at all,
-          // because the class-scope name shadows the outer one.
+          // A static field initializer and a static block both run while
+          // the class expression is still being evaluated, so the storage
+          // binding an expression form is assigned to is in its temporal
+          // dead zone there. Only a class declaration's `self` body
+          // reaches a binding at all, because the class-scope name
+          // shadows the outer one.
           (method.kind === "self" &&
-            staticPlacement &&
-            isField(method.element) &&
+            deferred &&
             testCase.form !== "declaration") ||
           (method.kind === "super" && testCase.heritage === "none") ||
           (method.kind === "field" &&
@@ -185,7 +208,7 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
               staticPlacement ||
               isField(method.element)));
         return {
-          computed: method.computed && !privateElement,
+          computed: method.computed && !privateElement && !block,
           element: method.element,
           kind: unrepresentable ? ("constant" as const) : method.kind,
           privateElement,
@@ -231,8 +254,8 @@ function methodResult(testCase: ClassCase, method: MethodSpec): string {
  * Independent model of the evaluation order marker string one class
  * definition leaves: every computed key evaluates in source order, a
  * getter and setter pair evaluates its key once per clause, and every
- * `static` field initializer then runs in static-element order, after
- * the whole body is in place.
+ * `static` field initializer and static block then runs in
+ * static-element order, after the whole body is in place.
  */
 function modelDefinitionOrder(testCase: ClassCase): string {
   const keys = testCase.methods
@@ -244,7 +267,10 @@ function modelDefinitionOrder(testCase: ClassCase): string {
     .join("");
   const statics = testCase.methods
     .map((method, index) =>
-      method.element === "field" && method.staticPlacement ? `i${index}` : "",
+      (method.element === "field" && method.staticPlacement) ||
+      method.element === "static-block"
+        ? `i${index}`
+        : "",
     )
     .join("");
   return keys + statics;
@@ -346,6 +372,13 @@ function printCase(testCase: ClassCase): string {
               ]
             : []),
         ].join("\n");
+    // A static block names nothing and declares nothing. Its receiver is
+    // the constructor, so the assignment it performs leaves the same own
+    // property of the class a static field would, marked in the same
+    // place so the order string records where the block ran.
+    if (method.element === "static-block") {
+      return `  static {\n    this.m${index} = note(${index}, ${read});\n  }`;
+    }
     if (method.element === "bare-field") {
       return `  ${modifier}${key};${bridges}`;
     }
@@ -417,6 +450,18 @@ function printCase(testCase: ClassCase): string {
     // A static element is reached through the class and an instance
     // element through an instance, whichever kind of element it is.
     const receiver = method.staticPlacement ? "Shape" : "instance";
+    // A static block leaves an ordinary own property of the constructor,
+    // so it is observed exactly where a public static field is, with the
+    // writable, enumerable, configurable attributes an assignment to a
+    // fresh key gives it.
+    if (method.element === "static-block") {
+      return (
+        `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
+        `Shape, "m${index}");\n` +
+        `console.log("m${index}", Shape.m${index}, ${descriptor}.writable, ` +
+        `${descriptor}.enumerable, ${descriptor}.configurable);`
+      );
+    }
     // A private element reaches no descriptor and no key list, so its
     // observation goes through the bridges and reports only the values.
     if (method.privateElement) {
@@ -571,14 +616,11 @@ function expected(testCase: ClassCase): string {
   const lines: string[] = [];
   lines.push(`definition ${modelDefinitionOrder(testCase)}`);
   // A method and an accessor are non-enumerable, so only a public
-  // `static` field reaches a key list, in the order the definitions ran.
+  // `static` field and a static block's assignment reach a key list, in
+  // the order the definitions ran.
   const staticKeys = testCase.methods
     .map((method, index) =>
-      isField(method.element) &&
-      method.staticPlacement &&
-      !method.privateElement
-        ? `m${index}`
-        : "",
+      runsAsStaticElement(method) && !method.privateElement ? `m${index}` : "",
     )
     .join("");
   lines.push(`keys ${staticKeys}`);
@@ -617,6 +659,10 @@ function expected(testCase: ClassCase): string {
   }
   testCase.methods.forEach((method, index) => {
     const result = methodResult(testCase, method);
+    if (method.element === "static-block") {
+      lines.push(`m${index} ${result} true true true`);
+      return;
+    }
     if (method.privateElement) {
       if (method.element === "bare-field") {
         lines.push(`m${index} undefined`);
@@ -1021,6 +1067,68 @@ test("class model defines static fields after the whole body", () => {
   assert.match(source, /const bridge = \{ read2: Shape\.read2 \};/u);
 });
 
+test("class model interleaves static blocks with static fields", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    heritage: "none",
+    methods: [
+      {
+        computed: false,
+        element: "static-block",
+        kind: "constant",
+        privateElement: false,
+        staticPlacement: true,
+        superWrite: false,
+        value: 1,
+      },
+      {
+        computed: true,
+        element: "field",
+        kind: "constant",
+        privateElement: false,
+        staticPlacement: true,
+        superWrite: false,
+        value: 2,
+      },
+      {
+        computed: false,
+        element: "static-block",
+        kind: "self",
+        privateElement: false,
+        staticPlacement: true,
+        superWrite: false,
+        value: 3,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    // Every key evaluates first, then the two blocks and the static
+    // field run in one source-ordered pass.
+    "definition 1i0i1i2\n" +
+      "keys m0m1m2\n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "instance-keys \n" +
+      "m0 1 true true true\n" +
+      "m1 2 true true true\n" +
+      "m2 true true true true\n" +
+      "no-new true\n" +
+      "order 1i0i1i2c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(
+    source,
+    /^ {2}static \{\n {4}this\.m0 = note\(0, 1\);\n {2}\}$/mu,
+  );
+  assert.match(source, /^ {4}this\.m2 = note\(2, Shape === Shape\);$/mu);
+  // A block declares no element, so nothing names it and no descriptor
+  // read reaches anything but the property its assignment left.
+  assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m0"\)/u);
+});
+
 test("class model reads inherited members of a derived class", () => {
   const testCase: ClassCase = {
     fields: [3],
@@ -1302,7 +1410,9 @@ test(
           "method, a getter, a setter, a getter and setter pair placed on " +
           "the prototype or on the constructor with `static`, or an " +
           "instance field declared with an initializer, without one, or " +
-          "with an anonymous function the key names, whose reading " +
+          "with an anonymous function the key names, or a `static { ... }` " +
+          "initialization block that assigns through its constructor " +
+          "receiver, whose reading " +
           "body returns a constant, an instance field, the class-scope name " +
           "binding, or a base member reached through `super`, and whose " +
           "setter clause stores through `this` or through `super`, each " +
@@ -1320,7 +1430,8 @@ test(
         numRuns: 15,
         profile:
           "M5 class declarations, expressions, accessors, statics, " +
-          "inheritance, instance fields, and private names",
+          "inheritance, instance fields, private names, and static " +
+          "initialization blocks",
         seed: 0x5eed_0017,
         sizeLimit:
           "zero to two constructor parameters, zero to three class " +

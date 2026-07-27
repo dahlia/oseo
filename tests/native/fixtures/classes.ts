@@ -2971,4 +2971,395 @@ console.log(Hinted.bump(140737488355327, 1), Plain.bump(140737488355327, 1));
       overflowMisses: 1,
     },
   },
+  {
+    name: "class-static-blocks",
+    source: `
+// A static initialization block runs once, while the class is defined,
+// with the constructor as its receiver. It declares no element and
+// evaluates no key, so nothing about the block itself is observable.
+class Setup {
+  static {
+    this.ready = true;
+  }
+}
+console.log(Setup.ready, Object.keys(Setup).length, Object.keys(Setup)[0]);
+const readied = Object.getOwnPropertyDescriptor(Setup, "ready");
+console.log(readied.writable, readied.enumerable, readied.configurable);
+console.log(Object.keys(Setup.prototype).length, "ready" in new Setup());
+// Several blocks run in source order, and each one sees what the
+// earlier ones left behind.
+let trace = "";
+class Ordered {
+  static {
+    trace = trace + "first ";
+    this.count = 1;
+  }
+  static {
+    trace = trace + "second ";
+    this.count = this.count + 1;
+  }
+  static {
+    trace = trace + "third";
+  }
+}
+console.log(trace, Ordered.count);
+// The receiver of a block is the constructor itself, so a nested arrow
+// captures the class while an ordinary nested function keeps its own
+// strict receiver, and new.target is undefined.
+class Receiver {
+  static {
+    const arrow = () => this;
+    const loose = function () {
+      return typeof this;
+    };
+    console.log(
+      this === Receiver,
+      this.name,
+      arrow() === Receiver,
+      loose(),
+      new.target,
+    );
+  }
+}
+// The class-scope binding is initialized before any static element
+// runs, so a block reaches the class by name and reaches a method
+// declared later in the body.
+class Named {
+  static {
+    console.log(Named === this, this.compute(), typeof Named.prototype.later);
+  }
+  static compute() {
+    return 7;
+  }
+  later() {
+    return "later";
+  }
+}
+// A class expression is named before its static elements run.
+const anonymous = class {
+  static {
+    console.log(this.name, typeof this);
+  }
+};
+console.log(anonymous.name);
+// A class whose only element is a static block declares no instance
+// element, so construction adds nothing to an instance.
+class Bare {
+  static {
+    this.marked = 1;
+  }
+}
+console.log(Object.keys(new Bare()).length, Bare.marked);
+`,
+  },
+  {
+    name: "class-static-block-order",
+    source: `
+// Every element key evaluates once, in class-body order, while the
+// class is defined. A static block, like a static field initializer,
+// waits until the whole body is in place, and the two interleave in
+// source order.
+let trace = "";
+function step(mark, value) {
+  trace = trace + mark + " ";
+  return value;
+}
+class Ordered {
+  static [step("key-alpha", "alpha")] = step("static-alpha", 1);
+  static {
+    step("block-one", 0);
+    this.fromBlock = this.alpha + 1;
+  }
+  [step("key-instance", "instance")] = step("init-instance", 2);
+  static [step("key-beta", "beta")] = step("static-beta", 3);
+  static {
+    step("block-two", 0);
+  }
+  [step("key-method", "method")]() {
+    return "method";
+  }
+}
+console.log("definition", trace);
+trace = "";
+const made = new Ordered();
+console.log("construction", trace);
+console.log(Ordered.alpha, Ordered.fromBlock, Ordered.beta, made.instance);
+// A static block runs after every method is defined and after the
+// class-scope binding is initialized, so a static field declared after
+// it reads what the block left behind.
+class Late {
+  static {
+    this.seeded = this.compute();
+  }
+  static derived = Late.seeded + 1;
+  static compute() {
+    return 10;
+  }
+}
+console.log(Late.seeded, Late.derived);
+// An abrupt block stops the class definition where it threw, leaving
+// the earlier static elements performed and the later ones unreached.
+let ran = "";
+function note(mark) {
+  ran = ran + mark + " ";
+  return mark;
+}
+try {
+  class Abrupt {
+    static before = note("before");
+    static {
+      note("block");
+      undefined.missing;
+    }
+    static after = note("after");
+  }
+} catch (error) {
+  console.log("abrupt block", error instanceof TypeError, ran);
+}
+// A class declaration whose block throws never initializes its
+// binding, so nothing after the declaration is reached.
+ran = "";
+try {
+  class Declared {
+    static {
+      note("declared");
+      throw new RangeError("stop");
+    }
+  }
+  console.log("unreachable", typeof Declared);
+} catch (error) {
+  console.log("abrupt declaration", error instanceof RangeError, ran);
+}
+`,
+  },
+  {
+    name: "class-static-block-scope",
+    source: `
+// A static block is its own function body: it declares var, let, const,
+// and function bindings that no other element and no enclosing scope
+// reaches, and the class scope is what it closes over.
+let outer = "outer";
+class Scoped {
+  static {
+    var counted = 1;
+    let shifted = 2;
+    const fixed = 3;
+    function total() {
+      return counted + shifted + fixed;
+    }
+    console.log(total(), outer, typeof Scoped);
+  }
+  static {
+    // A second block is a separate body, so its own var declaration
+    // shadows nothing and starts undefined here.
+    var counted = 10;
+    console.log(counted);
+  }
+}
+// A block reaches the static private elements the class declares,
+// through the constructor its receiver is.
+class Hidden {
+  static #count = 0;
+  static #label = "start";
+  static {
+    this.#count = this.#count + 1;
+    this.#label = this.#label + "-run";
+    this.report = this.#count + " " + this.#label;
+  }
+  static read() {
+    return this.#count;
+  }
+}
+console.log(Hidden.report, Hidden.read());
+console.log(Object.keys(Hidden).length, Object.keys(Hidden)[0]);
+// Every class evaluation runs its blocks afresh against the class that
+// evaluation created.
+function make(tag) {
+  return class {
+    static {
+      this.tag = tag;
+    }
+  };
+}
+const first = make("one");
+const second = make("two");
+console.log(first.tag, second.tag, first === second);
+// A nested class inside a block is an ordinary class, and its own block
+// runs while the outer one is still running.
+let nesting = "";
+class Outer {
+  static {
+    nesting = nesting + "outer-start ";
+    class Inner {
+      static {
+        nesting = nesting + "inner ";
+      }
+    }
+    nesting = nesting + "outer-end";
+    this.nested = typeof Inner;
+  }
+}
+console.log(nesting, Outer.nested);
+// A block reaches the loops, conditionals, and try statements every
+// other function body admits.
+class Control {
+  static {
+    let sum = 0;
+    for (let index = 0; index < 4; index = index + 1) {
+      if (index === 2) continue;
+      sum = sum + index;
+    }
+    try {
+      throw new TypeError("caught");
+    } catch (error) {
+      sum = sum + (error instanceof TypeError ? 10 : 0);
+    } finally {
+      sum = sum + 100;
+    }
+    this.sum = sum;
+  }
+}
+console.log(Control.sum);
+`,
+  },
+  {
+    name: "class-static-block-super",
+    source: `
+// A static block carries the constructor as its home object, so
+// super.x inside one starts at the parent constructor, exactly as a
+// static field initializer and a static method do.
+class Base {
+  static tag = "base";
+  static describe() {
+    return "base-describe";
+  }
+}
+class Derived extends Base {
+  static {
+    this.fromSuper = super.tag;
+    this.calledSuper = super.describe();
+  }
+  static describe() {
+    return "derived-describe";
+  }
+}
+console.log(Derived.fromSuper, Derived.calledSuper);
+console.log(Derived.describe(), Derived.tag);
+// A class definition completes before the class that extends it
+// begins, so a parent's static block always runs before its child's.
+let order = "";
+class Parent {
+  static {
+    order = order + "parent ";
+  }
+}
+class Child extends Parent {
+  static {
+    order = order + "child ";
+  }
+}
+class Grandchild extends Child {
+  static {
+    order = order + "grandchild";
+  }
+}
+console.log(order);
+// A static block reaches an inherited static element through the
+// constructor its receiver is.
+class Counter {
+  static value = 1;
+  static next() {
+    return this.value + 1;
+  }
+}
+class Doubling extends Counter {
+  static {
+    this.doubled = this.next() * 2;
+  }
+}
+console.log(Doubling.doubled, Doubling.value, Doubling.next());
+// A super reference in a block reads through the chain a two-level
+// heritage builds.
+class Root {
+  static level() {
+    return "root";
+  }
+}
+class Middle extends Root {
+  static level() {
+    return "middle";
+  }
+}
+class Leaf extends Middle {
+  static {
+    this.seen = super.level();
+  }
+  static level() {
+    return "leaf";
+  }
+}
+console.log(Leaf.seen, Leaf.level());
+// The block still receives the derived constructor, so a static field
+// the parent declared is defined on the parent while the block writes
+// to the child.
+class Shared {
+  static owned = "parent";
+}
+class Overwrites extends Shared {
+  static {
+    this.owned = "child";
+  }
+}
+console.log(Shared.owned, Overwrites.owned);
+console.log(Object.keys(Overwrites).length, Object.keys(Shared).length);
+`,
+  },
+  {
+    name: "class-static-block-hints",
+    source: `
+// Static blocks surround a hinted method without changing the
+// specialization it takes: the hinted class and its unhinted twin agree
+// on every guard path, including the misses a string operand, a double
+// operand, and an overflow force.
+class Hinted {
+  static seed = 3;
+  static bump(left: number, right: number) {
+    return left + right;
+  }
+  static {
+    this.base = Hinted.bump(this.seed, 7);
+  }
+  static combined = Hinted.bump(Hinted.base, 2);
+  static {
+    this.total = Hinted.bump(this.combined, 0);
+  }
+}
+class Plain {
+  static seed = 3;
+  static bump(left, right) {
+    return left + right;
+  }
+  static {
+    this.base = Plain.bump(this.seed, 7);
+  }
+  static combined = Plain.bump(Plain.base, 2);
+  static {
+    this.total = Plain.bump(this.combined, 0);
+  }
+}
+console.log(Hinted.base, Hinted.combined, Hinted.total);
+console.log(Plain.base, Plain.combined, Plain.total);
+console.log(Hinted.bump(1, 2), Plain.bump(1, 2));
+console.log(Hinted.bump("a", "b"), Plain.bump("a", "b"));
+console.log(Hinted.bump(0.5, 0.25), Plain.bump(0.5, 0.25));
+console.log(Hinted.bump(140737488355327, 1), Plain.bump(140737488355327, 1));
+`,
+    specialization: {
+      genericCallsDisabled: 14,
+      genericCallsEnabled: 10,
+      hits: 4,
+      misses: 14,
+      overflowMisses: 1,
+    },
+  },
 ];

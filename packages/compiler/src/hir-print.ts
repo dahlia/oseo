@@ -1,7 +1,7 @@
 import type {
   HirBindingPattern,
   HirCallArgument,
-  HirClassElement,
+  HirClassField,
   HirExpression,
   HirPrivateName,
   HirProgram,
@@ -32,7 +32,7 @@ function printHirPrivateName(privateName: HirPrivateName): string {
   return `%b${privateName.bindingId} ${privateName.name}`;
 }
 
-function printHirClassElementKey(key: HirClassElement["key"]): string {
+function printHirClassElementKey(key: HirClassField["key"]): string {
   return key.kind === "private-name"
     ? printHirPrivateName(key.privateName)
     : printHirExpression(key);
@@ -155,18 +155,22 @@ function printHirExpression(expression: HirExpression): string {
       `{constructor: ${printHirExpression(expression.constructorFunction)}` +
       expression.elements
         .map((element) =>
-          element.kind === "field"
-            ? ", " +
-              (element.staticPlacement === true ? "static " : "") +
-              `field ${printHirClassElementKey(element.key)}` +
-              (element.initializer == null
-                ? ""
-                : ` = ${printHirExpression(element.initializer)}`)
-            : ", " +
-              (element.staticPlacement === true ? "static " : "") +
-              (element.accessorKind == null ? "" : `${element.accessorKind} `) +
-              `${printHirClassElementKey(element.key)}: ` +
-              printHirExpression(element.value),
+          element.kind === "static-block"
+            ? `, static block ${printHirExpression(element.body)}`
+            : element.kind === "field"
+              ? ", " +
+                (element.staticPlacement === true ? "static " : "") +
+                `field ${printHirClassElementKey(element.key)}` +
+                (element.initializer == null
+                  ? ""
+                  : ` = ${printHirExpression(element.initializer)}`)
+              : ", " +
+                (element.staticPlacement === true ? "static " : "") +
+                (element.accessorKind == null
+                  ? ""
+                  : `${element.accessorKind} `) +
+                `${printHirClassElementKey(element.key)}: ` +
+                printHirExpression(element.value),
         )
         .join("") +
       "}"

@@ -232,6 +232,10 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-static-field-order" ||
     fixture.name === "class-static-private-fields" ||
     fixture.name === "class-static-field-inheritance" ||
+    fixture.name === "class-static-blocks" ||
+    fixture.name === "class-static-block-order" ||
+    fixture.name === "class-static-block-scope" ||
+    fixture.name === "class-static-block-super" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

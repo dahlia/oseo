@@ -6,6 +6,7 @@ supportedFeatures:
   - class-fields-private
   - class-fields-public
   - class-methods-private
+  - class-static-block
   - class-static-fields-private
   - class-static-fields-public
   - coalesce-expression
@@ -512,6 +513,12 @@ tests:
   - path: test/language/expressions/arrow-function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/static-init-await-binding.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/expressions/arrow-function/static-init-await-reference.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -2370,6 +2377,12 @@ tests:
   - path: test/language/expressions/class/static-gen-method-param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/static-init-await-binding.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/expressions/class/static-init-await-reference.js
+    expectedClassification: pass
+    dependencies: [classes]
   - path: test/language/expressions/class/static-method-length-dflt.js
     expectedClassification: pass
     dependencies: [classes, default-parameters, functions]
@@ -2463,6 +2476,12 @@ tests:
   - path: test/language/expressions/function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/function/static-init-await-binding.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/function/static-init-await-reference.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
   - path: test/language/expressions/generators/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [generators]
@@ -2571,6 +2590,12 @@ tests:
   - path: test/language/expressions/generators/scope-name-var-close.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/language/expressions/generators/static-init-await-binding.js
+    expectedClassification: pass
+    dependencies: [classes, generators]
+  - path: test/language/expressions/generators/static-init-await-reference.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, generators]
   - path: test/language/expressions/generators/use-strict-with-non-simple-param.js
     expectedClassification: expected-negative
     dependencies: [generators]
@@ -3387,6 +3412,9 @@ tests:
   - path: test/language/expressions/object/ident-name-method-def-with-escaped.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/ident-name-prop-name-literal-await-static-init.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
   - path: test/language/expressions/object/ident-name-prop-name-literal-break-escaped.js
     expectedClassification: pass
     dependencies: [object-literals]
@@ -3525,6 +3553,12 @@ tests:
   - path: test/language/expressions/object/identifier-shorthand-await-strict-mode.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/identifier-shorthand-static-init-await-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/identifier-shorthand-static-init-await-valid.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-literals]
   - path: test/language/expressions/object/let-non-strict-access.js
     expectedClassification: pass
     dependencies: [object-literals]
@@ -3630,6 +3664,24 @@ tests:
   - path: test/language/expressions/object/method-definition/name-property-desc.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-binding-accessor.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-binding-generator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-binding-normal.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-reference-accessor.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-reference-generator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-literals]
+  - path: test/language/expressions/object/method-definition/static-init-await-reference-normal.js
+    expectedClassification: pass
+    dependencies: [classes, object-literals]
   - path: test/language/expressions/object/prop-def-id-valid.js
     expectedClassification: pass
     dependencies: [object-literals]
@@ -4026,6 +4078,9 @@ tests:
   - path: test/language/expressions/yield/star-rhs-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [generators, iterator-protocol]
+  - path: test/language/identifier-resolution/static-init-invalid-await.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -4840,6 +4895,9 @@ tests:
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
+  - path: test/language/statements/break/static-init-without-label.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
   - path: test/language/statements/class/accessor-name-inst-computed-yield-expr.js
     expectedClassification: pass
     dependencies: [classes, generators, object-properties]
@@ -6553,6 +6611,84 @@ tests:
   - path: test/language/statements/class/static-classelementname-abrupt-completion.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/static-init-abrupt.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, classes]
+  - path: test/language/statements/class/static-init-arguments-functions.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/static-init-arguments-methods.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-literals]
+  - path: test/language/statements/class/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-expr-new-target.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-expr-this.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-invalid-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/static-init-invalid-await.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-invalid-label-dup.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
+  - path: test/language/statements/class/static-init-invalid-lex-dup.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/static-init-invalid-lex-var.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/static-init-invalid-return.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
+  - path: test/language/statements/class/static-init-invalid-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-invalid-undefined-break-target.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
+  - path: test/language/statements/class/static-init-invalid-undefined-continue-target.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
+  - path: test/language/statements/class/static-init-invalid-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, generators]
+  - path: test/language/statements/class/static-init-scope-lex-close.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/static-init-scope-lex-derived.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/static-init-scope-lex-open.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/static-init-scope-private.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-scope-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, var-bindings]
+  - path: test/language/statements/class/static-init-scope-var-derived.js
+    expectedClassification: pass
+    dependencies: [classes, var-bindings]
+  - path: test/language/statements/class/static-init-scope-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, var-bindings]
+  - path: test/language/statements/class/static-init-statement-list-optional.js
+    expectedClassification: pass
+    dependencies: [classes]
+  - path: test/language/statements/class/static-init-super-property.js
+    expectedClassification: pass
+    dependencies: [classes]
   - path: test/language/statements/class/static-method-length-dflt.js
     expectedClassification: pass
     dependencies: [classes, default-parameters, functions]
@@ -6770,6 +6906,18 @@ tests:
   - path: test/language/statements/const/global-use-before-initialization-in-prior-statement.js
     expectedClassification: expected-negative
     dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/statements/const/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/const/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/continue/static-init-with-label.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
+  - path: test/language/statements/continue/static-init-without-label.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
   - path: test/language/statements/do-while/S12.6.1_A15.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -7544,6 +7692,12 @@ tests:
   - path: test/language/statements/function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/statements/function/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions]
+  - path: test/language/statements/function/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
   - path: test/language/statements/generators/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [generators]
@@ -7676,6 +7830,9 @@ tests:
   - path: test/language/statements/labeled/decl-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/labeled/static-init-invalid-await.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow]
   - path: test/language/statements/labeled/value-await-module.js
     expectedClassification: expected-negative
     dependencies: [control-flow, module-linking]
@@ -7752,6 +7909,12 @@ tests:
   - path: test/language/statements/let/global-use-before-initialization-in-prior-statement.js
     expectedClassification: expected-negative
     dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/statements/let/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/let/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
   - path: test/language/statements/let/syntax/let.js
     expectedClassification: pass
     dependencies: [lexical-bindings]
@@ -7843,6 +8006,12 @@ tests:
   - path: test/language/statements/try/dstr/obj-ptrn-rest-val-obj.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/try/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, classes]
+  - path: test/language/statements/try/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, classes]
   - path: test/language/statements/variable/S12.2_A12.js
     expectedClassification: pass
     dependencies: [control-flow, var-bindings]
@@ -7874,6 +8043,12 @@ tests:
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-iter-done.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-static-init-await-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings, var-bindings]
+  - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-static-init-await-valid.js
+    expectedClassification: pass
+    dependencies: [classes, destructuring-bindings, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-rest-ary-elem.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -7895,6 +8070,12 @@ tests:
         object-properties,
         var-bindings,
       ]
+  - path: test/language/statements/variable/dstr/obj-ptrn-elem-id-static-init-await-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings, var-bindings]
+  - path: test/language/statements/variable/dstr/obj-ptrn-elem-id-static-init-await-valid.js
+    expectedClassification: pass
+    dependencies: [classes, destructuring-bindings, var-bindings]
   - path: test/language/statements/variable/dstr/obj-ptrn-id-init-fn-name-arrow.js
     expectedClassification: pass
     dependencies:
@@ -7916,3 +8097,9 @@ tests:
   - path: test/language/statements/variable/dstr/obj-ptrn-rest-val-obj.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/statements/variable/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, var-bindings]
+  - path: test/language/statements/variable/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes, var-bindings]

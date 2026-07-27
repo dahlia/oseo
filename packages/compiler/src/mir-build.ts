@@ -1407,9 +1407,29 @@ function lowerFieldInitializerName(
 interface ClassFieldDefinition {
   readonly initializer: number;
   readonly key: number;
+  readonly kind: "field";
   readonly privateElement: boolean;
   readonly range: SourceRange;
 }
+
+/**
+ * The evaluated closure of one `static { ... }` block, carried from the
+ * element loop to the run that follows it for the same reason a static
+ * field carries its halves.
+ */
+interface ClassStaticBlockDefinition {
+  readonly body: number;
+  readonly kind: "static-block";
+  readonly range: SourceRange;
+}
+
+/**
+ * One deferred static element. ECMA-262 collects static fields and
+ * static blocks into a single source-ordered list and runs it once the
+ * class is otherwise complete, so the two share one list rather than
+ * running in separate passes.
+ */
+type ClassStaticElement = ClassFieldDefinition | ClassStaticBlockDefinition;
 
 /**
  * Lowers the definition half of one field element: the key evaluated
@@ -1465,7 +1485,13 @@ function lowerClassFieldDefinition(
   if (element.initializer != null) {
     lowerHomeObjectBind(initializer, home, element.range, builder);
   }
-  return { initializer, key, privateElement, range: element.range };
+  return {
+    initializer,
+    key,
+    kind: "field",
+    privateElement,
+    range: element.range,
+  };
 }
 
 /**
@@ -1557,6 +1583,44 @@ function lowerStaticFieldDefine(
 }
 
 /**
+ * Runs one `static { ... }` block: an ordinary call of the block's
+ * closure with the constructor as its receiver, whose completion value
+ * is discarded. The block needs no runtime entry point of its own,
+ * because ECMA-262 defines it as exactly that call.
+ */
+function lowerStaticBlockRun(
+  block: ClassStaticBlockDefinition,
+  constructorValue: number,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "static initialization block",
+    [block.body, constructorValue],
+    block.range,
+  );
+  const called = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [block.body, constructorValue],
+    detail: "static initialization block",
+    id: called,
+    kind: "call",
+    range: block.range,
+    target: { kind: "dynamic" },
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [called],
+    block.range,
+  );
+  recordRoot(builder, called, block.range);
+}
+
+/**
  * Lowers one private method or accessor definition. It defines no
  * property: the pair of private name and closure is recorded on the
  * constructor, and every instance the class constructs receives it
@@ -1644,10 +1708,11 @@ function lowerClassPrivateMethod(
  * constructor, and the prototype object from the parent's `prototype`.
  *
  * A `static` field takes part in that one loop only with its key and
- * its initializer closure. Its initializer runs after the loop and
- * after the class-scope binding is initialized, in source order among
- * the other static fields, because ClassDefinitionEvaluation defers
- * every static element until the class is otherwise complete.
+ * its initializer closure, and a `static { ... }` block only with its
+ * closure. Both run after the loop and after the class-scope binding is
+ * initialized, interleaved in source order, because
+ * ClassDefinitionEvaluation collects every static element into one list
+ * it defers until the class is otherwise complete.
  */
 function lowerClassExpression(
   expression: HirExpression & { readonly kind: "class" },
@@ -1757,7 +1822,7 @@ function lowerClassExpression(
   );
   recordRoot(builder, prototype, expression.range);
   lowerHomeObjectBind(constructorValue, prototype, expression.range, builder);
-  const staticFields: ClassFieldDefinition[] = [];
+  const staticElements: ClassStaticElement[] = [];
   for (const element of expression.elements) {
     if (element.kind === "field") {
       const staticPlacement = element.staticPlacement === true;
@@ -1766,8 +1831,21 @@ function lowerClassExpression(
         staticPlacement ? constructorValue : prototype,
         builder,
       );
-      if (staticPlacement) staticFields.push(field);
+      if (staticPlacement) staticElements.push(field);
       else lowerInstanceFieldRecord(field, constructorValue, builder);
+      continue;
+    }
+    if (element.kind === "static-block") {
+      // The closure exists where the block appears and carries the
+      // constructor as its home object, exactly like a static field's
+      // initializer; only the call itself waits for the class.
+      const body = lowerExpression(element.body, builder);
+      lowerHomeObjectBind(body, constructorValue, element.range, builder);
+      staticElements.push({
+        body,
+        kind: "static-block",
+        range: element.range,
+      });
       continue;
     }
     if (element.key.kind === "private-name") {
@@ -1850,12 +1928,17 @@ function lowerClassExpression(
     });
     recordRoot(builder, initialized, expression.range);
   }
-  // The static field initializers run last, after every element is in
-  // place and after the class-scope binding is initialized, so one
-  // reaches a method declared later in the body and reads the class
-  // through its own name rather than in a temporal dead zone.
-  for (const field of staticFields) {
-    lowerStaticFieldDefine(field, constructorValue, builder);
+  // The static field initializers and static blocks run last, in source
+  // order among each other, after every element is in place and after
+  // the class-scope binding is initialized. One therefore reaches a
+  // method declared later in the body and reads the class through its
+  // own name rather than in a temporal dead zone.
+  for (const staticElement of staticElements) {
+    if (staticElement.kind === "static-block") {
+      lowerStaticBlockRun(staticElement, constructorValue, builder);
+      continue;
+    }
+    lowerStaticFieldDefine(staticElement, constructorValue, builder);
   }
   return constructorValue;
 }
