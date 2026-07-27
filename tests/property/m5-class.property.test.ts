@@ -71,6 +71,14 @@ interface MethodSpec {
   readonly element: ElementKind;
   /** Selects the body of a method or getter; a lone setter ignores it. */
   readonly kind: MethodKind;
+  /**
+   * Names the element with a private `#name` instead of a property key.
+   * A private element defines no property, so the class exposes it
+   * through generated bridge methods and no descriptor observation
+   * reaches it. This profile admits no static or computed private
+   * element, so the flag excludes both.
+   */
+  readonly privateElement: boolean;
   /** A `static` element is defined on the constructor, not the prototype. */
   readonly staticPlacement: boolean;
   /**
@@ -110,6 +118,7 @@ const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
     "setter",
   ),
   kind: fc.constantFrom<MethodKind>("constant", "field", "self", "super"),
+  privateElement: fc.boolean(),
   staticPlacement: fc.boolean(),
   superWrite: fc.boolean(),
   value: fc.integer({ max: 20, min: -20 }),
@@ -150,9 +159,12 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       methods: testCase.methods.map((method) => {
         // This profile admits no static field, and a field initializer
         // runs before the constructor body assigns `f0`, so a field
-        // element carries neither placement nor a `field` body.
+        // element carries neither placement nor a `field` body. A
+        // private element is neither static nor computed here, so it
+        // drops both.
+        const privateElement = method.privateElement;
         const staticPlacement =
-          method.staticPlacement && !isField(method.element);
+          method.staticPlacement && !isField(method.element) && !privateElement;
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
           (method.kind === "super" && testCase.heritage === "none") ||
@@ -161,9 +173,10 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
               staticPlacement ||
               isField(method.element)));
         return {
-          computed: method.computed,
+          computed: method.computed && !privateElement,
           element: method.element,
           kind: unrepresentable ? ("constant" as const) : method.kind,
+          privateElement,
           staticPlacement,
           superWrite: method.superWrite && testCase.heritage !== "none",
           value: method.value,
@@ -171,6 +184,19 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       }),
     };
   });
+
+/**
+ * The element index the brand check reads through, which is the first
+ * private element the class exposes a reader for. A lone private setter
+ * has no reader, so a case whose only private element is one runs no
+ * brand check.
+ */
+function brandCheckIndex(testCase: ClassCase): number | undefined {
+  const index = testCase.methods.findIndex(
+    (method) => method.privateElement && method.element !== "setter",
+  );
+  return index === -1 ? undefined : index;
+}
 
 /** The class-scope binding a `self` method reads, if the form has one. */
 function innerName(testCase: ClassCase): string {
@@ -230,7 +256,11 @@ function printCase(testCase: ClassCase): string {
     .map((_, index) => `    this.f${index} = p${index};`)
     .join("\n");
   const bodies = testCase.methods.map((method, index) => {
-    const key = method.computed ? `[mark("m${index}", ${index})]` : `m${index}`;
+    const key = method.privateElement
+      ? `#m${index}`
+      : method.computed
+        ? `[mark("m${index}", ${index})]`
+        : `m${index}`;
     // A static element is defined on the constructor, so its dynamic
     // `this` is the class itself rather than an instance.
     const modifier = method.staticPlacement ? "static " : "";
@@ -261,18 +291,47 @@ function printCase(testCase: ClassCase): string {
     // the order string records where it ran, except for the anonymous
     // function form, whose initializer must stay an anonymous definition
     // for NamedEvaluation to name it from the key.
-    if (method.element === "bare-field") return `  ${key};`;
-    if (method.element === "named-field") return `  ${key} = function () {};`;
+    // A private element defines no property, so the class carries the
+    // bridges every observation of it goes through: reading one, writing
+    // one, and reading a private method's own `name`.
+    const bridges = !method.privateElement
+      ? ""
+      : "\n" +
+        [
+          ...(method.element === "setter"
+            ? []
+            : [
+                method.element === "method"
+                  ? `  read${index}(received) {\n` +
+                    `    return this.#m${index}(received);\n  }`
+                  : `  read${index}() {\n    return this.#m${index};\n  }`,
+              ]),
+          ...(method.element === "setter" || method.element === "pair"
+            ? [`  write${index}(value) {\n    this.#m${index} = value;\n  }`]
+            : []),
+          ...(method.element === "method"
+            ? [`  name${index}() {\n    return this.#m${index}.name;\n  }`]
+            : []),
+        ].join("\n");
+    if (method.element === "bare-field") return `  ${key};${bridges}`;
+    if (method.element === "named-field") {
+      return `  ${key} = function () {};${bridges}`;
+    }
     if (method.element === "field") {
-      return `  ${key} = note(${index}, ${read});`;
+      return `  ${key} = note(${index}, ${read});${bridges}`;
     }
     if (method.element === "getter" || method.element === "pair") {
       const getter = `  ${modifier}get ${key}() {\n    return ${read};\n  }`;
-      return method.element === "pair" ? `${getter}\n${setter}` : getter;
+      return (
+        (method.element === "pair" ? `${getter}\n${setter}` : getter) + bridges
+      );
     }
-    if (method.element === "setter") return setter;
+    if (method.element === "setter") return setter + bridges;
     const signature = method.kind === "self" ? "received" : "";
-    return `  ${modifier}${key}(${signature}) {\n    return ${returned};\n  }`;
+    return (
+      `  ${modifier}${key}(${signature}) {\n    return ${returned};\n  }` +
+      bridges
+    );
   });
   const implicit = testCase.heritage === "derived-implicit";
   const body = [
@@ -320,6 +379,36 @@ function printCase(testCase: ClassCase): string {
   const reads = testCase.methods.map((method, index) => {
     const argument = method.kind === "self" ? "Shape" : "";
     const descriptor = `d${index}`;
+    // A private element reaches no descriptor and no key list, so its
+    // observation goes through the bridges and reports only the values.
+    if (method.privateElement) {
+      if (method.element === "named-field") {
+        return (
+          `console.log("m${index}", typeof instance.read${index}(), ` +
+          `instance.read${index}().name);`
+        );
+      }
+      if (method.element === "setter") {
+        return (
+          `instance.write${index}(${method.value});\n` +
+          `console.log("m${index}", instance.s${index});`
+        );
+      }
+      if (method.element === "pair") {
+        return (
+          `instance.write${index}(${method.value});\n` +
+          `console.log("m${index}", instance.read${index}(), ` +
+          `instance.s${index});`
+        );
+      }
+      if (method.element === "method") {
+        return (
+          `console.log("m${index}", instance.read${index}(${argument}), ` +
+          `instance.name${index}());`
+        );
+      }
+      return `console.log("m${index}", instance.read${index}());`;
+    }
     // A static element is an own property of the constructor and is
     // reached through the class, never through an instance.
     const owner = method.staticPlacement ? "Shape" : "Shape.prototype";
@@ -372,6 +461,20 @@ function printCase(testCase: ClassCase): string {
       `${descriptor}.writable, ${attributes}, ${owner}.m${index}.name);`
     );
   });
+  // One brand check per case that declares a readable private element:
+  // the bridge runs against a plain object, whose class never installed
+  // the element, so PrivateGet reports a TypeError instead of undefined.
+  const brandIndex = brandCheckIndex(testCase);
+  const brandCheck =
+    brandIndex == null
+      ? ""
+      : `const bridge = { read${brandIndex}: ` +
+        `Shape.prototype.read${brandIndex} };\n` +
+        "try {\n" +
+        `  bridge.read${brandIndex}();\n` +
+        "} catch (error) {\n" +
+        '  console.log("brand", error instanceof TypeError);\n' +
+        "}\n";
   const fieldReads = testCase.fields
     .map((_, index) => `instance.f${index}`)
     .join(", ");
@@ -410,7 +513,7 @@ for (const key of Object.keys(instance)) {
 }
 console.log("instance-keys", instanceKeys);
 ${inherited}${reads.join("\n")}
-try {
+${brandCheck}try {
   Shape();
 } catch (error) {
   console.log("no-new", error instanceof TypeError);
@@ -441,7 +544,9 @@ function expected(testCase: ClassCase): string {
   const instanceKeys =
     (testCase.heritage === "none" ? "" : "base") +
     testCase.methods
-      .map((method, index) => (isField(method.element) ? `m${index}` : ""))
+      .map((method, index) =>
+        isField(method.element) && !method.privateElement ? `m${index}` : "",
+      )
       .join("") +
     testCase.fields.map((_, index) => `f${index}`).join("");
   lines.push(`instance-keys ${instanceKeys}`);
@@ -453,6 +558,30 @@ function expected(testCase: ClassCase): string {
   }
   testCase.methods.forEach((method, index) => {
     const result = methodResult(testCase, method);
+    if (method.privateElement) {
+      if (method.element === "bare-field") {
+        lines.push(`m${index} undefined`);
+        return;
+      }
+      if (method.element === "named-field") {
+        lines.push(`m${index} function #m${index}`);
+        return;
+      }
+      if (method.element === "setter") {
+        lines.push(`m${index} ${method.value}`);
+        return;
+      }
+      if (method.element === "pair") {
+        lines.push(`m${index} ${result} ${method.value}`);
+        return;
+      }
+      if (method.element === "method") {
+        lines.push(`m${index} ${result} #m${index}`);
+        return;
+      }
+      lines.push(`m${index} ${result}`);
+      return;
+    }
     if (method.element === "bare-field") {
       lines.push(`m${index} undefined true true true`);
       return;
@@ -487,6 +616,7 @@ function expected(testCase: ClassCase): string {
     }
     lines.push(`m${index} ${result} true false true m${index}`);
   });
+  if (brandCheckIndex(testCase) != null) lines.push("brand true");
   lines.push("no-new true");
   lines.push(`order ${order}`);
   return `${lines.join("\n")}\n`;
@@ -541,6 +671,7 @@ test("class model orders computed keys before construction", () => {
           computed: false,
           element: "method",
           kind: "field",
+          privateElement: false,
           staticPlacement: false,
           superWrite: false,
           value: 0,
@@ -549,6 +680,7 @@ test("class model orders computed keys before construction", () => {
           computed: true,
           element: "method",
           kind: "self",
+          privateElement: false,
           staticPlacement: false,
           superWrite: false,
           value: 0,
@@ -568,6 +700,66 @@ test("class model orders computed keys before construction", () => {
   );
 });
 
+test("class model reads private elements only through bridges", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    heritage: "none",
+    methods: [
+      {
+        computed: false,
+        element: "field",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: false,
+        superWrite: false,
+        value: 5,
+      },
+      {
+        computed: false,
+        element: "method",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: false,
+        superWrite: false,
+        value: 6,
+      },
+      {
+        computed: false,
+        element: "pair",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: false,
+        superWrite: false,
+        value: 7,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "instance-keys \n" +
+      "m0 5\n" +
+      "m1 6 #m1\n" +
+      "m2 7 7\n" +
+      "brand true\n" +
+      "no-new true\n" +
+      "order i0c\n",
+  );
+  const source = printCase(testCase);
+  // A private element never becomes a property, so nothing in the
+  // generated source names it outside the class body.
+  assert.match(source, /  #m0 = note\(0, 5\);/u);
+  assert.match(source, /  read0\(\) \{\n    return this\.#m0;\n  \}/u);
+  assert.match(source, /  name1\(\) \{\n    return this\.#m1\.name;\n  \}/u);
+  assert.match(source, /  write2\(value\) \{\n    this\.#m2 = value;\n  \}/u);
+  assert.doesNotMatch(source, /getOwnPropertyDescriptor\([^)]*"#m/u);
+});
+
 test("class model reports the inner name of a named expression", () => {
   const testCase: ClassCase = {
     fields: [],
@@ -578,6 +770,7 @@ test("class model reports the inner name of a named expression", () => {
         computed: false,
         element: "method",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 9,
@@ -609,6 +802,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         computed: false,
         element: "getter",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 1,
@@ -617,6 +811,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         computed: false,
         element: "setter",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 2,
@@ -625,6 +820,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         computed: true,
         element: "pair",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 3,
@@ -662,6 +858,7 @@ test("class model reads a static element through the constructor", () => {
         computed: true,
         element: "method",
         kind: "self",
+        privateElement: false,
         staticPlacement: true,
         superWrite: false,
         value: 5,
@@ -670,6 +867,7 @@ test("class model reads a static element through the constructor", () => {
         computed: false,
         element: "pair",
         kind: "constant",
+        privateElement: false,
         staticPlacement: true,
         superWrite: false,
         value: 6,
@@ -710,6 +908,7 @@ test("class model reads inherited members of a derived class", () => {
         computed: false,
         element: "method",
         kind: "field",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 1,
@@ -744,6 +943,7 @@ test("class model reads and writes a derived class through super", () => {
         computed: false,
         element: "method",
         kind: "super",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 1,
@@ -752,6 +952,7 @@ test("class model reads and writes a derived class through super", () => {
         computed: false,
         element: "getter",
         kind: "super",
+        privateElement: false,
         staticPlacement: true,
         superWrite: false,
         value: 2,
@@ -760,6 +961,7 @@ test("class model reads and writes a derived class through super", () => {
         computed: false,
         element: "setter",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: true,
         value: 3,
@@ -800,6 +1002,7 @@ test("class model orders field initializers before the constructor", () => {
         computed: true,
         element: "field",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 8,
@@ -808,6 +1011,7 @@ test("class model orders field initializers before the constructor", () => {
         computed: false,
         element: "bare-field",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 0,
@@ -816,6 +1020,7 @@ test("class model orders field initializers before the constructor", () => {
         computed: false,
         element: "named-field",
         kind: "constant",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 0,
@@ -853,6 +1058,7 @@ test("class model runs implicit derived fields after the base body", () => {
         computed: false,
         element: "field",
         kind: "super",
+        privateElement: false,
         staticPlacement: false,
         superWrite: false,
         value: 1,
@@ -968,7 +1174,8 @@ test(
         domain:
           "class declarations, named class expressions, and anonymous class " +
           "expressions with zero to two constructor-assigned fields and zero " +
-          "to three elements over literal and computed keys, each element a " +
+          "to three elements over literal, computed, and private `#` " +
+          "names, each element a " +
           "method, a getter, a setter, a getter and setter pair placed on " +
           "the prototype or on the constructor with `static`, or an " +
           "instance field declared with an initializer, without one, or " +
@@ -976,10 +1183,13 @@ test(
           "body returns a constant, an instance field, the class-scope name " +
           "binding, or a base member reached through `super`, and whose " +
           "setter clause stores through `this` or through `super`, each " +
+          "private element read and written only through generated bridge " +
+          "methods and brand-checked against a plain object, each " +
           "class standing alone, extending a base class " +
           "through a declared `super()` call, or extending it through the " +
           "implicit derived constructor, comparing an independent name, " +
           "own-property descriptor, accessor round-trip, inherited-member, " +
+          "private-element value, brand-check, " +
           "instance own-key order, and definition and initialization order " +
           "model with Node.js, Deno, and both native " +
           "specialization policies with forced collection on the enabled " +
@@ -987,7 +1197,7 @@ test(
         numRuns: 15,
         profile:
           "M5 class declarations, expressions, accessors, statics, " +
-          "inheritance, and instance fields",
+          "inheritance, instance fields, and private names",
         seed: 0x5eed_0017,
         sizeLimit:
           "zero to two constructor parameters, zero to three class " +

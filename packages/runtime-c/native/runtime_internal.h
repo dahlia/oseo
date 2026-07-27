@@ -91,6 +91,7 @@ typedef enum {
     OSEO_HEAP_TIMER = 11,
     OSEO_HEAP_SYMBOL = 12,
     OSEO_HEAP_ARGUMENT_LIST = 13,
+    OSEO_HEAP_PRIVATE_NAME = 14,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -122,6 +123,17 @@ typedef struct {
     /* The description string, or undefined for a bare Symbol(). */
     OseoValue description;
 } OseoSymbol;
+
+/*
+ * One Private Name. Identity is the allocation itself and nothing else,
+ * so two names one class body spells the same way never match. A
+ * private name is never a property key, and no expression in this
+ * profile yields one to source code, so it carries no description: the
+ * spelled `#name` stays in the inspectable MIR instead.
+ */
+typedef struct {
+    OseoHeapObject header;
+} OseoPrivateName;
 
 typedef struct {
     OseoHeapObject header;
@@ -184,12 +196,43 @@ typedef struct {
     bool yielded_result_object;
 } OseoGenerator;
 
+/* Which slot of one object's [[PrivateElements]] entry is live. */
+typedef enum {
+    OSEO_PRIVATE_ELEMENT_FIELD = 0,
+    OSEO_PRIVATE_ELEMENT_METHOD = 1,
+    OSEO_PRIVATE_ELEMENT_ACCESSOR = 2,
+} OseoPrivateElementKind;
+
+/*
+ * One entry of an object's [[PrivateElements]]. `key` is a private name,
+ * so no string or symbol can name the entry and no property
+ * enumeration, descriptor, or prototype walk reaches it.
+ */
+typedef struct {
+    OseoValue key;
+    /* The field value or the method function; undefined otherwise. */
+    OseoValue value;
+    /* [[Get]] and [[Set]] of an accessor element, each possibly
+     * undefined; undefined for every other kind. */
+    OseoValue getter;
+    OseoValue setter;
+    OseoPrivateElementKind kind;
+} OseoPrivateElement;
+
 typedef struct {
     OseoHeapObject header;
     OseoValue prototype;
     OseoProperty *properties;
     size_t property_capacity;
     size_t property_count;
+    /*
+     * [[PrivateElements]], in the order one class installed them. It is
+     * not property storage: it grows only through the class that
+     * declared the names, and only a private reference reads it.
+     */
+    OseoPrivateElement *private_elements;
+    size_t private_element_capacity;
+    size_t private_element_count;
     size_t shape_id;
     uint32_t array_length;
     bool dictionary;
@@ -211,16 +254,30 @@ typedef struct {
     OseoGenerator *generator;
 } OseoOrdinaryObject;
 
+/* Which instance element one class constructor record describes. */
+typedef enum {
+    OSEO_CLASS_ELEMENT_FIELD = 0,
+    OSEO_CLASS_ELEMENT_PRIVATE_FIELD = 1,
+    OSEO_CLASS_ELEMENT_PRIVATE_METHOD = 2,
+    OSEO_CLASS_ELEMENT_PRIVATE_ACCESSOR = 3,
+} OseoClassElementKind;
+
 /*
- * One entry of a class constructor's [[Fields]]: the key its class body
- * evaluated once and the closure that produces the value for each
- * instance. `initializer` is undefined for a field declared without
- * one, whose value is undefined.
+ * One entry of a class constructor's [[Fields]] and [[PrivateMethods]].
+ * `key` is the property key the class body evaluated for a public
+ * field, and the private name the class evaluation created otherwise.
+ * `value` is the closure that produces one instance's field value,
+ * undefined for a field declared without an initializer, or the
+ * function of a private method; `getter` and `setter` carry the two
+ * halves of a private accessor, each possibly undefined.
  */
 typedef struct {
     OseoValue key;
-    OseoValue initializer;
-} OseoClassField;
+    OseoValue value;
+    OseoValue getter;
+    OseoValue setter;
+    OseoClassElementKind kind;
+} OseoClassElement;
 
 typedef struct {
     OseoOrdinaryObject ordinary;
@@ -236,14 +293,14 @@ typedef struct {
      */
     OseoValue home_object;
     /*
-     * [[Fields]], in class-body order and non-NULL only on a class
-     * constructor whose body declared instance fields. The list is
-     * complete before the class definition finishes, so an instance can
-     * never observe it growing.
+     * [[Fields]] and [[PrivateMethods]], in class-body order and
+     * non-NULL only on a class constructor whose body declared instance
+     * elements. The list is complete before the class definition
+     * finishes, so an instance can never observe it growing.
      */
-    OseoClassField *fields;
-    size_t field_count;
-    size_t field_capacity;
+    OseoClassElement *elements;
+    size_t element_count;
+    size_t element_capacity;
     size_t code_id;
     OseoFunctionKind function_kind;
     bool prototype_writable;
@@ -342,6 +399,9 @@ static inline OseoOrdinaryObject *ordinary_object(OseoValue value) {
 static inline OseoCell *cell_object(OseoValue value) {
     return (OseoCell *)heap_object(value);
 }
+static inline OseoPrivateName *private_name_object(OseoValue value) {
+    return (OseoPrivateName *)heap_object(value);
+}
 static inline OseoSymbol *symbol_object(OseoValue value) {
     return (OseoSymbol *)heap_object(value);
 }
@@ -406,6 +466,10 @@ static inline bool is_cell(OseoValue value) {
 static inline bool is_symbol(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_SYMBOL;
+}
+static inline bool is_private_name(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_PRIVATE_NAME;
 }
 static inline bool is_array_iterator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&

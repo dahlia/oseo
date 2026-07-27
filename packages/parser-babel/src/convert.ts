@@ -21,6 +21,7 @@ import type {
   SyntaxObjectBindingPattern,
   SyntaxObjectProperty,
   SyntaxParameter,
+  SyntaxPrivateName,
   SyntaxProgram,
   SyntaxStatement,
   SyntaxSwitchCase,
@@ -37,12 +38,64 @@ import {
   type SuperPropertyContext,
 } from "./babel.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
-import { location, sourceRange, unsupported } from "./locations.ts";
+import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
 
 export function identifierName(value: BabelNode): string | undefined {
   return value.type === "Identifier" && typeof value.name === "string"
     ? value.name
     : undefined;
+}
+
+/** The declared name a `PrivateName` node carries, including its `#`. */
+function privateName(value: BabelNode): string | undefined {
+  if (value.type !== "PrivateName") return undefined;
+  const identifier = node(value.id);
+  const name = identifier == null ? undefined : identifierName(identifier);
+  return name == null ? undefined : `#${name}`;
+}
+
+/**
+ * The private name a member expression references, absent when the
+ * expression names an ordinary property. A private reference is never
+ * computed, because its name resolves in the class body that declared
+ * it rather than against the object.
+ */
+function privateMemberName(value: BabelNode): string | undefined {
+  if (value.type !== "MemberExpression" || value.computed === true) {
+    return undefined;
+  }
+  const property = node(value.property);
+  return property == null ? undefined : privateName(property);
+}
+
+/**
+ * Converts the object of a private reference. This unit admits `this`
+ * as that object, so a private element is reached only through the
+ * receiver the running class element already holds. Every other
+ * operand, including `super` and a separately evaluated expression,
+ * names the boundary it crosses.
+ */
+function privateReferenceObject(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  if (value.optional === true) {
+    return unsupported(
+      context,
+      value,
+      "Optional access to a private member is unsupported.",
+    );
+  }
+  const objectNode = node(value.object);
+  if (objectNode == null) return unsupported(context, value);
+  if (objectNode.type !== "ThisExpression") {
+    return unsupported(
+      context,
+      value,
+      "A private member is reachable only through this.",
+    );
+  }
+  return expression(context, objectNode);
 }
 
 const compoundAssignmentOperators = new Map<unknown, AssignmentOperator>([
@@ -162,6 +215,18 @@ export function callTarget(
       };
     }
   }
+  const privateCallee = privateMemberName(value);
+  if (privateCallee != null) {
+    const receiver = privateReferenceObject(context, value);
+    return receiver == null
+      ? undefined
+      : {
+          ...location(context, value),
+          kind: "private-method",
+          name: privateCallee,
+          object: receiver,
+        };
+  }
   const parts = memberParts(context, value, true);
   return parts == null
     ? undefined
@@ -234,11 +299,16 @@ export function memberParts(
   let key: SyntaxExpression | undefined;
   if (value.computed === true) {
     key = expression(context, propertyNode);
+  } else if (propertyNode.type === "PrivateName") {
+    return unsupported(
+      context,
+      value,
+      "A private member is unsupported in this position.",
+    );
   } else {
     const name = identifierName(propertyNode);
-    if (name != null) {
-      key = { ...location(context, propertyNode), kind: "string", value: name };
-    }
+    if (name == null) return unsupported(context, propertyNode);
+    key = { ...location(context, propertyNode), kind: "string", value: name };
   }
   return objectValue == null || key == null
     ? undefined
@@ -376,6 +446,17 @@ export function expression(
     if (value.operator === "delete") {
       const argumentNode = unparenthesizedExpression(value.argument);
       if (argumentNode == null) return unsupported(context, value);
+      // Deleting a private member is an early error, and the rule
+      // applies through any number of covering parentheses. The
+      // bootstrap parser reports the uncovered spelling itself, so this
+      // reports the covered one at the same code and location.
+      if (privateMemberName(argumentNode) != null) {
+        return earlyError(
+          context,
+          argumentNode,
+          "A private member cannot be deleted.",
+        );
+      }
       const member = memberParts(context, argumentNode);
       return member == null
         ? undefined
@@ -508,6 +589,13 @@ export function expression(
     return classExpression(context, value);
   }
   if (value.type === "MemberExpression") {
+    const name = privateMemberName(value);
+    if (name != null) {
+      const object = privateReferenceObject(context, value);
+      return object == null
+        ? undefined
+        : { ...located, kind: "private-get", name, object };
+    }
     const member = memberParts(context, value, true);
     return member == null
       ? undefined
@@ -534,6 +622,20 @@ export function expression(
           value: assigned,
         };
       }
+      const privateTarget = privateMemberName(left);
+      if (privateTarget != null) {
+        const object = privateReferenceObject(context, left);
+        return object == null
+          ? undefined
+          : {
+              ...located,
+              kind: "private-update",
+              name: privateTarget,
+              object,
+              operator,
+              value: assigned,
+            };
+      }
       const member = memberParts(context, left, true);
       return member == null
         ? undefined
@@ -559,6 +661,20 @@ export function expression(
         ? undefined
         : { ...located, kind: "destructuring-set", pattern, value: assigned };
     }
+    const privateTarget = privateMemberName(left);
+    if (privateTarget != null) {
+      const object = privateReferenceObject(context, left);
+      const assigned = expression(context, right);
+      return object == null || assigned == null
+        ? undefined
+        : {
+            ...located,
+            kind: "private-set",
+            name: privateTarget,
+            object,
+            value: assigned,
+          };
+    }
     const member = memberParts(context, left, true);
     const assigned = expression(context, right);
     return member == null || assigned == null
@@ -581,6 +697,20 @@ export function expression(
         operator,
         prefix: value.prefix === true,
       };
+    }
+    const privateTarget = privateMemberName(argument);
+    if (privateTarget != null) {
+      const object = privateReferenceObject(context, argument);
+      return object == null
+        ? undefined
+        : {
+            ...located,
+            kind: "private-step",
+            name: privateTarget,
+            object,
+            operator,
+            prefix: value.prefix === true,
+          };
     }
     const member = memberParts(context, argument, true);
     return member == null
@@ -731,6 +861,13 @@ export function expression(
     const rightNode = node(value.right);
     if (leftNode == null || rightNode == null)
       return unsupported(context, value);
+    if (leftNode.type === "PrivateName") {
+      return unsupported(
+        context,
+        leftNode,
+        "The in operator on a private name is unsupported.",
+      );
+    }
     const left = expression(context, leftNode);
     const right = expression(context, rightNode);
     if (left == null || right == null) return undefined;
@@ -3366,10 +3503,18 @@ export function functionDeclaration(
 function classElementKey(
   context: ConvertContext,
   element: BabelNode,
-): SyntaxExpression | undefined {
+): SyntaxExpression | SyntaxPrivateName | undefined {
   const keyNode = node(element.key);
   if (keyNode == null) return unsupported(context, element);
   if (element.computed === true) return expression(context, keyNode);
+  const privateKey = privateName(keyNode);
+  if (privateKey != null) {
+    return {
+      ...location(context, keyNode),
+      kind: "private-name",
+      name: privateKey,
+    };
+  }
   const name = identifierName(keyNode);
   if (name != null) {
     return { ...location(context, keyNode), kind: "string", value: name };
@@ -3428,12 +3573,12 @@ function implicitDerivedConstructor(
 }
 
 /**
- * Converts one instance field definition. The initializer is converted
- * as its own function body: it provides the receiver the field is
- * defined on, so `this` is admitted there, and it carries the class
- * element home object, so a derived class admits `super.x` in it. It is
- * not a constructor, so `super()` stays rejected with the diagnostic
- * every non-constructor position already reports.
+ * Converts one instance field definition, public or private. The
+ * initializer is converted as its own function body: it provides the
+ * receiver the field is defined on, so `this` is admitted there, and it
+ * carries the class element home object, so a derived class admits
+ * `super.x` in it. It is not a constructor, so `super()` stays rejected
+ * with the diagnostic every non-constructor position already reports.
  */
 function classField(
   context: ConvertContext,
@@ -3444,7 +3589,9 @@ function classField(
     return unsupported(
       context,
       element,
-      "Static class fields are unsupported.",
+      element.type === "ClassPrivateProperty"
+        ? "Static private class elements are unsupported."
+        : "Static class fields are unsupported.",
     );
   }
   if (
@@ -3531,17 +3678,31 @@ export function classExpression(
   const elements: SyntaxClassElement[] = [];
   let constructorFunction: SyntaxFunction | undefined;
   for (const element of nodes(bodyNode.body)) {
-    if (element.type === "ClassProperty") {
+    if (
+      element.type === "ClassProperty" ||
+      element.type === "ClassPrivateProperty"
+    ) {
       const field = classField(context, element, derived);
       if (field == null) break;
       elements.push(field);
       continue;
     }
-    if (element.type !== "ClassMethod") {
+    if (
+      element.type !== "ClassMethod" &&
+      element.type !== "ClassPrivateMethod"
+    ) {
       unsupported(context, element, "This class element is unsupported.");
       break;
     }
     const staticPlacement = element.static === true;
+    if (element.type === "ClassPrivateMethod" && staticPlacement) {
+      unsupported(
+        context,
+        element,
+        "Static private class elements are unsupported.",
+      );
+      break;
+    }
     if (element.kind === "constructor") {
       if (constructorFunction != null) {
         unsupported(context, element, "A class defines one constructor.");
@@ -3600,14 +3761,18 @@ export function classExpression(
         returnHints: [],
         strict: true,
       };
-  // Whichever constructor the class ends up with runs the instance field
-  // initializers, so the flag is decided once the whole body is known.
-  const instanceFields = elements.some((element) => element.kind === "field");
+  // Whichever constructor the class ends up with installs the private
+  // methods and runs the field initializers, so the flag is decided once
+  // the whole body is known.
+  const instanceElements = elements.some(
+    (element) =>
+      element.kind === "field" || element.key.kind === "private-name",
+  );
   const classConstructor = constructorFunction ?? implicitConstructor;
   return {
     ...located,
-    constructorFunction: instanceFields
-      ? { ...classConstructor, initializesInstanceFields: true }
+    constructorFunction: instanceElements
+      ? { ...classConstructor, initializesInstanceElements: true }
       : classConstructor,
     elements,
     ...(heritage == null ? {} : { heritage }),

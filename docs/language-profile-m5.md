@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,567 reviewed cases: 1,016 passes, 382 expected
-negatives, and 169 unsupported profile features. It records no semantic or
+The current manifest contains 2,284 reviewed cases: 1,161 passes, 826 expected
+negatives, and 297 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -818,8 +818,8 @@ its deliberate boundary and its evidence:
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
-    boundaries: private names, static initialization blocks, and
-    `export default class` are rejected with source-located diagnostics.
+    boundaries: static initialization blocks and `export default class` are
+    rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use; generator and
     asynchronous generator methods stay rejected with that shared
@@ -871,10 +871,10 @@ its deliberate boundary and its evidence:
     to object literal accessors, for identifier, string literal, numeric
     literal, computed, and symbol keys alike. A getter's parameter list must
     be empty and a setter's must be exactly one non-rest parameter; the
-    frontend reports the violation, a literal-keyed accessor named
-    `constructor`, and a private accessor with a source-located
-    diagnostic, while a computed key that evaluates to `"constructor"`
-    defines an ordinary prototype accessor. Native
+    frontend reports the violation and a literal-keyed accessor named
+    `constructor` with a source-located diagnostic, while a computed key
+    that evaluates to `"constructor"` defines an ordinary prototype
+    accessor. Native
     differential fixtures cover a getter, a setter, a getter and setter
     pair, the round trip through both halves, `name` and `length` for both
     halves, the accessor property descriptor and its `enumerable` and
@@ -1139,8 +1139,8 @@ its deliberate boundary and its evidence:
     class body fills with the one key evaluation it performs. A key follows
     ToPropertyKey, so a numeric, string literal, computed, or symbol key
     behaves as it does elsewhere. Deliberate boundaries: a static field, a
-    private field, a field named `constructor`, and the TypeScript `declare`,
-    `readonly`, `definite`, and optional field modifiers are rejected with
+    field named `constructor`, and the TypeScript `declare`, `readonly`,
+    `definite`, and optional field modifiers are rejected with
     source-located diagnostics. Native differential fixtures cover a field
     with and without an initializer, an initializer reading an earlier field,
     the own-property descriptor, per-instance copies, the absent prototype
@@ -1179,6 +1179,55 @@ its deliberate boundary and its evidence:
     reviewed subset until `Object.prototype.hasOwnProperty` exists. The
     reviewed manifest moves to 1077 passes, 460 expected negatives, and 227
     unsupported profile features with no semantic or harness failures.
+ -  Private instance class elements. A `#name` field, a `#name()` method, and
+    a `get #name` or `set #name` accessor declare a private name that the
+    class body owns rather than a property key. A private element is not a
+    property: no key observation reaches it, so `Object.keys`, property
+    enumeration, and descriptor reads on an instance or its prototype stay
+    exactly as they were before the element was declared, and the name is
+    unforgeable from outside the class body. Each evaluation of a class
+    creates its private names afresh, so two instances produced by two
+    evaluations of one class expression never satisfy each other's elements,
+    and a derived class that spells a name its base also spells declares its
+    own rather than reaching the base's. Reading or writing a private element
+    on an object that does not carry the declaring class's brand throws a
+    `TypeError`, which is what a detached method, a plain object, a receiver
+    that never ran the constructor, and the class prototype itself all
+    observe. Private methods and accessors are installed before any field
+    initializer runs, matching InitializeInstanceElements, so an initializer
+    reaches a method its class declares later in the body. A private method
+    is not writable, so assigning to one from class-body code throws a
+    `TypeError`, and it is the same non-constructible method kind prototype
+    methods use, so `new` on a retrieved one throws and it carries the class
+    prototype as its home object, which lets `super.x` inside it start at the
+    parent's prototype. A private accessor pairs a getter and a setter under
+    one name into one element, so a getter-only element rejects a write. A
+    derived constructor installs its private elements where `super()`
+    returns, so a private read before `super()` reports the `this` binding's
+    temporal dead zone `ReferenceError` rather than a brand `TypeError`.
+    Compound assignment and the prefix and postfix update operators read the
+    element once and write it once through the same private name. Deliberate
+    boundaries: a static private element, `#name in object`, a private
+    reference whose base is anything other than `this`, optional `?.#name`
+    access, and a private reference used as a destructuring or `for-of`
+    assignment target are rejected with source-located diagnostics, and
+    `delete this.#name` is reported as the early error it is. Native
+    differential fixtures cover private fields and their absence from every
+    key observation, private methods including installation order, non-
+    writability, non-constructibility, and the home object, private
+    accessors, brand checks across per-evaluation identity, plain objects,
+    uninitialized receivers, the prototype receiver, and a base that lacks a
+    derived name, the pre-`super()` temporal dead zone, compound assignment
+    and update operators, private state holding every admitted value, and a
+    hinted method that specializes while private fields, a private method,
+    and a private accessor surround it, with every guard path leaving those
+    elements intact. Eighty-four reviewed test262 cases newly pass and three
+    hundred sixty-six new expected negatives record the private name early
+    errors, which are dominated by the undeclared-private-name references
+    every class element form reports. Seventy new unsupported cases record
+    this unit's boundaries. The reviewed manifest moves to 1,161 passes, 826
+    expected negatives, and 297 unsupported profile features with no semantic
+    or harness failures.
 
 
 Known gaps inside the claim
@@ -1193,8 +1242,12 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Static fields, private names, static initialization blocks, and
-    `export default class` are outside the admitted class subset. `super()`,
+ -  Static fields, static private elements, static initialization blocks, and
+    `export default class` are outside the admitted class subset. A private
+    element is reachable only through `this`, so a cross-instance
+    `other.#name` reference, the `#name in object` brand check, optional
+    `?.#name` access, and a private destructuring or `for-of` assignment
+    target remain rejected. `super()`,
     `super.x`, and `new.target` are rejected inside an arrow function, and
     `super.x` is also rejected inside an asynchronous class element, because
     this profile captures none of them lexically yet. A `super` property
@@ -1205,12 +1258,17 @@ must never shrink by reclassification alone.
  -  `super()` runs the parent against the receiver the `new` expression
     already allocated instead of performing a fresh `Construct` per call, so a
     second `super()` in one invocation runs the parent a second time against
-    that same receiver rather than a new one. The `ReferenceError` the second
-    call must throw still follows, and the parent still runs exactly twice, so
-    the difference is observable only to a parent that publishes or mutates
-    its receiver during a call that is already doomed. Closing it needs a
-    runtime `Construct` path that allocates at the base-constructor boundary.
-    Owner: the functions and executable syntax stream.
+    that same receiver rather than a new one. When the parent declares no
+    private element, the `ReferenceError` the second call must throw still
+    follows and the parent still runs exactly twice, so the difference is
+    observable only to a parent that publishes or mutates its receiver during
+    a call that is already doomed. When the parent does declare a private
+    element, reinstalling it on the receiver that already carries it throws a
+    `TypeError` from InitializeInstanceElements before the parent body runs a
+    second time, so that case reports the wrong error type and runs the parent
+    once rather than twice. Closing both needs a runtime `Construct` path that
+    allocates at the base-constructor boundary. Owner: the functions and
+    executable syntax stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

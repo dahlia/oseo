@@ -2094,4 +2094,477 @@ console.log(
       overflowMisses: 1,
     },
   },
+  {
+    name: "class-private-fields",
+    source: `
+// A private field is not a property: no key observation reaches it, and
+// a public property of the same spelling stays independent of it.
+class Box {
+  #value = 1;
+  #empty;
+  ["#value"] = "public";
+  read() {
+    return this.#value;
+  }
+  readEmpty() {
+    return this.#empty;
+  }
+  write(next) {
+    this.#value = next;
+    return this.#value;
+  }
+}
+const box = new Box();
+console.log(box.read(), typeof box.readEmpty(), box.write(7), box.read());
+console.log(Object.keys(box).length, Object.keys(box)[0]);
+console.log(box["#value"], box.read());
+console.log(Object.getOwnPropertyDescriptor(box, "#value").value);
+console.log(Object.getOwnPropertyDescriptor(Box.prototype, "#value"));
+const other = new Box();
+console.log(other.read(), box.read());
+
+// The initializer runs once per instance with the instance as its
+// receiver, and an arrow inside it captures that instance.
+class Counted {
+  #self = this;
+  #arrow = () => this;
+  same() {
+    return this.#self === this && this.#arrow() === this;
+  }
+}
+console.log(new Counted().same());
+
+// A base constructor that replaces its result leaves the private
+// elements on the instance the class allocated, not on the replacement.
+class Replaced {
+  #kept = 1;
+  constructor(swap) {
+    if (swap) return { swapped: true };
+  }
+  read() {
+    return this.#kept;
+  }
+}
+console.log(new Replaced(false).read());
+const swapped = new Replaced(true);
+console.log(swapped.swapped);
+const detached = { read: Replaced.prototype.read };
+try {
+  detached.read();
+} catch (error) {
+  console.log("swapped-brand", error instanceof TypeError);
+}
+`,
+  },
+  {
+    name: "class-private-methods",
+    source: `
+// A private method is installed on the instance rather than on the
+// prototype, so no prototype observation reports it, and every instance
+// shares the one function the class created.
+class Machine {
+  #state = 0;
+  #advance(step) {
+    this.#state = this.#state + step;
+    return this.#state;
+  }
+  run(step) {
+    return this.#advance(step);
+  }
+  method() {
+    return this.#advance;
+  }
+}
+const machine = new Machine();
+console.log(machine.run(2), machine.run(3));
+console.log(Object.keys(Machine.prototype).length, Object.keys(machine).length);
+console.log(Object.getOwnPropertyDescriptor(Machine.prototype, "#advance"));
+console.log(machine.method().name, machine.method().length);
+console.log(machine.method() === new Machine().method());
+console.log(typeof machine.method(), "prototype" in machine.method());
+try {
+  new (machine.method())();
+} catch (error) {
+  console.log("not-a-constructor", error instanceof TypeError);
+}
+
+// Every private method is installed before any field initializer runs,
+// so an initializer reaches a method its class declares later.
+class Ordered {
+  #seeded = this.#seed();
+  #seed() {
+    return "seeded";
+  }
+  read() {
+    return this.#seeded;
+  }
+}
+console.log(new Ordered().read());
+
+// A private method is not writable.
+class Frozen {
+  #step() {
+    return 1;
+  }
+  overwrite() {
+    try {
+      this.#step = 2;
+    } catch (error) {
+      return error instanceof TypeError;
+    }
+    return "assigned";
+  }
+}
+console.log(new Frozen().overwrite());
+
+// A private method still carries the class prototype as its home
+// object, so super reaches the parent exactly as an ordinary method.
+class Parent {
+  describe() {
+    return "parent";
+  }
+}
+class Child extends Parent {
+  #describe() {
+    return super.describe() + "/child";
+  }
+  read() {
+    return this.#describe();
+  }
+}
+console.log(new Child().read());
+`,
+  },
+  {
+    name: "class-private-accessors",
+    source: `
+// A getter and a setter under one private name describe one element,
+// whichever order the class body defines them in.
+class Celsius {
+  #kelvin = 273.15;
+  get #degrees() {
+    return this.#kelvin - 273.15;
+  }
+  set #degrees(value) {
+    this.#kelvin = value + 273.15;
+  }
+  read() {
+    return this.#degrees;
+  }
+  write(value) {
+    this.#degrees = value;
+    return this.#kelvin;
+  }
+}
+const celsius = new Celsius();
+console.log(celsius.read(), celsius.write(100), celsius.read());
+console.log(Object.keys(Celsius.prototype).length);
+
+class Reversed {
+  #store = 1;
+  set #doubled(value) {
+    this.#store = value / 2;
+  }
+  get #doubled() {
+    return this.#store * 2;
+  }
+  round(value) {
+    this.#doubled = value;
+    return this.#doubled;
+  }
+}
+console.log(new Reversed().round(10));
+
+// A half-declared accessor rejects the operation it has no function
+// for, and reports it as a TypeError rather than undefined.
+class Half {
+  #hidden = "kept";
+  get #readable() {
+    return this.#hidden;
+  }
+  set #writable(value) {
+    this.#hidden = value;
+  }
+  readReadable() {
+    return this.#readable;
+  }
+  writeReadable() {
+    try {
+      this.#readable = "next";
+    } catch (error) {
+      return error instanceof TypeError;
+    }
+    return "assigned";
+  }
+  readWritable() {
+    try {
+      return this.#writable;
+    } catch (error) {
+      return error instanceof TypeError;
+    }
+  }
+  writeWritable(value) {
+    this.#writable = value;
+    return this.#hidden;
+  }
+}
+const half = new Half();
+console.log(half.readReadable(), half.writeReadable(), half.readWritable());
+console.log(half.writeWritable("written"), half.readReadable());
+
+// An accessor half runs against the instance that carries the element,
+// and a setter reports the assigned value rather than its own result.
+class Reported {
+  #stored = 0;
+  set #slot(value) {
+    this.#stored = value * 2;
+    return "ignored";
+  }
+  assign(value) {
+    const produced = (this.#slot = value);
+    return typeof produced + ":" + produced + ":" + this.#stored;
+  }
+}
+console.log(new Reported().assign(4));
+`,
+  },
+  {
+    name: "class-private-brand-checks",
+    source: `
+// A private name is created once per class evaluation, so instances of
+// two evaluations of one class expression never satisfy each other.
+function make() {
+  return class {
+    #tag = "tagged";
+    read() {
+      return this.#tag;
+    }
+  };
+}
+const First = make();
+const Second = make();
+const first = new First();
+console.log(first.read(), new Second().read());
+const crossed = { read: Second.prototype.read };
+try {
+  crossed.read();
+} catch (error) {
+  console.log("cross-evaluation", error instanceof TypeError);
+}
+
+// A plain object, a primitive receiver, and a prototype that never ran
+// the constructor all fail the same brand check.
+class Branded {
+  #brand = true;
+  read() {
+    return this.#brand;
+  }
+}
+const detached = { read: Branded.prototype.read };
+try {
+  detached.read();
+} catch (error) {
+  console.log("plain-object", error instanceof TypeError);
+}
+const inherited = Object.create(Branded.prototype);
+const wrapped = { read: inherited.read };
+try {
+  wrapped.read();
+} catch (error) {
+  console.log("uninitialized", error instanceof TypeError);
+}
+try {
+  Branded.prototype.read();
+} catch (error) {
+  console.log("prototype-receiver", error instanceof TypeError);
+}
+
+// Private names are per class, not inherited: a derived class that
+// spells the same name declares its own, and each half of the chain
+// reads only what its own body installed.
+class Base {
+  #shared = "base";
+  fromBase() {
+    return this.#shared;
+  }
+}
+class Derived extends Base {
+  #shared = "derived";
+  fromDerived() {
+    return this.#shared;
+  }
+}
+const derived = new Derived();
+console.log(derived.fromBase(), derived.fromDerived());
+const base = new Base();
+const derivedReader = { fromDerived: Derived.prototype.fromDerived };
+try {
+  derivedReader.fromDerived();
+} catch (error) {
+  console.log("base-lacks-derived", error instanceof TypeError);
+}
+console.log(base.fromBase(), derived instanceof Base);
+
+// A derived constructor installs its own elements where super()
+// returns, so a private read before super() reports the this binding's
+// temporal dead zone rather than a brand failure.
+class Early extends Base {
+  #own = 1;
+  constructor(read) {
+    if (read) {
+      try {
+        this.#own;
+      } catch (error) {
+        super();
+        this.reported = error instanceof ReferenceError;
+        return;
+      }
+    }
+    super();
+    this.reported = "reached";
+  }
+  read() {
+    return this.#own;
+  }
+}
+console.log(new Early(true).reported, new Early(false).reported);
+console.log(new Early(false).read());
+`,
+  },
+  {
+    name: "class-private-updates",
+    source: `
+// Compound assignment and the update operators read the element once
+// and write it once, through the same private name.
+class Tally {
+  #count = 1;
+  step() {
+    const post = this.#count++;
+    const pre = ++this.#count;
+    const decrement = this.#count--;
+    return post + ":" + pre + ":" + decrement + ":" + this.#count;
+  }
+  compound() {
+    this.#count += 10;
+    this.#count *= 2;
+    this.#count **= 2;
+    this.#count ||= 99;
+    this.#count &&= this.#count - 1;
+    return this.#count;
+  }
+  nullish() {
+    this.#count = undefined;
+    this.#count ??= "filled";
+    return this.#count;
+  }
+}
+const tally = new Tally();
+console.log(tally.step());
+console.log(tally.compound());
+console.log(tally.nullish());
+
+// An accessor element runs its getter and setter once each for a
+// compound assignment, in that order.
+class Logged {
+  #stored = 1;
+  #reads = 0;
+  #writes = 0;
+  get #slot() {
+    this.#reads = this.#reads + 1;
+    return this.#stored;
+  }
+  set #slot(value) {
+    this.#writes = this.#writes + 1;
+    this.#stored = value;
+  }
+  run() {
+    this.#slot += 5;
+    return this.#stored + ":" + this.#reads + ":" + this.#writes;
+  }
+}
+console.log(new Logged().run());
+
+// A private field holds any value the language admits, including a
+// function, an object, and a nested class instance.
+class Holder {
+  #payload;
+  set(value) {
+    this.#payload = value;
+    return this;
+  }
+  get() {
+    return this.#payload;
+  }
+}
+const holder = new Holder();
+console.log(typeof holder.set(() => 1).get());
+console.log(holder.set({ nested: 2 }).get().nested);
+console.log(holder.set(new Holder().set("deep")).get().get());
+`,
+  },
+  {
+    name: "class-private-hints",
+    source: `
+// The addition specialization only rewrites a two-parameter body whose
+// one statement returns the sum, so private state cannot enter that
+// body. What it can do is surround it: a class that declares private
+// fields, a private method, and a private accessor still specializes
+// its hinted method, and every guard path leaves the private elements
+// intact. An unhinted twin agrees with it.
+class Hinted {
+  #calls = 0;
+  #tag = "hinted";
+  #record() {
+    this.#calls = this.#calls + 1;
+    return this.#calls;
+  }
+  get #summary() {
+    return this.#tag + ":" + this.#calls;
+  }
+  add(left: number, right: number) {
+    return left + right;
+  }
+  run(left, right) {
+    const sum = this.add(left, right);
+    this.#record();
+    return this.#summary + ":" + sum;
+  }
+}
+class Plain {
+  #calls = 0;
+  #tag = "plain";
+  #record() {
+    this.#calls = this.#calls + 1;
+    return this.#calls;
+  }
+  get #summary() {
+    return this.#tag + ":" + this.#calls;
+  }
+  add(left, right) {
+    return left + right;
+  }
+  run(left, right) {
+    const sum = this.add(left, right);
+    this.#record();
+    return this.#summary + ":" + sum;
+  }
+}
+const hinted = new Hinted();
+const plain = new Plain();
+console.log(hinted.run(1, 2));
+console.log(plain.run(1, 2));
+console.log(hinted.run("a", "b"));
+console.log(plain.run("a", "b"));
+console.log(hinted.run(0.5, 0.25));
+console.log(hinted.run(140737488355327, 1));
+console.log(hinted.run(3, 4));
+`,
+    specialization: {
+      genericCallsDisabled: 42,
+      genericCallsEnabled: 40,
+      hits: 2,
+      misses: 2,
+      overflowMisses: 1,
+    },
+  },
 ];

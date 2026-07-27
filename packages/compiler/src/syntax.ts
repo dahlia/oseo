@@ -75,6 +75,16 @@ export type SyntaxCallTarget =
       readonly key: SyntaxExpression;
       readonly kind: "property";
       readonly object: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      /**
+       * A private member call, `this.#m()`. The callee is the private
+       * element the object carries, and the object stays the receiver,
+       * so the two are evaluated once each.
+       */
+      readonly kind: "private-method";
+      readonly name: string;
+      readonly object: SyntaxExpression;
     });
 
 /** Binary operations selected before native backend lowering. */
@@ -183,11 +193,23 @@ export type SyntaxObjectProperty =
   | SyntaxObjectDefinition
   | SyntaxObjectSpreadProperty;
 
+/**
+ * One private element name in a class body, such as `#count`. A private
+ * name is not a property key: a fresh one exists per class evaluation,
+ * only the declaring class body reaches it, and it never becomes a
+ * string or symbol an own-property observation can report.
+ */
+export interface SyntaxPrivateName extends LocatedSyntax {
+  readonly kind: "private-name";
+  /** The declared name, including its leading `#`. */
+  readonly name: string;
+}
+
 /** One method or accessor definition in an owned class body. */
 export interface SyntaxClassMethod extends LocatedSyntax {
   /** A get or set accessor; absent for an ordinary method definition. */
   readonly accessorKind?: "get" | "set";
-  readonly key: SyntaxExpression;
+  readonly key: SyntaxExpression | SyntaxPrivateName;
   readonly kind: "method";
   /**
    * True for a `static` element, which is defined on the constructor
@@ -210,7 +232,7 @@ export interface SyntaxClassField extends LocatedSyntax {
    * class scope rather than the constructor's parameters.
    */
   readonly initializer?: SyntaxExpression;
-  readonly key: SyntaxExpression;
+  readonly key: SyntaxExpression | SyntaxPrivateName;
   readonly kind: "field";
 }
 
@@ -365,6 +387,37 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly key: SyntaxExpression;
       readonly kind: "property-step";
+      readonly object: SyntaxExpression;
+      readonly operator: UpdateOperator;
+      readonly prefix: boolean;
+    })
+  | (LocatedSyntax & {
+      /**
+       * A private member reference, `this.#x`. The name resolves in the
+       * class body that declares it rather than against the object, so
+       * it carries the declared name instead of a key expression, and
+       * the object is checked for the element at run time.
+       */
+      readonly kind: "private-get";
+      readonly name: string;
+      readonly object: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-set";
+      readonly name: string;
+      readonly object: SyntaxExpression;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-update";
+      readonly name: string;
+      readonly object: SyntaxExpression;
+      readonly operator: AssignmentOperator;
+      readonly value: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-step";
+      readonly name: string;
       readonly object: SyntaxExpression;
       readonly operator: UpdateOperator;
       readonly prefix: boolean;
@@ -677,7 +730,7 @@ export interface SyntaxFunction extends LocatedSyntax {
    * class recorded: a base constructor before its body, and a derived
    * one where `super()` returns.
    */
-  readonly initializesInstanceFields?: true;
+  readonly initializesInstanceElements?: true;
   readonly kind: "function";
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];

@@ -407,8 +407,8 @@ computed method definitions, `constructor` and `prototype` property
 descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
-unit's boundaries. Private names, static initialization blocks, and
-`export default class` remain rejected with source-located diagnostics.
+unit's boundaries. Static initialization blocks and `export default class`
+remain rejected with source-located diagnostics.
 Asynchronous class methods are admitted, because they share the object literal
 method path exactly; generator and asynchronous generator methods stay rejected
 with the same diagnostic object literals already use. The manifest moves to 812
@@ -429,8 +429,8 @@ accessor closure reuses the non-constructible method kind and the runtime
 so its `name` follows identifier, string literal, numeric literal, computed,
 and symbol keys alike, and `new` on it throws a `TypeError`. The frontend
 rejects a getter with a parameter, a setter without exactly one non-rest
-parameter, a literal-keyed accessor named `constructor`, and private
-accessors with source-located diagnostics; a computed key that evaluates to
+parameter and a literal-keyed accessor named `constructor` with
+source-located diagnostics; a computed key that evaluates to
 `"constructor"` defines an ordinary prototype accessor. Fixed native fixtures
 cover a getter, a setter, a pair and its round trip, both halves' `name` and
 `length`, the accessor descriptor and its attributes, accessor
@@ -531,12 +531,16 @@ constructor, because its fast path would leave the block before the
 so a parameter hint cannot change what a derived constructor returns. Because
 `super()` reuses the receiver the `new` expression allocated instead of
 performing a fresh `Construct` per call, a second `super()` runs the parent
-against that same receiver rather than a new one; the required
-`ReferenceError` still follows and the parent still runs exactly twice, so the
-difference reaches only a parent that publishes or mutates its receiver during
-a call that is already doomed. Closing it needs a runtime `Construct` path
-that allocates at the base-constructor boundary, and the language profile
-records it as a known gap. Every `return` of a derived constructor leaves
+against that same receiver rather than a new one. When the parent declares no
+private element, the required `ReferenceError` still follows and the parent
+still runs exactly twice, so the difference reaches only a parent that
+publishes or mutates its receiver during a call that is already doomed. When
+the parent declares a private element, reinstalling it on a receiver that
+already carries it throws a `TypeError` from InitializeInstanceElements before
+the parent body runs again, so that case reports the wrong error type and runs
+the parent once. Closing both needs a runtime `Construct` path that allocates
+at the base-constructor boundary, and the language profile records it as a
+known gap. Every `return` of a derived constructor leaves
 through that binding,
 so an object stands as written, `undefined` yields the bound `this`, and any
 other value is a `TypeError`; MIR rewrites the terminators after the body is
@@ -674,9 +678,9 @@ body fills with the one key evaluation it performs, which is ECMA-262's
 carries the class prototype as its home object, so `super.x` inside it starts
 at the parent's prototype with the instance as the receiver, including under
 the implicit derived constructor. Deliberate boundaries: a static field, a
-private field, a field named `constructor`, and the TypeScript `declare`,
-`readonly`, `definite`, and optional field modifiers stay rejected with
-source-located diagnostics. Fixed native fixtures cover a field with and
+field named `constructor`, and the TypeScript `declare`, `readonly`,
+`definite`, and optional field modifiers stay rejected with source-located
+diagnostics. Fixed native fixtures cover a field with and
 without an initializer, the own-property descriptor, per-instance copies, an
 inherited setter that does not run, a non-writable inherited property, a
 shadowed prototype method, interleaved key and initializer order across
@@ -699,6 +703,37 @@ test262 cases newly pass, seventy-eight new expected negatives record the
 name early errors, and twenty-eight new unsupported cases record this unit's
 boundaries. The manifest moves to 1077 passes, 460 expected negatives, and
 227 unsupported profile features with no semantic or harness failures.
+
+Private instance class elements are now admitted: a `#name` field, a
+`#name()` method, and a `get #name` or `set #name` accessor declare a private
+name owned by the class body rather than a property key. A private element is
+not a property, so no key observation, enumeration, or descriptor read
+reaches it. Each class evaluation creates its private names afresh, so
+instances from two evaluations of one class expression never satisfy each
+other's elements, and a derived class that spells a base's name declares its
+own. A read or write against an object without the declaring class's brand
+throws a `TypeError`. Private methods and accessors are installed before any
+field initializer runs, matching InitializeInstanceElements, so an
+initializer reaches a method declared later in the body. A private method is
+not writable and is the same non-constructible method kind prototype methods
+use, carrying the class prototype as its home object so `super.x` works
+inside it. A derived constructor installs its private elements where
+`super()` returns, so a private read before `super()` reports the `this`
+temporal dead zone `ReferenceError` rather than a brand `TypeError`.
+Compound assignment and the update operators read and write the element once
+through the same name. Deliberate boundaries: a static private element,
+`#name in object`, a private reference based on anything other than `this`,
+optional `?.#name` access, and a private reference used as a destructuring or
+`for-of` assignment target stay rejected with source-located diagnostics, and
+`delete this.#name` is reported as an early error. Fixed native fixtures
+cover private fields, methods, accessors, brand checks, updates, the values
+private state can hold, and a hinted method that specializes while private
+elements surround it on every guard path. The generated class property suite
+draws private elements alongside public ones. Eighty-four reviewed test262
+cases newly pass, three hundred sixty-six new expected negatives record the
+private name early errors, and seventy new unsupported cases record this
+unit's boundaries. The manifest moves to 1161 passes, 826 expected negatives,
+and 297 unsupported profile features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

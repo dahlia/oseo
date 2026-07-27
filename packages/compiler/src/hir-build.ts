@@ -19,6 +19,8 @@ import type {
   HirObjectBindingProperty,
   HirObjectProperty,
   HirParameter,
+  HirPrivateName,
+  HirPrivateNameKey,
   HirResult,
   HirStatement,
   HirSwitchCase,
@@ -30,6 +32,7 @@ import type {
   LocatedSyntax,
   SyntaxAssignmentPattern,
   SyntaxCallArgument,
+  SyntaxClassElement,
   SyntaxClassField,
   SyntaxExpression,
   SyntaxFunction,
@@ -59,6 +62,14 @@ function findBinding(
     if (binding != null) return binding;
   }
   return undefined;
+}
+
+/** The source location of one syntax node, without its other fields. */
+function locatedOf(value: LocatedSyntax): LocatedSyntax {
+  return {
+    ...(value.byteRange == null ? {} : { byteRange: value.byteRange }),
+    range: value.range,
+  };
 }
 
 function shadowedMethodTarget(
@@ -101,6 +112,33 @@ function inferFunctionName(
     };
   }
   return expression;
+}
+
+/**
+ * Resolves one private name against the enclosing class bodies. A class
+ * body binds every private name it declares in its own scope under the
+ * spelled `#name`, which no identifier can collide with, so an inner
+ * class shadows an outer declaration of the same name and a reference
+ * outside every declaring body reports an unresolved name.
+ */
+function resolvePrivateName(
+  name: string,
+  located: LocatedSyntax,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirPrivateName | undefined {
+  const binding = findBinding(scopes, name);
+  if (binding == null) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        located,
+        `Private name ${name} is not declared in an enclosing class body.`,
+      ),
+    );
+    return undefined;
+  }
+  return { bindingId: binding.id, name };
 }
 
 function resolveCallArgument(
@@ -421,6 +459,47 @@ function resolveExpression(
       ? undefined
       : { ...expression, key, object };
   }
+  if (
+    expression.kind === "private-get" ||
+    expression.kind === "private-set" ||
+    expression.kind === "private-step" ||
+    expression.kind === "private-update"
+  ) {
+    const located = locatedOf(expression);
+    const object = resolveExpression(expression.object, scopes, state);
+    const privateName = resolvePrivateName(
+      expression.name,
+      expression,
+      scopes,
+      state,
+    );
+    if (object == null || privateName == null) return undefined;
+    if (expression.kind === "private-get") {
+      return { ...located, kind: "private-get", object, privateName };
+    }
+    if (expression.kind === "private-step") {
+      return {
+        ...located,
+        kind: "private-step",
+        object,
+        operator: expression.operator,
+        prefix: expression.prefix,
+        privateName,
+      };
+    }
+    const value = resolveExpression(expression.value, scopes, state);
+    if (value == null) return undefined;
+    return expression.kind === "private-set"
+      ? { ...located, kind: "private-set", object, privateName, value }
+      : {
+          ...located,
+          kind: "private-update",
+          object,
+          operator: expression.operator,
+          privateName,
+          value,
+        };
+  }
   if (expression.kind === "new") {
     const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
@@ -567,6 +646,16 @@ function resolveExpression(
       return undefined;
     }
     target = { kind: "super", thisBinding };
+  } else if (expression.target.kind === "private-method") {
+    const object = resolveExpression(expression.target.object, scopes, state);
+    const privateName = resolvePrivateName(
+      expression.target.name,
+      expression.target,
+      scopes,
+      state,
+    );
+    if (object == null || privateName == null) return undefined;
+    target = { kind: "private-method", object, privateName };
   } else {
     const object = resolveExpression(expression.target.object, scopes, state);
     const key = resolveExpression(expression.target.key, scopes, state);
@@ -884,7 +973,9 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
         : expression.target.kind === "method"
           ? hirExpressionHasAwait(expression.target.object) ||
             hirExpressionHasAwait(expression.target.key)
-          : false;
+          : expression.target.kind === "private-method"
+            ? hirExpressionHasAwait(expression.target.object)
+            : false;
     return targetAwait || expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "new") {
@@ -911,7 +1002,13 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     return (
       (expression.heritage != null &&
         hirExpressionHasAwait(expression.heritage)) ||
-      expression.elements.some((element) => hirExpressionHasAwait(element.key))
+      // A private name is created by the class evaluation itself, so
+      // only a key expression can carry an await.
+      expression.elements.some(
+        (element) =>
+          element.key.kind !== "private-name" &&
+          hirExpressionHasAwait(element.key),
+      )
     );
   }
   if (
@@ -931,6 +1028,18 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     return (
       hirExpressionHasAwait(expression.object) ||
       hirExpressionHasAwait(expression.key) ||
+      hirExpressionHasAwait(expression.value)
+    );
+  }
+  if (expression.kind === "private-get" || expression.kind === "private-step") {
+    return hirExpressionHasAwait(expression.object);
+  }
+  if (
+    expression.kind === "private-set" ||
+    expression.kind === "private-update"
+  ) {
+    return (
+      hirExpressionHasAwait(expression.object) ||
       hirExpressionHasAwait(expression.value)
     );
   }
@@ -1111,6 +1220,39 @@ function resolveFunctionExpression(
 }
 
 /**
+ * Resolves one class element key. A private name resolves to the class
+ * binding that holds the private name value rather than to a property
+ * key expression, so the element it names is recorded under an identity
+ * no property observation can produce.
+ */
+function resolveClassElementKey(
+  key: SyntaxClassElement["key"],
+  classScopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirExpression | HirPrivateNameKey | undefined {
+  if (key.kind !== "private-name") {
+    return resolveExpression(key, classScopes, state);
+  }
+  const privateName = resolvePrivateName(key.name, key, classScopes, state);
+  return privateName == null
+    ? undefined
+    : { ...locatedOf(key), kind: "private-name", privateName };
+}
+
+/**
+ * The name a class element key gives an anonymous definition it holds.
+ * ECMA-262 names a private element after its declared `#name`, exactly
+ * as a static string key names an ordinary one; every other key names
+ * its definition only where the evaluated key value exists.
+ */
+function classElementStaticName(
+  key: HirExpression | HirPrivateNameKey,
+): string | undefined {
+  if (key.kind === "private-name") return key.privateName.name;
+  return key.kind === "string" ? key.value : undefined;
+}
+
+/**
  * Resolves one instance field definition. The key belongs to the class
  * body and is evaluated where the element appears, while the
  * initializer becomes a separate function that runs once per instance.
@@ -1128,12 +1270,9 @@ function resolveClassField(
   classScopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirClassField | undefined {
-  const key = resolveExpression(element.key, classScopes, state);
+  const key = resolveClassElementKey(element.key, classScopes, state);
   if (key == null) return undefined;
-  const located = {
-    ...(element.byteRange == null ? {} : { byteRange: element.byteRange }),
-    range: element.range,
-  };
+  const located = locatedOf(element);
   if (element.initializer == null) {
     return { ...located, key, kind: "field" };
   }
@@ -1148,13 +1287,14 @@ function resolveClassField(
   state.thisBinding = outerThisBinding;
   if (resolved == null) return undefined;
   const range = element.initializer.range;
+  const staticName = classElementStaticName(key);
   const named =
-    key.kind === "string" ? inferFunctionName(resolved, key.value) : resolved;
-  // A key that is not a static string still names an anonymous
+    staticName == null ? resolved : inferFunctionName(resolved, staticName);
+  // A key that names nothing statically still names an anonymous
   // initializer, so it travels to the closure through a cell the class
   // body fills once, rather than being evaluated again per instance.
   const keyNameBindingId =
-    key.kind === "string" || !anonymousDefinition(named)
+    staticName != null || !anonymousDefinition(named)
       ? undefined
       : state.nextBindingId;
   if (keyNameBindingId != null) state.nextBindingId += 1;
@@ -1227,6 +1367,21 @@ function resolveClassExpression(
     heritage = resolveExpression(expression.heritage, classScopes, state);
     if (heritage == null) return undefined;
   }
+  // The private names are bound after the heritage operand resolves,
+  // because ECMA-262 evaluates ClassHeritage under the enclosing private
+  // environment: a class cannot reach its own private names from the
+  // expression it extends.
+  const privateNames: HirPrivateName[] = [];
+  for (const element of expression.elements) {
+    if (element.key.kind !== "private-name") continue;
+    // A getter and its setter declare one name between them.
+    if (classScope.has(element.key.name)) continue;
+    const name = element.key.name;
+    const bindingId = state.nextBindingId;
+    state.nextBindingId += 1;
+    classScope.set(name, { id: bindingId, mutable: false, name });
+    privateNames.push({ bindingId, name });
+  }
   let thisBinding: HirClassThisBinding | undefined;
   if (expression.heritage != null) {
     thisBinding = { bindingId: state.nextBindingId };
@@ -1259,7 +1414,7 @@ function resolveClassExpression(
       elements.push(field);
       continue;
     }
-    const key = resolveExpression(element.key, classScopes, state);
+    const key = resolveClassElementKey(element.key, classScopes, state);
     const methodId = state.nextFunctionId;
     state.nextFunctionId += 1;
     state.functionInfo.set(element.value, { id: methodId });
@@ -1278,11 +1433,11 @@ function resolveClassExpression(
       name: element.value.name ?? "",
       range: element.range,
     };
+    const staticName = classElementStaticName(key);
     elements.push({
       ...element,
       key,
-      value:
-        key.kind === "string" ? inferFunctionName(value, key.value) : value,
+      value: staticName == null ? value : inferFunctionName(value, staticName),
     });
   }
   const byteRange = expression.byteRange;
@@ -1293,6 +1448,7 @@ function resolveClassExpression(
     ...(heritage == null ? {} : { heritage }),
     kind: "class",
     ...(nameBinding == null ? {} : { nameBinding }),
+    ...(privateNames.length === 0 ? {} : { privateNames }),
     range: expression.range,
   };
 }

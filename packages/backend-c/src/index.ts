@@ -1099,12 +1099,109 @@ function emitClassFieldDefine(state: EmitState, operation: MirOperation): void {
 }
 
 /**
- * Runs the running constructor's instance field initializers against
- * one instance. The constructor is the callee, so a base constructor
- * defines its own class's fields and a derived one defines only the
- * fields its own class declared.
+ * Creates one private name: the identity a class evaluation gives one
+ * declared `#name`. The name itself carries nothing, so the operation
+ * takes no operand and the spelled name stays in the MIR detail.
  */
-function emitInstanceFieldsInit(
+function emitPrivateNameCreate(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(state, "result = oseo_private_name_create(context);");
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Records one private field on the constructor: the private name the
+ * class evaluation created and the closure that produces the value, or
+ * `undefined` for a field declared without an initializer.
+ */
+function emitClassPrivateFieldDefine(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const constructorValue = operationArgument(operation, 0);
+  const privateName = operationArgument(operation, 1);
+  const initializer = operationArgument(operation, 2);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_class_private_field_define(context, ` +
+      `roots[${constructorValue}], roots[${privateName}], ` +
+      `roots[${initializer}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Records one private method or accessor half on the constructor. A
+ * getter and a setter under one private name merge into the single
+ * accessor element that name reaches.
+ */
+function emitClassPrivateMethodDefine(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const constructorValue = operationArgument(operation, 0);
+  const privateName = operationArgument(operation, 1);
+  const value = operationArgument(operation, 2);
+  const kind =
+    operation.accessorKind === "get"
+      ? "OSEO_PRIVATE_GETTER"
+      : operation.accessorKind === "set"
+        ? "OSEO_PRIVATE_SETTER"
+        : "OSEO_PRIVATE_METHOD";
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_class_private_method_define(context, ` +
+      `roots[${constructorValue}], roots[${privateName}], ` +
+      `roots[${value}], ${kind});`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/** PrivateGet: the element the object carries under one private name. */
+function emitPrivateGet(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const privateName = operationArgument(operation, 1);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_private_get(context, roots[${object}], ` +
+      `roots[${privateName}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/** PrivateSet: replaces the value one private field element holds. */
+function emitPrivateSet(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const privateName = operationArgument(operation, 1);
+  const value = operationArgument(operation, 2);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_private_set(context, roots[${object}], ` +
+      `roots[${privateName}], roots[${value}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Runs the running constructor's instance element records against one
+ * instance: it installs the private methods and accessors, then runs
+ * the field initializers. The constructor is the callee, so a base
+ * constructor reaches its own class's records and a derived one reaches
+ * only the records its own class declared.
+ */
+function emitInstanceElementsInit(
   state: EmitState,
   operation: MirOperation,
 ): void {
@@ -1113,7 +1210,7 @@ function emitInstanceFieldsInit(
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_initialize_instance_fields(context, callee, ` +
+    `result = oseo_initialize_instance_elements(context, callee, ` +
       `roots[${instance}]);`,
   );
   line(state, `roots[${operation.id}] = result.value;`);
@@ -1309,8 +1406,18 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitClassHeritage(state, operation);
   } else if (operation.kind === "class-field-define") {
     emitClassFieldDefine(state, operation);
-  } else if (operation.kind === "instance-fields-init") {
-    emitInstanceFieldsInit(state, operation);
+  } else if (operation.kind === "private-name-create") {
+    emitPrivateNameCreate(state, operation);
+  } else if (operation.kind === "class-private-field-define") {
+    emitClassPrivateFieldDefine(state, operation);
+  } else if (operation.kind === "class-private-method-define") {
+    emitClassPrivateMethodDefine(state, operation);
+  } else if (operation.kind === "private-get") {
+    emitPrivateGet(state, operation);
+  } else if (operation.kind === "private-set") {
+    emitPrivateSet(state, operation);
+  } else if (operation.kind === "instance-elements-init") {
+    emitInstanceElementsInit(state, operation);
   } else if (operation.kind === "home-object-bind") {
     emitHomeObjectBind(state, operation);
   } else if (operation.kind === "super-base") {

@@ -1148,14 +1148,12 @@ const outer = Named;`,
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     ["class C { static field = 1; }", /Static class fields/u],
-    ["class C { static #hidden() {} }", /class element is unsupported/u],
-    ["class C { get #hidden() {} }", /class element is unsupported/u],
-    ["class C { set #hidden(v) {} }", /class element is unsupported/u],
+    ["class C { static #hidden() {} }", /Static private class elements/u],
+    ["class C { static get #hidden() {} }", /Static private class elements/u],
+    ["class C { static #field = 1; }", /Static private class elements/u],
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
-    ["class C { #field = 1; }", /class element is unsupported/u],
-    ["class C { #hidden() {} }", /class element is unsupported/u],
     ["class C { static {} }", /class element is unsupported/u],
     ["class C { *step() {} }", /method generator functions/u],
     ["class C { static *step() {} }", /method generator functions/u],
@@ -1233,6 +1231,105 @@ console.log(new Derived().describe(), Derived.of());
   const mir = printMir(result.mir);
   assert.match(mir, /super-base home object prototype/u);
   assert.match(mir, /home-object-bind home object/u);
+});
+
+test("lowers private class elements to per-evaluation names", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Counter {
+  #count = 0;
+  #step;
+  constructor(step) {
+    this.#step = step;
+  }
+  #bump() {
+    this.#count += this.#step;
+  }
+  get #doubled() {
+    return this.#count * 2;
+  }
+  set #doubled(value) {
+    this.#count = value / 2;
+  }
+  next() {
+    this.#bump();
+    this.#count++;
+    this.#doubled = 8;
+    return this.#doubled;
+  }
+}
+console.log(new Counter(1).next());
+`,
+    sourceId: "class-private.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  // A private element carries the binding holding its name, never a
+  // property key, and the getter and setter share the one binding.
+  assert.match(text, /field %b\d+ #count = /u);
+  assert.match(text, /get %b(\d+) #doubled: .*set %b\1 #doubled: /su);
+  assert.match(text, /private get this\.%b\d+ #count/u);
+  assert.match(text, /private set this\.%b\d+ #step = /u);
+  assert.match(text, /private update this\.%b\d+ #count \+= /u);
+  assert.match(text, /private update this\.%b\d+ #count\+\+/u);
+  assert.match(text, /call this\.%b\d+ #bump\(\)/u);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /private-name-create private name #count/u);
+  assert.match(mir, /class-private-field-define record private instance/u);
+  assert.match(mir, /class-private-method-define record private method/u);
+  assert.match(mir, /class-private-method-define record private get/u);
+  assert.match(mir, /private-get private-get/u);
+  assert.match(mir, /private-set private-set/u);
+});
+
+test("rejects private references outside the admitted profile", () => {
+  const cases: readonly (readonly [string, RegExp])[] = [
+    [
+      "class C { #x = 1; probe(o) { return o.#x; } }",
+      /reachable only through this/u,
+    ],
+    [
+      "class C { #x = 1; probe(o) { return #x in o; } }",
+      /in operator on a private name/u,
+    ],
+    [
+      "class C { #x = 1; m() { [this.#x] = [1]; } }",
+      /private member is unsupported in this position/u,
+    ],
+  ];
+  for (const [source, message] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "private-rejection.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+  }
+});
+
+test("locates the early errors a private name reports at parse time", () => {
+  // Every one of these is an ECMA-262 early error, so the bootstrap
+  // parser reports it before conversion; the profile still owes each a
+  // diagnostic located at the offending name.
+  const cases: readonly (readonly [string, number, number])[] = [
+    ["class D { m() { return this.#x; } }", 1, 29],
+    ["class C { #x = 1; }\nclass D { m() { return this.#x; } }", 2, 29],
+    ["class C {}\nclass D extends C { #x = 1; m() { super.#x; } }", 2, 35],
+    ["class C { #x = 1; m() { delete this.#x; } }", 1, 25],
+    ["class C { #x; #x; }", 1, 15],
+    ["class C { #constructor = 1; }", 1, 11],
+  ];
+  for (const [source, line, column] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "private-early-error.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    assert.deepEqual(result.diagnostics[0]?.range.start, { column, line });
+  }
 });
 
 test("rejects super and new.target outside their admitted positions", () => {

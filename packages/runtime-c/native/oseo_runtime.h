@@ -483,13 +483,76 @@ OseoResult oseo_class_field_define(
     OseoValue initializer
 );
 /*
- * InitializeInstanceElements: runs `constructor`'s recorded field
- * initializers against `instance`, defining each result as an own
- * writable, enumerable, configurable data property. Each initializer is
- * called with the instance as its receiver and no arguments, and an
- * abrupt completion stops the remaining fields.
+ * Creates one Private Name. Identity is the allocation itself, so a
+ * class body evaluated twice produces names that never match and an
+ * instance of one evaluation fails the other's brand check.
  */
-OseoResult oseo_initialize_instance_fields(
+OseoResult oseo_private_name_create(OseoContext *context);
+/*
+ * Appends one private field to a class constructor's element list: the
+ * private name and the closure that produces the value, or `undefined`
+ * for a field declared without an initializer.
+ */
+OseoResult oseo_class_private_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue initializer
+);
+/* Which half of a private element one class body definition supplies. */
+typedef enum {
+    OSEO_PRIVATE_METHOD = 0,
+    OSEO_PRIVATE_GETTER = 1,
+    OSEO_PRIVATE_SETTER = 2,
+} OseoPrivateMethodKind;
+/*
+ * Appends one private method or accessor half to a class constructor's
+ * element list. A getter and a setter recorded under the same private
+ * name merge into the one accessor element that name reaches, whichever
+ * order the class body defines them in.
+ */
+OseoResult oseo_class_private_method_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue value,
+    OseoPrivateMethodKind kind
+);
+/*
+ * PrivateGet: the value `object` carries under one private name. A
+ * field or method element yields its value, an accessor element runs
+ * its getter against the object, and an object whose class never
+ * installed the element throws a TypeError, because a private name
+ * cannot be an absent property key.
+ */
+OseoResult oseo_private_get(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name
+);
+/*
+ * PrivateSet: replaces the value `object` carries under one private
+ * name and reports the assigned value. Only a field element and an
+ * accessor element with a setter accept a write; a method element, a
+ * getter-only accessor, and an object without the element all throw a
+ * TypeError.
+ */
+OseoResult oseo_private_set(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name,
+    OseoValue value
+);
+/*
+ * InitializeInstanceElements: installs `constructor`'s recorded private
+ * methods and accessors on `instance`, then runs its field
+ * initializers in class-body order. Each public field result becomes an
+ * own writable, enumerable, configurable data property and each private
+ * field result becomes a private element. Every initializer is called
+ * with the instance as its receiver and no arguments, and an abrupt
+ * completion stops the remaining elements.
+ */
+OseoResult oseo_initialize_instance_elements(
     OseoContext *context,
     OseoValue constructor,
     OseoValue instance

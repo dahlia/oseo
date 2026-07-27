@@ -68,6 +68,17 @@ static void trace_object(
             mark_value(ordinary->properties[index].getter, worklist);
             mark_value(ordinary->properties[index].setter, worklist);
         }
+        /* [[PrivateElements]] is reachable only through the object that
+         * carries it, so nothing else keeps a private name or a private
+         * method alive once the instance dies. */
+        for (size_t index = 0u;
+             index < ordinary->private_element_count;
+             index += 1u) {
+            mark_value(ordinary->private_elements[index].key, worklist);
+            mark_value(ordinary->private_elements[index].value, worklist);
+            mark_value(ordinary->private_elements[index].getter, worklist);
+            mark_value(ordinary->private_elements[index].setter, worklist);
+        }
         if (object->kind == OSEO_HEAP_FUNCTION) {
             OseoFunction *function = (OseoFunction *)object;
             mark_value(function->environment, worklist);
@@ -75,10 +86,12 @@ static void trace_object(
             mark_value(function->prototype_object, worklist);
             mark_value(function->home_object, worklist);
             for (size_t index = 0u;
-                 index < function->field_count;
+                 index < function->element_count;
                  index += 1u) {
-                mark_value(function->fields[index].key, worklist);
-                mark_value(function->fields[index].initializer, worklist);
+                mark_value(function->elements[index].key, worklist);
+                mark_value(function->elements[index].value, worklist);
+                mark_value(function->elements[index].getter, worklist);
+                mark_value(function->elements[index].setter, worklist);
             }
         } else if (object->kind == OSEO_HEAP_PROMISE) {
             OseoPromise *promise = (OseoPromise *)object;
@@ -119,9 +132,10 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_PROMISE) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
+        free(ordinary->private_elements);
         free(ordinary->generator);
         if (object->kind == OSEO_HEAP_FUNCTION) {
-            free(((OseoFunction *)object)->fields);
+            free(((OseoFunction *)object)->elements);
         }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);

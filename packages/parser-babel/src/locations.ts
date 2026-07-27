@@ -141,6 +141,28 @@ export function diagnosticAt(
   };
 }
 
+/**
+ * Reports one ECMA-262 early error the bootstrap parser did not raise,
+ * located at the offending syntax. It carries the parse-rejection code
+ * rather than the profile code, because the source is not a valid
+ * program in any profile: a construct the parser accepts but the
+ * grammar's static semantics forbid belongs here, not among the
+ * constructs this profile merely does not implement.
+ */
+export function earlyError(
+  context: ConvertContext,
+  value: BabelNode,
+  description: string,
+): undefined {
+  context.diagnostics.push({
+    ...location(context, value),
+    code: "OSEO0001",
+    message: description,
+    sourceId: context.input.sourceId,
+  });
+  return undefined;
+}
+
 export function unsupported(
   context: ConvertContext,
   value: BabelNode,

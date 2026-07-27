@@ -235,6 +235,9 @@ OseoResult oseo_function_create(
     function->ordinary.properties = NULL;
     function->ordinary.property_capacity = 0u;
     function->ordinary.property_count = 0u;
+    function->ordinary.private_elements = NULL;
+    function->ordinary.private_element_capacity = 0u;
+    function->ordinary.private_element_count = 0u;
     function->ordinary.shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     function->ordinary.array_length = 0u;
@@ -252,9 +255,9 @@ OseoResult oseo_function_create(
     function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
     function->home_object = oseo_undefined();
-    function->fields = NULL;
-    function->field_count = 0u;
-    function->field_capacity = 0u;
+    function->elements = NULL;
+    function->element_count = 0u;
+    function->element_capacity = 0u;
     function->code_id = code_id;
     function->function_kind = function_kind;
     /* A class's `prototype` is non-writable, non-enumerable, and
@@ -529,61 +532,398 @@ OseoResult oseo_class_heritage(
     return result;
 }
 
+/*
+ * Reserves room for one more entry in a class constructor's element
+ * list. The list belongs to the constructor rather than to the heap
+ * object graph, so it grows with the same explicit reallocation the
+ * property table uses, and the caller reacquires the function pointer.
+ */
+static OseoResult reserve_class_element(
+    OseoContext *context,
+    OseoValue constructor
+) {
+    OseoFunction *function = function_object(constructor);
+    if (function->element_count != function->element_capacity) {
+        return normal(constructor);
+    }
+    size_t capacity = function->element_capacity == 0u
+        ? 4u
+        : function->element_capacity * 2u;
+    if (capacity < function->element_capacity ||
+        capacity > SIZE_MAX / sizeof(OseoClassElement)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Class element storage is too large."
+        );
+    }
+    if (context->collect_every_safepoint) oseo_collect(context);
+    context->allocation_attempts += 1u;
+    OseoClassElement *elements =
+        context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at
+            ? NULL
+            : malloc(capacity * sizeof(*elements));
+    if (elements == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Class element allocation failed."
+        );
+    }
+    function = function_object(constructor);
+    if (function->element_count > 0u) {
+        memcpy(
+            elements,
+            function->elements,
+            function->element_count * sizeof(*elements)
+        );
+    }
+    free(function->elements);
+    function->elements = elements;
+    function->element_capacity = capacity;
+    return normal(constructor);
+}
+
+/* Appends one already-complete record to a constructor's element list. */
+static OseoResult append_class_element(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoClassElement element
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class elements need a class.");
+    }
+    OseoResult result = reserve_class_element(context, constructor);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoFunction *function = function_object(constructor);
+    function->elements[function->element_count] = element;
+    function->element_count += 1u;
+    return normal(constructor);
+}
+
 OseoResult oseo_class_field_define(
     OseoContext *context,
     OseoValue constructor,
     OseoValue key,
     OseoValue initializer
 ) {
-    if (!is_function(constructor)) {
-        return failure(context, "OSEO2001", "Class fields need a class.");
-    }
-    OseoFunction *function = function_object(constructor);
-    if (function->field_count == function->field_capacity) {
-        size_t capacity = function->field_capacity == 0u
-            ? 4u
-            : function->field_capacity * 2u;
-        if (capacity < function->field_capacity ||
-            capacity > SIZE_MAX / sizeof(OseoClassField)) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Class field storage is too large."
-            );
-        }
-        if (context->collect_every_safepoint) oseo_collect(context);
-        context->allocation_attempts += 1u;
-        OseoClassField *fields =
-            context->fail_allocation_at != 0u &&
-            context->allocation_attempts == context->fail_allocation_at
-                ? NULL
-                : malloc(capacity * sizeof(*fields));
-        if (fields == NULL) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Class field allocation failed."
-            );
-        }
-        function = function_object(constructor);
-        if (function->field_count > 0u) {
-            memcpy(
-                fields,
-                function->fields,
-                function->field_count * sizeof(*fields)
-            );
-        }
-        free(function->fields);
-        function->fields = fields;
-        function->field_capacity = capacity;
-    }
-    function->fields[function->field_count].key = key;
-    function->fields[function->field_count].initializer = initializer;
-    function->field_count += 1u;
-    return normal(constructor);
+    OseoClassElement element = {
+        key,
+        initializer,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_CLASS_ELEMENT_FIELD,
+    };
+    return append_class_element(context, constructor, element);
 }
 
-OseoResult oseo_initialize_instance_fields(
+OseoResult oseo_class_private_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue initializer
+) {
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A private field needs a private name."
+        );
+    }
+    OseoClassElement element = {
+        name,
+        initializer,
+        oseo_undefined(),
+        oseo_undefined(),
+        OSEO_CLASS_ELEMENT_PRIVATE_FIELD,
+    };
+    return append_class_element(context, constructor, element);
+}
+
+OseoResult oseo_class_private_method_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue value,
+    OseoPrivateMethodKind kind
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class elements need a class.");
+    }
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A private method needs a private name."
+        );
+    }
+    if (kind == OSEO_PRIVATE_METHOD) {
+        OseoClassElement element = {
+            name,
+            value,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_CLASS_ELEMENT_PRIVATE_METHOD,
+        };
+        return append_class_element(context, constructor, element);
+    }
+    /* A getter and a setter under one private name describe one
+     * accessor element, so the second half fills the record the first
+     * appended instead of adding a second entry the instance would
+     * reject as a duplicate. */
+    OseoFunction *function = function_object(constructor);
+    for (size_t index = 0u; index < function->element_count; index += 1u) {
+        OseoClassElement *element = &function->elements[index];
+        if (element->kind != OSEO_CLASS_ELEMENT_PRIVATE_ACCESSOR) continue;
+        if (element->key != name) continue;
+        if (kind == OSEO_PRIVATE_GETTER) {
+            element->getter = value;
+        } else {
+            element->setter = value;
+        }
+        return normal(constructor);
+    }
+    OseoClassElement element = {
+        name,
+        oseo_undefined(),
+        kind == OSEO_PRIVATE_GETTER ? value : oseo_undefined(),
+        kind == OSEO_PRIVATE_SETTER ? value : oseo_undefined(),
+        OSEO_CLASS_ELEMENT_PRIVATE_ACCESSOR,
+    };
+    return append_class_element(context, constructor, element);
+}
+
+/*
+ * Reserves room for one more entry in an object's [[PrivateElements]].
+ * The list is per-instance and grows only while a constructor installs
+ * the elements its class declared.
+ */
+static OseoResult reserve_private_element(
+    OseoContext *context,
+    OseoValue object
+) {
+    OseoOrdinaryObject *target = ordinary_object(object);
+    if (target->private_element_count != target->private_element_capacity) {
+        return normal(object);
+    }
+    size_t capacity = target->private_element_capacity == 0u
+        ? 4u
+        : target->private_element_capacity * 2u;
+    if (capacity < target->private_element_capacity ||
+        capacity > SIZE_MAX / sizeof(OseoPrivateElement)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Private element storage is too large."
+        );
+    }
+    if (context->collect_every_safepoint) oseo_collect(context);
+    context->allocation_attempts += 1u;
+    OseoPrivateElement *elements =
+        context->fail_allocation_at != 0u &&
+        context->allocation_attempts == context->fail_allocation_at
+            ? NULL
+            : malloc(capacity * sizeof(*elements));
+    if (elements == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Private element allocation failed."
+        );
+    }
+    target = ordinary_object(object);
+    if (target->private_element_count > 0u) {
+        memcpy(
+            elements,
+            target->private_elements,
+            target->private_element_count * sizeof(*elements)
+        );
+    }
+    free(target->private_elements);
+    target->private_elements = elements;
+    target->private_element_capacity = capacity;
+    return normal(object);
+}
+
+/* PrivateElementFind: the entry `object` carries under `name`. */
+static OseoPrivateElement *find_private_element(
+    OseoValue object,
+    OseoValue name
+) {
+    if (!is_object(object)) return NULL;
+    OseoOrdinaryObject *target = ordinary_object(object);
+    for (size_t index = 0u;
+         index < target->private_element_count;
+         index += 1u) {
+        if (target->private_elements[index].key == name) {
+            return &target->private_elements[index];
+        }
+    }
+    return NULL;
+}
+
+/* Appends one private element, which PrivateElementFind must not find. */
+static OseoResult add_private_element(
+    OseoContext *context,
+    OseoValue object,
+    OseoPrivateElement element
+) {
+    if (!is_object(object)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A private element needs an object."
+        );
+    }
+    if (find_private_element(object, element.key) != NULL) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "This object already carries that private member."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = object;
+    frame.slots[1] = element.key;
+    frame.slots[2] = element.value;
+    frame.slots[3] = element.getter;
+    frame.slots[4] = element.setter;
+    result = reserve_private_element(context, frame.slots[0]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoOrdinaryObject *target = ordinary_object(frame.slots[0]);
+        OseoPrivateElement stored = {
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3],
+            frame.slots[4],
+            element.kind,
+        };
+        target->private_elements[target->private_element_count] = stored;
+        target->private_element_count += 1u;
+        result = normal(frame.slots[0]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_private_name_create(OseoContext *context) {
+    OseoPrivateName *name =
+        oseo_internal_allocate_heap_bytes(context, sizeof(*name));
+    if (name == NULL) {
+        return failure(context, "OSEO2001", "Private name allocation failed.");
+    }
+    return oseo_internal_publish_heap(
+        context,
+        &name->header,
+        OSEO_HEAP_PRIVATE_NAME
+    );
+}
+
+OseoResult oseo_private_get(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name
+) {
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A private reference needs a private name."
+        );
+    }
+    /* GetValue converts the base with ToObject first, and no primitive
+     * wrapper carries a private element, so every non-object base ends
+     * in the same TypeError this reports directly. */
+    OseoPrivateElement *element = find_private_element(object, name);
+    if (element == NULL) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "This object does not carry that private member."
+        );
+    }
+    if (element->kind != OSEO_PRIVATE_ELEMENT_ACCESSOR) {
+        return normal(element->value);
+    }
+    OseoValue getter = element->getter;
+    if (tag_of(getter) == OSEO_TAG_UNDEFINED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "This private accessor declares no getter."
+        );
+    }
+    return oseo_call_function(
+        context,
+        getter,
+        object,
+        0u,
+        NULL,
+        oseo_undefined()
+    );
+}
+
+OseoResult oseo_private_set(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name,
+    OseoValue value
+) {
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A private reference needs a private name."
+        );
+    }
+    OseoPrivateElement *element = find_private_element(object, name);
+    if (element == NULL) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "This object does not carry that private member."
+        );
+    }
+    if (element->kind == OSEO_PRIVATE_ELEMENT_FIELD) {
+        element->value = value;
+        return normal(value);
+    }
+    if (element->kind == OSEO_PRIVATE_ELEMENT_METHOD) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A private method cannot be assigned."
+        );
+    }
+    OseoValue setter = element->setter;
+    if (tag_of(setter) == OSEO_TAG_UNDEFINED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "This private accessor declares no setter."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = value;
+    result = oseo_call_function(
+        context,
+        setter,
+        object,
+        1u,
+        &frame.slots[0],
+        oseo_undefined()
+    );
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[0]);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_initialize_instance_elements(
     OseoContext *context,
     OseoValue constructor,
     OseoValue instance
@@ -592,26 +932,59 @@ OseoResult oseo_initialize_instance_fields(
         return failure(
             context,
             "OSEO2001",
-            "Instance fields need a class constructor."
+            "Instance elements need a class constructor."
         );
     }
-    if (function_object(constructor)->field_count == 0u) {
+    if (function_object(constructor)->element_count == 0u) {
         return normal(instance);
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = constructor;
     frame.slots[1] = instance;
+    /* Every private method and accessor is installed before any field
+     * initializer runs, so an initializer can already call `this.#m()`
+     * even when the method is declared after it. */
     for (size_t index = 0u;
-         index < function_object(frame.slots[0])->field_count;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < function_object(frame.slots[0])->element_count;
          index += 1u) {
         /* The list is complete before any instance exists, so re-reading
          * it only guards against a reallocation this loop cannot cause. */
-        OseoClassField field =
-            function_object(frame.slots[0])->fields[index];
-        frame.slots[2] = field.key;
-        frame.slots[3] = field.initializer;
+        OseoClassElement element =
+            function_object(frame.slots[0])->elements[index];
+        if (element.kind != OSEO_CLASS_ELEMENT_PRIVATE_METHOD &&
+            element.kind != OSEO_CLASS_ELEMENT_PRIVATE_ACCESSOR) {
+            continue;
+        }
+        frame.slots[2] = element.key;
+        frame.slots[3] = element.value;
+        frame.slots[4] = element.getter;
+        frame.slots[5] = element.setter;
+        OseoPrivateElement installed = {
+            frame.slots[2],
+            frame.slots[3],
+            frame.slots[4],
+            frame.slots[5],
+            element.kind == OSEO_CLASS_ELEMENT_PRIVATE_METHOD
+                ? OSEO_PRIVATE_ELEMENT_METHOD
+                : OSEO_PRIVATE_ELEMENT_ACCESSOR,
+        };
+        result = add_private_element(context, frame.slots[1], installed);
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < function_object(frame.slots[0])->element_count;
+         index += 1u) {
+        OseoClassElement element =
+            function_object(frame.slots[0])->elements[index];
+        if (element.kind != OSEO_CLASS_ELEMENT_FIELD &&
+            element.kind != OSEO_CLASS_ELEMENT_PRIVATE_FIELD) {
+            continue;
+        }
+        frame.slots[2] = element.key;
+        frame.slots[3] = element.value;
         frame.slots[4] = oseo_undefined();
         if (tag_of(frame.slots[3]) != OSEO_TAG_UNDEFINED) {
             result = oseo_call_function(
@@ -625,6 +998,17 @@ OseoResult oseo_initialize_instance_fields(
             frame.slots[4] = result.value;
             if (result.status != OSEO_STATUS_NORMAL) break;
         }
+        if (element.kind == OSEO_CLASS_ELEMENT_PRIVATE_FIELD) {
+            OseoPrivateElement added = {
+                frame.slots[2],
+                frame.slots[4],
+                oseo_undefined(),
+                oseo_undefined(),
+                OSEO_PRIVATE_ELEMENT_FIELD,
+            };
+            result = add_private_element(context, frame.slots[1], added);
+            continue;
+        }
         OseoPropertyAttributes attributes = {true, true, true, false};
         result = oseo_object_define(
             context,
@@ -633,7 +1017,6 @@ OseoResult oseo_initialize_instance_fields(
             frame.slots[4],
             attributes
         );
-        if (result.status != OSEO_STATUS_NORMAL) break;
     }
     if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[1]);
     oseo_roots_release(context, &frame);

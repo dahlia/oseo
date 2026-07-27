@@ -259,6 +259,9 @@ static OseoResult object_create(
     object->properties = NULL;
     object->property_capacity = 0u;
     object->property_count = 0u;
+    object->private_elements = NULL;
+    object->private_element_capacity = 0u;
+    object->private_element_count = 0u;
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     object->array_length = 0u;
@@ -307,6 +310,9 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->properties = NULL;
     array->property_capacity = 0u;
     array->property_count = 0u;
+    array->private_elements = NULL;
+    array->private_element_capacity = 0u;
+    array->private_element_count = 0u;
     array->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     array->array_length = (uint32_t)length;

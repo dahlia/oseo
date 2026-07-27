@@ -148,8 +148,7 @@ test("preserves async returns and bindings across await", () => {
 
 test("validates unreachable async statements", () => {
   const loop = compileSource(babelFrontend, {
-    source:
-      "async function invalid() { return 1; class Later { #hidden() {} } }",
+    source: "async function invalid() { return 1; class Later { static {} } }",
     sourceId: "async-unreachable-loop.js",
   });
   assert.equal(loop.mir, undefined);
@@ -165,7 +164,7 @@ test("validates unreachable async statements", () => {
   const continuation = compileSource(babelFrontend, {
     source:
       "async function invalid() { await 0; return 1; " +
-      "class Later { #hidden() {} } }",
+      "class Later { static {} } }",
     sourceId: "async-unreachable-continuation.js",
   });
   assert.equal(continuation.mir, undefined);
