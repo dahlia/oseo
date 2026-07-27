@@ -184,6 +184,12 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       /** Absent for a bare `yield`, which sends `undefined` out. */
       readonly argument?: SyntaxExpression;
+      /**
+       * True for `yield*`, which delegates every resumption to the
+       * operand's iterator. The grammar requires an operand, so a
+       * delegating expression always carries an `argument`.
+       */
+      readonly delegate?: true;
       readonly kind: "yield";
     })
   | (LocatedSyntax & {

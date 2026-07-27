@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 715
-passes, 318 expected negatives, and 113 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 736
+passes, 319 expected negatives, and 140 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -277,8 +277,35 @@ to the intrinsic, and an own property or a replacement `prototype` object
 shadows them. Completing a generator discards its `[[GeneratorContext]]`, so a
 retained completed generator does not keep its suspended object graph reachable.
 
-`yield*`, `%GeneratorPrototype%.throw`, asynchronous generators, and generator
-method definitions remain rejected with source-located diagnostics. Default and
+`yield* operand` now gets the operand's iterator once and forwards every
+resumption to it. A normal resumption steps the captured `next` with the value
+the resumption delivered, sending `undefined` on the first step, and suspends
+with the inner iterator's own result object, so a result that omits `done` or
+carries extra properties reaches the outer consumer unchanged and `value` is
+read only on the step that reports exhaustion. That value is the delegating
+expression's own result. A return resumption steps the inner iterator's
+`return` instead; an iterator with no `return`, or one whose result is done,
+ends the delegation and leaves the body through the return completion, while a
+result that is not done keeps the delegation alive. No step closes the inner
+iterator on an abrupt completion, because the completion came from that
+iterator. MIR gains `iterator-delegate-next` and `iterator-delegate-return`
+operations and a `resultObject` flag on `generator-yield`, and the generator
+record records whether the pending suspension already yielded a complete
+iterator result object.
+
+`%GeneratorPrototype%.throw`, asynchronous generators, and generator
+method definitions remain rejected with source-located diagnostics. No throw
+resumption can reach a body while `%GeneratorPrototype%.throw` is
+unimplemented, so the `throw` branch of `yield*` is unreachable and
+unimplemented. `%GeneratorFunction%` and `%GeneratorFunction.prototype%` stay
+unmaterialized: every specified route to them starts at
+`Object.getPrototypeOf(function* () {})`, which this profile does not admit,
+creating a generator function from one needs the dynamic-source boundary of
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md), and ECMAScript exposes
+no `GeneratorFunction` global binding that could stand in for the intrinsic.
+The twenty-three reviewed *test/built-ins/GeneratorFunction/* cases are
+recorded as unsupported with the `dynamic-source` dependency tag so that
+boundary stays visible in the manifest. Default and
 binding-pattern generator parameters are also rejected, because this profile
 lowers them as body statements that a generator body reaches only on first
 resumption, while `FunctionDeclarationInstantiation` requires them at the call.
@@ -309,6 +336,24 @@ negatives from unsupported to expected negatives. Implementing
 executing, and suspended-start states and the `try`/`catch` and `try`/`finally`
 resumption paths, alongside two honestly unsupported receiver cases that reach
 the method through the unmaterialized `%GeneratorFunction%` chain.
+
+Admitting `yield*` adds fixed fixtures for delegation to another generator with
+sent values and a result, to an array, through two nested delegations, inside a
+counted loop, over a hand-written iterator whose result object passes through
+unchanged, and over one that omits `return`, refuses a `return`, is not
+iterable, throws from `next`, or reports a non-object result, plus an explicit
+and an implicit close that reach the delegated iterator first and object growth
+across delegated suspensions under forced collection. The generated generator
+property gains `yield*` steps that forward an inner generator's values alone
+and that fold its result into the body's total. Twenty-one reviewed cases from
+_test/language/expressions/yield/star-\*_ newly pass with one new expected
+negative and four honestly unsupported cases that need `arguments`, the
+`Boolean` intrinsic, or an unresolvable reference. The fourteen
+`star-rhs-iter-thrw-*` and `star-throw-is-null` cases stay out of the reviewed
+subset until `%GeneratorPrototype%.throw` lands, and `star-string` stays out
+until strings are iterable. The manifest moves to 736 passes, 319 expected
+negatives, and 140 unsupported profile features with no semantic or harness
+failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

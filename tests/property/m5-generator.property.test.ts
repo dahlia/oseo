@@ -32,10 +32,15 @@ const { assertAsyncProperty } = await import(
  * progress, and the accumulated total rather than only the top-level
  * statement index. An `iterated` step suspends while a for-of over a
  * nested generator is still in progress, so the loop's iterator state has
- * to survive the suspension and the fresh invocation that resumes it.
+ * to survive the suspension and the fresh invocation that resumes it. A
+ * `delegated` step suspends through `yield*`, so every resumption reaches
+ * an inner generator first, and a `delegated-result` step also folds that
+ * inner generator's return value into the body's own total.
  */
 type StepKind =
   | "conditional"
+  | "delegated"
+  | "delegated-result"
   | "iterated"
   | "loop"
   | "nested"
@@ -75,6 +80,8 @@ const stepArbitrary: fc.Arbitrary<Step> = fc.record({
   inner: fc.integer({ max: 2, min: 0 }),
   kind: fc.constantFrom<StepKind>(
     "conditional",
+    "delegated",
+    "delegated-result",
     "iterated",
     "loop",
     "nested",
@@ -118,9 +125,10 @@ function modelYields(testCase: GeneratorCase): readonly YieldPoint[] {
         accumulates: false,
         value: step.flag ? step.value : step.value + 1,
       });
-    } else if (step.kind === "loop" || step.kind === "iterated") {
-      // A for-of over `source(outer)` delivers the same 0..outer-1 values a
-      // counted loop does, so both share one model.
+    } else if (step.kind !== "nested") {
+      // A for-of over `source(outer)`, a `yield*` over `shifted(outer)`,
+      // and a counted loop all deliver the same 0..outer-1 values, so
+      // every one of them shares a single model.
       for (let index = 0; index < step.outer; index += 1) {
         points.push({ accumulates: false, value: step.value + index });
       }
@@ -144,6 +152,11 @@ function modelTotal(testCase: GeneratorCase): number {
   modelYields(testCase).forEach((point, index) => {
     if (point.accumulates) total += sends[index % sends.length]!;
   });
+  // A delegating expression evaluates to the inner generator's return
+  // value, which `shifted` defines as the number of values it produced.
+  for (const step of testCase.steps) {
+    if (step.kind === "delegated-result") total += step.outer;
+  }
   return total;
 }
 
@@ -166,6 +179,12 @@ function printStep(step: Step, index: number): string {
       `    yield base + ${step.value} + i${index};\n` +
       "  }"
     );
+  }
+  if (step.kind === "delegated") {
+    return `  yield* shifted(${step.outer}, base + ${step.value});`;
+  }
+  if (step.kind === "delegated-result") {
+    return `  total += yield* shifted(${step.outer}, base + ${step.value});`;
   }
   if (step.kind === "iterated") {
     return (
@@ -203,6 +222,10 @@ let entered = 0;
 let cleaned = 0;
 function* source(count) {
   for (let index = 0; index < count; index = index + 1) yield index;
+}
+function* shifted(count, offset) {
+  for (let index = 0; index < count; index = index + 1) yield offset + index;
+  return count;
 }
 function* generated(base) {
   entered = entered + 1;
@@ -350,6 +373,32 @@ test("generator model closes a body that stops before its last step", () => {
   assert.ok(!stopsEarly({ ...testCase, stopAfter: 4 }));
 });
 
+test("generator model folds a delegated result into the body total", () => {
+  const testCase: GeneratorCase = {
+    sends: [5],
+    steps: [
+      { flag: true, inner: 0, kind: "delegated", outer: 2, value: 3 },
+      { flag: true, inner: 0, kind: "delegated-result", outer: 3, value: 10 },
+    ],
+    stopAfter: 0,
+  };
+  assert.deepEqual(
+    modelYields(testCase).map((point) => point.value),
+    [3, 4, 10, 11, 12],
+  );
+  // No delegated suspension accumulates a sent value, so the total is the
+  // second delegation's own result alone.
+  assert.equal(modelTotal(testCase), 3);
+  assert.match(printCase(testCase), /yield\* shifted\(2, base \+ 3\);/u);
+  assert.match(
+    printCase(testCase),
+    /total \+= yield\* shifted\(3, base \+ 10\);/u,
+  );
+  // Stopping inside a delegation closes the inner generator first, and the
+  // body's own `finally` still runs exactly once.
+  assert.ok(stopsEarly({ ...testCase, stopAfter: 3 }));
+});
+
 test("generator model expands loop and nested suspensions", () => {
   const testCase: GeneratorCase = {
     sends: [3, 4],
@@ -431,8 +480,10 @@ test(
         domain:
           "synchronous generator bodies with zero to four suspension steps " +
           "placed at statement level, inside a conditional, inside a loop, " +
-          "inside nested loops, and inside a for-of over a nested " +
-          "generator, wrapped in a cleanup-observing try/finally, driven " +
+          "inside nested loops, inside a for-of over a nested " +
+          "generator, and delegated through `yield*` both for its values " +
+          "alone and for its result, wrapped in a cleanup-observing " +
+          "try/finally, driven " +
           "by a bounded cycle of sent values and either drained or closed " +
           "with `return` after a bounded number of yields, comparing an " +
           "independent suspension-order, sent-value, cleanup, and " +

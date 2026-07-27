@@ -171,9 +171,9 @@ function printHirExpression(expression: HirExpression): string {
     return `await ${printHirExpression(expression.argument)}`;
   }
   if (expression.kind === "yield") {
-    return expression.argument == null
-      ? "yield"
-      : `yield ${printHirExpression(expression.argument)}`;
+    if (expression.argument == null) return "yield";
+    const star = expression.delegate === true ? "*" : "";
+    return `yield${star} ${printHirExpression(expression.argument)}`;
   }
   if (expression.kind === "new") {
     return (

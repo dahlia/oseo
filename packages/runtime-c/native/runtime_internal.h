@@ -175,6 +175,13 @@ typedef struct {
      */
     size_t resume_kind;
     OseoGeneratorState state;
+    /*
+     * True when the pending suspension already yielded a complete
+     * iterator result object, as `yield*` does by forwarding the inner
+     * iterator's own result. The resumption then reports that object
+     * unchanged instead of creating a fresh one.
+     */
+    bool yielded_result_object;
 } OseoGenerator;
 
 typedef struct {

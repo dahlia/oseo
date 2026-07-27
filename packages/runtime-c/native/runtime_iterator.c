@@ -354,6 +354,151 @@ OseoResult oseo_iterator_next(
 }
 
 /*
+ * IteratorComplete over one delegation step's result, followed by
+ * IteratorValue only when the step is done. A step that is not done
+ * reports the inner result object itself, because GeneratorYield
+ * forwards it to the resuming consumer unchanged; reading `value` there
+ * would observe a getter the specification never runs.
+ */
+static OseoResult delegate_result_fields(
+    OseoContext *context,
+    OseoValue inner,
+    OseoValue *result_value,
+    bool *done
+) {
+    OseoValue slots[2] = {inner, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "done");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *done = oseo_to_boolean(result.value);
+        if (!*done) {
+            *result_value = slots[0];
+            oseo_roots_pop(context, &frame);
+            return normal(oseo_boolean(true));
+        }
+        result = ascii_iterator_string(context, "value");
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) *result_value = result.value;
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_boolean(false));
+}
+
+OseoResult oseo_iterator_delegate_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue sent,
+    OseoValue *result_value,
+    bool *done
+) {
+    *result_value = oseo_undefined();
+    *done = true;
+    /* The sent value occupies its own root slot so it can be passed as
+     * the one-element argument list the specification requires. */
+    OseoValue slots[3] = {iterator, next_method, sent};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        1u,
+        &slots[2],
+        oseo_undefined()
+    );
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator result is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = delegate_result_fields(
+            context,
+            slots[2],
+            result_value,
+            done
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_iterator_delegate_return(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *result_value,
+    bool *done
+) {
+    /* GetMethod reports undefined for both an absent and a null method,
+     * and the delegating body then leaves through the return completion
+     * carrying the value the resumption delivered. */
+    *result_value = sent;
+    *done = true;
+    OseoValue slots[3] = {iterator, oseo_undefined(), sent};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "return");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        oseo_roots_pop(context, &frame);
+        return normal(oseo_boolean(false));
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator return method is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[0],
+            1u,
+            &slots[2],
+            oseo_undefined()
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator return result is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = delegate_result_fields(
+            context,
+            slots[2],
+            result_value,
+            done
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
  * IteratorClose: if the iterator has a callable return method, call it.
  * When closing because of an in-flight error the original completion is
  * preserved, so a catchable throw or non-object return result is

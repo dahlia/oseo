@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,146 reviewed cases: 715 passes, 318 expected
-negatives, and 113 unsupported profile features. It records no semantic or
+The current manifest contains 1,195 reviewed cases: 736 passes, 319 expected
+negatives, and 140 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -673,9 +673,31 @@ its deliberate boundary and its evidence:
     suspended generator leaves no live C frame, a suspension taken while a
     `for-of` or array binding is still stepping resumes with that iterator's
     progress intact, and the collector traces its frame through the generator
-    object. Deliberate boundaries: `yield*`, `%GeneratorPrototype%.throw`,
+    object. `yield* operand` gets the operand's iterator once and forwards
+    every resumption to it. A normal resumption calls the iterator record's
+    captured `next` with the value the resumption delivered; the first step
+    always sends `undefined`, because the resumption that entered the
+    delegating expression is not the one it forwards. A step that is not done
+    suspends with the inner iterator's own result object, which the delegating
+    generator reports unchanged, so a result that omits `done` or carries
+    extra properties reaches the outer consumer intact, and `value` is read
+    only on the step that reports exhaustion. That value is the delegating
+    expression's own result. A return resumption reads the inner iterator's
+    `return` method instead: an iterator with no such method, or one whose
+    result is done, ends the delegation, and the body then leaves through the
+    return completion so every enclosing `finally` and iterator close still
+    runs; a result that is not done suspends the same way, so a `return` the
+    inner iterator refuses does not end the outer generator. No step closes
+    the inner iterator on an abrupt completion, because that completion came
+    from the inner iterator itself. `yield*` therefore delegates to arrays,
+    other generators, nested delegations, and any hand-written iterable, and
+    an `IteratorClose` on the delegating generator reaches the delegated
+    iterator first. Deliberate boundaries: `%GeneratorPrototype%.throw`,
     asynchronous generators, and generator method definitions in object
-    literals are rejected with source-located diagnostics. Default and
+    literals are rejected with source-located diagnostics. No throw
+    resumption can reach a body while `%GeneratorPrototype%.throw` is
+    unimplemented, so a delegating expression never reads the inner
+    iterator's `throw` method. Default and
     binding-pattern generator parameters are also rejected, because this
     profile lowers them as body statements that the generator body would only
     reach on the first resumption, which `FunctionDeclarationInstantiation`
@@ -684,7 +706,13 @@ its deliberate boundary and its evidence:
     reachable object with virtualized methods rather than own properties, and
     `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized at all, matching how the array iterator prototype is already
-    virtualized. Native differential fixtures retain a single yield, several
+    virtualized. ECMAScript exposes no `GeneratorFunction` global binding, so
+    admitting one would be a deliberate divergence rather than a step toward
+    the intrinsic; every specified route to `%GeneratorFunction%` starts at
+    `Object.getPrototypeOf(function* () {})`, which this profile does not
+    admit, and creating a generator function from one needs the dynamic-source
+    boundary that [ADR 0016](./adr/0016-dynamic-source-boundary.md) leaves
+    closed. Native differential fixtures retain a single yield, several
     yields, a bare `yield` with and without a sent value, an empty generator,
     sent values threaded through an accumulator, generator function `length`,
     `name`, and inferred `name`, rest parameters, yields inside `for` and
@@ -720,7 +748,29 @@ its deliberate boundary and its evidence:
     the completed, executing, and suspended-start states and the `try`/`catch`
     and `try`/`finally` resumption paths, alongside two honestly unsupported
     receiver cases that reach the method through the unmaterialized
-    `%GeneratorFunction%` chain.
+    `%GeneratorFunction%` chain. Admitting `yield*` adds fixed fixtures for
+    delegation to another generator with sent values and a result, to an
+    array, through two nested delegations, inside a counted loop, over a
+    hand-written iterator whose result object passes through unchanged, and
+    over one that omits `return`, refuses a `return`, is not iterable, throws
+    from `next`, or reports a non-object result, plus an explicit and an
+    implicit close that reach the delegated iterator first and object growth
+    across delegated suspensions under forced collection. The generated
+    generator property gains `yield*` steps that forward an inner generator's
+    values alone and that fold its result into the body's total. Twenty-one
+    reviewed cases from _test/language/expressions/yield/star-\*_ newly pass,
+    covering array and iterable operands, the `GetIterator`, `next`, and
+    `return` error paths, the `done` and `value` read order, the delegating
+    expression's result, and a return completion forwarded to an iterator with
+    no `return` method, with one new expected negative and four honestly
+    unsupported cases that need `arguments`, the `Boolean` intrinsic, or an
+    unresolvable reference. The fourteen `star-rhs-iter-thrw-*` and
+    `star-throw-is-null` cases stay out of the reviewed subset until
+    `%GeneratorPrototype%.throw` lands, and `star-string` stays out until
+    strings are iterable. The twenty-three reviewed
+    *test/built-ins/GeneratorFunction/* cases are recorded as unsupported with
+    the `dynamic-source` dependency tag, so the intrinsic boundary stays
+    visible in the manifest rather than absent from it.
 
 
 Known gaps inside the claim
@@ -759,10 +809,19 @@ must never shrink by reclassification alone.
  -  `await` is restricted to the M4 positions; asynchronous generators,
     `for await`, and asynchronous module cycles are unsupported. Owner: the
     functions and executable syntax stream.
- -  `yield*`, `%GeneratorPrototype%.throw`, generator method definitions,
-    and default or binding-pattern generator parameters are outside the
-    admitted generator subset. Owner: the functions and executable syntax
-    stream.
+ -  `%GeneratorPrototype%.throw`, generator method definitions, and default
+    or binding-pattern generator parameters are outside the admitted
+    generator subset. Because no throw resumption can reach a body, the
+    `throw` branch of `yield*` is unreachable and unimplemented. Owner: the
+    functions and executable syntax stream.
+ -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
+    materialized. Reaching either needs `Object.getPrototypeOf`, and
+    creating a generator function from one needs the dynamic-source
+    boundary of [ADR 0016](./adr/0016-dynamic-source-boundary.md), so the
+    reviewed *test/built-ins/GeneratorFunction/* cases carry the
+    `dynamic-source` tag. There is no `GeneratorFunction` global binding in
+    ECMAScript, so this profile does not add one. Owner: the intrinsics and
+    built-in objects stream.
  -  `eval`, the `Function` constructor, and dynamic import stay explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
     Reviewed cases that need them carry the `dynamic-source` dependency
