@@ -216,6 +216,9 @@ bound names. `default-parameters` identifies function parameter
 initialization whose fallback expressions and reported function length differ
 from a simple parameter list. `rest-parameters` identifies function parameter
 initialization that collects the unbound argument suffix into a fresh array.
+`generators` identifies synchronous generator functions, their suspension and
+resumption behavior, and the generator objects and prototype methods that
+drive them.
 
 
 Alternatives considered

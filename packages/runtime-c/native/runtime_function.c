@@ -181,13 +181,16 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_ASYNC_ARROW:
         case OSEO_FUNCTION_INTERNAL:
         case OSEO_FUNCTION_METHOD:
+        case OSEO_FUNCTION_GENERATOR:
             break;
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");
     }
-    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 9u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[5] = inferred_name;
+    /* The [[Prototype]] of the created `prototype` object. */
+    frame.slots[8] = oseo_null();
     frame.slots[7] = function_kind == OSEO_FUNCTION_ARROW ||
         function_kind == OSEO_FUNCTION_ASYNC_ARROW
         ? lexical_this
@@ -198,7 +201,20 @@ OseoResult oseo_function_create(
         oseo_roots_release(context, &frame);
         return result;
     }
-    result = oseo_object_create(context, oseo_null());
+    /* A generator function's `prototype` object inherits from
+     * %GeneratorPrototype%, so its generators reach the virtualized
+     * `next` and `Symbol.iterator` through the specified lookup order,
+     * and, unlike a constructor's prototype, it has no `constructor`
+     * property. */
+    if (function_kind == OSEO_FUNCTION_GENERATOR) {
+        result = oseo_internal_generator_prototype(context);
+        frame.slots[8] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+    }
+    result = oseo_object_create(context, frame.slots[8]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL &&
         context->observe_specialization && context->allocations > 0u) {
@@ -229,6 +245,8 @@ OseoResult oseo_function_create(
     function->ordinary.iterator_array = oseo_undefined();
     function->ordinary.iterator_index = 0u;
     function->ordinary.default_intrinsics = true;
+    function->ordinary.generator_prototype = false;
+    function->ordinary.generator = NULL;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
@@ -326,7 +344,8 @@ OseoResult oseo_function_create(
             attributes
         );
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL &&
+        function_kind != OSEO_FUNCTION_GENERATOR) {
         static const uint16_t constructor_name[] = {
             'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
         };
@@ -341,7 +360,8 @@ OseoResult oseo_function_create(
             context->allocations -= 1u;
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL &&
+        function_kind != OSEO_FUNCTION_GENERATOR) {
         OseoPropertyAttributes attributes = {true, false, true, false};
         result = oseo_object_define(
             context,
@@ -461,6 +481,12 @@ OseoResult oseo_call_function(
         result = oseo_internal_array_iterator_next(context, receiver);
     } else if (code_id == OSEO_ITERATOR_SELF_CODE_ID) {
         result = normal(receiver);
+    } else if (code_id == OSEO_GENERATOR_NEXT_CODE_ID) {
+        result = oseo_generator_next(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
     } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
         OseoValue description_input = argument_count > 0u
             ? arguments[0]

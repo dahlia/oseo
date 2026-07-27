@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 639
-passes, 254 expected negatives, and 126 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 698
+passes, 318 expected negatives, and 111 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -235,6 +235,59 @@ thirty-eight reviewed test262 cases newly pass, twenty-four of them object
 spread cases covering identifier, null, undefined, multiple, getter
 descriptor, getter initialization, immutable override, and
 previous-property override sources.
+
+Synchronous generator functions are now admitted, the first unit of the
+functions and executable syntax stream. `function*` declarations and function
+expressions accept `yield` in any admitted expression position, including
+inside loops, conditionals, and `try` blocks. Calling a generator function runs
+its environment and parameter prologue immediately and returns a suspended
+generator object; only resumption runs the body.
+`%GeneratorPrototype%.next(value)` restores the saved state, delivers `value`
+as the awaiting `yield`'s result, and returns a fresh `{ value, done }`
+object, reporting the body's return value once and `{ undefined, true }`
+afterwards. A body that throws completes the generator, and resuming a running
+one throws a `TypeError`.
+
+A generator body's root slots and saved abrupt-completion records live in the
+generator record instead of a native root frame, so a suspended generator
+leaves no live C frame and the collector traces the whole frame through the
+generator object. MIR gains a `generator-yield` block terminator that names the
+resume block and the slot receiving the sent value, and the C backend emits one
+call entry that creates the generator plus one separately reentrant body whose
+saved resume point selects the block to continue at. The saved completions
+moved from parallel C arrays into an `OseoCompletionRecord` array shared by
+every generated function, so a generator can suspend inside `try` and `for-of`
+cleanup without losing its pending completion. One shared
+`%GeneratorPrototype%` per context carries the virtualized `next` and
+`Symbol.iterator`, the same pattern the array iterator already uses, and every
+generator function's `prototype` object inherits from it, so both resolve
+through the specified lookup order, a non-object `prototype` falls back to the
+intrinsic, and an own property or a replacement `prototype` object shadows
+them. Completing a generator discards its `[[GeneratorContext]]`, so a retained
+completed generator does not keep its suspended object graph reachable.
+
+`yield*`, `%GeneratorPrototype%.return`, `%GeneratorPrototype%.throw`,
+asynchronous generators, and generator method definitions remain rejected with
+source-located diagnostics. Default and binding-pattern generator parameters
+are also rejected, because this profile lowers them as body statements that a
+generator body reaches only on first resumption, while
+`FunctionDeclarationInstantiation` requires them at the call. The generated
+property suite uses seed `0x5eed0016` across zero to four suspension steps at
+statement level, inside a conditional, inside a loop, and inside nested loops,
+driven by a bounded cycle of sent values, comparing an independent suspension
+order, sent value, and completion model with Node.js, Deno, and both native
+specialization policies with forced collection on the enabled path. Fixed
+native fixtures retain single, multiple, and bare yields, sent values, an empty
+generator, `length` and inferred `name`, rest parameters, loop and nested-loop
+suspensions, per-iteration closure capture across a suspension, yields in
+`try`, `catch`, and `finally`, abrupt completion and the completed state after
+it, deferred body entry, self-iterability, non-constructibility, spread,
+dynamic `this`, hand-written delegation, the already-running `TypeError`,
+independent generator identity, and object growth across suspensions under
+forced collection. Fifty-nine reviewed test262 cases newly pass with
+forty-nine new expected negatives, and admitting the `generators` feature
+promotes fifteen existing module-code parse negatives from unsupported to
+expected negatives.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

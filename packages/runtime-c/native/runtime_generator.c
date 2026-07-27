@@ -1,0 +1,242 @@
+#include "runtime_internal.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+/*
+ * Synchronous generator objects: the suspended body frame, its
+ * collector-traced root slots and saved completion records, and the
+ * %GeneratorPrototype%.next resumption that drives them.
+ *
+ * A generator's roots live in the generator record rather than on the
+ * native root stack, so no C frame of a suspended body stays alive. The
+ * record is allocated once, is never resized, and the collector never
+ * moves it, so generated code can hold `roots` across every safepoint
+ * in the resumed body.
+ */
+
+static OseoGenerator *generator_state(OseoValue value) {
+    return ordinary_object(value)->generator;
+}
+
+/*
+ * %GeneratorPrototype%, created once per context and permanently rooted.
+ * It carries the brand that serves the virtualized `next` and
+ * `Symbol.iterator`, and every generator function's own `prototype`
+ * object inherits from it, so the specified lookup order and the shared
+ * identity both hold without materializing the rest of the intrinsic.
+ */
+OseoResult oseo_internal_generator_prototype(OseoContext *context) {
+    if (tag_of(context->generator_prototype) != OSEO_TAG_UNDEFINED) {
+        return normal(context->generator_prototype);
+    }
+    OseoResult result = oseo_object_create(context, oseo_null());
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoOrdinaryObject *object = ordinary_object(result.value);
+    object->default_intrinsics = true;
+    object->generator_prototype = true;
+    context->generator_prototype = result.value;
+    return result;
+}
+
+OseoResult oseo_generator_create(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t slot_count,
+    size_t completion_count
+) {
+    if (!is_function(callee) ||
+        function_object(callee)->function_kind != OSEO_FUNCTION_GENERATOR) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A generator requires a generator function."
+        );
+    }
+    if (slot_count > (SIZE_MAX - sizeof(OseoGenerator)) / sizeof(OseoValue)) {
+        return failure(context, "OSEO2001", "Generator frame is too large.");
+    }
+    size_t slot_bytes = slot_count * sizeof(OseoValue);
+    size_t remaining = SIZE_MAX - sizeof(OseoGenerator) - slot_bytes;
+    if (completion_count > remaining / sizeof(OseoCompletionRecord)) {
+        return failure(context, "OSEO2001", "Generator frame is too large.");
+    }
+    size_t completion_bytes = completion_count * sizeof(OseoCompletionRecord);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = callee;
+    frame.slots[1] = receiver;
+    frame.slots[2] = function_object(callee)->prototype_object;
+    /* GetPrototypeFromConstructor falls back to the intrinsic whenever
+     * the function's `prototype` is not an object. */
+    if (!is_object(frame.slots[2])) {
+        result = oseo_internal_generator_prototype(context);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[2]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    frame.slots[2] = result.value;
+    OseoValue generator = frame.slots[2];
+    /* The record is published only after it is fully initialized, so a
+     * collection triggered by this allocation never traces half a
+     * frame. */
+    OseoGenerator *state = malloc(
+        sizeof(OseoGenerator) + slot_bytes + completion_bytes
+    );
+    if (state == NULL) {
+        oseo_roots_release(context, &frame);
+        return failure(context, "OSEO2001", "Generator allocation failed.");
+    }
+    state->callee = frame.slots[0];
+    state->receiver = frame.slots[1];
+    state->sent = oseo_undefined();
+    state->slots = (OseoValue *)(void *)(state + 1);
+    state->completions = (OseoCompletionRecord *)(void *)
+        ((unsigned char *)state->slots + slot_bytes);
+    state->slot_count = slot_count;
+    state->completion_count = completion_count;
+    state->resume_point = 0u;
+    state->state = OSEO_GENERATOR_SUSPENDED_START;
+    for (size_t index = 0u; index < slot_count; index += 1u) {
+        state->slots[index] = oseo_undefined();
+    }
+    if (completion_bytes > 0u) memset(state->completions, 0, completion_bytes);
+    OseoOrdinaryObject *object = ordinary_object(generator);
+    object->default_intrinsics = true;
+    object->generator = state;
+    oseo_roots_release(context, &frame);
+    return normal(generator);
+}
+
+OseoValue *oseo_generator_slots(OseoValue generator) {
+    return generator_state(generator)->slots;
+}
+
+OseoCompletionRecord *oseo_generator_completions(OseoValue generator) {
+    return generator_state(generator)->completions;
+}
+
+OseoValue oseo_generator_callee(OseoValue generator) {
+    return generator_state(generator)->callee;
+}
+
+OseoValue oseo_generator_receiver(OseoValue generator) {
+    return generator_state(generator)->receiver;
+}
+
+OseoValue oseo_generator_sent(OseoValue generator) {
+    return generator_state(generator)->sent;
+}
+
+size_t oseo_generator_resume_point(OseoValue generator) {
+    return generator_state(generator)->resume_point;
+}
+
+void oseo_generator_suspend(
+    OseoContext *context,
+    OseoValue generator,
+    size_t resume_point
+) {
+    (void)context;
+    OseoGenerator *state = generator_state(generator);
+    state->resume_point = resume_point;
+    state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
+}
+
+/*
+ * Discard [[GeneratorContext]] once a generator completes. A completed
+ * generator can never be resumed, so retaining its frame would keep the
+ * whole suspended object graph reachable for as long as the generator
+ * itself is.
+ */
+static void generator_complete(OseoValue generator) {
+    OseoGenerator *state = generator_state(generator);
+    state->state = OSEO_GENERATOR_COMPLETED;
+    state->callee = oseo_undefined();
+    state->receiver = oseo_undefined();
+    state->sent = oseo_undefined();
+    for (size_t index = 0u; index < state->slot_count; index += 1u) {
+        state->slots[index] = oseo_undefined();
+    }
+    if (state->completion_count > 0u) {
+        memset(
+            state->completions,
+            0,
+            state->completion_count * sizeof(OseoCompletionRecord)
+        );
+    }
+}
+
+OseoResult oseo_generator_next(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue sent
+) {
+    if (!is_generator(generator)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Generator next requires a generator receiver."
+        );
+    }
+    if (generator_state(generator)->state == OSEO_GENERATOR_EXECUTING) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot resume an already running generator."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = generator;
+    frame.slots[1] = sent;
+    if (generator_state(frame.slots[0])->state == OSEO_GENERATOR_COMPLETED) {
+        result =
+            oseo_internal_iterator_result(context, oseo_undefined(), true);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (context->generator_dispatcher == NULL) {
+        oseo_roots_release(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "No generated generator dispatcher is installed."
+        );
+    }
+    OseoGenerator *state = generator_state(frame.slots[0]);
+    state->sent = frame.slots[1];
+    state->state = OSEO_GENERATOR_EXECUTING;
+    result = oseo_call_enter(context);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        generator_complete(frame.slots[0]);
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = context->generator_dispatcher(context, frame.slots[0]);
+    oseo_call_leave(context);
+    state = generator_state(frame.slots[0]);
+    state->sent = oseo_undefined();
+    /* The completion value only lives in `result` until it is rooted,
+     * and discarding the frame drops the slot it came from. */
+    frame.slots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        generator_complete(frame.slots[0]);
+        result.value = frame.slots[1];
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    bool done = state->state != OSEO_GENERATOR_SUSPENDED_YIELD;
+    if (done) generator_complete(frame.slots[0]);
+    result = oseo_internal_iterator_result(context, frame.slots[1], done);
+    oseo_roots_release(context, &frame);
+    return result;
+}

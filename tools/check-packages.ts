@@ -222,6 +222,7 @@ async function main(): Promise<void> {
         requireFile(files, "native/runtime_error.c", packed.name);
         requireFile(files, "native/runtime_symbol.c", packed.name);
         requireFile(files, "native/runtime_iterator.c", packed.name);
+        requireFile(files, "native/runtime_generator.c", packed.name);
         requireFile(files, "native/runtime_primitive.c", packed.name);
         requireFile(files, "native/runtime_promise.c", packed.name);
         requireFile(files, "native/runtime_event_loop.c", packed.name);

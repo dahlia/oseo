@@ -229,7 +229,7 @@ test("emits rooted iterator protocol operations", () => {
   assert.ok(emitted.source.includes("bool fast_4 = !iterator_done_4;"));
   assert.ok(
     emitted.source.includes(
-      "oseo_iterator_close(context, roots[1], completion_kind[0u] == 2)",
+      "oseo_iterator_close(context, roots[1], completion[0u].kind == 2)",
     ),
   );
 });
@@ -540,4 +540,139 @@ test("keeps string constant units out of generated stack frames", () => {
   });
   assert.match(emitted.source, /static const uint16_t string_units_0\[\]/u);
   assert.doesNotMatch(emitted.source, /\(const uint16_t\[\]\)/u);
+});
+
+test("emits a generator entry and a separately resumable body", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "generator.js",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [
+      {
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                constant: { kind: "number", value: 1 },
+                detail: "1",
+                id: 0,
+                kind: "constant",
+                range,
+              },
+            ],
+            terminator: {
+              kind: "generator-yield",
+              resume: 1,
+              sent: 1,
+              value: 0,
+            },
+          },
+          {
+            id: 1,
+            operations: [],
+            terminator: { kind: "return", value: 1 },
+          },
+        ],
+        functionLength: 0,
+        generator: true,
+        id: 0,
+        kind: "mir-function",
+        localBindingIds: [],
+        name: "counter",
+        parameterCount: 0,
+        parameters: [],
+        range,
+        rootSlotCount: 2,
+      },
+    ],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "counter",
+              functionId: 0,
+              functionKind: "generator",
+              functionLength: 0,
+              functionName: "counter",
+              id: 0,
+              kind: "function-create",
+              range,
+            },
+            {
+              arguments: [],
+              detail: "call counter",
+              id: 1,
+              kind: "call",
+              range,
+              target: { functionId: 0, kind: "function" },
+            },
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "generator.ts",
+    specialization: "disabled",
+  });
+  assert.match(emitted.source, /OSEO_FUNCTION_GENERATOR/u);
+  // The call entry allocates only the frame that roots the new
+  // generator; the body's roots belong to the generator record.
+  assert.match(
+    emitted.source,
+    /oseo_generator_create\(context, callee, receiver, \d+u, 0u\);/u,
+  );
+  assert.match(emitted.source, /roots = oseo_generator_slots\(frame\.slots/u);
+  assert.match(
+    emitted.source,
+    /static OseoResult oseo_generator_body_0\(\n {4}OseoContext \*context/u,
+  );
+  assert.match(
+    emitted.source,
+    new RegExp(
+      "switch \\(oseo_generator_resume_point\\(generator\\)\\) \\{\\n" +
+        " {4}case 0u: goto bb0;\\n {4}case 1u: goto bb1;",
+      "u",
+    ),
+  );
+  assert.match(
+    emitted.source,
+    /oseo_generator_suspend\(context, generator, 1u\);/u,
+  );
+  assert.match(
+    emitted.source,
+    /roots\[1\] = oseo_generator_sent\(generator\);/u,
+  );
+  assert.match(emitted.source, /oseo_context_set_generator_dispatcher/u);
+  assert.match(
+    emitted.source,
+    /case 0u:\n {8}return oseo_generator_body_0\(context, generator\);/u,
+  );
+  // A suspended body must not release a native frame it does not own.
+  const bodyStart = emitted.source.indexOf(
+    "static OseoResult oseo_generator_body_0(\n",
+  );
+  const body = emitted.source.slice(
+    bodyStart,
+    emitted.source.indexOf("\nstatic OseoResult ", bodyStart + 1),
+  );
+  assert.doesNotMatch(body, /oseo_roots_release/u);
 });

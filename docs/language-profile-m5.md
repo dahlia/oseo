@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 1,019 reviewed cases: 639 passes, 254 expected
-negatives, and 126 unsupported profile features. It records no semantic or
+The current manifest contains 1,127 reviewed cases: 698 passes, 318 expected
+negatives, and 111 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -630,6 +630,74 @@ its deliberate boundary and its evidence:
     method definitions, non-constructible method identity, getter and
     setter accessor forms, object spread sources, and the destructuring
     parameter patterns their method bodies already supported.
+ -  Synchronous generator functions. `function*` declarations and function
+    expressions are admitted with `yield` in any admitted expression
+    position, including inside loops, conditionals, `switch`, labeled
+    statements, and `try` blocks. Calling a generator function runs its
+    environment and parameter prologue immediately and returns a suspended
+    generator object whose `[[Prototype]]` is the function's own
+    `prototype` object; the body itself runs only on resumption.
+    `%GeneratorPrototype%.next(value)` resumes the saved state, delivers
+    `value` as the result of the awaiting `yield`, and returns a fresh
+    `{ value, done }` object. A body that runs to completion reports its
+    return value with `done` true, and every later resumption reports
+    `{ undefined, true }`. Resuming a generator that is already running
+    throws a `TypeError`, and a body that throws completes the generator
+    and propagates the thrown value. A generator function is not
+    constructible, so `new` on one throws a `TypeError`, and its
+    `prototype` object carries no `constructor` property. Each generator
+    function's `prototype` object inherits from one shared
+    `%GeneratorPrototype%` that the context creates lazily and roots
+    permanently; that intrinsic serves the virtualized `next` and
+    `Symbol.iterator`, so both resolve through the specified lookup order
+    and an own property on the function's `prototype`, or a replacement
+    `prototype` object, shadows them. A `prototype` that is not an object
+    falls back to `%GeneratorPrototype%` as
+    `GetPrototypeFromConstructor` requires. `next` reports a `length` of
+    1 and a `name` of `next`. A generator is therefore its own iterable
+    and works with `for-of`, array spread, call spread, and array
+    destructuring. Completing a generator, normally or abruptly, discards
+    its `[[GeneratorContext]]`, so a retained completed generator does
+    not keep its suspended object graph reachable. A generator body's root
+    slots and saved completion records live in its generator record rather than
+    on the native root stack, so a suspended generator leaves no live C frame
+    and the collector traces its frame through the generator object. Deliberate
+    boundaries: `yield*`, `%GeneratorPrototype%.return`,
+    `%GeneratorPrototype%.throw`, asynchronous generators, and generator method
+    definitions in object literals are rejected with source-located
+    diagnostics. Default and binding-pattern generator parameters are also
+    rejected, because this profile lowers them as body statements that the
+    generator body would only reach on the first resumption, which
+    `FunctionDeclarationInstantiation` requires to happen at the call instead.
+    Simple and rest parameters are admitted and keep the ordinary call ABI.
+    `%GeneratorPrototype%` exists as a reachable object with virtualized
+    methods rather than own properties, and `%GeneratorFunction%` and
+    `%GeneratorFunction.prototype%` are not materialized at all, matching how
+    the array iterator prototype is already virtualized. Native differential
+    fixtures retain a single yield, several yields, a bare `yield` with and
+    without a sent value, an empty generator, sent values threaded through an
+    accumulator, generator function `length`, `name`, and inferred `name`, rest
+    parameters, yields inside `for` and `while` loops, per-iteration closure
+    capture across a suspension, yields in `try`, `catch`, and `finally`
+    blocks, an abrupt body completion and the completed state after it,
+    deferred body entry, self-iterability, non-constructibility, a shared
+    `next` identity across two generator functions, a non-object `prototype`
+    falling back to the intrinsic, an own `next` on a replacement `prototype`,
+    spread over a generator, a dynamic `this` receiver, hand-written delegation
+    over another generator, the already-running `TypeError`, independent
+    generator identities, and object growth across suspensions under forced
+    collection. A generated property with seed `0x5eed0016` covers zero to four
+    suspension steps placed at statement level, inside a conditional, inside a
+    loop, and inside nested loops, driven by a bounded cycle of sent values,
+    across Node.js, Deno, both specialization policies, and forced collection
+    on the enabled path. Fifty-nine reviewed test262 cases newly pass and
+    forty-nine new expected negatives cover generator declarations and
+    expressions, `prototype` and `length` descriptors, `name` inference,
+    non-constructibility, `yield` as a statement, operand, spread element, and
+    property name, consecutive and lone yields, executing-state reentry, and
+    the strict-mode `yield` early errors. Admitting the `generators` feature
+    also promotes fifteen existing module-code parse negatives from unsupported
+    to expected negatives.
 
 
 Known gaps inside the claim
@@ -638,7 +706,7 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Classes, generators, big integers, regular expressions, and the remaining
+ -  Classes, big integers, regular expressions, and the remaining
     expression grammar are outside the admitted syntax. Owner: the
     core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
@@ -667,6 +735,10 @@ must never shrink by reclassification alone.
     on this unit.
  -  `await` is restricted to the M4 positions; asynchronous generators,
     `for await`, and asynchronous module cycles are unsupported. Owner: the
+    functions and executable syntax stream.
+ -  `yield*`, `%GeneratorPrototype%.return`, `%GeneratorPrototype%.throw`,
+    generator method definitions, and default or binding-pattern generator
+    parameters are outside the admitted generator subset. Owner: the
     functions and executable syntax stream.
  -  `eval`, the `Function` constructor, and dynamic import stay explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).

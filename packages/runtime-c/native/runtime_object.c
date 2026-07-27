@@ -270,6 +270,8 @@ static OseoResult object_create(
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;
     object->default_intrinsics = default_intrinsics;
+    object->generator_prototype = false;
+    object->generator = NULL;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
 }
@@ -316,6 +318,8 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;
     array->default_intrinsics = true;
+    array->generator_prototype = false;
+    array->generator = NULL;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
@@ -521,6 +525,28 @@ OseoResult oseo_object_get(
                 );
             }
         }
+        /* Only %GeneratorPrototype% carries this brand, and generator
+         * objects reach it through their function's `prototype` object,
+         * so an own property on either, or a replacement `prototype`
+         * object, shadows these methods the way the specified prototype
+         * chain does. `next` is an own property of the intrinsic, so it
+         * survives a replaced prototype; `Symbol.iterator` is inherited
+         * from %IteratorPrototype% and does not. */
+        if (object->generator_prototype) {
+            if (oseo_internal_string_is_ascii(key, "next")) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_GENERATOR_NEXT_CODE_ID
+                );
+            }
+            if (object->default_intrinsics &&
+                oseo_internal_iterator_key_matches(context, key)) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_ITERATOR_SELF_CODE_ID
+                );
+            }
+        }
         if (is_array(current) && object->default_intrinsics &&
             oseo_internal_iterator_key_matches(context, key)) {
             return oseo_internal_iterator_method(
@@ -602,7 +628,7 @@ OseoResult oseo_object_has_own(
             NULL
         )));
     }
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         return normal(oseo_boolean(true));
     }
@@ -641,7 +667,7 @@ OseoResult oseo_object_set(
         }
         return normal(value);
     }
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         OseoFunction *function = function_object(object_value);
         if (!function->prototype_writable) {
@@ -775,7 +801,7 @@ OseoResult oseo_object_define(
             "Cannot define a module namespace property."
         );
     }
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
             return type_error(
@@ -904,7 +930,7 @@ OseoResult oseo_object_define_accessor(
             "Cannot define a module namespace property."
         );
     }
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         return type_error(
             context,
@@ -1001,7 +1027,7 @@ OseoResult oseo_object_delete(
         }
         return normal(oseo_boolean(true));
     }
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         return strict
             ? type_error(context, "Cannot delete the prototype property.")
@@ -1536,7 +1562,7 @@ bool oseo_internal_own_descriptor(
 ) {
     *getter = oseo_undefined();
     *setter = oseo_undefined();
-    if (function_is_constructible(object_value) &&
+    if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         *value = function_object(object_value)->prototype_object;
         *attributes = (OseoPropertyAttributes){

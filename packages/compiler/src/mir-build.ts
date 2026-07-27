@@ -1121,6 +1121,35 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "yield") {
+    if (!builder.generator) {
+      throw new Error(
+        "HIR yield reached a function that is not a generator body.",
+      );
+    }
+    const value =
+      expression.argument == null
+        ? lowerSyntheticUndefined(expression.range, builder)
+        : lowerExpression(expression.argument, builder);
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "generator suspension result allocation",
+      [value],
+      expression.range,
+    );
+    const sent = builder.nextValue;
+    builder.nextValue += 1;
+    const resume = createMirBlock(builder);
+    builder.current.terminator = {
+      kind: "generator-yield",
+      resume: resume.id,
+      sent,
+      value,
+    };
+    builder.current = resume;
+    return recordRoot(builder, sent, expression.range);
+  }
   if (expression.kind === "error-intrinsic") {
     appendMirMetadata(
       builder,
@@ -3410,6 +3439,7 @@ function buildMirFunction(
   range: SourceRange,
   specialization: SpecializationMode,
   strict: boolean,
+  generator = false,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -3423,6 +3453,7 @@ function buildMirFunction(
     labels: [],
     loops: [],
     finalizers: [],
+    generator,
     nextValue: 0,
     pendingLabels: [],
     specialization,
@@ -3459,6 +3490,7 @@ function buildMirFunction(
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
     functionLength,
+    ...(generator ? { generator: true as const } : {}),
     id,
     kind: "mir-function",
     localBindingIds: [...localBindingIds],
@@ -3514,6 +3546,7 @@ export function buildMir(
         functionValue.range,
         specialization,
         functionValue.strict === true,
+        functionValue.functionKind === "generator",
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

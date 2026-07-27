@@ -194,6 +194,19 @@ function resolveExpression(
     const argument = resolveExpression(expression.argument, scopes, state);
     return argument == null ? undefined : { ...expression, argument };
   }
+  if (expression.kind === "yield") {
+    if (expression.argument == null) {
+      return {
+        ...(expression.byteRange == null
+          ? {}
+          : { byteRange: expression.byteRange }),
+        kind: "yield",
+        range: expression.range,
+      };
+    }
+    const argument = resolveExpression(expression.argument, scopes, state);
+    return argument == null ? undefined : { ...expression, argument };
+  }
   if (
     expression.kind === "boolean" ||
     expression.kind === "null" ||

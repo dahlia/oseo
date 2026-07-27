@@ -18,6 +18,7 @@ void oseo_context_init(
     context->roots = NULL;
     context->objects = NULL;
     context->function_dispatcher = NULL;
+    context->generator_dispatcher = NULL;
     context->async_call_capability = oseo_undefined();
     context->microtask_head = oseo_undefined();
     context->microtask_tail = oseo_undefined();
@@ -39,6 +40,8 @@ void oseo_context_init(
     context->iterator_values_function = oseo_undefined();
     context->iterator_next_function = oseo_undefined();
     context->iterator_self_function = oseo_undefined();
+    context->generator_next_function = oseo_undefined();
+    context->generator_prototype = oseo_undefined();
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -71,6 +74,13 @@ void oseo_context_set_function_dispatcher(
     OseoFunctionDispatcher dispatcher
 ) {
     context->function_dispatcher = dispatcher;
+}
+
+void oseo_context_set_generator_dispatcher(
+    OseoContext *context,
+    OseoGeneratorDispatcher dispatcher
+) {
+    context->generator_dispatcher = dispatcher;
 }
 
 void oseo_context_fail_allocation_at(OseoContext *context, size_t attempt) {
@@ -107,6 +117,8 @@ void oseo_context_destroy(OseoContext *context) {
     context->iterator_values_function = oseo_undefined();
     context->iterator_next_function = oseo_undefined();
     context->iterator_self_function = oseo_undefined();
+    context->generator_next_function = oseo_undefined();
+    context->generator_prototype = oseo_undefined();
     context->timer_head = oseo_undefined();
     oseo_collect(context);
 }

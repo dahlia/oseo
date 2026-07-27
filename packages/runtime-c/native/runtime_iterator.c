@@ -52,10 +52,18 @@ OseoResult oseo_internal_iterator_method(
     };
     const uint16_t *name;
     size_t name_length;
+    /* %GeneratorPrototype%.next takes one declared parameter; every
+     * other virtualized iterator method declares none. */
+    size_t parameter_count = 0u;
     if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
         cache = &context->iterator_next_function;
         name = next_units;
         name_length = 4u;
+    } else if (code_id == OSEO_GENERATOR_NEXT_CODE_ID) {
+        cache = &context->generator_next_function;
+        name = next_units;
+        name_length = 4u;
+        parameter_count = 1u;
     } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
         cache = &context->iterator_values_function;
         name = values_units;
@@ -79,7 +87,7 @@ OseoResult oseo_internal_iterator_method(
             frame.slots[0],
             name,
             name_length,
-            0u,
+            parameter_count,
             OSEO_FUNCTION_INTERNAL,
             oseo_undefined(),
             oseo_undefined(),
@@ -117,8 +125,7 @@ OseoResult oseo_internal_array_values(
     return result;
 }
 
-/* Build one { value, done } iterator result object. */
-static OseoResult iterator_result(
+OseoResult oseo_internal_iterator_result(
     OseoContext *context,
     OseoValue value,
     bool done
@@ -173,12 +180,12 @@ OseoResult oseo_internal_array_iterator_next(
     }
     OseoOrdinaryObject *state = ordinary_object(iterator);
     if (!is_array(state->iterator_array)) {
-        return iterator_result(context, oseo_undefined(), true);
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
     uint32_t length = ordinary_object(state->iterator_array)->array_length;
     if (state->iterator_index >= length) {
         state->iterator_array = oseo_undefined();
-        return iterator_result(context, oseo_undefined(), true);
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
     OseoValue slots[2] = {iterator, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
@@ -193,7 +200,7 @@ OseoResult oseo_internal_array_iterator_next(
     if (result.status == OSEO_STATUS_NORMAL) {
         state = ordinary_object(slots[0]);
         state->iterator_index += 1u;
-        result = iterator_result(context, slots[1], false);
+        result = oseo_internal_iterator_result(context, slots[1], false);
     }
     oseo_roots_pop(context, &frame);
     return result;

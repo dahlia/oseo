@@ -1429,6 +1429,12 @@ OseoResult oseo_has_property(
              oseo_internal_iterator_key_matches(context, property))) {
             return normal(oseo_boolean(true));
         }
+        if (object->generator_prototype &&
+            (oseo_internal_string_is_ascii(property, "next") ||
+             (object->default_intrinsics &&
+              oseo_internal_iterator_key_matches(context, property)))) {
+            return normal(oseo_boolean(true));
+        }
         if (is_array(current) && object->default_intrinsics &&
             oseo_internal_iterator_key_matches(context, property)) {
             return normal(oseo_boolean(true));

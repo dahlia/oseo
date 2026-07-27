@@ -32,6 +32,7 @@ import { asyncFixtures } from "./native/fixtures/async.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
+import { generatorFixtures } from "./native/fixtures/generators.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
@@ -76,6 +77,7 @@ const fixtures: readonly Fixture[] = [
   ...objectFixtures,
   ...bindingFixtures,
   ...expressionFixtures,
+  ...generatorFixtures,
   ...asyncFixtures,
 ];
 
@@ -199,6 +201,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
     fixture.name === "object-literals" ||
+    fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "function-rest-parameters" ||

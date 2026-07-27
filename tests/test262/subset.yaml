@@ -8,6 +8,7 @@ supportedFeatures:
   - destructuring-binding
   - exponentiation
   - for-of
+  - generators
   - let
   - object-rest
   - object-spread
@@ -64,6 +65,27 @@ tests:
   - path: test/built-ins/Error/prototype/toString/name.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/GeneratorPrototype/next/consecutive-yields.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/context-method-invocation.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/from-state-executing.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/lone-return.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/lone-yield.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/no-control-flow.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/next/return-yield-expr.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/NativeErrors/EvalError/constructor.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
@@ -684,6 +706,183 @@ tests:
   - path: test/language/expressions/function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/generators/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/has-instance.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/implicit-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/invoke-as-constructor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/length-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-no-strict-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-no-strict-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-strict-error-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-strict-error-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-identifier-non-strict.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-identifier-spread-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-identifier-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-spread-arr-multiple.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/named-yield-spread-obj.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/no-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/no-yield.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/prototype-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/prototype-typeof.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/prototype-uniqueness.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/return.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/scope-name-var-close.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/use-strict-with-non-simple-param.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-function-expression-binding-identifier.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-generator-expression-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-literal-property-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-logical-or-expression.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-parameter.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-property-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-statement.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-as-yield-operand.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-identifier-non-strict.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-identifier-spread-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-identifier-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-newline.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-spread-arr-multiple.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-spread-obj.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-star-after-newline.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/generators/yield-weak-binding.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
   - path: test/language/expressions/in/rhs-yield-absent-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -1756,7 +1955,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-decl.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/early-dup-export-dflt-id.js
     expectedClassification: expected-negative
@@ -2050,16 +2249,16 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-class-decl-method-gen-static.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-class-decl-method-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-gen-static.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-class-expr-meth-static.js
     expectedClassification: expected-negative
@@ -2113,7 +2312,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-generator-decl.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-generator-expr.js
     expectedClassification: expected-negative
@@ -2128,7 +2327,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-object-gen-method.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-export-object-getter.js
     expectedClassification: expected-negative
@@ -2179,16 +2378,16 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-class-decl-method-gen-static.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-class-decl-method-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-gen-static.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-static.js
     expectedClassification: expected-negative
@@ -2242,7 +2441,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-generator-decl.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-generator-expr.js
     expectedClassification: expected-negative
@@ -2257,7 +2456,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-object-gen-method.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-decl-pos-import-object-getter.js
     expectedClassification: expected-negative
@@ -2308,13 +2507,13 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-hoist-lex-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-invoke-anon-fun-decl.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-invoke-anon-gen-decl.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/parse-err-return.js
     expectedClassification: expected-negative
@@ -3401,6 +3600,132 @@ tests:
   - path: test/language/statements/function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/statements/generators/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/declaration.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/has-instance.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/invoke-as-constructor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/length-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/no-yield.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/param-dflt-yield.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/prototype-property-descriptor.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/prototype-typeof.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/prototype-uniqueness.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/return.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/use-strict-with-non-simple-param.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-function-expression-binding-identifier.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-generator-declaration-binding-identifier.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-literal-property-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-logical-or-expression.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-parameter.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-property-name.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-statement.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-as-yield-operand.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-identifier-non-strict.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-identifier-spread-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-identifier-strict.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-newline.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-spread-arr-multiple.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-spread-obj.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-star-after-newline.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/statements/generators/yield-weak-binding.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
   - path: test/language/statements/labeled/continue.js
     expectedClassification: expected-negative
     dependencies: [control-flow]

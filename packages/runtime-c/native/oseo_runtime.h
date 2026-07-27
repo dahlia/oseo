@@ -24,6 +24,11 @@ typedef enum {
      * "get "/"set " prefix is orthogonal to constructibility and is
      * requested separately through OseoFunctionNamePrefix. */
     OSEO_FUNCTION_METHOD = 5,
+    /* Dynamic `this` and never constructible. Calling one runs only the
+     * environment and parameter prologue and returns a suspended
+     * generator whose `prototype` object serves the virtualized
+     * %GeneratorPrototype% methods. */
+    OSEO_FUNCTION_GENERATOR = 6,
 } OseoFunctionKind;
 
 /*
@@ -53,6 +58,16 @@ typedef OseoResult (*OseoFunctionDispatcher)(
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
+);
+
+/*
+ * Enters one generator body at its saved resume point. The runtime
+ * never resumes a generator without this dispatcher, which generated
+ * code installs alongside the function dispatcher.
+ */
+typedef OseoResult (*OseoGeneratorDispatcher)(
+    OseoContext *context,
+    OseoValue generator
 );
 
 typedef enum {
@@ -91,6 +106,27 @@ typedef struct {
     size_t slot;
 } OseoPropertyCache;
 
+/*
+ * One saved abrupt completion of generated code. `kind` is 0 normal,
+ * 1 return, 2 throw, and 3 jump; `target` and `depth` name the block
+ * and cleanup nesting a jump resumes at, and the remaining fields
+ * restore the diagnostic location of a saved throw. The completion's
+ * value lives in the owning frame's root slots so the collector traces
+ * it. A generator body's records belong to its generator record, so
+ * they survive suspension along with the roots they describe.
+ */
+typedef struct {
+    int kind;
+    size_t target;
+    size_t depth;
+    size_t line;
+    size_t column;
+    const char *source_id;
+    size_t source_id_length;
+    const char *error_code;
+    const char *error_message;
+} OseoCompletionRecord;
+
 struct OseoRootFrame {
     OseoRootFrame *previous;
     OseoValue *slots;
@@ -101,6 +137,7 @@ struct OseoContext {
     OseoRootFrame *roots;
     OseoHeapObject *objects;
     OseoFunctionDispatcher function_dispatcher;
+    OseoGeneratorDispatcher generator_dispatcher;
     OseoValue async_call_capability;
     OseoValue microtask_head;
     OseoValue microtask_tail;
@@ -119,6 +156,8 @@ struct OseoContext {
     OseoValue iterator_values_function;
     OseoValue iterator_next_function;
     OseoValue iterator_self_function;
+    OseoValue generator_next_function;
+    OseoValue generator_prototype;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
@@ -213,6 +252,10 @@ void oseo_context_print_observations(const OseoContext *context);
 void oseo_context_set_function_dispatcher(
     OseoContext *context,
     OseoFunctionDispatcher dispatcher
+);
+void oseo_context_set_generator_dispatcher(
+    OseoContext *context,
+    OseoGeneratorDispatcher dispatcher
 );
 
 OseoResult oseo_call_enter(OseoContext *context);
@@ -309,6 +352,52 @@ OseoResult oseo_call_function(
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
+);
+/*
+ * Creates one suspended generator for a call to `callee`. The record
+ * owns `slot_count` collector-traced root slots and `completion_count`
+ * saved completion records, so the generator body's frame survives every
+ * suspension. The generator's [[Prototype]] is the function's
+ * `prototype` object when that is an object, and null otherwise.
+ */
+OseoResult oseo_generator_create(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t slot_count,
+    size_t completion_count
+);
+/*
+ * The generator record's stable interior pointers and saved state.
+ * Generated body code reacquires each on entry; the collector never
+ * moves a generator, so the pointers stay valid across safepoints.
+ */
+OseoValue *oseo_generator_slots(OseoValue generator);
+OseoCompletionRecord *oseo_generator_completions(OseoValue generator);
+OseoValue oseo_generator_callee(OseoValue generator);
+OseoValue oseo_generator_receiver(OseoValue generator);
+OseoValue oseo_generator_sent(OseoValue generator);
+size_t oseo_generator_resume_point(OseoValue generator);
+/*
+ * Records the block that the next resumption continues at and marks the
+ * generator suspended. Generated code calls this immediately before
+ * leaving a body with a yielded value.
+ */
+void oseo_generator_suspend(
+    OseoContext *context,
+    OseoValue generator,
+    size_t resume_point
+);
+/*
+ * %GeneratorPrototype%.next: resumes a suspended generator with `sent`
+ * and returns a fresh { value, done } object. A completed generator
+ * returns { undefined, true } without entering the body, and a running
+ * one throws a TypeError.
+ */
+OseoResult oseo_generator_next(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue sent
 );
 OseoResult oseo_argument_list_create(OseoContext *context);
 OseoResult oseo_argument_list_append(
