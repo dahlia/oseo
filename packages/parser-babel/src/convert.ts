@@ -3293,10 +3293,7 @@ export function classExpression(
       unsupported(context, element, "This class element is unsupported.");
       break;
     }
-    if (element.static === true) {
-      unsupported(context, element, "Static class elements are unsupported.");
-      break;
-    }
+    const staticPlacement = element.static === true;
     if (element.kind === "constructor") {
       if (constructorFunction != null) {
         unsupported(context, element, "A class defines one constructor.");
@@ -3323,6 +3320,7 @@ export function classExpression(
       ...(accessorKind == null ? {} : { accessorKind }),
       key,
       kind: "method",
+      ...(staticPlacement ? { staticPlacement: true as const } : {}),
       value: method,
     });
   }

@@ -175,12 +175,17 @@ export type SyntaxObjectProperty =
   | SyntaxObjectDefinition
   | SyntaxObjectSpreadProperty;
 
-/** One prototype method or accessor definition in an owned class body. */
+/** One method or accessor definition in an owned class body. */
 export interface SyntaxClassMethod extends LocatedSyntax {
   /** A get or set accessor; absent for an ordinary method definition. */
   readonly accessorKind?: "get" | "set";
   readonly key: SyntaxExpression;
   readonly kind: "method";
+  /**
+   * True for a `static` element, which is defined on the constructor
+   * itself instead of on its prototype object.
+   */
+  readonly staticPlacement?: true;
   readonly value: SyntaxFunction;
 }
 

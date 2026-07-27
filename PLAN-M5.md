@@ -407,7 +407,7 @@ computed method definitions, `constructor` and `prototype` property
 descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
-unit's boundaries. Static members, class fields,
+unit's boundaries. Class fields,
 private names, static initialization blocks, `extends`, `super`, and
 `export default class` remain rejected with source-located diagnostics.
 Asynchronous class methods are admitted, because they share the object literal
@@ -430,7 +430,7 @@ accessor closure reuses the non-constructible method kind and the runtime
 so its `name` follows identifier, string literal, numeric literal, computed,
 and symbol keys alike, and `new` on it throws a `TypeError`. The frontend
 rejects a getter with a parameter, a setter without exactly one non-rest
-parameter, a literal-keyed accessor named `constructor`, and static or private
+parameter, a literal-keyed accessor named `constructor`, and private
 accessors with source-located diagnostics; a computed key that evaluates to
 `"constructor"` defines an ordinary prototype accessor. Fixed native fixtures
 cover a getter, a setter, a pair and its round trip, both halves' `name` and
@@ -455,6 +455,52 @@ before execution. The two `grammar-special-prototype-accessor-meth` cases stay
 out of the reviewed subset until `Object.prototype.hasOwnProperty` exists. The
 manifest moves to 868 passes, 364 expected negatives, and 165 unsupported
 profile features with no semantic or harness failures.
+
+Class static methods and accessors are now admitted, the fourth unit of the
+functions and executable syntax stream. A `static` element carries a placement
+flag through the owned syntax tree and HIR, and MIR lowering chooses the
+constructor value instead of the prototype object as the target of the
+`property-define-method` and `property-define-accessor` operations the
+prototype elements already use. Static and prototype elements share one
+source-ordered loop, because ClassDefinitionEvaluation defines every element
+in source order and only chooses a different target for each, so a computed
+static key and a computed prototype key still interleave by position. A static
+element therefore reuses the whole prototype-element contract: the
+non-constructible method function kind, the `get ` and `set ` name prefixes,
+name inference over identifier, string literal, numeric literal, computed, and
+symbol keys, and writable, non-enumerable, configurable placement, so
+`Object.keys` on the constructor stays empty. Because it defines an own
+property of the constructor, a static element replaces the `name` or `length`
+the class installed, and a computed `"prototype"` key throws a `TypeError`
+against the non-writable, non-configurable `prototype` property. Static
+fields, static initialization blocks, and private static members stay rejected
+with the class element diagnostic they already had. Fixed native fixtures
+cover a static method, a static getter and setter pair, `this` inside a static
+method called through the class and through a detached reference, the static
+method descriptor and its attributes, static `name` and `length` for methods
+and both accessor halves, static non-constructibility, an instance that does
+not inherit a static member, a class that defines the same name statically and
+on the prototype, a static member on an anonymous class expression,
+interleaved computed static and prototype key evaluation order, numeric,
+string literal, symbol, and computed static keys, a static element that
+replaces `name` and `length`, the computed `"prototype"` rejection, a static
+`"constructor"` key that leaves `prototype.constructor` intact,
+last-definition-wins across a static method and accessor under one key, a
+static accessor round trip, and the class-scope name binding read from a
+static method and getter. The generated class property suite now places each
+drawn element on the prototype or on the constructor and reads it through the
+matching owner. Eighty-two reviewed test262 cases newly pass, covering the
+`accessor-name-static` and `method-static` families in both class forms,
+static setter and method parameter-body variable scope, static method
+`length` under a default parameter, the computed `"prototype"` `TypeError`,
+and the eight previously unsupported prototype accessor descriptor and
+`name` cases whose classes also define static accessors. Fifteen new expected
+negatives cover static method parameter `yield` and the static class name
+identifier early errors, while six new unsupported cases record the
+unresolvable computed accessor key, the static field element name, and the
+generator methods the `fn-name` and `fn-length` static precedence cases
+require. The manifest moves to 950 passes, 379 expected negatives, and 156
+unsupported profile features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

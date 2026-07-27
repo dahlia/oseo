@@ -833,14 +833,74 @@ tests:
   - path: test/language/expressions/class/accessor-name-inst/literal-string-unicode-escape.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static-computed-in.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static-computed-yield-expr.js
+    expectedClassification: pass
+    dependencies: [classes, generators, object-properties]
   - path: test/language/expressions/class/accessor-name-static/computed-err-evaluation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/computed-err-to-prop-key.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/computed-err-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/accessor-name-static/computed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-binary.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-exponent.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-hex.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-leading-decimal.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-non-canonical.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-octal.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-numeric-zero.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-char-escape.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-default-escaped.js
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/accessor-name-static/literal-string-default.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-double-quote.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-empty.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-hex-escape.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-line-continuation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-single-quote.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/accessor-name-static/literal-string-unicode-escape.js
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/class-name-ident-await-escaped-module.js
     expectedClassification: expected-negative
@@ -1019,6 +1079,51 @@ tests:
   - path: test/language/expressions/class/method-param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/method-static/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/expressions/class/method-static/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/expressions/class/method-static/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
+  - path: test/language/expressions/class/method-static/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/expressions/class/method-static/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/method-static/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/method-static/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, rest-parameters]
+  - path: test/language/expressions/class/method-static/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, rest-parameters]
   - path: test/language/expressions/class/method/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [classes, destructuring-bindings]
@@ -1085,12 +1190,27 @@ tests:
   - path: test/language/expressions/class/scope-setter-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [classes, object-properties, var-bindings]
+  - path: test/language/expressions/class/scope-static-meth-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/scope-static-meth-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/expressions/class/scope-static-setter-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, var-bindings]
+  - path: test/language/expressions/class/scope-static-setter-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, var-bindings]
   - path: test/language/expressions/class/setter-length-dflt.js
     expectedClassification: pass
     dependencies: [classes, default-parameters]
   - path: test/language/expressions/class/static-gen-method-param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters, generators]
+  - path: test/language/expressions/class/static-method-length-dflt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
   - path: test/language/expressions/class/static-method-param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters, generators]
@@ -3375,17 +3495,80 @@ tests:
   - path: test/language/statements/class/accessor-name-inst/literal-string-unicode-escape.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static-computed-yield-expr.js
+    expectedClassification: pass
+    dependencies: [classes, generators, object-properties]
   - path: test/language/statements/class/accessor-name-static/computed-err-evaluation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/computed-err-to-prop-key.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/computed-err-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/accessor-name-static/computed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-binary.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-exponent.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-hex.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-leading-decimal.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-non-canonical.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-octal.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-numeric-zero.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-char-escape.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-default-escaped-ext.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-default-escaped.js
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/accessor-name-static/literal-string-default.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-double-quote.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-empty.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-hex-escape.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-line-continuation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-single-quote.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/accessor-name-static/literal-string-unicode-escape.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/class-name-ident-static-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/class-name-ident-static.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
   - path: test/language/statements/class/definition/accessors.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/constructor-property.js
     expectedClassification: pass
@@ -3420,23 +3603,32 @@ tests:
   - path: test/language/statements/class/definition/early-errors-class-method-formals-contains-super-call.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
+  - path: test/language/statements/class/definition/fn-length-static-precedence-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-length-static-precedence.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [classes, functions]
+    dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-name-accessor-get.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties, symbols]
   - path: test/language/statements/class/definition/fn-name-accessor-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties, symbols]
-  - path: test/language/statements/class/definition/getters-non-configurable-err.js
+  - path: test/language/statements/class/definition/fn-name-static-precedence-order.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions, generators]
+  - path: test/language/statements/class/definition/fn-name-static-precedence.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, functions, generators]
+  - path: test/language/statements/class/definition/getters-non-configurable-err.js
+    expectedClassification: pass
     dependencies: [classes, generators, object-properties]
   - path: test/language/statements/class/definition/getters-prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/getters-restricted-ids.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/methods-gen-return.js
     expectedClassification: unsupported-profile-feature
@@ -3472,13 +3664,13 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/setters-non-configurable-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, generators, object-properties]
   - path: test/language/statements/class/definition/setters-prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/setters-restricted-ids.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/this-access-restriction.js
     expectedClassification: unsupported-profile-feature
@@ -3486,6 +3678,54 @@ tests:
   - path: test/language/statements/class/getter-param-dflt.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/ident-name-method-def-static-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/method-static/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/statements/class/method-static/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/method-static/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
+  - path: test/language/statements/class/method-static/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, destructuring-bindings]
+  - path: test/language/statements/class/method-static/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/method-static/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/method-static/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [classes, rest-parameters]
+  - path: test/language/statements/class/method-static/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, rest-parameters]
   - path: test/language/statements/class/method/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [classes, destructuring-bindings]
@@ -3540,9 +3780,33 @@ tests:
   - path: test/language/statements/class/scope-setter-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [classes, object-properties, var-bindings]
+  - path: test/language/statements/class/scope-static-meth-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/scope-static-meth-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, functions]
+  - path: test/language/statements/class/scope-static-setter-paramsbody-var-close.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, var-bindings]
+  - path: test/language/statements/class/scope-static-setter-paramsbody-var-open.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, var-bindings]
   - path: test/language/statements/class/setter-length-dflt.js
     expectedClassification: pass
     dependencies: [classes, default-parameters]
+  - path: test/language/statements/class/static-classelementname-abrupt-completion.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/static-method-length-dflt.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions]
+  - path: test/language/statements/class/static-method-non-configurable-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/static-method-param-yield.js
+    expectedClassification: expected-negative
+    dependencies: [classes, default-parameters, generators]
   - path: test/language/statements/class/strict-mode/with.js
     expectedClassification: expected-negative
     dependencies: [classes]

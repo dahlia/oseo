@@ -497,4 +497,221 @@ console.log(new Collected(4).read());
 console.log(new Collected(0).read() === "");
 `,
   },
+  {
+    name: "class-static-members",
+    source: `
+class Registry {
+  constructor(label) {
+    this.label = label;
+  }
+  static create(label) {
+    return new Registry(label);
+  }
+  static get kind() {
+    return "registry";
+  }
+  static set kind(value) {
+    Registry.recorded = value;
+  }
+  static owner() {
+    return this === Registry;
+  }
+  read() {
+    return this.label;
+  }
+}
+console.log(Registry.create("first").read(), Registry.kind, Registry.owner());
+Registry.kind = "written";
+console.log(Registry.recorded, Registry.kind);
+// A static member lives on the constructor, never on the prototype, and
+// an instance therefore does not inherit it.
+console.log(
+  typeof Registry.create,
+  Registry.prototype.create,
+  typeof Registry.prototype.read,
+  Registry.read,
+  new Registry("x").create,
+);
+let names = "";
+for (const key of Object.keys(Registry)) {
+  names = names + key + ",";
+}
+console.log("keys", names, Object.keys(Registry.prototype).length);
+const methodDescriptor = Object.getOwnPropertyDescriptor(Registry, "create");
+console.log(
+  typeof methodDescriptor.value,
+  methodDescriptor.writable,
+  methodDescriptor.enumerable,
+  methodDescriptor.configurable,
+);
+const accessorDescriptor = Object.getOwnPropertyDescriptor(Registry, "kind");
+console.log(
+  typeof accessorDescriptor.get,
+  typeof accessorDescriptor.set,
+  accessorDescriptor.enumerable,
+  accessorDescriptor.configurable,
+  "value" in accessorDescriptor,
+);
+console.log(
+  Registry.create.name,
+  Registry.create.length,
+  accessorDescriptor.get.name,
+  accessorDescriptor.set.name,
+  accessorDescriptor.get.length,
+  accessorDescriptor.set.length,
+);
+// A static member reuses the non-constructible method kind, so it has no
+// own prototype property and new on it throws.
+console.log("prototype" in Registry.create, "prototype" in Registry.owner);
+try {
+  new Registry.create("x");
+} catch (error) {
+  console.log("static construct", error instanceof TypeError);
+}
+// A detached static method keeps class-body strictness, so an undefined
+// receiver stays undefined instead of becoming the global object.
+const detached = Registry.owner;
+console.log(detached());
+class Split {
+  static shared() {
+    return "static";
+  }
+  shared() {
+    return "prototype";
+  }
+}
+console.log(
+  Split.shared(),
+  new Split().shared(),
+  Split.shared === Split.prototype.shared,
+);
+const Anonymous = class {
+  static label() {
+    return "anonymous";
+  }
+};
+console.log(Anonymous.label(), Anonymous.name);
+`,
+  },
+  {
+    name: "class-static-keys",
+    source: `
+let order = "";
+function key(name) {
+  order = order + name;
+  return name;
+}
+const marker = Symbol("marker");
+// ClassDefinitionEvaluation walks elements in source order and only
+// chooses a different target for a static one, so a computed static key
+// and a computed prototype key interleave by position.
+class Mixed {
+  [key("a")]() {
+    return "prototype-a";
+  }
+  static [key("b")]() {
+    return "static-b";
+  }
+  static get [key("c")]() {
+    return "static-c";
+  }
+  [key("d")]() {
+    return "prototype-d";
+  }
+}
+console.log(order, Mixed.b(), Mixed.c, new Mixed().a(), new Mixed().d());
+class Keys {
+  static 7() {
+    return "numeric";
+  }
+  static "spaced name"() {
+    return "spaced";
+  }
+  static [marker]() {
+    return "symbol";
+  }
+  static ["computed"]() {
+    return "computed";
+  }
+}
+console.log(
+  Keys[7](),
+  Keys["spaced name"](),
+  Keys[marker](),
+  Keys.computed(),
+);
+console.log(
+  Keys[7].name,
+  Keys["spaced name"].name,
+  Keys[marker].name,
+  Keys.computed.name,
+);
+// A static element defines an own property of the constructor, so it
+// replaces the name and length the class itself installed.
+class Shadow {
+  static name() {
+    return "shadowed name";
+  }
+  static length() {
+    return "shadowed length";
+  }
+}
+console.log(typeof Shadow.name, Shadow.name(), Shadow.length());
+// Only prototype is reserved on a class constructor; a static element
+// under a computed prototype key rejects because the property is
+// non-writable and non-configurable.
+try {
+  class Reserved {
+    static ["prototype"]() {
+      return "never";
+    }
+  }
+  console.log("defined prototype");
+} catch (error) {
+  console.log("static prototype", error instanceof TypeError);
+}
+class Named {
+  static ["constructor"]() {
+    return "static constructor";
+  }
+}
+console.log(Named.constructor(), Named.prototype.constructor === Named);
+class Replaced {
+  static value() {
+    return "first";
+  }
+  static get value() {
+    return "accessor";
+  }
+  static value() {
+    return "second";
+  }
+}
+console.log(
+  Replaced.value(),
+  Object.getOwnPropertyDescriptor(Replaced, "value").get,
+);
+class Paired {
+  static get item() {
+    return Paired.stored;
+  }
+  static set item(value) {
+    Paired.stored = value * 2;
+  }
+}
+Paired.item = 5;
+console.log(Paired.item, Paired.stored);
+const paired = Object.getOwnPropertyDescriptor(Paired, "item");
+console.log(typeof paired.get, typeof paired.set, paired.get.name);
+const Self = class Inner {
+  static self() {
+    return Inner === Self;
+  }
+  static get inner() {
+    return Inner.name;
+  }
+};
+console.log(Self.self(), Self.inner, Self.name);
+`,
+  },
 ];

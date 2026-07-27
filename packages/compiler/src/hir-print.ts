@@ -141,6 +141,7 @@ function printHirExpression(expression: HirExpression): string {
         .map(
           (element) =>
             ", " +
+            (element.staticPlacement === true ? "static " : "") +
             (element.accessorKind == null ? "" : `${element.accessorKind} `) +
             `${printHirExpression(element.key)}: ` +
             printHirExpression(element.value),
