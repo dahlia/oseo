@@ -20,6 +20,9 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.properties = NULL;
     promise->ordinary.property_capacity = 0u;
     promise->ordinary.property_count = 0u;
+    promise->ordinary.private_elements = NULL;
+    promise->ordinary.private_element_capacity = 0u;
+    promise->ordinary.private_element_count = 0u;
     promise->ordinary.shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     promise->ordinary.array_length = 0u;

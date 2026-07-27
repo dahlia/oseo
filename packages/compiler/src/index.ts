@@ -25,6 +25,7 @@ export type { SyntaxCallArgument } from "./syntax.ts";
 export type { SyntaxObjectDefinition } from "./syntax.ts";
 export type { SyntaxObjectSpreadProperty } from "./syntax.ts";
 export type { SyntaxObjectProperty } from "./syntax.ts";
+export type { SyntaxPrivateName } from "./syntax.ts";
 export type { SyntaxClassMethod } from "./syntax.ts";
 export type { SyntaxClassField } from "./syntax.ts";
 export type { SyntaxClassElement } from "./syntax.ts";

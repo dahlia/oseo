@@ -1,7 +1,9 @@
 import type {
   HirBindingPattern,
   HirCallArgument,
+  HirClassElement,
   HirExpression,
+  HirPrivateName,
   HirProgram,
   HirStatement,
 } from "./hir.ts";
@@ -24,6 +26,16 @@ function hintText(hints: readonly Hint[]): string {
 export function numberText(value: number): string {
   if (Object.is(value, -0)) return "-0";
   return String(value);
+}
+
+function printHirPrivateName(privateName: HirPrivateName): string {
+  return `%b${privateName.bindingId} ${privateName.name}`;
+}
+
+function printHirClassElementKey(key: HirClassElement["key"]): string {
+  return key.kind === "private-name"
+    ? printHirPrivateName(key.privateName)
+    : printHirExpression(key);
 }
 
 function printHirCallArgument(argument: HirCallArgument): string {
@@ -144,14 +156,14 @@ function printHirExpression(expression: HirExpression): string {
       expression.elements
         .map((element) =>
           element.kind === "field"
-            ? `, field ${printHirExpression(element.key)}` +
+            ? `, field ${printHirClassElementKey(element.key)}` +
               (element.initializer == null
                 ? ""
                 : ` = ${printHirExpression(element.initializer)}`)
             : ", " +
               (element.staticPlacement === true ? "static " : "") +
               (element.accessorKind == null ? "" : `${element.accessorKind} `) +
-              `${printHirExpression(element.key)}: ` +
+              `${printHirClassElementKey(element.key)}: ` +
               printHirExpression(element.value),
         )
         .join("") +
@@ -186,6 +198,34 @@ function printHirExpression(expression: HirExpression): string {
     const target =
       `update ${printHirExpression(expression.object)}[` +
       `${printHirExpression(expression.key)}]`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
+  }
+  if (expression.kind === "private-get") {
+    return (
+      `private get ${printHirExpression(expression.object)}.` +
+      printHirPrivateName(expression.privateName)
+    );
+  }
+  if (expression.kind === "private-set") {
+    return (
+      `private set ${printHirExpression(expression.object)}.` +
+      `${printHirPrivateName(expression.privateName)} = ` +
+      printHirExpression(expression.value)
+    );
+  }
+  if (expression.kind === "private-update") {
+    return (
+      `private update ${printHirExpression(expression.object)}.` +
+      `${printHirPrivateName(expression.privateName)} ` +
+      `${expression.operator}= ${printHirExpression(expression.value)}`
+    );
+  }
+  if (expression.kind === "private-step") {
+    const target =
+      `private update ${printHirExpression(expression.object)}.` +
+      printHirPrivateName(expression.privateName);
     return expression.prefix
       ? `${expression.operator}${target}`
       : `${target}${expression.operator}`;
@@ -233,8 +273,11 @@ function printHirExpression(expression: HirExpression): string {
               ? printHirExpression(expression.target.callee)
               : expression.target.kind === "super"
                 ? `super -> %b${expression.target.thisBinding.bindingId} this`
-                : `${printHirExpression(expression.target.object)}[` +
-                  `${printHirExpression(expression.target.key)}]`;
+                : expression.target.kind === "private-method"
+                  ? `${printHirExpression(expression.target.object)}.` +
+                    printHirPrivateName(expression.target.privateName)
+                  : `${printHirExpression(expression.target.object)}[` +
+                    `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirCallArgument).join(", ") +

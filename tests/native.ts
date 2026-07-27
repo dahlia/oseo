@@ -223,6 +223,11 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-field-inheritance" ||
     fixture.name === "class-field-scope" ||
     fixture.name === "class-field-super" ||
+    fixture.name === "class-private-fields" ||
+    fixture.name === "class-private-methods" ||
+    fixture.name === "class-private-accessors" ||
+    fixture.name === "class-private-brand-checks" ||
+    fixture.name === "class-private-updates" ||
     fixture.name === "generators" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||

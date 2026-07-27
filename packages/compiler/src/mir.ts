@@ -90,9 +90,9 @@ export interface MirControlTarget {
 /** One inspectable backend-neutral MIR operation. */
 export interface MirOperation {
   /**
-   * Selects the accessor slot for `property-define-accessor` and the
-   * `SetFunctionName` prefix for the accessor closure created by
-   * `function-create`.
+   * Selects the accessor slot for `property-define-accessor` and
+   * `class-private-method-define`, and the `SetFunctionName` prefix for
+   * the accessor closure created by `function-create`.
    */
   readonly accessorKind?: "get" | "set";
   readonly argumentListId?: number;
@@ -124,6 +124,8 @@ export interface MirOperation {
     | "check-status"
     | "class-field-define"
     | "class-heritage"
+    | "class-private-field-define"
+    | "class-private-method-define"
     | "class-prototype"
     | "constant"
     | "caught"
@@ -142,7 +144,7 @@ export interface MirOperation {
     | "guard-smi"
     | "home-object-bind"
     | "initialize"
-    | "instance-fields-init"
+    | "instance-elements-init"
     | "iterator-close"
     | "iterator-delegate-next"
     | "iterator-delegate-return"
@@ -156,6 +158,9 @@ export interface MirOperation {
     | "object-create"
     | "object-rest"
     | "object-spread"
+    | "private-get"
+    | "private-name-create"
+    | "private-set"
     | "property-key"
     | "property-define-accessor"
     | "property-define-data"
@@ -369,7 +374,7 @@ export interface MirBuilder {
    * True while lowering a class constructor whose class declares
    * instance fields, so `super()` initializes them where it returns.
    */
-  readonly initializesInstanceFields: boolean;
+  readonly initializesInstanceElements: boolean;
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;

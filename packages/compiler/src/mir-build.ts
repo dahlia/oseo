@@ -7,11 +7,14 @@ import type {
   HirBindingPattern,
   HirCallArgument,
   HirClassField,
+  HirClassMethod,
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
   HirObjectBindingPattern,
   HirParameter,
+  HirPrivateName,
+  HirPrivateNameKey,
   HirProgram,
   HirSpreadArgument,
   HirStatement,
@@ -1244,7 +1247,7 @@ function lowerReceiver(range: SourceRange, builder: MirBuilder): number {
  * a derived one reaches its own rather than the parent's, which the
  * parent's own constructor already ran.
  */
-function lowerInstanceFieldsInit(
+function lowerInstanceElementsInit(
   instance: number,
   range: SourceRange,
   builder: MirBuilder,
@@ -1262,7 +1265,7 @@ function lowerInstanceFieldsInit(
     arguments: [instance],
     detail: "initialize instance fields",
     id,
-    kind: "instance-fields-init",
+    kind: "instance-elements-init",
     range,
   });
   appendMirMetadata(
@@ -1273,6 +1276,104 @@ function lowerInstanceFieldsInit(
     range,
   );
   recordRoot(builder, id, range);
+}
+
+/**
+ * Reads the private name value one class evaluation created, which is
+ * the identity every element and reference in that body shares. The
+ * binding is an ordinary class-scope cell, so a closure that outlives
+ * the definition keeps the identity it captured and a second evaluation
+ * of the same class produces a name no earlier instance carries.
+ */
+function lowerPrivateName(
+  privateName: HirPrivateName,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  return lowerBindingRead(
+    privateName.bindingId,
+    privateName.name,
+    range,
+    builder,
+  );
+}
+
+/**
+ * PrivateGet: the value the object carries under one private name. A
+ * method element yields its function, an accessor element runs its
+ * getter against the object, and an object whose class never installed
+ * the element reports a `TypeError` rather than `undefined`, because a
+ * private name is not a property key that can be absent.
+ */
+function lowerPrivateRead(
+  object: number,
+  privateNameValue: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "private element lookup",
+    [object, privateNameValue],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, privateNameValue],
+    detail: "private-get",
+    id,
+    kind: "private-get",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+/**
+ * PrivateSet: replaces the value the object carries under one private
+ * name. Only a field element is writable, so a method element and a
+ * getter-only accessor both report a `TypeError`, as does an object
+ * whose class never installed the element.
+ */
+function lowerPrivateWrite(
+  object: number,
+  privateNameValue: number,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "private element assignment",
+    [object, privateNameValue, value],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, privateNameValue, value],
+    detail: "private-set",
+    id,
+    kind: "private-set",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
 }
 
 /**
@@ -1307,6 +1408,11 @@ function lowerFieldInitializerName(
  * A computed key that names an anonymous initializer is also stored in
  * a fresh cell the closure captures, because NamedEvaluation applies
  * where the initializer runs while the key exists only here.
+ *
+ * A private field evaluates no key at all: its name is the value the
+ * class evaluation created, read from its class-scope binding, so the
+ * record it appends is added to the instance rather than defined as a
+ * property.
  */
 function lowerClassField(
   element: HirClassField,
@@ -1314,12 +1420,18 @@ function lowerClassField(
   prototype: number,
   builder: MirBuilder,
 ): void {
-  // A computed element key is class-body code, so it is strict even
-  // when the enclosing function or script is not.
-  const enclosingStrictCode = builder.strictCode;
-  builder.strictCode = true;
-  const key = lowerPropertyKey(element.key, builder);
-  builder.strictCode = enclosingStrictCode;
+  const privateElement = element.key.kind === "private-name";
+  let key: number;
+  if (element.key.kind === "private-name") {
+    key = lowerPrivateName(element.key.privateName, element.range, builder);
+  } else {
+    // A computed element key is class-body code, so it is strict even
+    // when the enclosing function or script is not.
+    const enclosingStrictCode = builder.strictCode;
+    builder.strictCode = true;
+    key = lowerPropertyKey(element.key, builder);
+    builder.strictCode = enclosingStrictCode;
+  }
   if (element.keyNameBindingId != null) {
     resetBinding(element.keyNameBindingId, "field key", element.range, builder);
     const stored = builder.nextValue;
@@ -1344,7 +1456,9 @@ function lowerClassField(
   appendMirMetadata(
     builder,
     "safepoint",
-    "instance field record growth",
+    privateElement
+      ? "private field record growth"
+      : "instance field record growth",
     [constructorValue, key, initializer],
     element.range,
   );
@@ -1352,9 +1466,77 @@ function lowerClassField(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [constructorValue, key, initializer],
-    detail: "record instance field",
+    detail: privateElement
+      ? "record private instance field"
+      : "record instance field",
     id: recorded,
-    kind: "class-field-define",
+    kind: privateElement ? "class-private-field-define" : "class-field-define",
+    range: element.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [recorded],
+    element.range,
+  );
+  recordRoot(builder, recorded, element.range);
+}
+
+/**
+ * Lowers one private method or accessor definition. It defines no
+ * property: the pair of private name and closure is recorded on the
+ * constructor, and every instance the class constructs receives it
+ * before its field initializers run, which is how a method reaches an
+ * instance without being visible on the prototype. A getter and its
+ * setter share one private name, so the runtime merges the two halves
+ * into the accessor element that name reaches.
+ *
+ * The closure still carries the class prototype as its home object, so
+ * `super.x` inside a private method resolves exactly as it does inside
+ * an ordinary one.
+ */
+function lowerClassPrivateMethod(
+  element: HirClassMethod,
+  key: HirPrivateNameKey,
+  constructorValue: number,
+  prototype: number,
+  builder: MirBuilder,
+): void {
+  const privateNameValue = lowerPrivateName(
+    key.privateName,
+    element.range,
+    builder,
+  );
+  const value = lowerExpression(
+    element.value,
+    builder,
+    undefined,
+    element.accessorKind,
+  );
+  lowerHomeObjectBind(value, prototype, element.range, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    element.accessorKind == null
+      ? "private method record growth"
+      : "private accessor record growth",
+    [constructorValue, privateNameValue, value],
+    element.range,
+  );
+  const recorded = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    ...(element.accessorKind == null
+      ? {}
+      : { accessorKind: element.accessorKind }),
+    arguments: [constructorValue, privateNameValue, value],
+    detail:
+      element.accessorKind == null
+        ? "record private method"
+        : `record private ${element.accessorKind} accessor`,
+    id: recorded,
+    kind: "class-private-method-define",
     range: element.range,
   });
   appendMirMetadata(
@@ -1406,6 +1588,47 @@ function lowerClassExpression(
     expression.heritage == null
       ? undefined
       : lowerExpression(expression.heritage, builder);
+  // Every private name the body declares exists before the constructor
+  // closure does, so the closure captures the cells already holding the
+  // identities this evaluation created. A second evaluation of the same
+  // class resets the cells and creates fresh names, which is why an
+  // instance of one evaluation fails the brand check of the other.
+  for (const privateName of expression.privateNames ?? []) {
+    resetBinding(
+      privateName.bindingId,
+      privateName.name,
+      expression.range,
+      builder,
+    );
+    const created = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `private name ${privateName.name}`,
+      id: created,
+      kind: "private-name-create",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [created],
+      expression.range,
+    );
+    recordRoot(builder, created, expression.range);
+    const initialized = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [created],
+      bindingId: privateName.bindingId,
+      detail: `%b${privateName.bindingId} ${privateName.name}`,
+      id: initialized,
+      kind: "initialize",
+      range: expression.range,
+    });
+    recordRoot(builder, initialized, expression.range);
+  }
   const constructorValue = lowerExpression(
     expression.constructorFunction,
     builder,
@@ -1458,6 +1681,16 @@ function lowerClassExpression(
   for (const element of expression.elements) {
     if (element.kind === "field") {
       lowerClassField(element, constructorValue, prototype, builder);
+      continue;
+    }
+    if (element.key.kind === "private-name") {
+      lowerClassPrivateMethod(
+        element,
+        element.key,
+        constructorValue,
+        prototype,
+        builder,
+      );
       continue;
     }
     const staticPlacement = element.staticPlacement === true;
@@ -2384,6 +2617,97 @@ function lowerExpression(
       builder,
     );
   }
+  if (expression.kind === "private-get") {
+    const object = lowerExpression(expression.object, builder);
+    const privateNameValue = lowerPrivateName(
+      expression.privateName,
+      expression.range,
+      builder,
+    );
+    return lowerPrivateRead(
+      object,
+      privateNameValue,
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "private-set") {
+    const object = lowerExpression(expression.object, builder);
+    const privateNameValue = lowerPrivateName(
+      expression.privateName,
+      expression.range,
+      builder,
+    );
+    const value = lowerExpression(expression.value, builder);
+    return lowerPrivateWrite(
+      object,
+      privateNameValue,
+      value,
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "private-update") {
+    const object = lowerExpression(expression.object, builder);
+    // One private name reaches both halves: the name is an identity the
+    // class evaluation fixed, so re-reading its cell could observe
+    // nothing new.
+    const privateNameValue = lowerPrivateName(
+      expression.privateName,
+      expression.range,
+      builder,
+    );
+    const current = lowerPrivateRead(
+      object,
+      privateNameValue,
+      expression.range,
+      builder,
+    );
+    return lowerAssignmentValue(
+      current,
+      expression.operator,
+      expression.value,
+      (value) =>
+        lowerPrivateWrite(
+          object,
+          privateNameValue,
+          value,
+          expression.range,
+          builder,
+        ),
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "private-step") {
+    const object = lowerExpression(expression.object, builder);
+    const privateNameValue = lowerPrivateName(
+      expression.privateName,
+      expression.range,
+      builder,
+    );
+    const current = lowerPrivateRead(
+      object,
+      privateNameValue,
+      expression.range,
+      builder,
+    );
+    return lowerUpdateValue(
+      current,
+      expression.operator,
+      expression.prefix,
+      (value) =>
+        lowerPrivateWrite(
+          object,
+          privateNameValue,
+          value,
+          expression.range,
+          builder,
+        ),
+      expression.range,
+      builder,
+    );
+  }
   if (expression.kind === "promise-construct") {
     const lowered = lowerCallArguments(
       expression.arguments,
@@ -2545,6 +2869,22 @@ function lowerExpression(
     if (expression.target.kind === "dynamic") {
       callee = lowerExpression(expression.target.callee, builder);
       receiver = lowerSyntheticUndefined(expression.range, builder);
+    } else if (expression.target.kind === "private-method") {
+      // PrivateGet already resolves the element the object carries, so
+      // a private method call needs no lookup of its own: it calls that
+      // value with the same object as its receiver.
+      receiver = lowerExpression(expression.target.object, builder);
+      const privateNameValue = lowerPrivateName(
+        expression.target.privateName,
+        expression.range,
+        builder,
+      );
+      callee = lowerPrivateRead(
+        receiver,
+        privateNameValue,
+        expression.range,
+        builder,
+      );
     } else {
       // A `super` method call looks the callee up through the home
       // object's prototype and still calls it with the enclosing
@@ -2723,8 +3063,8 @@ function lowerSuperCall(
   recordRoot(builder, bound, expression.range);
   // SuperCall initializes the derived class's own fields on the receiver
   // the parent produced, after the binding a second `super()` rejects.
-  if (builder.initializesInstanceFields) {
-    lowerInstanceFieldsInit(constructed, expression.range, builder);
+  if (builder.initializesInstanceElements) {
+    lowerInstanceElementsInit(constructed, expression.range, builder);
   }
   return bound;
 }
@@ -4327,7 +4667,7 @@ function buildMirFunction(
   strict: boolean,
   generator = false,
   derivedThisBindingId?: number,
-  initializesInstanceFields = false,
+  initializesInstanceElements = false,
   fieldKeyBindingId?: number,
 ): MirFunction {
   const entry: MutableMirBlock = {
@@ -4344,7 +4684,7 @@ function buildMirFunction(
     loops: [],
     finalizers: [],
     generator,
-    initializesInstanceFields,
+    initializesInstanceElements,
     nextValue: 0,
     pendingLabels: [],
     specialization,
@@ -4353,8 +4693,8 @@ function buildMirFunction(
   // A base constructor initializes its class's fields before its body
   // runs, which is where [[Construct]] performs InitializeInstanceElements
   // for it; a derived one waits for the receiver `super()` produces.
-  if (initializesInstanceFields && derivedThisBindingId == null) {
-    lowerInstanceFieldsInit(lowerReceiver(range, builder), range, builder);
+  if (initializesInstanceElements && derivedThisBindingId == null) {
+    lowerInstanceElementsInit(lowerReceiver(range, builder), range, builder);
   }
   const returned = lowerStatements(body, builder);
   if (!returned) {
@@ -4450,7 +4790,7 @@ export function buildMir(
         functionValue.strict === true,
         functionValue.functionKind === "generator",
         functionValue.derivedThisBindingId,
-        functionValue.initializesInstanceFields === true,
+        functionValue.initializesInstanceElements === true,
         functionValue.fieldKeyBindingId,
       );
       return specialization === "enabled"

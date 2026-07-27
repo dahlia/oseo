@@ -225,6 +225,16 @@ export type HirCallTarget =
       readonly key: HirExpression;
       readonly kind: "method";
       readonly object: HirExpression;
+    }
+  | {
+      /**
+       * A private member call. The callee is the private element the
+       * object carries, and the object stays the receiver, so no
+       * property lookup and no separate receiver expression exist.
+       */
+      readonly kind: "private-method";
+      readonly object: HirExpression;
+      readonly privateName: HirPrivateName;
     };
 
 /** One resolved spread entry retained inside an HIR array literal. */
@@ -264,11 +274,33 @@ export interface HirObjectSpreadProperty extends LocatedSyntax {
 /** One defined or spread HIR object literal property. */
 export type HirObjectProperty = HirObjectDefinition | HirObjectSpreadProperty;
 
+/**
+ * One resolved private name. The binding holds the private name value
+ * the class evaluation created, so every element and reference in the
+ * class body reaches the same identity, and a second evaluation of the
+ * same class creates a distinct one.
+ */
+export interface HirPrivateName {
+  readonly bindingId: number;
+  /** The declared name, including its leading `#`. */
+  readonly name: string;
+}
+
+/**
+ * A private element name standing where a class element key stands. It
+ * is not an expression: it names an element the object carries outside
+ * its properties, so lowering never converts it to a property key.
+ */
+export interface HirPrivateNameKey extends LocatedSyntax {
+  readonly kind: "private-name";
+  readonly privateName: HirPrivateName;
+}
+
 /** One resolved method or accessor definition in an HIR class body. */
 export interface HirClassMethod extends LocatedSyntax {
   /** A get or set accessor; absent for an ordinary method definition. */
   readonly accessorKind?: "get" | "set";
-  readonly key: HirExpression;
+  readonly key: HirExpression | HirPrivateNameKey;
   readonly kind: "method";
   /**
    * True for a `static` element, which is defined on the constructor
@@ -290,7 +322,7 @@ export interface HirClassField extends LocatedSyntax {
    * declared without an initializer, whose value is `undefined`.
    */
   readonly initializer?: HirExpression;
-  readonly key: HirExpression;
+  readonly key: HirExpression | HirPrivateNameKey;
   /**
    * Where the evaluated key is stored for the initializer to read,
    * present only when the initializer is an anonymous definition whose
@@ -469,6 +501,14 @@ export type HirExpression =
        * temporal dead zone.
        */
       readonly nameBinding?: HirClassNameBinding;
+      /**
+       * The private names this class body declares, in declaration
+       * order. The class evaluation creates one value per entry before
+       * any element is defined, so every element and every reference in
+       * the body shares that identity and a second evaluation of the
+       * same class produces names no earlier instance carries.
+       */
+      readonly privateNames?: readonly HirPrivateName[];
     })
   | (LocatedSyntax & {
       readonly kind: "object";
@@ -503,6 +543,37 @@ export type HirExpression =
       readonly object: HirExpression;
       readonly operator: "++" | "--";
       readonly prefix: boolean;
+    })
+  | (LocatedSyntax & {
+      /**
+       * A private member reference. The name is already resolved to the
+       * class body that declared it, so lowering reads the private name
+       * value from its binding and asks the object for that element
+       * instead of looking a property key up along a prototype chain.
+       */
+      readonly kind: "private-get";
+      readonly object: HirExpression;
+      readonly privateName: HirPrivateName;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-set";
+      readonly object: HirExpression;
+      readonly privateName: HirPrivateName;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-update";
+      readonly object: HirExpression;
+      readonly operator: AssignmentOperator;
+      readonly privateName: HirPrivateName;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-step";
+      readonly object: HirExpression;
+      readonly operator: "++" | "--";
+      readonly prefix: boolean;
+      readonly privateName: HirPrivateName;
     })
   | (LocatedSyntax & {
       readonly kind: "number";
@@ -686,7 +757,7 @@ export interface HirFunction extends LocatedSyntax {
    * a base constructor before its body, and a derived one where
    * `super()` returns.
    */
-  readonly initializesInstanceFields?: true;
+  readonly initializesInstanceElements?: true;
   readonly kind: "hir-function";
   readonly localBindingIds: readonly number[];
   readonly name: string;
