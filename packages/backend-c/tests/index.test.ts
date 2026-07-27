@@ -234,6 +234,136 @@ test("emits rooted iterator protocol operations", () => {
   );
 });
 
+test("emits delegating iterator steps and a pass-through suspension", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "delegation.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [
+      {
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                constant: { kind: "undefined" },
+                detail: "sent",
+                id: 0,
+                kind: "constant",
+                range,
+              },
+              {
+                arguments: [1, 2, 0],
+                detail: "delegate next",
+                id: 3,
+                iteratorValueResult: 4,
+                kind: "iterator-delegate-next",
+                range,
+              },
+              {
+                arguments: [1, 0],
+                detail: "delegate return",
+                id: 5,
+                iteratorValueResult: 6,
+                kind: "iterator-delegate-return",
+                range,
+              },
+            ],
+            terminator: {
+              kind: "generator-yield",
+              resume: 1,
+              resultObject: true,
+              returnResume: 2,
+              sent: 7,
+              value: 4,
+            },
+          },
+          { id: 1, operations: [], terminator: { kind: "return", value: 7 } },
+          { id: 2, operations: [], terminator: { kind: "return", value: 6 } },
+        ],
+        functionLength: 0,
+        generator: true,
+        id: 0,
+        kind: "mir-function",
+        localBindingIds: [],
+        name: "delegating",
+        parameterCount: 0,
+        parameters: [],
+        range,
+        rootSlotCount: 8,
+      },
+    ],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "delegating",
+              functionId: 0,
+              functionKind: "generator",
+              functionLength: 0,
+              functionName: "delegating",
+              id: 0,
+              kind: "function-create",
+              range,
+            },
+            {
+              arguments: [],
+              detail: "call delegating",
+              id: 1,
+              kind: "call",
+              range,
+              target: { functionId: 0, kind: "function" },
+            },
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "delegation.ts",
+    specialization: "disabled",
+  });
+  // The sent value is the delegating step's third operand, and both steps
+  // report their result through the shared value slot.
+  assert.ok(
+    emitted.source.includes(
+      "oseo_iterator_delegate_next(context, roots[1], roots[2], " +
+        "roots[0], &roots[4], &iterator_done_3);",
+    ),
+  );
+  assert.ok(emitted.source.includes("bool fast_3 = !iterator_done_3;"));
+  assert.ok(
+    emitted.source.includes(
+      "oseo_iterator_delegate_return(context, roots[1], roots[0], " +
+        "&roots[6], &iterator_done_5);",
+    ),
+  );
+  // A delegating suspension yields the inner iterator's own result object,
+  // so the resumption reports it instead of creating a fresh one.
+  assert.ok(
+    emitted.source.includes(
+      "oseo_generator_suspend(context, generator, 1u, true);",
+    ),
+  );
+});
+
 test("emits dynamic array accumulation operations", () => {
   const range = {
     end: { column: 1, line: 1 },
@@ -661,7 +791,7 @@ test("emits a generator entry and a separately resumable body", () => {
   );
   assert.match(
     emitted.source,
-    /oseo_generator_suspend\(context, generator, 1u\);/u,
+    /oseo_generator_suspend\(context, generator, 1u, false\);/u,
   );
   assert.match(
     emitted.source,

@@ -888,6 +888,224 @@ function lowerUpdateValue(
   return prefix ? assigned : numeric;
 }
 
+/**
+ * `yield* operand`: get the operand's iterator once, then forward every
+ * resumption of the enclosing generator to it.
+ *
+ * A normal resumption steps `next` with the sent value; the first step
+ * sends `undefined`, because the resumption that entered the delegating
+ * expression is not the one it forwards. A step that is not done
+ * suspends with the inner iterator's own result object, which the
+ * delegating generator reports unchanged, so a result that omits `done`
+ * or carries extra properties reaches the outer consumer intact. Only
+ * the step that reports exhaustion reads `value`, and that value is the
+ * delegating expression's own result.
+ *
+ * A return resumption steps the inner iterator's `return` instead. An
+ * inner iterator that has no `return` method, or one whose result is
+ * done, ends the delegation, and the body then leaves through the return
+ * completion so every enclosing `finally` and iterator close still runs.
+ * A result that is not done suspends the same way, so a `return` the
+ * inner iterator refuses does not end the outer generator.
+ *
+ * A throw resumption cannot reach a body in this profile, because
+ * `%GeneratorPrototype%.throw` is not admitted, so no branch reads the
+ * inner iterator's `throw` method.
+ *
+ * No branch closes the inner iterator on an abrupt completion: every step
+ * of the specified delegation loop propagates its own abrupt completion
+ * without an `IteratorClose`, because that completion came from the inner
+ * iterator itself.
+ */
+function lowerYieldDelegation(
+  argument: HirExpression,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const iterable = lowerExpression(argument, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "get delegated iterator",
+    [iterable],
+    range,
+  );
+  const iterator = builder.nextValue;
+  builder.nextValue += 1;
+  const nextMethod = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterable],
+    detail: "GetIterator sync",
+    id: iterator,
+    iteratorNextMethodResult: nextMethod,
+    kind: "iterator-get",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> step, abrupt -> return without close",
+    [iterator],
+    range,
+  );
+  recordRoot(builder, iterator, range);
+  recordRoot(builder, nextMethod, range);
+
+  const stepBlock = createMirBlock(builder);
+  const stepYieldBlock = createMirBlock(builder);
+  const suspendBlock = createMirBlock(builder);
+  const resumeBlock = createMirBlock(builder);
+  const returnResumeBlock = createMirBlock(builder);
+  const returnStepBlock = createMirBlock(builder);
+  const returnYieldBlock = createMirBlock(builder);
+  const returnExitBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  // A `branch` carries no argument list, so each side of a step reaches
+  // the shared suspension through a jump that passes the yielded value.
+  const received = builder.nextValue;
+  builder.nextValue += 1;
+  stepBlock.parameters = [received];
+  const returnReceived = builder.nextValue;
+  builder.nextValue += 1;
+  returnStepBlock.parameters = [returnReceived];
+  const yielded = builder.nextValue;
+  builder.nextValue += 1;
+  suspendBlock.parameters = [yielded];
+
+  const start = lowerSyntheticUndefined(range, builder);
+  builder.current.terminator = {
+    kind: "jump",
+    target: stepBlock.id,
+    values: [start],
+  };
+
+  builder.current = stepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "step delegated iterator",
+    [iterator, nextMethod, received],
+    range,
+  );
+  const continues = builder.nextValue;
+  builder.nextValue += 1;
+  /* One slot carries both roles a delegating step reports: the inner
+   * result object while the delegation continues, and `IteratorValue`
+   * once the inner iterator is done. */
+  const stepResult = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator, nextMethod, received],
+    detail: "IteratorNext, IteratorComplete, and IteratorValue",
+    id: continues,
+    iteratorValueResult: stepResult,
+    kind: "iterator-delegate-next",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> return without close",
+    [continues],
+    range,
+  );
+  recordRoot(builder, stepResult, range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: continues,
+    whenFalse: exitBlock.id,
+    whenTrue: stepYieldBlock.id,
+  };
+
+  builder.current = stepYieldBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: suspendBlock.id,
+    values: [stepResult],
+  };
+
+  builder.current = suspendBlock;
+  const sent = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.terminator = {
+    kind: "generator-yield",
+    resume: resumeBlock.id,
+    resultObject: true,
+    returnResume: returnResumeBlock.id,
+    sent,
+    value: yielded,
+  };
+
+  builder.current = resumeBlock;
+  recordRoot(builder, sent, range);
+  builder.current.terminator = {
+    kind: "jump",
+    target: stepBlock.id,
+    values: [sent],
+  };
+
+  builder.current = returnResumeBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: returnStepBlock.id,
+    values: [sent],
+  };
+
+  builder.current = returnStepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "close delegated iterator",
+    [iterator, returnReceived],
+    range,
+  );
+  const returnContinues = builder.nextValue;
+  builder.nextValue += 1;
+  const returnStepResult = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator, returnReceived],
+    detail: "GetMethod return, IteratorComplete, and IteratorValue",
+    id: returnContinues,
+    iteratorValueResult: returnStepResult,
+    kind: "iterator-delegate-return",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> return without close",
+    [returnContinues],
+    range,
+  );
+  recordRoot(builder, returnStepResult, range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: returnContinues,
+    whenFalse: returnExitBlock.id,
+    whenTrue: returnYieldBlock.id,
+  };
+
+  builder.current = returnYieldBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: suspendBlock.id,
+    values: [returnStepResult],
+  };
+
+  /* The finalizer chain is captured while lowering the delegation,
+   * because the builder's finalizer stack only describes this point. */
+  builder.current = returnExitBlock;
+  if (!enterFinalizer(builder, "return", range, returnStepResult)) {
+    builder.current.terminator = { kind: "return", value: returnStepResult };
+  }
+
+  builder.current = exitBlock;
+  appendMirMetadata(builder, "join", `yield* bb${stepBlock.id}`, [], range);
+  return recordRoot(builder, stepResult, range);
+}
+
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
@@ -1125,6 +1343,16 @@ function lowerExpression(
     if (!builder.generator) {
       throw new Error(
         "HIR yield reached a function that is not a generator body.",
+      );
+    }
+    if (expression.delegate === true) {
+      if (expression.argument == null) {
+        throw new Error("HIR yield* reached MIR without an operand.");
+      }
+      return lowerYieldDelegation(
+        expression.argument,
+        expression.range,
+        builder,
       );
     }
     const value =

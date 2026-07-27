@@ -131,6 +131,8 @@ export interface MirOperation {
     | "guard-smi"
     | "initialize"
     | "iterator-close"
+    | "iterator-delegate-next"
+    | "iterator-delegate-return"
     | "iterator-get"
     | "iterator-next"
     | "join"
@@ -172,6 +174,12 @@ export interface MirOperation {
   readonly hint?: MirHint;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
+  /**
+   * The slot receiving the stepped value. `iterator-next` leaves it
+   * `undefined` once the iterator reports exhaustion, while the two
+   * delegation operations always store `IteratorValue`, because `yield*`
+   * reports the final value as the delegating expression's result.
+   */
   readonly iteratorValueResult?: number;
   readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
@@ -210,6 +218,13 @@ export type MirTerminator =
        */
       readonly kind: "generator-yield";
       readonly resume: number;
+      /**
+       * True when `value` already is a complete iterator result object
+       * that the resumption reports unchanged. `yield*` suspends this
+       * way, because `GeneratorYield` receives the inner iterator's own
+       * result object rather than a freshly created one.
+       */
+      readonly resultObject?: true;
       readonly returnResume: number;
       readonly sent: number;
       readonly value: number;

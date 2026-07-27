@@ -224,19 +224,22 @@ export function expression(
       : { ...located, argument, kind: "await" };
   }
   if (value.type === "YieldExpression") {
-    if (value.delegate === true) {
-      return unsupported(
-        context,
-        value,
-        "The yield* delegation expression is unsupported.",
-      );
-    }
+    const delegate = value.delegate === true;
     const argumentNode = node(value.argument);
-    if (argumentNode == null) return { ...located, kind: "yield" };
+    if (argumentNode == null) {
+      // `yield*` requires an operand, so a delegating node without one
+      // could only come from a malformed tree.
+      if (delegate) return unsupported(context, value);
+      return { ...located, kind: "yield" };
+    }
     const argument = expression(context, argumentNode);
-    return argument == null
-      ? undefined
-      : { ...located, argument, kind: "yield" };
+    if (argument == null) return undefined;
+    return {
+      ...located,
+      argument,
+      ...(delegate ? { delegate: true as const } : {}),
+      kind: "yield",
+    };
   }
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };

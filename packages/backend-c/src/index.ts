@@ -475,6 +475,35 @@ function emitIteratorOperation(
     line(state, `roots[${operation.id}] = result.value;`);
     return;
   }
+  if (
+    operation.kind === "iterator-delegate-next" ||
+    operation.kind === "iterator-delegate-return"
+  ) {
+    // A delegating step reports the inner iterator's value even when the
+    // result is done, because `yield*` reports that value as its own.
+    const delegatingNext = operation.kind === "iterator-delegate-next";
+    const value = operation.iteratorValueResult;
+    if (value == null) {
+      throw new Error(`MIR iterator delegation %${operation.id} has no value.`);
+    }
+    state.scalarKinds.set(operation.id, "boolean");
+    const done = `iterator_done_${operation.id}`;
+    const inner = delegatingNext
+      ? `roots[${operationArgument(operation, 1)}], ` +
+        `roots[${operationArgument(operation, 2)}]`
+      : `roots[${operationArgument(operation, 1)}]`;
+    line(state, `bool ${done} = true;`);
+    line(
+      state,
+      `result = oseo_iterator_delegate_` +
+        `${delegatingNext ? "next" : "return"}(context, ` +
+        `roots[${operationArgument(operation, 0)}], ${inner}, ` +
+        `&roots[${value}], &${done});`,
+    );
+    line(state, `bool fast_${operation.id} = !${done};`);
+    line(state, `(void)fast_${operation.id};`);
+    return;
+  }
   if (operation.kind === "iterator-next") {
     const iterator = operationArgument(operation, 0);
     const nextMethod = operationArgument(operation, 1);
@@ -1147,6 +1176,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (
     operation.kind === "iterator-get" ||
     operation.kind === "iterator-next" ||
+    operation.kind === "iterator-delegate-next" ||
+    operation.kind === "iterator-delegate-return" ||
     operation.kind === "iterator-close"
   ) {
     emitIteratorOperation(state, operation);
@@ -1243,9 +1274,13 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   if (terminator.kind === "return") {
     emitNormalReturn(state, `roots[${terminator.value}]`);
   } else if (terminator.kind === "generator-yield") {
+    // `yield*` suspends with the inner iterator's own result object, so
+    // the resumption reports it instead of creating a fresh one.
+    const resultObject = terminator.resultObject === true ? "true" : "false";
     line(
       state,
-      `oseo_generator_suspend(context, generator, ${terminator.resume}u);`,
+      `oseo_generator_suspend(context, generator, ${terminator.resume}u, ` +
+        `${resultObject});`,
     );
     line(
       state,

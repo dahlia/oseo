@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { compileSource, printMir } from "@oseo/compiler";
+import { compileSource, printHir, printMir } from "@oseo/compiler";
 
 import { babelFrontend } from "../src/index.ts";
 
@@ -122,9 +122,78 @@ test("keeps a bare yield's implicit undefined operand", () => {
   assert.deepEqual(operand?.constant, { kind: "undefined" });
 });
 
+test("delegates a yield* suspension to the operand's iterator", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function* outer() { yield* [1]; }\nouter();",
+    sourceId: "yield-star.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const generator = result.mir.functions.find(
+    (functionValue) => functionValue.generator === true,
+  );
+  assert.ok(generator != null);
+  const operations = generator.blocks.flatMap((block) => block.operations);
+  const kinds = new Set(operations.map((operation) => operation.kind));
+  assert.ok(kinds.has("iterator-get"));
+  assert.ok(kinds.has("iterator-delegate-next"));
+  // A return resumption reaches the inner iterator before the delegating
+  // body leaves, so the delegation owns a `return` step of its own.
+  assert.ok(kinds.has("iterator-delegate-return"));
+  assert.ok(!kinds.has("iterator-close"));
+  const suspension = generator.blocks.find(
+    (block) => block.terminator.kind === "generator-yield",
+  );
+  assert.ok(suspension?.terminator.kind === "generator-yield");
+  // The inner iterator's own result object is what the delegating
+  // generator reports, so the suspension yields it unchanged.
+  assert.equal(suspension.terminator.resultObject, true);
+  assert.deepEqual(suspension.parameters, [suspension.terminator.value]);
+  const step = operations.find(
+    (operation) => operation.kind === "iterator-delegate-next",
+  );
+  assert.equal(step?.arguments.length, 3);
+  assert.ok(step?.iteratorValueResult != null);
+  assert.match(printMir(result.mir), /iterator-delegate-next/u);
+  assert.match(printMir(result.mir), /iterator-delegate-return/u);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /yield\* \[1\]/u);
+});
+
+test("resumes a yield* delegation at the matching step", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function* outer() { yield* [1]; }\nouter();",
+    sourceId: "yield-star-resume.js",
+  });
+  assert.ok(result.mir != null);
+  const generator = result.mir.functions.find(
+    (functionValue) => functionValue.generator === true,
+  );
+  assert.ok(generator != null);
+  const suspension = generator.blocks.find(
+    (block) => block.terminator.kind === "generator-yield",
+  );
+  assert.ok(suspension?.terminator.kind === "generator-yield");
+  const { resume, returnResume } = suspension.terminator;
+  const blocks = new Map(generator.blocks.map((block) => [block.id, block]));
+  const targetOf = (id: number): number | undefined => {
+    const terminator = blocks.get(id)?.terminator;
+    return terminator?.kind === "jump" ? terminator.target : undefined;
+  };
+  const nextStep = targetOf(resume);
+  const returnStep = targetOf(returnResume);
+  assert.ok(nextStep != null && returnStep != null);
+  assert.notEqual(nextStep, returnStep);
+  // A normal resumption steps `next` again; a return resumption steps the
+  // inner iterator's `return` instead of leaving the body directly.
+  const stepKinds = (id: number): readonly string[] =>
+    (blocks.get(id)?.operations ?? []).map((operation) => operation.kind);
+  assert.ok(stepKinds(nextStep).includes("iterator-delegate-next"));
+  assert.ok(stepKinds(returnStep).includes("iterator-delegate-return"));
+});
+
 test("rejects generator forms outside the admitted unit", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["function* delegate() { yield* [1]; }", /yield\* delegation/u],
     ["async function* both() { yield 1; }", /Asynchronous and method/u],
     ["const holder = { *method() { yield 1; } };", /Asynchronous and method/u],
     [

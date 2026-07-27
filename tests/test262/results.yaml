@@ -481,6 +481,597 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/GeneratorFunction/extensibility.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/extensibility.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/extensibility.js:81:2\
+        5: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/has-instance.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/has-instance.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/has-instance.js:80:25:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-construct-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-construct-throws.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-construct-th\
+        rows.js:93:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-length.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-length.js:15\
+        1:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-name.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-name.js:144:\
+        25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-prototype.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-prototype.js\
+        :147:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-restricted-properties.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-restricted-propertie\
+        s.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-restricted-p\
+        roperties.js:81:17: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/instance-yield-expr-in-param.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/instance-yield-expr-in-param.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/instance-yield-expr-i\
+        n-param.js:88:25: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/invoked-as-constructor-no-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/invoked-as-constructor-no-arg\
+        uments.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/invoked-as-constructo\
+        r-no-arguments.js:80:25: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/invoked-as-function-multiple-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/invoked-as-function-multiple-\
+        arguments.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/invoked-as-function-m\
+        ultiple-arguments.js:82:25: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/invoked-as-function-no-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/invoked-as-function-no-argume\
+        nts.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/invoked-as-function-n\
+        o-arguments.js:80:25: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/invoked-as-function-single-ar\
+        gument.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/invoked-as-function-s\
+        ingle-argument.js:81:25: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+      flags: []
+      includes:
+        - isConstructor.js
+        - wellKnownIntrinsicObjects.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/is-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - Reflect.construct
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/length.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/length.js:136:25:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/name.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/name.js:146:25:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - cross-realm
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+      - Reflect
+  - case:
+      async: false
+      features:
+        - generators
+        - cross-realm
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/proto-from-ctor-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+      - Reflect
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.toStringTag
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/Symbol.toStringTag.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/Symbol.toStringTag.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/Symbol.toSt\
+        ringTag.js:142:34: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/constructor.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/constructor\
+        .js:141:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/extensibility.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/extensibility.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/extensibili\
+        ty.js:81:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/not-callable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/not-callable.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/not-callabl\
+        e.js:89:34: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/prop-desc.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/prop-desc.j\
+        s:137:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/GeneratorFunction/prototype/prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - generators
+    observation:
+      detail: "test/built-ins/GeneratorFunction/prototype/prototype.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/GeneratorFunction/prototype/prototype.j\
+        s:139:34: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/GeneratorPrototype/next/consecutive-yields.js
       strictness:
         - non-strict
@@ -19930,6 +20521,848 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-array.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-in-iteration-stmt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - generators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-in-rltn-expr.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - generators
+      - iterator-protocol
+    observation:
+      detail: "test/language/expressions/yield/star-in-rltn-expr.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/yield/star-in-rltn-expr.js:8\
+        7:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-iterable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-return-is-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-get-call-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-get-call-non-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-get-get-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-next-call-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-next-call-non-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-next-get-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-next-invoke.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - generators
+      - iterator-protocol
+    observation:
+      detail: "test/language/expressions/yield/star-rhs-iter-nrml-next-invoke\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/yield/star-rhs-iter-nrml-nex\
+        t-invoke.js:102:12: error[OSEO1001]: Unknown binding
+        'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-res-done-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-res-done-no-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-res-value-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-nrml-res-value-final.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-no-rtrn.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-res-done-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-res-done-no-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-res-value-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-res-value-final.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-call-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-call-non-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-get-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - generators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - generators
+      - iterator-protocol
+    observation:
+      detail: "test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/yield/star-rhs-iter-rtrn-rtr\
+        n-invoke.js:106:12: error[OSEO1001]: Unknown binding
+        'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-rhs-unresolvable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - generators
+      - iterator-protocol
+    observation:
+      detail: "test/language/expressions/yield/star-rhs-unresolvable.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/yield/star-rhs-unresolvable.\
+        js:87:13: error[OSEO1001]: Unknown binding
+        'test262unresolvable'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -34254,11 +35687,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 318
+  expectedNegatives: 319
   harnessFailures: 0
-  passes: 715
+  passes: 736
   semanticFailures: 0
-  unsupportedProfileFeatures: 113
+  unsupportedProfileFeatures: 140
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -34295,7 +35728,7 @@ summary:
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 26
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
@@ -34315,17 +35748,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: generators
-      expectedNegatives: 49
+      expectedNegatives: 50
       harnessFailures: 0
-      passes: 76
+      passes: 97
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 29
     - dependency: iterator-protocol
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 143
+      passes: 164
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 4
     - dependency: lexical-bindings
       expectedNegatives: 12
       harnessFailures: 0
@@ -34387,6 +35820,12 @@ summary:
       passes: 15
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/GeneratorFunction
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 23
     - group: built-ins/GeneratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -34418,11 +35857,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 93
+      expectedNegatives: 94
       harnessFailures: 0
-      passes: 422
+      passes: 443
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 19
     - group: language/module-code
       expectedNegatives: 151
       harnessFailures: 0

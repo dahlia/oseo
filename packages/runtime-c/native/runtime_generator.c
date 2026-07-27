@@ -105,6 +105,7 @@ OseoResult oseo_generator_create(
     state->resume_point = 0u;
     state->resume_kind = OSEO_GENERATOR_RESUME_NEXT;
     state->state = OSEO_GENERATOR_SUSPENDED_START;
+    state->yielded_result_object = false;
     for (size_t index = 0u; index < slot_count; index += 1u) {
         state->slots[index] = oseo_undefined();
     }
@@ -147,12 +148,14 @@ size_t oseo_generator_resume_kind(OseoValue generator) {
 void oseo_generator_suspend(
     OseoContext *context,
     OseoValue generator,
-    size_t resume_point
+    size_t resume_point,
+    bool result_object
 ) {
     (void)context;
     OseoGenerator *state = generator_state(generator);
     state->resume_point = resume_point;
     state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
+    state->yielded_result_object = result_object;
 }
 
 /*
@@ -264,7 +267,16 @@ static OseoResult generator_resume(
         return result;
     }
     bool done = state->state != OSEO_GENERATOR_SUSPENDED_YIELD;
-    if (done) generator_complete(frame.slots[0]);
+    if (done) {
+        generator_complete(frame.slots[0]);
+    } else if (state->yielded_result_object) {
+        /* GeneratorYield receives an already-built iterator result
+         * object from `yield*`, so it reaches the resuming consumer
+         * unchanged, including a result that omits `done`. */
+        OseoValue yielded = frame.slots[1];
+        oseo_roots_release(context, &frame);
+        return normal(yielded);
+    }
     result = oseo_internal_iterator_result(context, frame.slots[1], done);
     oseo_roots_release(context, &frame);
     return result;

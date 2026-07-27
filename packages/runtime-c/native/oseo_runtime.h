@@ -391,12 +391,15 @@ size_t oseo_generator_resume_kind(OseoValue generator);
 /*
  * Records the block that the next resumption continues at and marks the
  * generator suspended. Generated code calls this immediately before
- * leaving a body with a yielded value.
+ * leaving a body with a yielded value. `result_object` is true when that
+ * value already is a complete iterator result object, as it is for
+ * `yield*`, which forwards the inner iterator's own result unchanged.
  */
 void oseo_generator_suspend(
     OseoContext *context,
     OseoValue generator,
-    size_t resume_point
+    size_t resume_point,
+    bool result_object
 );
 /*
  * %GeneratorPrototype%.next: resumes a suspended generator with `sent`
@@ -591,6 +594,35 @@ OseoResult oseo_iterator_close(
     OseoContext *context,
     OseoValue iterator,
     bool from_error
+);
+/*
+ * One `yield*` delegation step over a normal resumption: call the
+ * iterator record's captured next method with `sent`, then read `done`
+ * and `value` from the result. Unlike oseo_iterator_next, `value`
+ * receives IteratorValue even when the result is done, because the
+ * delegating expression reports that value as its own.
+ */
+OseoResult oseo_iterator_delegate_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+);
+/*
+ * One `yield*` delegation step over a return resumption: read the
+ * iterator's `return` method and, when it exists, call it with `sent`
+ * and report the result's `done` and `value`. An iterator with no
+ * `return` method reports done with `sent` itself, which is the return
+ * completion the delegating body then leaves through.
+ */
+OseoResult oseo_iterator_delegate_return(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
 );
 OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_symbol_intrinsic(OseoContext *context);

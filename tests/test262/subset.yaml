@@ -65,6 +65,75 @@ tests:
   - path: test/built-ins/Error/prototype/toString/name.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
+  - path: test/built-ins/GeneratorFunction/extensibility.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/has-instance.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-construct-throws.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-restricted-properties.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/instance-yield-expr-in-param.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/invoked-as-constructor-no-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/invoked-as-function-multiple-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/invoked-as-function-no-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/is-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/length.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/Symbol.toStringTag.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/extensibility.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/not-callable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
+  - path: test/built-ins/GeneratorFunction/prototype/prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, generators]
   - path: test/built-ins/GeneratorPrototype/next/consecutive-yields.js
     expectedClassification: pass
     dependencies: [generators]
@@ -1999,6 +2068,84 @@ tests:
   - path: test/language/expressions/void/S11.4.2_A2_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/yield/star-array.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-in-iteration-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [generators]
+  - path: test/language/expressions/yield/star-in-rltn-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-iterable.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-return-is-null.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-get-call-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-get-call-non-obj.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-get-get-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-next-call-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-next-call-non-obj.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-next-get-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-next-invoke.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-res-done-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-res-done-no-value.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-res-value-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-nrml-res-value-final.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-no-rtrn.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-res-done-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-res-done-no-value.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-res-value-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-res-value-final.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-call-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-call-non-obj.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-get-err.js
+    expectedClassification: pass
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators, iterator-protocol]
+  - path: test/language/expressions/yield/star-rhs-unresolvable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators, iterator-protocol]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]

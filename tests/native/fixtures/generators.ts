@@ -447,4 +447,236 @@ console.log(methods.return === cleansUp().return);
 console.log("next" in methods, "return" in methods, "missing" in methods);
 `,
   },
+  {
+    // `yield*` forwards every resumption to the operand's iterator, so the
+    // fixture observes both directions: what the delegating generator
+    // reports outward and what each resumption delivers inward.
+    name: "generator-delegation",
+    source: `
+function* inner() {
+  const first = yield "inner-a";
+  const second = yield "inner-b:" + first;
+  return "inner-return:" + second;
+}
+
+function* delegates() {
+  const finished = yield* inner();
+  yield "after:" + finished;
+  return "outer-return";
+}
+const delegating = delegates();
+console.log(delegating.next("ignored").value);
+console.log(delegating.next("one").value);
+console.log(delegating.next("two").value);
+const delegatingEnd = delegating.next();
+console.log(delegatingEnd.value, delegatingEnd.done);
+
+function* delegatesToArray() {
+  const finished = yield* [1, 2, 3];
+  yield "array-result:" + finished;
+}
+let arrayText = "";
+for (const value of delegatesToArray()) arrayText += value + ";";
+console.log(arrayText);
+
+function* leaf() {
+  yield "leaf-a";
+  yield "leaf-b";
+  return "leaf-end";
+}
+function* middle() {
+  const inherited = yield* leaf();
+  yield "middle:" + inherited;
+  return "middle-end";
+}
+function* outermost() {
+  const inherited = yield* middle();
+  yield "outermost:" + inherited;
+}
+let nestedText = "";
+for (const value of outermost()) nestedText += value + ";";
+console.log(nestedText);
+
+function* delegatesInLoop() {
+  for (let index = 0; index < 2; index = index + 1) {
+    yield* [index, index + 10];
+  }
+}
+let loopText = "";
+for (const value of delegatesInLoop()) loopText += value + ";";
+console.log(loopText);
+
+// GeneratorYield forwards the inner iterator's own result object, so a
+// result that omits \`done\` or carries extra properties reaches the
+// resuming consumer unchanged.
+const passThrough = {};
+let passThroughIndex = 0;
+const passThroughResults = [
+  { value: "p0", extra: "kept" },
+  { value: "p1" },
+  { value: "p2", done: true },
+];
+passThrough[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      const result = passThroughResults[passThroughIndex];
+      passThroughIndex = passThroughIndex + 1;
+      return result;
+    },
+  };
+};
+function* forwardsResults() {
+  const finished = yield* passThrough;
+  yield "final:" + finished;
+}
+const forwarding = forwardsResults();
+const forwardedFirst = forwarding.next();
+console.log(forwardedFirst.value, forwardedFirst.done, forwardedFirst.extra);
+const forwardedSecond = forwarding.next();
+console.log(forwardedSecond.value, forwardedSecond.done);
+console.log(forwarding.next().value);
+
+// A return resumption reaches the inner iterator first, so its cleanup
+// runs before any enclosing \`finally\` of the delegating body.
+function* cleansUp() {
+  try {
+    yield "clean-a";
+    yield "clean-b";
+  } finally {
+    console.log("inner finally");
+  }
+}
+function* delegatesCleanUp() {
+  try {
+    yield* cleansUp();
+    console.log("unreached");
+  } finally {
+    console.log("outer finally");
+  }
+}
+const closing = delegatesCleanUp();
+console.log(closing.next().value);
+const closed = closing.return("stopped");
+console.log(closed.value, closed.done);
+console.log(closing.next().done);
+
+// An implicit IteratorClose reaches the delegated iterator the same way.
+let brokenText = "";
+for (const value of delegatesCleanUp()) {
+  brokenText += value + ";";
+  break;
+}
+console.log(brokenText);
+
+const withoutReturn = {};
+withoutReturn[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      return { value: "endless", done: false };
+    },
+  };
+};
+function* delegatesWithoutReturn() {
+  try {
+    yield* withoutReturn;
+  } finally {
+    console.log("without-return finally");
+  }
+}
+const unreturnable = delegatesWithoutReturn();
+console.log(unreturnable.next().value);
+const unreturned = unreturnable.return("requested");
+console.log(unreturned.value, unreturned.done);
+
+// An inner iterator whose \`return\` reports a result that is not done
+// keeps the delegation alive, so the outer generator stays suspended.
+const refusesReturn = {};
+refusesReturn[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      return { value: "next", done: false };
+    },
+    return: function (value) {
+      return { value: "refused:" + value, done: false };
+    },
+  };
+};
+function* delegatesRefusedReturn() {
+  yield* refusesReturn;
+}
+const refusing = delegatesRefusedReturn();
+console.log(refusing.next().value);
+const refused = refusing.return("first");
+console.log(refused.value, refused.done);
+console.log(refusing.next().value);
+
+// GetIterator runs before the first suspension, and every abrupt
+// completion the inner iterator reports propagates without closing it.
+function* delegatesToNonIterable() {
+  yield* 1;
+}
+try {
+  delegatesToNonIterable().next();
+} catch (error) {
+  console.log("not iterable", error instanceof TypeError);
+}
+
+const throwsOnNext = {};
+throwsOnNext[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      throw new RangeError("inner next");
+    },
+    return: function () {
+      console.log("unreached inner return");
+      return { done: true };
+    },
+  };
+};
+function* catchesInnerThrow() {
+  try {
+    yield* throwsOnNext;
+  } catch (error) {
+    yield "caught:" + (error instanceof RangeError);
+  }
+}
+console.log(catchesInnerThrow().next().value);
+
+const nonObjectResult = {};
+nonObjectResult[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      return "not an object";
+    },
+  };
+};
+function* delegatesToNonObjectResult() {
+  yield* nonObjectResult;
+}
+try {
+  delegatesToNonObjectResult().next();
+} catch (error) {
+  console.log("result not object", error instanceof TypeError);
+}
+
+// The delegating frame lives in the generator record, so an allocating
+// inner iterator can grow the heap across every delegated suspension.
+function* growsWhileDelegating(depth) {
+  let accumulated = {};
+  for (let index = 0; index < depth; index = index + 1) {
+    accumulated = { ...accumulated, ["delegated" + index]: index };
+    yield* [Object.keys(accumulated).length];
+  }
+  return accumulated.delegated0;
+}
+const growing = growsWhileDelegating(4);
+let grownText = "";
+let grownStep = growing.next();
+while (!grownStep.done) {
+  grownText += grownStep.value + ";";
+  grownStep = growing.next();
+}
+console.log(grownText, grownStep.value);
+`,
+  },
 ];
