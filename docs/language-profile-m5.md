@@ -815,7 +815,7 @@ its deliberate boundary and its evidence:
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
-    boundaries: static members, class fields,
+    boundaries: class fields,
     private names, static initialization blocks, `extends`, `super`, and
     `export default class` are rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
@@ -870,7 +870,7 @@ its deliberate boundary and its evidence:
     literal, computed, and symbol keys alike. A getter's parameter list must
     be empty and a setter's must be exactly one non-rest parameter; the
     frontend reports the violation, a literal-keyed accessor named
-    `constructor`, and a static or private accessor with a source-located
+    `constructor`, and a private accessor with a source-located
     diagnostic, while a computed key that evaluates to `"constructor"`
     defines an ordinary prototype accessor. Native
     differential fixtures cover a getter, a setter, a getter and setter
@@ -895,11 +895,66 @@ its deliberate boundary and its evidence:
     the class-scope name binding observed from a getter and a setter. One
     new expected negative records the early error for a getter that
     declares a parameter, and
-    sixteen deliberately unsupported cases record the static accessor
-    boundary and the unresolvable computed key that this profile rejects
-    before execution. The two `grammar-special-prototype-accessor-meth`
+    sixteen cases recorded the static accessor boundary and the
+    unresolvable computed key that this profile rejects before execution;
+    the static unit below promotes the static accessor cases and keeps the
+    unresolvable computed key unsupported. The
+    two `grammar-special-prototype-accessor-meth`
     cases stay out of the reviewed subset until
     `Object.prototype.hasOwnProperty` exists.
+ -  Class static methods and accessors on the constructor. A `static` element
+    carries a placement flag through the owned syntax tree and HIR, and MIR
+    lowering targets the constructor value instead of the prototype object
+    with the same `property-define-method` and `property-define-accessor`
+    operations prototype elements use. Static and prototype elements share
+    one source-ordered loop, because ClassDefinitionEvaluation defines every
+    element in source order and only chooses a different target for each, so
+    a computed static key and a computed prototype key interleave by
+    position. A static element therefore reuses the whole prototype-element
+    contract: the non-constructible method function kind, so it has no own
+    `prototype` property and `new` on it throws a `TypeError`; the `get ` and
+    `set ` runtime name prefixes; name inference over identifier, string
+    literal, numeric literal, computed, and symbol keys; and writable,
+    non-enumerable, configurable placement, so `Object.keys` on the
+    constructor is empty. Dynamic `this` inside a static method is the class
+    when the method is called through it, and stays `undefined` through a
+    detached reference because a class body is strict. Because a static
+    element defines an own property of the constructor, it replaces the
+    `name` or `length` the class itself installed, while a computed
+    `"prototype"` key throws a `TypeError` against the non-writable,
+    non-configurable `prototype` property. A literal `constructor` key is
+    admitted on a static element and leaves `prototype.constructor`
+    untouched, unlike the prototype element the grammar rejects. Deliberate
+    boundaries: static fields, static initialization blocks, and private
+    static members are rejected with the class element diagnostic. Native
+    differential fixtures retain a static method, a static getter and setter
+    pair, static `this` through the class and through a detached reference,
+    the static method and accessor descriptors and their attributes, static
+    `name` and `length` for methods and both accessor halves, static
+    non-constructibility, an instance that does not inherit a static member,
+    one class defining the same name statically and on the prototype, a
+    static member on an anonymous class expression, interleaved computed
+    static and prototype key evaluation order, numeric, string literal,
+    symbol, and computed static keys, a static element that replaces `name`
+    and `length`, the computed `"prototype"` rejection, a static
+    `"constructor"` key, last-definition-wins across a static method and
+    accessor under one key, a static accessor round trip, and the class-scope
+    name binding read from a static method and getter. The generated class
+    property suite now places each drawn element on the prototype or on the
+    constructor and reads it through the matching owner. Eighty-two reviewed
+    test262 cases newly pass, covering the `accessor-name-static` and
+    `method-static` families in both class forms, static setter and method
+    parameter-body variable scope, static method `length` under a default
+    parameter, the computed `"prototype"` `TypeError`, and the eight
+    previously unsupported prototype accessor descriptor and `name` cases
+    whose classes also define static accessors. Fifteen new expected
+    negatives cover static method parameter `yield` and the static class name
+    identifier early errors, and six new unsupported cases record the
+    unresolvable computed accessor key, the static field element name, and
+    the generator methods the `fn-name` and `fn-length` static precedence
+    cases require. The reviewed manifest moves to 950 passes, 379 expected
+    negatives, and 156 unsupported profile features with no semantic or
+    harness failures.
 
 
 Known gaps inside the claim
@@ -914,10 +969,9 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Class static members, class fields, private names, static initialization
-    blocks, `extends`, `super`, and `export default class` are outside the
-    admitted class subset. Owner: the functions and executable syntax
-    stream.
+ -  Class fields, private names, static initialization blocks, `extends`,
+    `super`, and `export default class` are outside the admitted class
+    subset. Owner: the functions and executable syntax stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

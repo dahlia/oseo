@@ -1079,6 +1079,50 @@ test("rejects accessor definitions with an unusable parameter list", () => {
   }
 });
 
+test("targets the constructor for static class elements", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Registry {
+  static create() {
+    return new Registry();
+  }
+  static get total() {
+    return 0;
+  }
+  static set total(value) {}
+  read() {
+    return 1;
+  }
+}
+console.log(Registry.create(), Registry.total, Registry.prototype.read);`,
+    sourceId: "class-static.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /static "create": function @f\d+ create/u);
+  assert.match(hir, /static get "total": function @f\d+ total/u);
+  assert.match(hir, /static set "total": function @f\d+ total/u);
+  assert.match(hir, /, "read": function @f\d+ read/u);
+  const mir = printMir(result.mir);
+  assert.match(
+    mir,
+    /property-define-method define non-enumerable static method/u,
+  );
+  assert.match(
+    mir,
+    /property-define-accessor define non-enumerable static get accessor/u,
+  );
+  assert.match(
+    mir,
+    /property-define-accessor define non-enumerable static set accessor/u,
+  );
+  assert.match(
+    mir,
+    /property-define-method define non-enumerable prototype method/u,
+  );
+});
+
 test("binds a class name only inside its own class body", () => {
   const result = compileSource(babelFrontend, {
     source: `const Named = class Inner {
@@ -1103,9 +1147,8 @@ const outer = Named;`,
 
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["class C { static m() {} }", /Static class elements/u],
-    ["class C { static get x() { return 1; } }", /Static class elements/u],
-    ["class C { static set x(v) {} }", /Static class elements/u],
+    ["class C { static field = 1; }", /class element is unsupported/u],
+    ["class C { static #hidden() {} }", /class element is unsupported/u],
     ["class C { get #hidden() {} }", /class element is unsupported/u],
     ["class C { set #hidden(v) {} }", /class element is unsupported/u],
     ["class C extends Base {}", /Class inheritance/u],
@@ -1113,6 +1156,7 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { #hidden() {} }", /class element is unsupported/u],
     ["class C { static {} }", /class element is unsupported/u],
     ["class C { *step() {} }", /method generator functions/u],
+    ["class C { static *step() {} }", /method generator functions/u],
     ["class C { constructor() {} constructor() {} }", /one constructor/u],
   ];
   for (const [source, message] of cases) {

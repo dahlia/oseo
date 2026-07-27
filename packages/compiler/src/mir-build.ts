@@ -1134,11 +1134,17 @@ function anonymousDefinition(expression: HirExpression): boolean {
  * Lowers one class expression in ClassDefinitionEvaluation order: the
  * class-scope cell is created first so every closure the body allocates
  * shares it, then the constructor closure and its prototype object,
- * then each prototype method as a non-enumerable data property and each
- * getter or setter as a non-enumerable accessor property, and the
- * class-scope binding is initialized last. Initializing it last is
- * observable: a computed key that reads the class name reaches the
- * binding in its temporal dead zone.
+ * then each method as a non-enumerable data property and each getter or
+ * setter as a non-enumerable accessor property, and the class-scope
+ * binding is initialized last. Initializing it last is observable: a
+ * computed key that reads the class name reaches the binding in its
+ * temporal dead zone.
+ *
+ * Static and prototype elements share one source-ordered loop, because
+ * ClassDefinitionEvaluation defines every element in source order and
+ * only chooses a different target for each: a `static` element is
+ * defined on the constructor itself, every other element on the
+ * prototype object.
  */
 function lowerClassExpression(
   expression: HirExpression & { readonly kind: "class" },
@@ -1184,6 +1190,9 @@ function lowerClassExpression(
   );
   recordRoot(builder, prototype, expression.range);
   for (const element of expression.elements) {
+    const staticPlacement = element.staticPlacement === true;
+    const target = staticPlacement ? constructorValue : prototype;
+    const placement = staticPlacement ? "static" : "prototype";
     // A computed element key is class-body code, so it is strict even
     // when the enclosing function or script is not.
     const enclosingStrictCode = builder.strictCode;
@@ -1200,9 +1209,9 @@ function lowerClassExpression(
       builder,
       "safepoint",
       element.accessorKind == null
-        ? "prototype method storage growth"
-        : "prototype accessor storage growth",
-      [prototype, key, value],
+        ? `${placement} method storage growth`
+        : `${placement} accessor storage growth`,
+      [target, key, value],
       element.range,
     );
     const defined = builder.nextValue;
@@ -1210,18 +1219,18 @@ function lowerClassExpression(
     builder.current.operations.push(
       element.accessorKind == null
         ? {
-            arguments: [prototype, key, value],
-            detail: "define non-enumerable prototype method",
+            arguments: [target, key, value],
+            detail: `define non-enumerable ${placement} method`,
             id: defined,
             kind: "property-define-method",
             range: element.range,
           }
         : {
             accessorKind: element.accessorKind,
-            arguments: [prototype, key, value],
+            arguments: [target, key, value],
             detail:
-              `define non-enumerable prototype ${element.accessorKind} ` +
-              "accessor property",
+              `define non-enumerable ${placement} ` +
+              `${element.accessorKind} accessor property`,
             enumerable: false,
             id: defined,
             kind: "property-define-accessor",

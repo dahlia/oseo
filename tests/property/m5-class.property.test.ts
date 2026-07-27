@@ -32,9 +32,9 @@ type ClassForm = "anonymous" | "declaration" | "named-expression";
 type MethodKind = "constant" | "field" | "self";
 
 /**
- * Which prototype element one generated definition installs. A `pair`
- * writes a getter and a setter clause under one key, so a computed key
- * evaluates twice.
+ * Which element one generated definition installs. A `pair` writes a
+ * getter and a setter clause under one key, so a computed key evaluates
+ * twice.
  */
 type ElementKind = "getter" | "method" | "pair" | "setter";
 
@@ -44,6 +44,8 @@ interface MethodSpec {
   readonly element: ElementKind;
   /** Selects the body of a method or getter; a lone setter ignores it. */
   readonly kind: MethodKind;
+  /** A `static` element is defined on the constructor, not the prototype. */
+  readonly staticPlacement: boolean;
   readonly value: number;
 }
 
@@ -66,13 +68,16 @@ const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
   computed: fc.boolean(),
   element: fc.constantFrom<ElementKind>("getter", "method", "pair", "setter"),
   kind: fc.constantFrom<MethodKind>("constant", "field", "self"),
+  staticPlacement: fc.boolean(),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 /**
  * An anonymous class expression has no class-scope name binding, and a
- * `field` method needs at least one constructor parameter, so both kinds
- * degrade to `constant` instead of generating unrepresentable source.
+ * `field` body reads an instance field, so it needs at least one
+ * constructor parameter and a prototype placement. Each unrepresentable
+ * kind degrades to `constant` instead of generating source the model
+ * cannot describe.
  */
 const caseArbitrary: fc.Arbitrary<ClassCase> = fc
   .record({
@@ -90,12 +95,14 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
     methods: testCase.methods.map((method) => {
       const unrepresentable =
         (method.kind === "self" && testCase.form === "anonymous") ||
-        (method.kind === "field" && testCase.fields.length === 0);
+        (method.kind === "field" &&
+          (testCase.fields.length === 0 || method.staticPlacement));
       return unrepresentable
         ? {
             computed: method.computed,
             element: method.element,
             kind: "constant" as const,
+            staticPlacement: method.staticPlacement,
             value: method.value,
           }
         : method;
@@ -139,6 +146,9 @@ function printCase(testCase: ClassCase): string {
     .join("\n");
   const bodies = testCase.methods.map((method, index) => {
     const key = method.computed ? `[mark("m${index}", ${index})]` : `m${index}`;
+    // A static element is defined on the constructor, so its dynamic
+    // `this` is the class itself rather than an instance.
+    const modifier = method.staticPlacement ? "static " : "";
     const returned =
       method.kind === "field"
         ? "this.f0"
@@ -149,14 +159,15 @@ function printCase(testCase: ClassCase): string {
     // class-scope binding with the outer binding instead of an argument.
     const read =
       method.kind === "self" ? `${innerName(testCase)} === Shape` : returned;
-    const setter = `  set ${key}(value) {\n    this.s${index} = value;\n  }`;
+    const stored = `    this.s${index} = value;`;
+    const setter = `  ${modifier}set ${key}(value) {\n${stored}\n  }`;
     if (method.element === "getter" || method.element === "pair") {
-      const getter = `  get ${key}() {\n    return ${read};\n  }`;
+      const getter = `  ${modifier}get ${key}() {\n    return ${read};\n  }`;
       return method.element === "pair" ? `${getter}\n${setter}` : getter;
     }
     if (method.element === "setter") return setter;
     const signature = method.kind === "self" ? "received" : "";
-    return `  ${key}(${signature}) {\n    return ${returned};\n  }`;
+    return `  ${modifier}${key}(${signature}) {\n    return ${returned};\n  }`;
   });
   const body = [
     `  constructor(${parameters}) {`,
@@ -175,36 +186,40 @@ function printCase(testCase: ClassCase): string {
   const reads = testCase.methods.map((method, index) => {
     const argument = method.kind === "self" ? "Shape" : "";
     const descriptor = `d${index}`;
+    // A static element is an own property of the constructor and is
+    // reached through the class, never through an instance.
+    const owner = method.staticPlacement ? "Shape" : "Shape.prototype";
+    const receiver = method.staticPlacement ? "Shape" : "instance";
     const lookup =
       `const ${descriptor} = Object.getOwnPropertyDescriptor(` +
-      `Shape.prototype, "m${index}");\n`;
+      `${owner}, "m${index}");\n`;
     const attributes = `${descriptor}.enumerable, ${descriptor}.configurable`;
     if (method.element === "getter") {
       return (
-        `${lookup}console.log("m${index}", instance.m${index}, ` +
+        `${lookup}console.log("m${index}", ${receiver}.m${index}, ` +
         `typeof ${descriptor}.get, ${descriptor}.set, ${attributes}, ` +
         `${descriptor}.get.name);`
       );
     }
     if (method.element === "setter") {
       return (
-        `${lookup}instance.m${index} = ${method.value};\n` +
-        `console.log("m${index}", instance.s${index}, ${descriptor}.get, ` +
+        `${lookup}${receiver}.m${index} = ${method.value};\n` +
+        `console.log("m${index}", ${receiver}.s${index}, ${descriptor}.get, ` +
         `typeof ${descriptor}.set, ${attributes}, ${descriptor}.set.name);`
       );
     }
     if (method.element === "pair") {
       return (
-        `${lookup}instance.m${index} = ${method.value};\n` +
-        `console.log("m${index}", instance.m${index}, instance.s${index}, ` +
-        `typeof ${descriptor}.get, typeof ${descriptor}.set, ${attributes}, ` +
+        `${lookup}${receiver}.m${index} = ${method.value};\n` +
+        `console.log("m${index}", ${receiver}.m${index}, ` +
+        `${receiver}.s${index}, typeof ${descriptor}.get, ` +
+        `typeof ${descriptor}.set, ${attributes}, ` +
         `${descriptor}.get.name, ${descriptor}.set.name);`
       );
     }
     return (
-      `${lookup}console.log("m${index}", instance.m${index}(${argument}), ` +
-      `${descriptor}.writable, ${attributes}, ` +
-      `Shape.prototype.m${index}.name);`
+      `${lookup}console.log("m${index}", ${receiver}.m${index}(${argument}), ` +
+      `${descriptor}.writable, ${attributes}, ${owner}.m${index}.name);`
     );
   });
   const fieldReads = testCase.fields
@@ -223,6 +238,7 @@ console.log("definition", order);
 const instance = new Shape(${testCase.fields.join(", ")});
 let keyList = "";
 for (const key of Object.keys(Shape.prototype)) { keyList = keyList + key; }
+for (const key of Object.keys(Shape)) { keyList = keyList + key; }
 console.log("keys", keyList);
 console.log("name", Shape.name, Shape.length);
 console.log("constructor", Shape.prototype.constructor === Shape);
@@ -328,8 +344,20 @@ test("class model orders computed keys before construction", () => {
       fields: [4],
       form: "declaration",
       methods: [
-        { computed: false, element: "method", kind: "field", value: 0 },
-        { computed: true, element: "method", kind: "self", value: 0 },
+        {
+          computed: false,
+          element: "method",
+          kind: "field",
+          staticPlacement: false,
+          value: 0,
+        },
+        {
+          computed: true,
+          element: "method",
+          kind: "self",
+          staticPlacement: false,
+          value: 0,
+        },
       ],
     }),
     "definition 1\n" +
@@ -349,7 +377,13 @@ test("class model reports the inner name of a named expression", () => {
     fields: [],
     form: "named-expression",
     methods: [
-      { computed: false, element: "method", kind: "constant", value: 9 },
+      {
+        computed: false,
+        element: "method",
+        kind: "constant",
+        staticPlacement: false,
+        value: 9,
+      },
     ],
   };
   assert.equal(
@@ -371,9 +405,27 @@ test("class model names accessors and evaluates a pair key twice", () => {
     fields: [],
     form: "declaration",
     methods: [
-      { computed: false, element: "getter", kind: "constant", value: 1 },
-      { computed: false, element: "setter", kind: "constant", value: 2 },
-      { computed: true, element: "pair", kind: "constant", value: 3 },
+      {
+        computed: false,
+        element: "getter",
+        kind: "constant",
+        staticPlacement: false,
+        value: 1,
+      },
+      {
+        computed: false,
+        element: "setter",
+        kind: "constant",
+        staticPlacement: false,
+        value: 2,
+      },
+      {
+        computed: true,
+        element: "pair",
+        kind: "constant",
+        staticPlacement: false,
+        value: 3,
+      },
     ],
   };
   assert.equal(
@@ -394,6 +446,50 @@ test("class model names accessors and evaluates a pair key twice", () => {
   assert.match(source, /set m1\(value\) \{/u);
   assert.match(source, /get \[mark\("m2", 2\)\]\(\) \{/u);
   assert.match(source, /set \[mark\("m2", 2\)\]\(value\) \{/u);
+});
+
+test("class model reads a static element through the constructor", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    methods: [
+      {
+        computed: true,
+        element: "method",
+        kind: "self",
+        staticPlacement: true,
+        value: 5,
+      },
+      {
+        computed: false,
+        element: "pair",
+        kind: "constant",
+        staticPlacement: true,
+        value: 6,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition 0\n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "m0 true true false true m0\n" +
+      "m1 6 6 function function false true get m1 set m1\n" +
+      "no-new true\n" +
+      "order 0c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /static \[mark\("m0", 0\)\]\(received\) \{/u);
+  assert.match(source, /static get m1\(\) \{/u);
+  assert.match(source, /static set m1\(value\) \{/u);
+  // A static element is an own property of the class, so both the
+  // descriptor lookup and the observation go through the constructor.
+  assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m0"\)/u);
+  assert.match(source, /Shape\.m0\(Shape\)/u);
+  assert.match(source, /Shape\.m1 = 6;/u);
 });
 
 test(
@@ -457,19 +553,20 @@ test(
         domain:
           "class declarations, named class expressions, and anonymous class " +
           "expressions with zero to two constructor-assigned fields and zero " +
-          "to three prototype elements over static and computed keys, each " +
-          "element a method, a getter, a setter, or a getter and setter " +
-          "pair whose reading body returns a constant, an instance field, " +
-          "or the class-scope name binding, comparing an independent name, " +
-          "prototype descriptor, accessor round-trip, and definition-order " +
-          "model with Node.js, Deno, and both native specialization " +
-          "policies with forced collection on the enabled path",
+          "to three elements over literal and computed keys, each element a " +
+          "method, a getter, a setter, or a getter and setter pair placed on " +
+          "the prototype or on the constructor with `static`, whose reading " +
+          "body returns a constant, an instance field, or the class-scope " +
+          "name binding, comparing an independent name, own-property " +
+          "descriptor, accessor round-trip, and definition-order model with " +
+          "Node.js, Deno, and both native specialization policies with " +
+          "forced collection on the enabled path",
         numRuns: 15,
-        profile: "M5 class declarations, expressions, and accessors",
+        profile: "M5 class declarations, expressions, accessors, and statics",
         seed: 0x5eed_0017,
         sizeLimit:
-          "zero to two constructor fields, zero to three prototype " +
-          "elements, and bounded integer values",
+          "zero to two constructor fields, zero to three class elements, " +
+          "and bounded integer values",
         timeLimitMilliseconds: 180_000,
       },
     );
