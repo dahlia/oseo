@@ -64,6 +64,14 @@ export type SyntaxCallTarget =
       readonly kind: "dynamic";
     })
   | (LocatedSyntax & {
+      /**
+       * A `super()` call, admitted only directly inside a derived class
+       * constructor. The parent constructor is the constructor's own
+       * [[Prototype]], so the target carries no callee expression.
+       */
+      readonly kind: "super";
+    })
+  | (LocatedSyntax & {
       readonly key: SyntaxExpression;
       readonly kind: "property";
       readonly object: SyntaxExpression;
@@ -296,6 +304,12 @@ export type SyntaxExpression =
        */
       readonly constructorFunction: SyntaxFunction;
       readonly elements: readonly SyntaxClassElement[];
+      /**
+       * The `extends` operand. Its presence makes the class derived, so
+       * the constructor must reach `this` through `super()`, even when
+       * the operand evaluates to `null`.
+       */
+      readonly heritage?: SyntaxExpression;
       readonly kind: "class";
       /**
        * The ClassName bound in the class's own lexical environment. Only
@@ -348,6 +362,9 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "this";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "new-target";
     })
   | (LocatedSyntax & {
       readonly argument: SyntaxExpression;

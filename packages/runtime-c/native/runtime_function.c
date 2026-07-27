@@ -451,6 +451,129 @@ OseoResult oseo_constructor_result(
     );
 }
 
+/*
+ * Replaces one freshly created object's [[Prototype]]. Both objects a
+ * class definition links are allocated by that definition, so no earlier
+ * shape assumption or intrinsic lookup can depend on the old chain; this
+ * therefore keeps the object out of dictionary mode, unlike the
+ * `Object.setPrototypeOf` path that must assume arbitrary history.
+ */
+static void relink_prototype(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue prototype
+) {
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    object->prototype = prototype;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+}
+
+OseoResult oseo_class_heritage(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue heritage
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class heritage needs a class.");
+    }
+    if (tag_of(heritage) == OSEO_TAG_NULL) return normal(constructor);
+    if (!function_is_constructible(heritage)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Class extends value is not a constructor or null."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = constructor;
+    frame.slots[1] = heritage;
+    static const uint16_t prototype_name[] = {
+        'p', 'r', 'o', 't', 'o', 't', 'y', 'p', 'e',
+    };
+    result = oseo_internal_allocate_string(
+        context,
+        prototype_name,
+        sizeof(prototype_name) / sizeof(*prototype_name)
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[1], frame.slots[2]);
+    }
+    OseoValue parent_prototype = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !is_object(parent_prototype) &&
+        tag_of(parent_prototype) != OSEO_TAG_NULL) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Class extends value has a non-object prototype."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue class_prototype =
+            function_object(frame.slots[0])->prototype_object;
+        if (is_object(class_prototype)) {
+            relink_prototype(context, class_prototype, parent_prototype);
+        }
+        relink_prototype(context, frame.slots[0], frame.slots[1]);
+        result = normal(frame.slots[0]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
+    OseoValue parent = is_function(callee)
+        ? function_object(callee)->ordinary.prototype
+        : oseo_undefined();
+    if (!function_is_constructible(parent)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Super constructor is not a constructor."
+        );
+    }
+    return normal(parent);
+}
+
+OseoResult oseo_bind_this(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+) {
+    if (!is_cell(cell)) {
+        return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    if (tag_of(cell_object(cell)->value) != OSEO_TAG_UNINITIALIZED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_REFERENCE,
+            "Super constructor was already called in this constructor."
+        );
+    }
+    cell_object(cell)->value = value;
+    return normal(value);
+}
+
+OseoResult oseo_derived_constructor_result(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue cell
+) {
+    if (is_object(returned) || is_promise(returned)) return normal(returned);
+    if (tag_of(returned) != OSEO_TAG_UNDEFINED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Derived constructor returned a non-object value."
+        );
+    }
+    return oseo_cell_get(context, cell);
+}
+
 OseoResult oseo_call_function(
     OseoContext *context,
     OseoValue callee,
@@ -484,6 +607,7 @@ OseoResult oseo_call_function(
         result = oseo_internal_error_construct(
             context,
             callee,
+            new_target,
             code_id,
             argument_count,
             arguments

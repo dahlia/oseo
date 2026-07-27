@@ -43,6 +43,7 @@ export const babelFrontend: SourceFrontend = {
         functionStack: [],
         input,
         locations,
+        receiverStack: [],
         strictStack: [],
         syntheticIndex: 0,
       };

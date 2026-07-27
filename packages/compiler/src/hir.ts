@@ -197,6 +197,16 @@ export type HirCallTarget =
       readonly kind: "dynamic";
     }
   | {
+      /**
+       * A `super()` call. It constructs the enclosing constructor's
+       * [[Prototype]] and binds the result to the derived constructor's
+       * `this` binding, which the target names so lowering can reach it
+       * without re-resolving the class.
+       */
+      readonly kind: "super";
+      readonly thisBinding: HirClassThisBinding;
+    }
+  | {
       readonly key: HirExpression;
       readonly kind: "method";
       readonly object: HirExpression;
@@ -263,6 +273,17 @@ export type HirClassElement = HirClassMethod;
 export interface HirClassNameBinding {
   readonly bindingId: number;
   readonly name: string;
+}
+
+/**
+ * The `this` binding a derived class constructor owns. It starts
+ * uninitialized, so reading `this` before `super()` throws a
+ * `ReferenceError`, and `super()` initializes it with whatever the parent
+ * constructor produced. A base class constructor has no such binding and
+ * reads its receiver directly.
+ */
+export interface HirClassThisBinding {
+  readonly bindingId: number;
 }
 
 /** A resolved, normalized HIR expression. */
@@ -396,6 +417,12 @@ export type HirExpression =
        */
       readonly constructorFunction: HirExpression;
       readonly elements: readonly HirClassElement[];
+      /**
+       * The evaluated `extends` operand, present exactly for a derived
+       * class. It is evaluated in the class's own lexical environment,
+       * before the constructor closure exists.
+       */
+      readonly heritage?: HirExpression;
       readonly kind: "class";
       /**
        * Present only for a named class. It is initialized after every
@@ -448,6 +475,9 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "this";
+    })
+  | (LocatedSyntax & {
+      readonly kind: "new-target";
     })
   | (LocatedSyntax & {
       readonly argument: HirExpression;
@@ -582,6 +612,12 @@ export interface HirParameter extends SyntaxParameter {
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
   readonly body: readonly HirStatement[];
+  /**
+   * Present exactly on a derived class constructor. Every `return` leaves
+   * through this binding, so a constructor that never reached `super()`
+   * throws a `ReferenceError` instead of producing an unbound receiver.
+   */
+  readonly derivedThisBindingId?: number;
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
   readonly functionKind: FunctionKind;
@@ -640,4 +676,10 @@ export interface ResolveState {
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;
   readonly sourceId: string;
+  /**
+   * The derived constructor `this` binding in scope, if any. It reaches
+   * every arrow function nested in that constructor and stops at the next
+   * function that provides its own receiver.
+   */
+  thisBinding?: HirClassThisBinding | undefined;
 }

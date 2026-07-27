@@ -455,6 +455,51 @@ OseoResult oseo_constructor_receiver(
     OseoContext *context,
     OseoValue prototype
 );
+/*
+ * Links a derived class to its `extends` operand. `heritage` must be
+ * null or a constructor whose `prototype` is an object or null;
+ * otherwise this throws a TypeError. On success the constructor's
+ * [[Prototype]] becomes `heritage` and the class `prototype` object's
+ * [[Prototype]] becomes the parent's `prototype`, so static and instance
+ * lookups both walk into the parent. A null heritage leaves both null,
+ * which is what an ordinary function's [[Prototype]] already is here,
+ * and leaves `super()` with no constructor to reach.
+ */
+OseoResult oseo_class_heritage(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue heritage
+);
+/*
+ * GetSuperConstructor: the running constructor's own [[Prototype]].
+ * Throws a TypeError when that is not a constructor, which is how
+ * `class C extends null {}` rejects `super()`.
+ */
+OseoResult oseo_super_constructor(
+    OseoContext *context,
+    OseoValue callee
+);
+/*
+ * BindThisValue. A derived constructor's `this` cell starts
+ * uninitialized, so a second `super()` in the same invocation throws a
+ * ReferenceError rather than replacing the receiver.
+ */
+OseoResult oseo_bind_this(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value
+);
+/*
+ * A derived constructor's completion value. An object stands as
+ * written, `undefined` yields the bound `this` and therefore throws a
+ * ReferenceError when `super()` never ran, and any other value is a
+ * TypeError.
+ */
+OseoResult oseo_derived_constructor_result(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue cell
+);
 OseoResult oseo_array_create(OseoContext *context, size_t length);
 /*
  * Append operations are for monotonic generated array accumulation. The

@@ -85,6 +85,7 @@ function printHirExpression(expression: HirExpression): string {
     return `function @f${expression.functionId} ${expression.name}`;
   }
   if (expression.kind === "this") return "this";
+  if (expression.kind === "new-target") return "new.target";
   if (expression.kind === "undefined" || expression.kind === "null") {
     return expression.kind;
   }
@@ -136,6 +137,9 @@ function printHirExpression(expression: HirExpression): string {
       (expression.nameBinding == null
         ? ""
         : ` ${expression.nameBinding.name}`) +
+      (expression.heritage == null
+        ? ""
+        : ` extends ${printHirExpression(expression.heritage)}`) +
       `{constructor: ${printHirExpression(expression.constructorFunction)}` +
       expression.elements
         .map(
@@ -220,8 +224,10 @@ function printHirExpression(expression: HirExpression): string {
             ? `intrinsic ${expression.target.method}`
             : expression.target.kind === "dynamic"
               ? printHirExpression(expression.target.callee)
-              : `${printHirExpression(expression.target.object)}[` +
-                `${printHirExpression(expression.target.key)}]`;
+              : expression.target.kind === "super"
+                ? `super -> %b${expression.target.thisBinding.bindingId} this`
+                : `${printHirExpression(expression.target.object)}[` +
+                  `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirCallArgument).join(", ") +

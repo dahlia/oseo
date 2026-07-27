@@ -980,14 +980,14 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class extends Base {};",
-    sourceId: "class-extends.ts",
+    source: "const value = class extends Base { field = 1; };",
+    sourceId: "class-field.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.deepEqual(result.diagnostics[0]?.range.start, {
-    column: 15,
+    column: 36,
     line: 1,
   });
 });
@@ -1151,7 +1151,6 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { static #hidden() {} }", /class element is unsupported/u],
     ["class C { get #hidden() {} }", /class element is unsupported/u],
     ["class C { set #hidden(v) {} }", /class element is unsupported/u],
-    ["class C extends Base {}", /Class inheritance/u],
     ["class C { field = 1; }", /class element is unsupported/u],
     ["class C { #hidden() {} }", /class element is unsupported/u],
     ["class C { static {} }", /class element is unsupported/u],
@@ -1163,6 +1162,57 @@ test("rejects class elements outside the admitted profile", () => {
     const result = compileSource(babelFrontend, {
       source,
       sourceId: "class-rejection.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+  }
+});
+
+test("lowers a derived class to a heritage operand and super call", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Base {}
+class Derived extends Base {
+  constructor(x) {
+    super();
+    this.x = x;
+  }
+}
+class Implicit extends Base {}
+console.log(new Derived(1).x, new Implicit() instanceof Base);
+`,
+    sourceId: "class-extends.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  assert.match(text, /class Derived extends %b\d+\(Base\)\{/u);
+  assert.match(text, /call super -> %b\d+ this\(\)/u);
+  // The implicit derived constructor forwards every argument through one
+  // synthetic rest parameter, so it is a spread super call.
+  assert.match(text, /call super -> %b\d+ this\(\.\.\.%b\d+\(/u);
+  assert.ok(result.mir != null);
+});
+
+test("rejects super and new.target outside their admitted positions", () => {
+  const cases: readonly (readonly [string, RegExp])[] = [
+    [
+      "class A {}\nclass B extends A { m() { return super.m; } }",
+      /Property access through super/u,
+    ],
+    [
+      "class A {}\nclass B extends A { constructor() { (() => super())(); } }",
+      /super\(\) from an arrow function/u,
+    ],
+    [
+      "function f() { return (() => new.target)(); }",
+      /new\.target inside an arrow function/u,
+    ],
+  ];
+  for (const [source, message] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-rejection.ts",
     });
     assert.equal(result.mir, undefined, source);
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);

@@ -260,6 +260,7 @@ OseoResult oseo_internal_throw_error(
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
     OseoValue callee,
+    OseoValue new_target,
     size_t code_id,
     size_t argument_count,
     const OseoValue *arguments
@@ -272,8 +273,13 @@ OseoResult oseo_internal_error_construct(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = argument_count > 0u ? arguments[0] : oseo_undefined();
     frame.slots[1] = argument_count > 1u ? arguments[1] : oseo_undefined();
-    OseoValue prototype = is_function(callee)
-        ? function_object(callee)->prototype_object
+    /* OrdinaryCreateFromConstructor takes the prototype from the new
+     * target, so `class E extends Error {}` gives its instances
+     * `E.prototype`. A plain call supplies no new target, and `new Error`
+     * supplies the callee itself, so both keep the callee's prototype. */
+    OseoValue source = is_function(new_target) ? new_target : callee;
+    OseoValue prototype = is_function(source)
+        ? function_object(source)->prototype_object
         : oseo_undefined();
     if (is_object(prototype)) {
         result = normal(prototype);

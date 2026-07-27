@@ -714,4 +714,542 @@ const Self = class Inner {
 console.log(Self.self(), Self.inner, Self.name);
 `,
   },
+  {
+    name: "class-inheritance",
+    source: `
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  sum() {
+    return this.x + this.y;
+  }
+  static origin() {
+    return new this(0, 0);
+  }
+  static get label() {
+    return "point";
+  }
+}
+class Point3D extends Point {
+  constructor(x, y, z) {
+    super(x, y);
+    this.z = z;
+  }
+  sum() {
+    return super_sum(this) + this.z;
+  }
+  volume() {
+    return this.x * this.y * this.z;
+  }
+}
+function super_sum(value) {
+  return value.x + value.y;
+}
+const point = new Point3D(2, 3, 4);
+console.log(point.x, point.y, point.z, point.sum(), point.volume());
+console.log(point instanceof Point3D, point instanceof Point);
+console.log(Point3D.name, Point3D.length);
+console.log(Point3D.prototype.constructor === Point3D);
+// A derived class inherits static members through the constructor chain
+// and instance members through the prototype chain.
+console.log(Point3D.label, typeof Point3D.origin);
+const origin = Point3D.origin();
+console.log(origin.x, origin.y, origin.z, origin instanceof Point3D);
+console.log(Object.keys(Point3D).length, Object.keys(Point3D.prototype).length);
+const prototypeDescriptor = Object.getOwnPropertyDescriptor(
+  Point3D,
+  "prototype",
+);
+console.log(
+  prototypeDescriptor.writable,
+  prototypeDescriptor.enumerable,
+  prototypeDescriptor.configurable,
+);
+// A derived class body with no constructor forwards every argument.
+class Implicit extends Point {}
+const implicit = new Implicit(5, 6);
+console.log(Implicit.length, implicit.x, implicit.y, implicit.sum());
+console.log(implicit instanceof Implicit, implicit instanceof Point);
+console.log(Implicit.label);
+// Three levels of inheritance keep one receiver.
+class Base {
+  constructor() {
+    this.chain = "base";
+  }
+}
+class Middle extends Base {
+  constructor() {
+    super();
+    this.chain = this.chain + "-middle";
+  }
+}
+class Leaf extends Middle {
+  constructor() {
+    super();
+    this.chain = this.chain + "-leaf";
+  }
+}
+const leaf = new Leaf();
+console.log(leaf.chain, leaf instanceof Base, leaf instanceof Middle);
+// An accessor and a method both resolve through the inherited prototype.
+class Measured {
+  get area() {
+    return this.side * this.side;
+  }
+  set area(value) {
+    this.side = value;
+  }
+}
+class Square extends Measured {
+  constructor(side) {
+    super();
+    this.side = side;
+  }
+}
+const square = new Square(3);
+console.log(square.area);
+square.area = 5;
+console.log(square.side, square.area);
+// A derived class expression, named and anonymous.
+const Anonymous = class extends Point {};
+console.log(Anonymous.name, new Anonymous(1, 1).sum());
+const NamedExpression = class Inner extends Point {
+  static self() {
+    return Inner === NamedExpression;
+  }
+};
+console.log(NamedExpression.name, NamedExpression.self());
+// A class extending an ordinary function reaches its prototype methods.
+function Legacy(tag) {
+  this.tag = tag;
+}
+Legacy.prototype.describe = function () {
+  return "legacy:" + this.tag;
+};
+class Modern extends Legacy {
+  constructor() {
+    super("modern");
+  }
+}
+const modern = new Modern();
+console.log(modern.tag, modern.describe(), modern instanceof Legacy);
+`,
+  },
+  {
+    name: "class-super-binding",
+    source: `
+class Base {
+  constructor() {
+    this.base = true;
+  }
+}
+function report(label, run) {
+  try {
+    console.log(label, "ok", run());
+  } catch (error) {
+    console.log(
+      label,
+      error instanceof ReferenceError,
+      error instanceof TypeError,
+    );
+  }
+}
+// A derived constructor cannot reach this before super() runs.
+class Early extends Base {
+  constructor() {
+    this.value = 1;
+    super();
+  }
+}
+report("early-this", () => new Early());
+// Falling off the end of a derived constructor still reads this.
+class Missing extends Base {
+  constructor() {
+    return;
+  }
+}
+report("missing-super", () => new Missing());
+// BindThisValue rejects a second super() in one invocation.
+class Twice extends Base {
+  constructor() {
+    super();
+    super();
+  }
+}
+report("double-super", () => new Twice());
+// A derived constructor returns this, an object, or throws.
+class ReturnsNumber extends Base {
+  constructor() {
+    super();
+    return 5;
+  }
+}
+report("number-return", () => new ReturnsNumber());
+class ReturnsUndefined extends Base {
+  constructor() {
+    super();
+    return undefined;
+  }
+}
+report("undefined-return", () => new ReturnsUndefined().base);
+class ReturnsObject extends Base {
+  constructor() {
+    super();
+    return { replaced: true };
+  }
+}
+const replaced = new ReturnsObject();
+console.log(replaced.replaced, replaced.base);
+console.log(replaced instanceof ReturnsObject);
+// super() adopts whatever the parent constructor produced, so a base that
+// returns its own object replaces the allocated receiver.
+class ReplacingBase {
+  constructor() {
+    return { fromBase: true };
+  }
+}
+class Adopts extends ReplacingBase {
+  constructor() {
+    super();
+    this.added = 1;
+  }
+}
+const adopted = new Adopts();
+console.log(adopted.fromBase, adopted.added, adopted instanceof Adopts);
+// A conditional and a loop both reach one super() per invocation.
+class Conditional extends Base {
+  constructor(flag) {
+    if (flag) {
+      super();
+      this.branch = "then";
+    } else {
+      super();
+      this.branch = "else";
+    }
+  }
+}
+console.log(new Conditional(true).branch, new Conditional(false).branch);
+// A return inside try leaves through finally, which may still run super().
+class Deferred extends Base {
+  constructor(mode) {
+    try {
+      if (mode === "defer") return;
+      super();
+      this.mode = "direct";
+    } finally {
+      if (mode === "defer") {
+        super();
+        this.mode = "deferred";
+      }
+    }
+  }
+}
+console.log(new Deferred("defer").mode, new Deferred("direct").mode);
+// An arrow reads the constructor's this binding, so one created before
+// super() still observes the bound receiver afterwards.
+class Arrowed extends Base {
+  constructor() {
+    const read = () => this.base;
+    super();
+    this.read = read;
+  }
+}
+console.log(new Arrowed().read());
+// An ordinary nested function keeps its own receiver, which strict class
+// code leaves undefined.
+class Nested extends Base {
+  constructor() {
+    super();
+    function plain() {
+      return this;
+    }
+    this.plain = plain() === undefined;
+  }
+}
+console.log(new Nested().plain);
+// A rest parameter forwards through super().
+class Collected extends Base {
+  constructor(...values) {
+    super();
+    this.count = values.length;
+  }
+}
+console.log(new Collected(1, 2, 3).count, Collected.length);
+// Calling a derived class without new still throws before any super().
+try {
+  Base();
+} catch (error) {
+  console.log("call-base", error instanceof TypeError);
+}
+try {
+  Collected();
+} catch (error) {
+  console.log("call-derived", error instanceof TypeError);
+}
+`,
+  },
+  {
+    name: "class-heritage-values",
+    source: `
+let order = "";
+function step(name, value) {
+  order = order + name + ";";
+  return value;
+}
+class Base {
+  constructor() {
+    this.base = 1;
+  }
+}
+// The heritage operand evaluates before any element key, inside the
+// class's own scope.
+class Ordered extends step("heritage", Base) {
+  [step("first", "first")]() {
+    return 1;
+  }
+  static [step("second", "second")]() {
+    return 2;
+  }
+}
+console.log(order, typeof new Ordered().first, typeof Ordered.second);
+// A heritage expression reads the class-scope name in its dead zone.
+try {
+  class Recursive extends Recursive {}
+  console.log("recursive defined");
+} catch (error) {
+  console.log("recursive", error instanceof ReferenceError);
+}
+// An extends operand must be null or a constructor.
+function reject(label, run) {
+  try {
+    run();
+    console.log(label, "defined");
+  } catch (error) {
+    console.log(label, error instanceof TypeError);
+  }
+}
+reject("number", () => class extends 5 {});
+reject("string", () => class extends "base" {});
+reject("undefined", () => class extends undefined {});
+reject("object", () => class extends {} {});
+const arrow = () => 1;
+reject("arrow", () => class extends arrow {});
+class Methods {
+  method() {
+    return 1;
+  }
+}
+reject("method", () => class extends Methods.prototype.method {});
+// A constructor whose prototype is neither an object nor null is rejected.
+function BadPrototype() {}
+BadPrototype.prototype = 3;
+reject("bad-prototype", () => class extends BadPrototype {});
+// A null prototype is admitted; instances then inherit nothing.
+function NullPrototype() {
+  this.own = 1;
+}
+NullPrototype.prototype = null;
+class FromNull extends NullPrototype {
+  constructor() {
+    super();
+  }
+}
+console.log(new FromNull().own, typeof FromNull.prototype);
+// extends null makes the class derived with no reachable super
+// constructor, so construction always throws.
+class ExtendsNull extends null {}
+reject("extends-null", () => new ExtendsNull());
+class ExtendsNullExplicit extends null {
+  constructor() {
+    super();
+  }
+}
+reject("extends-null-explicit", () => new ExtendsNullExplicit());
+// A getter on the parent supplies the prototype the class links to.
+const carrier = {};
+Object.defineProperty(carrier, "target", { value: Base });
+class FromGetter extends carrier.target {}
+console.log(new FromGetter().base, new FromGetter() instanceof Base);
+// A class expression as a heritage operand is evaluated once per
+// evaluation of the enclosing class.
+function makeDerived() {
+  return class extends Base {
+    constructor() {
+      super();
+      this.derived = 1;
+    }
+  };
+}
+const First = makeDerived();
+const Second = makeDerived();
+console.log(First === Second, new First().base, new First().derived);
+console.log(new First() instanceof Second, new First() instanceof Base);
+`,
+  },
+  {
+    name: "class-new-target",
+    source: `
+function ordinary() {
+  return new.target;
+}
+console.log(ordinary() === undefined, new ordinary() !== undefined);
+function named() {
+  return new.target === undefined ? "call" : new.target.name;
+}
+console.log(named(), new named() instanceof named);
+class Reporting {
+  constructor() {
+    this.target = new.target;
+    this.targetName = new.target.name;
+  }
+  method() {
+    return new.target;
+  }
+  static make() {
+    return new.target;
+  }
+}
+const reporting = new Reporting();
+console.log(reporting.target === Reporting, reporting.targetName);
+console.log(reporting.method() === undefined, Reporting.make() === undefined);
+// new.target stays the constructed class through every super() hop.
+class Derived extends Reporting {
+  constructor() {
+    super();
+    this.own = new.target;
+  }
+}
+const derived = new Derived();
+console.log(derived.target === Derived, derived.targetName);
+console.log(derived.own === Derived);
+class Deeper extends Derived {}
+const deeper = new Deeper();
+console.log(deeper.target === Deeper, deeper.targetName);
+console.log(deeper.own === Deeper);
+// The receiver a derived construction allocates comes from new.target's
+// prototype, so the base constructor already sees the derived prototype.
+class Checking {
+  constructor() {
+    this.isDeeper = this instanceof Deeper;
+  }
+}
+class CheckedMiddle extends Checking {}
+class CheckedLeaf extends CheckedMiddle {}
+console.log(new CheckedLeaf() instanceof Checking, new CheckedLeaf().isDeeper);
+// A generator function and an asynchronous function are not
+// constructors, so new.target inside them is always undefined.
+function* generated() {
+  yield new.target === undefined;
+}
+console.log(generated().next().value);
+async function awaited() {
+  return new.target === undefined;
+}
+awaited().then((value) => console.log("async", value));
+`,
+  },
+  {
+    name: "class-derived-return-hints",
+    source: `
+// Every return of a derived constructor leaves through the this binding
+// super() initializes, so a number result is a TypeError. A parameter
+// hint must not let the addition specialization return the sum before
+// that rejection, and the hinted and unhinted twins must agree.
+class Rooted {
+  constructor() {
+    this.tag = "rooted";
+  }
+}
+class HintedReturn extends Rooted {
+  constructor(left: number, right: number) {
+    return left + right;
+  }
+}
+class PlainReturn extends Rooted {
+  constructor(left, right) {
+    return left + right;
+  }
+}
+function report(label, make) {
+  try {
+    console.log(label, "returned", typeof make());
+  } catch (error) {
+    console.log(label, "threw", error.constructor.name);
+  }
+}
+report("hinted small", function () { return new HintedReturn(1, 2); });
+report("plain small", function () { return new PlainReturn(1, 2); });
+// A falsified hint reaches the same rejection.
+report("hinted strings", function () { return new HintedReturn("a", "b"); });
+report("plain strings", function () { return new PlainReturn("a", "b"); });
+report("hinted overflow", function () {
+  return new HintedReturn(140737488355327, 1);
+});
+report("hinted double", function () { return new HintedReturn(0.5, 0.25); });
+// An object return still stands as written whether or not it is hinted.
+class HintedObject extends Rooted {
+  constructor(left: number, right: number) {
+    return { sum: left + right };
+  }
+}
+console.log(new HintedObject(1, 2).sum);
+console.log(new HintedObject(1, 2) instanceof Rooted);
+`,
+    // Enabling specialization leaves the generic addition call count
+    // unchanged, which is what proves the addition specialization never
+    // rewrote a derived constructor. The guard counters are shared with
+    // the property inline cache, so they record its reads here.
+    specialization: {
+      genericCallsDisabled: 8,
+      genericCallsEnabled: 8,
+      hits: 5,
+      misses: 8,
+      overflowMisses: 0,
+    },
+  },
+  {
+    name: "class-error-subclass",
+    source: `
+// A derived construction passes its new target to the parent, and an
+// error constructor takes the instance prototype from that target, so a
+// subclass instance is an instance of the subclass.
+class AppError extends Error {}
+const appError = new AppError("boom");
+console.log(appError instanceof AppError, appError instanceof Error);
+console.log(appError.message, appError.name, appError.constructor === AppError);
+class TypedError extends TypeError {}
+const typedError = new TypedError("typed");
+console.log(typedError instanceof TypedError, typedError instanceof TypeError);
+console.log(typedError instanceof Error, typedError.message);
+console.log(typedError.constructor === TypedError, typedError.name);
+class LeafError extends AppError {}
+const leafError = new LeafError("leaf");
+console.log(leafError instanceof LeafError, leafError instanceof AppError);
+console.log(leafError instanceof Error, leafError.message);
+// A direct construction supplies itself as the new target, so an
+// unsubclassed error keeps the callee prototype.
+const plain = new Error("plain");
+console.log(plain instanceof Error, plain.constructor === Error, plain.name);
+const typed = new TypeError("t");
+console.log(typed.constructor === TypeError, typed instanceof AppError);
+// A subclass constructor runs its own body after super() returns the
+// error the parent allocated.
+class CodedError extends Error {
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+  }
+}
+const coded = new CodedError("coded", 42);
+console.log(coded instanceof CodedError, coded.message, coded.code);
+console.log(coded.name, \`\${coded}\`, Object.keys(coded).length);
+try {
+  throw new AppError("thrown");
+} catch (error) {
+  console.log(error instanceof AppError, error.message);
+}
+`,
+  },
 ];

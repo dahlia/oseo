@@ -10,6 +10,7 @@ import type {
   HirCallTarget,
   HirClassElement,
   HirClassNameBinding,
+  HirClassThisBinding,
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
@@ -225,8 +226,19 @@ function resolveExpression(
     const argument = resolveExpression(expression.argument, scopes, state);
     return argument == null ? undefined : { ...expression, argument };
   }
+  if (expression.kind === "this" && state.thisBinding != null) {
+    // A derived constructor reaches `this` through a binding that stays
+    // uninitialized until `super()` runs, so reading it early throws.
+    return {
+      bindingId: state.thisBinding.bindingId,
+      kind: "binding",
+      name: "this",
+      range: expression.range,
+    };
+  }
   if (
     expression.kind === "boolean" ||
+    expression.kind === "new-target" ||
     expression.kind === "null" ||
     expression.kind === "number" ||
     expression.kind === "string" ||
@@ -527,6 +539,21 @@ function resolveExpression(
     const callee = resolveExpression(expression.target.callee, scopes, state);
     if (callee == null) return undefined;
     target = { callee, kind: "dynamic" };
+  } else if (expression.target.kind === "super") {
+    // The frontend admits `super()` only in a derived class constructor,
+    // which is exactly where a `this` binding is in scope.
+    const thisBinding = state.thisBinding;
+    if (thisBinding == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          "super() is only valid in a derived class constructor.",
+        ),
+      );
+      return undefined;
+    }
+    target = { kind: "super", thisBinding };
   } else {
     const object = resolveExpression(expression.target.object, scopes, state);
     const key = resolveExpression(expression.target.key, scopes, state);
@@ -696,13 +723,31 @@ function resolveStatementList(
   return result;
 }
 
+/**
+ * True for a function that takes `this` and `new.target` from the
+ * function that encloses it instead of from its own invocation.
+ */
+function lexicalReceiver(functionValue: SyntaxFunction): boolean {
+  return (
+    functionValue.functionKind === "arrow" ||
+    functionValue.functionKind === "async-arrow"
+  );
+}
+
 function resolveFunction(
   functionValue: SyntaxFunction,
   outerScopes: readonly Map<string, Binding>[],
   state: ResolveState,
   id: number,
   selfBinding?: Binding,
+  derivedThisBinding?: HirClassThisBinding,
 ): HirFunction {
+  const outerThisBinding = state.thisBinding;
+  if (derivedThisBinding != null) {
+    state.thisBinding = derivedThisBinding;
+  } else if (!lexicalReceiver(functionValue)) {
+    state.thisBinding = undefined;
+  }
   const parameterScope = new Map<string, Binding>();
   const parameters: HirParameter[] = [];
   for (const parameter of functionValue.parameters) {
@@ -736,9 +781,13 @@ function resolveFunction(
     bodyScope,
   );
   state.labels.push(...outerLabels);
+  state.thisBinding = outerThisBinding;
   const resolved: HirFunction = {
     ...functionValue,
     body,
+    ...(derivedThisBinding == null
+      ? {}
+      : { derivedThisBindingId: derivedThisBinding.bindingId }),
     functionLength: functionValue.functionLength ?? parameters.length,
     functionKind: functionValue.functionKind ?? "ordinary",
     id,
@@ -747,6 +796,7 @@ function resolveFunction(
       ...new Set([
         ...Array.from(parameterScope.values(), (binding) => binding.id),
         ...(selfBinding == null ? [] : [selfBinding.id]),
+        ...(derivedThisBinding == null ? [] : [derivedThisBinding.bindingId]),
         ...declaredHirBindingIds(body),
       ]),
     ],
@@ -842,10 +892,13 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     );
   }
   if (expression.kind === "class") {
-    // Only a computed element key evaluates in the enclosing context;
-    // the constructor and method bodies are separate functions.
-    return expression.elements.some((element) =>
-      hirExpressionHasAwait(element.key),
+    // Only the heritage operand and a computed element key evaluate in
+    // the enclosing context; the constructor and method bodies are
+    // separate functions.
+    return (
+      (expression.heritage != null &&
+        hirExpressionHasAwait(expression.heritage)) ||
+      expression.elements.some((element) => hirExpressionHasAwait(element.key))
     );
   }
   if (
@@ -1051,6 +1104,10 @@ function resolveFunctionExpression(
  * an outer assignment cannot replace. The constructor is resolved
  * without a function self-binding, because the class-scope binding
  * already covers the name it would provide.
+ *
+ * A derived class resolves its heritage operand in that same
+ * environment, before anything else, and gives its constructor a `this`
+ * binding that only `super()` initializes.
  */
 function resolveClassExpression(
   expression: SyntaxExpression & { readonly kind: "class" },
@@ -1072,6 +1129,16 @@ function resolveClassExpression(
     });
   }
   const classScopes = [...scopes, classScope];
+  let heritage: HirExpression | undefined;
+  if (expression.heritage != null) {
+    heritage = resolveExpression(expression.heritage, classScopes, state);
+    if (heritage == null) return undefined;
+  }
+  let thisBinding: HirClassThisBinding | undefined;
+  if (expression.heritage != null) {
+    thisBinding = { bindingId: state.nextBindingId };
+    state.nextBindingId += 1;
+  }
   const constructorId = state.nextFunctionId;
   state.nextFunctionId += 1;
   state.functionInfo.set(expression.constructorFunction, { id: constructorId });
@@ -1080,6 +1147,8 @@ function resolveClassExpression(
     classScopes,
     state,
     constructorId,
+    undefined,
+    thisBinding,
   );
   const constructorFunction: HirExpression = {
     functionId: constructorId,
@@ -1122,6 +1191,7 @@ function resolveClassExpression(
     ...(byteRange == null ? {} : { byteRange }),
     constructorFunction,
     elements,
+    ...(heritage == null ? {} : { heritage }),
     kind: "class",
     ...(nameBinding == null ? {} : { nameBinding }),
     range: expression.range,

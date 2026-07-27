@@ -91,6 +91,11 @@ export function specializeAddition(
   const original = generic.blocks[0];
   if (
     eligible == null ||
+    // A derived class constructor routes every `return` through a
+    // trailing `derived-return` operation. The specialized path leaves
+    // the block before that operation, so it would return the sum the
+    // generic path rejects with a `TypeError`.
+    generic.derivedThisBindingId != null ||
     generic.blocks.length !== 1 ||
     original == null ||
     original.terminator.kind !== "return"
