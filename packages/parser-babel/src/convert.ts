@@ -12,6 +12,7 @@ import type {
   SyntaxCallArgument,
   SyntaxCallTarget,
   SyntaxClassElement,
+  SyntaxClassField,
   SyntaxExpression,
   SyntaxForDeclaration,
   SyntaxForOfTarget,
@@ -3427,6 +3428,62 @@ function implicitDerivedConstructor(
 }
 
 /**
+ * Converts one instance field definition. The initializer is converted
+ * as its own function body: it provides the receiver the field is
+ * defined on, so `this` is admitted there, and it carries the class
+ * element home object, so a derived class admits `super.x` in it. It is
+ * not a constructor, so `super()` stays rejected with the diagnostic
+ * every non-constructor position already reports.
+ */
+function classField(
+  context: ConvertContext,
+  element: BabelNode,
+  derived: boolean,
+): SyntaxClassField | undefined {
+  if (element.static === true) {
+    return unsupported(
+      context,
+      element,
+      "Static class fields are unsupported.",
+    );
+  }
+  if (
+    element.abstract === true ||
+    element.declare === true ||
+    element.definite === true ||
+    element.optional === true ||
+    element.readonly === true ||
+    element.accessibility != null ||
+    element.override === true
+  ) {
+    return unsupported(
+      context,
+      element,
+      "TypeScript class field modifiers are unsupported.",
+    );
+  }
+  if (nodes(element.decorators).length > 0) {
+    return unsupported(context, element, "Class decorators are unsupported.");
+  }
+  const key = classElementKey(context, element);
+  if (key == null) return undefined;
+  const valueNode = node(element.value);
+  if (valueNode == null) {
+    return { ...location(context, element), key, kind: "field" };
+  }
+  context.functionStack.push(true);
+  context.receiverStack.push({
+    kind: "function",
+    superProperty: derived ? "admitted" : "none",
+  });
+  const initializer = expression(context, valueNode);
+  context.receiverStack.pop();
+  context.functionStack.pop();
+  if (initializer == null) return undefined;
+  return { ...location(context, element), initializer, key, kind: "field" };
+}
+
+/**
  * Converts one class declaration or expression into the owned class
  * expression. The class body is strict code, so the strictness stack
  * gains an entry for every element, including computed keys.
@@ -3474,6 +3531,12 @@ export function classExpression(
   const elements: SyntaxClassElement[] = [];
   let constructorFunction: SyntaxFunction | undefined;
   for (const element of nodes(bodyNode.body)) {
+    if (element.type === "ClassProperty") {
+      const field = classField(context, element, derived);
+      if (field == null) break;
+      elements.push(field);
+      continue;
+    }
     if (element.type !== "ClassMethod") {
       unsupported(context, element, "This class element is unsupported.");
       break;
@@ -3537,9 +3600,15 @@ export function classExpression(
         returnHints: [],
         strict: true,
       };
+  // Whichever constructor the class ends up with runs the instance field
+  // initializers, so the flag is decided once the whole body is known.
+  const instanceFields = elements.some((element) => element.kind === "field");
+  const classConstructor = constructorFunction ?? implicitConstructor;
   return {
     ...located,
-    constructorFunction: constructorFunction ?? implicitConstructor,
+    constructorFunction: instanceFields
+      ? { ...classConstructor, initializesInstanceFields: true }
+      : classConstructor,
     elements,
     ...(heritage == null ? {} : { heritage }),
     kind: "class",

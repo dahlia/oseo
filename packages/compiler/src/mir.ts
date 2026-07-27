@@ -122,6 +122,7 @@ export interface MirOperation {
     | "branch"
     | "call"
     | "check-status"
+    | "class-field-define"
     | "class-heritage"
     | "class-prototype"
     | "constant"
@@ -141,6 +142,7 @@ export interface MirOperation {
     | "guard-smi"
     | "home-object-bind"
     | "initialize"
+    | "instance-fields-init"
     | "iterator-close"
     | "iterator-delegate-next"
     | "iterator-delegate-return"
@@ -356,7 +358,18 @@ export interface MirBuilder {
    * block with `generator-yield`, because only its root slots survive
    * suspension.
    */
+  /**
+   * The binding holding the key that names the anonymous definition a
+   * class field initializer body returns. Set only while lowering such
+   * an initializer.
+   */
+  readonly fieldKeyBindingId?: number;
   readonly generator: boolean;
+  /**
+   * True while lowering a class constructor whose class declares
+   * instance fields, so `super()` initializes them where it returns.
+   */
+  readonly initializesInstanceFields: boolean;
   current: MutableMirBlock;
   nextValue: number;
   readonly specialization: SpecializationMode;

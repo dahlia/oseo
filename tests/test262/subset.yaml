@@ -1,7 +1,9 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
+  - arrow-function
   - async-functions
   - class
+  - class-fields-public
   - coalesce-expression
   - computed-property-names
   - const
@@ -933,6 +935,228 @@ tests:
   - path: test/language/expressions/class/class-name-ident-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, generators, lexical-bindings]
+  - path: test/language/expressions/class/constructor-this-tdz-during-initializers.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/arrow-fnc-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/arrow-fnc-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/computed-name-toprimitive-symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/computed-name-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/ctor-called-after-fields-init.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/derived-cls-direct-eval-err-contains-supercall.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/derived-cls-indirect-eval-contains-superproperty-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/direct-eval-err-contains-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/equality-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/equality-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-referenceerror.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-toprimitive-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-toprimitive-returns-noncallable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-toprimitive-returns-nonobject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-tostring-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/evaluation-error/computed-name-valueof-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/field-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-1.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-2.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-3.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-same-line-1.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-asi-same-line-2.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-literal-name-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-literal-name-static-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-literal-name-static-propname-prototype.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-run-once-on-double-super.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-string-name-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-string-name-static-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/fields-string-name-static-propname-prototype.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/init-err-evaluation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/init-value-incremental.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-arrow-fnc-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/nested-arrow-fnc-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/class/elements/nested-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-equality-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-equality-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-ternary-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-ternary-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-typeof-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/nested-typeof-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/redeclaration-symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/redeclaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-field-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/regular-definitions-rs-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-as-valid-instance-field-assigned.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/static-as-valid-instance-field.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-field-identifier-invalid-ues-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-field-identifier-invalid-zwj-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-field-identifier-invalid-zwnj-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/early-errors/grammar-fields-same-line-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/valid/grammar-field-classelementname-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/valid/grammar-field-classelementname-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/valid/grammar-field-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/valid/grammar-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/syntax/valid/grammar-fields-multi-line.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/ternary-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/ternary-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/typeof-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/typeof-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-field-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/wrapped-in-sc-rs-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/expressions/class/gen-method-param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters, generators]
@@ -3826,6 +4050,9 @@ tests:
   - path: test/language/statements/class/class-name-ident-static.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/classelementname-abrupt-completion.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/definition/accessors.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -3934,6 +4161,228 @@ tests:
   - path: test/language/statements/class/definition/this-access-restriction.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, functions]
+  - path: test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/arrow-fnc-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/class-field-on-frozen-objects.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/computed-name-toprimitive-symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/computed-name-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/ctor-called-after-fields-init.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/derived-cls-direct-eval-err-contains-supercall.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/derived-cls-indirect-eval-contains-superproperty-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/direct-eval-err-contains-arguments.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/equality-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/equality-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-referenceerror.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-toprimitive-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-toprimitive-returns-noncallable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-toprimitive-returns-nonobject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-tostring-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/evaluation-error/computed-name-valueof-err.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/field-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fielddefinition-initializer-abrupt-completion.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-1.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-2.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-3.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-same-line-1.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-asi-same-line-2.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-literal-name-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/fields-string-name-propname-constructor.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/init-err-evaluation.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/init-value-incremental.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-arrow-fnc-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/nested-arrow-fnc-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/elements/nested-comp-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-comp-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-equality-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-equality-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-ternary-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-ternary-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-typeof-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/nested-typeof-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/public-class-field-initialization-is-visible-to-proxy.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/public-class-field-initialization-on-super-class-with-setter.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/redeclaration-symbol.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/redeclaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-field-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/regular-definitions-rs-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-as-valid-instance-field-assigned.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/static-as-valid-instance-field.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/string-literal-name-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/string-literal-name-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/super-fielddefinition-initializer-abrupt-completion.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-field-identifier-invalid-ues-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-field-identifier-invalid-zwj-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-field-identifier-invalid-zwnj-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/early-errors/grammar-fields-same-line-error.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-field-classelementname-initializer-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-field-classelementname-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-field-identifier-alt.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/syntax/valid/grammar-fields-multi-line.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/ternary-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/ternary-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/typeof-init-err-contains-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/typeof-init-err-contains-super.js
+    expectedClassification: expected-negative
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-field-identifier-initializer.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/wrapped-in-sc-rs-field-identifier.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
   - path: test/language/statements/class/getter-param-dflt.js
     expectedClassification: expected-negative
     dependencies: [classes, default-parameters]

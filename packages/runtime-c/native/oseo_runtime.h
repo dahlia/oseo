@@ -471,6 +471,30 @@ OseoResult oseo_class_heritage(
     OseoValue heritage
 );
 /*
+ * Appends one instance field to a class constructor's [[Fields]]: the
+ * key the class body evaluated and the closure that produces the value,
+ * or `undefined` for a field declared without an initializer. Fields
+ * are recorded in class-body order and run in that order.
+ */
+OseoResult oseo_class_field_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue key,
+    OseoValue initializer
+);
+/*
+ * InitializeInstanceElements: runs `constructor`'s recorded field
+ * initializers against `instance`, defining each result as an own
+ * writable, enumerable, configurable data property. Each initializer is
+ * called with the instance as its receiver and no arguments, and an
+ * abrupt completion stops the remaining fields.
+ */
+OseoResult oseo_initialize_instance_fields(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue instance
+);
+/*
  * Records one class element's [[HomeObject]]: the class prototype
  * object for an instance element and the constructor for a static one.
  * A value that is not a function is ignored, because only a function

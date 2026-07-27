@@ -1,10 +1,12 @@
 import { specializeAddition } from "./mir-specialize.ts";
+import { anonymousDefinition } from "./hir.ts";
 import type {
   HirArrayBindingPattern,
   HirArraySpreadElement,
   HirBindingIdentifier,
   HirBindingPattern,
   HirCallArgument,
+  HirClassField,
   HirExpression,
   HirForDeclaration,
   HirForOfTarget,
@@ -1195,21 +1197,6 @@ function lowerYieldDelegation(
 }
 
 /**
- * True for an anonymous function or class definition, which
- * NamedEvaluation names from the key or binding that stores it. A static
- * key is already resolved during HIR name inference; this decides whether
- * a computed key must also reach the closure at run time.
- */
-function anonymousDefinition(expression: HirExpression): boolean {
-  if (expression.kind === "function") return expression.name === "";
-  return (
-    expression.kind === "class" &&
-    expression.constructorFunction.kind === "function" &&
-    expression.constructorFunction.name === ""
-  );
-}
-
-/**
  * Records the object a class element resolves `super.x` against. A
  * `static` element and the constructor take the constructor itself and
  * the class prototype object respectively, matching the two chains
@@ -1233,6 +1220,151 @@ function lowerHomeObjectBind(
     kind: "home-object-bind",
     range,
   });
+}
+
+/** The dynamic `this` of the running function, taken from its receiver. */
+function lowerReceiver(range: SourceRange, builder: MirBuilder): number {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "this",
+    id,
+    kind: "receiver",
+    range,
+  });
+  return recordRoot(builder, id, range);
+}
+
+/**
+ * Runs the running constructor's instance field initializers against
+ * one instance, which is ECMA-262's InitializeInstanceElements. The
+ * constructor is the running function itself, so the operation names
+ * only the instance: a base constructor reaches its own field list, and
+ * a derived one reaches its own rather than the parent's, which the
+ * parent's own constructor already ran.
+ */
+function lowerInstanceFieldsInit(
+  instance: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "instance field initialization",
+    [instance],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [instance],
+    detail: "initialize instance fields",
+    id,
+    kind: "instance-fields-init",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  recordRoot(builder, id, range);
+}
+
+/**
+ * The value naming the anonymous definition a class field initializer
+ * returns, which is ECMA-262's [[ClassFieldInitializerName]]. It is the
+ * field key the class body already evaluated, read from the cell the
+ * initializer's closure captured; every other body returns no name.
+ */
+function lowerFieldInitializerName(
+  expression: HirExpression,
+  builder: MirBuilder,
+): number | undefined {
+  if (builder.fieldKeyBindingId == null || !anonymousDefinition(expression)) {
+    return undefined;
+  }
+  return lowerBindingRead(
+    builder.fieldKeyBindingId,
+    "field key",
+    expression.range,
+    builder,
+  );
+}
+
+/**
+ * Lowers one instance field definition. The key is evaluated here, in
+ * class-body order, while the initializer closure it pairs with runs
+ * once per instance, so the pair is recorded on the constructor instead
+ * of defining a property now. The closure carries the class prototype
+ * as its home object, exactly like a prototype method, so `super.x`
+ * inside an initializer starts at the parent's prototype.
+ *
+ * A computed key that names an anonymous initializer is also stored in
+ * a fresh cell the closure captures, because NamedEvaluation applies
+ * where the initializer runs while the key exists only here.
+ */
+function lowerClassField(
+  element: HirClassField,
+  constructorValue: number,
+  prototype: number,
+  builder: MirBuilder,
+): void {
+  // A computed element key is class-body code, so it is strict even
+  // when the enclosing function or script is not.
+  const enclosingStrictCode = builder.strictCode;
+  builder.strictCode = true;
+  const key = lowerPropertyKey(element.key, builder);
+  builder.strictCode = enclosingStrictCode;
+  if (element.keyNameBindingId != null) {
+    resetBinding(element.keyNameBindingId, "field key", element.range, builder);
+    const stored = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [key],
+      bindingId: element.keyNameBindingId,
+      detail: `%b${element.keyNameBindingId} field key`,
+      id: stored,
+      kind: "initialize",
+      range: element.range,
+    });
+    recordRoot(builder, stored, element.range);
+  }
+  const initializer =
+    element.initializer == null
+      ? lowerSyntheticUndefined(element.range, builder)
+      : lowerExpression(element.initializer, builder);
+  if (element.initializer != null) {
+    lowerHomeObjectBind(initializer, prototype, element.range, builder);
+  }
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "instance field record growth",
+    [constructorValue, key, initializer],
+    element.range,
+  );
+  const recorded = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [constructorValue, key, initializer],
+    detail: "record instance field",
+    id: recorded,
+    kind: "class-field-define",
+    range: element.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [recorded],
+    element.range,
+  );
+  recordRoot(builder, recorded, element.range);
 }
 
 /**
@@ -1324,6 +1456,10 @@ function lowerClassExpression(
   recordRoot(builder, prototype, expression.range);
   lowerHomeObjectBind(constructorValue, prototype, expression.range, builder);
   for (const element of expression.elements) {
+    if (element.kind === "field") {
+      lowerClassField(element, constructorValue, prototype, builder);
+      continue;
+    }
     const staticPlacement = element.staticPlacement === true;
     const target = staticPlacement ? constructorValue : prototype;
     const placement = staticPlacement ? "static" : "prototype";
@@ -1509,16 +1645,7 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "this") {
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [],
-      detail: "this",
-      id,
-      kind: "receiver",
-      range: expression.range,
-    });
-    return recordRoot(builder, id, expression.range);
+    return lowerReceiver(expression.range, builder);
   }
   if (expression.kind === "new-target") {
     const id = builder.nextValue;
@@ -2593,7 +2720,13 @@ function lowerSuperCall(
     [bound],
     expression.range,
   );
-  return recordRoot(builder, bound, expression.range);
+  recordRoot(builder, bound, expression.range);
+  // SuperCall initializes the derived class's own fields on the receiver
+  // the parent produced, after the binding a second `super()` rejects.
+  if (builder.initializesInstanceFields) {
+    lowerInstanceFieldsInit(constructed, expression.range, builder);
+  }
+  return bound;
 }
 
 function createMirBlock(builder: MirBuilder): MutableMirBlock {
@@ -3687,7 +3820,11 @@ function lowerStatements(
       const value =
         statement.expression == null
           ? lowerSyntheticUndefined(statement.range, builder)
-          : lowerExpression(statement.expression, builder);
+          : lowerExpression(
+              statement.expression,
+              builder,
+              lowerFieldInitializerName(statement.expression, builder),
+            );
       if (!enterFinalizer(builder, "return", statement.range, value)) {
         builder.current.terminator = { kind: "return", value };
       }
@@ -4190,6 +4327,8 @@ function buildMirFunction(
   strict: boolean,
   generator = false,
   derivedThisBindingId?: number,
+  initializesInstanceFields = false,
+  fieldKeyBindingId?: number,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -4200,15 +4339,23 @@ function buildMirFunction(
     abruptTargets: [],
     blocks: [entry],
     current: entry,
+    ...(fieldKeyBindingId == null ? {} : { fieldKeyBindingId }),
     labels: [],
     loops: [],
     finalizers: [],
     generator,
+    initializesInstanceFields,
     nextValue: 0,
     pendingLabels: [],
     specialization,
     strictCode: strict,
   };
+  // A base constructor initializes its class's fields before its body
+  // runs, which is where [[Construct]] performs InitializeInstanceElements
+  // for it; a derived one waits for the receiver `super()` produces.
+  if (initializesInstanceFields && derivedThisBindingId == null) {
+    lowerInstanceFieldsInit(lowerReceiver(range, builder), range, builder);
+  }
   const returned = lowerStatements(body, builder);
   if (!returned) {
     const value = lowerSyntheticUndefined(range, builder);
@@ -4303,6 +4450,8 @@ export function buildMir(
         functionValue.strict === true,
         functionValue.functionKind === "generator",
         functionValue.derivedThisBindingId,
+        functionValue.initializesInstanceFields === true,
+        functionValue.fieldKeyBindingId,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

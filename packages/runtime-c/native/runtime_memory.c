@@ -74,6 +74,12 @@ static void trace_object(
             mark_value(function->lexical_this, worklist);
             mark_value(function->prototype_object, worklist);
             mark_value(function->home_object, worklist);
+            for (size_t index = 0u;
+                 index < function->field_count;
+                 index += 1u) {
+                mark_value(function->fields[index].key, worklist);
+                mark_value(function->fields[index].initializer, worklist);
+            }
         } else if (object->kind == OSEO_HEAP_PROMISE) {
             OseoPromise *promise = (OseoPromise *)object;
             mark_value(promise->result, worklist);
@@ -114,6 +120,9 @@ static void destroy_heap_object(OseoHeapObject *object) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->generator);
+        if (object->kind == OSEO_HEAP_FUNCTION) {
+            free(((OseoFunction *)object)->fields);
+        }
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);
     }

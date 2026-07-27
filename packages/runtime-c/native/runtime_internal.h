@@ -211,6 +211,17 @@ typedef struct {
     OseoGenerator *generator;
 } OseoOrdinaryObject;
 
+/*
+ * One entry of a class constructor's [[Fields]]: the key its class body
+ * evaluated once and the closure that produces the value for each
+ * instance. `initializer` is undefined for a field declared without
+ * one, whose value is undefined.
+ */
+typedef struct {
+    OseoValue key;
+    OseoValue initializer;
+} OseoClassField;
+
 typedef struct {
     OseoOrdinaryObject ordinary;
     OseoValue environment;
@@ -224,6 +235,15 @@ typedef struct {
      * definition sets it before it defines the element's property.
      */
     OseoValue home_object;
+    /*
+     * [[Fields]], in class-body order and non-NULL only on a class
+     * constructor whose body declared instance fields. The list is
+     * complete before the class definition finishes, so an instance can
+     * never observe it growing.
+     */
+    OseoClassField *fields;
+    size_t field_count;
+    size_t field_capacity;
     size_t code_id;
     OseoFunctionKind function_kind;
     bool prototype_writable;

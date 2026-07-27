@@ -197,8 +197,25 @@ export interface SyntaxClassMethod extends LocatedSyntax {
   readonly value: SyntaxFunction;
 }
 
+/**
+ * One field definition in an owned class body. The key is evaluated
+ * once, where the element appears, while the initializer runs once per
+ * instance, so the two live in different execution contexts.
+ */
+export interface SyntaxClassField extends LocatedSyntax {
+  /**
+   * The initializer expression, absent for a field declared without one,
+   * whose value is `undefined`. It is a separate function body: it takes
+   * the instance under construction as its receiver and reaches the
+   * class scope rather than the constructor's parameters.
+   */
+  readonly initializer?: SyntaxExpression;
+  readonly key: SyntaxExpression;
+  readonly kind: "field";
+}
+
 /** One element admitted by an owned class body. */
-export type SyntaxClassElement = SyntaxClassMethod;
+export type SyntaxClassElement = SyntaxClassField | SyntaxClassMethod;
 
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
@@ -654,6 +671,13 @@ export interface SyntaxFunction extends LocatedSyntax {
   /** JavaScript `length`, which can differ from the ABI parameter count. */
   readonly functionLength?: number;
   readonly functionKind?: FunctionKind;
+  /**
+   * True on a class constructor whose class body declares at least one
+   * instance field. Such a constructor runs the field initializers its
+   * class recorded: a base constructor before its body, and a derived
+   * one where `super()` returns.
+   */
+  readonly initializesInstanceFields?: true;
   readonly kind: "function";
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];

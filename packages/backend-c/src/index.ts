@@ -1080,6 +1080,46 @@ function emitClassHeritage(state: EmitState, operation: MirOperation): void {
 }
 
 /**
+ * Records one instance field on the constructor: the key evaluated by
+ * the class body and the closure that produces the value, or
+ * `undefined` for a field declared without an initializer.
+ */
+function emitClassFieldDefine(state: EmitState, operation: MirOperation): void {
+  const constructorValue = operationArgument(operation, 0);
+  const key = operationArgument(operation, 1);
+  const initializer = operationArgument(operation, 2);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_class_field_define(context, ` +
+      `roots[${constructorValue}], roots[${key}], roots[${initializer}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
+ * Runs the running constructor's instance field initializers against
+ * one instance. The constructor is the callee, so a base constructor
+ * defines its own class's fields and a derived one defines only the
+ * fields its own class declared.
+ */
+function emitInstanceFieldsInit(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const instance = operationArgument(operation, 0);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    `result = oseo_initialize_instance_fields(context, callee, ` +
+      `roots[${instance}]);`,
+  );
+  line(state, `roots[${operation.id}] = result.value;`);
+}
+
+/**
  * Records the object a class element's `super.x` references look
  * through. The binding is the only way the element's function object
  * reaches its class again, because a method value can be called through
@@ -1267,6 +1307,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitClassPrototype(state, operation);
   } else if (operation.kind === "class-heritage") {
     emitClassHeritage(state, operation);
+  } else if (operation.kind === "class-field-define") {
+    emitClassFieldDefine(state, operation);
+  } else if (operation.kind === "instance-fields-init") {
+    emitInstanceFieldsInit(state, operation);
   } else if (operation.kind === "home-object-bind") {
     emitHomeObjectBind(state, operation);
   } else if (operation.kind === "super-base") {

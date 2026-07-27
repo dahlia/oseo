@@ -1,4 +1,4 @@
-import { errorIntrinsicName } from "./hir.ts";
+import { anonymousDefinition, errorIntrinsicName } from "./hir.ts";
 import type {
   Binding,
   HirArrayElement,
@@ -9,6 +9,7 @@ import type {
   HirCallArgument,
   HirCallTarget,
   HirClassElement,
+  HirClassField,
   HirClassNameBinding,
   HirClassThisBinding,
   HirExpression,
@@ -29,6 +30,7 @@ import type {
   LocatedSyntax,
   SyntaxAssignmentPattern,
   SyntaxCallArgument,
+  SyntaxClassField,
   SyntaxExpression,
   SyntaxFunction,
   SyntaxProgram,
@@ -1109,6 +1111,86 @@ function resolveFunctionExpression(
 }
 
 /**
+ * Resolves one instance field definition. The key belongs to the class
+ * body and is evaluated where the element appears, while the
+ * initializer becomes a separate function that runs once per instance.
+ * That function is built here rather than resolved from a synthesized
+ * syntax function, because its body is exactly one `return` of the
+ * initializer expression and it declares nothing of its own.
+ *
+ * The initializer's scope is the class scope, so it never reaches the
+ * constructor's parameters, and it provides its own receiver, so a
+ * derived constructor's `this` binding stops at it and an arrow
+ * function inside it captures the instance being initialized.
+ */
+function resolveClassField(
+  element: SyntaxClassField,
+  classScopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirClassField | undefined {
+  const key = resolveExpression(element.key, classScopes, state);
+  if (key == null) return undefined;
+  const located = {
+    ...(element.byteRange == null ? {} : { byteRange: element.byteRange }),
+    range: element.range,
+  };
+  if (element.initializer == null) {
+    return { ...located, key, kind: "field" };
+  }
+  const initializerId = state.nextFunctionId;
+  state.nextFunctionId += 1;
+  const outerThisBinding = state.thisBinding;
+  state.thisBinding = undefined;
+  // Labels never cross a function boundary, and the initializer is one.
+  const outerLabels = state.labels.splice(0);
+  const resolved = resolveExpression(element.initializer, classScopes, state);
+  state.labels.push(...outerLabels);
+  state.thisBinding = outerThisBinding;
+  if (resolved == null) return undefined;
+  const range = element.initializer.range;
+  const named =
+    key.kind === "string" ? inferFunctionName(resolved, key.value) : resolved;
+  // A key that is not a static string still names an anonymous
+  // initializer, so it travels to the closure through a cell the class
+  // body fills once, rather than being evaluated again per instance.
+  const keyNameBindingId =
+    key.kind === "string" || !anonymousDefinition(named)
+      ? undefined
+      : state.nextBindingId;
+  if (keyNameBindingId != null) state.nextBindingId += 1;
+  state.hirFunctions.push({
+    body: [{ expression: named, kind: "return", range }],
+    ...(keyNameBindingId == null
+      ? {}
+      : { fieldKeyBindingId: keyNameBindingId }),
+    functionKind: "method",
+    functionLength: 0,
+    id: initializerId,
+    kind: "hir-function",
+    localBindingIds: [],
+    name: "",
+    parameters: [],
+    range,
+    returnHints: [],
+    strict: true,
+  });
+  return {
+    ...located,
+    initializer: {
+      functionId: initializerId,
+      functionKind: "method",
+      functionLength: 0,
+      kind: "function",
+      name: "",
+      range,
+    },
+    key,
+    ...(keyNameBindingId == null ? {} : { keyNameBindingId }),
+    kind: "field",
+  };
+}
+
+/**
  * Resolves one class expression inside its own lexical environment. A
  * named class binds its name immutably in that environment, so the
  * constructor and every method reach the class through a binding that
@@ -1171,6 +1253,12 @@ function resolveClassExpression(
   };
   const elements: HirClassElement[] = [];
   for (const element of expression.elements) {
+    if (element.kind === "field") {
+      const field = resolveClassField(element, classScopes, state);
+      if (field == null) return undefined;
+      elements.push(field);
+      continue;
+    }
     const key = resolveExpression(element.key, classScopes, state);
     const methodId = state.nextFunctionId;
     state.nextFunctionId += 1;
