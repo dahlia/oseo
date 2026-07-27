@@ -364,6 +364,17 @@ export type SyntaxExpression =
       readonly kind: "this";
     })
   | (LocatedSyntax & {
+      /**
+       * The `super` operand of a property reference. It stands only as
+       * the `object` of a property get, set, update, or step expression
+       * or of a `property` call target: the reference reads or writes
+       * through the running function's home object while keeping `this`
+       * as its receiver, so an operand that escaped those positions
+       * would have no receiver to carry.
+       */
+      readonly kind: "super-base";
+    })
+  | (LocatedSyntax & {
       readonly kind: "new-target";
     })
   | (LocatedSyntax & {

@@ -848,12 +848,25 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     // A class body's computed keys are strict even inside a non-strict
     // function, so the operation may raise the function's strictness.
     const strict = state.strict || operation.strict === true;
+    // A `super` reference looks the key up through `object` while a
+    // getter, setter, or receiver-side assignment observes the separate
+    // receiver the operation carries as its last argument.
+    const superReference = operation.superReference === true;
     if (operation.kind === "property-get") {
-      line(
-        state,
-        `result = oseo_object_get(context, roots[${object}], ` +
-          `roots[${key}]);`,
-      );
+      if (superReference) {
+        const receiver = operationArgument(operation, 2);
+        line(
+          state,
+          `result = oseo_super_get(context, roots[${object}], ` +
+            `roots[${key}], roots[${receiver}]);`,
+        );
+      } else {
+        line(
+          state,
+          `result = oseo_object_get(context, roots[${object}], ` +
+            `roots[${key}]);`,
+        );
+      }
     } else if (operation.kind === "property-delete") {
       line(
         state,
@@ -862,12 +875,22 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       );
     } else {
       const value = operationArgument(operation, 2);
-      line(
-        state,
-        `result = oseo_object_set(context, roots[${object}], ` +
-          `roots[${key}], roots[${value}], ` +
-          `${strict ? "true" : "false"});`,
-      );
+      if (superReference) {
+        const receiver = operationArgument(operation, 3);
+        line(
+          state,
+          `result = oseo_super_set(context, roots[${object}], ` +
+            `roots[${key}], roots[${value}], roots[${receiver}], ` +
+            `${strict ? "true" : "false"});`,
+        );
+      } else {
+        line(
+          state,
+          `result = oseo_object_set(context, roots[${object}], ` +
+            `roots[${key}], roots[${value}], ` +
+            `${strict ? "true" : "false"});`,
+        );
+      }
     }
   }
   line(state, `roots[${operation.id}] = result.value;`);
@@ -1057,6 +1080,35 @@ function emitClassHeritage(state: EmitState, operation: MirOperation): void {
 }
 
 /**
+ * Records the object a class element's `super.x` references look
+ * through. The binding is the only way the element's function object
+ * reaches its class again, because a method value can be called through
+ * any receiver.
+ */
+function emitHomeObjectBind(state: EmitState, operation: MirOperation): void {
+  const functionValue = operationArgument(operation, 0);
+  const home = operationArgument(operation, 1);
+  location(state, operation.range);
+  line(
+    state,
+    `oseo_bind_home_object(roots[${functionValue}], roots[${home}]);`,
+  );
+}
+
+/**
+ * Reads the [[Prototype]] of the running function's home object, which
+ * is where a `super` property reference starts its lookup. It reads
+ * runtime state that a class definition already established, so it runs
+ * no user code and reports no abrupt completion; a home object whose
+ * chain ends leaves the nullish value for the reference itself to
+ * reject.
+ */
+function emitSuperBase(state: EmitState, operation: MirOperation): void {
+  location(state, operation.range);
+  line(state, `roots[${operation.id}] = oseo_super_base(callee);`);
+}
+
+/**
  * Reads the running constructor's own [[Prototype]], which is the
  * constructor `super()` invokes.
  */
@@ -1215,6 +1267,10 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitClassPrototype(state, operation);
   } else if (operation.kind === "class-heritage") {
     emitClassHeritage(state, operation);
+  } else if (operation.kind === "home-object-bind") {
+    emitHomeObjectBind(state, operation);
+  } else if (operation.kind === "super-base") {
+    emitSuperBase(state, operation);
   } else if (operation.kind === "super-constructor") {
     emitSuperConstructor(state, operation);
   } else if (operation.kind === "this-bind") {

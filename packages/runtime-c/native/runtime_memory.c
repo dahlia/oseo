@@ -73,6 +73,7 @@ static void trace_object(
             mark_value(function->environment, worklist);
             mark_value(function->lexical_this, worklist);
             mark_value(function->prototype_object, worklist);
+            mark_value(function->home_object, worklist);
         } else if (object->kind == OSEO_HEAP_PROMISE) {
             OseoPromise *promise = (OseoPromise *)object;
             mark_value(promise->result, worklist);

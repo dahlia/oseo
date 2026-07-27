@@ -226,6 +226,17 @@ function resolveExpression(
     const argument = resolveExpression(expression.argument, scopes, state);
     return argument == null ? undefined : { ...expression, argument };
   }
+  if (expression.kind === "super-base") {
+    // The receiver is the enclosing element's own `this`, so a reference
+    // inside a derived constructor reads the binding `super()`
+    // initializes and observes its temporal dead zone before then.
+    const receiver = resolveExpression(
+      { kind: "this", range: expression.range },
+      scopes,
+      state,
+    );
+    return receiver == null ? undefined : { ...expression, receiver };
+  }
   if (expression.kind === "this" && state.thisBinding != null) {
     // A derived constructor reaches `this` through a binding that stays
     // uninitialized until `super()` runs, so reading it early throws.

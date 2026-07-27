@@ -35,8 +35,12 @@ type ClassForm = "anonymous" | "declaration" | "named-expression";
  */
 type ClassHeritage = "derived" | "derived-implicit" | "none";
 
-/** What one generated prototype method or getter returns. */
-type MethodKind = "constant" | "field" | "self";
+/**
+ * What one generated prototype method or getter returns. A `super` body
+ * reads through the home object: a prototype element reaches the base
+ * prototype and a `static` element the base constructor.
+ */
+type MethodKind = "constant" | "field" | "self" | "super";
 
 /**
  * Which element one generated definition installs. A `pair` writes a
@@ -53,6 +57,12 @@ interface MethodSpec {
   readonly kind: MethodKind;
   /** A `static` element is defined on the constructor, not the prototype. */
   readonly staticPlacement: boolean;
+  /**
+   * Stores a setter's value through `super` instead of `this`. The base
+   * declares no accessor for the key, so the assignment creates the same
+   * own property of the receiver either way and the model is unchanged.
+   */
+  readonly superWrite: boolean;
   readonly value: number;
 }
 
@@ -75,17 +85,19 @@ const nativeTarget = targetForExecutionHost(
 const methodArbitrary: fc.Arbitrary<MethodSpec> = fc.record({
   computed: fc.boolean(),
   element: fc.constantFrom<ElementKind>("getter", "method", "pair", "setter"),
-  kind: fc.constantFrom<MethodKind>("constant", "field", "self"),
+  kind: fc.constantFrom<MethodKind>("constant", "field", "self", "super"),
   staticPlacement: fc.boolean(),
+  superWrite: fc.boolean(),
   value: fc.integer({ max: 20, min: -20 }),
 });
 
 /**
  * An anonymous class expression has no class-scope name binding, and a
  * `field` body reads an instance field, so it needs at least one
- * constructor parameter and a prototype placement. Each unrepresentable
- * kind degrades to `constant` instead of generating source the model
- * cannot describe.
+ * constructor parameter and a prototype placement. A `super` body and a
+ * `super` store both need a base class. Each unrepresentable kind
+ * degrades to `constant` or to a `this` store instead of generating
+ * source the model cannot describe.
  */
 const caseArbitrary: fc.Arbitrary<ClassCase> = fc
   .record({
@@ -114,17 +126,17 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       methods: testCase.methods.map((method) => {
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
+          (method.kind === "super" && testCase.heritage === "none") ||
           (method.kind === "field" &&
             (fields.length === 0 || method.staticPlacement));
-        return unrepresentable
-          ? {
-              computed: method.computed,
-              element: method.element,
-              kind: "constant" as const,
-              staticPlacement: method.staticPlacement,
-              value: method.value,
-            }
-          : method;
+        return {
+          computed: method.computed,
+          element: method.element,
+          kind: unrepresentable ? ("constant" as const) : method.kind,
+          staticPlacement: method.staticPlacement,
+          superWrite: method.superWrite && testCase.heritage !== "none",
+          value: method.value,
+        };
       }),
     };
   });
@@ -138,6 +150,11 @@ function innerName(testCase: ClassCase): string {
 function methodResult(testCase: ClassCase, method: MethodSpec): string {
   if (method.kind === "field") return String(testCase.fields[0]);
   if (method.kind === "self") return "true";
+  // A super body reports the base member the reference reaches, which
+  // the placement selects: the base prototype or the base constructor.
+  if (method.kind === "super") {
+    return method.staticPlacement ? "inheriteds" : "sharedb";
+  }
   return String(method.value);
 }
 
@@ -169,17 +186,27 @@ function printCase(testCase: ClassCase): string {
     // A static element is defined on the constructor, so its dynamic
     // `this` is the class itself rather than an instance.
     const modifier = method.staticPlacement ? "static " : "";
+    // A super reference reads the base through the home object: a
+    // method call and a data property in one expression, so both the
+    // generic lookup and the cached read run in every generated body.
+    const superRead = method.staticPlacement
+      ? "super.inherited() + super.badge"
+      : "super.shared() + super.badge";
     const returned =
       method.kind === "field"
         ? "this.f0"
         : method.kind === "self"
           ? `${innerName(testCase)} === received`
-          : String(method.value);
+          : method.kind === "super"
+            ? superRead
+            : String(method.value);
     // A getter takes no parameter, so a `self` getter compares the
     // class-scope binding with the outer binding instead of an argument.
     const read =
       method.kind === "self" ? `${innerName(testCase)} === Shape` : returned;
-    const stored = `    this.s${index} = value;`;
+    const stored = method.superWrite
+      ? `    super.s${index} = value;`
+      : `    this.s${index} = value;`;
     const setter = `  ${modifier}set ${key}(value) {\n${stored}\n  }`;
     if (method.element === "getter" || method.element === "pair") {
       const getter = `  ${modifier}get ${key}() {\n    return ${read};\n  }`;
@@ -220,6 +247,8 @@ function printCase(testCase: ClassCase): string {
           '    return "inherited";',
           "  }",
           "}",
+          'Base.prototype.badge = "b";',
+          'Base.badge = "s";',
           "",
         ].join("\n");
   const extendsClause = testCase.heritage === "none" ? "" : " extends Base";
@@ -408,6 +437,7 @@ test("class model orders computed keys before construction", () => {
           element: "method",
           kind: "field",
           staticPlacement: false,
+          superWrite: false,
           value: 0,
         },
         {
@@ -415,6 +445,7 @@ test("class model orders computed keys before construction", () => {
           element: "method",
           kind: "self",
           staticPlacement: false,
+          superWrite: false,
           value: 0,
         },
       ],
@@ -442,6 +473,7 @@ test("class model reports the inner name of a named expression", () => {
         element: "method",
         kind: "constant",
         staticPlacement: false,
+        superWrite: false,
         value: 9,
       },
     ],
@@ -471,6 +503,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         element: "getter",
         kind: "constant",
         staticPlacement: false,
+        superWrite: false,
         value: 1,
       },
       {
@@ -478,6 +511,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         element: "setter",
         kind: "constant",
         staticPlacement: false,
+        superWrite: false,
         value: 2,
       },
       {
@@ -485,6 +519,7 @@ test("class model names accessors and evaluates a pair key twice", () => {
         element: "pair",
         kind: "constant",
         staticPlacement: false,
+        superWrite: false,
         value: 3,
       },
     ],
@@ -520,6 +555,7 @@ test("class model reads a static element through the constructor", () => {
         element: "method",
         kind: "self",
         staticPlacement: true,
+        superWrite: false,
         value: 5,
       },
       {
@@ -527,6 +563,7 @@ test("class model reads a static element through the constructor", () => {
         element: "pair",
         kind: "constant",
         staticPlacement: true,
+        superWrite: false,
         value: 6,
       },
     ],
@@ -565,6 +602,7 @@ test("class model reads inherited members of a derived class", () => {
         element: "method",
         kind: "field",
         staticPlacement: false,
+        superWrite: false,
         value: 1,
       },
     ],
@@ -584,6 +622,61 @@ test("class model reads inherited members of a derived class", () => {
   const source = printCase(testCase);
   assert.match(source, /class Shape extends Base \{/u);
   assert.match(source, /^ {4}super\(\);$/mu);
+});
+
+test("class model reads and writes a derived class through super", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    heritage: "derived",
+    methods: [
+      {
+        computed: false,
+        element: "method",
+        kind: "super",
+        staticPlacement: false,
+        superWrite: false,
+        value: 1,
+      },
+      {
+        computed: false,
+        element: "getter",
+        kind: "super",
+        staticPlacement: true,
+        superWrite: false,
+        value: 2,
+      },
+      {
+        computed: false,
+        element: "setter",
+        kind: "constant",
+        staticPlacement: false,
+        superWrite: true,
+        value: 3,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "heritage true 7 shared inherited\n" +
+      "m0 sharedb true false true m0\n" +
+      "m1 inheriteds function undefined false true get m1\n" +
+      "m2 3 undefined function false true set m2\n" +
+      "no-new true\n" +
+      "order c\n",
+  );
+  const source = printCase(testCase);
+  // A prototype element reaches the base prototype and a static element
+  // the base constructor, and a super store lands on the receiver, so
+  // the stored value reads back exactly as a `this` store would.
+  assert.match(source, /return super\.shared\(\) \+ super\.badge;/u);
+  assert.match(source, /return super\.inherited\(\) \+ super\.badge;/u);
+  assert.match(source, /^ {4}super\.s2 = value;$/mu);
 });
 
 test("class model gives an implicit derived class no own constructor", () => {
@@ -676,8 +769,10 @@ test(
           "to three elements over literal and computed keys, each element a " +
           "method, a getter, a setter, or a getter and setter pair placed on " +
           "the prototype or on the constructor with `static`, whose reading " +
-          "body returns a constant, an instance field, or the class-scope " +
-          "name binding, each class standing alone, extending a base class " +
+          "body returns a constant, an instance field, the class-scope name " +
+          "binding, or a base member reached through `super`, and whose " +
+          "setter clause stores through `this` or through `super`, each " +
+          "class standing alone, extending a base class " +
           "through a declared `super()` call, or extending it through the " +
           "implicit derived constructor, comparing an independent name, " +
           "own-property descriptor, accessor round-trip, inherited-member, " +

@@ -210,6 +210,10 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-strict-body" ||
     fixture.name === "class-inheritance" ||
     fixture.name === "class-super-binding" ||
+    fixture.name === "class-super-property" ||
+    fixture.name === "class-super-assignment" ||
+    fixture.name === "class-super-computed" ||
+    fixture.name === "class-super-static" ||
     fixture.name === "class-heritage-values" ||
     fixture.name === "class-new-target" ||
     fixture.name === "class-derived-return-hints" ||

@@ -408,7 +408,7 @@ descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
 unit's boundaries. Class fields,
-private names, static initialization blocks, `extends`, `super`, and
+private names, static initialization blocks, and
 `export default class` remain rejected with source-located diagnostics.
 Asynchronous class methods are admitted, because they share the object literal
 method path exactly; generator and asynchronous generator methods stay rejected
@@ -548,9 +548,9 @@ name and a `length` of zero. `new.target` is admitted as its own expression
 over the construction target the call ABI already carries: it is the
 constructed class through every `super()` hop and `undefined` for an ordinary
 call, a method call, a generator body, and an asynchronous function.
-`super.property` access stays rejected with a source-located diagnostic, and
-so do `super()` and `new.target` inside an arrow function, because an arrow
-takes both from the function enclosing it and this profile captures neither
+`super()` and `new.target` inside an arrow function stay rejected with a
+source-located diagnostic, because an arrow takes both from the function
+enclosing it and this profile captures neither
 lexically yet. Fixed native fixtures cover two-level and three-level chains,
 an inherited method, accessor, and static member, a derived class with no
 constructor, named and anonymous derived class expressions, a class extending
@@ -592,6 +592,59 @@ the reviewed subset until `Function.prototype.bind` exists, because the
 heritage they build starts from a bound function. The manifest moves to 1016
 passes, 382 expected negatives, and 169 unsupported profile features with no
 semantic or harness failures.
+
+`super` property references are now admitted, the sixth unit of the functions
+and executable syntax stream. A class definition records each element's home
+object through one new runtime binding: the class `prototype` object for an
+instance element and the constructor itself for a `static` one, which are the
+two objects the heritage link already relates. A reference reads the
+[[Prototype]] of the home object its running function carries, so an instance
+reference starts its lookup at the parent's `prototype` and a static one at
+the parent constructor, and both keep the enclosing element's `this` as the
+receiver. MIR therefore carries the lookup object and the receiver as separate
+operands of one property operation instead of introducing a second property
+machinery. A read shares the ordinary property inline cache, guarded on the
+lookup object, so a data property the parent prototype owns hits the cached
+slot while an inherited property and an accessor take the generic path; the
+fast path never observes the receiver, because the cache refuses accessor
+slots. An assignment is `Set` with a distinct receiver: a setter found on the
+base chain runs against `this`, and an assignment that reaches no setter
+creates or updates an own property of `this` without consulting an accessor
+that only the receiver's own chain would find. A computed reference reads its
+receiver before its key, so `super[key()]` inside a derived constructor throws
+the uninitialized-`this` `ReferenceError` before `key` runs, and reads the home
+object's [[Prototype]] after that key, so a key expression that replaces the
+prototype is observed by the very reference it precedes. A reference stays
+rejected with a source-located diagnostic in a class body without `extends`
+and in an object literal method, because this runtime has no
+`Object.prototype` object for that lookup to reach, inside an arrow function,
+which owns no home object, inside an asynchronous class element, whose body
+runs in a synthesized function that carries none, and as the operand of
+`delete`, a destructuring assignment target, or a `for` head. Fixed native
+fixtures cover a read, a method call, and a detached method value through
+two-level and three-level chains, an override reached from the parent through
+the derived receiver, an accessor read and its receiver, a write that reaches
+a parent setter, a write that shadows a receiver accessor without running it,
+a write that creates an own data property and its descriptor, a compound
+assignment and both update forms reading the parent and writing the receiver,
+a write to a read-only parent property, computed references over a string,
+symbol, and index key, computed-key evaluation order against the `this`
+temporal dead zone, a reference inside a derived constructor before and after
+`super()`, static method, getter, and setter references through the
+constructor chain, a nested class taking its own home object, and cached,
+inherited, and accessor reads with their guard hit and miss counts. The
+generated class property suite now draws a reading body that returns a base
+member reached through `super` and a setter clause that stores through
+`super`, on the prototype and on the constructor. Eighteen reviewed test262
+cases newly pass, fifteen of them newly reviewed and three leaving the
+unsupported list, covering the `prop-dot` and `prop-expr` value, receiver,
+null-prototype, and uninitialized-`this` families, the `super` in-method and
+in-accessor cases, and the `new.target` value read through a `super`
+property. Thirty-three new unsupported cases record the unit's boundaries and
+the `Object.freeze`, `Object.setPrototypeOf` ordering, `Object` heritage, and
+`Test262Error` observations the remaining cases need. The manifest moves to
+1034 passes, 382 expected negatives, and 199 unsupported profile features
+with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act
@@ -909,7 +962,9 @@ identifier and member targets. Identifier targets perform one checked read
 before the right operand and one checked write afterward. Member targets
 evaluate their object and property-key expression once. They convert the
 retained key value for the read, then convert it again after the right operand
-on the taken write path. Logical assignments lower through explicit branches,
+on the taken write path. Plain `=` assignment to a computed member likewise
+retains the raw key and converts it only after the right operand, as `PutValue`
+specifies. Logical assignments lower through explicit branches,
 so their short path skips the right operand, second conversion, and write.
 Anonymous functions on taken logical-assignment paths retain inferred
 identifier names, while property targets remain unnamed. Imported and

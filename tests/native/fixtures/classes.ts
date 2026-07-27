@@ -1252,4 +1252,461 @@ try {
 }
 `,
   },
+  {
+    name: "class-super-property",
+    source: `
+// A super property reference starts its lookup at the home object's
+// prototype and keeps 'this' as its receiver, so an override still
+// reaches the definition it shadows.
+class Shape {
+  constructor(name) {
+    this.name = name;
+  }
+  describe() {
+    return "shape:" + this.name;
+  }
+  get area() {
+    return 0;
+  }
+  label() {
+    return this.describe() + "/" + this.area;
+  }
+}
+class Square extends Shape {
+  constructor(side) {
+    super("square");
+    this.side = side;
+    this.initial = super.describe();
+  }
+  describe() {
+    return "square<" + super.describe() + ">";
+  }
+  get area() {
+    return this.side * this.side;
+  }
+  both() {
+    return super.area + "," + this.area;
+  }
+  parentLabel() {
+    return super.label();
+  }
+  handle() {
+    return super.describe;
+  }
+}
+const square = new Square(3);
+console.log(square.describe(), square.initial, square.name, square.side);
+console.log(square.both(), square.area);
+// The parent method runs against the derived receiver, so the call it
+// makes dispatches back through the override.
+console.log(square.parentLabel());
+console.log(square.handle() === Shape.prototype.describe);
+// A reference is a property lookup, not a call, so the value survives
+// detached from any receiver.
+const detached = square.handle();
+console.log(detached === Shape.prototype.describe, typeof detached);
+// A class between the reference and the definition is skipped only by
+// the prototype chain, never by the reference itself.
+class Rounded extends Square {}
+class Chamfered extends Rounded {
+  describe() {
+    return "chamfered[" + super.describe() + "]";
+  }
+}
+const chamfered = new Chamfered(2);
+console.log(chamfered.describe(), chamfered.area);
+console.log(typeof super_free);
+function super_free() {
+  return 0;
+}
+`,
+  },
+  {
+    name: "class-super-assignment",
+    source: `
+// A super assignment looks the key up through the home object's
+// prototype but writes to the receiver, so it reaches a setter defined
+// on the parent and otherwise creates the property on the instance.
+class Store {
+  constructor() {
+    this.tag = "base";
+  }
+  set recorded(value) {
+    this.log = "parent-set:" + value + ":" + this.tag;
+  }
+  get recorded() {
+    return "parent-get:" + this.log;
+  }
+}
+Store.prototype.total = 100;
+Store.prototype.count = 20;
+class Tracked extends Store {
+  constructor() {
+    super();
+    this.tag = "t";
+  }
+  writeThroughSetter() {
+    super.recorded = 5;
+    return this.log;
+  }
+  readThroughGetter() {
+    return super.recorded;
+  }
+  // The receiver's own accessor is never consulted, because the write
+  // defines an own property instead of assigning through the chain.
+  set shadowed(value) {
+    this.shadowRan = true;
+  }
+  writeShadowed() {
+    super.shadowed = 7;
+    return this.shadowed + "/" + this.shadowRan;
+  }
+  // A compound assignment reads through the parent and writes to the
+  // receiver, so the parent's value seeds an own property that later
+  // reads no longer see.
+  compound() {
+    super.total += 5;
+    return this.total + "," + super.total;
+  }
+  increment() {
+    const before = super.count++;
+    const after = ++super.count;
+    return before + "," + after + "," + this.count;
+  }
+  detached() {
+    super.absent = super.absent + 1;
+    return this.absent;
+  }
+}
+const tracked = new Tracked();
+console.log(tracked.writeThroughSetter(), tracked.readThroughGetter());
+console.log(tracked.writeShadowed());
+console.log(Object.getOwnPropertyDescriptor(tracked, "shadowed").value);
+console.log(tracked.compound(), tracked.total);
+console.log(tracked.increment(), tracked.count);
+console.log(tracked.detached());
+// A write that reaches a read-only parent property fails, because a
+// class body is strict code.
+class Sealed {}
+Object.defineProperty(Sealed.prototype, "fixed", {
+  value: "F",
+  writable: false,
+});
+class Attempt extends Sealed {
+  write() {
+    try {
+      super.fixed = 1;
+      return "assigned";
+    } catch (error) {
+      return error.constructor.name + ":" + (super.fixed === "F");
+    }
+  }
+}
+console.log(new Attempt().write());
+// The created property is an ordinary own data property of the
+// receiver, and the parent object never changes.
+class Base {}
+class Writer extends Base {
+  fill() {
+    super.made = "own";
+    return this.made;
+  }
+}
+const writer = new Writer();
+console.log(writer.fill(), "made" in Base.prototype);
+const descriptor = Object.getOwnPropertyDescriptor(writer, "made");
+console.log(descriptor.writable, descriptor.enumerable);
+console.log(descriptor.configurable);
+`,
+  },
+  {
+    name: "class-super-computed",
+    source: `
+// A computed super reference evaluates its receiver before its key, so
+// a reference inside a derived constructor observes the 'this'
+// temporal dead zone before the key expression runs.
+let order = "";
+function key(name) {
+  order = order + "key:" + name + " ";
+  return name;
+}
+class Base {
+  constructor() {
+    this.kind = "base";
+  }
+  greet() {
+    return "hello:" + this.kind;
+  }
+  get value() {
+    return "base-value";
+  }
+}
+Base.prototype.data = "base-data";
+class Derived extends Base {
+  constructor(mode) {
+    if (mode === "early") {
+      try {
+        super[key("early")];
+      } catch (error) {
+        order = order + "caught:" + error.constructor.name + " ";
+      }
+    }
+    super();
+    this.kind = "derived";
+  }
+  read(name) {
+    return super[key(name)];
+  }
+  call(name) {
+    return super[key(name)]();
+  }
+  write(name, value) {
+    super[key(name)] = value;
+    return this[name];
+  }
+  greet() {
+    return "override";
+  }
+}
+const derived = new Derived("early");
+console.log(order);
+console.log(derived.read("data"), derived.read("value"));
+console.log(derived.call("greet"), derived.greet());
+console.log(derived.write("stored", 12), "stored" in Base.prototype);
+console.log(order);
+// A key that is not a string is converted once, and a symbol key
+// reaches the same lookup.
+const marker = Symbol("marker");
+class Keyed extends Base {
+  reach() {
+    return super[marker];
+  }
+  reachIndex() {
+    return super[1];
+  }
+}
+Base.prototype[marker] = "symbol-value";
+Base.prototype[1] = "index-value";
+console.log(new Keyed().reach(), new Keyed().reachIndex());
+// A nested class body takes its own home object, so an inner reference
+// never reaches the outer class.
+class Outer extends Base {
+  build() {
+    class Inner extends Base {
+      read() {
+        return super.data;
+      }
+    }
+    return new Inner().read() + "/" + super.data;
+  }
+}
+console.log(new Outer().build());
+// MakeSuperPropertyReference obtains the home object's prototype after
+// the key expression has produced its value, so a key that replaces
+// that prototype is observed by the reference it precedes.
+const replacement = {
+  pick: "new",
+  run() {
+    return "new-call";
+  },
+  set slot(value) {
+    order = order + "new-setter:" + value + " ";
+  },
+};
+class Old {}
+Old.prototype.pick = "old";
+Old.prototype.run = function () {
+  return "old-call";
+};
+Object.defineProperty(Old.prototype, "slot", {
+  set(value) {
+    order = order + "old-setter:" + value + " ";
+  },
+});
+class Swap extends Old {
+  read() {
+    return super[swap("pick")];
+  }
+  invoke() {
+    return super[swap("run")]();
+  }
+  store() {
+    super[swap("slot")] = "v";
+  }
+}
+function swap(name) {
+  Object.setPrototypeOf(Swap.prototype, replacement);
+  return name;
+}
+function reset() {
+  Object.setPrototypeOf(Swap.prototype, Old.prototype);
+}
+const swapper = new Swap();
+reset();
+console.log(swapper.read());
+reset();
+console.log(swapper.invoke());
+reset();
+order = "";
+swapper.store();
+console.log(order);
+// PutValue converts the key, so an assignment holds the key
+// expression's raw value until the right side has been evaluated. The
+// ordinary and the super form share that order.
+const late = {
+  toString() {
+    order = order + "key ";
+    return "slot";
+  },
+};
+const plain = {};
+order = "";
+plain[late] = ((order = order + "right "), 1);
+console.log(order, plain.slot);
+class Holder extends Old {}
+class Late extends Holder {
+  put() {
+    super[late] = ((order = order + "right "), 2);
+    return this.slot;
+  }
+}
+order = "";
+console.log(new Late().put(), order);
+`,
+  },
+  {
+    name: "class-super-static",
+    source: `
+// A static element's home object is the constructor itself, so its
+// super references walk the constructor chain that 'extends' links,
+// while an instance element walks the prototype chain.
+class Registry {
+  static create(tag) {
+    return "registry:" + tag + ":" + this.label;
+  }
+  static get label() {
+    return "registry";
+  }
+  static set label(value) {
+    this.assigned = "registry-set:" + value;
+  }
+  static describe() {
+    return "static-describe";
+  }
+  instance() {
+    return "instance";
+  }
+}
+Registry.stored = "registry-stored";
+class Scoped extends Registry {
+  static create(tag) {
+    return "scoped<" + super.create(tag) + ">";
+  }
+  static get label() {
+    return "scoped";
+  }
+  static both() {
+    return super.label + "," + this.label;
+  }
+  static write() {
+    super.label = 3;
+    return this.assigned;
+  }
+  static shared() {
+    return super.stored;
+  }
+  static handle() {
+    return super.describe === Registry.describe;
+  }
+  instance() {
+    return "scoped-instance/" + super.instance();
+  }
+}
+console.log(Scoped.create("a"));
+console.log(Scoped.both(), Scoped.label);
+console.log(Scoped.write(), Scoped.assigned);
+console.log(Scoped.shared(), Scoped.handle());
+console.log(new Scoped().instance());
+// The static reference reads the constructor chain, so an own static
+// property of the derived class does not shadow what super names.
+Scoped.stored = "scoped-stored";
+console.log(Scoped.shared(), Scoped.stored);
+// A three-level chain reaches through every intermediate constructor.
+class Nested extends Scoped {
+  static create(tag) {
+    return "nested[" + super.create(tag) + "]";
+  }
+}
+console.log(Nested.create("b"));
+console.log(Nested.label, Object.keys(Nested).length);
+`,
+  },
+  {
+    name: "class-super-cache",
+    source: `
+// A super read uses the same inline cache as an ordinary property read,
+// guarded on the object the lookup starts at. A data property that the
+// parent's own prototype object holds hits that cache, while a
+// definition further up the chain and an accessor always leave the fast
+// path for the generic lookup.
+class Root {
+  get accessed() {
+    return "accessor:" + this.mark;
+  }
+}
+Root.prototype.deep = "root-deep";
+class Middle extends Root {
+  method() {
+    return "middle-method";
+  }
+}
+Middle.prototype.near = "middle-near";
+class Leaf extends Middle {
+  constructor() {
+    super();
+    this.mark = "leaf";
+  }
+  cached() {
+    return super.near;
+  }
+  inherited() {
+    return super.deep;
+  }
+  accessor() {
+    return super.accessed;
+  }
+  called() {
+    return super.method();
+  }
+}
+const leaf = new Leaf();
+let report = "";
+let index = 0;
+while (index < 4) {
+  report = report + leaf.cached() + " " + leaf.inherited() + " ";
+  report = report + leaf.accessor() + " " + leaf.called() + " ";
+  index = index + 1;
+}
+console.log(report);
+// Replacing the parent's own property changes the shape the cache
+// recorded, so the next read reports the new value.
+Middle.prototype.near = "replaced";
+console.log(leaf.cached(), leaf.inherited(), leaf.accessor());
+// The cached slot belongs to the parent prototype, not to the receiver,
+// so an own property of the receiver never satisfies the reference.
+leaf.near = "own";
+console.log(leaf.cached(), leaf.near);
+`,
+    // The counters record that a super read shares the ordinary
+    // property inline cache: the parent prototype's own data property
+    // hits the cached slot, while the inherited property and the
+    // accessor take the generic lookup on every execution.
+    specialization: {
+      genericCallsDisabled: 41,
+      genericCallsEnabled: 41,
+      hits: 9,
+      misses: 16,
+      overflowMisses: 0,
+    },
+  },
 ];

@@ -477,6 +477,19 @@ export type HirExpression =
       readonly kind: "this";
     })
   | (LocatedSyntax & {
+      /**
+       * The `super` operand of a property reference. It stands only as
+       * the `object` of a property get, set, update, or step expression
+       * or of a `method` call target. Lowering starts the lookup at the
+       * running function's home object prototype and keeps `receiver` as
+       * the value a getter, setter, or method call receives as `this`,
+       * which is the resolved `this` of the enclosing class element and
+       * therefore the derived constructor's binding where one exists.
+       */
+      readonly kind: "super-base";
+      readonly receiver: HirExpression;
+    })
+  | (LocatedSyntax & {
       readonly kind: "new-target";
     })
   | (LocatedSyntax & {

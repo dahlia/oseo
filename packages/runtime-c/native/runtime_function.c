@@ -251,6 +251,7 @@ OseoResult oseo_function_create(
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
     function->prototype_object = frame.slots[1];
+    function->home_object = oseo_undefined();
     function->code_id = code_id;
     function->function_kind = function_kind;
     /* A class's `prototype` is non-writable, non-enumerable, and
@@ -523,6 +524,18 @@ OseoResult oseo_class_heritage(
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+void oseo_bind_home_object(OseoValue function, OseoValue home) {
+    if (!is_function(function)) return;
+    function_object(function)->home_object = home;
+}
+
+OseoValue oseo_super_base(OseoValue callee) {
+    if (!is_function(callee)) return oseo_undefined();
+    OseoValue home = function_object(callee)->home_object;
+    if (!is_object(home)) return oseo_undefined();
+    return ordinary_object(home)->prototype;
 }
 
 OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
