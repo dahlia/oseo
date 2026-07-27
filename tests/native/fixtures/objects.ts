@@ -1182,4 +1182,118 @@ while (accessorCursor !== null) {
 console.log(accessorSteps, accessorChain.depth);
 `,
   },
+  {
+    name: "object-literal-spread",
+    source: `
+const empty = { ...{} };
+console.log(Object.keys(empty).length);
+
+const base = { first: 1, second: 2 };
+const copied = { ...base };
+console.log(copied.first, copied.second, copied === base);
+console.log(Object.keys(copied).length);
+
+const copiedDescriptor = Object.getOwnPropertyDescriptor(copied, "first");
+console.log(
+  copiedDescriptor.value,
+  copiedDescriptor.writable,
+  copiedDescriptor.enumerable,
+  copiedDescriptor.configurable,
+);
+
+let getterCalls = 0;
+const withGetter = {
+  get counted() { getterCalls = getterCalls + 1; return getterCalls; },
+};
+const flattened = { ...withGetter };
+console.log(getterCalls, flattened.counted, flattened.counted);
+const flattenedDescriptor = Object.getOwnPropertyDescriptor(
+  flattened,
+  "counted",
+);
+console.log("value" in flattenedDescriptor, "get" in flattenedDescriptor);
+
+const interleaved = { before: 0, ...base, middle: 3, ...{ last: 4 }, after: 5 };
+const interleavedKeys = Object.keys(interleaved);
+let interleavedText = "";
+for (let index = 0; index < interleavedKeys.length; index = index + 1) {
+  const key = interleavedKeys[index];
+  interleavedText = interleavedText + key + "=" + interleaved[key] + ";";
+}
+console.log(interleavedText);
+
+const overwritten = { value: 1, ...{ value: 2 }, ...{ value: 3 } };
+console.log(overwritten.value);
+const overwrittenLater = { ...{ value: 2 }, value: 1 };
+console.log(overwrittenLater.value);
+
+const ordered = { later: 1, ...{ 2: "two", 0: "zero" }, 1: "one" };
+const orderedKeys = Object.keys(ordered);
+console.log(orderedKeys[0], orderedKeys[1], orderedKeys[2], orderedKeys[3]);
+
+console.log(Object.keys({ ...null, ...undefined }).length);
+const nullishWithData = { ...null, kept: 1, ...undefined };
+console.log(nullishWithData.kept, Object.keys(nullishWithData).length);
+
+const fromString = { ..."ab" };
+console.log(fromString[0], fromString[1], Object.keys(fromString).length);
+console.log(Object.keys({ ...5, ...true, ...Symbol("s") }).length);
+
+const fromArray = { ...[7, 8] };
+console.log(fromArray[0], fromArray[1], Object.keys(fromArray).length);
+
+function namedFunction(first, second) { return first; }
+console.log(Object.keys({ ...namedFunction }).length);
+
+const prototypeSource = Object.create({ inherited: 1 });
+prototypeSource.own = 2;
+const ownOnly = { ...prototypeSource };
+console.log(ownOnly.own, ownOnly.inherited, Object.keys(ownOnly).length);
+
+const partiallyHidden = {};
+Object.defineProperty(partiallyHidden, "hidden", {
+  value: 1,
+  enumerable: false,
+});
+Object.defineProperty(partiallyHidden, "shown", { value: 2, enumerable: true });
+const visibleOnly = { ...partiallyHidden };
+console.log(visibleOnly.hidden, visibleOnly.shown);
+
+const marker = Symbol("marker");
+const symbolSource = { [marker]: 9, plain: 1 };
+const symbolCopy = { ...symbolSource };
+console.log(symbolCopy[marker], symbolCopy.plain, Object.keys(symbolCopy)[0]);
+
+let order = "";
+function trace(tag, value) { order = order + tag; return value; }
+const traced = {
+  [trace("k", "computed")]: trace("v", 1),
+  ...trace("s", { get read() { return trace("g", 2); } }),
+  tail: trace("t", 3),
+};
+console.log(order, traced.computed, traced.read, traced.tail);
+
+let reachedLater = false;
+try {
+  const abrupt = {
+    kept: 1,
+    ...{ get failing() { throw new TypeError("spread source failure"); } },
+    later: (reachedLater = true, 2),
+  };
+  console.log("no throw", abrupt.kept);
+} catch (error) {
+  console.log("threw", error instanceof TypeError, error.message, reachedLater);
+}
+
+function grow(depth) {
+  let accumulated = {};
+  for (let index = 0; index < depth; index = index + 1) {
+    accumulated = { ...accumulated, ["key" + index]: index };
+  }
+  return accumulated;
+}
+const grown = grow(24);
+console.log(Object.keys(grown).length, grown.key0, grown.key23);
+`,
+  },
 ];

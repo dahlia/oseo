@@ -1213,15 +1213,20 @@ static OseoResult snapshot_rest_keys(
     return normal(oseo_undefined());
 }
 
-OseoResult oseo_object_rest(
+/**
+ * CopyDataProperties: adds every own enumerable property of `source` that is
+ * not an excluded key to `target` as a writable, enumerable, configurable
+ * data property, in own-key order. `source` must not be nullish; the two
+ * callers apply the nullish rule their own syntax requires. The result value
+ * is `target` so a caller can return it directly.
+ */
+static OseoResult copy_data_properties(
     OseoContext *context,
+    OseoValue target,
     OseoValue source,
     size_t excluded_count,
     const OseoValue *excluded_keys
 ) {
-    if (is_nullish(source)) {
-        return type_error(context, "Cannot destructure a nullish value.");
-    }
     size_t key_count = is_string(source)
         ? string_object(source)->length
         : is_object(source)
@@ -1234,11 +1239,8 @@ OseoResult oseo_object_rest(
     OseoResult result = oseo_roots_allocate(context, &frame, key_count + 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = source;
-    result = oseo_object_literal_create(context);
-    frame.slots[1] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = snapshot_rest_keys(context, &frame, key_count);
-    }
+    frame.slots[1] = target;
+    result = snapshot_rest_keys(context, &frame, key_count);
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < key_count;
          index += 1u) {
@@ -1279,6 +1281,44 @@ OseoResult oseo_object_rest(
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[1];
     oseo_roots_release(context, &frame);
     return result;
+}
+
+OseoResult oseo_object_rest(
+    OseoContext *context,
+    OseoValue source,
+    size_t excluded_count,
+    const OseoValue *excluded_keys
+) {
+    if (is_nullish(source)) {
+        return type_error(context, "Cannot destructure a nullish value.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = source;
+    result = oseo_object_literal_create(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = copy_data_properties(
+            context,
+            result.value,
+            frame.slots[0],
+            excluded_count,
+            excluded_keys
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_object_spread(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue source
+) {
+    /* An object literal spread of null or undefined copies nothing rather
+     * than throwing, unlike an object binding rest. */
+    if (is_nullish(source)) return normal(target);
+    return copy_data_properties(context, target, source, 0u, NULL);
 }
 
 static OseoResult define_ascii_value(

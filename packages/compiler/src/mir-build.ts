@@ -1396,6 +1396,34 @@ function lowerExpression(
     );
     recordRoot(builder, id, expression.range);
     for (const property of expression.properties) {
+      if (property.kind === "spread") {
+        const source = lowerExpression(property.argument, builder);
+        appendMirMetadata(
+          builder,
+          "safepoint",
+          "object spread copy",
+          [id, source],
+          property.range,
+        );
+        const copied = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [id, source],
+          detail: "CopyDataProperties for object literal spread",
+          id: copied,
+          kind: "object-spread",
+          range: property.range,
+        });
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [copied],
+          property.range,
+        );
+        recordRoot(builder, copied, property.range);
+        continue;
+      }
       const key = lowerPropertyKey(property.key, builder);
       const value = lowerExpression(
         property.value,

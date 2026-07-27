@@ -25,15 +25,37 @@ const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-type PropertyKind = "data" | "get" | "method" | "set" | "shorthand";
+type PropertyKind =
+  | "data"
+  | "get"
+  | "method"
+  | "set"
+  | "shorthand"
+  | "spread"
+  | "spread-nullish";
 
 interface PropertySpec {
   readonly kind: PropertyKind;
+  /**
+   * Own keys of a `spread` source, as indices into the shared `p<n>` key
+   * pool the other property kinds also define, so a generated spread can
+   * introduce a fresh key or overwrite an earlier definition. Ignored by
+   * every other kind.
+   */
+  readonly spreadKeys: readonly number[];
   readonly value: number;
 }
 
 interface ObjectLiteralCase {
   readonly properties: readonly PropertySpec[];
+}
+
+/** The final state of one own key after every property is applied. */
+interface KeyState {
+  readonly kind: "data" | "get" | "method" | "set";
+  /** Index of the property that last defined the key. */
+  readonly owner: number;
+  readonly value: number;
 }
 
 const host = createNodeHost();
@@ -51,17 +73,75 @@ const propertyArbitrary: fc.Arbitrary<PropertySpec> = fc.record({
     "method",
     "set",
     "shorthand",
+    "spread",
+    "spread-nullish",
   ),
+  spreadKeys: fc.array(fc.integer({ max: 4, min: 0 }), { maxLength: 3 }),
   value: fc.integer({ max: 20, min: -20 }),
 });
-const caseArbitrary: fc.Arbitrary<ObjectLiteralCase> = fc.record({
-  properties: fc.array(propertyArbitrary, { maxLength: 4 }),
-});
+/**
+ * V8 enumerates an accessor defined after an object literal spread property
+ * last instead of in property-creation order, so Node.js and Deno disagree
+ * with ECMA-262 for that one combination and cannot act as references for it.
+ * The generator rewrites such an accessor as a data property; the fixed
+ * tests/fixtures/object-spread-accessor-order.js native check keeps the
+ * specified order as evidence without a reference observation.
+ */
+const caseArbitrary: fc.Arbitrary<ObjectLiteralCase> = fc
+  .record({ properties: fc.array(propertyArbitrary, { maxLength: 4 }) })
+  .map((testCase) => {
+    let spread = false;
+    return {
+      properties: testCase.properties.map((property) => {
+        if (property.kind === "spread" || property.kind === "spread-nullish") {
+          spread = true;
+          return property;
+        }
+        return spread && (property.kind === "get" || property.kind === "set")
+          ? { ...property, kind: "data" as const }
+          : property;
+      }),
+    };
+  });
+
+/**
+ * Independent model of the own keys an object literal ends with: a key holds
+ * its first insertion position and the definition that last replaced it, and
+ * a spread contributes each of its source keys as a data property.
+ */
+function modelKeys(
+  testCase: ObjectLiteralCase,
+): readonly (readonly [string, KeyState])[] {
+  const insertion: string[] = [];
+  const states = new Map<string, KeyState>();
+  const define = (key: string, state: KeyState): void => {
+    if (!states.has(key)) insertion.push(key);
+    states.set(key, state);
+  };
+  testCase.properties.forEach((property, index) => {
+    if (property.kind === "spread-nullish") return;
+    if (property.kind === "spread") {
+      property.spreadKeys.forEach((key, offset) => {
+        define(`p${key}`, {
+          kind: "data",
+          owner: index,
+          value: property.value + offset,
+        });
+      });
+      return;
+    }
+    define(`p${index}`, {
+      kind: property.kind === "shorthand" ? "data" : property.kind,
+      owner: index,
+      value: property.value,
+    });
+  });
+  return insertion.map((key) => [key, states.get(key)!] as const);
+}
 
 function printCase(testCase: ObjectLiteralCase): string {
   const bindings: string[] = [];
   const tokens: string[] = [];
-  const reads: string[] = [];
   testCase.properties.forEach((property, index) => {
     const name = `p${index}`;
     const store = `s${index}`;
@@ -75,22 +155,31 @@ function printCase(testCase: ObjectLiteralCase): string {
     } else if (property.kind === "set") {
       bindings.push(`let ${store};`);
       tokens.push(`set ${name}(v) { ${store} = v; }`);
+    } else if (property.kind === "spread") {
+      const entries = property.spreadKeys
+        .map((key, offset) => `p${key}: ${property.value + offset}`)
+        .join(", ");
+      tokens.push(`...(order = order + "${index}", { ${entries} })`);
+    } else if (property.kind === "spread-nullish") {
+      tokens.push(`...(order = order + "${index}", null)`);
     } else {
       tokens.push(`${name}() { return ${property.value}; }`);
     }
-    if (property.kind === "method") {
-      reads.push(
-        `console.log("${name}", typeof o.${name}, o.${name}(), ` +
-          `o.${name}.name, "prototype" in o.${name});`,
+  });
+  const reads = modelKeys(testCase).map(([key, state]) => {
+    if (state.kind === "method") {
+      return (
+        `console.log("${key}", typeof o.${key}, o.${key}(), ` +
+        `o.${key}.name, "prototype" in o.${key});`
       );
-    } else if (property.kind === "set") {
-      reads.push(
-        `o.${name} = ${property.value};\n` +
-          `console.log("${name}", ${store});`,
-      );
-    } else {
-      reads.push(`console.log("${name}", o.${name});`);
     }
+    if (state.kind === "set") {
+      return (
+        `o.${key} = ${state.value};\n` +
+        `console.log("${key}", s${state.owner});`
+      );
+    }
+    return `console.log("${key}", o.${key});`;
   });
   return `
 let order = "";
@@ -105,20 +194,25 @@ console.log("order", order);
 }
 
 function expected(testCase: ObjectLiteralCase): string {
+  const entries = modelKeys(testCase);
   const lines: string[] = [];
-  const keys = testCase.properties.map((_property, index) => `p${index}`);
-  lines.push(`keys ${keys.map((key) => `${key},`).join("")}`);
-  testCase.properties.forEach((property, index) => {
-    const name = `p${index}`;
+  lines.push(`keys ${entries.map(([key]) => `${key},`).join("")}`);
+  for (const [key, state] of entries) {
     lines.push(
-      property.kind === "method"
-        ? `${name} function ${property.value} ${name} false`
-        : `${name} ${property.value}`,
+      state.kind === "method"
+        ? `${key} function ${state.value} ${key} false`
+        : `${key} ${state.value}`,
     );
-  });
+  }
   let order = "";
   testCase.properties.forEach((property, index) => {
-    if (property.kind === "data") order += String(index);
+    if (
+      property.kind === "data" ||
+      property.kind === "spread" ||
+      property.kind === "spread-nullish"
+    ) {
+      order += String(index);
+    }
   });
   lines.push(`order ${order}`);
   return `${lines.join("\n")}\n`;
@@ -164,14 +258,14 @@ async function references(source: string): Promise<
   }
 }
 
-test("object literal model orders only data property evaluation", () => {
+test("object literal model orders only evaluated property definitions", () => {
   assert.equal(
     expected({
       properties: [
-        { kind: "shorthand", value: 1 },
-        { kind: "data", value: 2 },
-        { kind: "method", value: 3 },
-        { kind: "data", value: 4 },
+        { kind: "shorthand", spreadKeys: [], value: 1 },
+        { kind: "data", spreadKeys: [], value: 2 },
+        { kind: "method", spreadKeys: [], value: 3 },
+        { kind: "data", spreadKeys: [], value: 4 },
       ],
     }),
     "keys p0,p1,p2,p3,\n" +
@@ -181,6 +275,29 @@ test("object literal model orders only data property evaluation", () => {
       "p3 4\n" +
       "order 13\n",
   );
+});
+
+test("object literal model keeps spread key positions and last values", () => {
+  const testCase: ObjectLiteralCase = {
+    properties: [
+      { kind: "spread", spreadKeys: [2, 0], value: 7 },
+      { kind: "data", spreadKeys: [], value: 1 },
+      { kind: "spread-nullish", spreadKeys: [], value: 0 },
+      { kind: "get", spreadKeys: [], value: 5 },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "keys p2,p0,p1,p3,\n" +
+      "p2 7\n" +
+      "p0 8\n" +
+      "p1 1\n" +
+      "p3 5\n" +
+      "order 012\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /\.\.\.\(order = order \+ "0", \{ p2: 7, p0: 8 \}\)/u);
+  assert.match(source, /\.\.\.\(order = order \+ "2", null\)/u);
 });
 
 test(
@@ -242,15 +359,19 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "object literals with zero to four data, shorthand, and method " +
-          "properties and bounded integer values, comparing an independent " +
-          "key-order and evaluation-order model with Node.js, Deno, and " +
-          "both native specialization policies with forced collection on " +
-          "the enabled path",
+          "object literals with zero to four data, shorthand, method, " +
+          "getter, setter, object spread, and nullish spread properties " +
+          "over a shared five-name key pool and bounded integer values, " +
+          "comparing an independent key-order, last-definition, and " +
+          "evaluation-order model with Node.js, Deno, and both native " +
+          "specialization policies with forced collection on the enabled " +
+          "path",
         numRuns: 15,
         profile: "M5 basic object literal expressions",
         seed: 0x5eed_0015,
-        sizeLimit: "zero to four properties and bounded integer values",
+        sizeLimit:
+          "zero to four properties, zero to three spread source keys, and " +
+          "bounded integer values",
         timeLimitMilliseconds: 180_000,
       },
     );

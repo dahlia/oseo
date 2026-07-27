@@ -693,6 +693,14 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         `${excluded.length}u, ` +
         (excluded.length === 0 ? "NULL);" : `${excludedName});`),
     );
+  } else if (operation.kind === "object-spread") {
+    const object = operationArgument(operation, 0);
+    const source = operationArgument(operation, 1);
+    line(
+      state,
+      `result = oseo_object_spread(context, roots[${object}], ` +
+        `roots[${source}]);`,
+    );
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(state, `result = oseo_property_key(context, roots[${input}]);`);
@@ -1120,6 +1128,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
     operation.kind === "object-rest" ||
+    operation.kind === "object-spread" ||
     operation.kind === "property-key" ||
     operation.kind === "property-define-accessor" ||
     operation.kind === "property-define-data" ||

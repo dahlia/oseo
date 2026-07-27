@@ -13,6 +13,7 @@ import type {
   HirForOfTarget,
   HirFunction,
   HirObjectBindingProperty,
+  HirObjectProperty,
   HirParameter,
   HirResult,
   HirStatement,
@@ -305,12 +306,14 @@ function resolveExpression(
     return { ...expression, expressions };
   }
   if (expression.kind === "object") {
-    const properties: {
-      readonly accessorKind?: "get" | "set";
-      readonly key: HirExpression;
-      readonly value: HirExpression;
-    }[] = [];
+    const properties: HirObjectProperty[] = [];
     for (const property of expression.properties) {
+      if (property.kind === "spread") {
+        const argument = resolveExpression(property.argument, scopes, state);
+        if (argument == null) return undefined;
+        properties.push({ ...property, argument });
+        continue;
+      }
       const key = resolveExpression(property.key, scopes, state);
       const value = resolveExpression(property.value, scopes, state);
       if (key == null || value == null) return undefined;
@@ -319,6 +322,7 @@ function resolveExpression(
           ? {}
           : { accessorKind: property.accessorKind }),
         key,
+        kind: "definition",
         value:
           key.kind === "string" ? inferFunctionName(value, key.value) : value,
       });
@@ -796,10 +800,11 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     return expression.arguments.some(hirCallArgumentHasAwait);
   }
   if (expression.kind === "object") {
-    return expression.properties.some(
-      (property) =>
-        hirExpressionHasAwait(property.key) ||
-        hirExpressionHasAwait(property.value),
+    return expression.properties.some((property) =>
+      property.kind === "spread"
+        ? hirExpressionHasAwait(property.argument)
+        : hirExpressionHasAwait(property.key) ||
+          hirExpressionHasAwait(property.value),
     );
   }
   if (

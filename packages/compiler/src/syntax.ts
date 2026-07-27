@@ -154,6 +154,27 @@ export interface SyntaxSpreadArgument extends LocatedSyntax {
 /** One ordinary or spread owned call argument. */
 export type SyntaxCallArgument = SyntaxExpression | SyntaxSpreadArgument;
 
+/** One data, shorthand, method, or accessor owned object literal entry. */
+export interface SyntaxObjectDefinition {
+  /** A get or set accessor; absent for a data, shorthand, or method
+   * property. */
+  readonly accessorKind?: "get" | "set";
+  readonly key: SyntaxExpression;
+  readonly kind: "definition";
+  readonly value: SyntaxExpression;
+}
+
+/** One spread entry retained inside an owned object literal. */
+export interface SyntaxObjectSpreadProperty extends LocatedSyntax {
+  readonly argument: SyntaxExpression;
+  readonly kind: "spread";
+}
+
+/** One defined or spread owned object literal property. */
+export type SyntaxObjectProperty =
+  | SyntaxObjectDefinition
+  | SyntaxObjectSpreadProperty;
+
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
   | (LocatedSyntax & {
@@ -241,13 +262,7 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "object";
-      readonly properties: readonly {
-        /** A get or set accessor; absent for a data, shorthand, or method
-         * property. */
-        readonly accessorKind?: "get" | "set";
-        readonly key: SyntaxExpression;
-        readonly value: SyntaxExpression;
-      }[];
+      readonly properties: readonly SyntaxObjectProperty[];
     })
   | (LocatedSyntax & {
       readonly key: SyntaxExpression;

@@ -4,6 +4,8 @@ import type {
   HirExpression,
   HirFunction,
   HirGlobalBinding,
+  HirObjectProperty,
+  HirObjectSpreadProperty,
   HirParameter,
   HirProgram,
   HirStatement,
@@ -318,6 +320,23 @@ function rebuildHirArguments(
   );
 }
 
+/**
+ * Maps each object literal property to the index of its first flattened
+ * child, since a spread contributes one child and every other property kind
+ * contributes a key and a value.
+ */
+function objectPropertyChildOffsets(
+  properties: readonly HirObjectProperty[],
+): readonly number[] {
+  const offsets: number[] = [];
+  let cursor = 0;
+  for (const property of properties) {
+    offsets.push(cursor);
+    cursor += property.kind === "spread" ? 1 : 2;
+  }
+  return offsets;
+}
+
 function moduleExpressionParts(
   expression: HirExpression,
 ): ModuleExpressionParts | undefined {
@@ -431,19 +450,26 @@ function moduleExpressionParts(
     };
   }
   if (expression.kind === "object") {
-    const children = expression.properties.flatMap((property) => [
-      property.key,
-      property.value,
-    ]);
+    const offsets = objectPropertyChildOffsets(expression.properties);
+    const children = expression.properties.flatMap((property) =>
+      property.kind === "spread"
+        ? [property.argument]
+        : [property.key, property.value],
+    );
     return {
       children,
       rebuild: (rebuilt) => ({
         ...expression,
-        properties: expression.properties.map((property, index) => ({
-          ...property,
-          key: rebuilt[index * 2] ?? property.key,
-          value: rebuilt[index * 2 + 1] ?? property.value,
-        })),
+        properties: expression.properties.map((property, index) => {
+          const offset = offsets[index]!;
+          return property.kind === "spread"
+            ? { ...property, argument: rebuilt[offset] ?? property.argument }
+            : {
+                ...property,
+                key: rebuilt[offset] ?? property.key,
+                value: rebuilt[offset + 1] ?? property.value,
+              };
+        }),
       }),
     };
   }
@@ -580,6 +606,23 @@ function extractModuleAwait(
           preceding,
           "Call argument spread before a top-level await point is " +
             "unsupported.",
+        ),
+      );
+      return undefined;
+    }
+  }
+  if (expression.kind === "object") {
+    const offsets = objectPropertyChildOffsets(expression.properties);
+    const preceding = expression.properties.find(
+      (property, index): property is HirObjectSpreadProperty =>
+        property.kind === "spread" && offsets[index]! < childIndex,
+    );
+    if (preceding != null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          preceding,
+          "Object spread before a top-level await point is unsupported.",
         ),
       );
       return undefined;
