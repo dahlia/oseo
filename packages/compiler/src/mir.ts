@@ -139,6 +139,7 @@ export interface MirOperation {
     | "guard-object"
     | "guard-shape"
     | "guard-smi"
+    | "home-object-bind"
     | "initialize"
     | "iterator-close"
     | "iterator-delegate-next"
@@ -163,6 +164,7 @@ export interface MirOperation {
     | "read"
     | "receiver"
     | "root-store"
+    | "super-base"
     | "super-constructor"
     | "safepoint"
     | "this-bind"
@@ -204,6 +206,15 @@ export interface MirOperation {
    * are strict code even when the enclosing script is not.
    */
   readonly strict?: true;
+  /**
+   * Marks one `property-get` or `property-set` as a `super` reference,
+   * which starts its lookup at the object the operation's first argument
+   * names and passes a distinct receiver as its last argument. A getter
+   * or setter therefore runs against the enclosing element's `this`, and
+   * an assignment that reaches no setter creates its own property on
+   * that receiver instead of on the object it looked through.
+   */
+  readonly superReference?: true;
   readonly target?: MirCallTarget;
 }
 

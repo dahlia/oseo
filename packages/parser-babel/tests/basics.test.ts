@@ -1194,11 +1194,69 @@ console.log(new Derived(1).x, new Implicit() instanceof Base);
   assert.ok(result.mir != null);
 });
 
+test("lowers a super property reference to its base and receiver", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Base {
+  describe() {
+    return "base";
+  }
+}
+class Derived extends Base {
+  describe() {
+    return super.describe();
+  }
+  rename(key) {
+    super[key] = super.describe;
+    return super.describe;
+  }
+  static of() {
+    return super.of;
+  }
+}
+console.log(new Derived().describe(), Derived.of());
+`,
+    sourceId: "class-super-property.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  // Every reference names the receiver it carries, so a static element
+  // and an instance element are distinguishable only by the home object
+  // lowering records, not by the reference itself.
+  assert.match(text, /call super -> this\["describe"\]\(\)/u);
+  assert.match(text, /set super -> this\[%b\d+\(key\)\]/u);
+  assert.match(text, /get super -> this\["describe"\]/u);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /super-base home object prototype/u);
+  assert.match(mir, /home-object-bind home object/u);
+});
+
 test("rejects super and new.target outside their admitted positions", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     [
-      "class A {}\nclass B extends A { m() { return super.m; } }",
-      /Property access through super/u,
+      "class A { m() { return super.m; } }",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "const o = { m() { return super.m; } };",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "class A {}\nclass B extends A { m() { return (() => super.m)(); } }",
+      /super inside an arrow function is unsupported/u,
+    ],
+    [
+      "class A {}\nclass B extends A { async m() { return super.m; } }",
+      /super inside an async function is unsupported/u,
+    ],
+    [
+      "class A {}\nclass B extends A { m() { return delete super.m; } }",
+      /Property access through super is unsupported here/u,
+    ],
+    [
+      "class A {}\nclass B extends A { m() { [super.m] = [1]; } }",
+      /Property access through super is unsupported here/u,
     ],
     [
       "class A {}\nclass B extends A { constructor() { (() => super())(); } }",

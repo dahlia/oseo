@@ -186,6 +186,9 @@ function printHirExpression(expression: HirExpression): string {
       ? `${expression.operator}${target}`
       : `${target}${expression.operator}`;
   }
+  if (expression.kind === "super-base") {
+    return `super -> ${printHirExpression(expression.receiver)}`;
+  }
   if (expression.kind === "module-namespace") {
     return `module-namespace {${expression.entries
       .map((entry) => `${JSON.stringify(entry.name)}: %b${entry.bindingId}`)

@@ -32,6 +32,8 @@ import {
   type BabelNode,
   type ConvertContext,
   type ReceiverContext,
+  type ReceiverKind,
+  type SuperPropertyContext,
 } from "./babel.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
 import { location, sourceRange, unsupported } from "./locations.ts";
@@ -92,13 +94,13 @@ export function callTarget(
   }
   if (value.type === "Super") {
     const receiver = context.receiverStack.at(-1);
-    if (receiver === "derived-constructor") {
+    if (receiver?.kind === "derived-constructor") {
       return { ...location(context, value), kind: "super" };
     }
     return unsupported(
       context,
       value,
-      receiver === "arrow-in-derived-constructor"
+      receiver?.kind === "arrow-in-derived-constructor"
         ? "Calling super() from an arrow function is unsupported."
         : "super() is only valid in a derived class constructor.",
     );
@@ -159,15 +161,51 @@ export function callTarget(
       };
     }
   }
-  const parts = memberParts(context, value);
+  const parts = memberParts(context, value, true);
   return parts == null
     ? undefined
     : { ...location(context, value), ...parts, kind: "property" };
 }
 
+/**
+ * Converts the `super` operand of a property reference. The reference is
+ * admitted only where the running function's own function object carries
+ * a home object, which is a non-arrow, non-async element of a class with
+ * `extends`; every other position names the reason it is rejected.
+ */
+function superBase(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  const superProperty = context.receiverStack.at(-1)?.superProperty;
+  if (superProperty === "admitted") {
+    return { ...location(context, value), kind: "super-base" };
+  }
+  return unsupported(
+    context,
+    value,
+    superProperty === "arrow"
+      ? "Property access through super inside an arrow function is " +
+          "unsupported."
+      : superProperty === "async"
+        ? "Property access through super inside an async function is " +
+          "unsupported."
+        : "Property access through super is only valid in the body of a " +
+          "class element whose class has an extends clause.",
+  );
+}
+
+/**
+ * Converts one member expression into its object and key. `superAllowed`
+ * admits a `super` operand, which every caller that can carry the
+ * reference's `this` receiver through to lowering passes; the remaining
+ * callers reject it, because their targets read or write the object they
+ * evaluate rather than a separate receiver.
+ */
 export function memberParts(
   context: ConvertContext,
   value: BabelNode,
+  superAllowed = false,
 ):
   | {
       readonly key: SyntaxExpression;
@@ -182,7 +220,16 @@ export function memberParts(
   if (objectNode == null || propertyNode == null) {
     return unsupported(context, value);
   }
-  const objectValue = expression(context, objectNode);
+  const objectValue =
+    objectNode.type === "Super"
+      ? superAllowed
+        ? superBase(context, objectNode)
+        : unsupported(
+            context,
+            objectNode,
+            "Property access through super is unsupported here.",
+          )
+      : expression(context, objectNode);
   let key: SyntaxExpression | undefined;
   if (value.computed === true) {
     key = expression(context, propertyNode);
@@ -280,7 +327,8 @@ export function expression(
     return unsupported(
       context,
       value,
-      "Property access through super is unsupported.",
+      "super is only valid as a call or as the object of a property " +
+        "reference.",
     );
   }
   if (value.type === "MetaProperty") {
@@ -304,7 +352,8 @@ export function expression(
     }
     // An arrow takes new.target from the function that encloses it, which
     // this profile does not capture yet.
-    return receiver === "arrow" || receiver === "arrow-in-derived-constructor"
+    return receiver.kind === "arrow" ||
+      receiver.kind === "arrow-in-derived-constructor"
       ? unsupported(
           context,
           value,
@@ -458,7 +507,7 @@ export function expression(
     return classExpression(context, value);
   }
   if (value.type === "MemberExpression") {
-    const member = memberParts(context, value);
+    const member = memberParts(context, value, true);
     return member == null
       ? undefined
       : { ...located, ...member, kind: "property-get" };
@@ -484,7 +533,7 @@ export function expression(
           value: assigned,
         };
       }
-      const member = memberParts(context, left);
+      const member = memberParts(context, left, true);
       return member == null
         ? undefined
         : {
@@ -509,7 +558,7 @@ export function expression(
         ? undefined
         : { ...located, kind: "destructuring-set", pattern, value: assigned };
     }
-    const member = memberParts(context, left);
+    const member = memberParts(context, left, true);
     const assigned = expression(context, right);
     return member == null || assigned == null
       ? undefined
@@ -532,7 +581,7 @@ export function expression(
         prefix: value.prefix === true,
       };
     }
-    const member = memberParts(context, argument);
+    const member = memberParts(context, argument, true);
     return member == null
       ? undefined
       : {
@@ -2922,6 +2971,7 @@ export function functionDeclaration(
   requireName = true,
   memberKind?: "class" | "method",
   derivedConstructor = false,
+  derivedElement = false,
 ): SyntaxFunction | undefined {
   const generator = value.generator === true;
   if (generator && (value.async === true || memberKind != null)) {
@@ -3003,14 +3053,28 @@ export function functionDeclaration(
     (bodyNode?.type === "BlockStatement" && hasUseStrictDirective(bodyNode));
   const functionProvidesThis = value.type !== "ArrowFunctionExpression";
   const enclosingReceiver = context.receiverStack.at(-1);
-  const receiver: ReceiverContext = functionProvidesThis
+  const receiverKind: ReceiverKind = functionProvidesThis
     ? derivedConstructor === true
       ? "derived-constructor"
       : "function"
-    : enclosingReceiver === "derived-constructor" ||
-        enclosingReceiver === "arrow-in-derived-constructor"
+    : enclosingReceiver?.kind === "derived-constructor" ||
+        enclosingReceiver?.kind === "arrow-in-derived-constructor"
       ? "arrow-in-derived-constructor"
       : "arrow";
+  // Only the class element's own function object carries a home object.
+  // An async element runs its body in a synthesized function, and an
+  // arrow never owns one, so both keep the enclosing admission for the
+  // sole purpose of reporting why the reference is rejected there.
+  const superProperty: SuperPropertyContext = functionProvidesThis
+    ? derivedConstructor !== true && !derivedElement
+      ? "none"
+      : value.async === true
+        ? "async"
+        : "admitted"
+    : enclosingReceiver == null || enclosingReceiver.superProperty === "none"
+      ? "none"
+      : "arrow";
+  const receiver: ReceiverContext = { kind: receiverKind, superProperty };
   for (const parameterNode of parameterNodes) {
     const rest = parameterNode.type === "RestElement";
     const parameterPattern =
@@ -3440,7 +3504,14 @@ export function classExpression(
       break;
     }
     const key = classElementKey(context, element);
-    const method = functionDeclaration(context, element, false, "method");
+    const method = functionDeclaration(
+      context,
+      element,
+      false,
+      "method",
+      false,
+      derived,
+    );
     if (key == null || method == null) break;
     elements.push({
       ...location(context, element),

@@ -33,11 +33,29 @@ export interface BabelNode {
  * one; the profile then rejects them there with a distinct diagnostic
  * instead of silently reading the arrow's own construction state.
  */
-export type ReceiverContext =
+export type ReceiverKind =
   | "arrow"
   | "arrow-in-derived-constructor"
   | "derived-constructor"
   | "function";
+
+/**
+ * How the innermost enclosing function reaches a `super.x` reference.
+ * `admitted` is a non-arrow, non-async element of a class with
+ * `extends`, which is the only function whose own function object
+ * carries the home object the reference starts its lookup from. The
+ * remaining values name a position this profile rejects and select the
+ * diagnostic that explains it: an arrow has no home object of its own,
+ * and an async element runs its body in a synthesized function that
+ * does not carry one either.
+ */
+export type SuperPropertyContext = "admitted" | "arrow" | "async" | "none";
+
+/** The receiver state of one enclosing function. */
+export interface ReceiverContext {
+  readonly kind: ReceiverKind;
+  readonly superProperty: SuperPropertyContext;
+}
 
 export interface ConvertContext {
   readonly diagnostics: Diagnostic[];

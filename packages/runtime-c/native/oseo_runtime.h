@@ -471,6 +471,49 @@ OseoResult oseo_class_heritage(
     OseoValue heritage
 );
 /*
+ * Records one class element's [[HomeObject]]: the class prototype
+ * object for an instance element and the constructor for a static one.
+ * A value that is not a function is ignored, because only a function
+ * carries the slot.
+ */
+void oseo_bind_home_object(OseoValue function, OseoValue home);
+/*
+ * GetSuperBase: the [[Prototype]] of the running function's home
+ * object, where a `super` property reference starts its lookup. A
+ * function without a home object, or a home object without a prototype,
+ * yields a nullish value that the reference itself rejects, so this
+ * reports no completion of its own.
+ */
+OseoValue oseo_super_base(OseoValue callee);
+/*
+ * A `super.x` read. The lookup starts at `base` while a getter runs
+ * against `receiver`, which is the `this` of the class element holding
+ * the reference.
+ */
+OseoResult oseo_super_get(
+    OseoContext *context,
+    OseoValue base,
+    OseoValue key,
+    OseoValue receiver
+);
+/*
+ * A `super.x = v` write, which is Set with a receiver distinct from the
+ * object the lookup walks. A setter found on `base` or its prototype
+ * chain runs against `receiver`; otherwise the assignment creates or
+ * updates an own property of `receiver` and never reaches a setter that
+ * only `receiver`'s own chain would find. A read-only property on
+ * either side reports a TypeError in strict code and is ignored
+ * otherwise.
+ */
+OseoResult oseo_super_set(
+    OseoContext *context,
+    OseoValue base,
+    OseoValue key,
+    OseoValue value,
+    OseoValue receiver,
+    bool strict
+);
+/*
  * GetSuperConstructor: the running constructor's own [[Prototype]].
  * Throws a TypeError when that is not a constructor, which is how
  * `class C extends null {}` rejects `super()`.

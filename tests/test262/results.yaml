@@ -14654,19 +14654,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/new.target/value-via-super-property.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/new.target/value-via-super-property.js:97:5:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -26676,7 +26683,39 @@ results:
       flags: []
       includes: []
       mode: script
-      path: test/language/expressions/super/prop-dot-cls-val.js
+      path: test/language/expressions/super/prop-dot-cls-null-proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-ref-strict.js
       strictness:
         - non-strict
         - strict
@@ -26685,11 +26724,914 @@ results:
     dependencies:
       - classes
     observation:
-      detail: 'test/language/expressions/super/prop-dot-cls-val.js non-strict
+      detail: 'test/language/expressions/super/prop-dot-cls-ref-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-cls-ref-strict.js:112:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-ref-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-this-uninit.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "test/language/expressions/super/prop-dot-cls-this-uninit.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-dot-cls-this-unin\
+        it.js:100:17: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - arrow-function
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-val-from-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - arrow-function
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-val-from-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "test/language/expressions/super/prop-dot-cls-val-from-eval.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-dot-cls-val-from-\
+        eval.js:102:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-cls-val.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-null-proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-dot-obj-null-proto.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-obj-null-proto.js:97:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-ref-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-dot-obj-ref-non-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-obj-ref-non-strict.js:112:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-ref-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-dot-obj-ref-strict.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-obj-ref-strict.js:113:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-ref-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-dot-obj-ref-this.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-obj-ref-this.js:119:15:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - arrow-function
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-val-from-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - arrow-function
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-val-from-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: "test/language/expressions/super/prop-dot-obj-val-from-eval.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-dot-obj-val-from-\
+        eval.js:104:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-dot-obj-val.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-dot-obj-val.js non-strict
         disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-dot-cls-val.js:101:13:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
+        stderr="test/language/expressions/super/prop-dot-obj-val.js:104:13:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-cls-err.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-cls-err.js:94:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-key-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-cls-key-err.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-cls-key-err.js:97:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-null-proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-ref-strict.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-cls-ref-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-cls-ref-strict.js:112:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-ref-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-this-uninit.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "test/language/expressions/super/prop-expr-cls-this-uninit.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-expr-cls-this-uni\
+        nit.js:100:17: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-unresolvable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-cls-unresolvable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-cls-unresolvable.js:93:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - arrow-function
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-val-from-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - arrow-function
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-val-from-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+    observation:
+      detail: "test/language/expressions/super/prop-expr-cls-val-from-eval.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-expr-cls-val-from\
+        -eval.js:101:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-cls-val.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js:116:3:
+        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js:116:3:
+        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js:116:3:
+        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js:122:3:
+        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-err.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-err.js:93:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-key-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-key-err.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-key-err.js:96:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-null-proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-null-proto.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-null-proto.js:97:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-ref-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-ref-non-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-ref-non-strict.js:112:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-ref-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-ref-strict.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-ref-strict.js:113:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-ref-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-ref-this.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-ref-this.js:119:15:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-unresolvable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-expr-obj-unresolvable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-expr-obj-unresolvable.js:92:7:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - arrow-function
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-val-from-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - arrow-function
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-obj-val-from-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: "test/language/expressions/super/prop-expr-obj-val-from-eval.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/super/prop-expr-obj-val-from\
+        -eval.js:104:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -26713,8 +27655,159 @@ results:
       detail: 'test/language/expressions/super/prop-expr-obj-val.js non-strict
         disabled failed (1): stdout=""
         stderr="test/language/expressions/super/prop-expr-obj-val.js:104:13:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-uninitialized-this-getvalue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-uninitialized-this-putvalue-compound-assign.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-uninitialized-this-putvalue-increment.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-expr-uninitialized-this-putvalue.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/super/prop-poisoned-underscore-proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-literals
+    observation:
+      detail: 'test/language/expressions/super/prop-poisoned-underscore-proto.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-poisoned-underscore-proto.js:96:12:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -37147,11 +38240,11 @@ results:
       - classes
       - functions
     observation:
-      detail: 'test/language/statements/class/definition/this-access-restriction.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/this-access-restriction.js:103:7:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
+      detail: "test/language/statements/class/definition/this-access-restrict\
+        ion.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/definition/this-access-\
+        restriction.js:125:19: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -39557,7 +40650,7 @@ results:
       flags: []
       includes: []
       mode: script
-      path: test/language/statements/class/super/in-constructor.js
+      path: test/language/statements/class/super/in-constructor-superproperty-evaluation.js
       strictness:
         - non-strict
         - strict
@@ -39566,14 +40659,231 @@ results:
     dependencies:
       - classes
     observation:
-      detail: 'test/language/statements/class/super/in-constructor.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/super/in-constructor.js:85:22:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
+      detail: "test/language/statements/class/super/in-constructor-superprope\
+        rty-evaluation.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/super/in-constructor-su\
+        perproperty-evaluation.js:77:23: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-getter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-methods.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-setter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-static-getter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-static-methods.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/super/in-static-setter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -39624,8 +40934,9 @@ results:
       detail: 'test/language/statements/class/syntax/class-body-method-definition-super-property.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/class/syntax/class-body-method-definition-super-property.js:79:5:
-        error[OSEO1001]: Property access through super is
-        unsupported.\n"'
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -47310,9 +48621,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 382
   harnessFailures: 0
-  passes: 1016
+  passes: 1034
   semanticFailures: 0
-  unsupportedProfileFeatures: 169
+  unsupportedProfileFeatures: 199
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 0
@@ -47329,9 +48640,9 @@ summary:
     - dependency: classes
       expectedNegatives: 60
       harnessFailures: 0
-      passes: 276
+      passes: 294
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 57
     - dependency: control-flow
       expectedNegatives: 17
       harnessFailures: 0
@@ -47371,9 +48682,9 @@ summary:
     - dependency: functions
       expectedNegatives: 31
       harnessFailures: 0
-      passes: 97
+      passes: 98
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 11
     - dependency: generators
       expectedNegatives: 63
       harnessFailures: 0
@@ -47403,7 +48714,7 @@ summary:
       harnessFailures: 0
       passes: 341
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 22
     - dependency: object-properties
       expectedNegatives: 0
       harnessFailures: 0
@@ -47492,9 +48803,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 121
       harnessFailures: 0
-      passes: 602
+      passes: 613
       semanticFailures: 0
-      unsupportedProfileFeatures: 28
+      unsupportedProfileFeatures: 58
     - group: language/module-code
       expectedNegatives: 152
       harnessFailures: 0
@@ -47510,6 +48821,6 @@ summary:
     - group: language/statements
       expectedNegatives: 108
       harnessFailures: 0
-      passes: 304
+      passes: 311
       semanticFailures: 0
       unsupportedProfileFeatures: 32

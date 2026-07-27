@@ -112,11 +112,80 @@ function convertPropertyKey(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * The `super` operand of a property reference, when the reference is
+ * one. A `super` reference keeps its lookup start and its receiver
+ * apart, so every property lowering that admits the operand asks for it
+ * before it lowers the object as an ordinary expression.
+ */
+function superOperand(
+  object: HirExpression,
+): (HirExpression & { readonly kind: "super-base" }) | undefined {
+  return object.kind === "super-base" ? object : undefined;
+}
+
+/**
+ * Lowers the receiver of one `super` operand. The receiver is read
+ * before the key expression, because a reference inside a derived
+ * constructor observes the `this` temporal dead zone first.
+ */
+function lowerSuperReceiver(
+  operand: HirExpression & { readonly kind: "super-base" },
+  builder: MirBuilder,
+): number {
+  return lowerExpression(operand.receiver, builder);
+}
+
+/**
+ * Emits the object a `super` lookup starts at, which is the home
+ * object's prototype. MakeSuperPropertyReference reads that prototype
+ * after the computed key expression has produced its value, so a key
+ * that replaces the home object's prototype is observed by the very
+ * reference it precedes.
+ */
+function lowerSuperBase(
+  operand: HirExpression & { readonly kind: "super-base" },
+  builder: MirBuilder,
+): number {
+  const base = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "home object prototype",
+    id: base,
+    kind: "super-base",
+    range: operand.range,
+  });
+  return recordRoot(builder, base, operand.range);
+}
+
+/**
+ * Lowers the lookup object and the unconverted key of one property
+ * reference in specified order. An ordinary reference evaluates its
+ * object expression before the key. A `super` reference has already
+ * read its receiver and reads the home object's prototype only after
+ * the key, so the two orders cannot share one sequence.
+ */
+function lowerReferenceObject(
+  objectExpression: HirExpression,
+  keyExpression: HirExpression,
+  operand: (HirExpression & { readonly kind: "super-base" }) | undefined,
+  builder: MirBuilder,
+): { readonly keyInput: number; readonly object: number } {
+  if (operand == null) {
+    const object = lowerExpression(objectExpression, builder);
+    return { keyInput: lowerExpression(keyExpression, builder), object };
+  }
+  const keyInput = lowerExpression(keyExpression, builder);
+  return { keyInput, object: lowerSuperBase(operand, builder) };
+}
+
 function lowerSpecializedPropertyGet(
   object: number,
   keyExpression: HirExpression,
   range: SourceRange,
   builder: MirBuilder,
+  superReceiver?: number,
 ): number {
   const shapeBlock = createMirBlock(builder);
   const hitBlock = createMirBlock(builder);
@@ -189,11 +258,13 @@ function lowerSpecializedPropertyGet(
   const genericValue = builder.nextValue;
   builder.nextValue += 1;
   genericBlock.operations.push({
-    arguments: [object, key],
+    arguments:
+      superReceiver == null ? [object, key] : [object, key, superReceiver],
     detail: "generic",
     id: genericValue,
     kind: "property-get",
     range,
+    ...(superReceiver == null ? {} : { superReference: true as const }),
   });
   appendMirMetadata(
     builder,
@@ -562,6 +633,7 @@ function lowerPropertyRead(
   key: number,
   range: SourceRange,
   builder: MirBuilder,
+  superReceiver?: number,
 ): number {
   appendMirMetadata(
     builder,
@@ -573,11 +645,13 @@ function lowerPropertyRead(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: [object, key],
+    arguments:
+      superReceiver == null ? [object, key] : [object, key, superReceiver],
     detail: "property-get",
     id,
     kind: "property-get",
     range,
+    ...(superReceiver == null ? {} : { superReference: true as const }),
   });
   appendMirMetadata(
     builder,
@@ -634,6 +708,7 @@ function lowerPropertyWrite(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
+  superReceiver?: number,
 ): number {
   appendMirMetadata(
     builder,
@@ -645,12 +720,16 @@ function lowerPropertyWrite(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: [object, key, value],
+    arguments:
+      superReceiver == null
+        ? [object, key, value]
+        : [object, key, value, superReceiver],
     detail: "property-set",
     id,
     kind: "property-set",
     range,
     ...strictCodeFlag(builder),
+    ...(superReceiver == null ? {} : { superReference: true as const }),
   });
   appendMirMetadata(
     builder,
@@ -1131,6 +1210,32 @@ function anonymousDefinition(expression: HirExpression): boolean {
 }
 
 /**
+ * Records the object a class element resolves `super.x` against. A
+ * `static` element and the constructor take the constructor itself and
+ * the class prototype object respectively, matching the two chains
+ * `class-heritage` links, so an instance reference reads through the
+ * parent's `prototype` and a static one through the parent constructor.
+ * Every element carries the object whether or not the class is derived,
+ * because the binding describes the function rather than the reference.
+ */
+function lowerHomeObjectBind(
+  functionValue: number,
+  home: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [functionValue, home],
+    detail: "home object",
+    id,
+    kind: "home-object-bind",
+    range,
+  });
+}
+
+/**
  * Lowers one class expression in ClassDefinitionEvaluation order: the
  * class-scope cell is created first so every closure the body allocates
  * shares it, then the constructor closure and its prototype object,
@@ -1217,6 +1322,7 @@ function lowerClassExpression(
     expression.range,
   );
   recordRoot(builder, prototype, expression.range);
+  lowerHomeObjectBind(constructorValue, prototype, expression.range, builder);
   for (const element of expression.elements) {
     const staticPlacement = element.staticPlacement === true;
     const target = staticPlacement ? constructorValue : prototype;
@@ -1233,6 +1339,7 @@ function lowerClassExpression(
       anonymousDefinition(element.value) ? key : undefined,
       element.accessorKind,
     );
+    lowerHomeObjectBind(value, target, element.range, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -1424,6 +1531,14 @@ function lowerExpression(
       range: expression.range,
     });
     return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "super-base") {
+    // Every admitted position pairs the operand with the receiver it
+    // belongs to, so one that reaches ordinary expression lowering has
+    // lost the receiver a getter, setter, or method call needs.
+    throw new Error(
+      "A super operand reached MIR outside a property reference.",
+    );
   }
   if (expression.kind === "array") {
     const hasSpread = expression.elements.some(
@@ -1939,20 +2054,38 @@ function lowerExpression(
     expression.kind === "property-get" ||
     expression.kind === "property-delete"
   ) {
-    const object = lowerExpression(expression.object, builder);
+    const operand =
+      expression.kind === "property-get"
+        ? superOperand(expression.object)
+        : undefined;
+    const superReceiver =
+      operand == null ? undefined : lowerSuperReceiver(operand, builder);
     if (
       expression.kind === "property-get" &&
       expression.key.kind === "string" &&
       builder.specialization === "enabled"
     ) {
+      // A literal key runs no user code, so reading the home object's
+      // prototype before it stays unobservable.
+      const object =
+        operand == null
+          ? lowerExpression(expression.object, builder)
+          : lowerSuperBase(operand, builder);
       return lowerSpecializedPropertyGet(
         object,
         expression.key,
         expression.range,
         builder,
+        superReceiver,
       );
     }
-    const key = lowerPropertyKey(expression.key, builder);
+    const { keyInput, object } = lowerReferenceObject(
+      expression.object,
+      expression.key,
+      operand,
+      builder,
+    );
+    const key = convertPropertyKey(keyInput, expression.key.range, builder);
     if (expression.kind === "property-get") {
       appendMirMetadata(
         builder,
@@ -1973,12 +2106,14 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      arguments: [object, key],
+      arguments:
+        superReceiver == null ? [object, key] : [object, key, superReceiver],
       detail: expression.kind,
       id,
       kind: expression.kind,
       range: expression.range,
       ...(expression.kind === "property-delete" ? strictCodeFlag(builder) : {}),
+      ...(superReceiver == null ? {} : { superReference: true as const }),
     });
     appendMirMetadata(
       builder,
@@ -1990,9 +2125,19 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "property-set") {
-    const object = lowerExpression(expression.object, builder);
-    const key = lowerPropertyKey(expression.key, builder);
+    const operand = superOperand(expression.object);
+    const superReceiver =
+      operand == null ? undefined : lowerSuperReceiver(operand, builder);
+    const { keyInput, object } = lowerReferenceObject(
+      expression.object,
+      expression.key,
+      operand,
+      builder,
+    );
+    // PutValue converts the key, so an assignment holds the key
+    // expression's raw value until the right side has been evaluated.
     const value = lowerExpression(expression.value, builder);
+    const key = convertPropertyKey(keyInput, expression.key.range, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -2003,12 +2148,16 @@ function lowerExpression(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      arguments: [object, key, value],
+      arguments:
+        superReceiver == null
+          ? [object, key, value]
+          : [object, key, value, superReceiver],
       detail: "property-set",
       id,
       kind: "property-set",
       range: expression.range,
       ...strictCodeFlag(builder),
+      ...(superReceiver == null ? {} : { superReference: true as const }),
     });
     appendMirMetadata(
       builder,
@@ -2020,14 +2169,22 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "property-update") {
-    const object = lowerExpression(expression.object, builder);
-    const keyInput = lowerExpression(expression.key, builder);
+    const operand = superOperand(expression.object);
+    const superReceiver =
+      operand == null ? undefined : lowerSuperReceiver(operand, builder);
+    const { keyInput, object } = lowerReferenceObject(
+      expression.object,
+      expression.key,
+      operand,
+      builder,
+    );
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current = lowerPropertyRead(
       object,
       readKey,
       expression.range,
       builder,
+      superReceiver,
     );
     return lowerAssignmentValue(
       current,
@@ -2045,6 +2202,7 @@ function lowerExpression(
           value,
           expression.range,
           builder,
+          superReceiver,
         );
       },
       expression.range,
@@ -2052,19 +2210,29 @@ function lowerExpression(
     );
   }
   if (expression.kind === "property-step") {
-    const objectInput = lowerExpression(expression.object, builder);
-    const keyInput = lowerExpression(expression.key, builder);
-    const object = lowerObjectCoercible(
-      objectInput,
-      expression.object.range,
+    const operand = superOperand(expression.object);
+    const superReceiver =
+      operand == null ? undefined : lowerSuperReceiver(operand, builder);
+    const { keyInput, object: objectInput } = lowerReferenceObject(
+      expression.object,
+      expression.key,
+      operand,
       builder,
     );
+    // A `super` operand is the home object's prototype, which needs no
+    // RequireObjectCoercible: a nullish one reports its own TypeError
+    // from the read that follows, as the specified GetValue does.
+    const object =
+      operand == null
+        ? lowerObjectCoercible(objectInput, expression.object.range, builder)
+        : objectInput;
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current = lowerPropertyRead(
       object,
       readKey,
       expression.range,
       builder,
+      superReceiver,
     );
     return lowerUpdateValue(
       current,
@@ -2082,6 +2250,7 @@ function lowerExpression(
           value,
           expression.range,
           builder,
+          superReceiver,
         );
       },
       expression.range,
@@ -2250,23 +2419,42 @@ function lowerExpression(
       callee = lowerExpression(expression.target.callee, builder);
       receiver = lowerSyntheticUndefined(expression.range, builder);
     } else {
-      receiver = lowerExpression(expression.target.object, builder);
-      const key = lowerPropertyKey(expression.target.key, builder);
+      // A `super` method call looks the callee up through the home
+      // object's prototype and still calls it with the enclosing
+      // element's `this`, so the lookup object and the receiver differ.
+      const operand = superOperand(expression.target.object);
+      let lookup: number;
+      let keyInput: number;
+      if (operand == null) {
+        receiver = lowerExpression(expression.target.object, builder);
+        lookup = receiver;
+        keyInput = lowerExpression(expression.target.key, builder);
+      } else {
+        receiver = lowerSuperReceiver(operand, builder);
+        keyInput = lowerExpression(expression.target.key, builder);
+        lookup = lowerSuperBase(operand, builder);
+      }
+      const key = convertPropertyKey(
+        keyInput,
+        expression.target.key.range,
+        builder,
+      );
       appendMirMetadata(
         builder,
         "safepoint",
         "method lookup",
-        [receiver, key],
+        [lookup, key],
         expression.range,
       );
       callee = builder.nextValue;
       builder.nextValue += 1;
       builder.current.operations.push({
-        arguments: [receiver, key],
+        arguments: operand == null ? [lookup, key] : [lookup, key, receiver],
         detail: "method lookup",
         id: callee,
         kind: "property-get",
         range: expression.range,
+        ...(operand == null ? {} : { superReference: true as const }),
       });
       appendMirMetadata(
         builder,

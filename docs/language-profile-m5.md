@@ -207,7 +207,10 @@ its deliberate boundary and its evidence:
     anonymous functions unnamed. Member assignments evaluate the object and
     key expression once, convert the retained key value for the read, and
     convert it again after the right operand on the taken write path. A
-    short-circuited logical assignment skips that second conversion. Immutable
+    short-circuited logical assignment skips that second conversion. Plain
+    `=` assignment to a computed member likewise retains the raw key and
+    converts it only after the right operand, as `PutValue` specifies, so
+    a key whose `toString` is observable runs after that operand. Immutable
     and imported targets retain their catchable write errors. Native
     differential fixtures and a generated property with seed `0x5eed000d`
     cover all 15 operators, both target forms, short-circuiting, reference and
@@ -816,7 +819,7 @@ its deliberate boundary and its evidence:
     the storage key is a computed object literal key that only reaches the
     closure at run time. Deliberate
     boundaries: class fields,
-    private names, static initialization blocks, `super` property access, and
+    private names, static initialization blocks, and
     `export default class` are rejected with source-located diagnostics.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use; generator and
@@ -1003,10 +1006,10 @@ its deliberate boundary and its evidence:
     carries: it is the constructed class through every `super()` hop, and
     `undefined` for an ordinary call, a method call, a generator body, and an
     asynchronous function, none of which are constructors.
-    Deliberate boundaries: `super.property` access is rejected with a
-    source-located diagnostic, and so are `super()` and `new.target` inside an
-    arrow function, because an arrow takes both from the function enclosing it
-    and this profile captures neither lexically yet. Native differential
+    Deliberate boundaries: `super()` and `new.target` inside an arrow
+    function are rejected with a source-located diagnostic, because an arrow
+    takes both from the function enclosing it and this profile captures
+    neither lexically yet. Native differential
     fixtures cover a two-level and a three-level chain, an inherited method,
     accessor, and static member, a derived class with no constructor, a
     derived class expression both named and anonymous, a class extending an
@@ -1050,6 +1053,69 @@ its deliberate boundary and its evidence:
     from a bound function. The reviewed manifest moves to 1016 passes, 382
     expected negatives, and 169 unsupported profile features with no semantic
     or harness failures.
+ -  `super` property references inside a class body with `extends`. A class
+    definition records each element's home object: the class `prototype`
+    object for an instance element and the constructor itself for a `static`
+    one, which are the two objects `class-heritage` already links. A
+    reference reads the [[Prototype]] of the home object its running function
+    carries, so an instance reference starts at the parent's `prototype` and a
+    static one at the parent constructor, and both keep the enclosing
+    element's `this` as the receiver. `super.x`, `super[expr]`, and
+    `super.m()` therefore reach a definition an override shadows while a
+    getter or method still runs against the derived instance. A read shares
+    the ordinary property inline cache, guarded on the object the lookup
+    starts at, so a data property the parent prototype owns hits the cached
+    slot while an inherited property and an accessor take the generic lookup;
+    the fast path never observes the receiver, because the cache refuses
+    accessor slots. An assignment is `Set` with a distinct receiver: a setter
+    found on the base chain runs against `this`, and an assignment that
+    reaches no setter creates or updates an own property of `this` instead,
+    without consulting an accessor that only the receiver's own chain would
+    find. A read-only property on either side reports a `TypeError`, because
+    a class body is strict. A computed reference reads its receiver before
+    its key, so `super[key()]` inside a derived constructor throws the
+    `ReferenceError` for an uninitialized `this` before `key` runs, and
+    reads the home object's [[Prototype]] after that key, so a key
+    expression that replaces the prototype is observed by the very
+    reference it precedes. A home
+    object whose [[Prototype]] is null, as `extends null` leaves it, reports
+    the `TypeError` the read or write itself raises.
+    Deliberate boundaries: a `super` property reference is rejected with a
+    source-located diagnostic in a class body without `extends` and in an
+    object literal method, because this runtime has no `Object.prototype`
+    object for such a lookup to reach; inside an arrow function, which owns
+    no home object; inside an asynchronous class element, whose body runs in
+    a synthesized function that carries none; and as the operand of `delete`,
+    a destructuring assignment target, or a `for` head, which name a target
+    this lowering does not carry a receiver through. Native differential
+    fixtures cover a read, a method call, and a detached method value through
+    a two-level and a three-level chain, an override reached from the parent
+    through the derived receiver, an accessor read and its receiver, a write
+    that reaches a parent setter, a write that shadows a receiver accessor
+    without running it, a write that creates an own data property and its
+    descriptor, a compound assignment and both update forms reading the
+    parent and writing the receiver, a write to a read-only parent property,
+    computed references over a string, symbol, and index key, computed-key
+    evaluation order against the `this` temporal dead zone, a reference
+    inside a derived constructor before and after `super()`, static method,
+    getter, and setter references through the constructor chain, a nested
+    class taking its own home object, and cached, inherited, and accessor
+    reads with their guard hit and miss counts. The generated class property
+    suite now draws a reading body that returns a base member reached through
+    `super` and a setter clause that stores through `super`, on the prototype
+    and on the constructor. Eighteen reviewed test262 cases newly pass:
+    fifteen newly reviewed cases covering the `prop-dot` and `prop-expr`
+    value, receiver, null-prototype, and uninitialized-`this` families and
+    the `super` in-method, in-accessor, and static in-accessor cases, and
+    three that leave the unsupported list, including the three-level
+    `prop-dot-cls-val` chain and the `new.target` value read through a
+    `super` property. Thirty-three new unsupported cases record this unit's
+    boundaries: an object literal `super`, a class body without `extends`, an
+    arrow, and `eval`, together with the `Object.freeze`,
+    `Object.setPrototypeOf` ordering, `Object` heritage, and `Test262Error`
+    observations the remaining cases need. The reviewed manifest moves to
+    1034 passes, 382 expected negatives, and 199 unsupported profile features
+    with no semantic or harness failures.
 
 
 Known gaps inside the claim
@@ -1064,11 +1130,15 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Class fields, private names, static initialization blocks, `super`
-    property access, and `export default class` are outside the admitted class
-    subset. `super()` and `new.target` are also rejected inside an arrow
-    function, because this profile does not capture either lexically yet.
-    Owner: the functions and executable syntax stream.
+ -  Class fields, private names, static initialization blocks, and
+    `export default class` are outside the admitted class subset. `super()`,
+    `super.x`, and `new.target` are rejected inside an arrow function, and
+    `super.x` is also rejected inside an asynchronous class element, because
+    this profile captures none of them lexically yet. A `super` property
+    reference in a class body without `extends` and in an object literal
+    method stays rejected until the intrinsic graph provides the
+    `Object.prototype` object such a lookup reaches. Owner: the functions and
+    executable syntax stream.
  -  `super()` runs the parent against the receiver the `new` expression
     already allocated instead of performing a fresh `Construct` per call, so a
     second `super()` in one invocation runs the parent a second time against

@@ -216,6 +216,14 @@ typedef struct {
     OseoValue environment;
     OseoValue lexical_this;
     OseoValue prototype_object;
+    /*
+     * The object a `super.x` reference in this function's body looks
+     * through: the class prototype object for an instance element and
+     * the constructor itself for a static one. It stays undefined for
+     * every function a class definition does not claim, and a class
+     * definition sets it before it defines the element's property.
+     */
+    OseoValue home_object;
     size_t code_id;
     OseoFunctionKind function_kind;
     bool prototype_writable;
