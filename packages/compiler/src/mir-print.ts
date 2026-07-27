@@ -15,7 +15,8 @@ function printTerminator(terminator: MirTerminator): string {
   if (terminator.kind === "generator-yield") {
     return (
       `generator-yield %${terminator.value} ` +
-      `resume bb${terminator.resume} sent %${terminator.sent}`
+      `resume bb${terminator.resume} sent %${terminator.sent} ` +
+      `return bb${terminator.returnResume}`
     );
   }
   if (terminator.kind === "resume-completion") {

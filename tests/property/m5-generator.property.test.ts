@@ -28,10 +28,19 @@ const { assertAsyncProperty } = await import(
 /**
  * Where one generated `yield` sits inside the generator body. Each kind
  * places its suspension in a different control-flow position so a saved
- * resume point has to restore loop counters, branch selection, and the
- * accumulated total rather than only the top-level statement index.
+ * resume point has to restore loop counters, branch selection, iterator
+ * progress, and the accumulated total rather than only the top-level
+ * statement index. An `iterated` step suspends while a for-of over a
+ * nested generator is still in progress, so the loop's iterator state has
+ * to survive the suspension and the fresh invocation that resumes it.
  */
-type StepKind = "conditional" | "loop" | "nested" | "plain" | "sent";
+type StepKind =
+  | "conditional"
+  | "iterated"
+  | "loop"
+  | "nested"
+  | "plain"
+  | "sent";
 
 interface Step {
   readonly flag: boolean;
@@ -45,6 +54,12 @@ interface GeneratorCase {
   /** Values delivered by every resumption after the first `next()`. */
   readonly sends: readonly number[];
   readonly steps: readonly Step[];
+  /**
+   * How many yields the driver consumes before closing the generator with
+   * `return`. Zero drains the body instead, and a count beyond the body's
+   * suspensions never triggers, so both completions stay in the domain.
+   */
+  readonly stopAfter: number;
 }
 
 const host = createNodeHost();
@@ -60,6 +75,7 @@ const stepArbitrary: fc.Arbitrary<Step> = fc.record({
   inner: fc.integer({ max: 2, min: 0 }),
   kind: fc.constantFrom<StepKind>(
     "conditional",
+    "iterated",
     "loop",
     "nested",
     "plain",
@@ -75,6 +91,7 @@ const caseArbitrary: fc.Arbitrary<GeneratorCase> = fc.record({
     minLength: 1,
   }),
   steps: fc.array(stepArbitrary, { maxLength: 4 }),
+  stopAfter: fc.integer({ max: 6, min: 0 }),
 });
 
 /** One yielded value and whether its resumption feeds the running total. */
@@ -101,7 +118,9 @@ function modelYields(testCase: GeneratorCase): readonly YieldPoint[] {
         accumulates: false,
         value: step.flag ? step.value : step.value + 1,
       });
-    } else if (step.kind === "loop") {
+    } else if (step.kind === "loop" || step.kind === "iterated") {
+      // A for-of over `source(outer)` delivers the same 0..outer-1 values a
+      // counted loop does, so both share one model.
       for (let index = 0; index < step.outer; index += 1) {
         points.push({ accumulates: false, value: step.value + index });
       }
@@ -148,6 +167,13 @@ function printStep(step: Step, index: number): string {
       "  }"
     );
   }
+  if (step.kind === "iterated") {
+    return (
+      `  for (const v${index} of source(${step.outer})) {\n` +
+      `    yield base + ${step.value} + v${index};\n` +
+      "  }"
+    );
+  }
   return (
     `  for (let i${index} = 0; i${index} < ${step.outer}; ` +
     `i${index} = i${index} + 1) {\n` +
@@ -159,14 +185,33 @@ function printStep(step: Step, index: number): string {
   );
 }
 
+/**
+ * True when the driver closes the generator before the body finishes. A
+ * stop count beyond the body's suspensions never interrupts it, so the
+ * same domain covers both draining and early closing.
+ */
+function stopsEarly(testCase: GeneratorCase): boolean {
+  return (
+    testCase.stopAfter > 0 && testCase.stopAfter <= modelYields(testCase).length
+  );
+}
+
 function printCase(testCase: GeneratorCase): string {
   const sendList = testCase.sends.map((value) => String(value)).join(", ");
   return `
 let entered = 0;
+let cleaned = 0;
+function* source(count) {
+  for (let index = 0; index < count; index = index + 1) yield index;
+}
 function* generated(base) {
   entered = entered + 1;
   let total = 0;
+  try {
 ${testCase.steps.map(printStep).join("\n")}
+  } finally {
+    cleaned = cleaned + 1;
+  }
   return total;
 }
 console.log("meta", typeof generated, generated.length, generated.name);
@@ -174,25 +219,41 @@ const sends = [${sendList}];
 const iterator = generated(0);
 console.log("lazy", entered);
 let index = 0;
+let consumed = 0;
 let step = iterator.next();
 console.log("body", entered);
 while (!step.done) {
   console.log("yield", step.value, step.done);
+  consumed = consumed + 1;
+  if (consumed === ${testCase.stopAfter}) break;
   step = iterator.next(sends[index % ${testCase.sends.length}]);
   index = index + 1;
 }
+if (!step.done) step = iterator.return("stopped");
 console.log("return", step.value, step.done);
+console.log("cleanup", cleaned);
 console.log("after", iterator.next().value, iterator.next().done);
+console.log("closed", cleaned);
 `;
 }
 
 function expected(testCase: GeneratorCase): string {
   const lines = ["meta function 1 generated", "lazy 0", "body 1"];
-  for (const point of modelYields(testCase)) {
-    lines.push(`yield ${point.value} false`);
+  const points = modelYields(testCase);
+  const stopped = stopsEarly(testCase);
+  const consumed = stopped ? testCase.stopAfter : points.length;
+  for (let index = 0; index < consumed; index += 1) {
+    lines.push(`yield ${points[index]?.value} false`);
   }
-  lines.push(`return ${modelTotal(testCase)} true`);
+  lines.push(
+    stopped ? "return stopped true" : `return ${modelTotal(testCase)} true`,
+  );
+  // The body's `finally` runs exactly once on both completions: when the
+  // last step finishes, and when a return resumption leaves a suspension.
+  // A completed generator never re-enters the body, so the count holds.
+  lines.push("cleanup 1");
   lines.push("after undefined true");
+  lines.push("closed 1");
   return `${lines.join("\n")}\n`;
 }
 
@@ -245,6 +306,7 @@ test("generator model orders every suspension in source order", () => {
         { flag: true, inner: 0, kind: "sent", outer: 0, value: 5 },
         { flag: false, inner: 0, kind: "conditional", outer: 0, value: 7 },
       ],
+      stopAfter: 0,
     }),
     "meta function 1 generated\n" +
       "lazy 0\n" +
@@ -253,8 +315,39 @@ test("generator model orders every suspension in source order", () => {
       "yield 5 false\n" +
       "yield 8 false\n" +
       "return 2 true\n" +
-      "after undefined true\n",
+      "cleanup 1\n" +
+      "after undefined true\n" +
+      "closed 1\n",
   );
+});
+
+test("generator model closes a body that stops before its last step", () => {
+  const testCase: GeneratorCase = {
+    sends: [2],
+    steps: [
+      { flag: true, inner: 0, kind: "plain", outer: 0, value: 1 },
+      { flag: true, inner: 0, kind: "iterated", outer: 2, value: 5 },
+    ],
+    stopAfter: 2,
+  };
+  assert.ok(stopsEarly(testCase));
+  assert.equal(
+    expected(testCase),
+    "meta function 1 generated\n" +
+      "lazy 0\n" +
+      "body 1\n" +
+      "yield 1 false\n" +
+      "yield 5 false\n" +
+      "return stopped true\n" +
+      "cleanup 1\n" +
+      "after undefined true\n" +
+      "closed 1\n",
+  );
+  // The suspension is inside a for-of over `source`, so the return
+  // resumption also closes the loop's iterator on the way out.
+  assert.match(printCase(testCase), /for \(const v1 of source\(2\)\)/u);
+  // A stop count beyond the body's suspensions drains it instead.
+  assert.ok(!stopsEarly({ ...testCase, stopAfter: 4 }));
 });
 
 test("generator model expands loop and nested suspensions", () => {
@@ -265,6 +358,7 @@ test("generator model expands loop and nested suspensions", () => {
       { flag: true, inner: 2, kind: "nested", outer: 2, value: 100 },
       { flag: true, inner: 0, kind: "sent", outer: 0, value: -1 },
     ],
+    stopAfter: 0,
   };
   assert.deepEqual(
     modelYields(testCase).map((point) => point.value),
@@ -280,8 +374,9 @@ test(
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "generators preserve generated suspension order, sent values, and " +
-        "completion",
+      "generators preserve generated suspension order, sent values, " +
+        "iterator progress, and both draining and early-closing " +
+        "completions",
       fc.asyncProperty(caseArbitrary, async (testCase) => {
         const source = printCase(testCase);
         const expectedObservation = {
@@ -336,9 +431,12 @@ test(
         domain:
           "synchronous generator bodies with zero to four suspension steps " +
           "placed at statement level, inside a conditional, inside a loop, " +
-          "and inside nested loops, driven by a bounded cycle of sent " +
-          "values, comparing an independent suspension-order, sent-value, " +
-          "and completion model with Node.js, Deno, and both native " +
+          "inside nested loops, and inside a for-of over a nested " +
+          "generator, wrapped in a cleanup-observing try/finally, driven " +
+          "by a bounded cycle of sent values and either drained or closed " +
+          "with `return` after a bounded number of yields, comparing an " +
+          "independent suspension-order, sent-value, cleanup, and " +
+          "completion model with Node.js, Deno, and both native " +
           "specialization policies with forced collection on the enabled " +
           "path",
         numRuns: 15,
@@ -346,7 +444,8 @@ test(
         seed: 0x5eed_0016,
         sizeLimit:
           "zero to four steps, loops of at most three outer and two inner " +
-          "iterations, and one to three bounded sent values",
+          "iterations, one to three bounded sent values, and a stop count " +
+          "of zero to six",
         timeLimitMilliseconds: 180_000,
       },
     );

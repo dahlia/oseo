@@ -201,9 +201,16 @@ export type MirTerminator =
        * as the block that continues execution, `value` leaves the generator
        * as the yielded value, and the next resumption stores the sent value
        * in `sent` before running `resume`.
+       *
+       * A resumption that delivers a return completion, as
+       * `%GeneratorPrototype%.return` and an implicit `IteratorClose` do,
+       * continues at `returnResume` instead. That block leaves the body the
+       * way a `return` statement written at the suspension point would, so
+       * every enclosing `finally` and iterator close still runs.
        */
       readonly kind: "generator-yield";
       readonly resume: number;
+      readonly returnResume: number;
       readonly sent: number;
       readonly value: number;
     }

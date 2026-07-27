@@ -151,6 +151,7 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->iterator_next_function, &worklist);
     mark_value(context->iterator_self_function, &worklist);
     mark_value(context->generator_next_function, &worklist);
+    mark_value(context->generator_return_function, &worklist);
     mark_value(context->generator_prototype, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {

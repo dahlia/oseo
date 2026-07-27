@@ -265,4 +265,186 @@ try {
 console.log(throwing.next().done);
 `,
   },
+  {
+    // A generator body may suspend while an iterator operation is still in
+    // progress, so the done state of every for-of loop and array binding
+    // has to survive the suspension and the fresh body invocation that
+    // resumes it.
+    name: "generator-iterator-suspension",
+    source: `
+function* steps() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+function* forwardsEach() {
+  for (const value of steps()) {
+    yield "step:" + value;
+  }
+  yield "end";
+}
+let forwarded = "";
+for (const value of forwardsEach()) forwarded += value + ";";
+console.log(forwarded);
+
+function* stopsEarly() {
+  for (const value of steps()) {
+    yield value;
+    if (value === 2) break;
+  }
+  yield "after";
+}
+const stopping = stopsEarly();
+console.log(stopping.next().value, stopping.next().value);
+console.log(stopping.next().value, stopping.next().done);
+
+function* bindsAcrossSuspension(source) {
+  const [first = yield "first-default", second = yield "second-default"] =
+    source;
+  yield "bound:" + first + "/" + second;
+  return "done";
+}
+const shortBinding = bindsAcrossSuspension([]);
+console.log(shortBinding.next().value);
+console.log(shortBinding.next("a").value);
+console.log(shortBinding.next("b").value);
+console.log(shortBinding.next().value, shortBinding.next().done);
+
+const fullBinding = bindsAcrossSuspension([10, 20]);
+console.log(fullBinding.next().value);
+console.log(fullBinding.next().value, fullBinding.next().done);
+
+const partialBinding = bindsAcrossSuspension([10]);
+console.log(partialBinding.next().value);
+console.log(partialBinding.next("filled").value);
+console.log(partialBinding.next().value, partialBinding.next().done);
+
+function* nestsLoops() {
+  for (const outer of steps()) {
+    for (const inner of steps()) {
+      if (inner > outer) break;
+      yield outer + "-" + inner;
+    }
+  }
+}
+let nestedText = "";
+for (const value of nestsLoops()) nestedText += value + ";";
+console.log(nestedText);
+
+function* restsAcrossSuspension(source) {
+  const [head, ...tail] = source;
+  yield head;
+  yield tail.length;
+  yield tail[tail.length - 1];
+}
+const resting = restsAcrossSuspension([5, 6, 7]);
+console.log(resting.next().value, resting.next().value, resting.next().value);
+`,
+  },
+  {
+    // Every iterator consumer that stops early reaches the generator
+    // through IteratorClose, so %GeneratorPrototype%.return has to resume
+    // the body with a return completion and run its cleanup.
+    name: "generator-return",
+    source: `
+function* cleansUp() {
+  try {
+    yield 1;
+    yield 2;
+    yield 3;
+  } finally {
+    console.log("cleansUp finally");
+  }
+}
+for (const value of cleansUp()) {
+  console.log("loop", value);
+  break;
+}
+
+const explicit = cleansUp();
+console.log(explicit.next().value);
+const returned = explicit.return("early");
+console.log(returned.value, returned.done);
+const afterReturn = explicit.next();
+console.log(afterReturn.value, afterReturn.done);
+
+const unstarted = cleansUp();
+const unstartedReturn = unstarted.return("never");
+console.log(unstartedReturn.value, unstartedReturn.done);
+console.log(unstarted.next().done);
+
+const drained = cleansUp();
+console.log(drained.next().value, drained.next().value, drained.next().value);
+console.log(drained.next().done);
+const completedReturn = drained.return("after");
+console.log(completedReturn.value, completedReturn.done);
+
+function* yieldsInFinally() {
+  try {
+    yield "body";
+  } finally {
+    yield "finally";
+  }
+}
+const yielding = yieldsInFinally();
+console.log(yielding.next().value);
+const firstReturn = yielding.return("requested");
+console.log(firstReturn.value, firstReturn.done);
+const secondReturn = yielding.next();
+console.log(secondReturn.value, secondReturn.done);
+console.log(yielding.next().done);
+
+function* overridesReturn() {
+  try {
+    yield 1;
+  } finally {
+    return "override";
+  }
+}
+const overriding = overridesReturn();
+console.log(overriding.next().value);
+const overridden = overriding.return("requested");
+console.log(overridden.value, overridden.done);
+
+function* throwsInFinally() {
+  try {
+    yield 1;
+  } finally {
+    throw new TypeError("cleanup failed");
+  }
+}
+const throwing = throwsInFinally();
+console.log(throwing.next().value);
+try {
+  throwing.return("requested");
+} catch (error) {
+  console.log("threw", error instanceof TypeError, error.message);
+}
+console.log(throwing.next().done);
+
+const bindingSource = cleansUp();
+const [firstElement] = bindingSource;
+console.log("bound", firstElement);
+
+function* nestedClose() {
+  try {
+    for (const value of cleansUp()) {
+      yield "outer:" + value;
+    }
+  } finally {
+    console.log("nestedClose finally");
+  }
+}
+const nested = nestedClose();
+console.log(nested.next().value);
+const nestedReturn = nested.return("stop");
+console.log(nestedReturn.value, nestedReturn.done);
+
+const methods = cleansUp();
+console.log(typeof methods.return, methods.return.length, methods.return.name);
+console.log(methods.return === cleansUp().return);
+console.log("next" in methods, "return" in methods, "missing" in methods);
+`,
+  },
 ];

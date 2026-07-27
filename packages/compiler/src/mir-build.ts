@@ -1141,12 +1141,22 @@ function lowerExpression(
     const sent = builder.nextValue;
     builder.nextValue += 1;
     const resume = createMirBlock(builder);
+    const returnResume = createMirBlock(builder);
     builder.current.terminator = {
       kind: "generator-yield",
       resume: resume.id,
+      returnResume: returnResume.id,
       sent,
       value,
     };
+    /* A return resumption leaves the body from the suspension point, so it
+     * runs the same finalizer and iterator-close chain a `return` statement
+     * written there would. The chain is captured while lowering the yield,
+     * because the builder's finalizer stack only describes this point. */
+    builder.current = returnResume;
+    if (!enterFinalizer(builder, "return", expression.range, sent)) {
+      builder.current.terminator = { kind: "return", value: sent };
+    }
     builder.current = resume;
     return recordRoot(builder, sent, expression.range);
   }

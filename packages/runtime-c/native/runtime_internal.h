@@ -56,6 +56,8 @@
     (SIZE_MAX - 14u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_GENERATOR_NEXT_CODE_ID \
     (SIZE_MAX - 15u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_GENERATOR_RETURN_CODE_ID \
+    (SIZE_MAX - 16u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -139,9 +141,9 @@ typedef struct {
     OseoValue setter;
 } OseoProperty;
 
-/* The [[GeneratorState]] values this profile can observe. Generator
- * return and throw resumption are not admitted yet, so a suspended
- * generator only ever leaves through next or stays suspended. */
+/* The [[GeneratorState]] values this profile can observe. A suspended
+ * generator leaves through a next or a return resumption, or stays
+ * suspended; `%GeneratorPrototype%.throw` is not admitted yet. */
 typedef enum {
     OSEO_GENERATOR_SUSPENDED_START = 0,
     OSEO_GENERATOR_SUSPENDED_YIELD = 1,
@@ -166,6 +168,12 @@ typedef struct {
     size_t slot_count;
     size_t completion_count;
     size_t resume_point;
+    /*
+     * OSEO_GENERATOR_RESUME_NEXT or OSEO_GENERATOR_RESUME_RETURN: how the
+     * pending resumption delivers `sent`. Generated code reads it at the
+     * resume point, so it stays valid for exactly one resumption.
+     */
+    size_t resume_kind;
     OseoGeneratorState state;
 } OseoGenerator;
 

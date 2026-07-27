@@ -531,12 +531,20 @@ OseoResult oseo_object_get(
          * object, shadows these methods the way the specified prototype
          * chain does. `next` is an own property of the intrinsic, so it
          * survives a replaced prototype; `Symbol.iterator` is inherited
-         * from %IteratorPrototype% and does not. */
+         * from %IteratorPrototype% and does not. `return` is an own
+         * property of the intrinsic like `next`, and `IteratorClose`
+         * reaches it whenever a consumer stops early. */
         if (object->generator_prototype) {
             if (oseo_internal_string_is_ascii(key, "next")) {
                 return oseo_internal_iterator_method(
                     context,
                     OSEO_GENERATOR_NEXT_CODE_ID
+                );
+            }
+            if (oseo_internal_string_is_ascii(key, "return")) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_GENERATOR_RETURN_CODE_ID
                 );
             }
             if (object->default_intrinsics &&

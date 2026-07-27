@@ -103,6 +103,7 @@ OseoResult oseo_generator_create(
     state->slot_count = slot_count;
     state->completion_count = completion_count;
     state->resume_point = 0u;
+    state->resume_kind = OSEO_GENERATOR_RESUME_NEXT;
     state->state = OSEO_GENERATOR_SUSPENDED_START;
     for (size_t index = 0u; index < slot_count; index += 1u) {
         state->slots[index] = oseo_undefined();
@@ -137,6 +138,10 @@ OseoValue oseo_generator_sent(OseoValue generator) {
 
 size_t oseo_generator_resume_point(OseoValue generator) {
     return generator_state(generator)->resume_point;
+}
+
+size_t oseo_generator_resume_kind(OseoValue generator) {
+    return generator_state(generator)->resume_kind;
 }
 
 void oseo_generator_suspend(
@@ -174,16 +179,26 @@ static void generator_complete(OseoValue generator) {
     }
 }
 
-OseoResult oseo_generator_next(
+/*
+ * GeneratorResume and GeneratorResumeAbrupt over a return completion.
+ * Both deliver `sent` to the pending suspension and differ only in the
+ * resume kind the body observes and in what an unstarted or completed
+ * generator reports without entering the body.
+ */
+static OseoResult generator_resume(
     OseoContext *context,
     OseoValue generator,
-    OseoValue sent
+    OseoValue sent,
+    size_t resume_kind
 ) {
+    bool returning = resume_kind == OSEO_GENERATOR_RESUME_RETURN;
     if (!is_generator(generator)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "Generator next requires a generator receiver."
+            returning
+                ? "Generator return requires a generator receiver."
+                : "Generator next requires a generator receiver."
         );
     }
     if (generator_state(generator)->state == OSEO_GENERATOR_EXECUTING) {
@@ -198,9 +213,19 @@ OseoResult oseo_generator_next(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = generator;
     frame.slots[1] = sent;
-    if (generator_state(frame.slots[0])->state == OSEO_GENERATOR_COMPLETED) {
-        result =
-            oseo_internal_iterator_result(context, oseo_undefined(), true);
+    OseoGeneratorState current = generator_state(frame.slots[0])->state;
+    /* A return completion delivered before the body ever ran completes the
+     * generator without entering it, so no `finally` in a body that never
+     * started runs, and it reports the requested value. A completed
+     * generator reports it too, while `next` reports undefined. */
+    bool unstarted = returning && current == OSEO_GENERATOR_SUSPENDED_START;
+    if (current == OSEO_GENERATOR_COMPLETED || unstarted) {
+        if (unstarted) generator_complete(frame.slots[0]);
+        result = oseo_internal_iterator_result(
+            context,
+            returning ? frame.slots[1] : oseo_undefined(),
+            true
+        );
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -214,6 +239,7 @@ OseoResult oseo_generator_next(
     }
     OseoGenerator *state = generator_state(frame.slots[0]);
     state->sent = frame.slots[1];
+    state->resume_kind = resume_kind;
     state->state = OSEO_GENERATOR_EXECUTING;
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) {
@@ -225,6 +251,9 @@ OseoResult oseo_generator_next(
     oseo_call_leave(context);
     state = generator_state(frame.slots[0]);
     state->sent = oseo_undefined();
+    /* The kind describes one resumption only; the next suspension is
+     * resumed normally unless that resumption says otherwise. */
+    state->resume_kind = OSEO_GENERATOR_RESUME_NEXT;
     /* The completion value only lives in `result` until it is rooted,
      * and discarding the frame drops the slot it came from. */
     frame.slots[1] = result.value;
@@ -239,4 +268,30 @@ OseoResult oseo_generator_next(
     result = oseo_internal_iterator_result(context, frame.slots[1], done);
     oseo_roots_release(context, &frame);
     return result;
+}
+
+OseoResult oseo_generator_next(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue sent
+) {
+    return generator_resume(
+        context,
+        generator,
+        sent,
+        OSEO_GENERATOR_RESUME_NEXT
+    );
+}
+
+OseoResult oseo_generator_return(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value
+) {
+    return generator_resume(
+        context,
+        generator,
+        value,
+        OSEO_GENERATOR_RESUME_RETURN
+    );
 }

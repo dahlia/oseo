@@ -432,6 +432,20 @@ function emitBoxSmi(state: EmitState, operation: MirOperation): void {
   line(state, `roots[${operation.id}] = oseo_value_box_smi(fast_${argument});`);
 }
 
+/**
+ * The C expression reading one iterator's done flag.
+ *
+ * A generator body may suspend while an iterator operation is still in
+ * progress, and every resumption runs in a fresh C invocation, so an
+ * automatic local would read indeterminate state. Such a body keeps the
+ * flag in the root slot the MIR reserved for it instead.
+ */
+function iteratorDoneRead(state: EmitState, doneState: number): string {
+  return state.generator
+    ? `oseo_to_boolean(roots[${doneState}])`
+    : `iterator_done_${doneState}`;
+}
+
 function emitIteratorOperation(
   state: EmitState,
   operation: MirOperation,
@@ -450,7 +464,13 @@ function emitIteratorOperation(
         `&roots[${nextMethod}]);`,
     );
     if (operation.iteratorDoneState != null) {
-      line(state, `bool iterator_done_${operation.iteratorDoneState} = false;`);
+      const doneState = operation.iteratorDoneState;
+      line(
+        state,
+        state.generator
+          ? `roots[${doneState}] = oseo_boolean(false);`
+          : `bool iterator_done_${doneState} = false;`,
+      );
     }
     line(state, `roots[${operation.id}] = result.value;`);
     return;
@@ -463,34 +483,49 @@ function emitIteratorOperation(
       throw new Error(`MIR iterator next %${operation.id} has no value.`);
     }
     state.scalarKinds.set(operation.id, "boolean");
-    const doneState = operation.iteratorDoneState ?? operation.id;
-    if (operation.iteratorDoneState == null) {
-      line(state, `bool iterator_done_${doneState} = true;`);
-    }
-    if (operation.iteratorDoneState != null) {
-      line(state, `if (iterator_done_${doneState}) {`);
-      line(
-        state,
-        `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
-      );
-      line(state, `    roots[${value}] = oseo_undefined();`);
-      line(state, "} else {");
-      line(
-        state,
-        `    result = oseo_iterator_next(context, roots[${iterator}], ` +
-          `roots[${nextMethod}], &roots[${value}], ` +
-          `&iterator_done_${doneState});`,
-      );
-      line(state, "}");
-    } else {
+    const doneState = operation.iteratorDoneState;
+    if (doneState == null) {
+      // A step with no tracked done state owns the flag for this operation
+      // alone, so it never has to outlive the call that writes it.
+      line(state, `bool iterator_done_${operation.id} = true;`);
       line(
         state,
         `result = oseo_iterator_next(context, roots[${iterator}], ` +
           `roots[${nextMethod}], &roots[${value}], ` +
-          `&iterator_done_${doneState});`,
+          `&iterator_done_${operation.id});`,
       );
+      line(
+        state,
+        `bool fast_${operation.id} = !iterator_done_${operation.id};`,
+      );
+      line(state, `(void)fast_${operation.id};`);
+      return;
     }
-    line(state, `bool fast_${operation.id} = !iterator_done_${doneState};`);
+    // `oseo_iterator_next` writes the flag through a pointer, so a body that
+    // keeps the state in a root slot steps a local copy and stores it back.
+    const step = state.generator
+      ? `iterator_step_done_${operation.id}`
+      : `iterator_done_${doneState}`;
+    if (state.generator) {
+      line(state, `bool ${step} = ${iteratorDoneRead(state, doneState)};`);
+    }
+    line(state, `if (${step}) {`);
+    line(
+      state,
+      `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+    );
+    line(state, `    roots[${value}] = oseo_undefined();`);
+    line(state, "} else {");
+    line(
+      state,
+      `    result = oseo_iterator_next(context, roots[${iterator}], ` +
+        `roots[${nextMethod}], &roots[${value}], &${step});`,
+    );
+    line(state, "}");
+    if (state.generator) {
+      line(state, `roots[${doneState}] = oseo_boolean(${step});`);
+    }
+    line(state, `bool fast_${operation.id} = !${step};`);
     line(state, `(void)fast_${operation.id};`);
     return;
   }
@@ -507,7 +542,8 @@ function emitIteratorOperation(
         `completion[${slot}u].kind == 2);`,
     );
   } else {
-    line(state, `if (iterator_done_${operation.iteratorDoneState}) {`);
+    const done = iteratorDoneRead(state, operation.iteratorDoneState);
+    line(state, `if (${done}) {`);
     line(
       state,
       `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
@@ -1316,6 +1352,11 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       if (operation.iteratorNextMethodResult != null) {
         maximum = Math.max(maximum, operation.iteratorNextMethodResult);
       }
+      // A generator body keeps its iterator done flags in root slots, so the
+      // flag state survives a suspension taken mid-iteration.
+      if (operation.iteratorDoneState != null) {
+        maximum = Math.max(maximum, operation.iteratorDoneState);
+      }
       if (operation.iteratorValueResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueResult);
       }
@@ -1422,7 +1463,7 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
     if (block.terminator.kind === "jump") {
       pending.push(block.terminator.target);
     } else if (block.terminator.kind === "generator-yield") {
-      pending.push(block.terminator.resume);
+      pending.push(block.terminator.resume, block.terminator.returnResume);
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
     } else if (
@@ -1486,14 +1527,25 @@ function hasSelfCall(functionValue: MirFunction): boolean {
   return calledFunctionIds(functionValue).includes(functionValue.id);
 }
 
-/** Resume block identifiers paired with the slot receiving `next`'s value. */
+/** Where one suspension continues, by the kind of resumption it receives. */
+interface ResumePoint {
+  /** The block a return completion continues at instead of the resume block. */
+  readonly returnResume: number;
+  /** The slot receiving the value the resumption delivers. */
+  readonly sent: number;
+}
+
+/** Resume block identifiers paired with their resumption continuations. */
 function yieldResumePoints(
   blocks: readonly MirBlock[],
-): ReadonlyMap<number, number> {
-  const points = new Map<number, number>();
+): ReadonlyMap<number, ResumePoint> {
+  const points = new Map<number, ResumePoint>();
   for (const block of blocks) {
     if (block.terminator.kind !== "generator-yield") continue;
-    points.set(block.terminator.resume, block.terminator.sent);
+    points.set(block.terminator.resume, {
+      returnResume: block.terminator.returnResume,
+      sent: block.terminator.sent,
+    });
   }
   return points;
 }
@@ -1594,13 +1646,20 @@ function emitPrologue(
 function emitBlocks(
   state: EmitState,
   blocks: readonly MirBlock[],
-  resumePoints: ReadonlyMap<number, number>,
+  resumePoints: ReadonlyMap<number, ResumePoint>,
 ): void {
   for (const block of blocks) {
     if (block.id !== 0 || state.generator) line(state, `bb${block.id}:;`);
-    const sent = resumePoints.get(block.id);
-    if (sent != null) {
-      line(state, `roots[${sent}] = oseo_generator_sent(generator);`);
+    const resume = resumePoints.get(block.id);
+    if (resume != null) {
+      line(state, `roots[${resume.sent}] = oseo_generator_sent(generator);`);
+      // A return completion leaves the body from this suspension point, so
+      // it runs every enclosing `finally` and iterator close on the way out.
+      line(
+        state,
+        `if (oseo_generator_resume_kind(generator) == ` +
+          `OSEO_GENERATOR_RESUME_RETURN) goto bb${resume.returnResume};`,
+      );
     }
     for (const operation of block.operations) {
       emitOperation(state, operation);
@@ -1743,7 +1802,7 @@ function emitFunction(
   if (generator) {
     line(state, "result = (OseoResult){OSEO_STATUS_NORMAL, frame.slots[0]};");
   } else {
-    emitBlocks(state, blocks, new Map<number, number>());
+    emitBlocks(state, blocks, new Map<number, ResumePoint>());
   }
   if (state.usesAbrupt) {
     line(state, "abrupt:");

@@ -86,6 +86,63 @@ tests:
   - path: test/built-ins/GeneratorPrototype/next/return-yield-expr.js
     expectedClassification: pass
     dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/from-state-completed.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/from-state-executing.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/from-state-suspended-start.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/this-val-not-generator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/this-val-not-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-catch-before-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-catch-following-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-catch-within-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-catch-within-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-before-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-following-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-nested-try-catch-within-catch.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-nested-try-catch-within-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-nested-try-catch-within-inner-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-nested-try-catch-within-outer-try-after-nested.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-nested-try-catch-within-outer-try-before-nested.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-set-property-within-try.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-within-finally.js
+    expectedClassification: pass
+    dependencies: [generators]
+  - path: test/built-ins/GeneratorPrototype/return/try-finally-within-try.js
+    expectedClassification: pass
+    dependencies: [generators]
   - path: test/built-ins/NativeErrors/EvalError/constructor.js
     expectedClassification: pass
     dependencies: [error-intrinsics]

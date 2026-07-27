@@ -65,6 +65,41 @@ test("ends a generator block at each suspension and resumes after it", () => {
   assert.match(printMir(result.mir), /^function\* @f/mu);
 });
 
+test("leaves a suspension through its own block on a return resumption", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function* guarded() { try { yield 1; } finally { yield 2; } }\n" +
+      "guarded();",
+    sourceId: "return-resumption.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const generator = result.mir.functions.find(
+    (functionValue) => functionValue.generator === true,
+  );
+  assert.ok(generator != null);
+  const suspension = generator.blocks.find(
+    (block) => block.terminator.kind === "generator-yield",
+  );
+  assert.ok(suspension?.terminator.kind === "generator-yield");
+  const { resume, returnResume } = suspension.terminator;
+  assert.notEqual(returnResume, resume);
+  assert.notEqual(returnResume, suspension.id);
+  // The `try` body's suspension leaves through the finalizer, so a return
+  // completion delivered there still runs the `finally` block.
+  const returnBlock = generator.blocks.find(
+    (block) => block.id === returnResume,
+  );
+  assert.ok(returnBlock != null);
+  assert.ok(
+    returnBlock.operations.some(
+      (operation) => operation.completionKind === "return",
+    ),
+  );
+  assert.equal(returnBlock.terminator.kind, "jump");
+  assert.match(printMir(result.mir), /resume bb\d+ sent %\d+ return bb\d+/u);
+});
+
 test("keeps a bare yield's implicit undefined operand", () => {
   const result = compileSource(babelFrontend, {
     source: "function* bare() { yield; }\nbare();",

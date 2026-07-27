@@ -487,6 +487,12 @@ OseoResult oseo_call_function(
             receiver,
             argument_count > 0u ? arguments[0] : oseo_undefined()
         );
+    } else if (code_id == OSEO_GENERATOR_RETURN_CODE_ID) {
+        result = oseo_generator_return(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
     } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
         OseoValue description_input = argument_count > 0u
             ? arguments[0]

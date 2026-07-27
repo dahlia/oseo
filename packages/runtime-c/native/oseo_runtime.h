@@ -157,6 +157,7 @@ struct OseoContext {
     OseoValue iterator_next_function;
     OseoValue iterator_self_function;
     OseoValue generator_next_function;
+    OseoValue generator_return_function;
     OseoValue generator_prototype;
     OseoValue timer_head;
     const char *source_id;
@@ -379,6 +380,15 @@ OseoValue oseo_generator_receiver(OseoValue generator);
 OseoValue oseo_generator_sent(OseoValue generator);
 size_t oseo_generator_resume_point(OseoValue generator);
 /*
+ * How the pending resumption delivers `sent`. A normal resumption
+ * continues at the suspension's resume block; a return resumption leaves
+ * the body from the suspension point, so generated code branches to the
+ * block that runs the enclosing `finally` and iterator-close chain.
+ */
+#define OSEO_GENERATOR_RESUME_NEXT ((size_t)0u)
+#define OSEO_GENERATOR_RESUME_RETURN ((size_t)1u)
+size_t oseo_generator_resume_kind(OseoValue generator);
+/*
  * Records the block that the next resumption continues at and marks the
  * generator suspended. Generated code calls this immediately before
  * leaving a body with a yielded value.
@@ -398,6 +408,20 @@ OseoResult oseo_generator_next(
     OseoContext *context,
     OseoValue generator,
     OseoValue sent
+);
+/*
+ * %GeneratorPrototype%.return: resumes a suspended generator with a
+ * return completion so every enclosing `finally` and iterator close in
+ * the body runs, then returns a fresh { value, done } object. A body
+ * that yields again from a `finally` reports { yielded, false }. A
+ * generator suspended at its start or already completed returns
+ * { value, true } without entering the body, and a running one throws a
+ * TypeError. `IteratorClose` reaches this through the `return` method.
+ */
+OseoResult oseo_generator_return(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value
 );
 OseoResult oseo_argument_list_create(OseoContext *context);
 OseoResult oseo_argument_list_append(
