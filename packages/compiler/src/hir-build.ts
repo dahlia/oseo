@@ -32,7 +32,6 @@ import type {
   LocatedSyntax,
   SyntaxAssignmentPattern,
   SyntaxCallArgument,
-  SyntaxClassElement,
   SyntaxClassField,
   SyntaxExpression,
   SyntaxFunction,
@@ -1002,10 +1001,12 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     return (
       (expression.heritage != null &&
         hirExpressionHasAwait(expression.heritage)) ||
-      // A private name is created by the class evaluation itself, so
-      // only a key expression can carry an await.
+      // A private name is created by the class evaluation itself, and a
+      // static block is a function body, so only a key expression can
+      // carry an await.
       expression.elements.some(
         (element) =>
+          element.kind !== "static-block" &&
           element.key.kind !== "private-name" &&
           hirExpressionHasAwait(element.key),
       )
@@ -1226,7 +1227,7 @@ function resolveFunctionExpression(
  * no property observation can produce.
  */
 function resolveClassElementKey(
-  key: SyntaxClassElement["key"],
+  key: SyntaxClassField["key"],
   classScopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | HirPrivateNameKey | undefined {
@@ -1377,6 +1378,7 @@ function resolveClassExpression(
   // expression it extends.
   const privateNames: HirPrivateName[] = [];
   for (const element of expression.elements) {
+    if (element.kind === "static-block") continue;
     if (element.key.kind !== "private-name") continue;
     // A getter and its setter declare one name between them.
     if (classScope.has(element.key.name)) continue;
@@ -1416,6 +1418,32 @@ function resolveClassExpression(
       const field = resolveClassField(element, classScopes, state);
       if (field == null) return undefined;
       elements.push(field);
+      continue;
+    }
+    if (element.kind === "static-block") {
+      // The block resolves like an element function: it reaches the
+      // class scope, including the private names and the class name,
+      // and provides its own receiver rather than inheriting one.
+      const blockId = state.nextFunctionId;
+      state.nextFunctionId += 1;
+      state.functionInfo.set(element.body, { id: blockId });
+      const resolvedBlock = resolveFunction(
+        element.body,
+        classScopes,
+        state,
+        blockId,
+      );
+      elements.push({
+        ...element,
+        body: {
+          functionId: blockId,
+          functionKind: resolvedBlock.functionKind,
+          functionLength: resolvedBlock.functionLength,
+          kind: "function",
+          name: "",
+          range: element.range,
+        },
+      });
       continue;
     }
     const key = resolveClassElementKey(element.key, classScopes, state);

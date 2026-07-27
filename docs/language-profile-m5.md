@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 2,439 reviewed cases: 1,203 passes, 871 expected
-negatives, and 365 unsupported profile features. It records no semantic or
+The current manifest contains 2,501 reviewed cases: 1,230 passes, 898 expected
+negatives, and 373 unsupported profile features. It records no semantic or
 harness failures.
 
 
@@ -817,9 +817,8 @@ its deliberate boundary and its evidence:
     function expression, so `const Foo = class {}` reports a `name` of
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
-    closure at run time. Deliberate
-    boundaries: static initialization blocks and `export default class` are
-    rejected with source-located diagnostics.
+    closure at run time. Deliberate boundary: `export default class` is
+    rejected with a source-located diagnostic.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use; generator and
     asynchronous generator methods stay rejected with that shared
@@ -927,8 +926,8 @@ its deliberate boundary and its evidence:
     non-configurable `prototype` property. A literal `constructor` key is
     admitted on a static element and leaves `prototype.constructor`
     untouched, unlike the prototype element the grammar rejects. Deliberate
-    boundaries: static initialization blocks and private static methods and
-    accessors are rejected with the class element diagnostic. Native
+    boundary: private static methods and accessors are rejected with the
+    class element diagnostic. Native
     differential fixtures retain a static method, a static getter and setter
     pair, static `this` through the class and through a detached reference,
     the static method and accessor descriptors and their attributes, static
@@ -1255,8 +1254,8 @@ its deliberate boundary and its evidence:
     parent's, because the parent's class definition completes first. A class
     whose only elements are static declares no instance elements, so its
     constructor runs no instance element initialization at all. Deliberate
-    boundaries: a static private method or accessor, a static initialization
-    block, and a static private field reached as `C.#name` rather than
+    boundaries: a static private method or accessor and a static private
+    field reached as `C.#name` rather than
     through `this` are rejected with source-located diagnostics, and a static
     field named `constructor` or `prototype` stays the early error it is.
     Native differential fixtures cover the own-property descriptor, a field
@@ -1280,6 +1279,51 @@ its deliberate boundary and its evidence:
     until the units that own them land. The reviewed manifest moves to 1,203
     passes, 871 expected negatives, and 365 unsupported profile features with
     no semantic or harness failures.
+ -  Class static initialization blocks. A `static { ... }` element declares
+    nothing and evaluates no key: it is a statement list the class definition
+    runs once. The frontend converts the block to a parameterless function
+    body with the same element function kind a method has, so it owns `var`
+    hoisting, block-level declarations, and the strictness a class body
+    already established, and each block is a separate body whose bindings no
+    other element and no enclosing scope reaches. Lowering creates that
+    closure where the block appears, binds the constructor as its home
+    object, and calls it with the constructor as its receiver once the class
+    is otherwise complete, which is EvaluateStaticBlock. The call is an
+    ordinary call, so the unit adds no runtime entry point of its own. Blocks
+    and `static` field initializers share one deferred, source-ordered list,
+    which is ECMA-262's staticElements step: a block and a static field
+    interleave by position, both run after every key and every method and
+    after the class-scope binding is initialized, and an abrupt block stops
+    the class definition where it threw. `this` is the constructor, so a
+    nested arrow captures the class, an ordinary nested function keeps its
+    own strict receiver, `new.target` is `undefined`, and `super.x` starts at
+    the parent constructor in a derived class. A block reaches the static
+    private elements its class declares through that receiver, and a class
+    whose only element is a block declares no instance element. `arguments`,
+    `return`, `super()`, `await`, `yield`, and an unlabeled `break` or
+    `continue` inside a block stay the early errors they are. Native
+    differential fixtures cover a lone block and its own-property
+    observation, several blocks in source order, the receiver and a nested
+    arrow, the class-scope name binding and a method declared later, an
+    anonymous class expression named before its blocks run, interleaving with
+    static fields and computed keys, an abrupt block in a class expression
+    and in a class declaration, per-block `var`, `let`, `const`, and function
+    declarations, static private access, per-evaluation identity, a nested
+    class inside a block, loops and `try` inside a block, `super` reads over
+    a two-level chain, parent-before-child definition order, and a hinted
+    method that specializes while blocks surround it on every guard path. The
+    generated class property suite now draws a static block alongside the
+    other elements. Twenty-seven reviewed test262 cases newly pass,
+    twenty-seven new expected negatives record the `await`, `arguments`,
+    `return`, `super()`, `yield`, and unlabeled control-flow early errors,
+    and eight new unsupported cases record the boundaries this unit keeps. The
+    reviewed subset gains the `class-static-block` feature tag; the one
+    remaining case that tag reaches inside the admitted syntax,
+    *static-init-sequence.js*, needs `Array.prototype.push` and stays outside
+    the reviewed subset until the unit that owns it lands, with the same
+    interleaving covered by a native fixture meanwhile. The reviewed manifest
+    moves to 1,230 passes, 898 expected negatives, and 373 unsupported
+    profile features with no semantic or harness failures.
 
 
 Known gaps inside the claim
@@ -1294,8 +1338,8 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Static private methods and accessors, static initialization blocks, and
-    `export default class` are outside the admitted class subset. A private
+ -  Static private methods and accessors and `export default class` are
+    outside the admitted class subset. A private
     element is reachable only through `this`, so a cross-instance
     `other.#name` reference, a static private field read as `C.#name`, the
     `#name in object` brand check, optional `?.#name` access, and a private

@@ -13,6 +13,7 @@ import type {
   SyntaxCallTarget,
   SyntaxClassElement,
   SyntaxClassField,
+  SyntaxClassStaticBlock,
   SyntaxExpression,
   SyntaxForDeclaration,
   SyntaxForOfTarget,
@@ -3631,6 +3632,45 @@ function classField(
 }
 
 /**
+ * Converts one `static { ... }` initialization block. The block is a
+ * statement list rather than a definition, so it becomes a
+ * parameterless function body with the same element function kind a
+ * method has: it is not a constructor, it carries a home object, and it
+ * provides its own receiver, which the class definition supplies as the
+ * constructor.
+ *
+ * The block body is only a statement list, so it reaches the ordinary
+ * function conversion through a synthesized block statement. That
+ * conversion owns `var` hoisting, block-level declarations, and the
+ * strictness a class body already established.
+ */
+function classStaticBlock(
+  context: ConvertContext,
+  element: BabelNode,
+  derived: boolean,
+): SyntaxClassStaticBlock | undefined {
+  const bounds = {
+    ...(element.end == null ? {} : { end: element.end }),
+    ...(element.start == null ? {} : { start: element.start }),
+  };
+  const body = functionDeclaration(
+    context,
+    {
+      ...bounds,
+      body: { ...bounds, body: element.body, type: "BlockStatement" },
+      params: [],
+      type: "ClassStaticBlockBody",
+    },
+    false,
+    "method",
+    false,
+    derived,
+  );
+  if (body == null) return undefined;
+  return { ...location(context, element), body, kind: "static-block" };
+}
+
+/**
  * Converts one class declaration or expression into the owned class
  * expression. The class body is strict code, so the strictness stack
  * gains an entry for every element, including computed keys.
@@ -3685,6 +3725,12 @@ export function classExpression(
       const field = classField(context, element, derived);
       if (field == null) break;
       elements.push(field);
+      continue;
+    }
+    if (element.type === "StaticBlock") {
+      const block = classStaticBlock(context, element, derived);
+      if (block == null) break;
+      elements.push(block);
       continue;
     }
     if (
@@ -3767,6 +3813,7 @@ export function classExpression(
   // definition rather than to construction, so it never sets the flag.
   const instanceElements = elements.some(
     (element) =>
+      element.kind !== "static-block" &&
       element.staticPlacement !== true &&
       (element.kind === "field" || element.key.kind === "private-name"),
   );

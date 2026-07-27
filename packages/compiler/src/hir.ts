@@ -341,8 +341,23 @@ export interface HirClassField extends LocatedSyntax {
   readonly staticPlacement?: true;
 }
 
+/**
+ * One resolved `static { ... }` initialization block. The block body is
+ * resolved as its own function, so it reads the class scope and takes
+ * the constructor as its receiver, and the class definition calls that
+ * closure once and discards whatever it produces.
+ */
+export interface HirClassStaticBlock extends LocatedSyntax {
+  /** The closure holding the block's statements. */
+  readonly body: HirExpression;
+  readonly kind: "static-block";
+}
+
 /** One element admitted by an HIR class body. */
-export type HirClassElement = HirClassField | HirClassMethod;
+export type HirClassElement =
+  | HirClassField
+  | HirClassMethod
+  | HirClassStaticBlock;
 
 /**
  * The immutable binding a named class holds in its own lexical

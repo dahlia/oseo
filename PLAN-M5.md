@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 1,203
-passes, 871 expected negatives, and 365 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 1,230
+passes, 898 expected negatives, and 373 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -761,8 +761,8 @@ class that extends it begins, a derived class's static fields always run
 after its parent's. Two new runtime entry points perform the public and the
 private definition; the constructor's instance element list stays untouched,
 so a class whose only elements are static declares no instance elements at
-all. Deliberate boundaries: a static private method or accessor, a static
-initialization block, and a static field reached as `C.#name` rather than
+all. Deliberate boundaries: a static private method or accessor and a static
+field reached as `C.#name` rather than
 through `this` stay rejected with source-located diagnostics, and a static
 field named `constructor` or `prototype` remains the early error it is.
 Fixed native fixtures cover the own-property descriptor, a field without an
@@ -787,6 +787,55 @@ generator and asynchronous methods, and stay outside the reviewed subset
 until the units that own them land. The manifest moves to 1203 passes, 871
 expected negatives, and 365 unsupported profile features with no semantic or
 harness failures.
+
+Class static initialization blocks are now admitted, the tenth unit of the
+functions and executable syntax stream. A `static { ... }` element declares
+nothing and evaluates no key, so it is not a definition at all: it is a
+statement list the class definition runs once. The frontend converts the
+block to a parameterless function body with the same element function kind a
+method has, which gives it `var` hoisting, block-level declarations, and the
+strictness a class body already established for free, and makes each block a
+separate body whose bindings no other element and no enclosing scope reaches.
+Lowering creates that closure where the block appears, binds the constructor
+as its home object, and calls it with the constructor as its receiver once
+the class is otherwise complete, which is EvaluateStaticBlock. The call is an
+ordinary call, so this unit adds no runtime entry point, no backend
+operation, and no C at all.
+
+Blocks and `static` field initializers now share one deferred, source-ordered
+list, which is ECMA-262's staticElements step. That order is observable: a
+block and a static field interleave by position, both run after every key and
+every method and after the class-scope binding is initialized, and an abrupt
+block stops the class definition where it threw. Inside a block `this` is the
+constructor, so a nested arrow captures the class, an ordinary nested
+function keeps its own strict receiver, `new.target` is `undefined`, and
+`super.x` starts at the parent constructor in a derived class. A block
+reaches the static private elements its class declares through that receiver,
+and a class whose only element is a block declares no instance element.
+`arguments`, `return`, `super()`, `await`, `yield`, and an unlabeled `break`
+or `continue` inside a block stay the early errors they are.
+
+Fixed native fixtures cover a lone block and its own-property observation,
+several blocks in source order, the receiver and a nested arrow, the
+class-scope name binding and a method declared later, an anonymous class
+expression named before its blocks run, interleaving with static fields and
+computed keys, an abrupt block in a class expression and in a class
+declaration, per-block `var`, `let`, `const`, and function declarations,
+static private access, per-evaluation identity, a nested class inside a
+block, loops and `try` inside a block, `super` reads over a two-level chain,
+parent-before-child definition order, and a hinted method that specializes
+while blocks surround it on every guard path. The generated class property
+suite now draws a static block alongside the other elements. Twenty-seven
+reviewed test262 cases newly pass, twenty-seven new expected negatives record
+the `await`, `arguments`, `return`, `super()`, `yield`, and unlabeled
+control-flow early errors, and eight new unsupported cases record the
+boundaries this unit keeps. The reviewed subset gains the
+`class-static-block` feature tag; the one remaining case that tag reaches
+inside the admitted syntax, *static-init-sequence.js*, needs
+`Array.prototype.push` and stays outside the reviewed subset until the unit
+that owns it lands, with the same interleaving covered by a native fixture
+meanwhile. The manifest moves to 1230 passes, 898 expected negatives, and 373
+unsupported profile features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

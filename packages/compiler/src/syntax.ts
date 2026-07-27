@@ -242,8 +242,28 @@ export interface SyntaxClassField extends LocatedSyntax {
   readonly staticPlacement?: true;
 }
 
+/**
+ * One `static { ... }` initialization block in an owned class body. A
+ * block declares no element and evaluates no key: it is a statement list
+ * the class definition runs once, in source order among the other static
+ * elements.
+ */
+export interface SyntaxClassStaticBlock extends LocatedSyntax {
+  /**
+   * The block's statements as their own parameterless function body. It
+   * takes the constructor as its receiver and carries it as the home
+   * object, so `this` is the class and `super.x` starts at the parent
+   * constructor.
+   */
+  readonly body: SyntaxFunction;
+  readonly kind: "static-block";
+}
+
 /** One element admitted by an owned class body. */
-export type SyntaxClassElement = SyntaxClassField | SyntaxClassMethod;
+export type SyntaxClassElement =
+  | SyntaxClassField
+  | SyntaxClassMethod
+  | SyntaxClassStaticBlock;
 
 /** An expression in the parser-independent M1 syntax tree. */
 export type SyntaxExpression =
