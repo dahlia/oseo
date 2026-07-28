@@ -1,5 +1,1028 @@
 results:
   - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    observation:
+      detail: "test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-valu\
+        e-not-passed.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/next/abs\
+        ent-value-not-passed.js:201:27: error[OSEO1001]: Unknown binding
+        'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-poisoned-done.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-poisoned-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    observation:
+      detail: "test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-re\
+        sult-prototype.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/next/ite\
+        rator-result-prototype.js:119:5: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-rejected.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-unwrap-promise.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - async-iteration
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/next/return-promise.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    observation:
+      detail: "test/built-ins/AsyncFromSyncIteratorPrototype/next/return-prom\
+        ise.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/next/ret\
+        urn-promise.js:95:26: error[OSEO1001]: Unknown binding
+        'Promise'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-value-not-passed.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    observation:
+      detail: "test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-va\
+        lue-not-passed.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/return/a\
+        bsent-value-not-passed.js:204:29: error[OSEO1001]: Unknown
+        binding 'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-poisoned-done.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-poisoned-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-unwrap-promise.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/poisoned-get-return.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/poisoned-return.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/result-object-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/return-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/return/return-undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-poisoned-done.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-poisoned-value.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-unwrap-promise.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/poisoned-get-throw.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/poisoned-throw.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/result-object-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-get-return-undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-poisoned-return.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-return-not-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-return-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - async-iteration
@@ -749,6 +1772,33 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorPrototype/next/prop-desc.\
         js:139:31: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+    observation:
+      detail: 'test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js:229:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -5794,6 +6844,64 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Symbol.asyncIterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/asyncIterator/cross-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - symbols
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+  - case:
+      async: false
+      features:
+        - Symbol.asyncIterator
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Symbol/asyncIterator/prop-desc.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -118469,9 +119577,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1107
   harnessFailures: 0
-  passes: 1732
+  passes: 1758
   semanticFailures: 0
-  unsupportedProfileFeatures: 1012
+  unsupportedProfileFeatures: 1018
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -118488,9 +119596,9 @@ summary:
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
-      passes: 502
+      passes: 528
       semanticFailures: 0
-      unsupportedProfileFeatures: 639
+      unsupportedProfileFeatures: 645
     - dependency: classes
       expectedNegatives: 563
       harnessFailures: 0
@@ -118548,9 +119656,9 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
-      passes: 623
+      passes: 648
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 39
     - dependency: lexical-bindings
       expectedNegatives: 81
       harnessFailures: 0
@@ -118590,9 +119698,9 @@ summary:
     - dependency: symbols
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 32
+      passes: 33
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: top-level-await
       expectedNegatives: 3
       harnessFailures: 0
@@ -118606,6 +119714,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
   groups:
+    - group: built-ins/AsyncFromSyncIteratorPrototype
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 25
+      semanticFailures: 0
+      unsupportedProfileFeatures: 4
     - group: built-ins/AsyncGeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -118617,7 +119731,7 @@ summary:
       harnessFailures: 0
       passes: 22
       semanticFailures: 0
-      unsupportedProfileFeatures: 22
+      unsupportedProfileFeatures: 23
     - group: built-ins/AsyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -118663,9 +119777,9 @@ summary:
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 10
+      passes: 11
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - group: language/computed-property-names
       expectedNegatives: 0
       harnessFailures: 0

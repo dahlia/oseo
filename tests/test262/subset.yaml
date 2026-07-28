@@ -31,6 +31,93 @@ supportedFeatures:
   - top-level-await
   - well-known-symbols
 tests:
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-poisoned-done.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-poisoned-value.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-prototype.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-rejected.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-unwrap-promise.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/return-promise.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-value-not-passed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-poisoned-done.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-poisoned-value.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-unwrap-promise.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/poisoned-get-return.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/poisoned-return.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/result-object-error.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/return-null.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/return-undefined.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-poisoned-done.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-poisoned-value.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-unwrap-promise.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/poisoned-get-throw.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/poisoned-throw.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/result-object-error.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-null.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-get-return-undefined.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-poisoned-return.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-return-not-object.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined-return-object.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/throw-undefined.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncGeneratorFunction/extensibility.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, dynamic-source]
@@ -116,6 +203,9 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/prop-desc.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration]
+  - path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-order-state-executing.js
@@ -640,6 +730,12 @@ tests:
   - path: test/built-ins/Promise/resolve/resolve-non-obj.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Symbol/asyncIterator/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, symbols]
+  - path: test/built-ins/Symbol/asyncIterator/prop-desc.js
+    expectedClassification: pass
+    dependencies: [async-iteration, symbols]
   - path: test/built-ins/Symbol/auto-boxing-non-strict.js
     expectedClassification: pass
     dependencies: [symbols]

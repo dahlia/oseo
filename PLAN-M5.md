@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 3,851
-reviewed cases: 1,732 passes, 1,107 expected negatives, and 1,012 unsupported
+honest unsupported classifications. The current reviewed manifest records 3,883
+reviewed cases: 1,758 passes, 1,107 expected negatives, and 1,018 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1010,6 +1010,73 @@ replaced `prototype` object that reaches only its own `next`, and each of
 `next`, `return`, and `throw` rejecting rather than throwing for a
 non-generator receiver, including the intrinsic prototype itself. It runs under
 forced collection so the three new context roots are traced.
+
+The asynchronous iteration built-in inventory is now closed, the fourteenth
+unit of the functions and executable syntax stream and the last M5a unit of
+that family. It adds no capability. Every 16th-edition path under
+*test/built-ins/AsyncIteratorPrototype/*,
+*test/built-ins/AsyncGeneratorFunction/*,
+*test/built-ins/AsyncGeneratorPrototype/*,
+*test/built-ins/AsyncFromSyncIteratorPrototype/*, and
+*test/built-ins/Symbol/asyncIterator/* is now either a reviewed manifest entry
+or a named gap, so the family's remaining inventory is measured rather than
+assumed.
+
+The reviewed harness gains an *asyncHelpers.js* adaptation, which ten of the
+promoted cases need. Upstream `asyncTest` detects `$DONE` through
+`Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and upstream
+`assert.throwsAsync` renders the observed constructor name into its failure
+message; the profile admits neither `globalThis` nor generic string coercion,
+so the reviewed adaptation probes the binding with `typeof` and reports a
+constructor mismatch without composing a message from the observed value. Like
+every other reviewed harness, it is written inside the admitted profile rather
+than copied from upstream, and it changes no already reviewed case, because a
+harness include is opt-in through frontmatter.
+
+Twenty-six reviewed cases newly pass and six new unsupported cases record the
+family's boundaries, all of them promotions of existing behavior:
+*test/built-ins/AsyncFromSyncIteratorPrototype/* enters the manifest with
+twenty-five passes and four unsupported cases, and
+*test/built-ins/Symbol/asyncIterator/* with one of each. The manifest moves to
+1,758 passes, 1,107 expected negatives, and 1,018 unsupported profile features
+with no semantic or harness failures. Of the closed directories,
+*AsyncIteratorPrototype/* holds four reviewed cases and
+*AsyncGeneratorFunction/* twenty-three, every one of them unsupported because
+reaching those intrinsics needs `Object.getPrototypeOf` or the dynamic-source
+boundary; nine further *AsyncIteratorPrototype/* paths are `Symbol.asyncDispose`
+cases that [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) places
+in the 2027 edition, outside the M5a denominator.
+
+Twelve cases stay outside the reviewed subset because they observe behavior
+this profile does not implement, and the measurement names all three causes.
+AsyncFromSyncIteratorContinuation does not close the wrapped synchronous
+iterator when the stepped value rejects, which four *next* cases and one
+*throw* case observe. `PromiseResolve` does not read the resolved value's
+`constructor`, so a poisoned `constructor` getter neither rejects nor reaches
+the generator, which three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
+cases and the three *AsyncGeneratorPrototype/return/* broken-promise cases
+observe. The
+missing `%GeneratorPrototype%.throw` reaches one further case,
+*AsyncFromSyncIteratorPrototype/throw/iterator-result.js*, through a `throw`
+forwarded to a wrapped synchronous generator. Eight
+*test/built-ins/Function/prototype/toString/* cases the `async-iteration` tag
+reaches need an *nativeFunctionMatcher.js* include that has no reviewed
+implementation. Each is now a profile gap entry with a named owner.
+
+The wider `async-iteration` inventory outside these directories is measured
+but not promoted. Three thousand five hundred sixty-seven 16th-edition paths
+whose frontmatter carries `async-iteration` or `Symbol.asyncIterator` stay
+outside the reviewed subset, and running them records 544 passes, 307 expected
+negatives, 2,669 unsupported profile features, 39 semantic failures, and 8
+harness failures. Sixty-eight percent of the unsupported group reports the one
+diagnostic asynchronous generator method definitions already get, so promoting
+that group belongs to the unit that admits generator methods rather than to a
+classification pass. Every one of the 544 passes is a
+*test/language/statements/for-await-of/* case, and those 848 classifiable
+paths are generated destructuring cases whose reviewed dependency tags depend
+on the shared destructuring case rather than on the host; promoting them needs
+a tag derivation validated against the 379 for-await-of entries already
+reviewed, which this unit does not attempt.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),

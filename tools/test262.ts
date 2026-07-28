@@ -70,6 +70,10 @@ const propertyHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/propertyHelper.js",
 );
+const asyncHelpersHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/asyncHelpers.js",
+);
 const compareArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareArray.js",
@@ -1218,6 +1222,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
     base: await readFile(baseHarnessPath, "utf8"),
     done: await readFile(doneHarnessPath, "utf8"),
     includes: new Map([
+      ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
       ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
     ]),
