@@ -4,7 +4,7 @@ A linking exception for the runtime surface
 Status
 ------
 
-Proposed. Three questions remain open below, and the maintainer decides
+Proposed. Two questions remain open below, and the maintainer decides
 acceptance after they are answered. This record does not assess the legal
 effect of any license text.
 
@@ -152,16 +152,13 @@ library reaches source compiled into the user's program is not obvious, and it
 matters more here than for GCC because the M8 strategy moves built-in
 implementations across that line deliberately.
 
-**The surface inventory.** The definition above is a rule, not a list, and
-some current files satisfy it only in part. *packages/backend-c/src/index.ts*
-interleaves lowering logic with emitted fragments in the same functions.
-*packages/runtime-c* holds native support code beside a compile-time provider.
-Build output under _packages/\*/dist/_ is generated rather than tracked, so the
-inventory also has to say how a generated artifact inherits the treatment of
-the source it was built from. Acceptance needs a checked-in inventory of the
-files implementing the surface, a rule that a mixed file is split before it
-lands, and a mapping from file-level treatment to the package-level SPDX
-expressions that npm and JSR record.
+**The surface inventory (closed).** The checked-in
+[*runtime support surface inventory*](../runtime-support-surface.md) lists each
+tracked file in the current surface, requires mixed files to be split before
+they land, maps generated artifacts to their tracked sources, and maps
+file-level treatment to npm and JSR SPDX expressions. The backend's fixed and
+interpolated C fragments now live in a data-only file, separate from lowering
+and composition logic.
 
 Before acceptance, a written answer to the first two questions should be on
 file from the FSF licensing team or another identified source, and the third
@@ -221,3 +218,5 @@ Links
     self-hosted in the compiled subset, keeping primitive operations native.
  -  [*CONTRIBUTING.md*](../../CONTRIBUTING.md) states the packaging rules the
     license metadata must satisfy.
+ -  [*docs/runtime-support-surface.md*](../runtime-support-surface.md) is the
+    checked-in support-surface inventory.

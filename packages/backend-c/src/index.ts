@@ -10,6 +10,74 @@ import type {
   SourceRange,
 } from "@oseo/compiler";
 
+import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
+
+type CInterpolation = boolean | number | string;
+
+type NormalizedCFragment<Fragment extends CFragment> = {
+  readonly [Index in keyof Fragment]: string;
+};
+
+type CFragmentGroup = Readonly<Record<string, CFragment>>;
+type CFragmentCatalog = Readonly<Record<string, CFragmentGroup>>;
+
+type NormalizeCFragment<Value> = Value extends CFragment
+  ? NormalizedCFragment<Value>
+  : never;
+
+type NormalizedCCatalog<Catalog extends CFragmentCatalog> = {
+  readonly [Group in keyof Catalog]: {
+    readonly [Name in keyof Catalog[Group]]: NormalizeCFragment<
+      Catalog[Group][Name]
+    >;
+  };
+};
+
+function normalizeCCatalog<const Catalog extends CFragmentCatalog>(
+  catalog: Catalog,
+): NormalizedCCatalog<Catalog> {
+  const normalized: Record<string, Record<string, readonly string[]>> = {};
+  for (const [groupName, group] of Object.entries(catalog)) {
+    const normalizedGroup: Record<string, readonly string[]> = {};
+    for (const [fragmentName, fragment] of Object.entries(group)) {
+      normalizedGroup[fragmentName] = fragment.map((segment) =>
+        segment.join(""),
+      );
+    }
+    normalized[groupName] = normalizedGroup;
+  }
+  return normalized as NormalizedCCatalog<Catalog>;
+}
+
+const emittedC = normalizeCCatalog(emittedCSource);
+
+type RenderedCFragment = readonly [string, ...string[]];
+
+type CInterpolationValues<Fragment extends RenderedCFragment> =
+  Fragment extends readonly [string, ...infer Rest]
+    ? { [Index in keyof Rest]: CInterpolation }
+    : never;
+
+function renderC<const Fragment extends RenderedCFragment>(
+  segments: Fragment,
+  ...values: CInterpolationValues<Fragment>
+): string {
+  if (segments.length !== values.length + 1) {
+    throw new Error(
+      `C fragment needs ${segments.length - 1} values, got ` +
+        `${values.length}.`,
+    );
+  }
+  if (values.length === 0) return segments[0] ?? "";
+  let result = "";
+  for (let index = 0; index < values.length; index += 1) {
+    result += segments[index] ?? "";
+    result += String(values[index]);
+  }
+  result += segments.at(-1) ?? "";
+  return result;
+}
+
 interface EmitState {
   readonly argumentSlotStart: number;
   readonly completionSlotStart: number;
@@ -34,27 +102,39 @@ interface EmitState {
 
 /** Leave a generated function with a normal completion. */
 function emitNormalReturn(state: EmitState, value: string, indent = ""): void {
-  line(state, `${indent}result = (OseoResult){OSEO_STATUS_NORMAL, ${value}};`);
+  line(
+    state,
+    renderC(
+      emittedC.normalReturn.resultAssignOseoResultOseoStatusNormal,
+      indent,
+      value,
+    ),
+  );
   if (!state.generator) {
-    line(state, `${indent}oseo_roots_release(context, &frame);`);
+    line(state, renderC(emittedC.normalReturn.releaseRoots, indent));
   }
-  line(state, `${indent}return result;`);
+  line(state, renderC(emittedC.normalReturn.returnResult, indent));
 }
 
 function escapeCString(value: string): string {
   let result = "";
   for (const character of value) {
     const codePoint = character.codePointAt(0);
-    if (character === "\\") result += "\\\\";
-    else if (character === '"') result += '\\"';
-    else if (character === "?") result += "\\?";
-    else if (character === "\n") result += "\\n";
+    if (character === "\\") result += renderC(emittedC.cString.backslashEscape);
+    else if (character === '"') result += renderC(emittedC.cString.quoteEscape);
+    else if (character === "?")
+      result += renderC(emittedC.cString.questionMarkEscape);
+    else if (character === "\n")
+      result += renderC(emittedC.cString.newlineEscape);
     else if (codePoint != null && codePoint >= 0x20 && codePoint <= 0x7e) {
       result += character;
     } else if (codePoint != null) {
       const bytes = new TextEncoder().encode(character);
       for (const byte of bytes) {
-        result += `\\${byte.toString(8).padStart(3, "0")}`;
+        result += renderC(
+          emittedC.cString.octalEscape,
+          byte.toString(8).padStart(3, renderC(emittedC.cString.octalPadding)),
+        );
       }
     }
   }
@@ -62,7 +142,7 @@ function escapeCString(value: string): string {
 }
 
 function line(state: EmitState, source: string): void {
-  state.lines.push(`    ${source}`);
+  state.lines.push(renderC(emittedC.line.indentLine, source));
 }
 
 function location(state: EmitState, range: SourceRange): void {
@@ -71,15 +151,19 @@ function location(state: EmitState, range: SourceRange): void {
     const length = new TextEncoder().encode(range.sourceId).length;
     line(
       state,
-      `oseo_context_source_location(context, "${sourceId}", ${length}u, ` +
-        `${range.start.line}u, ${range.start.column}u);`,
+      renderC(emittedC.location.sourceLocationPrefix, sourceId, length) +
+        renderC(
+          emittedC.common.sourcePositionSuffix,
+          range.start.line,
+          range.start.column,
+        ),
     );
     return;
   }
   line(
     state,
-    `oseo_context_location(context, ${range.start.line}u, ` +
-      `${range.start.column}u);`,
+    renderC(emittedC.location.locationPrefix, range.start.line) +
+      renderC(emittedC.common.positionSuffix, range.start.column),
   );
 }
 
@@ -96,39 +180,42 @@ function operationArgument(operation: MirOperation, index: number): number {
 
 function operatorHelper(operator: BinaryOperator): string {
   const helpers: Readonly<Record<BinaryOperator, string>> = {
-    "!=": "oseo_not_loose_equal",
-    "!==": "oseo_not_strict_equal",
-    "%": "oseo_remainder",
-    "&": "oseo_bitwise_and",
-    "*": "oseo_multiply",
-    "**": "oseo_exponentiate",
-    "+": "oseo_add",
-    "-": "oseo_subtract",
-    "/": "oseo_divide",
-    "<": "oseo_less_than",
-    "<<": "oseo_shift_left",
-    "<=": "oseo_less_equal",
-    "==": "oseo_loose_equal",
-    "===": "oseo_strict_equal",
-    ">": "oseo_greater_than",
-    ">=": "oseo_greater_equal",
-    ">>": "oseo_shift_right",
-    ">>>": "oseo_shift_right_unsigned",
-    "^": "oseo_bitwise_xor",
-    in: "oseo_has_property",
-    instanceof: "oseo_instanceof",
-    "|": "oseo_bitwise_or",
+    "!=": renderC(emittedC.operatorHelper.oseoNotLooseEqual),
+    "!==": renderC(emittedC.operatorHelper.oseoNotStrictEqual),
+    "%": renderC(emittedC.operatorHelper.oseoRemainder),
+    "&": renderC(emittedC.operatorHelper.oseoBitwiseAnd),
+    "*": renderC(emittedC.operatorHelper.oseoMultiply),
+    "**": renderC(emittedC.operatorHelper.oseoExponentiate),
+    "+": renderC(emittedC.operatorHelper.oseoAdd),
+    "-": renderC(emittedC.operatorHelper.oseoSubtract),
+    "/": renderC(emittedC.operatorHelper.oseoDivide),
+    "<": renderC(emittedC.operatorHelper.oseoLessThan),
+    "<<": renderC(emittedC.operatorHelper.oseoShiftLeft),
+    "<=": renderC(emittedC.operatorHelper.oseoLessEqual),
+    "==": renderC(emittedC.operatorHelper.oseoLooseEqual),
+    "===": renderC(emittedC.operatorHelper.oseoStrictEqual),
+    ">": renderC(emittedC.operatorHelper.oseoGreaterThan),
+    ">=": renderC(emittedC.operatorHelper.oseoGreaterEqual),
+    ">>": renderC(emittedC.operatorHelper.oseoShiftRight),
+    ">>>": renderC(emittedC.operatorHelper.oseoShiftRightUnsigned),
+    "^": renderC(emittedC.operatorHelper.oseoBitwiseXor),
+    in: renderC(emittedC.operatorHelper.oseoHasProperty),
+    instanceof: renderC(emittedC.operatorHelper.oseoInstanceof),
+    "|": renderC(emittedC.operatorHelper.oseoBitwiseOr),
   };
   return helpers[operator];
 }
 
 function numberLiteral(value: number): string {
-  if (Number.isNaN(value)) return "NAN";
-  if (value === Infinity) return "INFINITY";
-  if (value === -Infinity) return "-INFINITY";
-  if (Object.is(value, -0)) return "-0.0";
+  if (Number.isNaN(value)) return renderC(emittedC.numberLiteral.nan);
+  if (value === Infinity)
+    return renderC(emittedC.numberLiteral.positiveInfinity);
+  if (value === -Infinity)
+    return renderC(emittedC.numberLiteral.negativeInfinity);
+  if (Object.is(value, -0)) return renderC(emittedC.numberLiteral.negativeZero);
   const text = value.toString();
-  if (Number.isInteger(value) && !text.includes("e")) return `${text}.0`;
+  if (Number.isInteger(value) && !text.includes("e"))
+    return renderC(emittedC.numberLiteral.integerAsDouble, text);
   return text;
 }
 
@@ -146,16 +233,33 @@ function emitStringConstant(
   value: string,
 ): void {
   const units = utf16Units(value);
-  let input = "NULL, 0u";
+  let input = renderC(emittedC.stringConstant.nullU);
   if (units.length > 0) {
-    const name = `string_units_${operation.id}`;
-    line(state, `static const uint16_t ${name}[] = {${units.join(", ")}};`);
-    input = `${name}, ${units.length}u`;
+    const name = renderC(emittedC.stringConstant.stringUnits, operation.id);
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        name,
+        units.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    input = renderC(
+      emittedC.stringConstant.unitsWithLength,
+      name,
+      units.length,
+    );
   }
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, `result = oseo_string_from_units(context, ${input});`);
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(
+    state,
+    renderC(
+      emittedC.stringConstant.resultAssignOseoStringFromUnitsContext,
+      input,
+    ),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitConstant(
@@ -166,15 +270,37 @@ function emitConstant(
   if (constant.kind === "string") {
     emitStringConstant(state, operation, constant.value);
   } else if (constant.kind === "undefined") {
-    line(state, `roots[${operation.id}] = oseo_undefined();`);
+    line(
+      state,
+      renderC(emittedC.common.rootsAssignOseoUndefinedStatement, operation.id),
+    );
   } else if (constant.kind === "null") {
-    line(state, `roots[${operation.id}] = oseo_null();`);
+    line(
+      state,
+      renderC(emittedC.constant.rootsAssignOseoNullStatement, operation.id),
+    );
   } else if (constant.kind === "boolean") {
-    const value = constant.value ? "true" : "false";
-    line(state, `roots[${operation.id}] = oseo_boolean(${value});`);
+    const value = constant.value
+      ? renderC(emittedC.common.trueValue)
+      : renderC(emittedC.common.falseValue);
+    line(
+      state,
+      renderC(
+        emittedC.common.rootsAssignOseoBooleanStatement,
+        operation.id,
+        value,
+      ),
+    );
   } else {
     const value = numberLiteral(constant.value);
-    line(state, `roots[${operation.id}] = oseo_number(${value});`);
+    line(
+      state,
+      renderC(
+        emittedC.constant.rootsAssignOseoNumberStatement,
+        operation.id,
+        value,
+      ),
+    );
   }
 }
 
@@ -183,28 +309,52 @@ function emitArguments(
   operation: MirOperation,
 ): { readonly count: string; readonly name: string } {
   if (operation.argumentListId != null) {
-    const count = `argument_count_${operation.id}`;
-    const name = `argument_values_${operation.id}`;
-    line(state, `size_t ${count} = 0u;`);
-    line(state, `const OseoValue *${name} = NULL;`);
+    const count = renderC(emittedC.arguments.argumentCount, operation.id);
+    const name = renderC(emittedC.arguments.argumentValues, operation.id);
+    line(state, renderC(emittedC.arguments.sizeTAssignUStatement, count));
     line(
       state,
-      `result = oseo_argument_list_view(context, ` +
-        `roots[${operation.argumentListId}], &${count}, &${name});`,
+      renderC(
+        emittedC.arguments.constOseoValuePointerAssignNullStatement,
+        name,
+      ),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(
+      state,
+      renderC(emittedC.arguments.resultAssignOseoArgumentListViewContext) +
+        renderC(
+          emittedC.arguments.rootsAddressAddressStatement,
+          operation.argumentListId,
+          count,
+          name,
+        ),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     return { count, name };
   }
   if (operation.arguments.length === 0) {
-    return { count: "0u", name: "NULL" };
+    return {
+      count: renderC(emittedC.arguments.zeroUnsigned),
+      name: renderC(emittedC.common.nullPointer),
+    };
   }
   for (let index = 0; index < operation.arguments.length; index += 1) {
     const value = operationArgument(operation, index);
-    line(state, `roots[${state.argumentSlotStart + index}] = roots[${value}];`);
+    line(
+      state,
+      renderC(
+        emittedC.common.rootAssignRoot,
+        state.argumentSlotStart + index,
+        value,
+      ),
+    );
   }
   return {
-    count: `${operation.arguments.length}u`,
-    name: `&roots[${state.argumentSlotStart}]`,
+    count: renderC(
+      emittedC.arguments.unsignedCount,
+      operation.arguments.length,
+    ),
+    name: renderC(emittedC.arguments.addressOfRoot, state.argumentSlotStart),
   };
 }
 
@@ -215,12 +365,14 @@ function emittedArgument(
 ): string {
   if (operation.argumentListId != null) {
     return (
-      `(${emitted.count} > ${index}u ? ` +
-      `${emitted.name}[${index}] : oseo_undefined())`
+      renderC(emittedC.argument.boundedArgumentCount, emitted.count, index) +
+      renderC(emittedC.argument.oseoUndefined, emitted.name, index)
     );
   }
   const value = operation.arguments[index];
-  return value == null ? "oseo_undefined()" : `roots[${value}]`;
+  return value == null
+    ? renderC(emittedC.common.undefinedValue)
+    : renderC(emittedC.common.root, value);
 }
 
 function emitRead(state: EmitState, operation: MirOperation): void {
@@ -232,12 +384,16 @@ function emitRead(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_environment_get(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u);`,
+    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+      renderC(
+        emittedC.common.rootsUStatement,
+        state.environmentSlot,
+        bindingId,
+      ),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-  line(state, "result = oseo_cell_get(context, result.value);");
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  line(state, renderC(emittedC.read.resultAssignOseoCellGetContextResultValue));
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitWrite(state: EmitState, operation: MirOperation): void {
@@ -246,43 +402,57 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
     throw new Error(`MIR write %${operation.id} has no binding identity.`);
   }
   const value = operationArgument(operation, 0);
-  line(state, `roots[${operation.id}] = roots[${value}];`);
+  line(state, renderC(emittedC.common.rootAssignRoot, operation.id, value));
   location(state, operation.range);
   state.usesAbrupt = true;
   if (operation.mutable === false) {
     if (operation.functionNameBinding === true && !state.strict) {
       line(
         state,
-        `result = (OseoResult){OSEO_STATUS_NORMAL, roots[${value}]};`,
+        renderC(emittedC.write.resultAssignOseoResultOseoStatusNormal, value),
       );
       return;
     }
     if (operation.importedBinding === true) {
-      line(state, "result = oseo_write_immutable_binding(context);");
+      line(
+        state,
+        renderC(emittedC.write.resultAssignOseoWriteImmutableBinding),
+      );
       return;
     }
     line(
       state,
-      `result = oseo_environment_get(context, ` +
-        `roots[${state.environmentSlot}], ${bindingId}u);`,
+      renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+        renderC(
+          emittedC.common.rootsUStatement,
+          state.environmentSlot,
+          bindingId,
+        ),
     );
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-    line(state, "    result = oseo_cell_get(context, result.value);");
-    line(state, "}");
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-    line(state, "    result = oseo_write_immutable_binding(context);");
-    line(state, "}");
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(
+      state,
+      renderC(emittedC.write.resultAssignOseoCellGetContextResultValue),
+    );
+    line(state, renderC(emittedC.common.closeBlock));
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(state, renderC(emittedC.write.indentedWriteImmutableBinding));
+    line(state, renderC(emittedC.common.closeBlock));
     return;
   }
   line(
     state,
-    `result = oseo_environment_get(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u);`,
+    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+      renderC(
+        emittedC.common.rootsUStatement,
+        state.environmentSlot,
+        bindingId,
+      ),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   line(
     state,
-    `result = oseo_cell_set(context, result.value, roots[${value}]);`,
+    renderC(emittedC.write.resultAssignOseoCellSetContextResultValue, value),
   );
 }
 
@@ -292,20 +462,24 @@ function emitInitialize(state: EmitState, operation: MirOperation): void {
     throw new Error(`MIR initialize %${operation.id} has no binding identity.`);
   }
   const value = operationArgument(operation, 0);
-  line(state, `roots[${operation.id}] = roots[${value}];`);
+  line(state, renderC(emittedC.common.rootAssignRoot, operation.id, value));
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_environment_get(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u);`,
+    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+      renderC(
+        emittedC.common.rootsUStatement,
+        state.environmentSlot,
+        bindingId,
+      ),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   line(
     state,
-    `result = oseo_cell_initialize(context, result.value, roots[${value}]);`,
+    renderC(emittedC.initialize.resultAssignOseoCellInitializeContext, value),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
 }
 
 function emitBindingReset(state: EmitState, operation: MirOperation): void {
@@ -315,16 +489,16 @@ function emitBindingReset(state: EmitState, operation: MirOperation): void {
   }
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, "result = oseo_cell_create(context, oseo_uninitialized());");
-  line(state, `roots[${operation.id}] = result.value;`);
-  line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+  line(state, renderC(emittedC.common.resultAssignOseoCellCreateContextOseo));
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+  line(state, renderC(emittedC.common.statusNormalOpen));
   line(
     state,
-    `    result = oseo_environment_set(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u, ` +
-      `roots[${operation.id}]);`,
+    renderC(emittedC.bindingReset.resultAssignOseoEnvironmentSetContext) +
+      renderC(emittedC.common.rootsU, state.environmentSlot, bindingId) +
+      renderC(emittedC.common.rootCallSuffix, operation.id),
   );
-  line(state, "}");
+  line(state, renderC(emittedC.common.closeBlock));
 }
 
 function emitUnary(state: EmitState, operation: MirOperation): void {
@@ -332,21 +506,27 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   if (operation.operator === "!") {
     line(
       state,
-      `roots[${operation.id}] = ` +
-        `oseo_boolean(!oseo_to_boolean(roots[${argument}]));`,
+      renderC(emittedC.common.rootsAssign, operation.id) +
+        renderC(
+          emittedC.unary.oseoBooleanOseoToBooleanRootsStatement,
+          argument,
+        ),
     );
     return;
   }
   if (operation.operator === "void") {
-    line(state, `roots[${operation.id}] = oseo_undefined();`);
+    line(
+      state,
+      renderC(emittedC.common.rootsAssignOseoUndefinedStatement, operation.id),
+    );
     return;
   }
   const helpers = {
-    "+": "oseo_to_number",
-    "-": "oseo_negate",
-    "to-string": "oseo_to_string",
-    typeof: "oseo_typeof",
-    "~": "oseo_bitwise_not",
+    "+": renderC(emittedC.common.unaryToNumber),
+    "-": renderC(emittedC.common.unaryNegate),
+    "to-string": renderC(emittedC.common.unaryToString),
+    typeof: renderC(emittedC.common.unaryTypeof),
+    "~": renderC(emittedC.common.unaryBitwiseNot),
   } as const;
   const operator = operation.operator;
   if (operator == null || !(operator in helpers)) {
@@ -355,8 +535,11 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   const helper = helpers[operator as keyof typeof helpers];
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, `result = ${helper}(context, roots[${argument}]);`);
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(
+    state,
+    renderC(emittedC.unary.resultAssignContextRootsStatement, helper, argument),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitBinary(state: EmitState, operation: MirOperation): void {
@@ -378,10 +561,10 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = ${operatorHelper(operator)}` +
-      `(context, roots[${left}], roots[${right}]);`,
+    renderC(emittedC.binary.resultAssign, operatorHelper(operator)) +
+      renderC(emittedC.binary.contextRootsRootsStatement, left, right),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitGuardSmi(state: EmitState, operation: MirOperation): void {
@@ -389,7 +572,11 @@ function emitGuardSmi(state: EmitState, operation: MirOperation): void {
   state.scalarKinds.set(operation.id, "boolean");
   line(
     state,
-    `bool fast_${operation.id} = oseo_value_is_smi(roots[${argument}]);`,
+    renderC(
+      emittedC.guardSmi.boolFastAssignOseoValueIsSmiRootsStatement,
+      operation.id,
+      argument,
+    ),
   );
 }
 
@@ -398,8 +585,8 @@ function emitUnboxSmi(state: EmitState, operation: MirOperation): void {
   state.scalarKinds.set(operation.id, "smi");
   line(
     state,
-    `int64_t fast_${operation.id} = ` +
-      `oseo_value_unbox_smi(roots[${argument}]);`,
+    renderC(emittedC.unboxSmi.int64TFastAssign, operation.id) +
+      renderC(emittedC.unboxSmi.oseoValueUnboxSmiRootsStatement, argument),
   );
 }
 
@@ -416,11 +603,16 @@ function emitCheckedAdd(state: EmitState, operation: MirOperation): void {
   }
   state.scalarKinds.set(operation.id, "boolean");
   state.scalarKinds.set(result, "smi");
-  line(state, `int64_t fast_${result};`);
+  line(state, renderC(emittedC.checkedAdd.int64TFastStatement, result));
   line(
     state,
-    `bool fast_${operation.id} = oseo_smi_try_add(` +
-      `fast_${left}, fast_${right}, &fast_${result});`,
+    renderC(emittedC.checkedAdd.boolFastAssignOseoSmiTryAdd, operation.id) +
+      renderC(
+        emittedC.checkedAdd.fastFastAddressFastStatement,
+        left,
+        right,
+        result,
+      ),
   );
 }
 
@@ -429,7 +621,14 @@ function emitBoxSmi(state: EmitState, operation: MirOperation): void {
   if (state.scalarKinds.get(argument) !== "smi") {
     throw new Error(`MIR box %${operation.id} has no small integer input.`);
   }
-  line(state, `roots[${operation.id}] = oseo_value_box_smi(fast_${argument});`);
+  line(
+    state,
+    renderC(
+      emittedC.boxSmi.rootsAssignOseoValueBoxSmiFastStatement,
+      operation.id,
+      argument,
+    ),
+  );
 }
 
 /**
@@ -442,8 +641,8 @@ function emitBoxSmi(state: EmitState, operation: MirOperation): void {
  */
 function iteratorDoneRead(state: EmitState, doneState: number): string {
   return state.generator
-    ? `oseo_to_boolean(roots[${doneState}])`
-    : `iterator_done_${doneState}`;
+    ? renderC(emittedC.common.oseoToBooleanRoots, doneState)
+    : renderC(emittedC.common.iteratorDone, doneState);
 }
 
 function emitIteratorOperation(
@@ -455,7 +654,10 @@ function emitIteratorOperation(
   // An asynchronous step reaches a distinct runtime entry point that
   // awaits its own result; the emitted control flow is otherwise the
   // synchronous protocol's, so only the called name changes.
-  const asynchronous = operation.iteratorAsync === true ? "async_" : "";
+  const asynchronous =
+    operation.iteratorAsync === true
+      ? renderC(emittedC.iteratorOperation.asyncPrefix)
+      : renderC(emittedC.common.empty);
   if (operation.kind === "iterator-get") {
     const iterable = operationArgument(operation, 0);
     const nextMethod = operation.iteratorNextMethodResult;
@@ -464,19 +666,32 @@ function emitIteratorOperation(
     }
     line(
       state,
-      `result = oseo_${asynchronous}iterator_get(context, ` +
-        `roots[${iterable}], &roots[${nextMethod}]);`,
+      renderC(
+        emittedC.iteratorOperation.resultAssignOseoIteratorGetContext,
+        asynchronous,
+      ) +
+        renderC(
+          emittedC.iteratorOperation.rootsAddressRootsStatement,
+          iterable,
+          nextMethod,
+        ),
     );
     if (operation.iteratorDoneState != null) {
       const doneState = operation.iteratorDoneState;
       line(
         state,
         state.generator
-          ? `roots[${doneState}] = oseo_boolean(false);`
-          : `bool iterator_done_${doneState} = false;`,
+          ? renderC(
+              emittedC.iteratorOperation.rootsAssignOseoBooleanFalseStatement,
+              doneState,
+            )
+          : renderC(
+              emittedC.iteratorOperation.boolIteratorDoneAssignFalseStatement,
+              doneState,
+            ),
       );
     }
-    line(state, `roots[${operation.id}] = result.value;`);
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
     return;
   }
   if (
@@ -488,29 +703,49 @@ function emitIteratorOperation(
     // result is done, because `yield*` reports that value as its own.
     const delegatingNext = operation.kind === "iterator-delegate-next";
     const step = delegatingNext
-      ? "next"
+      ? renderC(emittedC.common.iteratorDelegateNext)
       : operation.kind === "iterator-delegate-return"
-        ? "return"
-        : "throw";
+        ? renderC(emittedC.common.iteratorDelegateReturn)
+        : renderC(emittedC.common.iteratorDelegateThrow);
     const value = operation.iteratorValueResult;
     if (value == null) {
       throw new Error(`MIR iterator delegation %${operation.id} has no value.`);
     }
     state.scalarKinds.set(operation.id, "boolean");
-    const done = `iterator_done_${operation.id}`;
+    const done = renderC(emittedC.common.iteratorDone, operation.id);
     const inner = delegatingNext
-      ? `roots[${operationArgument(operation, 1)}], ` +
-        `roots[${operationArgument(operation, 2)}]`
-      : `roots[${operationArgument(operation, 1)}]`;
-    line(state, `bool ${done} = true;`);
+      ? renderC(
+          emittedC.common.rootWithComma,
+          operationArgument(operation, 1),
+        ) + renderC(emittedC.common.root, operationArgument(operation, 2))
+      : renderC(emittedC.common.root, operationArgument(operation, 1));
     line(
       state,
-      `result = oseo_${asynchronous}iterator_delegate_${step}(context, ` +
-        `roots[${operationArgument(operation, 0)}], ${inner}, ` +
-        `&roots[${value}], &${done});`,
+      renderC(emittedC.iteratorOperation.boolAssignTrueStatement, done),
     );
-    line(state, `bool fast_${operation.id} = !${done};`);
-    line(state, `(void)fast_${operation.id};`);
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.resultAssignOseoIteratorDelegateContext,
+        asynchronous,
+        step,
+      ) +
+        renderC(
+          emittedC.common.twoRootsWithComma,
+          operationArgument(operation, 0),
+          inner,
+        ) +
+        renderC(
+          emittedC.iteratorOperation.addressRootsAddressStatement,
+          value,
+          done,
+        ),
+    );
+    line(
+      state,
+      renderC(emittedC.common.boolFastAssignStatement, operation.id, done),
+    );
+    line(state, renderC(emittedC.common.voidFastStatement, operation.id));
     return;
   }
   if (operation.kind === "iterator-next") {
@@ -525,47 +760,96 @@ function emitIteratorOperation(
     if (doneState == null) {
       // A step with no tracked done state owns the flag for this operation
       // alone, so it never has to outlive the call that writes it.
-      line(state, `bool iterator_done_${operation.id} = true;`);
       line(
         state,
-        `result = oseo_${asynchronous}iterator_next(context, ` +
-          `roots[${iterator}], roots[${nextMethod}], &roots[${value}], ` +
-          `&iterator_done_${operation.id});`,
+        renderC(
+          emittedC.iteratorOperation.boolIteratorDoneAssignTrueStatement,
+          operation.id,
+        ),
       );
       line(
         state,
-        `bool fast_${operation.id} = !iterator_done_${operation.id};`,
+        renderC(
+          emittedC.iteratorOperation.resultAssignOseoIteratorNextContext,
+          asynchronous,
+        ) +
+          renderC(
+            emittedC.common.rootsRootsAddressRoots,
+            iterator,
+            nextMethod,
+            value,
+          ) +
+          renderC(
+            emittedC.iteratorOperation.addressIteratorDoneStatement,
+            operation.id,
+          ),
       );
-      line(state, `(void)fast_${operation.id};`);
+      line(
+        state,
+        renderC(
+          emittedC.iteratorOperation.boolFastAssignIteratorDoneStatement,
+          operation.id,
+          operation.id,
+        ),
+      );
+      line(state, renderC(emittedC.common.voidFastStatement, operation.id));
       return;
     }
     // `oseo_iterator_next` writes the flag through a pointer, so a body that
     // keeps the state in a root slot steps a local copy and stores it back.
     const step = state.generator
-      ? `iterator_step_done_${operation.id}`
-      : `iterator_done_${doneState}`;
+      ? renderC(emittedC.iteratorOperation.iteratorStepDone, operation.id)
+      : renderC(emittedC.common.iteratorDone, doneState);
     if (state.generator) {
-      line(state, `bool ${step} = ${iteratorDoneRead(state, doneState)};`);
+      line(
+        state,
+        renderC(
+          emittedC.iteratorOperation.boolAssignStatement,
+          step,
+          iteratorDoneRead(state, doneState),
+        ),
+      );
     }
-    line(state, `if (${step}) {`);
+    line(state, renderC(emittedC.common.ifOpen, step));
     line(
       state,
-      `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+      renderC(emittedC.common.resultAssignOseoResultOseoStatusNormalOseo),
     );
-    line(state, `    roots[${value}] = oseo_undefined();`);
-    line(state, "} else {");
     line(
       state,
-      `    result = oseo_${asynchronous}iterator_next(context, ` +
-        `roots[${iterator}], roots[${nextMethod}], &roots[${value}], ` +
-        `&${step});`,
+      renderC(
+        emittedC.iteratorOperation.rootsAssignOseoUndefinedStatement,
+        value,
+      ),
     );
-    line(state, "}");
+    line(state, renderC(emittedC.common.elseOpen));
+    line(
+      state,
+      renderC(emittedC.iteratorOperation.indentedIteratorNext, asynchronous) +
+        renderC(
+          emittedC.common.rootsRootsAddressRoots,
+          iterator,
+          nextMethod,
+          value,
+        ) +
+        renderC(emittedC.common.addressStatement, step),
+    );
+    line(state, renderC(emittedC.common.closeBlock));
     if (state.generator) {
-      line(state, `roots[${doneState}] = oseo_boolean(${step});`);
+      line(
+        state,
+        renderC(
+          emittedC.common.rootsAssignOseoBooleanStatement,
+          doneState,
+          step,
+        ),
+      );
     }
-    line(state, `bool fast_${operation.id} = !${step};`);
-    line(state, `(void)fast_${operation.id};`);
+    line(
+      state,
+      renderC(emittedC.common.boolFastAssignStatement, operation.id, step),
+    );
+    line(state, renderC(emittedC.common.voidFastStatement, operation.id));
     return;
   }
   const iterator = operationArgument(operation, 0);
@@ -577,25 +861,36 @@ function emitIteratorOperation(
   if (operation.iteratorDoneState == null) {
     line(
       state,
-      `result = oseo_${asynchronous}iterator_close(context, ` +
-        `roots[${iterator}], completion[${slot}u].kind == 2);`,
+      renderC(
+        emittedC.iteratorOperation.resultAssignOseoIteratorCloseContext,
+        asynchronous,
+      ) +
+        renderC(
+          emittedC.common.rootsCompletionUKindEqualStatement,
+          iterator,
+          slot,
+        ),
     );
   } else {
     const done = iteratorDoneRead(state, operation.iteratorDoneState);
-    line(state, `if (${done}) {`);
+    line(state, renderC(emittedC.common.ifOpen, done));
     line(
       state,
-      `    result = (OseoResult){OSEO_STATUS_NORMAL, oseo_undefined()};`,
+      renderC(emittedC.common.resultAssignOseoResultOseoStatusNormalOseo),
     );
-    line(state, "} else {");
+    line(state, renderC(emittedC.common.elseOpen));
     line(
       state,
-      `    result = oseo_${asynchronous}iterator_close(context, ` +
-        `roots[${iterator}], completion[${slot}u].kind == 2);`,
+      renderC(emittedC.iteratorOperation.indentedIteratorClose, asynchronous) +
+        renderC(
+          emittedC.common.rootsCompletionUKindEqualStatement,
+          iterator,
+          slot,
+        ),
     );
-    line(state, "}");
+    line(state, renderC(emittedC.common.closeBlock));
   }
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitCall(state: EmitState, operation: MirOperation): void {
@@ -615,41 +910,60 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   const argumentsValue = emitArguments(state, callArguments);
   if (target.kind === "await") {
     const value = operationArgument(operation, 0);
-    line(state, `result = oseo_await_value(context, roots[${value}]);`);
+    line(
+      state,
+      renderC(emittedC.call.resultAssignOseoAwaitValueContextRoots, value),
+    );
   } else if (target.kind === "console-log") {
     line(
       state,
-      `result = oseo_console_log(context, ${argumentsValue.count}, ` +
-        `${argumentsValue.name});`,
+      renderC(
+        emittedC.call.resultAssignOseoConsoleLogContext,
+        argumentsValue.count,
+      ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
     );
   } else if (target.kind === "object-intrinsic") {
     const names = {
-      create: "oseo_object_builtin_create",
-      defineProperty: "oseo_object_builtin_define_property",
-      getOwnPropertyDescriptor:
-        "oseo_object_builtin_get_own_property_descriptor",
-      keys: "oseo_object_builtin_keys",
-      setPrototypeOf: "oseo_object_builtin_set_prototype_of",
+      create: renderC(emittedC.call.oseoObjectBuiltinCreate),
+      defineProperty: renderC(emittedC.call.oseoObjectBuiltinDefineProperty),
+      getOwnPropertyDescriptor: renderC(
+        emittedC.call.oseoObjectBuiltinGetOwnPropertyDescriptor,
+      ),
+      keys: renderC(emittedC.call.oseoObjectBuiltinKeys),
+      setPrototypeOf: renderC(emittedC.call.oseoObjectBuiltinSetPrototypeOf),
     } as const;
     line(
       state,
-      `result = ${names[target.method]}(context, ` +
-        `${argumentsValue.count}, ${argumentsValue.name});`,
+      renderC(emittedC.common.resultAssignContext, names[target.method]) +
+        renderC(
+          emittedC.common.twoValuesCallSuffix,
+          argumentsValue.count,
+          argumentsValue.name,
+        ),
     );
   } else if (target.kind === "promise-constructor") {
     const executor = emittedArgument(callArguments, argumentsValue, 0);
-    line(state, `result = oseo_promise_construct(context, ${executor});`);
+    line(
+      state,
+      renderC(emittedC.call.resultAssignOseoPromiseConstructContext, executor),
+    );
   } else if (target.kind === "promise-intrinsic") {
     if (target.method === "asyncCall") {
       const execution = emittedArgument(callArguments, argumentsValue, 0);
-      line(state, `result = oseo_promise_async_call(context, ${execution});`);
+      line(
+        state,
+        renderC(
+          emittedC.call.resultAssignOseoPromiseAsyncCallContext,
+          execution,
+        ),
+      );
     } else if (target.method === "awaitThen") {
       const promise = emittedArgument(callArguments, argumentsValue, 0);
       const onFulfilled = emittedArgument(callArguments, argumentsValue, 1);
       line(
         state,
-        "result = oseo_promise_await_then(context, " +
-          `${promise}, ${onFulfilled});`,
+        renderC(emittedC.call.resultAssignOseoPromiseAwaitThenContext) +
+          renderC(emittedC.common.twoValuesCallSuffix, promise, onFulfilled),
       );
     } else if (target.method === "then") {
       const promise = emittedArgument(callArguments, argumentsValue, 0);
@@ -657,48 +971,71 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       const onRejected = emittedArgument(callArguments, argumentsValue, 2);
       line(
         state,
-        "result = oseo_promise_then(context, " +
-          `${promise}, ${onFulfilled}, ${onRejected});`,
+        renderC(emittedC.call.resultAssignOseoPromiseThenContext) +
+          renderC(
+            emittedC.call.threeValuesCallSuffix,
+            promise,
+            onFulfilled,
+            onRejected,
+          ),
       );
     } else {
       const names = {
-        all: "oseo_promise_all",
-        race: "oseo_promise_race",
-        reject: "oseo_promise_reject",
-        resolve: "oseo_promise_resolve",
+        all: renderC(emittedC.call.oseoPromiseAll),
+        race: renderC(emittedC.call.oseoPromiseRace),
+        reject: renderC(emittedC.call.oseoPromiseReject),
+        resolve: renderC(emittedC.call.oseoPromiseResolve),
       } as const;
       const value = emittedArgument(callArguments, argumentsValue, 0);
-      line(state, `result = ${names[target.method]}(context, ${value});`);
+      line(
+        state,
+        renderC(
+          emittedC.call.resultAssignContextStatement,
+          names[target.method],
+          value,
+        ),
+      );
     }
   } else if (target.kind === "timer-intrinsic") {
     if (target.method === "setTimeout") {
       line(
         state,
-        `result = oseo_set_timeout(context, ${argumentsValue.count}, ` +
-          `${argumentsValue.name});`,
+        renderC(
+          emittedC.call.resultAssignOseoSetTimeoutContext,
+          argumentsValue.count,
+        ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
       );
     } else {
       const handle = emittedArgument(callArguments, argumentsValue, 0);
-      line(state, `result = oseo_clear_timeout(context, ${handle});`);
+      line(
+        state,
+        renderC(emittedC.call.resultAssignOseoClearTimeoutContext, handle),
+      );
     }
   } else if (target.kind === "dynamic") {
     const callee = operationArgument(operation, 0);
     const receiver = operationArgument(operation, 1);
     line(
       state,
-      `result = oseo_call_function(context, roots[${callee}], ` +
-        `roots[${receiver}], ${argumentsValue.count}, ` +
-        `${argumentsValue.name}, ` +
-        (constructing ? `roots[${callee}]);` : "oseo_undefined());"),
+      renderC(emittedC.call.callFunctionWithDynamicReceiverPrefix, callee) +
+        renderC(
+          emittedC.common.twoRootsWithComma,
+          receiver,
+          argumentsValue.count,
+        ) +
+        renderC(emittedC.common.valueWithComma, argumentsValue.name) +
+        (constructing
+          ? renderC(emittedC.common.rootCallSuffix, callee)
+          : renderC(emittedC.common.undefinedFinalArgumentCallSuffix)),
     );
     if (constructing) {
-      line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+      line(state, renderC(emittedC.common.statusNormalOpen));
       line(
         state,
-        `    result = oseo_constructor_result(` +
-          `context, result.value, roots[${receiver}]);`,
+        renderC(emittedC.call.resultAssignOseoConstructorResult) +
+          renderC(emittedC.call.contextResultValueRootsStatement, receiver),
       );
-      line(state, "}");
+      line(state, renderC(emittedC.common.closeBlock));
     }
   } else if (target.kind === "super") {
     // The parent constructor runs against the receiver `new` already
@@ -708,15 +1045,19 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     const parent = operationArgument(operation, 0);
     line(
       state,
-      `result = oseo_call_function(context, roots[${parent}], receiver, ` +
-        `${argumentsValue.count}, ${argumentsValue.name}, new_target);`,
+      renderC(emittedC.call.callFunctionWithReceiverPrefix, parent) +
+        renderC(
+          emittedC.call.newTargetStatement,
+          argumentsValue.count,
+          argumentsValue.name,
+        ),
     );
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
+    line(state, renderC(emittedC.common.statusNormalOpen));
     line(
       state,
-      "    result = oseo_constructor_result(context, result.value, receiver);",
+      renderC(emittedC.call.resultAssignOseoConstructorResultContext),
     );
-    line(state, "}");
+    line(state, renderC(emittedC.common.closeBlock));
   } else {
     const targetRootCount = state.functionRootCounts.get(target.functionId);
     if (targetRootCount == null) {
@@ -725,33 +1066,52 @@ function emitCall(state: EmitState, operation: MirOperation): void {
           `'${target.functionId}'.`,
       );
     }
-    let functionName = `oseo_function_${target.functionId}`;
+    let functionName = renderC(emittedC.call.oseoFunction, target.functionId);
     if (target.functionId === state.functionId) {
-      functionName = `recursive_target_${state.nextRecursiveTarget}`;
+      functionName = renderC(
+        emittedC.call.recursiveTarget,
+        state.nextRecursiveTarget,
+      );
       state.nextRecursiveTarget += 1;
       line(
         state,
-        `OseoFunctionEntry volatile ${functionName} = ` +
-          `oseo_function_${target.functionId};`,
+        renderC(emittedC.call.oseoFunctionEntryVolatileAssign, functionName) +
+          renderC(emittedC.call.oseoFunctionStatement, target.functionId),
       );
     }
-    line(state, "result = oseo_call_enter(context);");
-    line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-    line(state, `    result = oseo_frame_enter(context, ${targetRootCount}u);`);
-    line(state, "    if (result.status == OSEO_STATUS_NORMAL) {");
     line(
       state,
-      `        result = ${functionName}` +
-        `(context, oseo_undefined(), oseo_undefined(), ` +
-        `${argumentsValue.count}, ${argumentsValue.name}, ` +
-        "oseo_undefined());",
+      renderC(emittedC.call.resultAssignOseoCallEnterContextStatement),
     );
-    line(state, `        oseo_frame_leave(context, ${targetRootCount}u);`);
-    line(state, "    }");
-    line(state, "    oseo_call_leave(context);");
-    line(state, "}");
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(
+      state,
+      renderC(
+        emittedC.call.resultAssignOseoFrameEnterContextU,
+        targetRootCount,
+      ),
+    );
+    line(state, renderC(emittedC.call.ifResultStatusEqualOseoStatusNormalOpen));
+    line(
+      state,
+      renderC(emittedC.call.resultAssign, functionName) +
+        renderC(emittedC.call.contextOseoUndefinedOseoUndefined) +
+        renderC(
+          emittedC.common.twoValuesWithComma,
+          argumentsValue.count,
+          argumentsValue.name,
+        ) +
+        renderC(emittedC.common.undefinedFinalArgumentCallSuffix),
+    );
+    line(
+      state,
+      renderC(emittedC.call.oseoFrameLeaveContextUStatement, targetRootCount),
+    );
+    line(state, renderC(emittedC.common.indentedCloseBlock));
+    line(state, renderC(emittedC.call.oseoCallLeaveContextStatement));
+    line(state, renderC(emittedC.common.closeBlock));
   }
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {
@@ -763,65 +1123,111 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     }
     line(
       state,
-      `result = oseo_array_create(context, ${operation.arrayLength}u);`,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoArrayCreateContextU,
+        operation.arrayLength,
+      ),
     );
   } else if (operation.kind === "array-append") {
     const array = operationArgument(operation, 0);
     const value = operationArgument(operation, 1);
     line(
       state,
-      `result = oseo_array_append(context, roots[${array}], ` +
-        `roots[${value}]);`,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoArrayAppendContextRoots,
+        array,
+      ) + renderC(emittedC.common.rootCallSuffix, value),
     );
   } else if (operation.kind === "array-append-hole") {
     const array = operationArgument(operation, 0);
-    line(state, `result = oseo_array_append_hole(context, roots[${array}]);`);
+    line(
+      state,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoArrayAppendHoleContext,
+        array,
+      ),
+    );
   } else if (operation.kind === "object-create") {
-    line(state, "result = oseo_object_literal_create(context);");
+    line(
+      state,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoObjectLiteralCreateContext,
+      ),
+    );
   } else if (operation.kind === "object-coercible") {
     const input = operationArgument(operation, 0);
     line(
       state,
-      `result = oseo_require_object_coercible(context, roots[${input}]);`,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoRequireObjectCoercible,
+        input,
+      ),
     );
   } else if (operation.kind === "object-rest") {
     const object = operationArgument(operation, 0);
     const excluded = operation.arguments.slice(1);
-    const excludedName = `object_rest_excluded_${operation.id}`;
+    const excludedName = renderC(
+      emittedC.objectOperation.objectRestExcluded,
+      operation.id,
+    );
     if (excluded.length > 0) {
       line(
         state,
-        `OseoValue ${excludedName}[${excluded.length}u] = {` +
-          excluded.map((id) => `roots[${id}]`).join(", ") +
-          "};",
+        renderC(
+          emittedC.objectOperation.oseoValueUAssignOpen,
+          excludedName,
+          excluded.length,
+        ) +
+          excluded
+            .map((id) => renderC(emittedC.common.root, id))
+            .join(renderC(emittedC.common.commaSpace)) +
+          renderC(emittedC.objectOperation.initializerSuffix),
       );
     }
     line(
       state,
-      `result = oseo_object_rest(context, roots[${object}], ` +
-        `${excluded.length}u, ` +
-        (excluded.length === 0 ? "NULL);" : `${excludedName});`),
+      renderC(
+        emittedC.objectOperation.resultAssignOseoObjectRestContextRoots,
+        object,
+      ) +
+        renderC(emittedC.common.unsignedWithComma, excluded.length) +
+        (excluded.length === 0
+          ? renderC(emittedC.objectOperation.nullStatement)
+          : renderC(emittedC.common.callSuffix, excludedName)),
     );
   } else if (operation.kind === "object-spread") {
     const object = operationArgument(operation, 0);
     const source = operationArgument(operation, 1);
     line(
       state,
-      `result = oseo_object_spread(context, roots[${object}], ` +
-        `roots[${source}]);`,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoObjectSpreadContextRoots,
+        object,
+      ) + renderC(emittedC.common.rootCallSuffix, source),
     );
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
-    line(state, `result = oseo_property_key(context, roots[${input}]);`);
+    line(
+      state,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoPropertyKeyContextRoots,
+        input,
+      ),
+    );
   } else if (operation.kind === "property-define-data") {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
     const value = operationArgument(operation, 2);
     line(
       state,
-      `result = oseo_object_define(context, roots[${object}], ` +
-        `roots[${key}], roots[${value}], ` +
-        "(OseoPropertyAttributes){true, true, true, false});",
+      renderC(
+        emittedC.common.resultAssignOseoObjectDefineContextRoots,
+        object,
+      ) +
+        renderC(emittedC.common.rootsRoots, key, value) +
+        renderC(
+          emittedC.objectOperation.oseoPropertyAttributesTrueTrueTrueFalse,
+        ),
     );
   } else if (operation.kind === "property-define-method") {
     const object = operationArgument(operation, 0);
@@ -831,9 +1237,14 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     // enumerable, unlike an object literal's method definition.
     line(
       state,
-      `result = oseo_object_define(context, roots[${object}], ` +
-        `roots[${key}], roots[${value}], ` +
-        "(OseoPropertyAttributes){true, false, true, false});",
+      renderC(
+        emittedC.common.resultAssignOseoObjectDefineContextRoots,
+        object,
+      ) +
+        renderC(emittedC.common.rootsRoots, key, value) +
+        renderC(
+          emittedC.objectOperation.oseoPropertyAttributesTrueFalseTrueFalse,
+        ),
     );
   } else if (operation.kind === "property-define-accessor") {
     const object = operationArgument(operation, 0);
@@ -845,12 +1256,36 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     const enumerable = operation.enumerable !== false;
     line(
       state,
-      `result = oseo_object_define_accessor(context, roots[${object}], ` +
-        `roots[${key}], ` +
-        `${isSetter ? "oseo_undefined()" : `roots[${value}]`}, ` +
-        `${isSetter ? `roots[${value}]` : "oseo_undefined()"}, ` +
-        `${isSetter ? "false" : "true"}, ${isSetter ? "true" : "false"}, ` +
-        `(OseoPropertyAttributes){true, ${enumerable}, false, true});`,
+      renderC(
+        emittedC.objectOperation.resultAssignOseoObjectDefineAccessor,
+        object,
+      ) +
+        renderC(emittedC.common.rootWithComma, key) +
+        renderC(
+          emittedC.common.valueWithComma,
+          isSetter
+            ? renderC(emittedC.common.undefinedValue)
+            : renderC(emittedC.common.root, value),
+        ) +
+        renderC(
+          emittedC.common.valueWithComma,
+          isSetter
+            ? renderC(emittedC.common.root, value)
+            : renderC(emittedC.common.undefinedValue),
+        ) +
+        renderC(
+          emittedC.common.twoValuesWithComma,
+          isSetter
+            ? renderC(emittedC.common.falseValue)
+            : renderC(emittedC.common.trueValue),
+          isSetter
+            ? renderC(emittedC.common.trueValue)
+            : renderC(emittedC.common.falseValue),
+        ) +
+        renderC(
+          emittedC.objectOperation.oseoPropertyAttributesTrueFalseTrue,
+          enumerable,
+        ),
     );
   } else {
     const object = operationArgument(operation, 0);
@@ -867,21 +1302,34 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         const receiver = operationArgument(operation, 2);
         line(
           state,
-          `result = oseo_super_get(context, roots[${object}], ` +
-            `roots[${key}], roots[${receiver}]);`,
+          renderC(
+            emittedC.objectOperation.resultAssignOseoSuperGetContextRoots,
+            object,
+          ) + renderC(emittedC.common.rootsRootsStatement, key, receiver),
         );
       } else {
         line(
           state,
-          `result = oseo_object_get(context, roots[${object}], ` +
-            `roots[${key}]);`,
+          renderC(
+            emittedC.objectOperation.resultAssignOseoObjectGetContextRoots,
+            object,
+          ) + renderC(emittedC.common.rootCallSuffix, key),
         );
       }
     } else if (operation.kind === "property-delete") {
       line(
         state,
-        `result = oseo_object_delete(context, roots[${object}], ` +
-          `roots[${key}], ${strict ? "true" : "false"});`,
+        renderC(
+          emittedC.objectOperation.resultAssignOseoObjectDeleteContextRoots,
+          object,
+        ) +
+          renderC(
+            emittedC.common.rootsStatement,
+            key,
+            strict
+              ? renderC(emittedC.common.trueValue)
+              : renderC(emittedC.common.falseValue),
+          ),
       );
     } else {
       const value = operationArgument(operation, 2);
@@ -889,21 +1337,42 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         const receiver = operationArgument(operation, 3);
         line(
           state,
-          `result = oseo_super_set(context, roots[${object}], ` +
-            `roots[${key}], roots[${value}], roots[${receiver}], ` +
-            `${strict ? "true" : "false"});`,
+          renderC(
+            emittedC.objectOperation.resultAssignOseoSuperSetContextRoots,
+            object,
+          ) +
+            renderC(
+              emittedC.objectOperation.rootsRootsRoots,
+              key,
+              value,
+              receiver,
+            ) +
+            renderC(
+              emittedC.common.callSuffix,
+              strict
+                ? renderC(emittedC.common.trueValue)
+                : renderC(emittedC.common.falseValue),
+            ),
         );
       } else {
         line(
           state,
-          `result = oseo_object_set(context, roots[${object}], ` +
-            `roots[${key}], roots[${value}], ` +
-            `${strict ? "true" : "false"});`,
+          renderC(
+            emittedC.objectOperation.resultAssignOseoObjectSetContextRoots,
+            object,
+          ) +
+            renderC(emittedC.common.rootsRoots, key, value) +
+            renderC(
+              emittedC.common.callSuffix,
+              strict
+                ? renderC(emittedC.common.trueValue)
+                : renderC(emittedC.common.falseValue),
+            ),
         );
       }
     }
   }
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitArgumentListOperation(
@@ -913,24 +1382,33 @@ function emitArgumentListOperation(
   location(state, operation.range);
   state.usesAbrupt = true;
   if (operation.kind === "argument-list-create") {
-    line(state, "result = oseo_argument_list_create(context);");
+    line(
+      state,
+      renderC(
+        emittedC.argumentListOperation
+          .resultAssignOseoArgumentListCreateContext,
+      ),
+    );
   } else {
     const list = operationArgument(operation, 0);
     const value = operationArgument(operation, 1);
     line(
       state,
-      `result = oseo_argument_list_append(context, roots[${list}], ` +
-        `roots[${value}]);`,
+      renderC(
+        emittedC.argumentListOperation
+          .resultAssignOseoArgumentListAppendContext,
+        list,
+      ) + renderC(emittedC.common.rootCallSuffix, value),
     );
   }
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function propertyCacheName(operation: MirOperation): string {
   if (operation.cacheId == null) {
     throw new Error(`MIR ${operation.kind} %${operation.id} has no cache.`);
   }
-  return `property_cache_${operation.cacheId}`;
+  return renderC(emittedC.propertyCacheName.propertyCache, operation.cacheId);
 }
 
 function emitGuardObject(state: EmitState, operation: MirOperation): void {
@@ -938,7 +1416,11 @@ function emitGuardObject(state: EmitState, operation: MirOperation): void {
   state.scalarKinds.set(operation.id, "boolean");
   line(
     state,
-    `bool fast_${operation.id} = oseo_value_is_object(roots[${object}]);`,
+    renderC(
+      emittedC.guardObject.boolFastAssignOseoValueIsObjectRoots,
+      operation.id,
+      object,
+    ),
   );
 }
 
@@ -946,11 +1428,19 @@ function emitGuardShape(state: EmitState, operation: MirOperation): void {
   const object = operationArgument(operation, 0);
   const cache = propertyCacheName(operation);
   state.scalarKinds.set(operation.id, "boolean");
-  line(state, `static OseoPropertyCache ${cache} = {0u, 0u};`);
   line(
     state,
-    `bool fast_${operation.id} = oseo_property_cache_matches(` +
-      `roots[${object}], &${cache});`,
+    renderC(
+      emittedC.guardShape.staticOseoPropertyCacheAssignUUStatement,
+      cache,
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.guardShape.boolFastAssignOseoPropertyCacheMatches,
+      operation.id,
+    ) + renderC(emittedC.guardShape.rootsAddressStatement, object, cache),
   );
 }
 
@@ -959,8 +1449,12 @@ function emitLoadFixedSlot(state: EmitState, operation: MirOperation): void {
   const cache = propertyCacheName(operation);
   line(
     state,
-    `roots[${operation.id}] = ` +
-      `oseo_property_cache_load(roots[${object}], &${cache});`,
+    renderC(emittedC.common.rootsAssign, operation.id) +
+      renderC(
+        emittedC.loadFixedSlot.oseoPropertyCacheLoadRootsAddressStatement,
+        object,
+        cache,
+      ),
   );
 }
 
@@ -973,8 +1467,11 @@ function emitUpdatePropertyCache(
   const cache = propertyCacheName(operation);
   line(
     state,
-    `oseo_property_cache_update(roots[${object}], roots[${key}], ` +
-      `&${cache});`,
+    renderC(
+      emittedC.updatePropertyCache.oseoPropertyCacheUpdateRootsRoots,
+      object,
+      key,
+    ) + renderC(emittedC.common.addressStatement, cache),
   );
 }
 
@@ -993,56 +1490,80 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     );
   }
   const functionKinds = {
-    arrow: "OSEO_FUNCTION_ARROW",
-    async: "OSEO_FUNCTION_ASYNC",
-    "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
-    "async-generator": "OSEO_FUNCTION_ASYNC_GENERATOR",
-    class: "OSEO_FUNCTION_CLASS",
-    generator: "OSEO_FUNCTION_GENERATOR",
-    method: "OSEO_FUNCTION_METHOD",
-    ordinary: "OSEO_FUNCTION_ORDINARY",
+    arrow: renderC(emittedC.functionCreate.oseoFunctionArrow),
+    async: renderC(emittedC.functionCreate.oseoFunctionAsync),
+    "async-arrow": renderC(emittedC.functionCreate.oseoFunctionAsyncArrow),
+    "async-generator": renderC(
+      emittedC.functionCreate.oseoFunctionAsyncGenerator,
+    ),
+    class: renderC(emittedC.functionCreate.oseoFunctionClass),
+    generator: renderC(emittedC.functionCreate.oseoFunctionGenerator),
+    method: renderC(emittedC.functionCreate.oseoFunctionMethod),
+    ordinary: renderC(emittedC.functionCreate.oseoFunctionOrdinary),
   } as const;
   const units = utf16Units(operation.functionName);
-  let nameInput = "NULL";
+  let nameInput = renderC(emittedC.common.nullPointer);
   if (units.length > 0) {
-    const name = `function_name_units_${operation.id}`;
-    line(state, `static const uint16_t ${name}[] = {${units.join(", ")}};`);
+    const name = renderC(
+      emittedC.functionCreate.functionNameUnits,
+      operation.id,
+    );
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        name,
+        units.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
     nameInput = name;
   }
   const inferredName =
     operation.arguments[0] == null
-      ? "oseo_undefined()"
-      : `roots[${operation.arguments[0]}]`;
+      ? renderC(emittedC.common.undefinedValue)
+      : renderC(emittedC.common.root, operation.arguments[0]);
   const namePrefixes = {
-    get: "OSEO_FUNCTION_NAME_PREFIX_GET",
-    set: "OSEO_FUNCTION_NAME_PREFIX_SET",
+    get: renderC(emittedC.functionCreate.oseoFunctionNamePrefixGet),
+    set: renderC(emittedC.functionCreate.oseoFunctionNamePrefixSet),
   } as const;
   const namePrefix =
     operation.accessorKind == null
-      ? "OSEO_FUNCTION_NAME_PREFIX_NONE"
+      ? renderC(emittedC.functionCreate.oseoFunctionNamePrefixNone)
       : namePrefixes[operation.accessorKind];
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_function_create(context, ${operation.functionId}u, ` +
-      `roots[${state.environmentSlot}], ${nameInput}, ${units.length}u, ` +
-      `${operation.functionLength}u, ` +
-      `${functionKinds[operation.functionKind]}, receiver, ${inferredName}, ` +
-      `${namePrefix});`,
+    renderC(
+      emittedC.functionCreate.resultAssignOseoFunctionCreateContextU,
+      operation.functionId,
+    ) +
+      renderC(
+        emittedC.functionCreate.rootsU,
+        state.environmentSlot,
+        nameInput,
+        units.length,
+      ) +
+      renderC(emittedC.common.unsignedWithComma, operation.functionLength) +
+      renderC(
+        emittedC.functionCreate.receiver,
+        functionKinds[operation.functionKind],
+        inferredName,
+      ) +
+      renderC(emittedC.common.callSuffix, namePrefix),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitErrorIntrinsic(state: EmitState, operation: MirOperation): void {
   const errorKinds = {
-    Error: "OSEO_ERROR_ERROR",
-    EvalError: "OSEO_ERROR_EVAL",
-    RangeError: "OSEO_ERROR_RANGE",
-    ReferenceError: "OSEO_ERROR_REFERENCE",
-    SyntaxError: "OSEO_ERROR_SYNTAX",
-    TypeError: "OSEO_ERROR_TYPE",
-    URIError: "OSEO_ERROR_URI",
+    Error: renderC(emittedC.errorIntrinsic.oseoErrorError),
+    EvalError: renderC(emittedC.errorIntrinsic.oseoErrorEval),
+    RangeError: renderC(emittedC.errorIntrinsic.oseoErrorRange),
+    ReferenceError: renderC(emittedC.errorIntrinsic.oseoErrorReference),
+    SyntaxError: renderC(emittedC.errorIntrinsic.oseoErrorSyntax),
+    TypeError: renderC(emittedC.errorIntrinsic.oseoErrorType),
+    URIError: renderC(emittedC.errorIntrinsic.oseoErrorUri),
   } as const;
   if (operation.errorName == null) {
     throw new Error(`MIR error-intrinsic %${operation.id} has no name.`);
@@ -1051,10 +1572,10 @@ function emitErrorIntrinsic(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_error_intrinsic(context, ` +
-      `${errorKinds[operation.errorName]});`,
+    renderC(emittedC.errorIntrinsic.resultAssignOseoErrorIntrinsicContext) +
+      renderC(emittedC.common.callSuffix, errorKinds[operation.errorName]),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitConstructReceiver(
@@ -1064,11 +1585,19 @@ function emitConstructReceiver(
   const callee = operationArgument(operation, 0);
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, `result = oseo_function_prototype(context, roots[${callee}]);`);
-  line(state, "if (result.status == OSEO_STATUS_NORMAL) {");
-  line(state, "    result = oseo_constructor_receiver(context, result.value);");
-  line(state, "}");
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(
+    state,
+    renderC(emittedC.common.resultAssignOseoFunctionPrototypeContext, callee),
+  );
+  line(state, renderC(emittedC.common.statusNormalOpen));
+  line(
+    state,
+    renderC(
+      emittedC.constructReceiver.resultAssignOseoConstructorReceiverContext,
+    ),
+  );
+  line(state, renderC(emittedC.common.closeBlock));
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1084,10 +1613,12 @@ function emitClassHeritage(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_class_heritage(context, roots[${constructorValue}], ` +
-      `roots[${heritage}]);`,
+    renderC(
+      emittedC.classHeritage.resultAssignOseoClassHeritageContextRoots,
+      constructorValue,
+    ) + renderC(emittedC.common.rootCallSuffix, heritage),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1103,10 +1634,15 @@ function emitClassFieldDefine(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_class_field_define(context, ` +
-      `roots[${constructorValue}], roots[${key}], roots[${initializer}]);`,
+    renderC(emittedC.classFieldDefine.resultAssignOseoClassFieldDefineContext) +
+      renderC(
+        emittedC.common.rootsRootsRootsStatement,
+        constructorValue,
+        key,
+        initializer,
+      ),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1124,16 +1660,21 @@ function emitClassStaticFieldDefine(
   const key = operationArgument(operation, 1);
   const initializer = operationArgument(operation, 2);
   const entryPoint = privateElement
-    ? "oseo_class_static_private_field_define"
-    : "oseo_class_static_field_define";
+    ? renderC(emittedC.classStaticFieldDefine.oseoClassStaticPrivateFieldDefine)
+    : renderC(emittedC.classStaticFieldDefine.oseoClassStaticFieldDefine);
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    `result = ${entryPoint}(context, ` +
-      `roots[${constructorValue}], roots[${key}], roots[${initializer}]);`,
+    renderC(emittedC.common.resultAssignContext, entryPoint) +
+      renderC(
+        emittedC.common.rootsRootsRootsStatement,
+        constructorValue,
+        key,
+        initializer,
+      ),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1147,8 +1688,13 @@ function emitPrivateNameCreate(
 ): void {
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, "result = oseo_private_name_create(context);");
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(
+    state,
+    renderC(
+      emittedC.privateNameCreate.resultAssignOseoPrivateNameCreateContext,
+    ),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1167,11 +1713,13 @@ function emitClassPrivateFieldDefine(
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_class_private_field_define(context, ` +
-      `roots[${constructorValue}], roots[${privateName}], ` +
-      `roots[${initializer}]);`,
+    renderC(
+      emittedC.classPrivateFieldDefine.resultAssignOseoClassPrivateFieldDefine,
+    ) +
+      renderC(emittedC.common.rootsRoots, constructorValue, privateName) +
+      renderC(emittedC.common.rootCallSuffix, initializer),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1188,19 +1736,22 @@ function emitClassPrivateMethodDefine(
   const value = operationArgument(operation, 2);
   const kind =
     operation.accessorKind === "get"
-      ? "OSEO_PRIVATE_GETTER"
+      ? renderC(emittedC.common.privateGetterKind)
       : operation.accessorKind === "set"
-        ? "OSEO_PRIVATE_SETTER"
-        : "OSEO_PRIVATE_METHOD";
+        ? renderC(emittedC.common.privateSetterKind)
+        : renderC(emittedC.common.privateMethodKind);
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_class_private_method_define(context, ` +
-      `roots[${constructorValue}], roots[${privateName}], ` +
-      `roots[${value}], ${kind});`,
+    renderC(
+      emittedC.classPrivateMethodDefine
+        .resultAssignOseoClassPrivateMethodDefine,
+    ) +
+      renderC(emittedC.common.rootsRoots, constructorValue, privateName) +
+      renderC(emittedC.common.rootsStatement, value, kind),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /** PrivateGet: the element the object carries under one private name. */
@@ -1211,10 +1762,12 @@ function emitPrivateGet(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_private_get(context, roots[${object}], ` +
-      `roots[${privateName}]);`,
+    renderC(
+      emittedC.privateGet.resultAssignOseoPrivateGetContextRoots,
+      object,
+    ) + renderC(emittedC.common.rootCallSuffix, privateName),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /** PrivateSet: replaces the value one private field element holds. */
@@ -1226,10 +1779,12 @@ function emitPrivateSet(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_private_set(context, roots[${object}], ` +
-      `roots[${privateName}], roots[${value}]);`,
+    renderC(
+      emittedC.privateSet.resultAssignOseoPrivateSetContextRoots,
+      object,
+    ) + renderC(emittedC.common.rootsRootsStatement, privateName, value),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1248,10 +1803,11 @@ function emitInstanceElementsInit(
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_initialize_instance_elements(context, callee, ` +
-      `roots[${instance}]);`,
+    renderC(
+      emittedC.instanceElementsInit.resultAssignOseoInitializeInstanceElements,
+    ) + renderC(emittedC.common.rootCallSuffix, instance),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1266,7 +1822,11 @@ function emitHomeObjectBind(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   line(
     state,
-    `oseo_bind_home_object(roots[${functionValue}], roots[${home}]);`,
+    renderC(
+      emittedC.homeObjectBind.oseoBindHomeObjectRootsRootsStatement,
+      functionValue,
+      home,
+    ),
   );
 }
 
@@ -1280,7 +1840,13 @@ function emitHomeObjectBind(state: EmitState, operation: MirOperation): void {
  */
 function emitSuperBase(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
-  line(state, `roots[${operation.id}] = oseo_super_base(callee);`);
+  line(
+    state,
+    renderC(
+      emittedC.superBase.rootsAssignOseoSuperBaseCalleeStatement,
+      operation.id,
+    ),
+  );
 }
 
 /**
@@ -1290,8 +1856,11 @@ function emitSuperBase(state: EmitState, operation: MirOperation): void {
 function emitSuperConstructor(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
-  line(state, "result = oseo_super_constructor(context, callee);");
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(
+    state,
+    renderC(emittedC.superConstructor.resultAssignOseoSuperConstructorContext),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /** Binds what `super()` produced to the derived constructor's `this`. */
@@ -1305,15 +1874,22 @@ function emitThisBind(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_environment_get(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u);`,
+    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+      renderC(
+        emittedC.common.rootsUStatement,
+        state.environmentSlot,
+        bindingId,
+      ),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   line(
     state,
-    `result = oseo_bind_this(context, result.value, roots[${value}]);`,
+    renderC(
+      emittedC.thisBind.resultAssignOseoBindThisContextResultValue,
+      value,
+    ),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 /**
@@ -1333,17 +1909,23 @@ function emitDerivedReturn(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_environment_get(context, ` +
-      `roots[${state.environmentSlot}], ${bindingId}u);`,
+    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+      renderC(
+        emittedC.common.rootsUStatement,
+        state.environmentSlot,
+        bindingId,
+      ),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   line(
     state,
-    `result = oseo_derived_constructor_result(context, roots[${value}], ` +
-      "result.value);",
+    renderC(
+      emittedC.derivedReturn.resultAssignOseoDerivedConstructorResult,
+      value,
+    ) + renderC(emittedC.derivedReturn.resultValueStatement),
   );
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitClassPrototype(state: EmitState, operation: MirOperation): void {
@@ -1352,9 +1934,12 @@ function emitClassPrototype(state: EmitState, operation: MirOperation): void {
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_function_prototype(context, roots[${constructorValue}]);`,
+    renderC(
+      emittedC.common.resultAssignOseoFunctionPrototypeContext,
+      constructorValue,
+    ),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitModuleNamespace(state: EmitState, operation: MirOperation): void {
@@ -1372,10 +1957,13 @@ function emitModuleNamespace(state: EmitState, operation: MirOperation): void {
     state.usesAbrupt = true;
     line(
       state,
-      `result = oseo_module_namespace_create(context, ` +
-        `roots[${state.environmentSlot}], 0u, NULL, NULL, NULL);`,
+      renderC(emittedC.common.resultAssignOseoModuleNamespaceCreate) +
+        renderC(
+          emittedC.moduleNamespace.rootsUNullNullNullStatement,
+          state.environmentSlot,
+        ),
     );
-    line(state, `roots[${operation.id}] = result.value;`);
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
     return;
   }
   const pointers: string[] = [];
@@ -1384,40 +1972,66 @@ function emitModuleNamespace(state: EmitState, operation: MirOperation): void {
     const units = utf16Units(name);
     lengths.push(units.length);
     if (units.length === 0) {
-      pointers.push("NULL");
+      pointers.push(renderC(emittedC.common.nullPointer));
       continue;
     }
-    const constantName = `namespace_units_${operation.id}_${index}`;
+    const constantName = renderC(
+      emittedC.moduleNamespace.namespaceUnits,
+      operation.id,
+      index,
+    );
     line(
       state,
-      `static const uint16_t ${constantName}[] = {${units.join(", ")}};`,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        constantName,
+        units.join(renderC(emittedC.common.commaSpace)),
+      ),
     );
     pointers.push(constantName);
   }
-  const prefix = `namespace_${operation.id}`;
+  const prefix = renderC(emittedC.moduleNamespace.namespace, operation.id);
   line(
     state,
-    `static const uint16_t *const ${prefix}_names[] = ` +
-      `{${pointers.join(", ")}};`,
+    renderC(
+      emittedC.moduleNamespace.staticConstUint16TPointerConstNamesAssign,
+      prefix,
+    ) +
+      renderC(
+        emittedC.common.bracedInitializer,
+        pointers.join(renderC(emittedC.common.commaSpace)),
+      ),
   );
   line(
     state,
-    `static const size_t ${prefix}_lengths[] = {${lengths.join(", ")}};`,
+    renderC(
+      emittedC.moduleNamespace.staticConstSizeTLengthsAssignStatement,
+      prefix,
+      lengths.join(renderC(emittedC.common.commaSpace)),
+    ),
   );
   line(
     state,
-    `static const size_t ${prefix}_bindings[] = ` +
-      `{${namespaceBindingIds.join(", ")}};`,
+    renderC(emittedC.moduleNamespace.staticConstSizeTBindingsAssign, prefix) +
+      renderC(
+        emittedC.common.bracedInitializer,
+        namespaceBindingIds.join(renderC(emittedC.common.commaSpace)),
+      ),
   );
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    `result = oseo_module_namespace_create(context, ` +
-      `roots[${state.environmentSlot}], ${names.length}u, ` +
-      `${prefix}_names, ${prefix}_lengths, ${prefix}_bindings);`,
+    renderC(emittedC.common.resultAssignOseoModuleNamespaceCreate) +
+      renderC(emittedC.common.rootsU, state.environmentSlot, names.length) +
+      renderC(
+        emittedC.moduleNamespace.namesLengthsBindingsStatement,
+        prefix,
+        prefix,
+        prefix,
+      ),
   );
-  line(state, `roots[${operation.id}] = result.value;`);
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitOperation(state: EmitState, operation: MirOperation): void {
@@ -1475,19 +2089,27 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "symbol-intrinsic") {
     location(state, operation.range);
     state.usesAbrupt = true;
-    line(state, "result = oseo_symbol_intrinsic(context);");
-    line(state, `roots[${operation.id}] = result.value;`);
+    line(
+      state,
+      renderC(emittedC.operation.resultAssignOseoSymbolIntrinsicContext),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "module-namespace-create") {
     emitModuleNamespace(state, operation);
   } else if (operation.kind === "receiver") {
-    line(state, `roots[${operation.id}] = receiver;`);
+    line(
+      state,
+      renderC(emittedC.operation.rootsAssignReceiverStatement, operation.id),
+    );
   } else if (operation.kind === "new-target") {
     // A generator body resumes outside any construction, and a generator
     // function is not a constructor, so its new.target is undefined.
     line(
       state,
-      `roots[${operation.id}] = ` +
-        (state.generator ? "oseo_undefined();" : "new_target;"),
+      renderC(emittedC.common.rootsAssign, operation.id) +
+        (state.generator
+          ? renderC(emittedC.operation.undefinedExpressionStatement)
+          : renderC(emittedC.operation.newTargetStatement)),
     );
   } else if (operation.kind === "caught") {
     state.usesCompletion = true;
@@ -1495,15 +2117,22 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (slot == null) {
       throw new Error(`MIR caught %${operation.id} has no completion slot.`);
     }
-    line(state, "oseo_context_clear_language_error(context);");
+    line(state, renderC(emittedC.common.oseoContextClearLanguageErrorContext));
     line(
       state,
-      `roots[${operation.id}] = roots[${state.completionSlotStart + slot}u];`,
+      renderC(
+        emittedC.operation.rootsAssignRootsUStatement,
+        operation.id,
+        state.completionSlotStart + slot,
+      ),
     );
     line(
       state,
-      `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
-        `roots[${state.completionSlotStart + slot}u]};`,
+      renderC(emittedC.common.resultAssignOseoResultOseoStatusNormal) +
+        renderC(
+          emittedC.common.rootUnsignedInitializerSuffix,
+          state.completionSlotStart + slot,
+        ),
     );
   } else if (operation.kind === "completion-set") {
     state.usesCompletion = true;
@@ -1518,41 +2147,86 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
         `MIR completion-set %${operation.id} has no completion slot.`,
       );
     }
-    line(state, `completion[${slot}u].kind = ${kinds[kind]};`);
+    line(
+      state,
+      renderC(
+        emittedC.operation.completionUKindAssignStatement,
+        slot,
+        kinds[kind],
+      ),
+    );
     if (kind === "throw") {
       location(state, operation.range);
-      line(state, "oseo_context_clear_language_error(context);");
-      line(state, `completion[${slot}u].line = context->line;`);
-      line(state, `completion[${slot}u].column = context->column;`);
-      line(state, `completion[${slot}u].source_id = context->source_id;`);
       line(
         state,
-        `completion[${slot}u].source_id_length = ` +
-          "context->source_id_length;",
+        renderC(emittedC.common.oseoContextClearLanguageErrorContext),
       );
-      line(state, `completion[${slot}u].error_code = context->error_code;`);
       line(
         state,
-        `completion[${slot}u].error_message = context->error_message;`,
+        renderC(
+          emittedC.operation.completionULineAssignContextMemberLine,
+          slot,
+        ),
+      );
+      line(
+        state,
+        renderC(
+          emittedC.operation.completionUColumnAssignContextMemberColumn,
+          slot,
+        ),
+      );
+      line(
+        state,
+        renderC(
+          emittedC.operation.completionUSourceIdAssignContextMember,
+          slot,
+        ),
+      );
+      line(
+        state,
+        renderC(emittedC.operation.completionUSourceIdLengthAssign, slot) +
+          renderC(emittedC.common.contextMemberSourceIdLengthStatement),
+      );
+      line(
+        state,
+        renderC(
+          emittedC.operation.completionUErrorCodeAssignContextMember,
+          slot,
+        ),
+      );
+      line(
+        state,
+        renderC(
+          emittedC.operation.completionUErrorMessageAssignContextMember,
+          slot,
+        ),
       );
     }
     if (operation.arguments[0] != null) {
       line(
         state,
-        `roots[${state.completionSlotStart + slot}u] = ` +
-          `roots[${operation.arguments[0]}];`,
+        renderC(
+          emittedC.operation.rootsUAssign,
+          state.completionSlotStart + slot,
+        ) + renderC(emittedC.operation.rootsStatement, operation.arguments[0]),
       );
     }
     if (operation.completionTarget != null) {
       line(
         state,
-        `completion[${slot}u].target = ` +
-          `${operation.completionTarget.blockId}u;`,
+        renderC(emittedC.operation.completionUTargetAssign, slot) +
+          renderC(
+            emittedC.common.uStatement,
+            operation.completionTarget.blockId,
+          ),
       );
       line(
         state,
-        `completion[${slot}u].depth = ` +
-          `${operation.completionTarget.cleanupDepth}u;`,
+        renderC(emittedC.operation.completionUDepthAssign, slot) +
+          renderC(
+            emittedC.common.uStatement,
+            operation.completionTarget.cleanupDepth,
+          ),
       );
     }
   } else if (operation.kind === "unary") {
@@ -1586,15 +2260,24 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitUpdatePropertyCache(state, operation);
   } else if (operation.kind === "count-guard-hit") {
     if (state.observeSpecialization) {
-      line(state, "context->guard_hits += 1u;");
+      line(
+        state,
+        renderC(emittedC.operation.contextMemberGuardHitsPlusAssignUStatement),
+      );
     }
   } else if (operation.kind === "count-guard-miss") {
     if (state.observeSpecialization) {
-      line(state, "context->guard_misses += 1u;");
+      line(
+        state,
+        renderC(emittedC.operation.contextMemberGuardMissesPlusAssignU),
+      );
     }
   } else if (operation.kind === "count-overflow-miss") {
     if (state.observeSpecialization) {
-      line(state, "context->overflow_misses += 1u;");
+      line(
+        state,
+        renderC(emittedC.operation.contextMemberOverflowMissesPlusAssignU),
+      );
     }
   } else if (operation.kind === "call" || operation.kind === "construct") {
     emitCall(state, operation);
@@ -1622,37 +2305,42 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitObjectOperation(state, operation);
   } else if (operation.kind === "check-status") {
     if (operation.abruptTarget == null) {
-      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+      line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     } else {
       const target = operation.abruptTarget.blockId;
       state.usesCompletion = true;
-      line(state, "if (result.status != OSEO_STATUS_NORMAL) {");
-      line(state, "    if (context->has_diagnostic) goto abrupt;");
-      line(state, `    completion[${target}u].kind = 2;`);
       line(
         state,
-        `    roots[${state.completionSlotStart + target}u] = ` +
-          "result.value;",
-      );
-      line(state, `    completion[${target}u].line = context->line;`);
-      line(state, `    completion[${target}u].column = context->column;`);
-      line(state, `    completion[${target}u].source_id = context->source_id;`);
-      line(
-        state,
-        `    completion[${target}u].source_id_length = ` +
-          "context->source_id_length;",
+        renderC(emittedC.operation.ifResultStatusNotEqualOseoStatusNormalOpen),
       );
       line(
         state,
-        `    completion[${target}u].error_code = context->error_code;`,
+        renderC(emittedC.operation.ifContextMemberHasDiagnosticGotoAbrupt),
       );
+      line(state, renderC(emittedC.operation.setThrowKind, target));
       line(
         state,
-        `    completion[${target}u].error_message = ` +
-          "context->error_message;",
+        renderC(
+          emittedC.common.rootsUAssign,
+          state.completionSlotStart + target,
+        ) + renderC(emittedC.operation.resultValueStatement),
       );
-      line(state, `    goto bb${target};`);
-      line(state, "}");
+      line(state, renderC(emittedC.operation.setThrowLine, target));
+      line(state, renderC(emittedC.operation.setThrowColumn, target));
+      line(state, renderC(emittedC.operation.setThrowSourceId, target));
+      line(
+        state,
+        renderC(emittedC.operation.setThrowSourceIdLength, target) +
+          renderC(emittedC.common.contextMemberSourceIdLengthStatement),
+      );
+      line(state, renderC(emittedC.operation.setThrowErrorCode, target));
+      line(
+        state,
+        renderC(emittedC.operation.completionUErrorMessageAssign, target) +
+          renderC(emittedC.operation.contextMemberErrorMessageStatement),
+      );
+      line(state, renderC(emittedC.common.gotoBbStatement, target));
+      line(state, renderC(emittedC.common.closeBlock));
     }
   }
 }
@@ -1662,38 +2350,53 @@ function emitCompletionCopy(
   source: number,
   target: number,
 ): void {
-  line(state, `    completion[${target}u] = completion[${source}u];`);
   line(
     state,
-    `    roots[${state.completionSlotStart + target}u] = ` +
-      `roots[${state.completionSlotStart + source}u];`,
+    renderC(
+      emittedC.completionCopy.completionUAssignCompletionUStatement,
+      target,
+      source,
+    ),
+  );
+  line(
+    state,
+    renderC(emittedC.common.rootsUAssign, state.completionSlotStart + target) +
+      renderC(
+        emittedC.completionCopy.rootsUStatement,
+        state.completionSlotStart + source,
+      ),
   );
 }
 
 function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   if (terminator.kind === "return") {
-    emitNormalReturn(state, `roots[${terminator.value}]`);
+    emitNormalReturn(state, renderC(emittedC.common.root, terminator.value));
   } else if (terminator.kind === "generator-yield") {
     // `yield*` suspends with the inner iterator's own result object, so
     // the resumption reports it instead of creating a fresh one. An
     // awaited suspension leaves no iteration step at all, so the driver
     // settles the value instead of reporting it.
-    const resultObject = terminator.resultObject === true ? "true" : "false";
+    const resultObject =
+      terminator.resultObject === true
+        ? renderC(emittedC.common.trueValue)
+        : renderC(emittedC.common.falseValue);
     const reason =
       terminator.awaited === true
-        ? "OSEO_GENERATOR_SUSPEND_AWAIT"
-        : "OSEO_GENERATOR_SUSPEND_YIELD";
+        ? renderC(emittedC.terminator.oseoGeneratorSuspendAwait)
+        : renderC(emittedC.terminator.oseoGeneratorSuspendYield);
     line(
       state,
-      `oseo_generator_suspend(context, generator, ${terminator.resume}u, ` +
-        `${resultObject}, ${reason});`,
+      renderC(
+        emittedC.terminator.oseoGeneratorSuspendContextGeneratorU,
+        terminator.resume,
+      ) + renderC(emittedC.common.twoValuesCallSuffix, resultObject, reason),
     );
     line(
       state,
-      `result = (OseoResult){OSEO_STATUS_NORMAL, ` +
-        `roots[${terminator.value}]};`,
+      renderC(emittedC.common.resultAssignOseoResultOseoStatusNormal) +
+        renderC(emittedC.terminator.rootsStatement, terminator.value),
     );
-    line(state, "return result;");
+    line(state, renderC(emittedC.common.returnResult));
   } else if (terminator.kind === "jump") {
     const parameters = state.blockParameters.get(terminator.target) ?? [];
     const values = terminator.values ?? [];
@@ -1704,16 +2407,26 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
       );
     }
     for (let index = 0; index < parameters.length; index += 1) {
-      line(state, `roots[${parameters[index]}] = roots[${values[index]}];`);
+      line(
+        state,
+        renderC(
+          emittedC.common.rootAssignRoot,
+          parameters[index]!,
+          values[index]!,
+        ),
+      );
     }
-    line(state, `goto bb${terminator.target};`);
+    line(state, renderC(emittedC.common.gotoBlock, terminator.target));
   } else if (terminator.kind === "branch") {
     const test =
       state.scalarKinds.get(terminator.test) === "boolean"
-        ? `fast_${terminator.test}`
-        : `oseo_to_boolean(roots[${terminator.test}])`;
-    line(state, `if (${test}) goto bb${terminator.whenTrue};`);
-    line(state, `goto bb${terminator.whenFalse};`);
+        ? renderC(emittedC.terminator.fast, terminator.test)
+        : renderC(emittedC.common.oseoToBooleanRoots, terminator.test);
+    line(
+      state,
+      renderC(emittedC.terminator.ifGotoBbStatement, test, terminator.whenTrue),
+    );
+    line(state, renderC(emittedC.common.gotoBlock, terminator.whenFalse));
   } else if (terminator.kind === "resume-completion") {
     state.usesCompletion = true;
     // The saved-throw branch below always emits `goto abrupt`, so the label
@@ -1722,60 +2435,97 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     const slot = terminator.completionSlot;
     if (terminator.outerAbrupt != null) {
       const target = terminator.outerAbrupt.blockId;
-      line(state, `if (completion[${slot}u].kind == 2) {`);
+      line(state, renderC(emittedC.common.ifCompletionKindThrowOpen, slot));
       emitCompletionCopy(state, slot, target);
-      line(state, `    goto bb${target};`);
-      line(state, "}");
+      line(state, renderC(emittedC.common.gotoBbStatement, target));
+      line(state, renderC(emittedC.common.closeBlock));
     }
     if (terminator.outerFinalizer != null) {
       const target = terminator.outerFinalizer;
       line(
         state,
-        `if (completion[${slot}u].kind != 0 && ` +
-          `completion[${slot}u].depth <= ${target.cleanupDepth}u) {`,
+        renderC(
+          emittedC.terminator.ifCompletionUKindNotEqualAddressAddress,
+          slot,
+        ) +
+          renderC(
+            emittedC.terminator.completionUDepthAssignUOpen,
+            slot,
+            target.cleanupDepth,
+          ),
       );
       emitCompletionCopy(state, slot, target.blockId);
-      line(state, `    goto bb${target.blockId};`);
-      line(state, "}");
+      line(state, renderC(emittedC.common.gotoBbStatement, target.blockId));
+      line(state, renderC(emittedC.common.closeBlock));
     }
-    line(state, `if (completion[${slot}u].kind == 1) {`);
+    line(state, renderC(emittedC.terminator.ifCompletionKindReturnOpen, slot));
     emitNormalReturn(
       state,
-      `roots[${state.completionSlotStart + slot}u]`,
-      "    ",
+      renderC(emittedC.common.rootUnsigned, state.completionSlotStart + slot),
+      renderC(emittedC.common.indent),
     );
-    line(state, "}");
-    line(state, `if (completion[${slot}u].kind == 2) {`);
-    line(state, `    context->line = completion[${slot}u].line;`);
-    line(state, `    context->column = completion[${slot}u].column;`);
-    line(state, `    context->source_id = completion[${slot}u].source_id;`);
+    line(state, renderC(emittedC.common.closeBlock));
+    line(state, renderC(emittedC.common.ifCompletionKindThrowOpen, slot));
     line(
       state,
-      `    context->source_id_length = ` +
-        `completion[${slot}u].source_id_length;`,
+      renderC(emittedC.terminator.contextMemberLineAssignCompletionULine, slot),
     );
-    line(state, `    context->error_code = completion[${slot}u].error_code;`);
     line(
       state,
-      `    context->error_message = completion[${slot}u].error_message;`,
+      renderC(
+        emittedC.terminator.contextMemberColumnAssignCompletionUColumn,
+        slot,
+      ),
     );
-    line(state, "    context->has_diagnostic = false;");
     line(
       state,
-      `    result = (OseoResult){OSEO_STATUS_THROW, ` +
-        `roots[${state.completionSlotStart + slot}u]};`,
+      renderC(emittedC.terminator.contextMemberSourceIdAssignCompletionU, slot),
     );
-    line(state, "    goto abrupt;");
-    line(state, "}");
-    line(state, `switch (completion[${slot}u].target) {`);
+    line(
+      state,
+      renderC(emittedC.terminator.contextMemberSourceIdLengthAssign) +
+        renderC(emittedC.terminator.completionUSourceIdLengthStatement, slot),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.terminator.contextMemberErrorCodeAssignCompletionU,
+        slot,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.terminator.contextMemberErrorMessageAssignCompletionU,
+        slot,
+      ),
+    );
+    line(
+      state,
+      renderC(emittedC.terminator.contextMemberHasDiagnosticAssignFalse),
+    );
+    line(
+      state,
+      renderC(emittedC.terminator.resultAssignOseoResultOseoStatusThrow) +
+        renderC(
+          emittedC.common.rootUnsignedInitializerSuffix,
+          state.completionSlotStart + slot,
+        ),
+    );
+    line(state, renderC(emittedC.terminator.gotoAbruptStatement));
+    line(state, renderC(emittedC.common.closeBlock));
+    line(state, renderC(emittedC.terminator.switchCompletionUTargetOpen, slot));
     for (const target of state.blockParameters.keys()) {
       if (target === 0) continue;
-      line(state, `case ${target}u: goto bb${target};`);
+      line(
+        state,
+        renderC(emittedC.common.caseUGotoBbStatement, target, target),
+      );
     }
-    line(state, "default: abort();");
-    line(state, "}");
+    line(state, renderC(emittedC.common.defaultAbortStatement));
+    line(state, renderC(emittedC.common.closeBlock));
   } else {
-    line(state, "abort();");
+    line(state, renderC(emittedC.terminator.abortStatement));
   }
 }
 
@@ -2016,38 +2766,51 @@ function emitPrologue(
   if (functionValue.id < 0) {
     line(
       state,
-      `result = oseo_environment_create(context, ${totalBindingCount}u);`,
+      renderC(
+        emittedC.prologue.resultAssignOseoEnvironmentCreateContextU,
+        totalBindingCount,
+      ),
     );
   } else {
-    line(state, "result = oseo_function_environment(context, callee);");
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-    line(state, "result = oseo_environment_clone(context, result.value);");
-  }
-  line(state, `roots[${environmentSlot}] = result.value;`);
-  line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-  for (const bindingId of bindingIdValues) {
-    line(state, "result = oseo_cell_create(context, oseo_uninitialized());");
-    line(state, `roots[${temporarySlot}] = result.value;`);
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
     line(
       state,
-      `result = oseo_environment_set(context, roots[${environmentSlot}], ` +
-        `${bindingId}u, roots[${temporarySlot}]);`,
+      renderC(emittedC.prologue.resultAssignOseoFunctionEnvironmentContext),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      renderC(emittedC.prologue.resultAssignOseoEnvironmentCloneContext),
+    );
+  }
+  line(state, renderC(emittedC.common.rootAssignResultValue, environmentSlot));
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  for (const bindingId of bindingIdValues) {
+    line(state, renderC(emittedC.common.resultAssignOseoCellCreateContextOseo));
+    line(state, renderC(emittedC.common.rootAssignResultValue, temporarySlot));
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      renderC(
+        emittedC.prologue.resultAssignOseoEnvironmentSetContextRoots,
+        environmentSlot,
+      ) + renderC(emittedC.prologue.uRootsStatement, bindingId, temporarySlot),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
   if (functionValue.selfBindingId != null) {
     line(
       state,
-      `result = oseo_environment_get(context, roots[${environmentSlot}], ` +
-        `${functionValue.selfBindingId}u);`,
+      renderC(
+        emittedC.common.resultAssignOseoEnvironmentGetContextRoots,
+        environmentSlot,
+      ) + renderC(emittedC.common.positionSuffix, functionValue.selfBindingId),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     line(
       state,
-      "result = oseo_cell_initialize(context, result.value, callee);",
+      renderC(emittedC.prologue.resultAssignOseoCellInitializeContext),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
   const parameters = functionValue.parameters;
   const initializedParameters = new Set<number>();
@@ -2056,44 +2819,63 @@ function emitPrologue(
     if (parameter == null) continue;
     line(
       state,
-      `result = oseo_environment_get(context, roots[${environmentSlot}], ` +
-        `${parameter.bindingId}u);`,
+      renderC(
+        emittedC.common.resultAssignOseoEnvironmentGetContextRoots,
+        environmentSlot,
+      ) + renderC(emittedC.common.positionSuffix, parameter.bindingId),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     const setter = initializedParameters.has(parameter.bindingId)
-      ? "oseo_cell_set"
-      : "oseo_cell_initialize";
+      ? renderC(emittedC.prologue.oseoCellSet)
+      : renderC(emittedC.prologue.oseoCellInitialize);
     if (parameter.rest === true) {
-      line(state, `roots[${temporarySlot}] = result.value;`);
-      line(state, "result = oseo_array_create(context, 0u);");
-      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
       line(
         state,
-        `result = ${setter}(context, roots[${temporarySlot}], result.value);`,
-      );
-      line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-      line(
-        state,
-        `for (size_t rest_index_${index} = ${index}u; ` +
-          `rest_index_${index} < argument_count; rest_index_${index} += 1u) {`,
+        renderC(emittedC.common.rootAssignResultValue, temporarySlot),
       );
       line(
         state,
-        `    result = oseo_array_append(context, result.value, ` +
-          `arguments[rest_index_${index}]);`,
+        renderC(emittedC.prologue.resultAssignOseoArrayCreateContextU),
       );
-      line(state, "    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-      line(state, "}");
+      line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+      line(
+        state,
+        renderC(
+          emittedC.prologue.resultAssignContextRootsResultValue,
+          setter,
+          temporarySlot,
+        ),
+      );
+      line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+      line(
+        state,
+        renderC(emittedC.prologue.forSizeTRestIndexAssignU, index, index) +
+          renderC(
+            emittedC.prologue.restIndexArgumentCountRestIndexPlusAssignU,
+            index,
+            index,
+          ),
+      );
+      line(
+        state,
+        renderC(emittedC.prologue.resultAssignOseoArrayAppendContextResult) +
+          renderC(emittedC.prologue.argumentsRestIndexStatement, index),
+      );
+      line(
+        state,
+        renderC(emittedC.prologue.ifResultStatusNotEqualOseoStatusNormalGoto),
+      );
+      line(state, renderC(emittedC.common.closeBlock));
       initializedParameters.add(parameter.bindingId);
       continue;
     }
     line(
       state,
-      `result = ${setter}(context, result.value, ` +
-        `(argument_count > ${index}u ? arguments[${index}] : ` +
-        "oseo_undefined()));",
+      renderC(emittedC.prologue.resultAssignContextResultValue, setter) +
+        renderC(emittedC.prologue.argumentCountUArguments, index, index) +
+        renderC(emittedC.prologue.undefinedDefaultArgumentCallSuffix),
     );
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     initializedParameters.add(parameter.bindingId);
   }
 }
@@ -2104,10 +2886,17 @@ function emitBlocks(
   resumePoints: ReadonlyMap<number, ResumePoint>,
 ): void {
   for (const block of blocks) {
-    if (block.id !== 0 || state.generator) line(state, `bb${block.id}:;`);
+    if (block.id !== 0 || state.generator)
+      line(state, renderC(emittedC.blocks.bbStatement, block.id));
     const resume = resumePoints.get(block.id);
     if (resume != null) {
-      line(state, `roots[${resume.sent}] = oseo_generator_sent(generator);`);
+      line(
+        state,
+        renderC(
+          emittedC.blocks.rootsAssignOseoGeneratorSentGenerator,
+          resume.sent,
+        ),
+      );
       // A return completion leaves the body from this suspension point, so
       // it runs every enclosing `finally` and iterator close on the way out,
       // and a throw completion raises the sent value there. Only a driver
@@ -2117,15 +2906,21 @@ function emitBlocks(
       if (resume.returnResume != null) {
         line(
           state,
-          `if (oseo_generator_resume_kind(generator) == ` +
-            `OSEO_GENERATOR_RESUME_RETURN) goto bb${resume.returnResume};`,
+          renderC(emittedC.common.ifOseoGeneratorResumeKindGeneratorEqual) +
+            renderC(
+              emittedC.blocks.oseoGeneratorResumeReturnGotoBbStatement,
+              resume.returnResume,
+            ),
         );
       }
       if (resume.throwResume != null) {
         line(
           state,
-          `if (oseo_generator_resume_kind(generator) == ` +
-            `OSEO_GENERATOR_RESUME_THROW) goto bb${resume.throwResume};`,
+          renderC(emittedC.common.ifOseoGeneratorResumeKindGeneratorEqual) +
+            renderC(
+              emittedC.blocks.oseoGeneratorResumeThrowGotoBbStatement,
+              resume.throwResume,
+            ),
         );
       }
     }
@@ -2140,24 +2935,34 @@ function completionDeclaration(
   state: EmitState,
   completionSlots: number,
 ): string {
-  if (!state.usesCompletion) return "";
+  if (!state.usesCompletion) return renderC(emittedC.common.empty);
   if (state.generator) {
     return (
-      "    OseoCompletionRecord *completion =\n" +
-      "        oseo_generator_completions(generator);\n" +
-      "    (void)completion;\n"
+      renderC(
+        emittedC.completionDeclaration.oseoCompletionRecordPointerCompletion,
+      ) +
+      renderC(
+        emittedC.completionDeclaration.oseoGeneratorCompletionsGeneratorLine,
+      ) +
+      renderC(emittedC.common.voidCompletionLine)
     );
   }
   return (
-    `    OseoCompletionRecord completion[${completionSlots}u] = ` +
-    "{{0, 0u, 0u, 0u, 0u, NULL, 0u, NULL, NULL}};\n" +
-    "    (void)completion;\n"
+    renderC(
+      emittedC.completionDeclaration.oseoCompletionRecordCompletionUAssign,
+      completionSlots,
+    ) +
+    renderC(emittedC.completionDeclaration.uUUUNullUNullNullLine) +
+    renderC(emittedC.common.voidCompletionLine)
   );
 }
 
 /** The C identifier holding one MIR function's generated body code. */
 function generatorBodyName(functionValue: MirFunction): string {
-  return `oseo_generator_body_${functionValue.id}`;
+  return renderC(
+    emittedC.generatorBodyName.oseoGeneratorBody,
+    functionValue.id,
+  );
 }
 
 function emitGeneratorBody(
@@ -2173,32 +2978,41 @@ function emitGeneratorBody(
     scalarKinds: new Map(),
   };
   const resumePoints = yieldResumePoints(blocks);
-  line(state, "switch (oseo_generator_resume_point(generator)) {");
+  line(
+    state,
+    renderC(emittedC.generatorBody.switchOseoGeneratorResumePointGenerator),
+  );
   for (const resume of [0, ...resumePoints.keys()]) {
-    line(state, `case ${resume}u: goto bb${resume};`);
+    line(state, renderC(emittedC.common.caseUGotoBbStatement, resume, resume));
   }
-  line(state, "default: abort();");
-  line(state, "}");
+  line(state, renderC(emittedC.common.defaultAbortStatement));
+  line(state, renderC(emittedC.common.closeBlock));
   emitBlocks(state, blocks, resumePoints);
   if (state.usesAbrupt) {
-    line(state, "abrupt:");
-    line(state, "return result;");
+    line(state, renderC(emittedC.common.abruptLabel));
+    line(state, renderC(emittedC.common.returnResult));
   }
   return (
-    `static OseoResult ${generatorBodyName(functionValue)}(\n` +
-    "    OseoContext *context,\n" +
-    "    OseoValue generator\n" +
-    ") {\n" +
-    "    OseoValue *roots = oseo_generator_slots(generator);\n" +
-    "    OseoValue callee = oseo_generator_callee(generator);\n" +
-    "    OseoValue receiver = oseo_generator_receiver(generator);\n" +
-    "    OseoResult result = {OSEO_STATUS_NORMAL, oseo_undefined()};\n" +
+    renderC(
+      emittedC.generatorBody.staticOseoResultLine,
+      generatorBodyName(functionValue),
+    ) +
+    renderC(emittedC.common.oseoContextPointerContextLine) +
+    renderC(emittedC.generatorBody.oseoValueGeneratorLine) +
+    renderC(emittedC.common.functionBodyOpenLine) +
+    renderC(emittedC.generatorBody.oseoValuePointerRootsAssignOseoGenerator) +
+    renderC(emittedC.generatorBody.oseoValueCalleeAssignOseoGeneratorCallee) +
+    renderC(emittedC.generatorBody.oseoValueReceiverAssignOseoGenerator) +
+    renderC(emittedC.generatorBody.oseoResultResultAssignOseoStatusNormalOseo) +
     completionDeclaration(state, completionSlots) +
-    "    (void)context;\n" +
-    "    (void)callee;\n" +
-    "    (void)receiver;\n" +
-    `${state.lines.join("\n")}\n` +
-    "}\n"
+    renderC(emittedC.generatorBody.voidContextLine) +
+    renderC(emittedC.common.voidCalleeLine) +
+    renderC(emittedC.common.voidReceiverLine) +
+    renderC(
+      emittedC.common.valueThenNewline,
+      state.lines.join(renderC(emittedC.common.newline)),
+    ) +
+    renderC(emittedC.common.closeBlockLine)
   );
 }
 
@@ -2253,12 +3067,22 @@ function emitFunction(
   if (generator) {
     line(
       state,
-      `result = oseo_generator_create(context, callee, receiver, ` +
-        `${functionRootCount}u, ${completionSlots}u);`,
+      renderC(emittedC.function.resultAssignOseoGeneratorCreateContext) +
+        renderC(
+          emittedC.common.sourcePositionSuffix,
+          functionRootCount,
+          completionSlots,
+        ),
     );
-    line(state, "frame.slots[0] = result.value;");
-    line(state, "if (result.status != OSEO_STATUS_NORMAL) goto abrupt;");
-    line(state, "roots = oseo_generator_slots(frame.slots[0]);");
+    line(
+      state,
+      renderC(emittedC.function.frameSlotsAssignResultValueStatement),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      renderC(emittedC.function.rootsAssignOseoGeneratorSlotsFrameSlots),
+    );
   }
   emitPrologue(
     state,
@@ -2268,58 +3092,75 @@ function emitFunction(
     temporarySlot,
   );
   if (generator) {
-    line(state, "result = (OseoResult){OSEO_STATUS_NORMAL, frame.slots[0]};");
+    line(
+      state,
+      renderC(emittedC.function.resultAssignOseoResultOseoStatusNormal),
+    );
   } else {
     emitBlocks(state, blocks, new Map<number, ResumePoint>());
   }
   if (state.usesAbrupt) {
-    line(state, "abrupt:");
-    line(state, "oseo_roots_release(context, &frame);");
-    line(state, "return result;");
+    line(state, renderC(emittedC.common.abruptLabel));
+    line(state, renderC(emittedC.function.oseoRootsReleaseContextAddressFrame));
+    line(state, renderC(emittedC.common.returnResult));
   }
-  const id = functionValue.id < 0 ? "script" : String(functionValue.id);
+  const id =
+    functionValue.id < 0
+      ? renderC(emittedC.common.script)
+      : String(functionValue.id);
   const entry =
-    `static OseoResult oseo_function_${id}(\n` +
-    "    OseoContext *context,\n" +
-    "    OseoValue callee,\n" +
-    "    OseoValue receiver,\n" +
-    "    size_t argument_count,\n" +
-    "    const OseoValue *arguments,\n" +
-    "    OseoValue new_target\n" +
-    ") {\n" +
-    "    OseoRootFrame frame = {NULL, NULL, 0u};\n" +
-    "    OseoValue *roots;\n" +
-    "    OseoResult result;\n" +
+    renderC(emittedC.function.staticOseoResultOseoFunctionLine, id) +
+    renderC(emittedC.common.oseoContextPointerContextLine) +
+    renderC(emittedC.function.oseoValueCalleeLine) +
+    renderC(emittedC.function.oseoValueReceiverLine) +
+    renderC(emittedC.function.sizeTArgumentCountLine) +
+    renderC(emittedC.function.constOseoValuePointerArgumentsLine) +
+    renderC(emittedC.function.oseoValueNewTargetLine) +
+    renderC(emittedC.common.functionBodyOpenLine) +
+    renderC(emittedC.function.oseoRootFrameFrameAssignNullNullULine) +
+    renderC(emittedC.function.oseoValuePointerRootsLine) +
+    renderC(emittedC.common.oseoResultResultLine) +
     completionDeclaration(state, completionSlots) +
-    "    (void)callee;\n" +
-    "    (void)receiver;\n" +
-    "    (void)argument_count;\n" +
-    "    (void)arguments;\n" +
-    "    (void)new_target;\n" +
-    `    result = oseo_roots_allocate(` +
-    `context, &frame, ${generator ? 1 : functionRootCount}u);\n` +
-    "    if (result.status != OSEO_STATUS_NORMAL) return result;\n" +
-    "    roots = frame.slots;\n" +
-    `${state.lines.join("\n")}\n` +
-    "}\n";
+    renderC(emittedC.common.voidCalleeLine) +
+    renderC(emittedC.common.voidReceiverLine) +
+    renderC(emittedC.function.voidArgumentCountLine) +
+    renderC(emittedC.function.voidArgumentsLine) +
+    renderC(emittedC.function.voidNewTargetLine) +
+    renderC(emittedC.function.resultAssignOseoRootsAllocate) +
+    renderC(
+      emittedC.function.contextAddressFrameULine,
+      generator ? 1 : functionRootCount,
+    ) +
+    renderC(emittedC.function.ifResultStatusNotEqualOseoStatusNormal) +
+    renderC(emittedC.function.rootsAssignFrameSlotsLine) +
+    renderC(
+      emittedC.common.valueThenNewline,
+      state.lines.join(renderC(emittedC.common.newline)),
+    ) +
+    renderC(emittedC.common.closeBlockLine);
   if (!generator) return entry;
-  return `${entry}\n${emitGeneratorBody(
-    functionValue,
-    blocks,
-    completionSlots,
-    base,
-  )}`;
+  return renderC(
+    emittedC.function.newline,
+    entry,
+    emitGeneratorBody(functionValue, blocks, completionSlots, base),
+  );
 }
 
 function prototype(functionValue: MirFunction): string {
-  const id = functionValue.id < 0 ? "script" : String(functionValue.id);
+  const id =
+    functionValue.id < 0
+      ? renderC(emittedC.common.script)
+      : String(functionValue.id);
   const entry =
-    `static OseoResult oseo_function_${id}(` +
-    "OseoContext *, OseoValue, OseoValue, size_t, " +
-    "const OseoValue *, OseoValue);";
+    renderC(emittedC.prototype.staticOseoResultOseoFunction, id) +
+    renderC(emittedC.prototype.oseoContextPointerOseoValueOseoValueSizeT) +
+    renderC(emittedC.prototype.constOseoValuePointerOseoValueStatement);
   return functionValue.generator === true
-    ? `${entry}\nstatic OseoResult ${generatorBodyName(functionValue)}(` +
-        "OseoContext *, OseoValue);"
+    ? renderC(
+        emittedC.prototype.staticOseoResult,
+        entry,
+        generatorBodyName(functionValue),
+      ) + renderC(emittedC.prototype.oseoContextPointerOseoValueStatement)
     : entry;
 }
 
@@ -2331,50 +3172,23 @@ function emitGeneratorDispatcher(
     (functionValue) => functionValue.generator === true,
   );
   if (generators.length === 0) return undefined;
-  return [
-    "static OseoResult oseo_dispatch_generator(",
-    "    OseoContext *context,",
-    "    OseoValue generator",
-    ") {",
-    "    size_t code_id = 0u;",
-    "    OseoResult result = oseo_function_code_id(",
-    "        context, oseo_generator_callee(generator), &code_id);",
-    "    if (result.status != OSEO_STATUS_NORMAL) return result;",
-    "    switch (code_id) {",
-    ...generators.flatMap((functionValue) => [
-      `    case ${functionValue.id}u:`,
-      `        return ${generatorBodyName(functionValue)}(context, generator);`,
-    ]),
-    "    default:",
-    "        return oseo_unknown_function(context, code_id);",
-    "    }",
-    "}",
-  ].join("\n");
+  const cases = generators
+    .map((functionValue) =>
+      renderC(
+        emittedC.generatorDispatcher.caseClause,
+        functionValue.id,
+        generatorBodyName(functionValue),
+      ),
+    )
+    .join(renderC(emittedC.common.newline));
+  return renderC(emittedC.generatorDispatcher.source, cases);
 }
 
 function emitFunctionDispatcher(
   functions: readonly MirFunction[],
   functionRootCounts: ReadonlyMap<number, number>,
 ): string {
-  const lines = [
-    "static OseoResult oseo_dispatch_function(",
-    "    OseoContext *context,",
-    "    OseoValue callee,",
-    "    OseoValue receiver,",
-    "    size_t argument_count,",
-    "    const OseoValue *arguments,",
-    "    OseoValue new_target",
-    ") {",
-    "    size_t code_id = 0u;",
-    "    OseoResult result = oseo_function_code_id(",
-    "        context, callee, &code_id);",
-    "    if (result.status != OSEO_STATUS_NORMAL) return result;",
-    "    (void)receiver;",
-    "    (void)argument_count;",
-    "    (void)arguments;",
-    "    (void)new_target;",
-    "    switch (code_id) {",
-  ];
+  const cases: string[] = [];
   for (const functionValue of functions) {
     const count = functionRootCounts.get(functionValue.id);
     if (count == null) {
@@ -2382,25 +3196,24 @@ function emitFunctionDispatcher(
         `MIR function '${functionValue.name}' has no root frame layout.`,
       );
     }
-    lines.push(
-      `    case ${functionValue.id}u:`,
-      `        result = oseo_frame_enter(context, ${count}u);`,
-      "        if (result.status == OSEO_STATUS_NORMAL) {",
-      `            result = oseo_function_${functionValue.id}(`,
-      "                context, callee, receiver, argument_count,",
-      "                arguments, new_target);",
-      `            oseo_frame_leave(context, ${count}u);`,
-      "        }",
-      "        return result;",
+    cases.push(
+      renderC(
+        emittedC.functionDispatcher.caseClause,
+        functionValue.id,
+        count,
+        functionValue.id,
+        count,
+      ),
     );
   }
-  lines.push(
-    "    default:",
-    "        return oseo_unknown_function(context, code_id);",
-    "    }",
-    "}",
-  );
-  return lines.join("\n");
+  const casesSection =
+    cases.length === 0
+      ? renderC(emittedC.common.empty)
+      : renderC(
+          emittedC.common.valueThenNewline,
+          cases.join(renderC(emittedC.common.newline)),
+        );
+  return renderC(emittedC.functionDispatcher.source, casesSection);
 }
 
 /** Deterministic C11 lowering whose only semantic input is MIR. */
@@ -2445,15 +3258,19 @@ export const cBackend: NativeBackend = {
     for (const binding of input.globalBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
-    const declarations = functions.map(prototype).join("\n");
+    const declarations = functions
+      .map(prototype)
+      .join(renderC(emittedC.common.newline));
     const dispatcher = emitFunctionDispatcher(
       declaredFunctions,
       functionRootCounts,
     );
     const generatorDispatcher = emitGeneratorDispatcher(declaredFunctions);
     const functionReferences = declaredFunctions
-      .map((functionValue) => `    (void)oseo_function_${functionValue.id};`)
-      .join("\n");
+      .map((functionValue) =>
+        renderC(emittedC.program.voidOseoFunctionStatement, functionValue.id),
+      )
+      .join(renderC(emittedC.common.newline));
     const definitions = functions
       .map((functionValue) =>
         emitFunction(
@@ -2463,66 +3280,50 @@ export const cBackend: NativeBackend = {
           input.observeSpecialization === true,
         ),
       )
-      .join("\n");
+      .join(renderC(emittedC.common.newline));
     const sourceId = escapeCString(input.sourceId);
     const sourceIdByteLength = new TextEncoder().encode(input.sourceId).length;
+    const empty = renderC(emittedC.common.empty);
     const functionEntryType = declaredFunctions.some(hasSelfCall)
-      ? "typedef OseoResult (*OseoFunctionEntry)(\n" +
-        "    OseoContext *, OseoValue, OseoValue, size_t,\n" +
-        "    const OseoValue *, OseoValue);\n\n"
-      : "";
+      ? renderC(emittedC.program.typedefOseoResultPointerOseoFunctionEntry) +
+        renderC(emittedC.program.oseoContextPointerOseoValueOseoValueSizeT) +
+        renderC(emittedC.program.constOseoValuePointerOseoValueLine)
+      : empty;
+    const generatorDispatcherSection =
+      generatorDispatcher == null
+        ? empty
+        : renderC(emittedC.common.valueThenBlankLine, generatorDispatcher);
+    const generatorRegistration =
+      generatorDispatcher == null
+        ? empty
+        : renderC(emittedC.program.oseoContextSetGeneratorDispatcherLine) +
+          renderC(emittedC.program.addressContextOseoDispatchGeneratorLine);
+    const specializationObservation =
+      input.observeSpecialization === true
+        ? renderC(emittedC.program.contextObserveSpecializationAssignTrueLine)
+        : empty;
+    const observations =
+      input.observeSpecialization === true
+        ? renderC(emittedC.program.oseoContextPrintObservationsAddressContext)
+        : empty;
     return {
-      source:
-        '#include "oseo_runtime.h"\n\n' +
-        "#include <math.h>\n" +
-        "#include <stddef.h>\n" +
-        "#include <stdint.h>\n" +
-        "#include <stdlib.h>\n\n" +
-        functionEntryType +
-        `${declarations}\n\n` +
-        `${dispatcher}\n\n` +
-        (generatorDispatcher == null ? "" : `${generatorDispatcher}\n\n`) +
-        `${definitions}\n` +
-        "int main(void) {\n" +
-        "    OseoContext context;\n" +
-        "    OseoResult result;\n" +
-        `${functionReferences}${functionReferences === "" ? "" : "\n"}` +
-        `    oseo_context_init(\n` +
-        `        &context, "${sourceId}", ${sourceIdByteLength}u);\n` +
-        "    oseo_context_set_function_dispatcher(\n" +
-        "        &context, oseo_dispatch_function);\n" +
-        (generatorDispatcher == null
-          ? ""
-          : "    oseo_context_set_generator_dispatcher(\n" +
-            "        &context, oseo_dispatch_generator);\n") +
-        (input.observeSpecialization === true
-          ? "    context.observe_specialization = true;\n"
-          : "") +
-        `    result = oseo_frame_enter(\n` +
-        `        &context, ${scriptRootCount}u);\n` +
-        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
-        "        result = oseo_function_script(\n" +
-        "            &context, oseo_undefined(), oseo_undefined(), 0u,\n" +
-        "            NULL, oseo_undefined());\n" +
-        `        oseo_frame_leave(\n` +
-        `            &context, ${scriptRootCount}u);\n` +
-        "    }\n" +
-        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
-        "        result = oseo_event_loop_run(&context);\n" +
-        "    } else {\n" +
-        "        result = oseo_entry_task_checkpoint(&context, result);\n" +
-        "    }\n" +
-        "    if (result.status != OSEO_STATUS_NORMAL) {\n" +
-        "        oseo_context_print_thrown(&context, result.value);\n" +
-        "        oseo_context_destroy(&context);\n" +
-        "        return 1;\n" +
-        "    }\n" +
-        (input.observeSpecialization === true
-          ? "    oseo_context_print_observations(&context);\n"
-          : "") +
-        "    oseo_context_destroy(&context);\n" +
-        "    return 0;\n" +
-        "}\n",
+      source: renderC(
+        emittedC.program.source,
+        functionEntryType,
+        declarations,
+        dispatcher,
+        generatorDispatcherSection,
+        definitions,
+        functionReferences,
+        functionReferences === empty ? empty : renderC(emittedC.common.newline),
+        sourceId,
+        sourceIdByteLength,
+        generatorRegistration,
+        specializationObservation,
+        scriptRootCount,
+        scriptRootCount,
+        observations,
+      ),
       sourceName: "generated.c",
     };
   },
