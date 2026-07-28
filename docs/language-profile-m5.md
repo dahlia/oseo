@@ -1346,8 +1346,11 @@ its deliberate boundary and its evidence:
     method's result and requires an object; the wrapper instead requires the
     synchronous result to be an object and then reads and awaits its `done`
     and `value`, and both happen before completion precedence applies, so an
-    in-flight body error still observes those getters. The head reuses the
-    synchronous
+    in-flight body error still observes those getters. The reviewed
+    *test/built-ins/AsyncFromSyncIteratorPrototype/* cases pin that wrapper
+    directly: twenty-five pass, four are unsupported, and the nine that stay
+    outside the reviewed subset belong to the three gap entries named below.
+    The head reuses the synchronous
     `for-of` lowering unchanged, so it admits the same `const`, `let`, `var`,
     existing binding, member target, and array or object pattern forms with
     the same temporal dead zones, fresh per-iteration cells, `var` hoisting,
@@ -1597,6 +1600,28 @@ must never shrink by reclassification alone.
     generators now own to reach ordinary asynchronous function bodies and the
     delegation steps as well. Owner: the functions and executable syntax
     stream.
+ -  AsyncFromSyncIteratorContinuation does not close the wrapped synchronous
+    iterator when the value it awaits rejects. The specification closes the
+    synchronous iterator before the wrapper's promise rejects whenever the
+    continuation was reached with `closeOnRejection` set, so a synchronous
+    iterator whose step reports a rejected promise never observes its own
+    `return` method here, while the rejection itself still reaches the
+    consumer unchanged. Five reviewed-candidate
+    *test/built-ins/AsyncFromSyncIteratorPrototype/* cases turn on the
+    difference and stay outside the reviewed subset, four under *next* and one
+    under *throw*. Owner: the functions and executable syntax stream.
+ -  `PromiseResolve` does not read the resolved value's `constructor`. The
+    specification returns an already-native promise unchanged only after
+    `SameValue(value.constructor, %Promise%)` holds, so a value carrying a
+    throwing `constructor` getter must make the operation abrupt. This
+    profile resolves the value without that read, so the getter never runs
+    and the abrupt completion the specification propagates never appears.
+    Six reviewed-candidate cases turn on the difference and stay outside the
+    reviewed subset: three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
+    cases and the three *AsyncGeneratorPrototype/return/* broken-promise
+    cases. Closing
+    it needs `Promise` as a materialized intrinsic value to compare against.
+    Owner: the intrinsics and built-in objects stream.
  -  `%GeneratorPrototype%.throw`, generator method definitions, and default
     or binding-pattern generator parameters are outside the admitted
     generator subset. Because no throw resumption can reach a synchronous
@@ -1605,8 +1630,10 @@ must never shrink by reclassification alone.
     a `throw` delivered to an asynchronous generator suspended inside a
     `yield*` over a synchronous generator finds no `throw` method on that
     generator, so the delegation closes it and reports a `TypeError` where
-    the specification forwards the completion. Owner: the functions and
-    executable syntax stream.
+    the specification forwards the completion.
+    *test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result.js*
+    is the reviewed candidate that turns on it and stays outside the reviewed
+    subset. Owner: the functions and executable syntax stream.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. Reaching either needs `Object.getPrototypeOf`, and
     creating a generator function from one needs the dynamic-source
@@ -1632,10 +1659,17 @@ must never shrink by reclassification alone.
     memory need runtime and harness capabilities that do not exist yet;
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
-    *compareArray.js*, and *propertyHelper.js* only. Cases that include
-    *asyncHelpers.js* or *promiseHelper.js* stay out of the reviewed subset
-    until those includes have reviewed implementations. Owner: the
-    standards harness expansion in [*PLAN-M5.md*](../PLAN-M5.md).
+    *asyncHelpers.js*, *compareArray.js*, and *propertyHelper.js* only. Cases
+    that include *promiseHelper.js* or *nativeFunctionMatcher.js* stay out of
+    the reviewed subset until those includes have reviewed implementations;
+    the eight *test/built-ins/Function/prototype/toString/* cases the
+    `async-iteration` tag reaches need the second of them. The reviewed
+    *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
+    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and its
+    `assert.throwsAsync` reports a constructor mismatch without composing a
+    message from the observed value, because this profile admits neither
+    `globalThis` nor generic string coercion. Owner: the standards harness
+    expansion in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host
     contract tolerates one. Cases that deliberately leave a rejection
