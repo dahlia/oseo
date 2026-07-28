@@ -478,15 +478,23 @@ the `Function`, `GeneratorFunction`, `AsyncFunction`, and
 counted here, because separating them from the non-compiling members of those
 families needs the per-case review M5c performs.
 
-Its remaining families are ordered by dependency, using inventory counts only
-to break ties:
+The four largest families were taken first, in dependency order, using
+inventory counts only to break ties. All four have landed, across eighteen
+merged units from `fa119c7` to `8f2fff6`.
 
-| Order | Family                 | Inventory paths |
-| ----- | ---------------------- | --------------- |
-| 1     | Object literals        | 1,170           |
-| 2     | Synchronous generators | 640             |
-| 3     | Classes                | 8,494           |
-| 4     | Asynchronous iteration | 2,231           |
+| Order | Family                 | Inventory paths | Status       |
+| ----- | ---------------------- | --------------- | ------------ |
+| 1     | Object literals        | 1,170           | Units landed |
+| 2     | Synchronous generators | 640             | Units landed |
+| 3     | Classes                | 8,494           | Units landed |
+| 4     | Asynchronous iteration | 2,231           | Units landed |
+
+Units landed is not the same as fully admitted. The profile still records open
+behavior in every one of these families, including generator and asynchronous
+generator method definitions, static private class members,
+`%GeneratorPrototype%.throw`, and the suspension model a `for await` step uses.
+Each count is the size of the family in the inventory, not a total of admitted
+paths.
 
 Each count is the deduplicated set of included paths under the directories that
 family owns. Classes cover *expressions/class/*, *statements/class/*, and
@@ -494,18 +502,26 @@ family owns. Classes cover *expressions/class/*, *statements/class/*, and
 *async-generator/* directories, and the `AsyncGeneratorPrototype`,
 `AsyncGeneratorFunction`, and `AsyncIteratorPrototype` intrinsics.
 
-Object literals come first because their accessors, computed keys, and
+Object literals came first because their accessors, computed keys, and
 shorthand methods share lowering with class elements. Synchronous generators
-precede asynchronous iteration because the asynchronous forms extend their
-suspension records. Classes are the largest family in the checkpoint, near
-four times the next one, and they decompose into many units covering methods,
+preceded asynchronous iteration because the asynchronous forms extend their
+suspension records. Classes decomposed into nine units covering methods,
 accessors, static members, fields, private names, static blocks, `super`, and
-inheritance; the count is what those units eventually reach together, not one
+inheritance. A count is an upper bound on direct promotion rather than a
+forecast, and many cases in a family also need machinery outside it.
+
+Those four are the largest families, not the whole checkpoint. M5a also owns
+the rest of the core language: optional chaining, tagged templates, and BigInt
+in the expression grammar, the `with` statement, the `arguments` object in
+function execution, and the parts of the class, generator, and asynchronous
+families that those units left open. Reading the table as the complete
+remaining scope is what makes a finished work queue look like a finished
 checkpoint.
 
-A count is an upper bound on direct promotion rather than a forecast. Many
-class expression cases also require machinery outside the family, so a family
-rarely promotes its whole count when it lands.
+M5a is complete when no entry in the known-gaps list of
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) names the core
+expressions and bindings stream or the functions and executable syntax stream
+as its owner. The profile is the test, not a work queue.
 
 M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
