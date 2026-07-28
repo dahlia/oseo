@@ -114,6 +114,68 @@ main();
 `,
   },
   {
+    name: "for-await-of-sync-step-order",
+    source: `
+function wrapped(next) {
+  return {
+    [Symbol.iterator]: function () { return { next: next }; },
+  };
+}
+// A wrapped synchronous iterator settles the promise its next method
+// returned by awaiting the stepped value, and the head awaits that promise
+// on top of it. Two chained reactions queued before the loop therefore
+// count the turns each step path costs. A path that reaches the wrapper's
+// own await, which every fulfilling step and a rejecting stepped value do,
+// spends two turns and reports after both reactions. A path that completes
+// abruptly before it, which a throwing next method, a non-object result,
+// and a throwing done or value getter do, rejects that same promise instead
+// of throwing to the head, so it spends one turn and reports between them.
+async function probe(label, next) {
+  const chain = Promise.resolve(0)
+    .then(function () { console.log(label, "one"); })
+    .then(function () { console.log(label, "two"); });
+  try {
+    for await (const value of wrapped(next)) {
+      console.log(label, "body", value);
+      return chain;
+    }
+    console.log(label, "exhausted");
+  } catch (error) {
+    // Only the name is reported, because a runtime's own TypeError text for
+    // a non-object step result is not part of the observed contract.
+    console.log(label, error.name);
+  }
+  return chain;
+}
+async function main() {
+  await probe("plain", function () { return { value: 1, done: false }; });
+  await probe("promised", function () {
+    return { value: Promise.resolve(2), done: false };
+  });
+  await probe("empty", function () { return { done: true }; });
+  await probe("emptyvalue", function () {
+    return { done: true, value: Promise.resolve(3) };
+  });
+  await probe("throwing", function () { throw new RangeError("step"); });
+  await probe("nonobject", function () { return 4; });
+  await probe("throwdone", function () {
+    return { get done() { throw new RangeError("done getter"); } };
+  });
+  await probe("throwvalue", function () {
+    return {
+      done: false,
+      get value() { throw new RangeError("value getter"); },
+    };
+  });
+  await probe("rejecting", function () {
+    return { value: Promise.reject(new RangeError("value")), done: false };
+  });
+  console.log("finished");
+}
+main();
+`,
+  },
+  {
     name: "for-await-of-sync-close-order",
     source: `
 function wrapped(returned) {

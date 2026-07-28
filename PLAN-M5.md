@@ -847,7 +847,11 @@ prototype and no properties, because nothing outside the loop reaches it.
 Each step awaits the result of the captured `next` method, requires an
 object, and reads `done` and `value`; a wrapped synchronous iterator instead
 awaits the stepped value, which is what makes a synchronous iterable of
-promises yield settled values. `AsyncIteratorClose` awaits the `return`
+promises yield settled values, and the head then awaits the promise the
+wrapper method settles. Every wrapper path reaches that outer await,
+including the abrupt ones that reject the same promise rather than throwing
+to the head, so a fallback step interleaves with queued jobs exactly where a
+reference host places it. `AsyncIteratorClose` awaits the `return`
 result and requires an object; the wrapper instead requires the synchronous
 result to be an object and then reads and awaits its `done` and `value`
 before completion precedence applies, so an in-flight body error still
@@ -877,7 +881,9 @@ land together.
 Native differential fixtures cover the synchronous fallback, generator and
 user iterables, `Symbol.asyncIterator` preference over `Symbol.iterator`,
 promised and direct step results, `done` and `value` accessor order,
-timer-driven steps, every head form, closures over per-iteration cells, the
+timer-driven steps, the turns a wrapped step and a wrapped close each spend
+against previously queued reactions,
+every head form, closures over per-iteration cells, the
 head's dead zone, every transfer, absent, promised, and throwing `return`
 methods, nested and `finally`-wrapped loops, and every catchable `TypeError`
 the protocol defines. A generated property with seed `0x5eed0011` draws

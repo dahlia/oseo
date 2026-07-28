@@ -724,10 +724,65 @@ static OseoResult async_from_sync_continuation(
 }
 
 /*
+ * The Await that a `for await` head and AsyncIteratorClose each perform on
+ * the promise a wrapper method returns, whatever that promise settles to.
+ * Every path through AsyncFromSyncIteratorPrototype.next and .return
+ * produces one, so the jobs queued before the step or the close run before
+ * the awaiting body resumes. It is a turn of its own even when the
+ * wrapper's own continuation already awaited the stepped value, because
+ * that inner await only settles the promise this one waits on. An abrupt
+ * path reaches it too, because IfAbruptRejectPromise rejects that same
+ * promise rather than throwing to the caller. The pending completion is
+ * carried across the drain the way the entry task checkpoint carries one,
+ * because the jobs it runs may raise and clear language errors of their
+ * own.
+ */
+static OseoResult await_wrapper_promise(
+    OseoContext *context,
+    OseoResult completion
+) {
+    /* A host diagnostic is terminal, so no further job runs after it. */
+    if (completion.status == OSEO_STATUS_THROW && context->has_diagnostic) {
+        return completion;
+    }
+    const char *error_code = context->error_code;
+    const char *error_message = context->error_message;
+    const char *source_id = context->source_id;
+    size_t source_id_length = context->source_id_length;
+    size_t line = context->line;
+    size_t column = context->column;
+    bool had_diagnostic = context->has_diagnostic;
+    OseoValue slots[1] = {completion.value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult drained = oseo_internal_await_step(context, oseo_undefined());
+    oseo_roots_pop(context, &frame);
+    if (drained.status != OSEO_STATUS_NORMAL && context->has_diagnostic) {
+        return drained;
+    }
+    if (completion.status == OSEO_STATUS_NORMAL) {
+        if (drained.status != OSEO_STATUS_NORMAL) return drained;
+        drained.value = slots[0];
+        return drained;
+    }
+    context->error_code = error_code;
+    context->error_message = error_message;
+    context->has_diagnostic = had_diagnostic;
+    context->source_id = source_id;
+    context->source_id_length = source_id_length;
+    context->line = line;
+    context->column = column;
+    completion.value = slots[0];
+    return completion;
+}
+
+/*
  * One asynchronous iteration step: call the captured next method, await
  * its result, require an object, and read `done` and `value`. A wrapped
- * synchronous iterator instead awaits the stepped value itself, so the
- * two records report the same contract to one loop lowering.
+ * synchronous iterator instead runs the wrapper's own continuation, which
+ * awaits the stepped value, and the head then awaits the promise that
+ * continuation settles, so the two records report the same contract to one
+ * loop lowering across the same number of turns.
  */
 OseoResult oseo_async_iterator_next(
     OseoContext *context,
@@ -764,12 +819,30 @@ OseoResult oseo_async_iterator_next(
                 "The iterator result is not an object."
             );
         }
+        bool stepped_done = true;
         if (result.status == OSEO_STATUS_NORMAL) {
-            result =
-                async_from_sync_continuation(context, slots[2], value, done);
+            result = async_from_sync_continuation(
+                context,
+                slots[2],
+                &slots[3],
+                &stepped_done
+            );
+        }
+        /*
+         * The head awaits the promise the wrapper's next method returned,
+         * which the continuation's await of the stepped value only settles.
+         * The stepped value stays rooted across that turn and reaches the
+         * caller only once it survives, because the drain runs jobs that
+         * allocate.
+         */
+        result = await_wrapper_promise(context, result);
+        if (result.status == OSEO_STATUS_NORMAL && !stepped_done) {
+            *value = slots[3];
+            *done = false;
         }
         oseo_roots_pop(context, &frame);
-        return result;
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        return normal(oseo_boolean(!*done));
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_await_step(context, slots[2]);
@@ -805,52 +878,6 @@ OseoResult oseo_async_iterator_next(
     oseo_roots_pop(context, &frame);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(oseo_boolean(!*done));
-}
-
-/*
- * The Await that AsyncIteratorClose performs on the wrapper's promise
- * whatever that promise settles to. Every path through
- * AsyncFromSyncIteratorPrototype.return produces one, so the jobs queued
- * before the close run before the closing body resumes. It is a turn of
- * its own even when the wrapper's own continuation already awaited the
- * stepped value, because that inner await only settles the promise this
- * one waits on. The pending completion is carried across the drain the
- * way the entry task checkpoint carries one, because the jobs it runs may
- * raise and clear language errors of their own.
- */
-static OseoResult drain_wrapper_close(
-    OseoContext *context,
-    OseoResult completion
-) {
-    /* A host diagnostic is terminal, so no further job runs after it. */
-    if (completion.status == OSEO_STATUS_THROW && context->has_diagnostic) {
-        return completion;
-    }
-    const char *error_code = context->error_code;
-    const char *error_message = context->error_message;
-    const char *source_id = context->source_id;
-    size_t source_id_length = context->source_id_length;
-    size_t line = context->line;
-    size_t column = context->column;
-    bool had_diagnostic = context->has_diagnostic;
-    OseoValue slots[1] = {completion.value};
-    OseoRootFrame frame = {NULL, slots, 1u};
-    oseo_roots_push(context, &frame);
-    OseoResult drained = oseo_internal_await_step(context, oseo_undefined());
-    oseo_roots_pop(context, &frame);
-    if (drained.status != OSEO_STATUS_NORMAL && context->has_diagnostic) {
-        return drained;
-    }
-    if (completion.status == OSEO_STATUS_NORMAL) return drained;
-    context->error_code = error_code;
-    context->error_message = error_message;
-    context->has_diagnostic = had_diagnostic;
-    context->source_id = source_id;
-    context->source_id_length = source_id_length;
-    context->line = line;
-    context->column = column;
-    completion.value = slots[0];
-    return completion;
 }
 
 /*
@@ -933,7 +960,7 @@ OseoResult oseo_async_iterator_close(
      * its own: the continuation's await of the stepped value settles that
      * promise rather than consuming this one.
      */
-    if (from_sync) result = drain_wrapper_close(context, result);
+    if (from_sync) result = await_wrapper_promise(context, result);
     if (from_error) {
         // The in-flight error stays authoritative, so the result check
         // below never runs and only a host diagnostic propagates.
