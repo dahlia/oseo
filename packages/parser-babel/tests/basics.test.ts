@@ -1158,8 +1158,8 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
-    ["class C { *step() {} }", /method generator functions/u],
-    ["class C { static *step() {} }", /method generator functions/u],
+    ["class C { *step() {} }", /Generator method definitions/u],
+    ["class C { static *step() {} }", /Generator method definitions/u],
     ["class C { constructor() {} constructor() {} }", /one constructor/u],
   ];
   for (const [source, message] of cases) {

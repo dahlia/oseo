@@ -5,6 +5,6 @@ import { cRuntimeProvider } from "../src/index.ts";
 
 test("provides the reviewed C runtime inputs", () => {
   const runtime = cRuntimeProvider.getRuntimeInput();
-  assert.equal(runtime.abiVersion, "m5-23");
-  assert.equal(runtime.assets.length, 14);
+  assert.equal(runtime.abiVersion, "m5-24");
+  assert.equal(runtime.assets.length, 15);
 });

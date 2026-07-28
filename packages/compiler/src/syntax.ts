@@ -633,6 +633,7 @@ export type FunctionKind =
   | "arrow"
   | "async"
   | "async-arrow"
+  | "async-generator"
   | "class"
   | "generator"
   | "method"

@@ -36,9 +36,9 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 2,880 reviewed cases: 1,511 passes, 988 expected
-negatives, and 381 unsupported profile features. It records no semantic or
-harness failures.
+The current manifest contains 3,851 reviewed cases: 1,732 passes, 1,107
+expected negatives, and 1,012 unsupported profile features. It records no
+semantic or harness failures.
 
 
 Capability groups
@@ -695,11 +695,12 @@ its deliberate boundary and its evidence:
     from the inner iterator itself. `yield*` therefore delegates to arrays,
     other generators, nested delegations, and any hand-written iterable, and
     an `IteratorClose` on the delegating generator reaches the delegated
-    iterator first. Deliberate boundaries: `%GeneratorPrototype%.throw`,
-    asynchronous generators, and generator method definitions in object
-    literals are rejected with source-located diagnostics. No throw
-    resumption can reach a body while `%GeneratorPrototype%.throw` is
-    unimplemented, so a delegating expression never reads the inner
+    iterator first. Deliberate boundaries: `%GeneratorPrototype%.throw` and
+    generator method definitions in object literals are rejected with
+    source-located diagnostics. No throw
+    resumption can reach a synchronous body while
+    `%GeneratorPrototype%.throw` is unimplemented, so a synchronous
+    delegating expression never reads the inner
     iterator's `throw` method. Default and
     binding-pattern generator parameters are also rejected, because this
     profile lowers them as body statements that the generator body would only
@@ -1383,6 +1384,86 @@ its deliberate boundary and its evidence:
     `for await` head over a string still fails, because primitive iteration
     is unsupported. A suspension inside the loop drains the scheduler instead
     of returning to the caller, which the gap entry below owns.
+ -  Asynchronous generator functions. `async function*` declarations and
+    function expressions are admitted, and calling one runs its parameter and
+    environment prologue and returns a suspended asynchronous generator whose
+    `[[Prototype]]` is the function's own `prototype` object. That object
+    inherits from a lazily created `%AsyncGeneratorPrototype%`, which serves
+    virtualized `next`, `return`, `throw`, and `Symbol.asyncIterator` methods,
+    so a generator is its own asynchronous iterable and a `for await` head
+    consumes it through the ordinary protocol. An asynchronous generator
+    function is not constructible and carries no `constructor` on its
+    `prototype` object.
+    An asynchronous generator body reuses the generator suspension record: it
+    suspends at `await` as well as at `yield`, so `await` is admitted in
+    ordinary expression positions inside such a body rather than only in the
+    M4 continuation positions. The frontend's existing destructuring
+    restriction still applies to an asynchronous generator body: `await`
+    inside a computed member of an assignment target, a computed binding
+    property name, or an array or object binding default is rejected with a
+    source-located diagnostic, because this profile lowers a pattern's
+    subexpressions before the suspension machinery reaches them.
+    `next`, `return`, and `throw` each enqueue one
+    AsyncGeneratorRequest and return its promise immediately; the queue's head
+    owns the running step, so a call that arrives while the body runs or
+    awaits waits its turn instead of reaching a running body, and every step
+    reports through the promise its own call returned. A suspension on `await`
+    installs reactions on the operand and returns to the caller, so a fulfilled
+    operand resumes the body with its value and a rejected one raises a throw
+    completion at the await position, which every enclosing `catch`,
+    `finally`, and iterator close still observes. A body that completes
+    normally reports `{ value, done: true }`, and one that throws rejects the
+    step's promise and completes the generator.
+    `yield` awaits its operand before the step reports it, so a yielded
+    promise reaches the consumer as its settled value, and `return expr`
+    awaits its operand for the same reason while a bare `return` awaits
+    nothing. A `return` resumption awaits the value it delivers before the
+    body leaves through the return completion, and a `return` or `throw` that
+    reaches a generator suspended at its start or already completed completes
+    it without entering the body: `return` awaits and reports its value,
+    `throw` rejects, and a later `next` reports `{ undefined, true }`.
+    `yield*` acquires the operand's asynchronous iterator, falling back to the
+    wrapped synchronous protocol, and forwards every resumption to it. Each
+    step awaits the inner result, requires an object, and reports
+    `IteratorValue` rather than the inner result object, because the outer
+    step is an AsyncGeneratorYield and that step awaits nothing; a promise the
+    delegated iterator produced therefore reaches the consumer unchanged. A
+    return resumption steps the inner `return` and a throw resumption steps
+    the inner `throw`; either method reporting a done result ends the
+    delegation, a return ending it leaves the body through the return
+    completion, and a throw ending it completes the delegating expression with
+    the reported value. An inner iterator with no `throw` method is closed and
+    the delegation reports a catchable `TypeError`.
+    Deliberate boundaries: asynchronous generator method definitions in object
+    literals and class bodies stay rejected with the same diagnostic
+    synchronous generator methods get, and default or binding-pattern
+    parameters stay rejected for the same ordering reason. `%AsyncGenerator%`,
+    `%AsyncGeneratorFunction%`, and `%AsyncIteratorPrototype%` are not
+    materialized, matching how `%GeneratorPrototype%` is virtualized, so the
+    reviewed *test/built-ins/AsyncGeneratorFunction/* cases carry the
+    `dynamic-source` dependency tag. The awaits a `yield*` step takes drain
+    the scheduler rather than returning to the caller, which the `for await`
+    gap entry below owns.
+    Native differential fixtures cover single and repeated yields, sent
+    values, awaited and promised operands, an empty body, an awaited explicit
+    return, function `length`, `name`, and inferred `name`, self-iterability
+    through `Symbol.asyncIterator`, the absent `Symbol.iterator`, a shared
+    method identity across two generators, the `prototype` object's own
+    property set with no `constructor`, `in` agreeing with a property read on
+    the virtualized `next`, `return`, `throw`, and `Symbol.asyncIterator`,
+    non-constructibility, `throw` into
+    `try`/`catch`, `return` through `finally` including a `finally` that
+    awaits and one that yields, unstarted `return` and `throw`, delegation to
+    arrays, synchronous generators, asynchronous generators, nested
+    delegations, and a hand-written asynchronous iterator whose `return` and
+    `throw` are forwarded, the missing-`throw` `TypeError`, rejected awaits
+    caught and uncaught, body throws, timer-driven awaits, queued requests
+    resolved in order, a misapplied method that rejects rather than throws,
+    and the exact microtask interleaving of two generators against five
+    chained reactions. A generated property with seed `0x5eed0018` draws
+    bounded bodies, awaited and promised operands, three delegation kinds,
+    `try`/`catch` and `try`/`finally` guards, and every resumption position
+    under both specialization policies and forced collection.
 
 
 Known gaps inside the claim
@@ -1445,10 +1526,14 @@ must never shrink by reclassification alone.
     binding is admitted. Owner: the intrinsics and built-in objects
     stream; the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends
     on this unit.
- -  `await` is restricted to the M4 positions; asynchronous generators and
-    asynchronous module cycles are unsupported. Owner: the
-    functions and executable syntax stream.
- -  A `for await` step suspends by draining the scheduler rather than by
+ -  Inside an ordinary asynchronous function body, `await` is restricted to
+    the M4 continuation positions, and asynchronous module cycles are
+    unsupported. An asynchronous generator body has no such restriction,
+    because it suspends through its own saved frame rather than through the
+    frontend's continuation split. Owner: the functions and executable syntax
+    stream.
+ -  A `for await` step, and each step of a `yield*` inside an asynchronous
+    generator, suspends by draining the scheduler rather than by
     returning to the caller. The frontend splits an `await` expression into
     continuations, and a loop has no such split, so each step resolves its
     promise, runs the queued jobs in order, and advances timers until that
@@ -1461,15 +1546,20 @@ must never shrink by reclassification alone.
     stay outside the reviewed subset:
     *async-from-sync-iterator-continuation-abrupt-completion-get-constructor.js*
     and the three _ticks-with-\*-constructor-lookup_ cases, which also need
-    `Promise` as a value. Closing it needs a real suspension record for
-    asynchronous function bodies, the same machinery asynchronous generators
-    need, so the two land together. Owner: the functions and executable
-    syntax stream.
+    `Promise` as a value. Closing it needs the suspension record asynchronous
+    generators now own to reach ordinary asynchronous function bodies and the
+    delegation steps as well. Owner: the functions and executable syntax
+    stream.
  -  `%GeneratorPrototype%.throw`, generator method definitions, and default
     or binding-pattern generator parameters are outside the admitted
-    generator subset. Because no throw resumption can reach a body, the
-    `throw` branch of `yield*` is unreachable and unimplemented. Owner: the
-    functions and executable syntax stream.
+    generator subset. Because no throw resumption can reach a synchronous
+    body, the `throw` branch of the synchronous `yield*` is unreachable and
+    unimplemented. The missing method is observable one step further out:
+    a `throw` delivered to an asynchronous generator suspended inside a
+    `yield*` over a synchronous generator finds no `throw` method on that
+    generator, so the delegation closes it and reports a `TypeError` where
+    the specification forwards the completion. Owner: the functions and
+    executable syntax stream.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. Reaching either needs `Object.getPrototypeOf`, and
     creating a generator function from one needs the dynamic-source

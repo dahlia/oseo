@@ -33,6 +33,11 @@ typedef enum {
      * non-enumerable, non-configurable `prototype` object that carries
      * the class's methods, and never callable without `new`. */
     OSEO_FUNCTION_CLASS = 7,
+    /* Like OSEO_FUNCTION_GENERATOR, but the generator it returns reports
+     * every step through a promise and its body suspends to await as
+     * well as to yield. Its `prototype` object serves the virtualized
+     * %AsyncGeneratorPrototype% methods. */
+    OSEO_FUNCTION_ASYNC_GENERATOR = 8,
 } OseoFunctionKind;
 
 /*
@@ -163,6 +168,11 @@ struct OseoContext {
     OseoValue generator_next_function;
     OseoValue generator_return_function;
     OseoValue generator_prototype;
+    OseoValue async_generator_next_function;
+    OseoValue async_generator_return_function;
+    OseoValue async_generator_throw_function;
+    OseoValue async_generator_prototype;
+    OseoValue async_iterator_self_function;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
@@ -387,23 +397,37 @@ size_t oseo_generator_resume_point(OseoValue generator);
  * How the pending resumption delivers `sent`. A normal resumption
  * continues at the suspension's resume block; a return resumption leaves
  * the body from the suspension point, so generated code branches to the
- * block that runs the enclosing `finally` and iterator-close chain.
+ * block that runs the enclosing `finally` and iterator-close chain; a
+ * throw resumption raises `sent` at the suspension point. Only an
+ * asynchronous generator body receives a throw resumption, either from
+ * `%AsyncGeneratorPrototype%.throw` or from an awaited rejection.
  */
 #define OSEO_GENERATOR_RESUME_NEXT ((size_t)0u)
 #define OSEO_GENERATOR_RESUME_RETURN ((size_t)1u)
+#define OSEO_GENERATOR_RESUME_THROW ((size_t)2u)
 size_t oseo_generator_resume_kind(OseoValue generator);
+/*
+ * What a pending suspension asked its driver for. A yield leaves an
+ * iteration step; an await leaves an operand the driver settles before
+ * it resumes the body, and no consumer observes it. Only an asynchronous
+ * generator body suspends to await.
+ */
+#define OSEO_GENERATOR_SUSPEND_YIELD ((size_t)0u)
+#define OSEO_GENERATOR_SUSPEND_AWAIT ((size_t)1u)
 /*
  * Records the block that the next resumption continues at and marks the
  * generator suspended. Generated code calls this immediately before
- * leaving a body with a yielded value. `result_object` is true when that
- * value already is a complete iterator result object, as it is for
- * `yield*`, which forwards the inner iterator's own result unchanged.
+ * leaving a body with a yielded or awaited value. `result_object` is
+ * true when that value already is a complete iterator result object, as
+ * it is for a synchronous `yield*`, which forwards the inner iterator's
+ * own result unchanged.
  */
 void oseo_generator_suspend(
     OseoContext *context,
     OseoValue generator,
     size_t resume_point,
-    bool result_object
+    bool result_object,
+    size_t suspend_reason
 );
 /*
  * %GeneratorPrototype%.next: resumes a suspended generator with `sent`
@@ -429,6 +453,31 @@ OseoResult oseo_generator_return(
     OseoContext *context,
     OseoValue generator,
     OseoValue value
+);
+/*
+ * %AsyncGeneratorPrototype%.next, .return, and .throw. Each enqueues one
+ * AsyncGeneratorRequest and returns its promise immediately: the step
+ * runs only while the queue's head owns it, so a call that arrives while
+ * the body is running or awaiting waits its turn instead of reaching a
+ * running body. A completed generator reports { undefined, true } from
+ * `next`, awaits the value it reports done from `return`, and rejects
+ * from `throw`. A receiver that is not an asynchronous generator rejects
+ * with a TypeError rather than throwing it.
+ */
+OseoResult oseo_async_generator_next(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue sent
+);
+OseoResult oseo_async_generator_return(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value
+);
+OseoResult oseo_async_generator_throw(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue reason
 );
 OseoResult oseo_argument_list_create(OseoContext *context);
 OseoResult oseo_argument_list_append(
@@ -852,6 +901,40 @@ OseoResult oseo_iterator_delegate_return(
     OseoContext *context,
     OseoValue iterator,
     OseoValue sent,
+    OseoValue *value,
+    bool *done
+);
+/*
+ * The three delegation steps a `yield*` inside an asynchronous generator
+ * takes. Each awaits the inner iterator's result before reading `done`
+ * and `value`, and each accepts either an asynchronous iterator or the
+ * wrapper `oseo_async_iterator_get` builds over a synchronous one.
+ *
+ * A return step over an iterator with no `return` method reports done
+ * with `sent`, which is the return completion the delegating body then
+ * leaves through. A throw step over an iterator with no `throw` method
+ * closes that iterator and reports a TypeError, because the delegating
+ * body has no way to deliver the throw completion it received.
+ */
+OseoResult oseo_async_iterator_delegate_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_async_iterator_delegate_return(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+);
+OseoResult oseo_async_iterator_delegate_throw(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue reason,
     OseoValue *value,
     bool *done
 );

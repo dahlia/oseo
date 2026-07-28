@@ -175,6 +175,7 @@ test("resumes a yield* delegation at the matching step", () => {
   );
   assert.ok(suspension?.terminator.kind === "generator-yield");
   const { resume, returnResume } = suspension.terminator;
+  assert.ok(returnResume != null);
   const blocks = new Map(generator.blocks.map((block) => [block.id, block]));
   const targetOf = (id: number): number | undefined => {
     const terminator = blocks.get(id)?.terminator;
@@ -194,8 +195,14 @@ test("resumes a yield* delegation at the matching step", () => {
 
 test("rejects generator forms outside the admitted unit", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    ["async function* both() { yield 1; }", /Asynchronous and method/u],
-    ["const holder = { *method() { yield 1; } };", /Asynchronous and method/u],
+    [
+      "const holder = { *method() { yield 1; } };",
+      /Generator method definitions/u,
+    ],
+    [
+      "async function* defaulted(value = 1) { yield value; }",
+      /default and binding-pattern parameters/u,
+    ],
     [
       "function* defaulted(value = 1) { yield value; }",
       /default and binding-pattern parameters/u,

@@ -481,11 +481,17 @@ function emitIteratorOperation(
   }
   if (
     operation.kind === "iterator-delegate-next" ||
-    operation.kind === "iterator-delegate-return"
+    operation.kind === "iterator-delegate-return" ||
+    operation.kind === "iterator-delegate-throw"
   ) {
     // A delegating step reports the inner iterator's value even when the
     // result is done, because `yield*` reports that value as its own.
     const delegatingNext = operation.kind === "iterator-delegate-next";
+    const step = delegatingNext
+      ? "next"
+      : operation.kind === "iterator-delegate-return"
+        ? "return"
+        : "throw";
     const value = operation.iteratorValueResult;
     if (value == null) {
       throw new Error(`MIR iterator delegation %${operation.id} has no value.`);
@@ -499,8 +505,7 @@ function emitIteratorOperation(
     line(state, `bool ${done} = true;`);
     line(
       state,
-      `result = oseo_iterator_delegate_` +
-        `${delegatingNext ? "next" : "return"}(context, ` +
+      `result = oseo_${asynchronous}iterator_delegate_${step}(context, ` +
         `roots[${operationArgument(operation, 0)}], ${inner}, ` +
         `&roots[${value}], &${done});`,
     );
@@ -991,6 +996,7 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
     arrow: "OSEO_FUNCTION_ARROW",
     async: "OSEO_FUNCTION_ASYNC",
     "async-arrow": "OSEO_FUNCTION_ASYNC_ARROW",
+    "async-generator": "OSEO_FUNCTION_ASYNC_GENERATOR",
     class: "OSEO_FUNCTION_CLASS",
     generator: "OSEO_FUNCTION_GENERATOR",
     method: "OSEO_FUNCTION_METHOD",
@@ -1570,6 +1576,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "iterator-next" ||
     operation.kind === "iterator-delegate-next" ||
     operation.kind === "iterator-delegate-return" ||
+    operation.kind === "iterator-delegate-throw" ||
     operation.kind === "iterator-close"
   ) {
     emitIteratorOperation(state, operation);
@@ -1668,12 +1675,18 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     emitNormalReturn(state, `roots[${terminator.value}]`);
   } else if (terminator.kind === "generator-yield") {
     // `yield*` suspends with the inner iterator's own result object, so
-    // the resumption reports it instead of creating a fresh one.
+    // the resumption reports it instead of creating a fresh one. An
+    // awaited suspension leaves no iteration step at all, so the driver
+    // settles the value instead of reporting it.
     const resultObject = terminator.resultObject === true ? "true" : "false";
+    const reason =
+      terminator.awaited === true
+        ? "OSEO_GENERATOR_SUSPEND_AWAIT"
+        : "OSEO_GENERATOR_SUSPEND_YIELD";
     line(
       state,
       `oseo_generator_suspend(context, generator, ${terminator.resume}u, ` +
-        `${resultObject});`,
+        `${resultObject}, ${reason});`,
     );
     line(
       state,
@@ -1891,7 +1904,13 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
     if (block.terminator.kind === "jump") {
       pending.push(block.terminator.target);
     } else if (block.terminator.kind === "generator-yield") {
-      pending.push(block.terminator.resume, block.terminator.returnResume);
+      pending.push(block.terminator.resume);
+      if (block.terminator.returnResume != null) {
+        pending.push(block.terminator.returnResume);
+      }
+      if (block.terminator.throwResume != null) {
+        pending.push(block.terminator.throwResume);
+      }
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
     } else if (
@@ -1958,9 +1977,11 @@ function hasSelfCall(functionValue: MirFunction): boolean {
 /** Where one suspension continues, by the kind of resumption it receives. */
 interface ResumePoint {
   /** The block a return completion continues at instead of the resume block. */
-  readonly returnResume: number;
+  readonly returnResume?: number;
   /** The slot receiving the value the resumption delivers. */
   readonly sent: number;
+  /** The block a throw completion continues at instead of the resume block. */
+  readonly throwResume?: number;
 }
 
 /** Resume block identifiers paired with their resumption continuations. */
@@ -1970,9 +1991,15 @@ function yieldResumePoints(
   const points = new Map<number, ResumePoint>();
   for (const block of blocks) {
     if (block.terminator.kind !== "generator-yield") continue;
-    points.set(block.terminator.resume, {
-      returnResume: block.terminator.returnResume,
-      sent: block.terminator.sent,
+    const terminator = block.terminator;
+    points.set(terminator.resume, {
+      ...(terminator.returnResume == null
+        ? {}
+        : { returnResume: terminator.returnResume }),
+      sent: terminator.sent,
+      ...(terminator.throwResume == null
+        ? {}
+        : { throwResume: terminator.throwResume }),
     });
   }
   return points;
@@ -2082,12 +2109,25 @@ function emitBlocks(
     if (resume != null) {
       line(state, `roots[${resume.sent}] = oseo_generator_sent(generator);`);
       // A return completion leaves the body from this suspension point, so
-      // it runs every enclosing `finally` and iterator close on the way out.
-      line(
-        state,
-        `if (oseo_generator_resume_kind(generator) == ` +
-          `OSEO_GENERATOR_RESUME_RETURN) goto bb${resume.returnResume};`,
-      );
+      // it runs every enclosing `finally` and iterator close on the way out,
+      // and a throw completion raises the sent value there. Only a driver
+      // that can deliver a resumption emits its branch: a synchronous body
+      // receives no throw completion, and an awaited suspension receives no
+      // return completion.
+      if (resume.returnResume != null) {
+        line(
+          state,
+          `if (oseo_generator_resume_kind(generator) == ` +
+            `OSEO_GENERATOR_RESUME_RETURN) goto bb${resume.returnResume};`,
+        );
+      }
+      if (resume.throwResume != null) {
+        line(
+          state,
+          `if (oseo_generator_resume_kind(generator) == ` +
+            `OSEO_GENERATOR_RESUME_THROW) goto bb${resume.throwResume};`,
+        );
+      }
     }
     for (const operation of block.operations) {
       emitOperation(state, operation);

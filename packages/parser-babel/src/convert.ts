@@ -3120,11 +3120,16 @@ export function functionDeclaration(
   derivedElement = false,
 ): SyntaxFunction | undefined {
   const generator = value.generator === true;
-  if (generator && (value.async === true || memberKind != null)) {
+  // An asynchronous generator body is a generator body: it suspends at
+  // `await` and at `yield` through the same saved frame, so it never
+  // reaches the continuation split an ordinary asynchronous function
+  // takes. Only the method definition forms stay outside the profile.
+  const asyncGenerator = generator && value.async === true;
+  if (generator && memberKind != null) {
     return unsupported(
       context,
       value,
-      "Asynchronous and method generator functions are unsupported.",
+      "Generator method definitions are unsupported.",
     );
   }
   if (value.typeParameters != null) {
@@ -3432,7 +3437,7 @@ export function functionDeclaration(
       },
     ];
   };
-  if (value.async === true) {
+  if (value.async === true && !asyncGenerator) {
     if (!validateAsyncContinuationCount(context, children)) {
       context.receiverStack.pop();
       context.functionStack.pop();
@@ -3490,10 +3495,12 @@ export function functionDeclaration(
         ? value.async === true
           ? "async-arrow"
           : "arrow"
-        : value.async === true
-          ? "async"
-          : generator
-            ? "generator"
+        : generator
+          ? asyncGenerator
+            ? "async-generator"
+            : "generator"
+          : value.async === true
+            ? "async"
             : (memberKind ?? "ordinary"),
     kind: "function",
     name,

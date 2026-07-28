@@ -57,6 +57,10 @@ static void trace_object(
             mark_value(generator->callee, worklist);
             mark_value(generator->receiver, worklist);
             mark_value(generator->sent, worklist);
+            /* The pending AsyncGeneratorRequest queue is reachable only
+             * through the generator that accepted it. */
+            mark_value(generator->request_head, worklist);
+            mark_value(generator->request_tail, worklist);
             /* The suspended body's roots, including its saved
              * completion values, live only here. */
             for (size_t index = 0u;
@@ -120,6 +124,12 @@ static void trace_object(
         OseoPromiseAggregate *aggregate = (OseoPromiseAggregate *)object;
         mark_value(aggregate->capability, worklist);
         mark_value(aggregate->values, worklist);
+    } else if (object->kind == OSEO_HEAP_ASYNC_GENERATOR_REQUEST) {
+        OseoAsyncGeneratorRequest *request =
+            (OseoAsyncGeneratorRequest *)object;
+        mark_value(request->next, worklist);
+        mark_value(request->capability, worklist);
+        mark_value(request->value, worklist);
     } else if (object->kind == OSEO_HEAP_TIMER) {
         OseoTimer *timer = (OseoTimer *)object;
         mark_value(timer->next, worklist);
@@ -180,6 +190,11 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->generator_next_function, &worklist);
     mark_value(context->generator_return_function, &worklist);
     mark_value(context->generator_prototype, &worklist);
+    mark_value(context->async_generator_next_function, &worklist);
+    mark_value(context->async_generator_return_function, &worklist);
+    mark_value(context->async_generator_throw_function, &worklist);
+    mark_value(context->async_generator_prototype, &worklist);
+    mark_value(context->async_iterator_self_function, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;
