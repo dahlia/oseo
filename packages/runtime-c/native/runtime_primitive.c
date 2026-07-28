@@ -1436,17 +1436,9 @@ OseoResult oseo_has_property(
               oseo_internal_iterator_key_matches(context, property)))) {
             return normal(oseo_boolean(true));
         }
-        /* The same virtualized keys %AsyncGeneratorPrototype% serves on a
-         * property read, so `in` and a read agree on what the brand
-         * carries. */
-        if (object->async_generator_prototype &&
-            (oseo_internal_string_is_ascii(property, "next") ||
-             oseo_internal_string_is_ascii(property, "return") ||
-             oseo_internal_string_is_ascii(property, "throw") ||
-             (object->default_intrinsics &&
-              oseo_internal_async_iterator_key_matches(context, property)))) {
-            return normal(oseo_boolean(true));
-        }
+        /* The asynchronous generator intrinsics need no case of their own:
+         * every method they carry is an ordinary own property, so the
+         * own-descriptor check above already reported it. */
         if (is_array(current) && object->default_intrinsics &&
             oseo_internal_iterator_key_matches(context, property)) {
             return normal(oseo_boolean(true));

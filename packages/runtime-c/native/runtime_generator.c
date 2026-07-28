@@ -41,24 +41,315 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
     return result;
 }
 
+static OseoResult ascii_generator_string(
+    OseoContext *context,
+    const char *text
+) {
+    size_t length = strlen(text);
+    uint16_t *units = NULL;
+    if (length > 0u) {
+        units = malloc(length * sizeof(uint16_t));
+        if (units == NULL) {
+            return failure(context, "OSEO2001", "String allocation failed.");
+        }
+        for (size_t index = 0u; index < length; index += 1u) {
+            units[index] = (uint16_t)(unsigned char)text[index];
+        }
+    }
+    OseoResult result = oseo_internal_allocate_string(context, units, length);
+    free(units);
+    return result;
+}
+
+/* Define one ASCII-named data property; object and value stay rooted. */
+static OseoResult define_ascii_property(
+    OseoContext *context,
+    OseoValue object,
+    const char *name,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    OseoValue slots[3] = {object, value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_generator_string(context, name);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[2] = result.value;
+        result = oseo_object_define(
+            context,
+            slots[0],
+            slots[2],
+            slots[1],
+            attributes
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The same for a well-known symbol key; object and value stay rooted. */
+static OseoResult define_symbol_property(
+    OseoContext *context,
+    OseoValue object,
+    size_t well_known,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+) {
+    OseoValue slots[3] = {object, value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        oseo_internal_well_known_symbol(context, well_known);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[2] = result.value;
+        result = oseo_object_define(
+            context,
+            slots[0],
+            slots[2],
+            slots[1],
+            attributes
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The same for `Symbol.toStringTag` and an ASCII tag value. */
+static OseoResult define_to_string_tag(
+    OseoContext *context,
+    OseoValue object,
+    const char *tag,
+    OseoPropertyAttributes attributes
+) {
+    OseoValue slots[1] = {object};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_generator_string(context, tag);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_symbol_property(
+            context,
+            slots[0],
+            OSEO_WELL_KNOWN_TO_STRING_TAG,
+            result.value,
+            attributes
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /*
- * %AsyncGeneratorPrototype%, the asynchronous counterpart of the object
- * above. It carries its own brand, because the two intrinsics share no
- * method: an asynchronous generator's `next` reports a promise and its
- * `Symbol.asyncIterator` is a distinct function from the synchronous
- * `Symbol.iterator`.
+ * Install one built-in method. Every method is cached on the context, so
+ * the value this defines is permanently rooted and two generators created
+ * from different functions share one method identity.
  */
-OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
+static OseoResult define_method(
+    OseoContext *context,
+    OseoValue object,
+    const char *name,
+    size_t code_id
+) {
+    /* A built-in method is writable, non-enumerable, and configurable. */
+    const OseoPropertyAttributes method = {true, false, true, false};
+    OseoValue slots[1] = {object};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result =
+        oseo_internal_async_generator_method(context, code_id);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_property(
+            context,
+            slots[0],
+            name,
+            result.value,
+            method
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * The asynchronous generator intrinsics, created as one cluster because
+ * their links are circular: %AsyncGeneratorFunction% names
+ * %AsyncGeneratorFunction.prototype% as its `prototype`, that object
+ * names the constructor back and %AsyncGeneratorPrototype% as its own
+ * `prototype`, and %AsyncGeneratorPrototype% names it as `constructor`.
+ * Every method is an ordinary own property of the object the
+ * specification places it on rather than a brand the property read
+ * synthesizes, so a descriptor read, a deletion, and an assignment all
+ * observe the same set a read does, and a generator function whose
+ * `prototype` is replaced reaches exactly the methods the replacement's
+ * chain still retains.
+ *
+ * The cluster reaches the context only after every property is defined,
+ * so a failed allocation leaves no partially wired intrinsic behind and
+ * the next reference rebuilds it. Its allocations are restored the way
+ * the error intrinsics restore theirs, because an intrinsic created on
+ * first use is not one the observed program performed.
+ *
+ * Three of the cluster's [[Prototype]] links stay null because this
+ * profile materializes neither %Object.prototype% nor the Function
+ * intrinsics: %AsyncIteratorPrototype% is specified to inherit from
+ * %Object.prototype%, %AsyncGeneratorFunction.prototype% from
+ * %Function.prototype%, and %AsyncGeneratorFunction% from %Function%.
+ */
+static OseoResult async_generator_intrinsics(OseoContext *context) {
     if (tag_of(context->async_generator_prototype) != OSEO_TAG_UNDEFINED) {
         return normal(context->async_generator_prototype);
     }
-    OseoResult result = oseo_object_create(context, oseo_null());
+    size_t entry_allocations = context->allocations;
+    const OseoPropertyAttributes hidden = {true, false, false, false};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    OseoOrdinaryObject *object = ordinary_object(result.value);
-    object->default_intrinsics = true;
-    object->async_generator_prototype = true;
-    context->async_generator_prototype = result.value;
+    result = oseo_object_create(context, oseo_null());
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[0])->default_intrinsics = true;
+        result = oseo_internal_async_generator_method(
+            context,
+            OSEO_ASYNC_ITERATOR_SELF_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoPropertyAttributes method = {true, false, true, false};
+        result = define_symbol_property(
+            context,
+            frame.slots[0],
+            OSEO_WELL_KNOWN_ASYNC_ITERATOR,
+            result.value,
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, frame.slots[0]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[1])->default_intrinsics = true;
+        result = define_method(
+            context,
+            frame.slots[1],
+            "next",
+            OSEO_ASYNC_GENERATOR_NEXT_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_method(
+            context,
+            frame.slots[1],
+            "return",
+            OSEO_ASYNC_GENERATOR_RETURN_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_method(
+            context,
+            frame.slots[1],
+            "throw",
+            OSEO_ASYNC_GENERATOR_THROW_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[2])->default_intrinsics = true;
+        result = oseo_environment_create(context, 0u);
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        static const uint16_t constructor_units[] = {
+            'A', 's', 'y', 'n', 'c', 'G', 'e', 'n', 'e', 'r', 'a', 't',
+            'o', 'r', 'F', 'u', 'n', 'c', 't', 'i', 'o', 'n'
+        };
+        result = oseo_function_create(
+            context,
+            OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID,
+            frame.slots[3],
+            constructor_units,
+            sizeof(constructor_units) / sizeof(*constructor_units),
+            1u,
+            OSEO_FUNCTION_ORDINARY,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoFunction *constructor = function_object(frame.slots[3]);
+        constructor->prototype_object = frame.slots[2];
+        constructor->prototype_writable = false;
+        constructor->ordinary.default_intrinsics = true;
+        result = define_ascii_property(
+            context,
+            frame.slots[2],
+            "constructor",
+            frame.slots[3],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_property(
+            context,
+            frame.slots[2],
+            "prototype",
+            frame.slots[1],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_to_string_tag(
+            context,
+            frame.slots[2],
+            "AsyncGeneratorFunction",
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_property(
+            context,
+            frame.slots[1],
+            "constructor",
+            frame.slots[2],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_to_string_tag(
+            context,
+            frame.slots[1],
+            "AsyncGenerator",
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->async_iterator_prototype = frame.slots[0];
+        context->async_generator_prototype = frame.slots[1];
+        context->async_generator_intrinsic = frame.slots[2];
+        context->async_generator_function = frame.slots[3];
+        result.value = frame.slots[1];
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    }
+    oseo_roots_release(context, &frame);
     return result;
+}
+
+OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
+    OseoResult result = async_generator_intrinsics(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(context->async_generator_prototype);
+}
+
+OseoResult oseo_internal_async_generator_intrinsic(OseoContext *context) {
+    OseoResult result = async_generator_intrinsics(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(context->async_generator_intrinsic);
 }
 
 OseoResult oseo_generator_create(

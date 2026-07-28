@@ -188,11 +188,13 @@ OseoResult oseo_function_create(
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");
     }
-    OseoResult result = oseo_roots_allocate(context, &frame, 9u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 10u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[5] = inferred_name;
     /* The [[Prototype]] of the created `prototype` object. */
     frame.slots[8] = oseo_null();
+    /* The [[Prototype]] of the function itself. */
+    frame.slots[9] = oseo_null();
     frame.slots[7] = function_kind == OSEO_FUNCTION_ARROW ||
         function_kind == OSEO_FUNCTION_ASYNC_ARROW
         ? lexical_this
@@ -219,6 +221,19 @@ OseoResult oseo_function_create(
             return result;
         }
     }
+    /* An asynchronous generator function itself inherits from
+     * %AsyncGeneratorFunction.prototype%, which is what makes its
+     * `constructor` reach %AsyncGeneratorFunction%. The synchronous
+     * counterpart has no materialized intrinsic yet, so a synchronous
+     * generator function keeps a null [[Prototype]]. */
+    if (function_kind == OSEO_FUNCTION_ASYNC_GENERATOR) {
+        result = oseo_internal_async_generator_intrinsic(context);
+        frame.slots[9] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+    }
     result = oseo_object_create(context, frame.slots[8]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL &&
@@ -235,7 +250,7 @@ OseoResult oseo_function_create(
         oseo_roots_release(context, &frame);
         return failure(context, "OSEO2001", "Function allocation failed.");
     }
-    function->ordinary.prototype = oseo_null();
+    function->ordinary.prototype = frame.slots[9];
     function->ordinary.properties = NULL;
     function->ordinary.property_capacity = 0u;
     function->ordinary.property_count = 0u;
@@ -256,7 +271,6 @@ OseoResult oseo_function_create(
     function->ordinary.async_sync_iterator = oseo_undefined();
     function->ordinary.default_intrinsics = true;
     function->ordinary.generator_prototype = false;
-    function->ordinary.async_generator_prototype = false;
     function->ordinary.generator = NULL;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
@@ -1239,6 +1253,17 @@ OseoResult oseo_call_function(
         );
     } else if (code_id == OSEO_ASYNC_ITERATOR_SELF_CODE_ID) {
         result = normal(receiver);
+    } else if (code_id == OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID) {
+        /* ADR 0016 keeps every form that compiles source text at run time
+         * outside the profile. The frontend rejects the ones it can see;
+         * a call reaching the intrinsic through the prototype chain
+         * reports the same boundary here instead of approximating it. */
+        result = failure(
+            context,
+            "OSEO1001",
+            "AsyncGeneratorFunction compiles source text at run time, "
+            "which is outside the admitted profile."
+        );
     } else if (code_id == OSEO_ASYNC_GENERATOR_NEXT_CODE_ID) {
         result = oseo_async_generator_next(
             context,

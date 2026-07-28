@@ -276,7 +276,6 @@ static OseoResult object_create(
     object->async_sync_iterator = oseo_undefined();
     object->default_intrinsics = default_intrinsics;
     object->generator_prototype = false;
-    object->async_generator_prototype = false;
     object->generator = NULL;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
@@ -330,7 +329,6 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->async_sync_iterator = oseo_undefined();
     array->default_intrinsics = true;
     array->generator_prototype = false;
-    array->async_generator_prototype = false;
     array->generator = NULL;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
@@ -573,37 +571,10 @@ static OseoResult object_get(
                 );
             }
         }
-        /* The same brand and lookup order for %AsyncGeneratorPrototype%,
-         * whose `next`, `return`, and `throw` are own properties of the
-         * intrinsic and whose `Symbol.asyncIterator` is inherited from
-         * %AsyncIteratorPrototype%. */
-        if (object->async_generator_prototype) {
-            if (oseo_internal_string_is_ascii(key, "next")) {
-                return oseo_internal_async_generator_method(
-                    context,
-                    OSEO_ASYNC_GENERATOR_NEXT_CODE_ID
-                );
-            }
-            if (oseo_internal_string_is_ascii(key, "return")) {
-                return oseo_internal_async_generator_method(
-                    context,
-                    OSEO_ASYNC_GENERATOR_RETURN_CODE_ID
-                );
-            }
-            if (oseo_internal_string_is_ascii(key, "throw")) {
-                return oseo_internal_async_generator_method(
-                    context,
-                    OSEO_ASYNC_GENERATOR_THROW_CODE_ID
-                );
-            }
-            if (object->default_intrinsics &&
-                oseo_internal_async_iterator_key_matches(context, key)) {
-                return oseo_internal_async_generator_method(
-                    context,
-                    OSEO_ASYNC_ITERATOR_SELF_CODE_ID
-                );
-            }
-        }
+        /* %AsyncGeneratorPrototype% and %AsyncIteratorPrototype% need no
+         * brand here: their methods are ordinary own properties of the
+         * intrinsic objects the cluster in *runtime_generator.c* builds,
+         * so the own-descriptor read above already found them. */
         if (is_array(current) && object->default_intrinsics &&
             oseo_internal_iterator_key_matches(context, key)) {
             return oseo_internal_iterator_method(

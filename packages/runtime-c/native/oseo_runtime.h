@@ -172,6 +172,12 @@ struct OseoContext {
     OseoValue async_generator_return_function;
     OseoValue async_generator_throw_function;
     OseoValue async_generator_prototype;
+    OseoValue async_iterator_prototype;
+    /* %AsyncGeneratorFunction.prototype% and the %AsyncGeneratorFunction%
+     * intrinsic it names, created with the two prototypes above because
+     * their `constructor` and `prototype` links are circular. */
+    OseoValue async_generator_intrinsic;
+    OseoValue async_generator_function;
     OseoValue async_iterator_self_function;
     OseoValue timer_head;
     const char *source_id;
