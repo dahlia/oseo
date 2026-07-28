@@ -62,7 +62,8 @@
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
 #define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)2u)
-#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)3u)
+#define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)3u)
+#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)4u)
 
 /*
  * The preferred-type hint passed to the generic ToPrimitive. The
@@ -246,6 +247,16 @@ typedef struct {
     bool array_iterator;
     OseoValue iterator_array;
     size_t iterator_index;
+    /*
+     * AsyncFromSyncIterator state. A `for await` head whose iterable has
+     * no Symbol.asyncIterator method wraps the synchronous iterator in a
+     * flagged object, which is the only representation of that wrapper:
+     * it never reaches user code, so it carries no prototype and no
+     * `next` property, and the asynchronous step and close entry points
+     * read the wrapped iterator from here instead.
+     */
+    bool async_from_sync;
+    OseoValue async_sync_iterator;
     /* A generator function's `prototype` object, which serves the
      * virtualized %GeneratorPrototype% methods to the generators created
      * from it. Replacing the object drops the brand with it. */
@@ -476,6 +487,11 @@ static inline bool is_array_iterator(OseoValue value) {
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
         ordinary_object(value)->array_iterator;
 }
+static inline bool is_async_from_sync_iterator(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_OBJECT &&
+        ordinary_object(value)->async_from_sync;
+}
 static inline bool is_function(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_FUNCTION;
@@ -670,5 +686,12 @@ OseoResult oseo_internal_jobs_drain_until(
     OseoValue promise
 );
 bool oseo_internal_jobs_reached_promise(OseoValue promise);
+/*
+ * Await one value from a position the frontend did not split into
+ * continuations, which is one step of a `for await` head. It runs the
+ * scheduler until the awaited promise settles and reports a stalled
+ * asynchronous iteration as a host diagnostic.
+ */
+OseoResult oseo_internal_await_step(OseoContext *context, OseoValue value);
 
 #endif

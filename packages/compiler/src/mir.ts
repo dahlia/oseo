@@ -197,6 +197,14 @@ export interface MirOperation {
   readonly functionNameBinding?: boolean;
   readonly importedBinding?: boolean;
   readonly hint?: MirHint;
+  /**
+   * Marks one `iterator-get`, `iterator-next`, or `iterator-close` as an
+   * asynchronous iteration step, which reads `Symbol.asyncIterator`
+   * before falling back to a wrapped synchronous iterator and awaits
+   * every result. Only a `for await` head produces these operations, so
+   * the synchronous protocol keeps its unconditional lowering.
+   */
+  readonly iteratorAsync?: true;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
   /**

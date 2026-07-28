@@ -234,6 +234,102 @@ test("emits rooted iterator protocol operations", () => {
   );
 });
 
+test("emits the asynchronous iterator protocol entry points", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "async-iterator.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              constant: { kind: "undefined" },
+              detail: "iterable",
+              id: 0,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0],
+              detail: "GetIterator async",
+              id: 1,
+              iteratorAsync: true,
+              iteratorNextMethodResult: 2,
+              kind: "iterator-get",
+              range,
+            },
+            {
+              arguments: [1, 2],
+              detail: "Await, IteratorStep, and IteratorValue",
+              id: 3,
+              iteratorAsync: true,
+              iteratorValueResult: 4,
+              kind: "iterator-next",
+              range,
+            },
+            {
+              arguments: [1],
+              completionSlot: 0,
+              detail: "AsyncIteratorClose",
+              id: 5,
+              iteratorAsync: true,
+              kind: "iterator-close",
+              range,
+            },
+            {
+              arguments: [5],
+              checkedResult: 5,
+              detail: "check async iterator close",
+              id: 6,
+              kind: "check-status",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 4 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      functionLength: 0,
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 7,
+    },
+    sourceId: "async-iterator.ts",
+    specialization: "disabled",
+  });
+  assert.ok(
+    emitted.source.includes(
+      "oseo_async_iterator_get(context, roots[0], &roots[2])",
+    ),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_async_iterator_next(context, roots[1], roots[2], &roots[4],",
+    ),
+  );
+  assert.ok(
+    emitted.source.includes(
+      "oseo_async_iterator_close(context, roots[1], completion[0u].kind == 2)",
+    ),
+  );
+  // The asynchronous protocol reuses the synchronous done-flag shape, so
+  // the loop branch it feeds is unchanged.
+  assert.ok(emitted.source.includes("bool fast_3 = !iterator_done_3;"));
+  assert.ok(!emitted.source.includes("oseo_iterator_get("));
+});
+
 test("emits delegating iterator steps and a pass-through suspension", () => {
   const range = {
     end: { column: 1, line: 1 },

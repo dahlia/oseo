@@ -29,6 +29,7 @@ import {
 
 import type { Fixture } from "./native/fixture.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
+import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
@@ -81,6 +82,7 @@ const fixtures: readonly Fixture[] = [
   ...expressionFixtures,
   ...generatorFixtures,
   ...asyncFixtures,
+  ...asyncIterationFixtures,
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {

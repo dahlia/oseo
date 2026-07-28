@@ -272,6 +272,8 @@ static OseoResult object_create(
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
     object->iterator_index = 0u;
+    object->async_from_sync = false;
+    object->async_sync_iterator = oseo_undefined();
     object->default_intrinsics = default_intrinsics;
     object->generator_prototype = false;
     object->generator = NULL;
@@ -323,6 +325,8 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->array_iterator = false;
     array->iterator_array = oseo_undefined();
     array->iterator_index = 0u;
+    array->async_from_sync = false;
+    array->async_sync_iterator = oseo_undefined();
     array->default_intrinsics = true;
     array->generator_prototype = false;
     array->generator = NULL;

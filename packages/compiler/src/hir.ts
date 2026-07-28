@@ -666,6 +666,8 @@ export type HirStatement =
       readonly update?: HirExpression;
     })
   | (LocatedSyntax & {
+      /** `for await`, which awaits each asynchronous iteration step. */
+      readonly awaited?: true;
       readonly body: HirStatement;
       readonly iterable: HirExpression;
       readonly kind: "for-of";

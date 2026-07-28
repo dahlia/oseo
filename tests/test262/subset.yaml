@@ -2,6 +2,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
   - arrow-function
   - async-functions
+  - async-iteration
   - class
   - class-fields-private
   - class-fields-public
@@ -23,6 +24,7 @@ supportedFeatures:
   - object-spread
   - rest-parameters
   - Symbol
+  - Symbol.asyncIterator
   - Symbol.iterator
   - Symbol.toPrimitive
   - Symbol.toStringTag
@@ -6933,6 +6935,4679 @@ tests:
   - path: test/language/statements/do-while/decl-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-init-in.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-init-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-init-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array-undefined-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-undefined-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-undefined-own.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-nested-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-put-const.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-put-prop-ref-user-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-put-prop-ref.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-target-simple-strict.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-target-yield-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-target-yield-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-trlg-iter-elision-iter-nrml-close-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elision-val-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-empty-val-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-after-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-iteration.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-array-undefined-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-array-undefined-own.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-array-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-array-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-obj-undefined-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-obj-undefined-own.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-obj-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-obj-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-nested-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-put-prop-ref-no-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-put-prop-ref.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-array-rest-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-empty-bool.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-empty-num.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-empty-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-empty-string.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-empty-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-identifier-resolution-first.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-identifier-resolution-last.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-identifier-resolution-lone.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-identifier-resolution-trlng.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-assignment-missing.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-assignment-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-assignment-truthy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-assignment-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-in.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-init-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-id-simple-no-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-assignment-missing.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-assignment-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-assignment-truthy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-assignment-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-in.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-target-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-identifier-resolution-first.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-identifier-resolution-last.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-identifier-resolution-lone.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-identifier-resolution-trlng.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-nested-array-yield-ident-valid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-nested-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-put-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-put-prop-ref-no-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-put-prop-ref.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-descriptors.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-empty-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-to-property-with-setter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-decl-dstr-obj-rest-to-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-elision-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-elision-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-empty-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elision-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elision-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elision-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-ary-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-ary-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-id-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-const-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-elision-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-elision-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-empty-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elision-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elision-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elision-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-ary-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-ary-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-id-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-let-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-elision-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-elision-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-empty-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elision-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elision-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elision-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-ary-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-ary-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-id-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-func-dstr-var-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-decl-dstr-array-elem-init-assignment.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-decl-dstr-obj-id-identifier-resolution-lone.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-async-obj-ptrn-prop-obj-init.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-const-obj-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-obj-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-let-obj-ptrn-prop-ary-init.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-elem-ary-rest-iter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-async-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-obj-ptrn-init-err.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/async-gen-dstr-var-obj-ptrn-rest-val-obj.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        destructuring-bindings,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/escaped-of.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/head-const-init.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/head-let-init.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/head-lhs-async.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/head-var-init.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/for-await-of/iterator-close-non-throw-get-method-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/iterator-close-non-throw-get-method-non-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/iterator-close-throw-get-method-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/iterator-close-throw-get-method-non-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/let-array-with-newline.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
   - path: test/language/statements/for-of/dstr/array-elem-put-prop-ref.js
     expectedClassification: pass
     dependencies:

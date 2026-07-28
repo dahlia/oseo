@@ -191,7 +191,20 @@ static OseoResult run_timer_turn(
     return result;
 }
 
-OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
+/*
+ * One Await that runs the scheduler until the awaited promise settles.
+ * Every caller is an outermost suspension point: the entry await of the
+ * linked module graph, or one step of a `for await` head, whose loop the
+ * frontend keeps in the enclosing body instead of splitting it into
+ * continuations. A body that can make no further progress is a stalled
+ * program rather than a language error, so it reports a host diagnostic
+ * naming the position that stalled.
+ */
+static OseoResult await_settled_value(
+    OseoContext *context,
+    OseoValue value,
+    const char *stall_message
+) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -220,11 +233,7 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
     while (result.status == OSEO_STATUS_NORMAL &&
            promise_object(frame.slots[1])->state == OSEO_PROMISE_PENDING) {
         if (tag_of(context->timer_head) == OSEO_TAG_UNDEFINED) {
-            result = failure(
-                context,
-                "OSEO3001",
-                "Top-level await cannot make progress."
-            );
+            result = failure(context, "OSEO3001", stall_message);
             break;
         }
         result = run_timer_turn(context, frame.slots[1]);
@@ -243,6 +252,22 @@ OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
+    return await_settled_value(
+        context,
+        value,
+        "Top-level await cannot make progress."
+    );
+}
+
+OseoResult oseo_internal_await_step(OseoContext *context, OseoValue value) {
+    return await_settled_value(
+        context,
+        value,
+        "An asynchronous iteration step cannot make progress."
+    );
 }
 
 OseoResult oseo_entry_task_checkpoint(

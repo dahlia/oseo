@@ -3623,11 +3623,17 @@ function lowerForOfStatement(
       resetBinding(binding.bindingId, binding.name, binding.range, builder);
     }
   }
+  // A `for await` head reaches the same loop shape as a synchronous one;
+  // only the three iterator operations change protocol, so break,
+  // continue, return, and the conditional close keep one lowering.
+  const awaited = statement.awaited === true;
+  const kind = awaited ? "asynchronous" : "synchronous";
+  const asynchronous = awaited ? { iteratorAsync: true as const } : {};
   const iterable = lowerExpression(statement.iterable, builder);
   appendMirMetadata(
     builder,
     "safepoint",
-    "get synchronous iterator",
+    `get ${kind} iterator`,
     [iterable],
     statement.iterable.range,
   );
@@ -3637,8 +3643,9 @@ function lowerForOfStatement(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [iterable],
-    detail: "GetIterator sync",
+    detail: `GetIterator ${awaited ? "async" : "sync"}`,
     id: iterator,
+    ...asynchronous,
     iteratorNextMethodResult: nextMethod,
     kind: "iterator-get",
     range: statement.iterable.range,
@@ -3665,7 +3672,7 @@ function lowerForOfStatement(
   appendMirMetadata(
     builder,
     "safepoint",
-    "step synchronous iterator",
+    `step ${kind} iterator`,
     [iterator, nextMethod],
     statement.range,
   );
@@ -3675,8 +3682,11 @@ function lowerForOfStatement(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [iterator, nextMethod],
-    detail: "IteratorStep and IteratorValue",
+    detail: awaited
+      ? "Await, IteratorStep, and IteratorValue"
+      : "IteratorStep and IteratorValue",
     id: hasValue,
+    ...asynchronous,
     iteratorValueResult: value,
     kind: "iterator-next",
     range: statement.range,
@@ -3725,7 +3735,7 @@ function lowerForOfStatement(
   appendMirMetadata(
     builder,
     "safepoint",
-    "close synchronous iterator",
+    `close ${kind} iterator`,
     [iterator],
     statement.range,
   );
@@ -3734,8 +3744,9 @@ function lowerForOfStatement(
   builder.current.operations.push({
     arguments: [iterator],
     completionSlot: closeBlock.id,
-    detail: "IteratorClose",
+    detail: awaited ? "AsyncIteratorClose" : "IteratorClose",
     id: closed,
+    ...asynchronous,
     kind: "iterator-close",
     range: statement.range,
   });
@@ -3758,7 +3769,7 @@ function lowerForOfStatement(
   appendMirMetadata(
     builder,
     "join",
-    `for-of bb${stepBlock.id}`,
+    `for${awaited ? "-await" : ""}-of bb${stepBlock.id}`,
     [],
     statement.range,
   );

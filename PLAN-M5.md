@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 1,230
-passes, 898 expected negatives, and 373 unsupported profile features with no
+honest unsupported classifications. The current reviewed manifest records 1,511
+passes, 988 expected negatives, and 381 unsupported profile features with no
 semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -836,6 +836,67 @@ inside the admitted syntax, *static-init-sequence.js*, needs
 that owns it lands, with the same interleaving covered by a native fixture
 meanwhile. The manifest moves to 1230 passes, 898 expected negatives, and 373
 unsupported profile features with no semantic or harness failures.
+
+The asynchronous iterator protocol and the `for await (... of ...)` statement
+are now admitted, the eleventh unit of the functions and executable syntax
+stream. `GetIterator(value, async)` reads `Symbol.asyncIterator`, calls it,
+and captures the iterator's `next` method once, and a value with no such
+method falls back to the synchronous protocol and wraps that record, which is
+CreateAsyncFromSyncIterator. The wrapper is a runtime-internal record with no
+prototype and no properties, because nothing outside the loop reaches it.
+Each step awaits the result of the captured `next` method, requires an
+object, and reads `done` and `value`; a wrapped synchronous iterator instead
+awaits the stepped value, which is what makes a synchronous iterable of
+promises yield settled values, and the head then awaits the promise the
+wrapper method settles. Every wrapper path reaches that outer await,
+including the abrupt ones that reject the same promise rather than throwing
+to the head, so a fallback step interleaves with queued jobs exactly where a
+reference host places it. `AsyncIteratorClose` awaits the `return`
+result and requires an object; the wrapper instead requires the synchronous
+result to be an object and then reads and awaits its `done` and `value`
+before completion precedence applies, so an in-flight body error still
+observes those getters.
+
+The head reuses the synchronous `for-of` lowering unchanged. One flag on the
+three iterator operations selects the protocol, and the loop shape, the head
+forms, the temporal dead zones, the fresh per-iteration cells, the `var`
+hoisting, and the conditional close all stay the code that already exists.
+That is why `break`, `continue`, `return`, labeled transfers, and body throws
+work with the same completion precedence as the synchronous head: a close
+failure replaces `break` or `return`, an in-flight throw stays authoritative,
+and `continue` keeps the iterator open. `Symbol.asyncIterator` joins the
+well-known symbols, and the runtime gains three entry points, which bumps the
+ABI to `m5-23`.
+
+A step suspends by draining the scheduler rather than by returning to the
+caller, because the frontend splits an `await` expression into continuations
+and a loop has no such split. Interleaving with jobs already queued is
+preserved, but the enclosing asynchronous function does not return to its
+caller at a step, and a step whose promise can never settle reports
+`OSEO3001` instead of leaving the function pending forever. That is the one
+deviation this unit accepts; the profile's gap entry owns it, and closing it
+needs the same suspension record asynchronous generators need, so the two
+land together.
+
+Native differential fixtures cover the synchronous fallback, generator and
+user iterables, `Symbol.asyncIterator` preference over `Symbol.iterator`,
+promised and direct step results, `done` and `value` accessor order,
+timer-driven steps, the turns a wrapped step and a wrapped close each spend
+against previously queued reactions,
+every head form, closures over per-iteration cells, the
+head's dead zone, every transfer, absent, promised, and throwing `return`
+methods, nested and `finally`-wrapped loops, and every catchable `TypeError`
+the protocol defines. A generated property with seed `0x5eed0011` draws
+asynchronous and synchronous iterator kinds, head forms, transfer positions,
+and close modes under both specialization policies and forced collection.
+Asynchronous generators stay rejected, so the asynchronous generator cases
+the `async-iteration` tag reaches stay outside the reviewed subset.
+Two hundred eighty-one reviewed test262 cases newly pass, ninety new expected
+negatives record the head's early errors, and eight new unsupported cases
+record that asynchronous generator boundary. The reviewed subset gains the
+`async-iteration` and `Symbol.asyncIterator` feature tags, and the manifest
+moves to 1511 passes, 988 expected negatives, and 381 unsupported profile
+features with no semantic or harness failures.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

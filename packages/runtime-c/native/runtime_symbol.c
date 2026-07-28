@@ -149,6 +149,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "iterator",
         "toPrimitive",
         "toStringTag",
+        "asyncIterator",
     };
     static const char *const well_known_descriptions[
         OSEO_WELL_KNOWN_SYMBOL_COUNT
@@ -156,6 +157,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "Symbol.iterator",
         "Symbol.toPrimitive",
         "Symbol.toStringTag",
+        "Symbol.asyncIterator",
     };
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};

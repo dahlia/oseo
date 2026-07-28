@@ -33,6 +33,8 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.array_iterator = false;
     promise->ordinary.iterator_array = oseo_undefined();
     promise->ordinary.iterator_index = 0u;
+    promise->ordinary.async_from_sync = false;
+    promise->ordinary.async_sync_iterator = oseo_undefined();
     promise->ordinary.default_intrinsics = true;
     promise->ordinary.generator_prototype = false;
     promise->ordinary.generator = NULL;
