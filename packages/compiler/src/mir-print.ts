@@ -13,10 +13,19 @@ function printTerminator(terminator: MirTerminator): string {
     );
   }
   if (terminator.kind === "generator-yield") {
+    const resumptions = [
+      terminator.returnResume == null
+        ? undefined
+        : `return bb${terminator.returnResume}`,
+      terminator.throwResume == null
+        ? undefined
+        : `throw bb${terminator.throwResume}`,
+    ].filter((resumption) => resumption != null);
     return (
-      `generator-yield %${terminator.value} ` +
-      `resume bb${terminator.resume} sent %${terminator.sent} ` +
-      `return bb${terminator.returnResume}`
+      `generator-${terminator.awaited === true ? "await" : "yield"} ` +
+      `%${terminator.value} ` +
+      `resume bb${terminator.resume} sent %${terminator.sent}` +
+      (resumptions.length === 0 ? "" : ` ${resumptions.join(" ")}`)
     );
   }
   if (terminator.kind === "resume-completion") {
@@ -45,7 +54,8 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
   const restText =
     restParameters.length === 0 ? "" : ` rest=[${restParameters.join()}]`;
   lines.push(
-    `function${functionValue.generator === true ? "*" : ""} ` +
+    `${functionValue.asyncGenerator === true ? "async " : ""}` +
+      `function${functionValue.generator === true ? "*" : ""} ` +
       `@f${functionValue.id} ${functionValue.name} roots=` +
       `${functionValue.rootSlotCount}` +
       restText +

@@ -43,6 +43,11 @@ void oseo_context_init(
     context->generator_next_function = oseo_undefined();
     context->generator_return_function = oseo_undefined();
     context->generator_prototype = oseo_undefined();
+    context->async_generator_next_function = oseo_undefined();
+    context->async_generator_return_function = oseo_undefined();
+    context->async_generator_throw_function = oseo_undefined();
+    context->async_generator_prototype = oseo_undefined();
+    context->async_iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     context->source_id = source_id;
     context->source_id_length = source_id_length;
@@ -121,6 +126,11 @@ void oseo_context_destroy(OseoContext *context) {
     context->generator_next_function = oseo_undefined();
     context->generator_return_function = oseo_undefined();
     context->generator_prototype = oseo_undefined();
+    context->async_generator_next_function = oseo_undefined();
+    context->async_generator_return_function = oseo_undefined();
+    context->async_generator_throw_function = oseo_undefined();
+    context->async_generator_prototype = oseo_undefined();
+    context->async_iterator_self_function = oseo_undefined();
     context->timer_head = oseo_undefined();
     oseo_collect(context);
 }

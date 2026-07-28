@@ -982,6 +982,347 @@ function lowerUpdateValue(
 }
 
 /**
+ * Raises one already-lowered value as a throw completion, which is what
+ * a `throw` statement does at its own position and what an asynchronous
+ * generator body does when a resumption delivers a throw completion or
+ * an awaited promise rejects. The value reaches the innermost enclosing
+ * handler, so every `catch`, `finally`, and iterator close between the
+ * position and the body's edge still runs.
+ */
+function lowerThrowValue(
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  const target = builder.abruptTargets.at(-1);
+  setCompletion(builder, "throw", target?.blockId ?? 0, range, value);
+  builder.current.terminator =
+    target == null
+      ? { completionSlot: 0, kind: "resume-completion" }
+      : { kind: "jump", target: target.blockId };
+}
+
+/**
+ * Await inside an asynchronous generator body: the body suspends with
+ * the operand instead of draining the scheduler, so the driver returns
+ * to whoever resumed it and settles the operand on its own. A fulfilled
+ * operand resumes with its value as this expression's result; a rejected
+ * one resumes with a throw completion raised at this position.
+ */
+function lowerAsyncGeneratorAwait(
+  operand: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "asynchronous generator await",
+    [operand],
+    range,
+  );
+  const sent = builder.nextValue;
+  builder.nextValue += 1;
+  const resume = createMirBlock(builder);
+  const throwResume = createMirBlock(builder);
+  builder.current.terminator = {
+    awaited: true,
+    kind: "generator-yield",
+    resume: resume.id,
+    sent,
+    throwResume: throwResume.id,
+    value: operand,
+  };
+  /* The rejection chain is captured while lowering the await, because
+   * the builder's handler stack only describes this point. */
+  builder.current = throwResume;
+  lowerThrowValue(sent, range, builder);
+  builder.current = resume;
+  return recordRoot(builder, sent, range);
+}
+
+/**
+ * One AsyncGeneratorYield: the suspension reports `value` as an
+ * iteration step without awaiting it. Only the `yield` operator awaits
+ * its operand, which is why `yield*` reports a promise the delegated
+ * iterator produced unchanged.
+ *
+ * The caller owns the three resumptions. `returnResume` receives a
+ * return completion, whose value AsyncGeneratorUnwrapYieldResumption
+ * awaits before it reaches the block, and `throwResume` receives a throw
+ * completion, which is raised unchanged. Both continue with the sent
+ * slot this function returns alongside its own resume value.
+ */
+function appendAsyncGeneratorYield(
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): {
+  readonly resume: MutableMirBlock;
+  readonly returnResume: MutableMirBlock;
+  readonly sent: number;
+  readonly throwResume: MutableMirBlock;
+} {
+  const yielded = value;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "generator suspension result allocation",
+    [yielded],
+    range,
+  );
+  const sent = builder.nextValue;
+  builder.nextValue += 1;
+  const resume = createMirBlock(builder);
+  const returnResume = createMirBlock(builder);
+  const throwResume = createMirBlock(builder);
+  builder.current.terminator = {
+    kind: "generator-yield",
+    resume: resume.id,
+    returnResume: returnResume.id,
+    sent,
+    throwResume: throwResume.id,
+    value: yielded,
+  };
+  builder.current = throwResume;
+  lowerThrowValue(sent, range, builder);
+  builder.current = resume;
+  recordRoot(builder, sent, range);
+  return { resume, returnResume, sent, throwResume };
+}
+
+/**
+ * `yield operand` inside an asynchronous generator body. The operator
+ * awaits its operand before the suspension reports it, so a promise
+ * reaches the consumer as its settled value. A return resumption leaves
+ * the body the way a `return` statement written at the suspension point
+ * would, after awaiting the value it delivers.
+ */
+function lowerAsyncGeneratorYield(
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const awaited = lowerAsyncGeneratorAwait(value, range, builder);
+  const suspension = appendAsyncGeneratorYield(awaited, range, builder);
+  const resume = builder.current;
+  builder.current = suspension.returnResume;
+  const returned = lowerAsyncGeneratorAwait(suspension.sent, range, builder);
+  if (!enterFinalizer(builder, "return", range, returned)) {
+    builder.current.terminator = { kind: "return", value: returned };
+  }
+  builder.current = resume;
+  return suspension.sent;
+}
+
+/**
+ * `yield* operand` inside an asynchronous generator body: acquire the
+ * operand's asynchronous iterator once, then forward every resumption of
+ * the enclosing generator to it.
+ *
+ * Unlike the synchronous delegation, each step reports the inner
+ * iterator's `value` rather than its whole result object, because
+ * AsyncGeneratorYield produces the outer step. That step awaits nothing:
+ * only the `yield` operator awaits its operand, so a promise the
+ * delegated iterator produced reaches the consumer unchanged.
+ * A return resumption steps the inner iterator's `return`, and a throw
+ * resumption steps its `throw`; either method reporting a done result
+ * ends the delegation, a return ending it leaves the body through the
+ * return completion, and a throw ending it completes the delegating
+ * expression with the reported value. An inner iterator with no `throw`
+ * method is closed and the delegation reports a `TypeError`, which the
+ * step operation itself raises.
+ */
+function lowerAsyncYieldDelegation(
+  argument: HirExpression,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const iterable = lowerExpression(argument, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "get delegated asynchronous iterator",
+    [iterable],
+    range,
+  );
+  const iterator = builder.nextValue;
+  builder.nextValue += 1;
+  const nextMethod = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterable],
+    detail: "GetIterator async",
+    id: iterator,
+    iteratorAsync: true,
+    iteratorNextMethodResult: nextMethod,
+    kind: "iterator-get",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> step, abrupt -> return without close",
+    [iterator],
+    range,
+  );
+  recordRoot(builder, iterator, range);
+  recordRoot(builder, nextMethod, range);
+
+  const stepBlock = createMirBlock(builder);
+  const returnStepBlock = createMirBlock(builder);
+  const throwStepBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  const received = builder.nextValue;
+  builder.nextValue += 1;
+  stepBlock.parameters = [received];
+  const returnReceived = builder.nextValue;
+  builder.nextValue += 1;
+  returnStepBlock.parameters = [returnReceived];
+  const throwReceived = builder.nextValue;
+  builder.nextValue += 1;
+  throwStepBlock.parameters = [throwReceived];
+  /* Three step kinds reach the same exit, and each reports its own
+   * value, so the join takes the delegating expression's result as a
+   * block parameter instead of reading one step's slot. */
+  const delegated = builder.nextValue;
+  builder.nextValue += 1;
+  exitBlock.parameters = [delegated];
+
+  const start = lowerSyntheticUndefined(range, builder);
+  builder.current.terminator = {
+    kind: "jump",
+    target: stepBlock.id,
+    values: [start],
+  };
+
+  /**
+   * One delegation step and the suspension that reports its value. The
+   * three step kinds differ only in the operation they run and in what
+   * a done result means, so each supplies its own exit.
+   */
+  const lowerDelegationStep = (
+    block: MutableMirBlock,
+    kind:
+      | "iterator-delegate-next"
+      | "iterator-delegate-return"
+      | "iterator-delegate-throw",
+    sentValue: number,
+    detail: string,
+    exit: (value: number) => void,
+  ): void => {
+    builder.current = block;
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      detail,
+      [iterator, sentValue],
+      range,
+    );
+    const continues = builder.nextValue;
+    builder.nextValue += 1;
+    const stepResult = builder.nextValue;
+    builder.nextValue += 1;
+    const stepArguments =
+      kind === "iterator-delegate-next"
+        ? [iterator, nextMethod, sentValue]
+        : [iterator, sentValue];
+    builder.current.operations.push({
+      arguments: stepArguments,
+      detail,
+      id: continues,
+      iteratorAsync: true,
+      iteratorValueResult: stepResult,
+      kind,
+      range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> branch, abrupt -> return without close",
+      [continues],
+      range,
+    );
+    recordRoot(builder, stepResult, range);
+    const yieldBlock = createMirBlock(builder);
+    const exitStepBlock = createMirBlock(builder);
+    builder.current.terminator = {
+      kind: "branch",
+      test: continues,
+      whenFalse: exitStepBlock.id,
+      whenTrue: yieldBlock.id,
+    };
+    builder.current = exitStepBlock;
+    exit(stepResult);
+    builder.current = yieldBlock;
+    const suspension = appendAsyncGeneratorYield(stepResult, range, builder);
+    builder.current.terminator = {
+      kind: "jump",
+      target: stepBlock.id,
+      values: [suspension.sent],
+    };
+    builder.current = suspension.returnResume;
+    const returned = lowerAsyncGeneratorAwait(suspension.sent, range, builder);
+    builder.current.terminator = {
+      kind: "jump",
+      target: returnStepBlock.id,
+      values: [returned],
+    };
+    builder.current = suspension.throwResume;
+    builder.current.terminator = {
+      kind: "jump",
+      target: throwStepBlock.id,
+      values: [suspension.sent],
+    };
+  };
+
+  lowerDelegationStep(
+    stepBlock,
+    "iterator-delegate-next",
+    received,
+    "IteratorNext, IteratorComplete, and IteratorValue",
+    (value) => {
+      builder.current.terminator = {
+        kind: "jump",
+        target: exitBlock.id,
+        values: [value],
+      };
+    },
+  );
+  lowerDelegationStep(
+    returnStepBlock,
+    "iterator-delegate-return",
+    returnReceived,
+    "GetMethod return, IteratorComplete, and IteratorValue",
+    (value) => {
+      /* The finalizer chain is captured while lowering the delegation,
+       * because the builder's finalizer stack only describes this
+       * point. */
+      if (!enterFinalizer(builder, "return", range, value)) {
+        builder.current.terminator = { kind: "return", value };
+      }
+    },
+  );
+  lowerDelegationStep(
+    throwStepBlock,
+    "iterator-delegate-throw",
+    throwReceived,
+    "GetMethod throw, IteratorComplete, and IteratorValue",
+    (value) => {
+      builder.current.terminator = {
+        kind: "jump",
+        target: exitBlock.id,
+        values: [value],
+      };
+    },
+  );
+
+  builder.current = exitBlock;
+  appendMirMetadata(builder, "join", `yield* bb${stepBlock.id}`, [], range);
+  return recordRoot(builder, delegated, range);
+}
+
+/**
  * `yield* operand`: get the operand's iterator once, then forward every
  * resumption of the enclosing generator to it.
  *
@@ -2161,6 +2502,9 @@ function lowerExpression(
   }
   if (expression.kind === "await") {
     const argument = lowerExpression(expression.argument, builder);
+    if (builder.asyncGenerator) {
+      return lowerAsyncGeneratorAwait(argument, expression.range, builder);
+    }
     appendMirMetadata(
       builder,
       "safepoint",
@@ -2197,16 +2541,21 @@ function lowerExpression(
       if (expression.argument == null) {
         throw new Error("HIR yield* reached MIR without an operand.");
       }
-      return lowerYieldDelegation(
-        expression.argument,
-        expression.range,
-        builder,
-      );
+      return builder.asyncGenerator
+        ? lowerAsyncYieldDelegation(
+            expression.argument,
+            expression.range,
+            builder,
+          )
+        : lowerYieldDelegation(expression.argument, expression.range, builder);
     }
     const value =
       expression.argument == null
         ? lowerSyntheticUndefined(expression.range, builder)
         : lowerExpression(expression.argument, builder);
+    if (builder.asyncGenerator) {
+      return lowerAsyncGeneratorYield(value, expression.range, builder);
+    }
     appendMirMetadata(
       builder,
       "safepoint",
@@ -4345,7 +4694,7 @@ function lowerStatements(
     } else if (statement.kind === "expression") {
       lowerExpression(statement.expression, builder);
     } else if (statement.kind === "return") {
-      const value =
+      const returned =
         statement.expression == null
           ? lowerSyntheticUndefined(statement.range, builder)
           : lowerExpression(
@@ -4353,24 +4702,21 @@ function lowerStatements(
               builder,
               lowerFieldInitializerName(statement.expression, builder),
             );
+      /* `return expr` inside an asynchronous generator awaits its
+       * operand, so a returned promise reports its settled value as the
+       * final step. A bare `return` names no operand and awaits
+       * nothing. */
+      const value =
+        builder.asyncGenerator && statement.expression != null
+          ? lowerAsyncGeneratorAwait(returned, statement.range, builder)
+          : returned;
       if (!enterFinalizer(builder, "return", statement.range, value)) {
         builder.current.terminator = { kind: "return", value };
       }
       return true;
     } else if (statement.kind === "throw") {
       const value = lowerExpression(statement.expression, builder);
-      const target = builder.abruptTargets.at(-1);
-      setCompletion(
-        builder,
-        "throw",
-        target?.blockId ?? 0,
-        statement.range,
-        value,
-      );
-      builder.current.terminator =
-        target == null
-          ? { completionSlot: 0, kind: "resume-completion" }
-          : { kind: "jump", target: target.blockId };
+      lowerThrowValue(value, statement.range, builder);
       return true;
     } else if (statement.kind === "try") {
       if (lowerTryStatement(statement, builder)) return true;
@@ -4857,6 +5203,7 @@ function buildMirFunction(
   derivedThisBindingId?: number,
   initializesInstanceElements = false,
   fieldKeyBindingId?: number,
+  asyncGenerator = false,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -4865,6 +5212,7 @@ function buildMirFunction(
   };
   const builder: MirBuilder = {
     abruptTargets: [],
+    asyncGenerator,
     blocks: [entry],
     current: entry,
     ...(fieldKeyBindingId == null ? {} : { fieldKeyBindingId }),
@@ -4918,6 +5266,7 @@ function buildMirFunction(
       ...(block.parameters == null ? {} : { parameters: block.parameters }),
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
+    ...(asyncGenerator ? { asyncGenerator: true as const } : {}),
     ...(derivedThisBindingId == null ? {} : { derivedThisBindingId }),
     functionLength,
     ...(generator ? { generator: true as const } : {}),
@@ -4976,10 +5325,12 @@ export function buildMir(
         functionValue.range,
         specialization,
         functionValue.strict === true,
-        functionValue.functionKind === "generator",
+        functionValue.functionKind === "generator" ||
+          functionValue.functionKind === "async-generator",
         functionValue.derivedThisBindingId,
         functionValue.initializesInstanceElements === true,
         functionValue.fieldKeyBindingId,
+        functionValue.functionKind === "async-generator",
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

@@ -150,6 +150,7 @@ export interface MirOperation {
     | "iterator-close"
     | "iterator-delegate-next"
     | "iterator-delegate-return"
+    | "iterator-delegate-throw"
     | "iterator-get"
     | "iterator-next"
     | "join"
@@ -198,11 +199,11 @@ export interface MirOperation {
   readonly importedBinding?: boolean;
   readonly hint?: MirHint;
   /**
-   * Marks one `iterator-get`, `iterator-next`, or `iterator-close` as an
-   * asynchronous iteration step, which reads `Symbol.asyncIterator`
-   * before falling back to a wrapped synchronous iterator and awaits
-   * every result. Only a `for await` head produces these operations, so
-   * the synchronous protocol keeps its unconditional lowering.
+   * Marks one iterator operation as an asynchronous iteration step,
+   * which reads `Symbol.asyncIterator` before falling back to a wrapped
+   * synchronous iterator and awaits every result. A `for await` head and
+   * a `yield*` inside an asynchronous generator produce these operations,
+   * so the synchronous protocol keeps its unconditional lowering.
    */
   readonly iteratorAsync?: true;
   readonly iteratorNextMethodResult?: number;
@@ -263,9 +264,23 @@ export type MirTerminator =
        * `%GeneratorPrototype%.return` and an implicit `IteratorClose` do,
        * continues at `returnResume` instead. That block leaves the body the
        * way a `return` statement written at the suspension point would, so
-       * every enclosing `finally` and iterator close still runs.
+       * every enclosing `finally` and iterator close still runs. A
+       * resumption that delivers a throw completion continues at
+       * `throwResume`, which raises the sent value at the suspension point.
+       *
+       * Only an asynchronous generator body receives either resumption at
+       * every suspension, so a synchronous body names no `throwResume` and
+       * an `awaited` suspension names no `returnResume`.
        */
       readonly kind: "generator-yield";
+      /**
+       * True when the suspension is an Await rather than a Yield: `value`
+       * is the operand the driver resolves, and the resumption delivers
+       * the fulfilled value to `resume` or the rejection to `throwResume`.
+       * The suspension leaves no iteration step, so no consumer observes
+       * it. Only an asynchronous generator body suspends this way.
+       */
+      readonly awaited?: true;
       readonly resume: number;
       /**
        * True when `value` already is a complete iterator result object
@@ -274,8 +289,9 @@ export type MirTerminator =
        * result object rather than a freshly created one.
        */
       readonly resultObject?: true;
-      readonly returnResume: number;
+      readonly returnResume?: number;
       readonly sent: number;
+      readonly throwResume?: number;
       readonly value: number;
     }
   | {
@@ -317,9 +333,16 @@ export interface MirFunction extends LocatedSyntax {
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
   /**
-   * A synchronous generator body. Calling the function runs only the
-   * parameter and environment prologue and returns a suspended generator;
-   * the blocks run on resumption and may leave through `generator-yield`.
+   * An asynchronous generator body, which is also a `generator` body.
+   * Its `await` operands suspend through `generator-yield` as well, so
+   * the driver owns every step the body takes and reports each one
+   * through a promise.
+   */
+  readonly asyncGenerator?: true;
+  /**
+   * A generator body. Calling the function runs only the parameter and
+   * environment prologue and returns a suspended generator; the blocks
+   * run on resumption and may leave through `generator-yield`.
    */
   readonly generator?: true;
   readonly id: number;
@@ -369,16 +392,22 @@ export interface MirBuilder {
   readonly pendingLabels: string[];
   readonly finalizers: MirControlTarget[];
   /**
-   * True while lowering a generator body. Only such a body may end a
-   * block with `generator-yield`, because only its root slots survive
-   * suspension.
+   * True while lowering an asynchronous generator body, whose `await`
+   * operands and `yield` operands both suspend rather than drain the
+   * scheduler in place. Such a body is always a `generator` body too.
    */
+  readonly asyncGenerator: boolean;
   /**
    * The binding holding the key that names the anonymous definition a
    * class field initializer body returns. Set only while lowering such
    * an initializer.
    */
   readonly fieldKeyBindingId?: number;
+  /**
+   * True while lowering a generator body. Only such a body may end a
+   * block with `generator-yield`, because only its root slots survive
+   * suspension.
+   */
   readonly generator: boolean;
   /**
    * True while lowering a class constructor whose class declares

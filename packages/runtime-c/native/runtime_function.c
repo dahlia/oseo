@@ -182,6 +182,7 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_INTERNAL:
         case OSEO_FUNCTION_METHOD:
         case OSEO_FUNCTION_GENERATOR:
+        case OSEO_FUNCTION_ASYNC_GENERATOR:
         case OSEO_FUNCTION_CLASS:
             break;
         default:
@@ -207,8 +208,11 @@ OseoResult oseo_function_create(
      * `next` and `Symbol.iterator` through the specified lookup order,
      * and, unlike a constructor's prototype, it has no `constructor`
      * property. */
-    if (function_kind == OSEO_FUNCTION_GENERATOR) {
-        result = oseo_internal_generator_prototype(context);
+    if (function_kind == OSEO_FUNCTION_GENERATOR ||
+        function_kind == OSEO_FUNCTION_ASYNC_GENERATOR) {
+        result = function_kind == OSEO_FUNCTION_ASYNC_GENERATOR
+            ? oseo_internal_async_generator_prototype(context)
+            : oseo_internal_generator_prototype(context);
         frame.slots[8] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) {
             oseo_roots_release(context, &frame);
@@ -252,6 +256,7 @@ OseoResult oseo_function_create(
     function->ordinary.async_sync_iterator = oseo_undefined();
     function->ordinary.default_intrinsics = true;
     function->ordinary.generator_prototype = false;
+    function->ordinary.async_generator_prototype = false;
     function->ordinary.generator = NULL;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
@@ -357,7 +362,8 @@ OseoResult oseo_function_create(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        function_kind != OSEO_FUNCTION_GENERATOR) {
+        function_kind != OSEO_FUNCTION_GENERATOR &&
+        function_kind != OSEO_FUNCTION_ASYNC_GENERATOR) {
         static const uint16_t constructor_name[] = {
             'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
         };
@@ -373,7 +379,8 @@ OseoResult oseo_function_create(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        function_kind != OSEO_FUNCTION_GENERATOR) {
+        function_kind != OSEO_FUNCTION_GENERATOR &&
+        function_kind != OSEO_FUNCTION_ASYNC_GENERATOR) {
         OseoPropertyAttributes attributes = {true, false, true, false};
         result = oseo_object_define(
             context,
@@ -1230,6 +1237,43 @@ OseoResult oseo_call_function(
             receiver,
             argument_count > 0u ? arguments[0] : oseo_undefined()
         );
+    } else if (code_id == OSEO_ASYNC_ITERATOR_SELF_CODE_ID) {
+        result = normal(receiver);
+    } else if (code_id == OSEO_ASYNC_GENERATOR_NEXT_CODE_ID) {
+        result = oseo_async_generator_next(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
+    } else if (code_id == OSEO_ASYNC_GENERATOR_RETURN_CODE_ID) {
+        result = oseo_async_generator_return(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
+    } else if (code_id == OSEO_ASYNC_GENERATOR_THROW_CODE_ID) {
+        result = oseo_async_generator_throw(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
+    } else if (code_id == OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID ||
+               code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID) {
+        /* One await reaction: the generator it resumes is the only value
+         * its environment carries. */
+        result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_async_generator_awaited(
+                context,
+                result.value,
+                argument_count > 0u ? arguments[0] : oseo_undefined(),
+                code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID
+            );
+        }
     } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
         OseoValue description_input = argument_count > 0u
             ? arguments[0]

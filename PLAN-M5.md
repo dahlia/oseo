@@ -17,9 +17,9 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 1,511
-passes, 988 expected negatives, and 381 unsupported profile features with no
-semantic or harness failures.
+honest unsupported classifications. The current reviewed manifest records 3,851
+reviewed cases: 1,732 passes, 1,107 expected negatives, and 1,012 unsupported
+profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
 and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
@@ -897,6 +897,54 @@ record that asynchronous generator boundary. The reviewed subset gains the
 `async-iteration` and `Symbol.asyncIterator` feature tags, and the manifest
 moves to 1511 passes, 988 expected negatives, and 381 unsupported profile
 features with no semantic or harness failures.
+
+Asynchronous generator functions are now admitted, the twelfth unit of the
+functions and executable syntax stream. `async function*` declarations and
+function expressions reuse the generator suspension record rather than the
+frontend continuation split, so one body suspends at `await` and at `yield`
+through the same saved frame. That is the real suspension record the
+`for await` unit deferred: a suspension leaves the body with a reason, and the
+driver either settles an awaited operand and resumes later or reports a step.
+Because the frame is the generator's own, `await` is admitted in every
+expression position inside such a body instead of only in the M4 continuation
+positions.
+
+`next`, `return`, and `throw` each enqueue one AsyncGeneratorRequest and
+return its promise immediately. The queue's head owns the running step, so a
+call that arrives while the body runs or awaits waits its turn instead of
+reaching a running body, and each step reports through the promise its own
+call returned. Resuming a body needs a third resumption kind: MIR's
+`generator-yield` terminator gains an `awaited` marker and an optional
+`throwResume` block, and the C backend emits the matching branch only where a
+driver can deliver that resumption, so a synchronous body's emitted code is
+unchanged. `yield` awaits its operand before the step reports it and
+`return expr` awaits its own, while a `yield*` step awaits nothing, which is
+what keeps a promise the delegated iterator produced from being unwrapped.
+
+`yield*` acquires the asynchronous iterator, falls back to the wrapped
+synchronous protocol, and forwards a normal, a return, and a throw resumption
+to the inner iterator through three delegation entry points. An inner iterator
+with no `throw` method is closed and the delegation reports a `TypeError`. The
+runtime gains the request queue, `%AsyncGeneratorPrototype%`, the two await
+reactions, and those delegation entry points, which bumps the ABI to `m5-24`.
+
+Native differential fixtures cover the step and resumption surface, delegation
+over arrays, synchronous generators, asynchronous generators, and hand-written
+asynchronous iterators, rejected awaits, timer-driven awaits, queued requests,
+and the exact microtask interleaving of two generators against five chained
+reactions. A generated property with seed `0x5eed0018` draws bounded bodies,
+awaited and promised operands, three delegation kinds, guards, and every
+resumption position under both specialization policies and forced collection.
+
+The awaits a `yield*` step takes still drain the scheduler, so the `for await`
+gap entry now names both. Asynchronous generator method definitions stay
+rejected with the diagnostic synchronous generator methods already get, and
+default or binding-pattern parameters stay rejected for the same ordering
+reason. `%GeneratorPrototype%.throw` staying unimplemented becomes observable
+one step further out: a `throw` delivered to an asynchronous generator
+suspended inside a `yield*` over a synchronous generator reports a `TypeError`
+where the specification forwards the completion, which that gap entry now
+records.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act

@@ -4,9 +4,11 @@
 #include <string.h>
 
 /*
- * Synchronous generator objects: the suspended body frame, its
- * collector-traced root slots and saved completion records, and the
- * %GeneratorPrototype%.next resumption that drives them.
+ * Generator objects: the suspended body frame shared by both generator
+ * kinds, its collector-traced root slots and saved completion records,
+ * and the %GeneratorPrototype% resumptions that drive a synchronous one.
+ * The asynchronous driver lives in *runtime_async_generator.c* and
+ * reuses the same record.
  *
  * A generator's roots live in the generator record rather than on the
  * native root stack, so no C frame of a suspended body stays alive. The
@@ -39,6 +41,26 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
     return result;
 }
 
+/*
+ * %AsyncGeneratorPrototype%, the asynchronous counterpart of the object
+ * above. It carries its own brand, because the two intrinsics share no
+ * method: an asynchronous generator's `next` reports a promise and its
+ * `Symbol.asyncIterator` is a distinct function from the synchronous
+ * `Symbol.iterator`.
+ */
+OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
+    if (tag_of(context->async_generator_prototype) != OSEO_TAG_UNDEFINED) {
+        return normal(context->async_generator_prototype);
+    }
+    OseoResult result = oseo_object_create(context, oseo_null());
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoOrdinaryObject *object = ordinary_object(result.value);
+    object->default_intrinsics = true;
+    object->async_generator_prototype = true;
+    context->async_generator_prototype = result.value;
+    return result;
+}
+
 OseoResult oseo_generator_create(
     OseoContext *context,
     OseoValue callee,
@@ -46,14 +68,15 @@ OseoResult oseo_generator_create(
     size_t slot_count,
     size_t completion_count
 ) {
-    if (!is_function(callee) ||
-        function_object(callee)->function_kind != OSEO_FUNCTION_GENERATOR) {
+    if (!function_is_generator(callee)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
             "A generator requires a generator function."
         );
     }
+    bool asynchronous =
+        function_object(callee)->function_kind == OSEO_FUNCTION_ASYNC_GENERATOR;
     if (slot_count > (SIZE_MAX - sizeof(OseoGenerator)) / sizeof(OseoValue)) {
         return failure(context, "OSEO2001", "Generator frame is too large.");
     }
@@ -72,7 +95,9 @@ OseoResult oseo_generator_create(
     /* GetPrototypeFromConstructor falls back to the intrinsic whenever
      * the function's `prototype` is not an object. */
     if (!is_object(frame.slots[2])) {
-        result = oseo_internal_generator_prototype(context);
+        result = asynchronous
+            ? oseo_internal_async_generator_prototype(context)
+            : oseo_internal_generator_prototype(context);
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -97,6 +122,8 @@ OseoResult oseo_generator_create(
     state->callee = frame.slots[0];
     state->receiver = frame.slots[1];
     state->sent = oseo_undefined();
+    state->request_head = oseo_undefined();
+    state->request_tail = oseo_undefined();
     state->slots = (OseoValue *)(void *)(state + 1);
     state->completions = (OseoCompletionRecord *)(void *)
         ((unsigned char *)state->slots + slot_bytes);
@@ -104,7 +131,10 @@ OseoResult oseo_generator_create(
     state->completion_count = completion_count;
     state->resume_point = 0u;
     state->resume_kind = OSEO_GENERATOR_RESUME_NEXT;
+    state->suspend_reason = OSEO_GENERATOR_SUSPEND_YIELD;
     state->state = OSEO_GENERATOR_SUSPENDED_START;
+    state->asynchronous = asynchronous;
+    state->awaiting_return = false;
     state->yielded_result_object = false;
     for (size_t index = 0u; index < slot_count; index += 1u) {
         state->slots[index] = oseo_undefined();
@@ -149,12 +179,17 @@ void oseo_generator_suspend(
     OseoContext *context,
     OseoValue generator,
     size_t resume_point,
-    bool result_object
+    bool result_object,
+    size_t suspend_reason
 ) {
     (void)context;
+    /* Both suspension reasons leave the body resumable at `resume_point`;
+     * the asynchronous driver is the only caller that distinguishes them,
+     * and it parks an awaiting body itself once it has the operand. */
     OseoGenerator *state = generator_state(generator);
     state->resume_point = resume_point;
     state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
+    state->suspend_reason = suspend_reason;
     state->yielded_result_object = result_object;
 }
 
@@ -164,12 +199,15 @@ void oseo_generator_suspend(
  * whole suspended object graph reachable for as long as the generator
  * itself is.
  */
-static void generator_complete(OseoValue generator) {
+void oseo_internal_generator_complete(OseoValue generator) {
     OseoGenerator *state = generator_state(generator);
     state->state = OSEO_GENERATOR_COMPLETED;
     state->callee = oseo_undefined();
     state->receiver = oseo_undefined();
     state->sent = oseo_undefined();
+    /* A completed asynchronous generator still reports the requests it
+     * already accepted, so only the frame is discarded here; the driver
+     * drains the queue itself. */
     for (size_t index = 0u; index < state->slot_count; index += 1u) {
         state->slots[index] = oseo_undefined();
     }
@@ -195,7 +233,10 @@ static OseoResult generator_resume(
     size_t resume_kind
 ) {
     bool returning = resume_kind == OSEO_GENERATOR_RESUME_RETURN;
-    if (!is_generator(generator)) {
+    /* An asynchronous generator reports its steps through promises, so
+     * the synchronous resumption never drives one even when a caller
+     * reaches this method with one as the receiver. */
+    if (!is_generator(generator) || is_async_generator(generator)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
@@ -223,7 +264,7 @@ static OseoResult generator_resume(
      * generator reports it too, while `next` reports undefined. */
     bool unstarted = returning && current == OSEO_GENERATOR_SUSPENDED_START;
     if (current == OSEO_GENERATOR_COMPLETED || unstarted) {
-        if (unstarted) generator_complete(frame.slots[0]);
+        if (unstarted) oseo_internal_generator_complete(frame.slots[0]);
         result = oseo_internal_iterator_result(
             context,
             returning ? frame.slots[1] : oseo_undefined(),
@@ -246,7 +287,7 @@ static OseoResult generator_resume(
     state->state = OSEO_GENERATOR_EXECUTING;
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) {
-        generator_complete(frame.slots[0]);
+        oseo_internal_generator_complete(frame.slots[0]);
         oseo_roots_release(context, &frame);
         return result;
     }
@@ -261,14 +302,14 @@ static OseoResult generator_resume(
      * and discarding the frame drops the slot it came from. */
     frame.slots[1] = result.value;
     if (result.status != OSEO_STATUS_NORMAL) {
-        generator_complete(frame.slots[0]);
+        oseo_internal_generator_complete(frame.slots[0]);
         result.value = frame.slots[1];
         oseo_roots_release(context, &frame);
         return result;
     }
     bool done = state->state != OSEO_GENERATOR_SUSPENDED_YIELD;
     if (done) {
-        generator_complete(frame.slots[0]);
+        oseo_internal_generator_complete(frame.slots[0]);
     } else if (state->yielded_result_object) {
         /* GeneratorYield receives an already-built iterator result
          * object from `yield*`, so it reaches the resuming consumer

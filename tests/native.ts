@@ -29,6 +29,7 @@ import {
 
 import type { Fixture } from "./native/fixture.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
+import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
@@ -83,6 +84,7 @@ const fixtures: readonly Fixture[] = [
   ...generatorFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
+  ...asyncGeneratorFixtures,
 ];
 
 const descriptorMapCompilation = compileSource(babelFrontend, {
@@ -239,6 +241,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-static-block-scope" ||
     fixture.name === "class-static-block-super" ||
     fixture.name === "generators" ||
+    fixture.name === "async-generators" ||
+    fixture.name === "async-generator-resumptions" ||
+    fixture.name === "async-generator-delegation" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "function-rest-parameters" ||

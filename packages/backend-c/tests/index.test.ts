@@ -455,7 +455,8 @@ test("emits delegating iterator steps and a pass-through suspension", () => {
   // so the resumption reports it instead of creating a fresh one.
   assert.ok(
     emitted.source.includes(
-      "oseo_generator_suspend(context, generator, 1u, true);",
+      "oseo_generator_suspend(context, generator, 1u, true, " +
+        "OSEO_GENERATOR_SUSPEND_YIELD);",
     ),
   );
 });
@@ -887,7 +888,11 @@ test("emits a generator entry and a separately resumable body", () => {
   );
   assert.match(
     emitted.source,
-    /oseo_generator_suspend\(context, generator, 1u, false\);/u,
+    new RegExp(
+      "oseo_generator_suspend\\(context, generator, 1u, false, " +
+        "OSEO_GENERATOR_SUSPEND_YIELD\\);",
+      "u",
+    ),
   );
   assert.match(
     emitted.source,
@@ -917,6 +922,129 @@ test("emits a generator entry and a separately resumable body", () => {
     emitted.source.indexOf("\nstatic OseoResult ", bodyStart + 1),
   );
   assert.doesNotMatch(body, /oseo_roots_release/u);
+});
+
+test("emits an awaited suspension and a throw resumption branch", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "async-generator.js",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [
+      {
+        asyncGenerator: true,
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                constant: { kind: "number", value: 1 },
+                detail: "1",
+                id: 0,
+                kind: "constant",
+                range,
+              },
+            ],
+            terminator: {
+              awaited: true,
+              kind: "generator-yield",
+              resume: 1,
+              sent: 1,
+              throwResume: 2,
+              value: 0,
+            },
+          },
+          {
+            id: 1,
+            operations: [],
+            terminator: { kind: "return", value: 1 },
+          },
+          {
+            id: 2,
+            operations: [],
+            terminator: { completionSlot: 0, kind: "resume-completion" },
+          },
+        ],
+        functionLength: 0,
+        generator: true,
+        id: 0,
+        kind: "mir-function",
+        localBindingIds: [],
+        name: "awaiting",
+        parameterCount: 0,
+        parameters: [],
+        range,
+        rootSlotCount: 2,
+      },
+    ],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "awaiting",
+              functionId: 0,
+              functionKind: "async-generator",
+              functionLength: 0,
+              functionName: "awaiting",
+              id: 0,
+              kind: "function-create",
+              range,
+            },
+            {
+              arguments: [],
+              detail: "call awaiting",
+              id: 1,
+              kind: "call",
+              range,
+              target: { functionId: 0, kind: "function" },
+            },
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 2,
+    },
+    sourceId: "async-generator.ts",
+    specialization: "disabled",
+  });
+  assert.match(emitted.source, /OSEO_FUNCTION_ASYNC_GENERATOR/u);
+  // An awaited suspension names its own reason, so the driver settles the
+  // value instead of reporting it as an iteration step.
+  assert.match(
+    emitted.source,
+    new RegExp(
+      "oseo_generator_suspend\\(context, generator, 1u, false, " +
+        "OSEO_GENERATOR_SUSPEND_AWAIT\\);",
+      "u",
+    ),
+  );
+  assert.match(
+    emitted.source,
+    new RegExp(
+      "if \\(oseo_generator_resume_kind\\(generator\\) == " +
+        "OSEO_GENERATOR_RESUME_THROW\\) goto bb2;",
+      "u",
+    ),
+  );
+  // No return completion reaches an awaited suspension, so no branch
+  // delivers one.
+  assert.doesNotMatch(emitted.source, /OSEO_GENERATOR_RESUME_RETURN/u);
 });
 
 test("keeps a generator body's iterator done state in its root slots", () => {

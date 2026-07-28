@@ -58,6 +58,21 @@
     (SIZE_MAX - 15u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_GENERATOR_RETURN_CODE_ID \
     (SIZE_MAX - 16u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_GENERATOR_NEXT_CODE_ID \
+    (SIZE_MAX - 17u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_GENERATOR_RETURN_CODE_ID \
+    (SIZE_MAX - 18u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_GENERATOR_THROW_CODE_ID \
+    (SIZE_MAX - 19u - OSEO_ERROR_KIND_COUNT)
+/* The two reactions one asynchronous generator await installs on the
+ * operand it suspended with. Each carries the generator in slot 0 of its
+ * own environment and resumes the body with the settled value. */
+#define OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID \
+    (SIZE_MAX - 20u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_GENERATOR_REJECT_CODE_ID \
+    (SIZE_MAX - 21u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_ITERATOR_SELF_CODE_ID \
+    (SIZE_MAX - 22u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -93,6 +108,7 @@ typedef enum {
     OSEO_HEAP_SYMBOL = 12,
     OSEO_HEAP_ARGUMENT_LIST = 13,
     OSEO_HEAP_PRIVATE_NAME = 14,
+    OSEO_HEAP_ASYNC_GENERATOR_REQUEST = 15,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -154,15 +170,39 @@ typedef struct {
     OseoValue setter;
 } OseoProperty;
 
-/* The [[GeneratorState]] values this profile can observe. A suspended
- * generator leaves through a next or a return resumption, or stays
- * suspended; `%GeneratorPrototype%.throw` is not admitted yet. */
+/*
+ * The [[GeneratorState]] values this profile can observe. A suspended
+ * generator leaves through a next, a return, or a throw resumption, or
+ * stays suspended; a synchronous generator receives no throw resumption,
+ * because `%GeneratorPrototype%.throw` is not admitted yet.
+ *
+ * An asynchronous generator adds `OSEO_GENERATOR_AWAITING`, which is
+ * [[AsyncGeneratorState]] `executing` with the body parked on a settled
+ * promise rather than running: the driver has returned to its caller and
+ * a queued reaction owns the next resumption.
+ */
 typedef enum {
     OSEO_GENERATOR_SUSPENDED_START = 0,
     OSEO_GENERATOR_SUSPENDED_YIELD = 1,
     OSEO_GENERATOR_EXECUTING = 2,
     OSEO_GENERATOR_COMPLETED = 3,
+    OSEO_GENERATOR_AWAITING = 4,
 } OseoGeneratorState;
+
+/*
+ * One AsyncGeneratorRequest: the promise capability that reports the
+ * step this request asked for, the value it delivers, and which
+ * completion the resumption carries. Requests form a singly linked
+ * first-in queue on the generator record, so a `next` that arrives while
+ * the body is running waits instead of reaching a running body.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue next;
+    OseoValue capability;
+    OseoValue value;
+    size_t resume_kind;
+} OseoAsyncGeneratorRequest;
 
 /*
  * [[GeneratorContext]]: the suspended body frame of one generator.
@@ -176,18 +216,43 @@ typedef struct {
     OseoValue receiver;
     /* The value the pending resumption delivers as the yield result. */
     OseoValue sent;
+    /* The pending AsyncGeneratorRequest queue, empty on a synchronous
+     * generator. The head request owns the running or parked step. */
+    OseoValue request_head;
+    OseoValue request_tail;
     OseoValue *slots;
     OseoCompletionRecord *completions;
     size_t slot_count;
     size_t completion_count;
     size_t resume_point;
     /*
-     * OSEO_GENERATOR_RESUME_NEXT or OSEO_GENERATOR_RESUME_RETURN: how the
-     * pending resumption delivers `sent`. Generated code reads it at the
-     * resume point, so it stays valid for exactly one resumption.
+     * OSEO_GENERATOR_RESUME_NEXT, OSEO_GENERATOR_RESUME_RETURN, or
+     * OSEO_GENERATOR_RESUME_THROW: how the pending resumption delivers
+     * `sent`. Generated code reads it at the resume point, so it stays
+     * valid for exactly one resumption.
      */
     size_t resume_kind;
+    /*
+     * OSEO_GENERATOR_SUSPEND_YIELD or OSEO_GENERATOR_SUSPEND_AWAIT: what
+     * the pending suspension asked its driver for. Only an asynchronous
+     * body suspends to await, and the reason stays valid until the
+     * suspension it describes is resumed.
+     */
+    size_t suspend_reason;
     OseoGeneratorState state;
+    /*
+     * True for a body created from an asynchronous generator function,
+     * whose steps are reported through promises and whose `await`
+     * operands suspend the same frame.
+     */
+    bool asynchronous;
+    /*
+     * True while the generator is parked on AsyncGeneratorAwaitReturn:
+     * `return` reached a body that never started or already completed,
+     * so no frame is entered and the settled value becomes the head
+     * request's own final step.
+     */
+    bool awaiting_return;
     /*
      * True when the pending suspension already yielded a complete
      * iterator result object, as `yield*` does by forwarding the inner
@@ -261,6 +326,10 @@ typedef struct {
      * virtualized %GeneratorPrototype% methods to the generators created
      * from it. Replacing the object drops the brand with it. */
     bool generator_prototype;
+    /* The same brand for an asynchronous generator function's
+     * `prototype` object, which serves %AsyncGeneratorPrototype%. The two
+     * intrinsics share no methods, so the brands stay distinct. */
+    bool async_generator_prototype;
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
 } OseoOrdinaryObject;
@@ -431,6 +500,9 @@ static inline OseoPromiseAggregate *aggregate_object(OseoValue value) {
 static inline OseoJob *job_object(OseoValue value) {
     return (OseoJob *)heap_object(value);
 }
+static inline OseoAsyncGeneratorRequest *request_object(OseoValue value) {
+    return (OseoAsyncGeneratorRequest *)heap_object(value);
+}
 static inline OseoTimer *timer_object(OseoValue value) {
     return (OseoTimer *)heap_object(value);
 }
@@ -514,12 +586,27 @@ static inline bool function_has_prototype_property(OseoValue value) {
     OseoFunctionKind kind = function_object(value)->function_kind;
     return kind == OSEO_FUNCTION_ORDINARY ||
         kind == OSEO_FUNCTION_GENERATOR ||
+        kind == OSEO_FUNCTION_ASYNC_GENERATOR ||
         kind == OSEO_FUNCTION_CLASS;
+}
+/* True for the two function kinds whose call returns a suspended
+ * generator instead of running their body to completion. */
+static inline bool function_is_generator(OseoValue value) {
+    if (!is_function(value)) return false;
+    OseoFunctionKind kind = function_object(value)->function_kind;
+    return kind == OSEO_FUNCTION_GENERATOR ||
+        kind == OSEO_FUNCTION_ASYNC_GENERATOR;
 }
 static inline bool is_generator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
         ordinary_object(value)->generator != NULL;
+}
+/* True for the generator record an asynchronous generator function
+ * created, which reports every step through a promise. */
+static inline bool is_async_generator(OseoValue value) {
+    return is_generator(value) &&
+        ordinary_object(value)->generator->asynchronous;
 }
 static inline bool function_has_lexical_this(OseoValue value) {
     if (!is_function(value)) return false;
@@ -629,6 +716,19 @@ OseoResult oseo_internal_promise_invoke_then(
     OseoValue on_fulfilled,
     OseoValue on_rejected
 );
+/* One fresh pending promise with no resolving functions, which is the
+ * capability every internal await and asynchronous generator step
+ * reports through. */
+OseoResult oseo_internal_promise_create(OseoContext *context);
+/* The lazily created, permanently rooted %AsyncGeneratorPrototype%
+ * methods and its `Symbol.asyncIterator`, selected by code id. */
+OseoResult oseo_internal_async_generator_method(
+    OseoContext *context,
+    size_t code_id
+);
+/* Discards one generator's [[GeneratorContext]] and marks it completed,
+ * which both drivers do on every path that leaves a body for good. */
+void oseo_internal_generator_complete(OseoValue generator);
 OseoResult oseo_internal_promise_method_function(
     OseoContext *context,
     const char *name
@@ -658,6 +758,20 @@ OseoResult oseo_internal_well_known_symbol(
 );
 /* The lazily created, permanently rooted %GeneratorPrototype%. */
 OseoResult oseo_internal_generator_prototype(OseoContext *context);
+/* The same for %AsyncGeneratorPrototype%. */
+OseoResult oseo_internal_async_generator_prototype(OseoContext *context);
+/*
+ * Resumes one asynchronous generator parked on an awaited operand. The
+ * two await reactions call this with the settled value and the
+ * completion the settlement carries, and it drives the request queue
+ * from there.
+ */
+OseoResult oseo_internal_async_generator_awaited(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value,
+    bool rejected
+);
 /* Builds one fresh { value, done } iterator result object. */
 OseoResult oseo_internal_iterator_result(
     OseoContext *context,
@@ -693,5 +807,11 @@ bool oseo_internal_jobs_reached_promise(OseoValue promise);
  * asynchronous iteration as a host diagnostic.
  */
 OseoResult oseo_internal_await_step(OseoContext *context, OseoValue value);
+/* The well-known Symbol.asyncIterator, matched the way the synchronous
+ * key is, so a virtualized lookup recognizes it without allocating. */
+bool oseo_internal_async_iterator_key_matches(
+    OseoContext *context,
+    OseoValue key
+);
 
 #endif

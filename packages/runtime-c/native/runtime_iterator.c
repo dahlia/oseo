@@ -33,6 +33,20 @@ bool oseo_internal_iterator_key_matches(
         iterator_symbol.value == key;
 }
 
+/* The same for Symbol.asyncIterator. */
+bool oseo_internal_async_iterator_key_matches(
+    OseoContext *context,
+    OseoValue key
+) {
+    if (!is_symbol(key)) return false;
+    OseoResult iterator_symbol = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ASYNC_ITERATOR
+    );
+    return iterator_symbol.status == OSEO_STATUS_NORMAL &&
+        iterator_symbol.value == key;
+}
+
 /*
  * The virtualized internal iterator methods are cached on the context
  * so each stays permanently rooted, matching the promise-method
@@ -714,9 +728,12 @@ static OseoResult async_from_sync_continuation(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_await_step(context, slots[1]);
     }
-    if (result.status == OSEO_STATUS_NORMAL && !is_done) {
+    /* Both roles this continuation serves read the awaited value: a
+     * `for await` step ignores it once the iterator reports exhaustion,
+     * while a `yield*` delegation step reports it as its own result. */
+    if (result.status == OSEO_STATUS_NORMAL) {
         *value = result.value;
-        *done = false;
+        *done = is_done;
     }
     oseo_roots_pop(context, &frame);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -985,4 +1002,268 @@ OseoResult oseo_async_iterator_close(
     oseo_roots_pop(context, &frame);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(oseo_undefined());
+}
+
+/*
+ * `done` and `value` of one awaited asynchronous delegation result.
+ * Unlike the synchronous delegation, which forwards the inner result
+ * object unchanged, an asynchronous `yield*` reports IteratorValue for
+ * every step, because AsyncGeneratorYield produces the outer step.
+ */
+static OseoResult async_delegate_result_fields(
+    OseoContext *context,
+    OseoValue inner,
+    OseoValue *result_value,
+    bool *done
+) {
+    OseoValue slots[2] = {inner, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "done");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    bool is_done = result.status == OSEO_STATUS_NORMAL &&
+        oseo_to_boolean(result.value);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "value");
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        *result_value = result.value;
+        *done = is_done;
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_boolean(!is_done));
+}
+
+/*
+ * One asynchronous delegation step: call `method` with `argument`, await
+ * its result, and read `done` and `value`. A wrapped synchronous
+ * iterator runs the wrapper's own continuation, which awaits the stepped
+ * value, and the step then awaits the promise that continuation settles,
+ * so both records spend the same number of turns per step.
+ */
+static OseoResult async_delegate_invoke(
+    OseoContext *context,
+    OseoValue target,
+    bool from_sync,
+    OseoValue method,
+    OseoValue argument,
+    OseoValue *value,
+    bool *done
+) {
+    OseoValue slots[3] = {target, method, argument};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        slots[0],
+        1u,
+        &slots[2],
+        oseo_undefined()
+    );
+    slots[2] = result.value;
+    if (from_sync) {
+        if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The iterator result is not an object."
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = async_from_sync_continuation(
+                context,
+                slots[2],
+                value,
+                done
+            );
+        }
+        result = await_wrapper_promise(context, result);
+        oseo_roots_pop(context, &frame);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        return normal(oseo_boolean(!*done));
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_await_step(context, slots[2]);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The async iterator result is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = async_delegate_result_fields(context, slots[2], value, done);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The iterator a delegation step actually calls its method on. */
+static OseoValue delegation_target(OseoValue iterator) {
+    return is_async_from_sync_iterator(iterator)
+        ? ordinary_object(iterator)->async_sync_iterator
+        : iterator;
+}
+
+OseoResult oseo_async_iterator_delegate_next(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+) {
+    *value = oseo_undefined();
+    *done = true;
+    return async_delegate_invoke(
+        context,
+        delegation_target(iterator),
+        is_async_from_sync_iterator(iterator),
+        next_method,
+        sent,
+        value,
+        done
+    );
+}
+
+/*
+ * GetMethod over one delegation step's named method. An absent or null
+ * method reports no method rather than an error, which is what lets a
+ * return step end the delegation and a throw step close the iterator.
+ */
+static OseoResult delegate_method(
+    OseoContext *context,
+    OseoValue target,
+    const char *name,
+    OseoValue *method,
+    bool *present
+) {
+    *method = oseo_undefined();
+    *present = false;
+    OseoValue slots[2] = {target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, name);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_nullish(slots[1])) {
+        if (!is_function(slots[1])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The iterator method is not callable."
+            );
+        } else {
+            *method = slots[1];
+            *present = true;
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_async_iterator_delegate_return(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+) {
+    /* An iterator with no `return` method reports done with the value the
+     * resumption delivered, which is the return completion the delegating
+     * body then leaves through. */
+    *value = sent;
+    *done = true;
+    OseoValue slots[3] = {iterator, sent, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    bool present = false;
+    OseoResult result = delegate_method(
+        context,
+        delegation_target(slots[0]),
+        "return",
+        &slots[2],
+        &present
+    );
+    if (result.status == OSEO_STATUS_NORMAL && !present) {
+        oseo_roots_pop(context, &frame);
+        return normal(oseo_boolean(false));
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = async_delegate_invoke(
+            context,
+            delegation_target(slots[0]),
+            is_async_from_sync_iterator(slots[0]),
+            slots[2],
+            slots[1],
+            value,
+            done
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_async_iterator_delegate_throw(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue reason,
+    OseoValue *value,
+    bool *done
+) {
+    *value = oseo_undefined();
+    *done = true;
+    OseoValue slots[3] = {iterator, reason, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    bool present = false;
+    OseoResult result = delegate_method(
+        context,
+        delegation_target(slots[0]),
+        "throw",
+        &slots[2],
+        &present
+    );
+    /* The delegating body has no way to deliver a throw completion to an
+     * iterator that declares no `throw`, so it closes that iterator and
+     * reports a TypeError instead. An abrupt close replaces it. */
+    if (result.status == OSEO_STATUS_NORMAL && !present) {
+        result = oseo_async_iterator_close(context, slots[0], false);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The delegated iterator has no throw method."
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = async_delegate_invoke(
+            context,
+            delegation_target(slots[0]),
+            is_async_from_sync_iterator(slots[0]),
+            slots[2],
+            slots[1],
+            value,
+            done
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }

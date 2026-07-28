@@ -10,7 +10,7 @@
  * and rejection tracking.
  */
 
-static OseoResult promise_create(OseoContext *context) {
+OseoResult oseo_internal_promise_create(OseoContext *context) {
     OseoPromise *promise =
         oseo_internal_allocate_heap_bytes(context, sizeof(*promise));
     if (promise == NULL) {
@@ -37,6 +37,7 @@ static OseoResult promise_create(OseoContext *context) {
     promise->ordinary.async_sync_iterator = oseo_undefined();
     promise->ordinary.default_intrinsics = true;
     promise->ordinary.generator_prototype = false;
+    promise->ordinary.async_generator_prototype = false;
     promise->ordinary.generator = NULL;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
@@ -425,7 +426,7 @@ OseoResult oseo_promise_resolve(
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = value;
-    result = promise_create(context);
+    result = oseo_internal_promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_promise_resolve_into(
@@ -447,7 +448,7 @@ OseoResult oseo_promise_reject(
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = reason;
-    result = promise_create(context);
+    result = oseo_internal_promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_promise_reject_into(
@@ -611,7 +612,7 @@ static OseoResult promise_combine(
     OseoResult result = oseo_roots_allocate(context, &frame, 14u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = iterable;
-    result = promise_create(context);
+    result = oseo_internal_promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoValue captured_next = oseo_undefined();
@@ -986,7 +987,7 @@ OseoResult oseo_promise_construct(
     OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = executor;
-    result = promise_create(context);
+    result = oseo_internal_promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = resolving_environment_create(context, frame.slots[1]);
@@ -1063,7 +1064,7 @@ static OseoResult promise_then_with_capability(
     frame.slots[2] = on_rejected;
     frame.slots[3] = capability;
     if (tag_of(frame.slots[3]) == OSEO_TAG_UNDEFINED) {
-        result = promise_create(context);
+        result = oseo_internal_promise_create(context);
         frame.slots[3] = result.value;
     } else if (!is_promise(frame.slots[3])) {
         result = failure(
@@ -1137,7 +1138,7 @@ OseoResult oseo_promise_async_call(
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = execution;
-    result = promise_create(context);
+    result = oseo_internal_promise_create(context);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         frame.slots[3] = context->async_call_capability;
