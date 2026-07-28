@@ -282,6 +282,23 @@ const syncNoReturn = {
 async function* delegatingNoReturn() {
   yield* syncNoReturn;
 }
+/* A native asynchronous iterator with no return method takes the other
+ * half of that path: no wrapper stands between the delegation and the
+ * iterator, so the delegation awaits the delivered value itself and a
+ * thenable resumption value is unwrapped before the delegating body
+ * leaves through the return completion. */
+const asyncNoReturn = {
+  [Symbol.asyncIterator]: function () {
+    return {
+      next: function () {
+        return Promise.resolve({ value: "async-no-return", done: false });
+      },
+    };
+  },
+};
+async function* delegatingAsyncNoReturn() {
+  yield* asyncNoReturn;
+}
 async function main() {
   const iterator = delegatingAsync();
   const a = await iterator.next();
@@ -360,6 +377,38 @@ async function main() {
       console.log("t5");
     });
   await ordered;
+
+  const asyncNoReturnIterator = delegatingAsyncNoReturn();
+  const o = await asyncNoReturnIterator.next();
+  console.log(o.value, o.done);
+  const asyncOrdered = asyncNoReturnIterator.return("async sent").then(
+    function (step) {
+      console.log("async missing return", step.value, step.done);
+    },
+  );
+  Promise.resolve()
+    .then(function () {
+      console.log("u1");
+    })
+    .then(function () {
+      console.log("u2");
+    })
+    .then(function () {
+      console.log("u3");
+    })
+    .then(function () {
+      console.log("u4");
+    })
+    .then(function () {
+      console.log("u5");
+    });
+  await asyncOrdered;
+
+  const unwrapping = delegatingAsyncNoReturn();
+  const p = await unwrapping.next();
+  console.log(p.value, p.done);
+  const q = await unwrapping.return(Promise.resolve("thenable sent"));
+  console.log("unwrapped return", q.value, q.done);
   console.log("finished");
 }
 main();
