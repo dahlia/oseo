@@ -1437,13 +1437,9 @@ its deliberate boundary and its evidence:
     Deliberate boundaries: asynchronous generator method definitions in object
     literals and class bodies stay rejected with the same diagnostic
     synchronous generator methods get, and default or binding-pattern
-    parameters stay rejected for the same ordering reason. `%AsyncGenerator%`,
-    `%AsyncGeneratorFunction%`, and `%AsyncIteratorPrototype%` are not
-    materialized, matching how `%GeneratorPrototype%` is virtualized, so the
-    reviewed *test/built-ins/AsyncGeneratorFunction/* cases carry the
-    `dynamic-source` dependency tag. The awaits a `yield*` step takes drain
-    the scheduler rather than returning to the caller, which the `for await`
-    gap entry below owns.
+    parameters stay rejected for the same ordering reason. The awaits a
+    `yield*` step takes drain the scheduler rather than returning to the
+    caller, which the `for await` gap entry below owns.
     Native differential fixtures cover single and repeated yields, sent
     values, awaited and promised operands, an empty body, an awaited explicit
     return, function `length`, `name`, and inferred `name`, self-iterability
@@ -1464,6 +1460,57 @@ its deliberate boundary and its evidence:
     bounded bodies, awaited and promised operands, three delegation kinds,
     `try`/`catch` and `try`/`finally` guards, and every resumption position
     under both specialization policies and forced collection.
+ -  The asynchronous generator intrinsic chain. `%AsyncIteratorPrototype%`,
+    `%AsyncGeneratorPrototype%`, `%AsyncGeneratorFunction.prototype%`, and
+    `%AsyncGeneratorFunction%` are materialized as one lazily created
+    cluster, because their `constructor` and `prototype` links are circular.
+    An asynchronous generator reaches its function's own `prototype` object,
+    that object inherits from `%AsyncGeneratorPrototype%`, and
+    `%AsyncGeneratorPrototype%` inherits from `%AsyncIteratorPrototype%`.
+    `next`, `return`, and `throw` are own properties of
+    `%AsyncGeneratorPrototype%` and `Symbol.asyncIterator` is an own property
+    of `%AsyncIteratorPrototype%`, each writable, non-enumerable, and
+    configurable, so a descriptor read, a deletion, and an assignment all
+    observe the same set a property read does, and a replaced `prototype`
+    object reaches exactly the methods its own chain still retains.
+    `%AsyncGeneratorPrototype%` carries own `constructor` and
+    `Symbol.toStringTag` properties, valued
+    `%AsyncGeneratorFunction.prototype%` and `"AsyncGenerator"`, and
+    `%AsyncGeneratorFunction.prototype%` carries own `constructor`,
+    `prototype`, and `Symbol.toStringTag` properties, valued
+    `%AsyncGeneratorFunction%`, `%AsyncGeneratorPrototype%`, and
+    `"AsyncGeneratorFunction"`. Each is non-writable, non-enumerable, and
+    configurable, as the specification requires.
+    `%AsyncGeneratorFunction%` has `name` `"AsyncGeneratorFunction"`,
+    `length` 1, and a non-writable, non-configurable `prototype`, and every
+    asynchronous generator function has it as its `constructor` because
+    `%AsyncGeneratorFunction.prototype%` is that function's `[[Prototype]]`.
+    Deliberate boundaries: three of the cluster's `[[Prototype]]` links are
+    null because this profile materializes neither `%Object.prototype%` nor
+    the `Function` intrinsics. `%AsyncIteratorPrototype%` should inherit
+    from `%Object.prototype%`, `%AsyncGeneratorFunction.prototype%` from
+    `%Function.prototype%`, and `%AsyncGeneratorFunction%` from
+    `%Function%`. Calling or constructing `%AsyncGeneratorFunction%` reports
+    the `OSEO1001` dynamic-source diagnostic of
+    [ADR 0016](./adr/0016-dynamic-source-boundary.md) instead of compiling
+    source text. The reviewed
+    *test/built-ins/AsyncGeneratorPrototype/* and
+    *test/built-ins/AsyncIteratorPrototype/* cases that observe these values
+    reach them through `Object.getPrototypeOf`, which is not admitted, so
+    none of them promote yet and the gap entry below owns that.
+    Native differential fixtures cover both intrinsic identities shared
+    across two generator functions, the four `constructor` and `prototype`
+    links, `%AsyncGeneratorFunction%`'s `name` and `length`, both
+    `Symbol.toStringTag` values as read through a generator and through its
+    function's `prototype` object, `in` agreeing with a property read across
+    the whole chain, every own property descriptor including the four methods
+    and the link each sits at, deleting a configurable method, the empty
+    enumerable key sets, the shared method identities and their `length` and
+    `name` values, a borrowed `Symbol.asyncIterator` returning an ordinary
+    receiver, the `%AsyncGeneratorPrototype%` fallback a non-object `prototype`
+    produces, a replaced `prototype` object that reaches only its own `next`,
+    and each of `next`, `return`, and `throw` rejecting rather than throwing
+    for a non-generator receiver, including the intrinsic prototype itself.
 
 
 Known gaps inside the claim
@@ -1568,6 +1615,14 @@ must never shrink by reclassification alone.
     `dynamic-source` tag. There is no `GeneratorFunction` global binding in
     ECMAScript, so this profile does not add one. Owner: the intrinsics and
     built-in objects stream.
+ -  `Object.getPrototypeOf` is not admitted, and neither `Object` nor
+    `Promise` is admitted as a value. Every reviewed
+    *test/built-ins/AsyncGeneratorPrototype/* and
+    *test/built-ins/AsyncIteratorPrototype/* case reaches the intrinsics it
+    checks through one of the three, so the cluster this profile now
+    materializes promotes none of them and they keep the
+    `unsupported-profile-feature` classification their compile-stage
+    `OSEO1001` produces. Owner: the intrinsics and built-in objects stream.
  -  `eval`, the `Function` constructor, and dynamic import stay explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
     Reviewed cases that need them carry the `dynamic-source` dependency

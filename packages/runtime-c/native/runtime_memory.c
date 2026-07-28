@@ -194,6 +194,9 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->async_generator_return_function, &worklist);
     mark_value(context->async_generator_throw_function, &worklist);
     mark_value(context->async_generator_prototype, &worklist);
+    mark_value(context->async_iterator_prototype, &worklist);
+    mark_value(context->async_generator_intrinsic, &worklist);
+    mark_value(context->async_generator_function, &worklist);
     mark_value(context->async_iterator_self_function, &worklist);
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {

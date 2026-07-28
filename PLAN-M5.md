@@ -954,6 +954,63 @@ an accessor as a data property, and the fixed
 the ECMA-262 order directly without a reference observation, alongside the
 accessor-before-spread order both references do agree with.
 
+The asynchronous generator intrinsic chain is now materialized, the thirteenth
+unit of the functions and executable syntax stream. `%AsyncIteratorPrototype%`,
+`%AsyncGeneratorPrototype%`, `%AsyncGeneratorFunction.prototype%`, and
+`%AsyncGeneratorFunction%` are created as one lazily built cluster, because
+their `constructor` and `prototype` links are circular and no partially wired
+intrinsic may become observable. The cluster reaches the context only after
+every property is defined, and its allocations are restored the way the error
+intrinsics restore theirs, so an intrinsic created on first use never enters
+the observed program's allocation count.
+
+The four methods stop being brands that a property read synthesizes and become
+ordinary own properties of the objects the specification places them on:
+`next`, `return`, and `throw` on `%AsyncGeneratorPrototype%`, and
+`Symbol.asyncIterator` one link further out on `%AsyncIteratorPrototype%`,
+which `%AsyncGeneratorPrototype%` now inherits from. A descriptor read, a
+deletion, and an assignment therefore observe the same set a property read
+does, which the brand could not offer, and a replaced `prototype` object
+reaches exactly the methods its own chain still retains.
+`%AsyncGeneratorPrototype%` gains own `constructor` and
+`Symbol.toStringTag` properties, `%AsyncGeneratorFunction.prototype%` gains
+own `constructor`, `prototype`, and `Symbol.toStringTag` properties, and every
+asynchronous generator function has `%AsyncGeneratorFunction.prototype%` as its
+`[[Prototype]]`, which is what makes its `constructor` reach
+`%AsyncGeneratorFunction%`. That constructor exists so the chain is complete;
+calling or constructing it reports the `OSEO1001` dynamic-source diagnostic of
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) rather than compiling
+source text, which is the one reference a property chain can still reach after
+the frontend has rejected every dynamic source form it can see. The runtime
+gains three context roots and one internal entry point, which bumps the ABI to
+`m5-25`.
+
+Three of the cluster's `[[Prototype]]` links stay null because this profile
+materializes neither `%Object.prototype%` nor the `Function` intrinsics:
+`%AsyncIteratorPrototype%` should inherit from `%Object.prototype%`,
+`%AsyncGeneratorFunction.prototype%` from `%Function.prototype%`, and
+`%AsyncGeneratorFunction%` from `%Function%`. No reviewed test262 case promotes:
+every *test/built-ins/AsyncGeneratorPrototype/* and
+*test/built-ins/AsyncIteratorPrototype/* case reaches the intrinsics it checks
+through `Object.getPrototypeOf`, or through `Object` or `Promise` as a value,
+and none of the three is admitted, so the manifest stays at 1,732 passes, 1,107
+expected negatives, and 1,012 unsupported profile features. The profile's known
+gaps gain that entry, which the intrinsics and built-in objects stream owns.
+
+One native differential fixture covers both intrinsic identities shared across
+two generator functions, the four `constructor` and `prototype` links,
+`%AsyncGeneratorFunction%`'s `name` and `length`, both `Symbol.toStringTag`
+values, `in` agreeing with a property read across the whole chain, every own
+property descriptor including the four methods and the link each sits at,
+deleting a configurable method, the empty enumerable key sets, the shared
+method identities with their `length` and `name`, a borrowed
+`Symbol.asyncIterator` returning an ordinary receiver, the
+`%AsyncGeneratorPrototype%` fallback a non-object `prototype` produces, a
+replaced `prototype` object that reaches only its own `next`, and each of
+`next`, `return`, and `throw` rejecting rather than throwing for a
+non-generator receiver, including the intrinsic prototype itself. It runs under
+forced collection so the three new context roots are traced.
+
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),

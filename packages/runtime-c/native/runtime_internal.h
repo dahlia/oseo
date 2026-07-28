@@ -73,6 +73,15 @@
     (SIZE_MAX - 21u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_ASYNC_ITERATOR_SELF_CODE_ID \
     (SIZE_MAX - 22u - OSEO_ERROR_KIND_COUNT)
+/* %AsyncGeneratorFunction%. The intrinsic exists so the asynchronous
+ * generator prototype chain and its `constructor` links are complete,
+ * but reaching its [[Call]] or [[Construct]] means source text became
+ * known only at run time, which ADR 0016 keeps outside the profile. The
+ * frontend rejects every dynamic source form it can see, so this entry
+ * point reports the same boundary for the one reference a property chain
+ * can still reach. */
+#define OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID \
+    (SIZE_MAX - 23u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -326,10 +335,6 @@ typedef struct {
      * virtualized %GeneratorPrototype% methods to the generators created
      * from it. Replacing the object drops the brand with it. */
     bool generator_prototype;
-    /* The same brand for an asynchronous generator function's
-     * `prototype` object, which serves %AsyncGeneratorPrototype%. The two
-     * intrinsics share no methods, so the brands stay distinct. */
-    bool async_generator_prototype;
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
 } OseoOrdinaryObject;
@@ -758,8 +763,13 @@ OseoResult oseo_internal_well_known_symbol(
 );
 /* The lazily created, permanently rooted %GeneratorPrototype%. */
 OseoResult oseo_internal_generator_prototype(OseoContext *context);
-/* The same for %AsyncGeneratorPrototype%. */
+/* The same for %AsyncGeneratorPrototype%. Reaching it creates the whole
+ * asynchronous generator intrinsic cluster, because its `constructor`
+ * and the chain above it are circular. */
 OseoResult oseo_internal_async_generator_prototype(OseoContext *context);
+/* %AsyncGeneratorFunction.prototype%, the object every asynchronous
+ * generator function has as its [[Prototype]]. */
+OseoResult oseo_internal_async_generator_intrinsic(OseoContext *context);
 /*
  * Resumes one asynchronous generator parked on an awaited operand. The
  * two await reactions call this with the settled value and the

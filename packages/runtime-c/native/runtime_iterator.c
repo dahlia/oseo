@@ -1185,7 +1185,14 @@ OseoResult oseo_async_iterator_delegate_return(
 ) {
     /* An iterator with no `return` method reports done with the value the
      * resumption delivered, which is the return completion the delegating
-     * body then leaves through. */
+     * body then leaves through. That path is still a turn: a native
+     * asynchronous iterator awaits the delivered value itself, and a
+     * wrapped synchronous one runs
+     * AsyncFromSyncIteratorPrototype.return, which resolves its own
+     * promise with a completed result object built from the unawaited
+     * value and leaves the delegation awaiting that promise. Both spend
+     * exactly one turn, so a `return` delivered into a delegation resumes
+     * the delegating body at the same point either way. */
     *value = sent;
     *done = true;
     OseoValue slots[3] = {iterator, sent, oseo_undefined()};
@@ -1200,7 +1207,16 @@ OseoResult oseo_async_iterator_delegate_return(
         &present
     );
     if (result.status == OSEO_STATUS_NORMAL && !present) {
+        if (is_async_from_sync_iterator(slots[0])) {
+            /* The wrapper reports the delivered value unchanged, so only
+             * the promise it settles is awaited here. */
+            result = await_wrapper_promise(context, normal(slots[1]));
+        } else {
+            result = oseo_internal_await_step(context, slots[1]);
+            if (result.status == OSEO_STATUS_NORMAL) *value = result.value;
+        }
         oseo_roots_pop(context, &frame);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
         return normal(oseo_boolean(false));
     }
     if (result.status == OSEO_STATUS_NORMAL) {

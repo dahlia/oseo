@@ -85,9 +85,9 @@ async function main() {
   console.log(typeof generatorObject.throw);
   console.log(generatorObject.next === counted(1, 2, 3).next);
   /* MakeConstructor never runs for an asynchronous generator function, so
-   * its prototype object carries no own constructor. An inherited one
-   * would come from %AsyncGenerator%, which this profile does not
-   * materialize, so only the own property set is observed here. */
+   * its prototype object carries no own constructor; the inherited one
+   * comes from %AsyncGeneratorPrototype% and the prototype fixture below
+   * observes it. */
   console.log(
     "own constructor",
     typeof Object.getOwnPropertyDescriptor(counted.prototype, "constructor"),
@@ -107,6 +107,214 @@ async function main() {
     constructed = error.constructor.name;
   }
   console.log("construct", constructed);
+  console.log("finished");
+}
+main();
+`,
+  },
+  {
+    name: "async-generator-prototypes",
+    source: `
+async function* first() {
+  yield 1;
+}
+async function* second() {
+  yield 2;
+}
+const iterator = first();
+const AsyncGenerator = first.prototype.constructor;
+const AsyncGeneratorFunction = first.constructor;
+console.log(typeof first.prototype, typeof AsyncGenerator);
+console.log(typeof AsyncGeneratorFunction, AsyncGeneratorFunction.name);
+console.log(AsyncGeneratorFunction.length);
+console.log(AsyncGenerator === second.prototype.constructor);
+console.log(AsyncGeneratorFunction === second.constructor);
+console.log(AsyncGeneratorFunction.prototype === AsyncGenerator);
+console.log(AsyncGenerator.constructor === AsyncGeneratorFunction);
+console.log(first.prototype === second.prototype);
+console.log(first.prototype === AsyncGenerator.prototype);
+console.log(AsyncGenerator[Symbol.toStringTag]);
+console.log(AsyncGenerator.prototype[Symbol.toStringTag]);
+console.log(first.prototype[Symbol.toStringTag], iterator[Symbol.toStringTag]);
+console.log(
+  "in",
+  "next" in first.prototype,
+  "return" in first.prototype,
+  "throw" in first.prototype,
+  "constructor" in first.prototype,
+);
+console.log(
+  "iterator in",
+  Symbol.asyncIterator in first.prototype,
+  Symbol.iterator in first.prototype,
+);
+console.log(iterator[Symbol.asyncIterator]() === iterator);
+/* The method is generic over its receiver, so an ordinary object that
+ * borrows it is reported back unchanged. */
+const holder = { [Symbol.asyncIterator]: iterator[Symbol.asyncIterator] };
+console.log(holder[Symbol.asyncIterator]() === holder);
+console.log(iterator.next === second().next);
+console.log(iterator.next.length, iterator.next.name);
+console.log(iterator.return.length, iterator.return.name);
+console.log(iterator.throw.length, iterator.throw.name);
+const self = iterator[Symbol.asyncIterator];
+console.log(self.length, self.name);
+/* Every method is an own property of the intrinsic the specification
+ * places it on, so a descriptor read sees the same set a property read
+ * does. */
+const nextDescriptor = Object.getOwnPropertyDescriptor(
+  AsyncGenerator.prototype,
+  "next",
+);
+console.log(
+  "next descriptor",
+  nextDescriptor.value === iterator.next,
+  nextDescriptor.writable,
+  nextDescriptor.enumerable,
+  nextDescriptor.configurable,
+);
+console.log(
+  "own methods",
+  typeof Object.getOwnPropertyDescriptor(AsyncGenerator.prototype, "return"),
+  typeof Object.getOwnPropertyDescriptor(AsyncGenerator.prototype, "throw"),
+  typeof Object.getOwnPropertyDescriptor(
+    AsyncGenerator.prototype,
+    Symbol.asyncIterator,
+  ),
+);
+const constructorDescriptor = Object.getOwnPropertyDescriptor(
+  AsyncGenerator.prototype,
+  "constructor",
+);
+console.log(
+  "constructor descriptor",
+  constructorDescriptor.value === AsyncGenerator,
+  constructorDescriptor.writable,
+  constructorDescriptor.enumerable,
+  constructorDescriptor.configurable,
+);
+const tagDescriptor = Object.getOwnPropertyDescriptor(
+  AsyncGenerator.prototype,
+  Symbol.toStringTag,
+);
+console.log(
+  "tag descriptor",
+  tagDescriptor.value,
+  tagDescriptor.writable,
+  tagDescriptor.enumerable,
+  tagDescriptor.configurable,
+);
+const prototypeDescriptor = Object.getOwnPropertyDescriptor(
+  AsyncGenerator,
+  "prototype",
+);
+console.log(
+  "prototype descriptor",
+  prototypeDescriptor.value === AsyncGenerator.prototype,
+  prototypeDescriptor.writable,
+  prototypeDescriptor.enumerable,
+  prototypeDescriptor.configurable,
+);
+const functionDescriptor = Object.getOwnPropertyDescriptor(
+  AsyncGeneratorFunction,
+  "prototype",
+);
+console.log(
+  "function descriptor",
+  functionDescriptor.value === AsyncGenerator,
+  functionDescriptor.writable,
+  functionDescriptor.enumerable,
+  functionDescriptor.configurable,
+);
+console.log(
+  "enumerable keys",
+  Object.keys(AsyncGenerator).length,
+  Object.keys(AsyncGenerator.prototype).length,
+  Object.keys(AsyncGeneratorFunction).length,
+);
+/* GetPrototypeFromConstructor falls back to %AsyncGeneratorPrototype%
+ * whenever the function's own prototype is not an object, so the
+ * generator still reaches the intrinsic chain. */
+async function* fallback() {
+  yield "fallen";
+}
+fallback.prototype = 1;
+const fallbackIterator = fallback();
+console.log(fallbackIterator[Symbol.toStringTag]);
+console.log(fallbackIterator[Symbol.asyncIterator]() === fallbackIterator);
+/* A replaced prototype object drops the chain with it, so the
+ * replacement's own methods are the only ones a generator reaches. */
+async function* replaced() {
+  yield "unreached";
+}
+replaced.prototype = {
+  next: function () {
+    return Promise.resolve({ value: "own", done: true });
+  },
+};
+const replacedIterator = replaced();
+console.log(
+  "replaced",
+  typeof replacedIterator.next,
+  typeof replacedIterator.return,
+  replacedIterator[Symbol.toStringTag],
+);
+async function main() {
+  const step = await iterator.next();
+  console.log(step.value, step.done);
+  const fallbackStep = await fallbackIterator.next();
+  console.log(fallbackStep.value, fallbackStep.done);
+  const replacedStep = await replacedIterator.next();
+  console.log(replacedStep.value, replacedStep.done);
+  /* Each method rejects rather than throws when its receiver is not an
+   * asynchronous generator, which is what IfAbruptRejectPromise gives
+   * every one of the three. */
+  const borrowed = {
+    next: iterator.next,
+    return: iterator.return,
+    throw: iterator.throw,
+  };
+  const rejected = await borrowed.next().then(
+    function () {
+      return "resolved";
+    },
+    function (error) {
+      return error.constructor.name;
+    },
+  );
+  console.log("borrowed next", rejected);
+  const borrowedReturn = await borrowed.return().then(
+    function () {
+      return "resolved";
+    },
+    function (error) {
+      return error.constructor.name;
+    },
+  );
+  console.log("borrowed return", borrowedReturn);
+  const borrowedThrow = await borrowed.throw().then(
+    function () {
+      return "resolved";
+    },
+    function (error) {
+      return error.constructor.name;
+    },
+  );
+  console.log("borrowed throw", borrowedThrow);
+  const onPrototype = await first.prototype.next().then(
+    function () {
+      return "resolved";
+    },
+    function (error) {
+      return error.constructor.name;
+    },
+  );
+  console.log("prototype receiver", onPrototype);
+  /* A configurable own property is deletable, and deleting it leaves the
+   * generator with nothing to inherit. This runs last because it mutates
+   * the shared intrinsic. */
+  console.log("delete throw", delete AsyncGenerator.prototype.throw);
+  console.log("after delete", iterator.throw, "throw" in first.prototype);
   console.log("finished");
 }
 main();
@@ -282,6 +490,23 @@ const syncNoReturn = {
 async function* delegatingNoReturn() {
   yield* syncNoReturn;
 }
+/* A native asynchronous iterator with no return method takes the other
+ * half of that path: no wrapper stands between the delegation and the
+ * iterator, so the delegation awaits the delivered value itself and a
+ * thenable resumption value is unwrapped before the delegating body
+ * leaves through the return completion. */
+const asyncNoReturn = {
+  [Symbol.asyncIterator]: function () {
+    return {
+      next: function () {
+        return Promise.resolve({ value: "async-no-return", done: false });
+      },
+    };
+  },
+};
+async function* delegatingAsyncNoReturn() {
+  yield* asyncNoReturn;
+}
 async function main() {
   const iterator = delegatingAsync();
   const a = await iterator.next();
@@ -360,6 +585,38 @@ async function main() {
       console.log("t5");
     });
   await ordered;
+
+  const asyncNoReturnIterator = delegatingAsyncNoReturn();
+  const o = await asyncNoReturnIterator.next();
+  console.log(o.value, o.done);
+  const asyncOrdered = asyncNoReturnIterator.return("async sent").then(
+    function (step) {
+      console.log("async missing return", step.value, step.done);
+    },
+  );
+  Promise.resolve()
+    .then(function () {
+      console.log("u1");
+    })
+    .then(function () {
+      console.log("u2");
+    })
+    .then(function () {
+      console.log("u3");
+    })
+    .then(function () {
+      console.log("u4");
+    })
+    .then(function () {
+      console.log("u5");
+    });
+  await asyncOrdered;
+
+  const unwrapping = delegatingAsyncNoReturn();
+  const p = await unwrapping.next();
+  console.log(p.value, p.done);
+  const q = await unwrapping.return(Promise.resolve("thenable sent"));
+  console.log("unwrapped return", q.value, q.done);
   console.log("finished");
 }
 main();
