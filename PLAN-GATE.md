@@ -223,6 +223,54 @@ measurement table are recorded in
 
 Owner: the standards harness expansion in [*PLAN-M5.md*](./PLAN-M5.md).
 
+### Compatibility ratchet check
+
+[*PLAN-M5.md*](./PLAN-M5.md) states that measured compatibility moves in one
+direction: a recorded pass does not change classification, the reviewed subset
+does not lose a path, and a generated domain does not lose a seed or shrink its
+case budget. Nothing checks it. The rule is enforced today by whoever reads the
+diff, and a reviewer who is looking at a large semantic change is the reader
+least likely to notice a manifest row that moved the wrong way.
+
+A check task compares the current state against a baseline and fails on any of
+those reversals. It reports the before and after counts either way, so a change
+that legitimately reverses one has the numbers its description needs.
+
+The baseline is selected by context rather than assumed, because getting it
+wrong is how a ratchet reads green while a regression sits in the diff:
+
+ -  a pull request compares against its base commit;
+ -  a push compares against the commit the push started from, so that a
+    regression introduced early in a multi-commit push cannot hide behind a
+    later commit that restores the count;
+ -  a push that creates a reference reports no such commit, so a new branch
+    falls back to its merge base with `main`, and a tag push is out of scope
+    because a tag records a state the branch check already covered;
+ -  a local branch compares against its merge base with `main`; and
+ -  uncommitted work on a local `main` compares against `HEAD`, so an unrelated
+    commit already on the branch is not counted as part of the change.
+
+Continuous integration checks out at depth one and in a detached state today,
+so the workflow supplies both the baseline commit and the history the
+comparison needs. A baseline the task cannot resolve fails the check rather
+than skipping it, because a ratchet that quietly passes when it cannot compare
+is worse than no ratchet.
+
+A reversal the evidence demands needs a way through, and that way is a checked-
+in override record rather than a command-line flag nobody keeps. Each record
+names one invariant, the path or generated domain it covers, the transition it
+expects, and the reason. It permits that transition and nothing else. An
+override whose transition does not occur is stale and fails the check, so the
+set cannot silently accumulate into a disabled ratchet.
+
+This checkpoint has no timing target. It is accepted when a deliberate
+reversal of each listed invariant fails the check, when an override permits
+only the transition it names, when a stale override fails, and when the
+reviewed subset passes unchanged.
+
+Owner: the measurement contract in [*PLAN-M5.md*](./PLAN-M5.md) states the
+rule; this plan only carries the gate that enforces it.
+
 ### Seed allocation registry
 
 Property seeds are allocated sequentially without a registry, so two
@@ -300,12 +348,13 @@ Archive reuse and concurrent execution are the two checkpoints with a timing
 target. One that does not move its recorded duration is reverted or replanned
 rather than kept for its structure.
 
-The seed registry, the failure classification, the record partitioning, and the
-evidence lanes have no timing target. They are accepted on their own terms: a
-registry that makes a colliding seed impossible, a classification that
-separates a resource failure from a harness defect in the manifest, a record
-format that two concurrent units can extend without conflicting, and a profile
-template that carries one normative record for each family. Each still records
+The ratchet check, the seed registry, the failure classification, the record
+partitioning, and the evidence lanes have no timing target. They are accepted
+on their own terms: a check that fails on a deliberate reversal, a registry
+that makes a colliding seed impossible, a classification that separates a
+resource failure from a harness defect in the manifest, a record format that
+two concurrent units can extend without conflicting, and a profile template
+that carries one normative record for each family. Each still records
 the table, because a correctness checkpoint that makes the gate slower is a
 result the next checkpoint needs to know about.
 
@@ -355,6 +404,9 @@ This plan is complete when:
     harness defects under an amended ADR 0013;
  -  the manifest record format supports the corpus size the claim requires
     without a single-file conflict for every concurrent unit;
+ -  a deliberate reversal of each monotonicity rule in the measurement
+    contract fails the ratchet check, and an unresolvable baseline fails it
+    too;
  -  property seeds are allocated from a checked-in registry;
  -  each admitted family has one normative profile record that concurrent
     units extend without conflicting; and

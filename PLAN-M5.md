@@ -1150,6 +1150,19 @@ from unsupported only after every applicable variant executes. A changed
 upstream revision is a reviewed manifest change, not an automatic percentage
 update.
 
+Measured compatibility moves in one direction. An upstream path recorded as a
+pass does not move to another classification, the reviewed subset does not lose
+a path, and a generated domain does not lose a seed or shrink its case budget.
+The edition and profile boundary below states the matching rule for the
+profile itself.
+
+A change may still reverse one of these when the evidence demands it, such as
+an upstream revision that withdraws a test or a defect that shows a recorded
+pass was wrong. It records the reversal and its reason in the same change.
+Reaching a green gate is not such a reason. That distinction is the whole
+point: weakening a measurement and improving an implementation are
+indistinguishable in a diff, and only the recorded reason separates them.
+
 Coverage reports group results by syntax, abstract operation, intrinsic,
 built-in object, module behavior, and asynchronous behavior. Raw totals remain
 available so a large group cannot hide a regression in a smaller dependency.

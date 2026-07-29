@@ -400,6 +400,8 @@ dependency, or refactoring edits. In the change description, explain:
  -  why the change belongs in the current milestone;
  -  how the implementation preserves generic behavior and package boundaries;
  -  which tests and repository checks were run;
+ -  the compatibility counts before and after, when the change moves them,
+    and the reason for any count that decreased;
  -  which living documents or decision records changed as a result.
 
 If an experiment disproves the current plan, that is a useful result. Preserve
