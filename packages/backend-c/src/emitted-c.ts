@@ -887,6 +887,12 @@ export const emittedC = {
     resultAssignOseoCellInitializeContext: [
       ["result = oseo_cell_initialize(context, result.va", "lue, callee);"],
     ],
+    resultAssignOseoArgumentsCreate: [
+      [
+        "result = oseo_arguments_create(context, callee, argument_count, ",
+        "arguments);",
+      ],
+    ],
     oseoCellSet: [["oseo_cell_set"]],
     oseoCellInitialize: [["oseo_cell_initialize"]],
     resultAssignOseoArrayCreateContextU: [

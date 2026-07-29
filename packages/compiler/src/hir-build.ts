@@ -867,6 +867,39 @@ function lexicalReceiver(functionValue: SyntaxFunction): boolean {
   );
 }
 
+/**
+ * True when this unit admits an implicit `arguments` object for the
+ * function. Strict, arrow, class, and asynchronous functions deliberately
+ * leave the name unresolved.
+ */
+function admitsArgumentsObject(functionValue: SyntaxFunction): boolean {
+  const kind = functionValue.functionKind ?? "ordinary";
+  return (
+    functionValue.strict !== true &&
+    kind !== "arrow" &&
+    kind !== "async" &&
+    kind !== "async-arrow" &&
+    kind !== "async-generator" &&
+    kind !== "class"
+  );
+}
+
+/**
+ * Prevents an ineligible nested function from capturing an enclosing
+ * function's implicit `arguments` binding. Explicit bindings with that name
+ * remain ordinary lexical references.
+ */
+function withoutArgumentsObjectBindings(
+  scopes: readonly Map<string, Binding>[],
+): readonly Map<string, Binding>[] {
+  return scopes.map((scope) => {
+    if (scope.get("arguments")?.argumentsObject !== true) return scope;
+    const filtered = new Map(scope);
+    filtered.delete("arguments");
+    return filtered;
+  });
+}
+
 function resolveFunction(
   functionValue: SyntaxFunction,
   outerScopes: readonly Map<string, Binding>[],
@@ -896,6 +929,20 @@ function resolveFunction(
     }
     parameters.push({ ...parameter, bindingId: binding.id });
   }
+  let argumentsBinding: Binding | undefined;
+  if (
+    admitsArgumentsObject(functionValue) &&
+    !parameterScope.has("arguments")
+  ) {
+    argumentsBinding = {
+      argumentsObject: true,
+      id: state.nextBindingId,
+      mutable: true,
+      name: "arguments",
+    };
+    state.nextBindingId += 1;
+    parameterScope.set("arguments", argumentsBinding);
+  }
   const bodyScope = new Map<string, Binding>();
   predeclareBindings(functionValue.body, bodyScope, state);
   // Labels never cross a function boundary.
@@ -903,7 +950,9 @@ function resolveFunction(
   const body = resolveStatementList(
     functionValue.body,
     [
-      ...outerScopes,
+      ...(admitsArgumentsObject(functionValue)
+        ? outerScopes
+        : withoutArgumentsObjectBindings(outerScopes)),
       ...(selfBinding == null
         ? []
         : [new Map([[selfBinding.name, selfBinding]])]),
@@ -917,6 +966,9 @@ function resolveFunction(
   state.thisBinding = outerThisBinding;
   const resolved: HirFunction = {
     ...functionValue,
+    ...(argumentsBinding == null
+      ? {}
+      : { argumentsBindingId: argumentsBinding.id }),
     body,
     ...(derivedThisBinding == null
       ? {}

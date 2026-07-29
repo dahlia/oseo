@@ -298,6 +298,58 @@ console.log(strictNamed());
 `,
   },
   {
+    name: "arguments-object",
+    nonStrictScript: true,
+    source: `
+function inspect() {
+  const first = arguments[0];
+  console.log(
+    arguments.length,
+    arguments[0],
+    arguments[1],
+    arguments[2],
+    arguments.callee === inspect,
+  );
+  arguments[0] = 40;
+  console.log(first, arguments[0], arguments.length);
+  return arguments;
+}
+const first = inspect(1, "two");
+const second = inspect();
+console.log(first === second, first.length, second.length);
+const indexDescriptor = Object.getOwnPropertyDescriptor(first, "0");
+const lengthDescriptor = Object.getOwnPropertyDescriptor(first, "length");
+const calleeDescriptor = Object.getOwnPropertyDescriptor(first, "callee");
+console.log(
+  indexDescriptor.writable,
+  indexDescriptor.enumerable,
+  indexDescriptor.configurable,
+);
+console.log(
+  lengthDescriptor.writable,
+  lengthDescriptor.enumerable,
+  lengthDescriptor.configurable,
+);
+console.log(
+  calleeDescriptor.writable,
+  calleeDescriptor.enumerable,
+  calleeDescriptor.configurable,
+);
+const object = {
+  method() {
+    return arguments.callee === object.method && arguments[0];
+  },
+};
+console.log(object.method(42));
+function* generate() {
+  yield arguments[0];
+  return arguments.callee === generate;
+}
+const generated = generate("yielded");
+console.log(generated.next().value, generated.next().value);
+`,
+  },
+  {
     name: "constructors",
     source: `
 function Box(value) { this.value = value; }

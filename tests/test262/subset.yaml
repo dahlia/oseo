@@ -768,6 +768,24 @@ tests:
   - path: test/built-ins/Symbol/uniqueness.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/language/arguments-object/10.6-12-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-6-3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/10.6-6-4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.6_A3_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.6_A3_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.6_A4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/computed-property-names/class/accessor/getter-duplicates.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
