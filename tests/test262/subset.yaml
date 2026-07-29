@@ -16015,10 +16015,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/with/12.10-2-4.js
-    expectedClassification: pass
+    expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, error-intrinsics, object-properties]
   - path: test/language/statements/with/12.10-2-5.js
-    expectedClassification: pass
+    expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, error-intrinsics, object-properties]
   - path: test/language/statements/with/12.10-7-1.js
     expectedClassification: pass

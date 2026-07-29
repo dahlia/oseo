@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,951 reviewed cases: 1,793 passes, 1,119
-expected negatives, and 1,039 unsupported profile features. It records no
+The current manifest contains 3,962 reviewed cases: 1,801 passes, 1,120
+expected negatives, and 1,041 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -598,6 +598,21 @@ its deliberate boundary and its evidence:
     no-strict test262 cases from *test/language/arguments-object/* cover empty
     calls despite formal parameters, `callee` identity and descriptors,
     writes, and deletion.
+ -  The non-strict `with` statement. Its object expression evaluates once and
+    passes `RequireObjectCoercible` before the body can run. HIR retains each
+    intervening object environment for an identifier reference. MIR tests
+    those environments from innermost to outermost before using the nearest
+    declarative binding or an uninitialized fallback, and fixes the selected
+    reference before an assignment evaluates its right operand. Nested
+    declarative scopes stop an outer object environment from bypassing a
+    nearer lexical binding. Reads, writes, method receivers, closures, nested
+    `with` statements, and abrupt exits preserve that resolution order. Strict
+    source keeps the required parse-time rejection. Fixed native evidence also
+    covers one-time object evaluation, fallback reads and writes, captured
+    object environments, nested environments, abrupt completion, and a
+    nullish `TypeError`. Eleven reviewed cases from
+    *test/language/statements/with/* record eight passes, one expected parse
+    negative, and two unsupported global-binding dependencies.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound
@@ -1654,9 +1669,15 @@ must never shrink by reclassification alone.
     bindings remain module-scoped, and an owned
     architecture decision on how a mutable global object meets
     closed-world name resolution before any dynamically created global
-    binding is admitted. Owner: the intrinsics and built-in objects
-    stream; the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends
-    on this unit.
+    binding is admitted. The reviewed
+    *test/language/statements/with/12.10-2-4.js* and
+    *test/language/statements/with/12.10-2-5.js* cases each contain a
+    failure-only read of the unresolved global `x` outside the `with`
+    environment. Their intended nullish `TypeError` path has fixed native
+    evidence, but the complete upstream source remains
+    `unsupported-profile-feature` until this global binding model lands.
+    Owner: the intrinsics and built-in objects stream; the surface audit in
+    [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Inside an ordinary asynchronous function body, `await` is restricted to
     the M4 continuation positions, and asynchronous module cycles are
     unsupported. An asynchronous generator body has no such restriction,
