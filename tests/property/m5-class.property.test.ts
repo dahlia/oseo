@@ -95,8 +95,7 @@ interface MethodSpec {
    * Names the element with a private `#name` instead of a property key.
    * A private element defines no property, so the class exposes it
    * through generated bridge methods and no descriptor observation
-   * reaches it. This profile admits no computed private element and no
-   * private static method or accessor, so the flag excludes both.
+   * reaches it. This profile admits no computed private element.
    */
   readonly privateElement: boolean;
   /** A `static` element is defined on the constructor, not the prototype. */
@@ -179,17 +178,12 @@ const caseArbitrary: fc.Arbitrary<ClassCase> = fc
       heritage: testCase.heritage,
       methods: testCase.methods.map((method) => {
         // A field initializer runs before the constructor body assigns
-        // `f0`, so a field element carries no `field` body. This profile
-        // admits a private static field but no private static method or
-        // accessor, and no computed private key at all. A static block
-        // names nothing, so it is neither private nor computed and is
-        // always static.
+        // `f0`, so a field element carries no `field` body. A private key
+        // is never computed. A static block names nothing, so it is
+        // neither private nor computed and is always static.
         const block = method.element === "static-block";
         const privateElement = method.privateElement && !block;
-        const staticPlacement =
-          block ||
-          (method.staticPlacement &&
-            (!privateElement || isField(method.element)));
+        const staticPlacement = block || method.staticPlacement;
         const deferred = block || (staticPlacement && isField(method.element));
         const unrepresentable =
           (method.kind === "self" && testCase.form === "anonymous") ||
@@ -1001,6 +995,54 @@ test("class model reads a static element through the constructor", () => {
   assert.match(source, /Object\.getOwnPropertyDescriptor\(Shape, "m0"\)/u);
   assert.match(source, /Shape\.m0\(Shape\)/u);
   assert.match(source, /Shape\.m1 = 6;/u);
+});
+
+test("class model reads static private elements through bridges", () => {
+  const testCase: ClassCase = {
+    fields: [],
+    form: "declaration",
+    heritage: "none",
+    methods: [
+      {
+        computed: false,
+        element: "method",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: true,
+        superWrite: false,
+        value: 5,
+      },
+      {
+        computed: false,
+        element: "pair",
+        kind: "constant",
+        privateElement: true,
+        staticPlacement: true,
+        superWrite: false,
+        value: 6,
+      },
+    ],
+  };
+  assert.equal(
+    expected(testCase),
+    "definition \n" +
+      "keys \n" +
+      "name Shape 0\n" +
+      "constructor true\n" +
+      "instance true\n" +
+      "instance-keys \n" +
+      "m0 5 #m0\n" +
+      "m1 6 6\n" +
+      "brand true\n" +
+      "no-new true\n" +
+      "order c\n",
+  );
+  const source = printCase(testCase);
+  assert.match(source, /^ {2}static #m0\(\) \{/mu);
+  assert.match(source, /^ {2}static get #m1\(\) \{/mu);
+  assert.match(source, /^ {2}static set #m1\(value\) \{/mu);
+  assert.match(source, /const bridge = \{ read0: Shape\.read0 \};/u);
+  assert.doesNotMatch(source, /getOwnPropertyDescriptor\([^)]*"#m/u);
 });
 
 test("class model defines static fields after the whole body", () => {

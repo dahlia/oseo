@@ -2554,6 +2554,109 @@ console.log(hinted.apply(other, "a", "b"));
 `,
   },
   {
+    name: "class-static-private-methods",
+    source: `
+// Static private methods and accessors are installed directly on the
+// constructor. They remain absent from property observations, retain
+// method names and lengths, and use the constructor as their home object.
+class StaticBase {
+  static identify() {
+    return "base";
+  }
+  static get captured() {
+    return this.saved;
+  }
+  static set captured(value) {
+    this.saved = value;
+  }
+}
+class StaticPrivate extends StaticBase {
+  static #add(left: number, right: number) {
+    return left + right;
+  }
+  static #describe() {
+    return super.identify();
+  }
+  static set #item(value) {
+    super.captured = value;
+  }
+  static get #item() {
+    return super.captured;
+  }
+  static get #readonly() {
+    return 7;
+  }
+  static set #writeonly(value) {
+    this.written = value;
+  }
+  static call(left, right) {
+    return this.#add(left, right);
+  }
+  static method() {
+    return this.#add;
+  }
+  static describe() {
+    return this.#describe();
+  }
+  static roundTrip(value) {
+    this.#item = value;
+    return this.#item;
+  }
+  static overwrite() {
+    this.#add = 0;
+  }
+  static writeReadonly() {
+    this.#readonly = 0;
+  }
+  static readWriteonly() {
+    return this.#writeonly;
+  }
+  static inner(target) {
+    return class {
+      static call() {
+        return target.#describe();
+      }
+    };
+  }
+}
+console.log(Object.keys(StaticPrivate).length);
+console.log(
+  StaticPrivate.method().name,
+  StaticPrivate.method().length,
+  "prototype" in StaticPrivate.method(),
+);
+console.log(StaticPrivate.call(1, 2), StaticPrivate.call("a", "b"));
+console.log(StaticPrivate.describe(), StaticPrivate.roundTrip(9));
+console.log(StaticPrivate.inner(StaticPrivate).call());
+try {
+  new (StaticPrivate.method())();
+} catch (error) {
+  console.log("not-a-constructor", error instanceof TypeError);
+}
+try {
+  StaticPrivate.overwrite();
+} catch (error) {
+  console.log("private write", error instanceof TypeError);
+}
+try {
+  StaticPrivate.writeReadonly();
+} catch (error) {
+  console.log("private write", error instanceof TypeError);
+}
+try {
+  StaticPrivate.readWriteonly();
+} catch (error) {
+  console.log("private write", error instanceof TypeError);
+}
+class StaticChild extends StaticPrivate {}
+try {
+  StaticChild.call(1, 2);
+} catch (error) {
+  console.log("subclass brand", error instanceof TypeError);
+}
+`,
+  },
+  {
     name: "class-private-in",
     source: `
 // A private brand check reports presence without reading a field or

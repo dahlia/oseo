@@ -232,6 +232,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-private-accessors" ||
     fixture.name === "class-private-brand-checks" ||
     fixture.name === "class-cross-private-access" ||
+    fixture.name === "class-static-private-methods" ||
     fixture.name === "class-private-updates" ||
     fixture.name === "class-static-fields" ||
     fixture.name === "class-static-field-order" ||
