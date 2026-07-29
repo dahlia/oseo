@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,851 reviewed cases: 1,732 passes, 1,107
-expected negatives, and 1,012 unsupported profile features. It records no
+The current manifest contains 3,920 reviewed cases: 1,772 passes, 1,119
+expected negatives, and 1,029 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -189,6 +189,36 @@ its deliberate boundary and its evidence:
     value. Sequences evaluate left to right and produce their final
     operand. The `coalesce-expression` test262 feature is a supported
     feature of the reviewed subset.
+ -  Optional chaining for static and computed member access and calls:
+    `value?.property`, `value?.[key]`, and `value?.(arguments)`. The frontend
+    retains each complete chain in parser-independent syntax and HIR, including
+    ordinary member and call steps after its first optional step. MIR evaluates
+    the base once and branches through explicit strict null and undefined
+    checks. A nullish guard produces `undefined` without evaluating its key,
+    arguments, property lookup, call, or any later chain step. A live path
+    preserves left-to-right key and argument evaluation and retains the member
+    receiver for ordinary and optional method calls. Parentheses preserve that
+    receiver for a following call while ending the chain's short-circuit
+    region, so a non-optional call after a short-circuited parenthesized chain
+    still attempts to call `undefined`. The lowering reuses ordinary property
+    and dynamic call operations and adds no runtime entry point. Native
+    differential fixtures cover null, undefined, other primitives, objects,
+    optional property, computed access, calls, multi-step chains, receiver
+    preservation, abrupt non-callable values, evaluation order, one base
+    evaluation, and skipped keys and arguments. A generated property with seed
+    `0x5eed0019` covers the same forms across both specialization policies and
+    forced collection. Fourteen reviewed test262 cases pass and twelve
+    expected negatives retain the tagged-template, assignment-target, update,
+    and invalid `super()` grammar errors. Eleven unsupported cases record
+    independent prerequisites including tagged templates, dynamic source,
+    `for-in`, restricted asynchronous `await` positions, `String`, `Reflect`,
+    regular expressions, and an optional call through a `super` property.
+    Deliberate boundary: `delete value?.property` is rejected with a
+    source-located diagnostic, because optional chaining as a `delete` operand
+    is not lowered yet. The
+    remaining directory case stays outside the reviewed subset because its
+    async function reaches `.call` through a function-intrinsic path that is
+    not materialized yet.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the
@@ -1523,7 +1553,7 @@ Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
  -  Big integers, regular expressions, and the remaining expression grammar
-    are outside the admitted syntax. Owner: the
+    other than optional chaining are outside the admitted syntax. Owner: the
     core expressions and bindings stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
@@ -1535,7 +1565,8 @@ must never shrink by reclassification alone.
     `#name in object` brand check, optional `?.#name` access, and a private
     destructuring or `for-of` assignment target remain rejected. `super()`,
     `super.x`, and `new.target` are rejected inside an arrow function, and
-    `super.x` is also rejected inside an asynchronous class element, because
+    an optional call through a `super` property remains rejected. `super.x` is
+    also rejected inside an asynchronous class element, because
     this profile captures none of them lexically yet. A `super` property
     reference in a class body without `extends` and in an object literal
     method stays rejected until the intrinsic graph provides the

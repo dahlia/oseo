@@ -604,6 +604,72 @@ test("lowers nullish coalescing through null and undefined checks", () => {
   assert.equal(jumps.length, 2);
 });
 
+test("lowers optional chains through one nullish branch and join", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          base: { kind: "null", range },
+          kind: "optional-chain",
+          links: [
+            {
+              key: { kind: "string", range, value: "method" },
+              kind: "member",
+              optional: true,
+              range,
+            },
+            {
+              arguments: [{ kind: "number", range, value: 2 }],
+              kind: "call",
+              optional: false,
+              range,
+            },
+          ],
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "optional-chain-join.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  const equalityChecks = script.blocks
+    .flatMap((block) => block.operations)
+    .filter(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    );
+  assert.equal(equalityChecks.length, 2);
+  const join = script.blocks.find(
+    (block) => (block.parameters?.length ?? 0) === 1,
+  );
+  assert.ok(join != null);
+  const entry = script.blocks[0];
+  assert.ok(entry != null);
+  assert.equal(entry.terminator.kind, "branch");
+  assert.ok(
+    !entry.operations.some(
+      (operation) =>
+        operation.kind === "constant" && operation.constant?.kind === "number",
+    ),
+    "the call argument must not evaluate before the nullish guard",
+  );
+  assert.ok(
+    script.blocks.some((block) =>
+      block.operations.some(
+        (operation) =>
+          operation.kind === "call" &&
+          operation.detail === "optional chain function value",
+      ),
+    ),
+  );
+});
+
 test("lowers comma sequences to their final operand", () => {
   const syntax: SyntaxProgram = {
     body: [

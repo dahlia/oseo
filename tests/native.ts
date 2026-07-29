@@ -250,6 +250,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
     fixture.name === "in-and-instanceof" ||
+    fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||
     fixture.name === "template-literals"
   ) {

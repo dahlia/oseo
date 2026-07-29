@@ -1525,3 +1525,56 @@ test("converts logical, conditional, and do-while to owned syntax", () => {
   assert.match(hirText, /\|\|/u);
   assert.match(hirText, /\? "three" : "other"/u);
 });
+
+test("converts optional member and call chains to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'function key() { return "method"; }\n' +
+      "function argument() { return 2; }\n" +
+      "const object = { method(value) { return value; } };\n" +
+      "console.log(object?.method(argument()));\n" +
+      "console.log(object?.[key()]?.(argument()));\n" +
+      "console.log((object?.missing).value?.());\n",
+    sourceId: "optional-chain.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.syntax != null);
+  const firstCall = result.syntax.body[3];
+  assert.equal(firstCall?.kind, "expression");
+  if (firstCall?.kind !== "expression") return;
+  assert.equal(firstCall.expression.kind, "call");
+  if (
+    firstCall.expression.kind !== "call" ||
+    firstCall.expression.arguments[0]?.kind !== "optional-chain"
+  ) {
+    return;
+  }
+  assert.deepEqual(
+    firstCall.expression.arguments[0].links.map((link) => [
+      link.kind,
+      link.optional,
+    ]),
+    [
+      ["member", true],
+      ["call", false],
+    ],
+  );
+  const boundaryCall = result.syntax.body[5];
+  assert.equal(boundaryCall?.kind, "expression");
+  if (
+    boundaryCall?.kind !== "expression" ||
+    boundaryCall.expression.kind !== "call" ||
+    boundaryCall.expression.arguments[0]?.kind !== "optional-chain"
+  ) {
+    return;
+  }
+  assert.equal(
+    boundaryCall.expression.arguments[0].base.kind,
+    "optional-chain",
+  );
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /object\)\?\.\["method"\]\(/u);
+  assert.match(hirText, /object\)\?\.\[call %b0\(key\)\(\)\]\?\.\(/u);
+  assert.match(hirText, /\(object\)\?\.\["missing"\]\)\["value"\]\?\.\(/u);
+});

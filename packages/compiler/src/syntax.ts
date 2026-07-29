@@ -172,6 +172,27 @@ export interface SyntaxSpreadArgument extends LocatedSyntax {
 /** One ordinary or spread owned call argument. */
 export type SyntaxCallArgument = SyntaxExpression | SyntaxSpreadArgument;
 
+/** One property or call step in an optional chain. */
+export type SyntaxOptionalChainLink =
+  | (LocatedSyntax & {
+      readonly key: SyntaxExpression;
+      readonly kind: "member";
+      /** Whether this step performs the chain's nullish guard. */
+      readonly optional: boolean;
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly SyntaxCallArgument[];
+      /**
+       * True when parentheses ended the optional chain before this ordinary
+       * call. The call retains the member receiver, but a short-circuited
+       * chain calls `undefined` instead of skipping it.
+       */
+      readonly chainBoundary?: true;
+      readonly kind: "call";
+      /** Whether this step performs the chain's nullish guard. */
+      readonly optional: boolean;
+    });
+
 /** One data, shorthand, method, or accessor owned object literal entry. */
 export interface SyntaxObjectDefinition {
   /** A get or set accessor; absent for a data, shorthand, or method
@@ -386,6 +407,16 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly kind: "object";
       readonly properties: readonly SyntaxObjectProperty[];
+    })
+  | (LocatedSyntax & {
+      /**
+       * The base and left-to-right property or call steps of one optional
+       * chain. Keeping the chain intact lets one guarded step skip every
+       * following unguarded step without evaluating the base twice.
+       */
+      readonly base: SyntaxExpression;
+      readonly kind: "optional-chain";
+      readonly links: readonly SyntaxOptionalChainLink[];
     })
   | (LocatedSyntax & {
       readonly key: SyntaxExpression;
