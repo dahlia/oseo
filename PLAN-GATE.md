@@ -4,12 +4,13 @@ Evidence gate throughput plan
 Status
 ------
 
-Implementation status: in progress. The runtime archive reuse and concurrent
-reviewed execution checkpoints are complete, while the later checkpoints
-remain planned. This plan defines the cost contract for the reviewed evidence
-gates and the checkpoints that keep that cost usable as the reviewed corpus
-grows. It does not change any language semantic, any classification vocabulary
-by itself, or the amount of evidence a semantic unit must supply.
+Implementation status: in progress. The runtime archive reuse, concurrent
+reviewed execution, and compatibility ratchet checkpoints are complete, while
+the later checkpoints remain planned. This plan defines the cost contract for
+the reviewed evidence gates and the checkpoints that keep that cost usable as
+the reviewed corpus grows. It does not change any language semantic, any
+classification vocabulary by itself, or the amount of evidence a semantic
+unit must supply.
 
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
@@ -225,19 +226,19 @@ Owner: the standards harness expansion in [*PLAN-M5.md*](./PLAN-M5.md).
 
 ### Compatibility ratchet check
 
-[*PLAN-M5.md*](./PLAN-M5.md) states that measured compatibility moves in one
-direction: a recorded pass does not change classification, the reviewed subset
-does not lose a path, and a generated domain does not lose a seed or shrink its
-case budget. Nothing checks it. The rule is enforced today by whoever reads the
-diff, and a reviewer who is looking at a large semantic change is the reader
-least likely to notice a manifest row that moved the wrong way.
+Checkpoint status: complete.
 
-A check task compares the current state against a baseline and fails on any of
-those reversals. It reports the before and after counts either way, so a change
-that legitimately reverses one has the numbers its description needs.
+`mise run check:compatibility-ratchet` compares the current worktree with its
+selected Git baseline. It derives the pass count and path classifications from
+*results.yaml*, compares the reviewed path set in *subset.yaml*, and parses the
+static `domain`, `seed`, and `numRuns` options passed to every
+`assertProperty` and `assertAsyncProperty` call. It fails when the pass count
+falls, a path that passed changes classification, a reviewed path disappears,
+the current subset and result manifest contain different path sets, or a
+generated domain loses a seed or has a smaller aggregate ordinary case budget.
+The task reports both sets of counts on success and failure.
 
-The baseline is selected by context rather than assumed, because getting it
-wrong is how a ratchet reads green while a regression sits in the diff:
+The baseline follows the context named by this plan:
 
  -  a pull request compares against its base commit;
  -  a push compares against the commit the push started from, so that a
@@ -250,23 +251,53 @@ wrong is how a ratchet reads green while a regression sits in the diff:
  -  uncommitted work on a local `main` compares against `HEAD`, so an unrelated
     commit already on the branch is not counted as part of the change.
 
-Continuous integration checks out at depth one and in a detached state today,
-so the workflow supplies both the baseline commit and the history the
-comparison needs. A baseline the task cannot resolve fails the check rather
-than skipping it, because a ratchet that quietly passes when it cannot compare
-is worse than no ratchet.
+The check job now fetches complete history for its detached checkout and
+fetches the exact base or `before` commit by object ID. The second fetch keeps a
+force-push comparison anchored to the commit the push started from even when no
+ref reaches that commit afterward. Missing commits, a missing `main` reference,
+and an unavailable merge base fail the task. A tag push is the only baseline
+selection that skips the comparison.
 
-A reversal the evidence demands needs a way through, and that way is a checked-
-in override record rather than a command-line flag nobody keeps. Each record
-names one invariant, the path or generated domain it covers, the transition it
-expects, and the reason. It permits that transition and nothing else. An
-override whose transition does not occur is stale and fails the check, so the
-set cannot silently accumulate into a disabled ratchet.
+Evidence-backed reversals use
+*tests/compatibility-ratchet-overrides.yaml*. One record names one of
+`pass-count`, `pass-classification`, `subset-path`, `property-seed`, or
+`property-case-budget`; gives the result path, reviewed path, or generated
+domain it covers; states the exact `from` and `to` values; and gives a reason.
+The subset/result path-set equality has no override because the measurement
+contract permits no inconsistent checked-in state. Only a record absent from
+the baseline can approve a current transition. A record already present in the
+baseline remains historical evidence and cannot approve another transition.
+A new or changed record whose exact transition does not occur is stale and
+fails the task.
 
-This checkpoint has no timing target. It is accepted when a deliberate
-reversal of each listed invariant fails the check, when an override permits
-only the transition it names, when a stale override fails, and when the
-reviewed subset passes unchanged.
+The language profile's admitted-item monotonicity is not checked by this
+checkpoint. *docs/language-profile-m5.md* records admitted behavior as prose
+without stable item identifiers, so a text comparison would claim coverage it
+cannot provide. The later per-family evidence lanes checkpoint owns the fixed
+profile template that can make such a comparison mechanical.
+
+Deliberate regression tests cover every enforced invariant, exact override
+matching, and stale overrides. Comparisons of merges `ad8955b`, `0918376`,
+`7b5b74a`, `9d2b8ff`, and `c2b0445` against their first parents passed.
+Commit `b396d20` failed with the expected eleven paths present in *subset.yaml*
+and absent from *results.yaml*.
+
+The isolated measurement and complete check ran on Linux
+7.1.4-200.fc44.x86\_64 with the same AMD Ryzen 7 7700X, 8-core/16-thread
+processor, tool versions, and target as the concurrent sample. Immediately
+after the samples, 14 GiB of memory was available, swap was full, */tmp* was
+47 percent used, and load average was 0.94/0.58/1.18. No unrelated native build
+ran during either sample.
+
+| Task                                      | Wall   | User    | System | CPU / wall |
+| ----------------------------------------- | ------ | ------- | ------ | ---------- |
+| `mise run check:compatibility-ratchet`    | 2.21 s | 2.98 s  | 0.37 s | 1.52       |
+| `mise run check`, with compatibility task | 7.01 s | 20.03 s | 6.92 s | 3.84       |
+
+The measured state held 1,883 passes and 3,966 paths in each manifest. The
+property scan found 29 domains, 28 distinct seeds, and an aggregate ordinary
+case budget of 2,290. This checkpoint has no timing target; these measurements
+record the cost the next checkpoint inherits.
 
 Owner: the measurement contract in [*PLAN-M5.md*](./PLAN-M5.md) states the
 rule; this plan only carries the gate that enforces it.

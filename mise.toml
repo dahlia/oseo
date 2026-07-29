@@ -38,6 +38,7 @@ mise run check:versions
 depends = [
   "check:actions",
   "check:boundaries",
+  "check:compatibility-ratchet",
   "check:fmt",
   "check:test262-inventory",
   "check:lines",
@@ -53,6 +54,10 @@ run = "actionlint"
 
 [tasks."check:boundaries"]
 run = "node tools/check-boundaries.ts"
+
+[tasks."check:compatibility-ratchet"]
+description = "Reject measured compatibility reversals"
+run = "node tools/compatibility-ratchet.ts"
 
 [tasks."check:fmt"]
 depends = ["check:fmt:md", "check:fmt:mise", "check:fmt:oxfmt"]
