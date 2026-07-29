@@ -134,6 +134,14 @@ task, drains the FIFO microtask queue, performs the rejection checkpoint, and
 only then starts another task. A backend callback cannot call a generated
 function from an arbitrary worker thread.
 
+If asynchronous context propagation is admitted, the runtime restores an I/O
+operation's context snapshot where the completion becomes an Oseo task. The
+proposed
+[ADR 0022](./docs/adr/0022-async-context-boundary.md) reserves the snapshot
+slot on the runtime-side operation record; the reservation is provisional
+and becomes binding when that record is accepted. The slot never crosses
+the adapter contract, and a backend neither reads nor writes it.
+
 ### Waiting, clocks, and liveness
 
 The scheduler tells the adapter the next monotonic timer deadline, if any, and
@@ -162,7 +170,8 @@ completion that makes buffers and handles safe to release. Every submitted
 operation reaches exactly one terminal runtime state even when the operating
 system reports a late completion.
 
-An in-flight operation roots its promise, callback state, handle, and buffers.
+An in-flight operation roots its promise, callback state, handle, buffers,
+and any snapshot stored in its reserved context slot.
 Native code must not retain a movable heap address across a safepoint. The first
 implementation may copy into runtime-owned native storage or use an explicit
 pinning contract, but that choice needs collector and failure-injection tests.
