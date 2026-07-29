@@ -656,6 +656,16 @@ export type HirExpression =
       readonly privateName: HirPrivateName;
     })
   | (LocatedSyntax & {
+      /**
+       * A private brand check. The name is resolved lexically, so
+       * lowering only evaluates the selected object and asks whether it
+       * carries the corresponding private element.
+       */
+      readonly kind: "private-in";
+      readonly object: HirExpression;
+      readonly privateName: HirPrivateName;
+    })
+  | (LocatedSyntax & {
       readonly kind: "private-set";
       readonly object: HirExpression;
       readonly privateName: HirPrivateName;

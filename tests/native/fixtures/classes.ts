@@ -2554,6 +2554,133 @@ console.log(hinted.apply(other, "a", "b"));
 `,
   },
   {
+    name: "class-private-in",
+    source: `
+// A private brand check reports presence without reading a field or
+// invoking a method or accessor. Every private element kind uses the
+// same lexically resolved private-name identity.
+let calls = 0;
+class Branded {
+  #field = 1;
+  #method() {
+    calls = calls + 1;
+  }
+  get #accessor() {
+    calls = calls + 1;
+  }
+  set #accessor(value) {
+    calls = calls + value;
+  }
+  static inspect(value) {
+    return (
+      (#field in value) +
+      ":" +
+      (#method in value) +
+      ":" +
+      (#accessor in value)
+    );
+  }
+}
+const branded = new Branded();
+console.log(Branded.inspect(branded), Branded.inspect({}), calls);
+
+// Each class evaluation and each nested declaration creates its own
+// identity, even when it spells the same private name.
+function make() {
+  return class {
+    #tag;
+    static has(value) {
+      return #tag in value;
+    }
+  };
+}
+const First = make();
+const Second = make();
+console.log(
+  First.has(new First()),
+  First.has(new Second()),
+  Second.has(new First()),
+);
+class Parent {
+  #tag;
+  static has(value) {
+    return #tag in value;
+  }
+}
+class Child extends Parent {
+  #tag;
+  static hasOwn(value) {
+    return #tag in value;
+  }
+}
+const child = new Child();
+console.log(Parent.has(child), Child.hasOwn(child), Child.hasOwn(new Parent()));
+
+// Static private elements brand the constructor itself, not its
+// instances or subclasses, and all three element kinds are checked
+// without invoking their bodies.
+class StaticBrand {
+  static #field = 1;
+  static #method() {
+    calls = calls + 1;
+  }
+  static get #accessor() {
+    calls = calls + 1;
+  }
+  static has(value) {
+    return #field in value && #method in value && #accessor in value;
+  }
+}
+class StaticChild extends StaticBrand {}
+console.log(
+  StaticBrand.has(StaticBrand),
+  StaticBrand.has(StaticChild),
+  StaticBrand.has(new StaticBrand()),
+  calls,
+);
+
+// The right operand runs once before the check. A non-object throws a
+// TypeError, and an abrupt right operand remains the observed error.
+let evaluations = 0;
+class Ordered {
+  #name;
+  static has(value) {
+    return #name in (evaluations++, value);
+  }
+  static abrupt() {
+    return #name in fail();
+  }
+}
+console.log(Ordered.has(new Ordered()), Ordered.has({}), evaluations);
+for (const value of [undefined, null, true, 1, "x", Symbol("x")]) {
+  try {
+    Ordered.has(value);
+  } catch (error) {
+    console.log("non-object", error instanceof TypeError);
+  }
+}
+const marker = new Error("marker");
+function fail() {
+  throw marker;
+}
+try {
+  Ordered.abrupt();
+} catch (error) {
+  console.log("abrupt", error === marker);
+}
+
+// Private methods are installed before fields initialize. A field
+// exists only after its own initializer completes, so an earlier field
+// sees a later method but not a later field.
+class InitializationOrder {
+  before = (#later in this) + ":" + (#method in this);
+  #later = 1;
+  #method() {}
+}
+console.log(new InitializationOrder().before);
+`,
+  },
+  {
     name: "class-private-updates",
     source: `
 // Compound assignment and the update operators read the element once

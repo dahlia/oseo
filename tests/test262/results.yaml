@@ -47196,6 +47196,578 @@ results:
       async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-in-nested.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-in.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-invalid-assignment-reference.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-invalid-assignment-target.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-invalid-identifier-complex.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-invalid-identifier-simple.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-invalid-rhs.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-methods-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-accessor-shadowed.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-methods-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-accessor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-field-shadowed.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-field.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-methods-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-method-shadowed.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-methods-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-presence-method.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-await-absent.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-await-present.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - classes
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/in/private-field-rhs-await-present.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/in/private-field-rhs-await-present.js:110:5:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-non-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-unresolvable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/in/private-field-rhs-unresolvable.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/in/private-field-rhs-unresol\
+        vable.js:89:17: error[OSEO1001]: Unknown binding
+        'test262unresolvable'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-yield-absent.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-private-in
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/private-field-rhs-yield-present.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - expression-operators
+      - generators
+    observation:
+      detail: 'test/language/expressions/in/private-field-rhs-yield-present.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/in/private-field-rhs-yield-present.js:94:3:
+        error[OSEO1001]: Generator method definitions are
+        unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
       features: []
       flags:
         - onlyStrict
@@ -122587,11 +123159,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1120
+  expectedNegatives: 1128
   harnessFailures: 0
-  passes: 1883
+  passes: 1891
   semanticFailures: 0
-  unsupportedProfileFeatures: 963
+  unsupportedProfileFeatures: 966
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -122604,7 +123176,7 @@ summary:
       harnessFailures: 0
       passes: 301
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 20
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
@@ -122612,11 +123184,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 645
     - dependency: classes
-      expectedNegatives: 564
+      expectedNegatives: 572
       harnessFailures: 0
-      passes: 573
+      passes: 581
       semanticFailures: 0
-      unsupportedProfileFeatures: 168
+      unsupportedProfileFeatures: 171
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -122648,11 +123220,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: expression-operators
-      expectedNegatives: 24
+      expectedNegatives: 32
       harnessFailures: 0
-      passes: 102
+      passes: 110
       semanticFailures: 0
-      unsupportedProfileFeatures: 34
+      unsupportedProfileFeatures: 37
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
@@ -122664,7 +123236,7 @@ summary:
       harnessFailures: 0
       passes: 151
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 37
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
@@ -122690,9 +123262,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 26
     - dependency: object-properties
-      expectedNegatives: 482
+      expectedNegatives: 490
       harnessFailures: 0
-      passes: 666
+      passes: 674
       semanticFailures: 0
       unsupportedProfileFeatures: 113
     - dependency: promise-settlement
@@ -122805,11 +123377,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 457
+      expectedNegatives: 465
       harnessFailures: 0
-      passes: 884
+      passes: 892
       semanticFailures: 0
-      unsupportedProfileFeatures: 521
+      unsupportedProfileFeatures: 524
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

@@ -651,6 +651,7 @@ function resolveExpression(
   }
   if (
     expression.kind === "private-get" ||
+    expression.kind === "private-in" ||
     expression.kind === "private-set" ||
     expression.kind === "private-step" ||
     expression.kind === "private-update"
@@ -664,8 +665,8 @@ function resolveExpression(
       state,
     );
     if (object == null || privateName == null) return undefined;
-    if (expression.kind === "private-get") {
-      return { ...located, kind: "private-get", object, privateName };
+    if (expression.kind === "private-get" || expression.kind === "private-in") {
+      return { ...located, kind: expression.kind, object, privateName };
     }
     if (expression.kind === "private-step") {
       return {
@@ -1294,7 +1295,11 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
       hirExpressionHasAwait(expression.value)
     );
   }
-  if (expression.kind === "private-get" || expression.kind === "private-step") {
+  if (
+    expression.kind === "private-get" ||
+    expression.kind === "private-in" ||
+    expression.kind === "private-step"
+  ) {
     return hirExpressionHasAwait(expression.object);
   }
   if (

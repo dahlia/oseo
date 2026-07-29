@@ -265,6 +265,12 @@ function printHirExpression(expression: HirExpression): string {
       printHirPrivateName(expression.privateName)
     );
   }
+  if (expression.kind === "private-in") {
+    return (
+      `${printHirPrivateName(expression.privateName)} in ` +
+      printHirExpression(expression.object)
+    );
+  }
   if (expression.kind === "private-set") {
     return (
       `private set ${printHirExpression(expression.object)}.` +

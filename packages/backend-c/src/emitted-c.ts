@@ -677,6 +677,12 @@ export const emittedC = {
       ["], "],
     ],
   },
+  privateIn: {
+    resultAssignOseoPrivateInContextRoots: [
+      ["result = oseo_private_in(context, roots["],
+      ["], "],
+    ],
+  },
   privateSet: {
     resultAssignOseoPrivateSetContextRoots: [
       ["result = oseo_private_set(context, roots["],

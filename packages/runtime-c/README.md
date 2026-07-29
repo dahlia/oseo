@@ -156,6 +156,9 @@ stepping.
 The `m5-28` ABI adds `oseo_class_static_private_method_define`. It installs
 static private methods directly on a class constructor and merges getter and
 setter halves into one accessor element under their shared private name.
+The `m5-29` ABI adds `oseo_private_in`. It performs the private-name brand
+check used by `#name in object`, returning a boolean for object operands and
+throwing a `TypeError` for non-objects.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
