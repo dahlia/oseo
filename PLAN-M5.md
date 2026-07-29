@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 3,920
-reviewed cases: 1,772 passes, 1,119 expected negatives, and 1,029 unsupported
+honest unsupported classifications. The current reviewed manifest records 3,966
+reviewed cases: 1,883 passes, 1,120 expected negatives, and 963 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -722,11 +722,12 @@ inside it. A derived constructor installs its private elements where
 `super()` returns, so a private read before `super()` reports the `this`
 temporal dead zone `ReferenceError` rather than a brand `TypeError`.
 Compound assignment and the update operators read and write the element once
-through the same name. Deliberate boundaries: a static private method or
-accessor, `#name in object`, a private reference based on anything other
-than `this`, optional `?.#name` access, and a private reference used as a
-destructuring or `for-of` assignment target stay rejected with source-located
-diagnostics, and `delete this.#name` is reported as an early error. Fixed
+through the same name. A private reference may use another object as its base
+and applies the same private-name lookup and brand check. Deliberate
+boundaries: `#name in object`, optional `?.#name` access, and a private
+reference used as a destructuring or `for-of` assignment target stay rejected
+with source-located diagnostics, and `delete this.#name` is reported as an
+early error. Fixed
 native fixtures cover private fields, methods, accessors, brand checks,
 updates, the values private state can hold, and a hinted method that
 specializes while private elements surround it on every guard path. The
@@ -762,10 +763,11 @@ class that extends it begins, a derived class's static fields always run
 after its parent's. Two new runtime entry points perform the public and the
 private definition; the constructor's instance element list stays untouched,
 so a class whose only elements are static declares no instance elements at
-all. Deliberate boundaries: a static private method or accessor and a static
-field reached as `C.#name` rather than
-through `this` stay rejected with source-located diagnostics, and a static
-field named `constructor` or `prototype` remains the early error it is.
+all. Static private methods and accessors are installed on the constructor,
+and a `C.#name` reference uses that constructor as its brand-checked base.
+Static accessor halves merge under one private name just as instance accessor
+halves do. A static field named `constructor` or `prototype` remains the early
+error it is.
 Fixed native fixtures cover the own-property descriptor, a field without an
 initializer, the receiver and the nested arrow, replaced `name` and `length`,
 a later assignment and deletion, subclass inheritance and redeclaration,
@@ -780,14 +782,39 @@ each field element on either placement and models the constructor's own key
 order and the definition-time initializer markers. Forty-two reviewed test262
 cases newly pass, forty-five new expected negatives record the `arguments`
 and `super` static initializer early errors, and sixty-eight new unsupported
-cases record the `C.#name` boundary this unit keeps. The reviewed subset
+cases record boundaries later units own. The reviewed subset
 gains the `class-static-fields-public` and `class-static-fields-private`
 feature tags; the remaining cases those tags reach need `String`, further
-`Object` members, `eval`, `Proxy`, `Function`, static private methods, or
-generator and asynchronous methods, and stay outside the reviewed subset
-until the units that own them land. The manifest moves to 1203 passes, 871
+`Object` members, `eval`, `Proxy`, `Function`, or generator and asynchronous
+methods, and stay outside the reviewed subset until the units that own them
+land. The manifest moves to 1203 passes, 871
 expected negatives, and 365 unsupported profile features with no semantic or
 harness failures.
+
+Cross-instance and static private access are now admitted as Unit 6.1.
+`other.#name` evaluates its base once, resolves the private name lexically,
+and applies the declaring class's brand check to that selected object for
+fields, methods, and accessors. `C.#name` performs the same lookup against the
+constructor object. Static private methods and accessors are installed on that
+constructor, while instance methods and accessors remain installed for each
+instance; each placement merges getter and setter halves under one private
+name and rejects a receiver carrying the wrong brand. Runtime ABI
+`oseo-runtime-m5-28` adds the static private method and accessor definition
+entry point.
+
+Fixed native fixtures cover successful field, method, and accessor access on
+other instances and on the class constructor, wrong-brand ordinary objects,
+instances, prototypes, subclasses, and primitive values, accessor writes,
+private-method calls, absence from property observations, both specialization
+policies, and forced collection. The generated class property suite uses seed
+`0x5eed001c` for instance and static placement, every private element kind,
+valid and invalid receivers, both specialization policies, and forced
+collection under Node.js, Deno, and native execution. Seventy-eight existing
+reviewed test262 cases move from unsupported to pass, and four focused static
+private accessor cases enter as passes. The reviewed subset gains the
+`class-static-methods-private` feature tag. The manifest moves to 1,883 passes,
+1,120 expected negatives, and 963 unsupported profile features with no
+semantic or harness failures.
 
 Class static initialization blocks are now admitted, the tenth unit of the
 functions and executable syntax stream. A `static { ... }` element declares

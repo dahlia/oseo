@@ -2183,16 +2183,16 @@ function lowerStaticBlockRun(
 
 /**
  * Lowers one private method or accessor definition. It defines no
- * property: the pair of private name and closure is recorded on the
- * constructor, and every instance the class constructs receives it
- * before its field initializers run, which is how a method reaches an
- * instance without being visible on the prototype. A getter and its
- * setter share one private name, so the runtime merges the two halves
- * into the accessor element that name reaches.
+ * property. An instance element is recorded on the constructor so each
+ * instance receives it before its field initializers run. A `static`
+ * element is installed directly on the constructor while the class body
+ * is evaluated. A getter and its setter share one private name, so the
+ * runtime merges the two halves into the accessor element that name
+ * reaches.
  *
- * The closure still carries the class prototype as its home object, so
- * `super.x` inside a private method resolves exactly as it does inside
- * an ordinary one.
+ * The closure carries the placement's ordinary home object, the class
+ * prototype for an instance element and the constructor for a static
+ * one, so `super.x` resolves exactly as it does in a public method.
  */
 function lowerClassPrivateMethod(
   element: HirClassMethod,
@@ -2201,6 +2201,8 @@ function lowerClassPrivateMethod(
   prototype: number,
   builder: MirBuilder,
 ): void {
+  const staticPlacement = element.staticPlacement === true;
+  const home = staticPlacement ? constructorValue : prototype;
   const privateNameValue = lowerPrivateName(
     key.privateName,
     element.range,
@@ -2212,13 +2214,17 @@ function lowerClassPrivateMethod(
     undefined,
     element.accessorKind,
   );
-  lowerHomeObjectBind(value, prototype, element.range, builder);
+  lowerHomeObjectBind(value, home, element.range, builder);
   appendMirMetadata(
     builder,
     "safepoint",
     element.accessorKind == null
-      ? "private method record growth"
-      : "private accessor record growth",
+      ? staticPlacement
+        ? "static private method definition"
+        : "private method record growth"
+      : staticPlacement
+        ? "static private accessor definition"
+        : "private accessor record growth",
     [constructorValue, privateNameValue, value],
     element.range,
   );
@@ -2231,10 +2237,16 @@ function lowerClassPrivateMethod(
     arguments: [constructorValue, privateNameValue, value],
     detail:
       element.accessorKind == null
-        ? "record private method"
-        : `record private ${element.accessorKind} accessor`,
+        ? staticPlacement
+          ? "define static private method"
+          : "record private method"
+        : staticPlacement
+          ? `define static private ${element.accessorKind} accessor`
+          : `record private ${element.accessorKind} accessor`,
     id: recorded,
-    kind: "class-private-method-define",
+    kind: staticPlacement
+      ? "class-static-private-method-define"
+      : "class-private-method-define",
     range: element.range,
   });
   appendMirMetadata(

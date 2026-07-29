@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,962 reviewed cases: 1,801 passes, 1,120
-expected negatives, and 1,041 unsupported profile features. It records no
+The current manifest contains 3,966 reviewed cases: 1,883 passes, 1,120
+expected negatives, and 963 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -162,7 +162,7 @@ its deliberate boundary and its evidence:
     distinct identity. Member tags retain their receiver, and tag lookup,
     template-object creation, substitutions, and invocation preserve
     ECMAScript evaluation and abrupt-completion order. The runtime ABI is
-    `oseo-runtime-m5-27`. Fixed native fixtures cover basic and identity
+    `oseo-runtime-m5-28`. Fixed native fixtures cover basic and identity
     tags, cooked and raw text, multiple substitutions, custom return
     values, errors from tags and substitutions, receiver preservation,
     invalid escapes, frozen descriptors, and site identity. Generated
@@ -590,7 +590,7 @@ its deliberate boundary and its evidence:
     otherwise unresolved reference keeps the ordinary source-located
     diagnostic. Parameter-index aliasing through a mapped arguments exotic
     object remains outside this ordinary-object unit. The runtime ABI is
-    `oseo-runtime-m5-27`. A generated property with seed `0x5eed001b` covers
+    `oseo-runtime-m5-28`. A generated property with seed `0x5eed001b` covers
     zero to six bounded arguments, in-range and absent indexed reads, writes,
     `length`, `callee`, fresh identity, both specialization policies, and
     forced collection. Fixed native evidence also covers property
@@ -1299,12 +1299,13 @@ its deliberate boundary and its evidence:
     returns, so a private read before `super()` reports the `this` binding's
     temporal dead zone `ReferenceError` rather than a brand `TypeError`.
     Compound assignment and the prefix and postfix update operators read the
-    element once and write it once through the same private name. Deliberate
-    boundaries: a static private method or accessor, `#name in object`, a
-    private reference whose base is anything other than `this`, optional
-    `?.#name` access, and a private reference used as a destructuring or
-    `for-of` assignment target are rejected with source-located diagnostics,
-    and `delete this.#name` is reported as the early error it is. Native
+    element once and write it once through the same private name. A private
+    reference may use another object as its base and performs the same
+    private-name lookup and brand check that a `this.#name` reference performs.
+    Deliberate boundaries: `#name in object`, optional `?.#name` access, and a
+    private reference used as a destructuring or `for-of` assignment target
+    are rejected with source-located diagnostics, and `delete this.#name` is
+    reported as the early error it is. Native
     differential fixtures cover private fields and their absence from every key
     observation, private methods including installation order, non-
     writability, non-constructibility, and the home object, private accessors,
@@ -1348,11 +1349,12 @@ its deliberate boundary and its evidence:
     constructor. A derived class's static fields always run after its
     parent's, because the parent's class definition completes first. A class
     whose only elements are static declares no instance elements, so its
-    constructor runs no instance element initialization at all. Deliberate
-    boundaries: a static private method or accessor and a static private
-    field reached as `C.#name` rather than
-    through `this` are rejected with source-located diagnostics, and a static
-    field named `constructor` or `prototype` stays the early error it is.
+    constructor runs no instance element initialization at all. Static private
+    methods and accessors are installed on the constructor, and a `C.#name`
+    reference uses that constructor as the brand-checked base. Static accessor
+    halves merge under one private name just as instance accessor halves do. A
+    static field named `constructor` or `prototype` stays the early error it
+    is.
     Native differential fixtures cover the own-property descriptor, a field
     without an initializer, the receiver and a nested arrow, replaced `name`
     and `length`, later assignment and deletion, subclass inheritance and
@@ -1365,13 +1367,13 @@ its deliberate boundary and its evidence:
     method that specializes while static elements surround it on every guard
     path. Forty-two reviewed test262 cases newly pass, forty-five new
     expected negatives record the `arguments` and `super` static initializer
-    early errors, and sixty-eight new unsupported cases record the `C.#name`
-    boundary this unit keeps. The reviewed subset gains the
+    early errors, and sixty-eight new unsupported cases record boundaries later
+    units own. The reviewed subset gains the
     `class-static-fields-public` and `class-static-fields-private` feature
     tags; the remaining cases those tags reach need `String`, further
-    `Object` members, `eval`, `Proxy`, `Function`, static private methods, or
-    generator and asynchronous methods, and stay outside the reviewed subset
-    until the units that own them land. The reviewed manifest moves to 1,203
+    `Object` members, `eval`, `Proxy`, `Function`, or generator and asynchronous
+    methods, and stay outside the reviewed subset until the units that own them
+    land. The reviewed manifest moves to 1,203
     passes, 871 expected negatives, and 365 unsupported profile features with
     no semantic or harness failures.
  -  Class static initialization blocks. A `static { ... }` element declares
@@ -1623,10 +1625,7 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Static private methods and accessors and `export default class` are
-    outside the admitted class subset. A private
-    element is reachable only through `this`, so a cross-instance
-    `other.#name` reference, a static private field read as `C.#name`, the
+ -  `export default class` is outside the admitted class subset. The
     `#name in object` brand check, optional `?.#name` access, and a private
     destructuring or `for-of` assignment target remain rejected. `super()`,
     `super.x`, and `new.target` are rejected inside an arrow function, and

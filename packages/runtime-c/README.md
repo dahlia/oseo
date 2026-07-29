@@ -153,6 +153,9 @@ once the body leaves. A generator body's iterator done state also moves into
 its generator record's root slots, because an automatic C local would not
 survive a suspension taken while a `for-of` or array binding is still
 stepping.
+The `m5-28` ABI adds `oseo_class_static_private_method_define`. It installs
+static private methods directly on a class constructor and merges getter and
+setter halves into one accessor element under their shared private name.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

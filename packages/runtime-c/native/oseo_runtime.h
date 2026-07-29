@@ -581,6 +581,18 @@ OseoResult oseo_class_private_method_define(
     OseoPrivateMethodKind kind
 );
 /*
+ * Installs one static private method or accessor half directly on
+ * the class constructor. A getter and setter under the same private
+ * name merge into one accessor element, whichever order defines them.
+ */
+OseoResult oseo_class_static_private_method_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue value,
+    OseoPrivateMethodKind kind
+);
+/*
  * PrivateGet: the value `object` carries under one private name. A
  * field or method element yields its value, an accessor element runs
  * its getter against the object, and an object whose class never
@@ -635,8 +647,8 @@ OseoResult oseo_class_static_field_define(
 /*
  * The same definition for a `static #name` field, whose result becomes
  * a private element the constructor itself carries rather than a
- * property. Only a private reference through the declaring class body
- * reaches it.
+ * property. A private reference whose lexical environment resolves the
+ * name reaches it only when its selected object has that element.
  */
 OseoResult oseo_class_static_private_field_define(
     OseoContext *context,

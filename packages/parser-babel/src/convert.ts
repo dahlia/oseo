@@ -71,11 +71,9 @@ function privateMemberName(value: BabelNode): string | undefined {
 }
 
 /**
- * Converts the object of a private reference. This unit admits `this`
- * as that object, so a private element is reached only through the
- * receiver the running class element already holds. Every other
- * operand, including `super` and a separately evaluated expression,
- * names the boundary it crosses.
+ * Converts the object of a private reference. The private name still
+ * resolves lexically in its declaring class body, while this expression
+ * selects the object whose private elements are searched and branded.
  */
 function privateReferenceObject(
   context: ConvertContext,
@@ -90,13 +88,6 @@ function privateReferenceObject(
   }
   const objectNode = node(value.object);
   if (objectNode == null) return unsupported(context, value);
-  if (objectNode.type !== "ThisExpression") {
-    return unsupported(
-      context,
-      value,
-      "A private member is reachable only through this.",
-    );
-  }
   return expression(context, objectNode);
 }
 
@@ -3952,14 +3943,6 @@ export function classExpression(
       break;
     }
     const staticPlacement = element.static === true;
-    if (element.type === "ClassPrivateMethod" && staticPlacement) {
-      unsupported(
-        context,
-        element,
-        "Static private class methods and accessors are unsupported.",
-      );
-      break;
-    }
     if (element.kind === "constructor") {
       if (constructorFunction != null) {
         unsupported(context, element, "A class defines one constructor.");

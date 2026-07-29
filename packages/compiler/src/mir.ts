@@ -91,8 +91,9 @@ export interface MirControlTarget {
 export interface MirOperation {
   /**
    * Selects the accessor slot for `property-define-accessor` and
-   * `class-private-method-define`, and the `SetFunctionName` prefix for
-   * the accessor closure created by `function-create`.
+   * `class-private-method-define`,
+   * `class-static-private-method-define`, and the `SetFunctionName`
+   * prefix for the accessor closure created by `function-create`.
    */
   readonly accessorKind?: "get" | "set";
   readonly argumentListId?: number;
@@ -129,6 +130,7 @@ export interface MirOperation {
     | "class-prototype"
     | "class-static-field-define"
     | "class-static-private-field-define"
+    | "class-static-private-method-define"
     | "constant"
     | "caught"
     | "completion-set"

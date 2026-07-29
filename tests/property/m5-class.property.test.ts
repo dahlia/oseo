@@ -1442,3 +1442,249 @@ test(
     );
   },
 );
+
+type PrivateAccessKind = "field" | "getter" | "method" | "pair" | "setter";
+
+interface PrivateAccessCase {
+  readonly initial: number;
+  readonly input: number;
+  readonly kind: PrivateAccessKind;
+  readonly staticPlacement: boolean;
+}
+
+const privateAccessCaseArbitrary: fc.Arbitrary<PrivateAccessCase> = fc.record({
+  initial: fc.integer({ max: 20, min: -20 }),
+  input: fc.integer({ max: 20, min: -20 }),
+  kind: fc.constantFrom<PrivateAccessKind>(
+    "field",
+    "getter",
+    "method",
+    "pair",
+    "setter",
+  ),
+  staticPlacement: fc.boolean(),
+});
+
+function privateAccessSource(testCase: PrivateAccessCase): string {
+  const modifier = testCase.staticPlacement ? "static " : "";
+  const receiver = testCase.staticPlacement ? "Vault" : "other";
+  const parameter = testCase.staticPlacement ? "value" : "other, value";
+  const storage = testCase.staticPlacement
+    ? `  static seen = ${testCase.initial};`
+    : `  seen = ${testCase.initial};`;
+  let element: string;
+  let probe: string;
+  let invalidProbe = "";
+  if (testCase.kind === "field") {
+    element = `  ${modifier}#item = ${testCase.initial};`;
+    probe = [
+      `  static probe(${parameter}) {`,
+      `    const before = ${receiver}.#item;`,
+      `    ${receiver}.#item = value;`,
+      `    return before + ":" + ${receiver}.#item;`,
+      "  }",
+    ].join("\n");
+  } else if (testCase.kind === "method") {
+    element = [
+      `  ${modifier}#item(value) {`,
+      "    this.seen = this.seen + value;",
+      "    return this.seen;",
+      "  }",
+    ].join("\n");
+    probe = [
+      `  static probe(${parameter}) {`,
+      `    return ${receiver}.#item(value);`,
+      "  }",
+    ].join("\n");
+  } else if (testCase.kind === "getter") {
+    element = [
+      `  ${modifier}get #item() {`,
+      "    return this.seen * 2;",
+      "  }",
+    ].join("\n");
+    probe = [
+      `  static probe(${testCase.staticPlacement ? "" : "other"}) {`,
+      `    return ${receiver}.#item;`,
+      "  }",
+    ].join("\n");
+  } else if (testCase.kind === "setter") {
+    element = [
+      `  ${modifier}set #item(value) {`,
+      "    this.seen = value;",
+      "  }",
+    ].join("\n");
+    probe = [
+      `  static probe(${parameter}) {`,
+      `    ${receiver}.#item = value;`,
+      `    return ${receiver}.seen;`,
+      "  }",
+    ].join("\n");
+  } else {
+    element = [
+      `  ${modifier}get #item() {`,
+      "    return this.seen * 2;",
+      "  }",
+      `  ${modifier}set #item(value) {`,
+      "    this.seen = value;",
+      "  }",
+    ].join("\n");
+    probe = [
+      `  static probe(${parameter}) {`,
+      `    ${receiver}.#item = value;`,
+      `    return ${receiver}.#item;`,
+      "  }",
+    ].join("\n");
+  }
+  if (testCase.staticPlacement) {
+    if (testCase.kind === "field") {
+      invalidProbe = [
+        "  static reject(target, value) {",
+        "    const before = target.#item;",
+        "    target.#item = value;",
+        "    return before;",
+        "  }",
+      ].join("\n");
+    } else if (testCase.kind === "method") {
+      invalidProbe = [
+        "  static reject(target, value) {",
+        "    return target.#item(value);",
+        "  }",
+      ].join("\n");
+    } else if (testCase.kind === "getter") {
+      invalidProbe = [
+        "  static reject(target) {",
+        "    return target.#item;",
+        "  }",
+      ].join("\n");
+    } else {
+      invalidProbe = [
+        "  static reject(target, value) {",
+        "    target.#item = value;",
+        "    return target.seen;",
+        "  }",
+      ].join("\n");
+    }
+  }
+  const properArguments = testCase.staticPlacement
+    ? testCase.kind === "getter"
+      ? ""
+      : String(testCase.input)
+    : testCase.kind === "getter"
+      ? "other"
+      : `other, ${testCase.input}`;
+  const invalidArguments = testCase.staticPlacement
+    ? testCase.kind === "getter"
+      ? "Derived"
+      : `Derived, ${testCase.input}`
+    : testCase.kind === "getter"
+      ? "{}"
+      : `{}, ${testCase.input}`;
+  return `
+class Vault {
+${storage}
+${element}
+${probe}
+${invalidProbe}
+}
+const other = new Vault();
+console.log(Vault.probe(${properArguments}));
+${testCase.staticPlacement ? "class Derived extends Vault {}" : ""}
+try {
+  Vault.${testCase.staticPlacement ? "reject" : "probe"}(${invalidArguments});
+} catch (error) {
+  console.log("brand", error instanceof TypeError);
+}
+`;
+}
+
+function privateAccessExpected(testCase: PrivateAccessCase): string {
+  let result: string;
+  if (testCase.kind === "field") {
+    result = `${testCase.initial}:${testCase.input}`;
+  } else if (testCase.kind === "method") {
+    result = String(testCase.initial + testCase.input);
+  } else if (testCase.kind === "getter") {
+    result = String(testCase.initial * 2);
+  } else if (testCase.kind === "setter") {
+    result = String(testCase.input);
+  } else {
+    result = String(testCase.input * 2);
+  }
+  return `${result}\nbrand true\n`;
+}
+
+test(
+  "generated private access checks explicit objects and constructors",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "private access preserves element lookup and brands",
+      fc.asyncProperty(privateAccessCaseArbitrary, async (testCase) => {
+        const source = privateAccessSource(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: privateAccessExpected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-private-access.ts" },
+            { specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          if (specialization === "enabled") {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          }
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) =>
+                assertMatchingObservations([expectedObservation, native]),
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one instance or static private field, method, getter, setter, or " +
+          "accessor pair reached through another instance or the declaring " +
+          "constructor, plus an unbranded ordinary object or derived " +
+          "constructor, comparing an independent value and TypeError model " +
+          "with Node.js, Deno, and both native specialization policies with " +
+          "forced collection on the enabled path",
+        numRuns: 10,
+        profile: "M5 cross-instance and declaring-constructor private access",
+        seed: 0x5eed_001c,
+        sizeLimit:
+          "one private element, one valid reference, one invalid brand, and " +
+          "bounded integer values",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);

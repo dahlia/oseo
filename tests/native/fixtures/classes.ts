@@ -2432,6 +2432,128 @@ console.log(new Early(false).read());
 `,
   },
   {
+    name: "class-cross-private-access",
+    source: `
+// A declaring class may apply each instance private element to another
+// instance. The selected object supplies the field storage, method
+// receiver, and accessor receiver.
+class Pair {
+  #value;
+  constructor(value) {
+    this.#value = value;
+  }
+  #add(step) {
+    this.#value = this.#value + step;
+    return this.#value;
+  }
+  get #doubled() {
+    return this.#value * 2;
+  }
+  set #doubled(value) {
+    this.#value = value / 2;
+  }
+  read(other) {
+    return other.#value;
+  }
+  write(other, value) {
+    other.#value = value;
+    return other.#value;
+  }
+  call(other, step) {
+    return other.#add(step);
+  }
+  getOther(other) {
+    return other.#doubled;
+  }
+  setOther(other, value) {
+    other.#doubled = value;
+    return other.#doubled;
+  }
+}
+const left = new Pair(2);
+const right = new Pair(5);
+console.log(
+  left.read(right),
+  left.write(right, 8),
+  left.call(right, 3),
+  left.getOther(right),
+  left.setOther(right, 20),
+  left.read(right),
+  left.read(left),
+);
+for (const value of [{}, Pair.prototype, null, 1]) {
+  try {
+    left.read(value);
+  } catch (error) {
+    console.log("instance brand", error instanceof TypeError);
+  }
+}
+
+// Static private fields, methods, and accessors live on the declaring
+// constructor. A reference through the class name reaches that object,
+// while a subclass and an instance fail the same private-name check.
+class Registry {
+  static #count = 1;
+  static #step(amount) {
+    Registry.#count = Registry.#count + amount;
+    return Registry.#count;
+  }
+  static get #doubled() {
+    return Registry.#count * 2;
+  }
+  static set #doubled(value) {
+    Registry.#count = value / 2;
+  }
+  static run() {
+    Registry.#doubled = 10;
+    return Registry.#step(2) + ":" + Registry.#doubled;
+  }
+  static field(target) {
+    return target.#count;
+  }
+  static method(target) {
+    return target.#step(1);
+  }
+  static accessor(target) {
+    target.#doubled = 18;
+    return target.#doubled;
+  }
+}
+console.log(Registry.run(), Registry.field(Registry));
+console.log(Registry.method(Registry), Registry.accessor(Registry));
+class DerivedRegistry extends Registry {}
+for (const value of [DerivedRegistry, new Registry(), {}]) {
+  for (const probe of [Registry.field, Registry.method, Registry.accessor]) {
+    try {
+      probe(value);
+    } catch (error) {
+      console.log("static brand", error instanceof TypeError);
+    }
+  }
+}
+console.log(Object.keys(Registry).length);
+console.log(Object.getOwnPropertyDescriptor(Registry, "#step"));
+
+// A private method may still contain a guarded specialization. Truthful
+// values hit it, while false hints miss into the compiled generic path;
+// both routes keep the cross-instance receiver and private storage.
+class Hinted {
+  #value = 0;
+  #add(left: number, right: number) {
+    return left + right;
+  }
+  apply(other, left, right) {
+    other.#value = other.#add(left, right);
+    return other.#value;
+  }
+}
+const hinted = new Hinted();
+const other = new Hinted();
+console.log(hinted.apply(other, 1, 2));
+console.log(hinted.apply(other, "a", "b"));
+`,
+  },
+  {
     name: "class-private-updates",
     source: `
 // Compound assignment and the update operators read the element once
