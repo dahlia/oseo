@@ -163,6 +163,17 @@ export type SyntaxArrayElement =
   | SyntaxExpression
   | undefined;
 
+/**
+ * One template object argument synthesized for a tagged template call.
+ * A missing cooked entry represents an invalid escape sequence, which
+ * tagged templates admit while retaining its raw source text.
+ */
+export interface SyntaxTemplateObject extends LocatedSyntax {
+  readonly cooked: readonly (string | undefined)[];
+  readonly kind: "template-object";
+  readonly raw: readonly string[];
+}
+
 /** One spread entry retained inside an owned call argument list. */
 export interface SyntaxSpreadArgument extends LocatedSyntax {
   readonly argument: SyntaxExpression;
@@ -329,6 +340,7 @@ export type SyntaxExpression =
       readonly elements: readonly SyntaxArrayElement[];
       readonly kind: "array";
     })
+  | SyntaxTemplateObject
   | (LocatedSyntax & {
       readonly kind: "binary";
       readonly left: SyntaxExpression;

@@ -420,13 +420,33 @@ test("converts untagged template literals to concatenation", () => {
   assert.match(hirText, /to-string \(1 \+ 1\)/u);
 });
 
-test("rejects tagged template expressions", () => {
+test("converts tagged templates to calls with owned template objects", () => {
   const result = compileSource(babelFrontend, {
-    source: "function tag(parts) { return parts; } console.log(tag`x`);",
+    source:
+      "function tag(parts, value) { return value; }\n" +
+      "console.log(tag`line\\n${1}tail`);",
     sourceId: "tagged.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /Tagged template/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /call %b\d+\(tag\)\(template \["line\\n", "tail"\]/u);
+  assert.match(hirText, /raw \["line\\\\n", "tail"\], 1\)/u);
+  const operations = result.mir?.script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  const template = operations?.find(
+    (operation) => operation.kind === "template-object",
+  );
+  assert.deepEqual(template?.templateCooked, ["line\n", "tail"]);
+  assert.deepEqual(template?.templateRaw, ["line\\n", "tail"]);
+  assert.ok(
+    operations?.some(
+      (operation) =>
+        operation.kind === "call" &&
+        operation.arguments.includes(template?.id ?? -1),
+    ),
+  );
 });
 
 test("converts loose equality to owned syntax", () => {

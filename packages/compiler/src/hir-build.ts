@@ -276,6 +276,7 @@ function resolveExpression(
     }
     return { ...expression, elements };
   }
+  if (expression.kind === "template-object") return expression;
   if (expression.kind === "await") {
     const argument = resolveExpression(expression.argument, scopes, state);
     return argument == null ? undefined : { ...expression, argument };

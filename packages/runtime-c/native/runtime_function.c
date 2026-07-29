@@ -262,6 +262,7 @@ OseoResult oseo_function_create(
     function->ordinary.array_length = 0u;
     function->ordinary.dictionary = false;
     function->ordinary.length_writable = false;
+    function->ordinary.extensible = true;
     function->ordinary.module_namespace = false;
     function->ordinary.error_data = false;
     function->ordinary.array_iterator = false;

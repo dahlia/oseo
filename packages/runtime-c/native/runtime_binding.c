@@ -185,6 +185,7 @@ OseoResult oseo_module_namespace_create(
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
         object->dictionary = true;
+        object->extensible = false;
         object->module_namespace = true;
         result.value = frame.slots[0];
     }

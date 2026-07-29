@@ -312,6 +312,8 @@ typedef struct {
     uint32_t array_length;
     bool dictionary;
     bool length_writable;
+    /* [[Extensible]], false for frozen arrays and module namespaces. */
+    bool extensible;
     bool module_namespace;
     bool default_intrinsics;
     /* The [[ErrorData]] brand Object.prototype.toString observes. */
@@ -338,6 +340,12 @@ typedef struct {
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
 } OseoOrdinaryObject;
+
+/* One realm-local GetTemplateObject cache entry, keyed by a generated site. */
+typedef struct {
+    const void *site;
+    OseoValue object;
+} OseoTemplateCacheEntry;
 
 /* Which instance element one class constructor record describes. */
 typedef enum {

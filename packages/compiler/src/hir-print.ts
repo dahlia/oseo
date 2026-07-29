@@ -84,6 +84,13 @@ function printHirExpression(expression: HirExpression): string {
       "]"
     );
   }
+  if (expression.kind === "template-object") {
+    const cooked = expression.cooked
+      .map((piece) => (piece == null ? "undefined" : JSON.stringify(piece)))
+      .join(", ");
+    const raw = expression.raw.map((piece) => JSON.stringify(piece)).join(", ");
+    return `template [${cooked}] raw [${raw}]`;
+  }
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
   }

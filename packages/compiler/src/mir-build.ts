@@ -2695,6 +2695,34 @@ function lowerExpression(
     }
     return id;
   }
+  if (expression.kind === "template-object") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "template object allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: `template object with ${expression.cooked.length} strings`,
+      id,
+      kind: "template-object",
+      range: expression.range,
+      templateCooked: expression.cooked,
+      templateRaw: expression.raw,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "await") {
     const argument = lowerExpression(expression.argument, builder);
     if (builder.asyncGenerator) {

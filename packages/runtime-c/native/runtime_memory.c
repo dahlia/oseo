@@ -198,6 +198,12 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->async_generator_intrinsic, &worklist);
     mark_value(context->async_generator_function, &worklist);
     mark_value(context->async_iterator_self_function, &worklist);
+    OseoTemplateCacheEntry *template_cache = context->template_cache;
+    for (size_t index = 0u;
+         index < context->template_cache_count;
+         index += 1u) {
+        mark_value(template_cache[index].object, &worklist);
+    }
     mark_value(context->timer_head, &worklist);
     while (worklist != NULL) {
         OseoHeapObject *object = worklist;

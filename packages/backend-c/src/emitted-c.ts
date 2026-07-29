@@ -219,6 +219,26 @@ export const emittedC = {
       [");"],
     ],
   },
+  templateObject: {
+    siteDeclaration: [["static const char "], [" = 0;"]],
+    pointerArrayDeclaration: [
+      ["static const uint16_t *const "],
+      ["[] = {"],
+      ["};"],
+    ],
+    sizeArrayDeclaration: [["static const size_t "], ["[] = {"], ["};"]],
+    boolArrayDeclaration: [["static const bool "], ["[] = {"], ["};"]],
+    resultAssign: [
+      ["result = oseo_template_object(context, &"],
+      [", "],
+      ["u, "],
+      [", "],
+      [", "],
+      [", "],
+      [", "],
+      [");"],
+    ],
+  },
   constant: {
     rootsAssignOseoNullStatement: [["roots["], ["] = oseo_null();"]],
     rootsAssignOseoNumberStatement: [["roots["], ["] = oseo_number("], [");"]],

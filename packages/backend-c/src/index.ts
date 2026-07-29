@@ -304,6 +304,121 @@ function emitConstant(
   }
 }
 
+function emitTemplateObject(state: EmitState, operation: MirOperation): void {
+  const cooked = operation.templateCooked;
+  const raw = operation.templateRaw;
+  if (
+    cooked == null ||
+    raw == null ||
+    cooked.length === 0 ||
+    cooked.length !== raw.length
+  ) {
+    throw new Error(
+      `MIR template-object %${operation.id} has invalid strings.`,
+    );
+  }
+  const suffix = String(operation.id);
+  const site = `template_site_${suffix}`;
+  const cookedPointers = `template_cooked_${suffix}`;
+  const cookedLengths = `template_cooked_lengths_${suffix}`;
+  const cookedDefined = `template_cooked_defined_${suffix}`;
+  const rawPointers = `template_raw_${suffix}`;
+  const rawLengths = `template_raw_lengths_${suffix}`;
+  const cookedInputs: string[] = [];
+  const rawInputs: string[] = [];
+  const emitUnits = (
+    kind: "cooked" | "raw",
+    value: string,
+    index: number,
+  ): string => {
+    const units = utf16Units(value);
+    if (units.length === 0) return renderC(emittedC.common.nullPointer);
+    const name = `template_${kind}_units_${suffix}_${index}`;
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        name,
+        units.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    return name;
+  };
+  for (let index = 0; index < cooked.length; index += 1) {
+    const cookedPiece = cooked[index];
+    cookedInputs.push(
+      cookedPiece == null
+        ? renderC(emittedC.common.nullPointer)
+        : emitUnits("cooked", cookedPiece, index),
+    );
+    rawInputs.push(emitUnits("raw", raw[index]!, index));
+  }
+  const comma = renderC(emittedC.common.commaSpace);
+  line(state, renderC(emittedC.templateObject.siteDeclaration, site));
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.pointerArrayDeclaration,
+      cookedPointers,
+      cookedInputs.join(comma),
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.sizeArrayDeclaration,
+      cookedLengths,
+      cooked.map((piece) => `${piece?.length ?? 0}u`).join(comma),
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.boolArrayDeclaration,
+      cookedDefined,
+      cooked
+        .map((piece) =>
+          piece == null
+            ? renderC(emittedC.common.falseValue)
+            : renderC(emittedC.common.trueValue),
+        )
+        .join(comma),
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.pointerArrayDeclaration,
+      rawPointers,
+      rawInputs.join(comma),
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.sizeArrayDeclaration,
+      rawLengths,
+      raw.map((piece) => `${piece.length}u`).join(comma),
+    ),
+  );
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    renderC(
+      emittedC.templateObject.resultAssign,
+      site,
+      cooked.length,
+      cookedPointers,
+      cookedLengths,
+      cookedDefined,
+      rawPointers,
+      rawLengths,
+    ),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+}
+
 function emitArguments(
   state: EmitState,
   operation: MirOperation,
@@ -2286,6 +2401,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "argument-list-create"
   ) {
     emitArgumentListOperation(state, operation);
+  } else if (operation.kind === "template-object") {
+    emitTemplateObject(state, operation);
   } else if (
     operation.kind === "array-append" ||
     operation.kind === "array-append-hole" ||

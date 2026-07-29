@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,920 reviewed cases: 1,772 passes, 1,119
-expected negatives, and 1,029 unsupported profile features. It records no
+The current manifest contains 3,945 reviewed cases: 1,787 passes, 1,119
+expected negatives, and 1,039 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -149,8 +149,33 @@ its deliberate boundary and its evidence:
     the frontend-synthesized `to-string` conversion, so an object
     substitution applies generic `ToPrimitive` with the string
     preference `ToString` requires rather than the addition operator's
-    default hint. Tagged template expressions stay
-    rejected with a source-located diagnostic.
+    default hint.
+ -  Tagged template expressions, lowered as calls whose first argument is
+    the template site's cached cooked array and whose remaining arguments
+    are the substitution values in source order. The cooked array and its
+    `.raw` array are frozen: their indexed and `length` properties are
+    non-writable and non-configurable, both arrays are non-extensible, and
+    `.raw` is a non-writable, non-configurable property. An invalid escape
+    produces `undefined` in the cooked array while preserving its source
+    spelling in `.raw`. Each template site reuses one template object per
+    runtime context, while identical source text at distinct sites has
+    distinct identity. Member tags retain their receiver, and tag lookup,
+    template-object creation, substitutions, and invocation preserve
+    ECMAScript evaluation and abrupt-completion order. The runtime ABI is
+    `oseo-runtime-m5-26`. Fixed native fixtures cover basic and identity
+    tags, cooked and raw text, multiple substitutions, custom return
+    values, errors from tags and substitutions, receiver preservation,
+    invalid escapes, frozen descriptors, and site identity. Generated
+    Node.js, Deno, and native evidence uses seed `0x5eed001a` for empty,
+    simple, multiple, nested, and raw-versus-cooked forms under both
+    specialization policies and forced collection. Thirteen of the 25
+    reviewed cases under *test/language/expressions/tagged-template/* pass;
+    twelve unsupported cases retain independent dynamic-source, realm,
+    `arguments`, top-level `this`, tail-call optimization, and `Array`
+    intrinsic prerequisites. The two remaining directory cases stay
+    outside the reviewed subset because they require
+    `Array.prototype.push`. The tagged-template cases under `new.target`
+    and optional chaining also move from unsupported to pass.
  -  Synchronous arrow functions with block and expression bodies,
     reusing the arrow function kind, lexical receiver, and
     non-constructibility the runtime already owns for asynchronous
@@ -207,11 +232,11 @@ its deliberate boundary and its evidence:
     preservation, abrupt non-callable values, evaluation order, one base
     evaluation, and skipped keys and arguments. A generated property with seed
     `0x5eed0019` covers the same forms across both specialization policies and
-    forced collection. Fourteen reviewed test262 cases pass and twelve
+    forced collection. Fifteen reviewed test262 cases pass and twelve
     expected negatives retain the tagged-template, assignment-target, update,
-    and invalid `super()` grammar errors. Eleven unsupported cases record
-    independent prerequisites including tagged templates, dynamic source,
-    `for-in`, restricted asynchronous `await` positions, `String`, `Reflect`,
+    and invalid `super()` grammar errors. Ten unsupported cases record
+    independent prerequisites including dynamic source, `for-in`, restricted
+    asynchronous `await` positions, `String`, `Reflect`,
     regular expressions, and an optional call through a `super` property.
     Deliberate boundary: `delete value?.property` is rejected with a
     source-located diagnostic, because optional chaining as a `delete` operand
@@ -1076,7 +1101,8 @@ its deliberate boundary and its evidence:
     unsupported cases record this unit's boundaries: `super()` from an arrow
     function, `super.property`, and the `Reflect`, tagged template,
     `Function.prototype.bind`, typed-array, and `Object` intrinsics that other
-    inheritance cases need. The two `definition/prototype-getter` and
+    inheritance cases need. The tagged-template case from that set now passes.
+    The two `definition/prototype-getter` and
     `definition/prototype-setter` cases leave the reviewed subset until
     `Function.prototype.bind` exists, because the heritage they build starts
     from a bound function. The reviewed manifest moves to 1016 passes, 382
@@ -1552,9 +1578,10 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Big integers, regular expressions, and the remaining expression grammar
-    other than optional chaining are outside the admitted syntax. Owner: the
-    core expressions and bindings stream in
+ -  Big integers, regular expressions, and the remaining expression grammar,
+    excluding the admitted optional chaining and tagged template forms, are
+    outside the admitted syntax. Owner: the core expressions and bindings
+    stream in
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
