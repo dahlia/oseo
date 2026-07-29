@@ -5430,6 +5430,7 @@ function buildMirFunction(
   initializesInstanceElements = false,
   fieldKeyBindingId?: number,
   asyncGenerator = false,
+  argumentsBindingId?: number,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -5486,6 +5487,7 @@ function buildMirFunction(
     }),
   );
   return {
+    ...(argumentsBindingId == null ? {} : { argumentsBindingId }),
     blocks: builder.blocks.map((block) => ({
       id: block.id,
       operations: block.operations,
@@ -5557,6 +5559,7 @@ export function buildMir(
         functionValue.initializesInstanceElements === true,
         functionValue.fieldKeyBindingId,
         functionValue.functionKind === "async-generator",
+        functionValue.argumentsBindingId,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

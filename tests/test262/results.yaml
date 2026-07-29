@@ -19,9 +19,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-valu\
-        e-not-passed.js non-strict disabled failed (1): stdout=\"\"
+        e-not-passed.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/next/abs\
-        ent-value-not-passed.js:201:27: error[OSEO1001]: Unknown binding
+        ent-value-not-passed.js:202:27: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -244,9 +244,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-va\
-        lue-not-passed.js non-strict disabled failed (1): stdout=\"\"
+        lue-not-passed.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncFromSyncIteratorPrototype/return/a\
-        bsent-value-not-passed.js:204:29: error[OSEO1001]: Unknown
+        bsent-value-not-passed.js:205:29: error[OSEO1001]: Unknown
         binding 'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -7234,6 +7234,179 @@ results:
           strictness: strict
         - specialization: enabled
           strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/10.6-12-1.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/10.6-6-3.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/10.6-6-4.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/S10.6_A3_T3.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/S10.6_A3_T4.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/arguments-object/S10.6_A4.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
       harnessFailed: false
       passed: true
@@ -22265,9 +22438,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-asy\
-        nc-next.js non-strict disabled failed (1): stdout=\"\"
+        nc-next.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-async-next.js:116:19: error[OSEO1001]: Unknown binding
+        star-async-next.js:117:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -22294,9 +22467,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-asy\
-        nc-return.js non-strict disabled failed (1): stdout=\"\"
+        nc-return.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-async-return.js:150:23: error[OSEO1001]: Unknown binding
+        star-async-return.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -22323,9 +22496,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-asy\
-        nc-throw.js non-strict disabled failed (1): stdout=\"\"
+        nc-throw.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-async-throw.js:150:23: error[OSEO1001]: Unknown binding
+        star-async-throw.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -24283,9 +24456,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-syn\
-        c-next.js non-strict disabled failed (1): stdout=\"\"
+        c-next.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-sync-next.js:165:19: error[OSEO1001]: Unknown binding
+        star-sync-next.js:166:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -24313,9 +24486,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-syn\
-        c-return.js non-strict disabled failed (1): stdout=\"\"
+        c-return.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-sync-return.js:164:23: error[OSEO1001]: Unknown binding
+        star-sync-return.js:165:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -24342,9 +24515,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/named-yield-star-syn\
-        c-throw.js non-strict disabled failed (1): stdout=\"\"
+        c-throw.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/named-yield-\
-        star-sync-throw.js:162:23: error[OSEO1001]: Unknown binding
+        star-sync-throw.js:163:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -25144,9 +25317,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-async-nex\
-        t.js non-strict disabled failed (1): stdout=\"\"
+        t.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-a\
-        sync-next.js:116:19: error[OSEO1001]: Unknown binding
+        sync-next.js:117:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -25173,9 +25346,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-async-ret\
-        urn.js non-strict disabled failed (1): stdout=\"\"
+        urn.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-a\
-        sync-return.js:150:23: error[OSEO1001]: Unknown binding
+        sync-return.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -25202,9 +25375,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-async-thr\
-        ow.js non-strict disabled failed (1): stdout=\"\"
+        ow.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-a\
-        sync-throw.js:150:23: error[OSEO1001]: Unknown binding
+        sync-throw.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -27236,9 +27409,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-sync-next\
-        .js non-strict disabled failed (1): stdout=\"\"
+        .js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-s\
-        ync-next.js:165:19: error[OSEO1001]: Unknown binding
+        ync-next.js:166:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -27266,9 +27439,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-sync-retu\
-        rn.js non-strict disabled failed (1): stdout=\"\"
+        rn.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-s\
-        ync-return.js:164:23: error[OSEO1001]: Unknown binding
+        ync-return.js:165:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -27295,9 +27468,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/async-generator/yield-star-sync-thro\
-        w.js non-strict disabled failed (1): stdout=\"\"
+        w.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/async-generator/yield-star-s\
-        ync-throw.js:162:23: error[OSEO1001]: Unknown binding
+        ync-throw.js:163:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -61883,10 +62056,9 @@ results:
       - expression-operators
     observation:
       detail: "test/language/expressions/tagged-template/call-expression-argu\
-        ment-list-evaluation.js non-strict disabled failed (1):
-        stdout=\"\"
+        ment-list-evaluation.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/call-express\
-        ion-argument-list-evaluation.js:93:7: error[OSEO1001]: Unknown
+        ion-argument-list-evaluation.js:94:7: error[OSEO1001]: Unknown
         binding 'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -62052,10 +62224,10 @@ results:
       - expression-operators
     observation:
       detail: "test/language/expressions/tagged-template/member-expression-ar\
-        gument-list-evaluation.js non-strict disabled failed (1):
+        gument-list-evaluation.js strict disabled failed (1):
         stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/member-expre\
-        ssion-argument-list-evaluation.js:92:5: error[OSEO1001]: Unknown
+        ssion-argument-list-evaluation.js:93:5: error[OSEO1001]: Unknown
         binding 'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -62834,9 +63006,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/yield/star-rhs-iter-nrml-next-invoke\
-        .js non-strict disabled failed (1): stdout=\"\"
+        .js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/yield/star-rhs-iter-nrml-nex\
-        t-invoke.js:102:12: error[OSEO1001]: Unknown binding
+        t-invoke.js:103:12: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -63269,9 +63441,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke\
-        .js non-strict disabled failed (1): stdout=\"\"
+        .js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/yield/star-rhs-iter-rtrn-rtr\
-        n-invoke.js:106:12: error[OSEO1001]: Unknown binding
+        n-invoke.js:107:12: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -76689,9 +76861,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-async-next\
-        .js non-strict disabled failed (1): stdout=\"\"
+        .js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-as\
-        ync-next.js:116:19: error[OSEO1001]: Unknown binding
+        ync-next.js:117:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -76718,9 +76890,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-async-retu\
-        rn.js non-strict disabled failed (1): stdout=\"\"
+        rn.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-as\
-        ync-return.js:150:23: error[OSEO1001]: Unknown binding
+        ync-return.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -76747,9 +76919,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-async-thro\
-        w.js non-strict disabled failed (1): stdout=\"\"
+        w.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-as\
-        ync-throw.js:150:23: error[OSEO1001]: Unknown binding
+        ync-throw.js:151:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -78852,9 +79024,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-sync-next.\
-        js non-strict disabled failed (1): stdout=\"\"
+        js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-sy\
-        nc-next.js:165:19: error[OSEO1001]: Unknown binding
+        nc-next.js:166:19: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -78882,9 +79054,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-sync-retur\
-        n.js non-strict disabled failed (1): stdout=\"\"
+        n.js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-sy\
-        nc-return.js:164:23: error[OSEO1001]: Unknown binding
+        nc-return.js:165:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -78911,9 +79083,9 @@ results:
       - iterator-protocol
     observation:
       detail: "test/language/statements/async-generator/yield-star-sync-throw\
-        .js non-strict disabled failed (1): stdout=\"\"
+        .js strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/async-generator/yield-star-sy\
-        nc-throw.js:162:23: error[OSEO1001]: Unknown binding
+        nc-throw.js:163:23: error[OSEO1001]: Unknown binding
         'arguments'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -121314,7 +121486,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1119
   harnessFailures: 0
-  passes: 1787
+  passes: 1793
   semanticFailures: 0
   unsupportedProfileFeatures: 1039
   dependencies:
@@ -121381,7 +121553,7 @@ summary:
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 110
+      passes: 116
       semanticFailures: 0
       unsupportedProfileFeatures: 15
     - dependency: generators
@@ -121417,7 +121589,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 481
       harnessFailures: 0
-      passes: 571
+      passes: 577
       semanticFailures: 0
       unsupportedProfileFeatures: 188
     - dependency: promise-settlement
@@ -121447,7 +121619,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 34
       harnessFailures: 0
-      passes: 148
+      passes: 153
       semanticFailures: 0
       unsupportedProfileFeatures: 1
   groups:
@@ -121517,6 +121689,12 @@ summary:
       passes: 11
       semanticFailures: 0
       unsupportedProfileFeatures: 1
+    - group: language/arguments-object
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 6
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: language/computed-property-names
       expectedNegatives: 0
       harnessFailures: 0

@@ -747,6 +747,18 @@ OseoResult oseo_template_object(
 );
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);
+/*
+ * Creates the ordinary, unmapped arguments object for one admitted
+ * non-strict function invocation. Indexed properties snapshot the call
+ * arguments, `length` records their count, and `callee` is the running
+ * function.
+ */
+OseoResult oseo_arguments_create(
+    OseoContext *context,
+    OseoValue callee,
+    size_t argument_count,
+    const OseoValue *arguments
+);
 OseoResult oseo_require_object_coercible(
     OseoContext *context,
     OseoValue value

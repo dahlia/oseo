@@ -307,7 +307,7 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
-            assert.equal(native.counters.allocations, 0);
+            assert.equal(native.counters.allocations, 5);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

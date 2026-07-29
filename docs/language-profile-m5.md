@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,945 reviewed cases: 1,787 passes, 1,119
+The current manifest contains 3,951 reviewed cases: 1,793 passes, 1,119
 expected negatives, and 1,039 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -162,7 +162,7 @@ its deliberate boundary and its evidence:
     distinct identity. Member tags retain their receiver, and tag lookup,
     template-object creation, substitutions, and invocation preserve
     ECMAScript evaluation and abrupt-completion order. The runtime ABI is
-    `oseo-runtime-m5-26`. Fixed native fixtures cover basic and identity
+    `oseo-runtime-m5-27`. Fixed native fixtures cover basic and identity
     tags, cooked and raw text, multiple substitutions, custom return
     values, errors from tags and substitutions, receiver preservation,
     invalid escapes, frozen descriptors, and site identity. Generated
@@ -575,6 +575,29 @@ its deliberate boundary and its evidence:
     completion, top-level fallback and suffix selection, prior references,
     function length, the parameter and body environment split, asynchronous
     default selection, and promise rejection.
+ -  The non-strict `arguments` object for ordinary functions, function
+    expressions, object methods, constructors, and synchronous generators.
+    HIR and MIR carry one implicit binding identity, and the generated
+    function prologue initializes its cell from the generic call ABI before
+    parameter initialization. Each invocation receives a fresh ordinary,
+    unmapped object whose indexed properties snapshot every supplied argument,
+    whose `length` records the supplied count, and whose `callee` is the
+    enclosing function. Indexed properties are writable, enumerable, and
+    configurable; `length` and `callee` are writable and configurable but
+    non-enumerable. A parameter named `arguments` remains an explicit binding
+    and suppresses the implicit one. Strict functions, arrows, class methods,
+    and asynchronous functions do not receive or capture this binding, so an
+    otherwise unresolved reference keeps the ordinary source-located
+    diagnostic. Parameter-index aliasing through a mapped arguments exotic
+    object remains outside this ordinary-object unit. The runtime ABI is
+    `oseo-runtime-m5-27`. A generated property with seed `0x5eed001b` covers
+    zero to six bounded arguments, in-range and absent indexed reads, writes,
+    `length`, `callee`, fresh identity, both specialization policies, and
+    forced collection. Fixed native evidence also covers property
+    descriptors, object methods, and synchronous generators. Six reviewed
+    no-strict test262 cases from *test/language/arguments-object/* cover empty
+    calls despite formal parameters, `callee` identity and descriptors,
+    writes, and deletion.
  -  Catch binding patterns. A catch parameter admits every array and object
     binding pattern supported by standalone declarations, including defaults,
     nested patterns, array rest, and final identifier object rest. Every bound

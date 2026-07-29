@@ -788,6 +788,11 @@ export interface HirParameter extends SyntaxParameter {
 
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
+  /**
+   * The implicit non-strict `arguments` binding initialized from the call
+   * arguments before parameter initialization.
+   */
+  readonly argumentsBindingId?: number;
   readonly body: readonly HirStatement[];
   /**
    * Present exactly on a derived class constructor. Every `return` leaves
@@ -845,6 +850,8 @@ export interface HirResult {
 }
 
 export interface Binding {
+  /** True only for an implicit non-strict `arguments` object binding. */
+  readonly argumentsObject?: true;
   readonly functionId?: number;
   readonly functionNameBinding?: boolean;
   readonly id: number;
