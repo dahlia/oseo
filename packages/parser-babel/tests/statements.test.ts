@@ -523,9 +523,23 @@ test("rejects typeof with an unresolved name explicitly", () => {
   );
 });
 
+test("converts with statements to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      'let value = "lexical";\n' +
+      'const environment = { value: "object" };\n' +
+      "with (environment) {\n" +
+      '  value = value + "!";\n' +
+      "}\n",
+    sourceId: "with-statement.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /with \(%b\d+\(environment\)\)/u);
+});
+
 const unsupportedForms = [
   ["property", "console.error(1);"],
-  ["with statement", "with ({}) { console.log(1); }"],
   ["module", 'import "fixture";'],
   ["optional parameter", "function value(input?: number) {}"],
   [

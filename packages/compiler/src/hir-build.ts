@@ -64,6 +64,89 @@ function findBinding(
   return undefined;
 }
 
+interface NameResolution {
+  readonly binding?: Binding;
+  readonly objectBindingIds: readonly number[];
+}
+
+/**
+ * Resolve one name while retaining each intervening `with` object.
+ * A lexical binding stops the search, so an outer `with` environment
+ * cannot bypass a nearer declarative environment.
+ */
+function resolveName(
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  name: string,
+): NameResolution {
+  const objectBindingIds: number[] = [];
+  for (let index = scopes.length - 1; index >= 0; index -= 1) {
+    const scope = scopes[index];
+    if (scope == null) continue;
+    const binding = scope.get(name);
+    if (binding != null) return { binding, objectBindingIds };
+    const objectBindingId = state.withScopes.get(scope);
+    if (objectBindingId != null) objectBindingIds.push(objectBindingId);
+  }
+  return { objectBindingIds };
+}
+
+/** Allocate the uninitialized fallback behind an unresolved `with` name. */
+function withFallbackBinding(name: string, state: ResolveState): Binding {
+  const owner = state.withFallbacks.at(-1);
+  if (owner == null) {
+    throw new Error("A with fallback was requested outside a with statement.");
+  }
+  const existing = owner.get(name);
+  if (existing != null) return existing;
+  const binding: Binding = {
+    id: state.nextBindingId,
+    mutable: true,
+    name,
+  };
+  state.nextBindingId += 1;
+  owner.set(name, binding);
+  return binding;
+}
+
+function bindingExpression(
+  binding: Binding,
+  range: SourceRange,
+): HirExpression {
+  return {
+    bindingId: binding.id,
+    kind: "binding",
+    name: binding.name,
+    range,
+  };
+}
+
+/**
+ * Build the statically owned fallback for a name read through `with`.
+ * An otherwise unresolved name receives an uninitialized hidden cell,
+ * preserving the ReferenceError when every object environment misses.
+ */
+function identifierFallback(
+  name: string,
+  range: SourceRange,
+  binding: Binding | undefined,
+  state: ResolveState,
+): HirExpression {
+  if (binding != null) return bindingExpression(binding, range);
+  if (name === "undefined") return { kind: "undefined", range };
+  if (name === "NaN" || name === "Infinity") {
+    return {
+      kind: "number",
+      range,
+      value: name === "NaN" ? NaN : Infinity,
+    };
+  }
+  const errorName = errorIntrinsicName(name);
+  if (errorName != null) return { errorName, kind: "error-intrinsic", range };
+  if (name === "Symbol") return { kind: "symbol-intrinsic", range };
+  return bindingExpression(withFallbackBinding(name, state), range);
+}
+
 /** The source location of one syntax node, without its other fields. */
 function locatedOf(value: LocatedSyntax): LocatedSyntax {
   return {
@@ -189,9 +272,12 @@ function resolveExpression(
     expression.kind === "binding-set" ||
     expression.kind === "binding-update"
   ) {
-    const binding = findBinding(scopes, expression.name);
+    const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
-    if (binding == null) {
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -201,30 +287,62 @@ function resolveExpression(
       );
       return undefined;
     }
-    return value == null
-      ? undefined
-      : {
+    if (value == null) return undefined;
+    const binding =
+      resolution.binding ?? withFallbackBinding(expression.name, state);
+    const inferred =
+      expression.kind === "binding-set" ||
+      expression.operator === "&&" ||
+      expression.operator === "??" ||
+      expression.operator === "||"
+        ? inferFunctionName(value, binding.name)
+        : value;
+    if (resolution.objectBindingIds.length > 0) {
+      const fallback = {
+        bindingId: binding.id,
+        ...(binding.functionNameBinding === true
+          ? { functionNameBinding: true as const }
+          : {}),
+        ...(binding.importedBinding === true
+          ? { importedBinding: true as const }
+          : {}),
+        mutable: binding.mutable,
+        name: binding.name,
+      };
+      if (expression.kind === "binding-set") {
+        return {
           ...expression,
-          bindingId: binding.id,
-          ...(binding.functionNameBinding === true
-            ? { functionNameBinding: true }
-            : {}),
-          ...(binding.importedBinding === true
-            ? { importedBinding: true }
-            : {}),
-          mutable: binding.mutable,
-          value:
-            expression.kind === "binding-set" ||
-            expression.operator === "&&" ||
-            expression.operator === "??" ||
-            expression.operator === "||"
-              ? inferFunctionName(value, binding.name)
-              : value,
+          fallback,
+          kind: "with-set",
+          objectBindingIds: resolution.objectBindingIds,
+          value: inferred,
         };
+      }
+      return {
+        ...expression,
+        fallback,
+        kind: "with-update",
+        objectBindingIds: resolution.objectBindingIds,
+        value: inferred,
+      };
+    }
+    return {
+      ...expression,
+      bindingId: binding.id,
+      ...(binding.functionNameBinding === true
+        ? { functionNameBinding: true }
+        : {}),
+      ...(binding.importedBinding === true ? { importedBinding: true } : {}),
+      mutable: binding.mutable,
+      value: inferred,
+    };
   }
   if (expression.kind === "binding-step") {
-    const binding = findBinding(scopes, expression.name);
-    if (binding == null) {
+    const resolution = resolveName(scopes, state, expression.name);
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length === 0
+    ) {
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -233,6 +351,26 @@ function resolveExpression(
         ),
       );
       return undefined;
+    }
+    const binding =
+      resolution.binding ?? withFallbackBinding(expression.name, state);
+    if (resolution.objectBindingIds.length > 0) {
+      return {
+        ...expression,
+        fallback: {
+          bindingId: binding.id,
+          ...(binding.functionNameBinding === true
+            ? { functionNameBinding: true }
+            : {}),
+          ...(binding.importedBinding === true
+            ? { importedBinding: true }
+            : {}),
+          mutable: binding.mutable,
+          name: binding.name,
+        },
+        kind: "with-step",
+        objectBindingIds: resolution.objectBindingIds,
+      };
     }
     return {
       ...expression,
@@ -335,7 +473,22 @@ function resolveExpression(
     );
   }
   if (expression.kind === "identifier") {
-    const binding = findBinding(scopes, expression.name);
+    const resolution = resolveName(scopes, state, expression.name);
+    if (resolution.objectBindingIds.length > 0) {
+      return {
+        fallback: identifierFallback(
+          expression.name,
+          expression.range,
+          resolution.binding,
+          state,
+        ),
+        kind: "with-get",
+        name: expression.name,
+        objectBindingIds: resolution.objectBindingIds,
+        range: expression.range,
+      };
+    }
+    const binding = resolution.binding;
     if (binding == null) {
       if (expression.name === "undefined") {
         return { kind: "undefined", range: expression.range };
@@ -375,10 +528,16 @@ function resolveExpression(
     };
   }
   if (expression.kind === "unary") {
+    const typeofResolution =
+      expression.operator === "typeof" &&
+      expression.argument.kind === "identifier"
+        ? resolveName(scopes, state, expression.argument.name)
+        : undefined;
     if (
       expression.operator === "typeof" &&
       expression.argument.kind === "identifier" &&
-      findBinding(scopes, expression.argument.name) == null &&
+      typeofResolution?.binding == null &&
+      typeofResolution?.objectBindingIds.length === 0 &&
       expression.argument.name !== "undefined" &&
       expression.argument.name !== "NaN" &&
       expression.argument.name !== "Infinity" &&
@@ -1038,7 +1197,9 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
   if (
     expression.kind === "binding-set" ||
-    expression.kind === "binding-update"
+    expression.kind === "binding-update" ||
+    expression.kind === "with-set" ||
+    expression.kind === "with-update"
   ) {
     return hirExpressionHasAwait(expression.value);
   }
@@ -1229,8 +1390,15 @@ export function declaredHirBindingIds(
     } else if (
       statement.kind === "while" ||
       statement.kind === "do-while" ||
-      statement.kind === "labeled"
+      statement.kind === "labeled" ||
+      statement.kind === "with"
     ) {
+      if (statement.kind === "with") {
+        result.push(statement.objectBindingId);
+        result.push(
+          ...statement.fallbackBindings.map((binding) => binding.bindingId),
+        );
+      }
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "for") {
       for (const declaration of statement.declarations ?? []) {
@@ -1611,10 +1779,18 @@ function resolveBindingPattern(
       : { ...pattern, key, object };
   }
   if (pattern.kind === "binding-identifier") {
-    const binding =
+    const resolution =
       mode === "declare"
-        ? scopes.at(-1)?.get(pattern.name)
-        : findBinding(scopes, pattern.name);
+        ? {
+            binding: scopes.at(-1)?.get(pattern.name),
+            objectBindingIds: [],
+          }
+        : resolveName(scopes, state, pattern.name);
+    const binding =
+      resolution.binding ??
+      (resolution.objectBindingIds.length === 0
+        ? undefined
+        : withFallbackBinding(pattern.name, state));
     if (binding == null) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -1635,6 +1811,9 @@ function resolveBindingPattern(
         ? { importedBinding: true as const }
         : {}),
       mutable: binding.mutable,
+      ...(resolution.objectBindingIds.length === 0
+        ? {}
+        : { withObjectBindingIds: resolution.objectBindingIds }),
     };
   }
   if (pattern.kind === "object-binding-pattern") {
@@ -2196,7 +2375,12 @@ function resolveStatement(
         target = { ...statement.target, pattern };
       }
     } else if (statement.target.kind === "binding") {
-      const binding = findBinding(scopes, statement.target.name);
+      const resolution = resolveName(scopes, state, statement.target.name);
+      const binding =
+        resolution.binding ??
+        (resolution.objectBindingIds.length === 0
+          ? undefined
+          : withFallbackBinding(statement.target.name, state));
       if (binding == null) {
         state.diagnostics.push(
           sourceDiagnostic(
@@ -2216,6 +2400,9 @@ function resolveStatement(
             ? { importedBinding: true as const }
             : {}),
           mutable: binding.mutable,
+          ...(resolution.objectBindingIds.length === 0
+            ? {}
+            : { withObjectBindingIds: resolution.objectBindingIds }),
         };
       }
     } else {
@@ -2294,6 +2481,37 @@ function resolveStatement(
     }
     return { ...statement, cases, discriminant };
   }
+  if (statement.kind === "with") {
+    const object = resolveExpression(statement.object, scopes, state);
+    if (object == null) return undefined;
+    const objectBindingId = state.nextBindingId;
+    state.nextBindingId += 1;
+    const withScope = new Map<string, Binding>();
+    const fallbackBindings = new Map<string, Binding>();
+    state.withScopes.set(withScope, objectBindingId);
+    state.withFallbacks.push(fallbackBindings);
+    const body = resolveStatement(
+      statement.body,
+      [...scopes, withScope],
+      state,
+      functionBody,
+      loopDepth,
+      breakDepth,
+    );
+    state.withFallbacks.pop();
+    state.withScopes.delete(withScope);
+    if (body == null) return undefined;
+    return {
+      ...statement,
+      body,
+      fallbackBindings: [...fallbackBindings.values()].map((binding) => ({
+        bindingId: binding.id,
+        name: binding.name,
+      })),
+      object,
+      objectBindingId,
+    };
+  }
   const test = resolveExpression(statement.test, scopes, state);
   const consequent = resolveStatement(
     statement.consequent,
@@ -2343,6 +2561,8 @@ export function buildSeededHir(
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
+    withFallbacks: [],
+    withScopes: new Map(),
   };
   const scriptScope = new Map(seed.bindings);
   predeclareBindings(program.body, scriptScope, state);

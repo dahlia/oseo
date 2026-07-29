@@ -15993,3 +15993,37 @@ tests:
   - path: test/language/statements/variable/static-init-await-binding-valid.js
     expectedClassification: pass
     dependencies: [classes, var-bindings]
+  - path: test/language/statements/with/12.10-0-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-10.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-11.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-12.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-8.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-0-9.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-2-4.js
+    expectedClassification: pass
+    dependencies: [control-flow, error-intrinsics, object-properties]
+  - path: test/language/statements/with/12.10-2-5.js
+    expectedClassification: pass
+    dependencies: [control-flow, error-intrinsics, object-properties]
+  - path: test/language/statements/with/12.10-7-1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, object-properties, var-bindings]
+  - path: test/language/statements/with/strict-script.js
+    expectedClassification: expected-negative
+    dependencies: [object-properties]

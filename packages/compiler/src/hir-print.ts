@@ -44,6 +44,10 @@ function printHirCallArgument(argument: HirCallArgument): string {
     : printHirExpression(argument);
 }
 
+function withObjectText(objectBindingIds: readonly number[]): string {
+  return objectBindingIds.map((bindingId) => `%b${bindingId}`).join(" -> ");
+}
+
 function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "binding-set") {
     return (
@@ -59,6 +63,22 @@ function printHirExpression(expression: HirExpression): string {
   }
   if (expression.kind === "binding-step") {
     const target = `%b${expression.bindingId} ${expression.name}`;
+    return expression.prefix
+      ? `${expression.operator}${target}`
+      : `${target}${expression.operator}`;
+  }
+  if (expression.kind === "with-set" || expression.kind === "with-update") {
+    const operator =
+      expression.kind === "with-set" ? "=" : `${expression.operator}=`;
+    return (
+      `with[${withObjectText(expression.objectBindingIds)}] ` +
+      `${expression.name} ${operator} ` +
+      printHirExpression(expression.value)
+    );
+  }
+  if (expression.kind === "with-step") {
+    const target =
+      `with[${withObjectText(expression.objectBindingIds)}] ` + expression.name;
     return expression.prefix
       ? `${expression.operator}${target}`
       : `${target}${expression.operator}`;
@@ -93,6 +113,12 @@ function printHirExpression(expression: HirExpression): string {
   }
   if (expression.kind === "binding") {
     return `%b${expression.bindingId}(${expression.name})`;
+  }
+  if (expression.kind === "with-get") {
+    return (
+      `with[${withObjectText(expression.objectBindingIds)}] ` +
+      `${expression.name} fallback ${printHirExpression(expression.fallback)}`
+    );
   }
   if (expression.kind === "error-intrinsic") {
     return `intrinsic ${expression.errorName}`;
@@ -422,6 +448,12 @@ function appendHirStatement(
   } else if (statement.kind === "while") {
     lines.push(
       `${indent}while ${printHirExpression(statement.test)}${location}`,
+    );
+    appendHirStatement(lines, statement.body, `${indent}  `);
+  } else if (statement.kind === "with") {
+    lines.push(
+      `${indent}with (${printHirExpression(statement.object)}) ` +
+        `%b${statement.objectBindingId}${location}`,
     );
     appendHirStatement(lines, statement.body, `${indent}  `);
   } else if (statement.kind === "do-while") {

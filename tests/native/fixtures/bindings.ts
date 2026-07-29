@@ -2,6 +2,67 @@ import type { Fixture } from "../fixture.ts";
 
 export const bindingFixtures: readonly Fixture[] = [
   {
+    name: "with-statements",
+    nonStrictScript: true,
+    source: `
+let selected = "lexical";
+let fallback = "lexical";
+let target = "lexical";
+let captured;
+let evaluations = 0;
+const environment = {
+  selected: "object",
+  target: "object",
+  method() {
+    return this === environment && this.selected;
+  },
+};
+with ((evaluations++, environment)) {
+  console.log("read", selected, fallback, evaluations);
+  target = "written";
+  console.log("call", method());
+  captured = () => selected;
+  {
+    let selected = "block";
+    console.log("block", selected);
+  }
+}
+console.log(
+  "after",
+  selected,
+  fallback,
+  target,
+  environment.target,
+  captured(),
+  evaluations,
+);
+
+const outer = { selected: "outer" };
+const inner = {};
+with (outer) {
+  with (inner) {
+    console.log("nested", selected);
+    selected = "nested-write";
+  }
+}
+console.log("nested-after", outer.selected, selected);
+
+try {
+  with (environment) {
+    throw new RangeError("abrupt");
+  }
+} catch (error) {
+  console.log("abrupt", error.name, selected);
+}
+
+try {
+  with (null) {}
+} catch (error) {
+  console.log("nullish", error.name);
+}
+`,
+  },
+  {
     name: "labeled-statements",
     source: `
 outer: for (let i = 0; i < 3; i = i + 1) {

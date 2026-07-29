@@ -20,6 +20,27 @@ export interface HirBindingIdentifier extends LocatedSyntax {
   readonly kind: "binding-identifier";
   readonly mutable: boolean;
   readonly name: string;
+  /**
+   * Ordered innermost-first object environments consulted before this
+   * lexical fallback when the target occurs inside `with`.
+   */
+  readonly withObjectBindingIds?: readonly number[];
+}
+
+/** One lexical assignment fallback behind an ordered `with` object chain. */
+export interface HirWithBindingReference {
+  readonly bindingId: number;
+  readonly functionNameBinding?: boolean;
+  readonly importedBinding?: boolean;
+  readonly mutable: boolean;
+  readonly name: string;
+}
+
+/** One resolved identifier read through active `with` environments. */
+export interface HirWithReference extends LocatedSyntax {
+  readonly fallback: HirExpression;
+  readonly name: string;
+  readonly objectBindingIds: readonly number[];
 }
 
 /** One resolved member reference used as an assignment-pattern leaf. */
@@ -125,6 +146,7 @@ export type HirForOfTarget =
       readonly mutable: boolean;
       readonly name: string;
       readonly range: SourceRange;
+      readonly withObjectBindingIds?: readonly number[];
     }
   | {
       readonly key: HirExpression;
@@ -450,6 +472,29 @@ export type HirExpression =
       readonly prefix: boolean;
     })
   | (LocatedSyntax & {
+      readonly fallback: HirWithBindingReference;
+      readonly kind: "with-set";
+      readonly name: string;
+      readonly objectBindingIds: readonly number[];
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly fallback: HirWithBindingReference;
+      readonly kind: "with-update";
+      readonly name: string;
+      readonly objectBindingIds: readonly number[];
+      readonly operator: AssignmentOperator;
+      readonly value: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly fallback: HirWithBindingReference;
+      readonly kind: "with-step";
+      readonly name: string;
+      readonly objectBindingIds: readonly number[];
+      readonly operator: "++" | "--";
+      readonly prefix: boolean;
+    })
+  | (LocatedSyntax & {
       readonly kind: "destructuring-set";
       readonly pattern: HirBindingPattern;
       readonly value: HirExpression;
@@ -501,6 +546,9 @@ export type HirExpression =
       readonly bindingId: number;
       readonly kind: "binding";
       readonly name: string;
+    })
+  | (HirWithReference & {
+      readonly kind: "with-get";
     })
   | (LocatedSyntax & {
       readonly errorName: ErrorIntrinsicName;
@@ -779,6 +827,21 @@ export type HirStatement =
       readonly body: HirStatement;
       readonly kind: "while";
       readonly test: HirExpression;
+    })
+  | (LocatedSyntax & {
+      readonly body: HirStatement;
+      /**
+       * Hidden uninitialized fallbacks used only when an object property
+       * may supply a name that has no statically owned lexical binding.
+       */
+      readonly fallbackBindings: readonly {
+        readonly bindingId: number;
+        readonly name: string;
+      }[];
+      readonly kind: "with";
+      /** Hidden cell containing the evaluated object for this execution. */
+      readonly objectBindingId: number;
+      readonly object: HirExpression;
     });
 
 /** A resolved function parameter. */
@@ -873,6 +936,13 @@ export interface ResolveState {
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;
   readonly sourceId: string;
+  /**
+   * Hidden fallback bindings owned by each currently resolved `with`
+   * statement, ordered outermost first.
+   */
+  readonly withFallbacks: Map<string, Binding>[];
+  /** Empty scope markers mapped to their hidden object binding identity. */
+  readonly withScopes: Map<Map<string, Binding>, number>;
   /**
    * The derived constructor `this` binding in scope, if any. It reaches
    * every arrow function nested in that constructor and stops at the next
