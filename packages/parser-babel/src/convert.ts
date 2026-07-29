@@ -879,11 +879,46 @@ export function expression(
     return { ...located, kind: "logical", left, operator, right };
   }
   if (value.type === "TaggedTemplateExpression") {
-    return unsupported(
-      context,
-      value,
-      "Tagged template expressions are unsupported.",
-    );
+    const tag = node(value.tag);
+    const quasi = node(value.quasi);
+    if (tag == null || quasi?.type !== "TemplateLiteral") {
+      return unsupported(context, value);
+    }
+    const target = callTarget(context, tag);
+    if (target == null) return undefined;
+    const quasis = nodes(quasi.quasis);
+    const expressions = nodes(quasi.expressions);
+    if (quasis.length !== expressions.length + 1) {
+      return unsupported(context, quasi);
+    }
+    const cooked: (string | undefined)[] = [];
+    const raw: string[] = [];
+    for (const element of quasis) {
+      cooked.push(cookedTemplateText(element));
+      const rawText = rawTemplateText(element);
+      if (rawText == null) return unsupported(context, element);
+      raw.push(rawText);
+    }
+    const substitutions: SyntaxExpression[] = [];
+    for (const expressionNode of expressions) {
+      const substitution = expression(context, expressionNode);
+      if (substitution == null) return undefined;
+      substitutions.push(substitution);
+    }
+    return {
+      ...located,
+      arguments: [
+        {
+          ...location(context, quasi),
+          cooked,
+          kind: "template-object",
+          raw,
+        },
+        ...substitutions,
+      ],
+      kind: "call",
+      target,
+    };
   }
   if (value.type === "TemplateLiteral") {
     const quasis = nodes(value.quasis);
@@ -2385,6 +2420,11 @@ export function cookedTemplateText(element: BabelNode): string | undefined {
   return typeof elementValue?.cooked === "string"
     ? elementValue.cooked
     : undefined;
+}
+
+export function rawTemplateText(element: BabelNode): string | undefined {
+  const elementValue = element.value as { readonly raw?: unknown } | undefined;
+  return typeof elementValue?.raw === "string" ? elementValue.raw : undefined;
 }
 
 export function identifierExpression(

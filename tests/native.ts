@@ -252,6 +252,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "in-and-instanceof" ||
     fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||
+    fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";

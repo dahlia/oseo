@@ -179,6 +179,13 @@ struct OseoContext {
     OseoValue async_generator_intrinsic;
     OseoValue async_generator_function;
     OseoValue async_iterator_self_function;
+    /*
+     * Realm-local GetTemplateObject cache. The private entry layout stays
+     * behind this public generated-code boundary.
+     */
+    void *template_cache;
+    size_t template_cache_count;
+    size_t template_cache_capacity;
     OseoValue timer_head;
     const char *source_id;
     size_t source_id_length;
@@ -723,6 +730,20 @@ OseoResult oseo_array_append(
 OseoResult oseo_array_append_hole(
     OseoContext *context,
     OseoValue array
+);
+/*
+ * Returns the frozen template object for one generated parse site, creating
+ * its frozen raw array and realm-local cache entry on first evaluation.
+ */
+OseoResult oseo_template_object(
+    OseoContext *context,
+    const void *site,
+    size_t count,
+    const uint16_t *const *cooked,
+    const size_t *cooked_lengths,
+    const bool *cooked_defined,
+    const uint16_t *const *raw,
+    const size_t *raw_lengths
 );
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);

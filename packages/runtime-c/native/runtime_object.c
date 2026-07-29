@@ -267,6 +267,7 @@ static OseoResult object_create(
     object->array_length = 0u;
     object->dictionary = false;
     object->length_writable = false;
+    object->extensible = true;
     object->module_namespace = false;
     object->error_data = false;
     object->array_iterator = false;
@@ -320,6 +321,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->array_length = (uint32_t)length;
     array->dictionary = false;
     array->length_writable = true;
+    array->extensible = true;
     array->module_namespace = false;
     array->error_data = false;
     array->array_iterator = false;
@@ -389,6 +391,139 @@ static OseoResult array_index_key(
         &units[start],
         sizeof(units) / sizeof(*units) - start
     );
+}
+
+OseoResult oseo_template_object(
+    OseoContext *context,
+    const void *site,
+    size_t count,
+    const uint16_t *const *cooked,
+    const size_t *cooked_lengths,
+    const bool *cooked_defined,
+    const uint16_t *const *raw,
+    const size_t *raw_lengths
+) {
+    if (site == NULL || count == 0u || count > UINT32_MAX ||
+        cooked == NULL || cooked_lengths == NULL ||
+        cooked_defined == NULL || raw == NULL || raw_lengths == NULL) {
+        return failure(context, "OSEO2001", "Invalid template object.");
+    }
+    OseoTemplateCacheEntry *cache = context->template_cache;
+    for (size_t index = 0u;
+         index < context->template_cache_count;
+         index += 1u) {
+        if (cache[index].site == site) return normal(cache[index].object);
+    }
+    for (size_t index = 0u; index < count; index += 1u) {
+        if ((cooked_defined[index] && cooked_lengths[index] > 0u &&
+             cooked[index] == NULL) ||
+            (raw_lengths[index] > 0u && raw[index] == NULL)) {
+            return failure(context, "OSEO2001", "Invalid template strings.");
+        }
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_array_create(context, count);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_create(context, count);
+        frame.slots[1] = result.value;
+    }
+    const OseoPropertyAttributes element_attributes =
+        (OseoPropertyAttributes){false, true, false, false};
+    for (uint32_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < (uint32_t)count;
+         index += 1u) {
+        result = array_index_key(context, index);
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = cooked_defined[index]
+            ? oseo_string_from_units(
+                context, cooked[index], cooked_lengths[index])
+            : normal(oseo_undefined());
+        frame.slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[3],
+            element_attributes
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_string_from_units(
+            context, raw[index], raw_lengths[index]);
+        frame.slots[3] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3],
+            element_attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        static const uint16_t raw_key[] = {
+            UINT16_C(0x72), UINT16_C(0x61), UINT16_C(0x77)
+        };
+        result = oseo_string_from_units(
+            context, raw_key, sizeof(raw_key) / sizeof(*raw_key));
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[2],
+            frame.slots[1],
+            (OseoPropertyAttributes){false, false, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoOrdinaryObject *cooked_object =
+            ordinary_object(frame.slots[0]);
+        OseoOrdinaryObject *raw_object = ordinary_object(frame.slots[1]);
+        cooked_object->length_writable = false;
+        cooked_object->extensible = false;
+        raw_object->length_writable = false;
+        raw_object->extensible = false;
+        if (context->template_cache_count ==
+            context->template_cache_capacity) {
+            size_t capacity = context->template_cache_capacity == 0u
+                ? 4u
+                : context->template_cache_capacity * 2u;
+            if (capacity < context->template_cache_capacity ||
+                capacity > SIZE_MAX / sizeof(*cache)) {
+                result = failure(
+                    context, "OSEO2001", "Template cache is too large.");
+            } else {
+                OseoTemplateCacheEntry *grown =
+                    realloc(cache, capacity * sizeof(*cache));
+                if (grown == NULL) {
+                    result = failure(
+                        context,
+                        "OSEO2001",
+                        "Template cache allocation failed."
+                    );
+                } else {
+                    context->template_cache = grown;
+                    context->template_cache_capacity = capacity;
+                    cache = grown;
+                }
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        size_t index = context->template_cache_count;
+        cache[index].site = site;
+        cache[index].object = frame.slots[0];
+        context->template_cache_count += 1u;
+        result.value = frame.slots[0];
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 OseoResult oseo_array_append(
@@ -800,6 +935,15 @@ OseoResult oseo_object_set(
         }
         current = owner->prototype;
     }
+    if (!receiver->extensible) {
+        if (strict) {
+            return type_error(
+                context,
+                "Cannot add a property to a non-extensible object."
+            );
+        }
+        return normal(value);
+    }
     if (extends_array && !receiver->length_writable) {
         if (strict) {
             return type_error(
@@ -1059,6 +1203,12 @@ OseoResult oseo_object_define(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
+    if (!object->extensible) {
+        return type_error(
+            context,
+            "Cannot define a property on a non-extensible object."
+        );
+    }
     OseoResult grown = grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
@@ -1158,6 +1308,12 @@ OseoResult oseo_object_define_accessor(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
+    if (!object->extensible) {
+        return type_error(
+            context,
+            "Cannot define a property on a non-extensible object."
+        );
+    }
     OseoResult grown = grow_properties(context, object_value);
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
@@ -1240,6 +1396,16 @@ OseoResult oseo_object_set_prototype(
             ? normal(object_value)
             : type_error(context, "Cannot change a namespace prototype.");
     }
+    OseoOrdinaryObject *object = ordinary_object(object_value);
+    if (!object->default_intrinsics && object->prototype == prototype) {
+        return normal(object_value);
+    }
+    if (!object->extensible) {
+        return type_error(
+            context,
+            "Cannot change a non-extensible object's prototype."
+        );
+    }
     OseoValue current = prototype;
     while (is_object(current)) {
         if (current == object_value) {
@@ -1250,7 +1416,6 @@ OseoResult oseo_object_set_prototype(
         }
         current = ordinary_object(current)->prototype;
     }
-    OseoOrdinaryObject *object = ordinary_object(object_value);
     object->prototype = prototype;
     object->default_intrinsics = false;
     object->dictionary = true;

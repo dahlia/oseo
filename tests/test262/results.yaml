@@ -47068,15 +47068,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
+      - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - template
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -58209,19 +58221,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/call-expression.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/call-expression.js:144:29:
-        error[OSEO1001]: Tagged template expressions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -61511,6 +61530,686 @@ results:
         error[OSEO1001]: Property access through super is only valid in
         the body of a class element whose class has an extends
         clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-different-functions-same-site.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-differing-expressions-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/cache-differing-expr\
+        essions-eval.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/cache-differ\
+        ing-expressions-eval.js:93:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-differing-expressions-new-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/cache-differing-expr\
+        essions-new-function.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/cache-differ\
+        ing-expressions-new-function.js:93:6: error[OSEO1001]: Unknown
+        binding 'Function'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-differing-expressions.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-differing-raw-strings.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-differing-string-count.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-eval-inner-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/cache-eval-inner-fun\
+        ction.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/cache-eval-i\
+        nner-function.js:92:3: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-identical-source-eval.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/cache-identical-sour\
+        ce-eval.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/cache-identi\
+        cal-source-eval.js:92:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-identical-source-new-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/cache-identical-sour\
+        ce-new-function.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/cache-identi\
+        cal-source-new-function.js:92:6: error[OSEO1001]: Unknown
+        binding 'Function'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-identical-source.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - cross-realm
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/cache-same-site.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/call-expression-argument-list-evaluation.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/call-expression-argu\
+        ment-list-evaluation.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/call-express\
+        ion-argument-list-evaluation.js:93:7: error[OSEO1001]: Unknown
+        binding 'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/call-expression-context-no-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/tagged-template/call-expression-context-no-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/tagged-template/call-expression-context-no-strict.js:91:27:
+        error[OSEO1001]: The profile admits this only where an enclosing
+        non-arrow function provides it.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/call-expression-context-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/chained-application.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/constructor-invocation.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/invalid-escape-sequences.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/member-expression-argument-list-evaluation.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/member-expression-ar\
+        gument-list-evaluation.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/member-expre\
+        ssion-argument-list-evaluation.js:92:5: error[OSEO1001]: Unknown
+        binding 'arguments'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/member-expression-context.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - tail-call-optimization
+      flags:
+        - onlyStrict
+      includes:
+        - tcoHelper.js
+      mode: script
+      path: test/language/expressions/tagged-template/tco-call.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - tail-call-optimization
+  - case:
+      async: false
+      features:
+        - tail-call-optimization
+      flags:
+        - onlyStrict
+      includes:
+        - tcoHelper.js
+      mode: script
+      path: test/language/expressions/tagged-template/tco-member.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - tail-call-optimization
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/template-object-frozen-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/template-object-frozen-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/tagged-template/template-object.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/tagged-template/template-object.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/tagged-template/template-obj\
+        ect.js:143:8: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -120615,9 +121314,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1119
   harnessFailures: 0
-  passes: 1772
+  passes: 1787
   semanticFailures: 0
-  unsupportedProfileFeatures: 1029
+  unsupportedProfileFeatures: 1039
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -120640,9 +121339,9 @@ summary:
     - dependency: classes
       expectedNegatives: 564
       harnessFailures: 0
-      passes: 490
+      passes: 491
       semanticFailures: 0
-      unsupportedProfileFeatures: 247
+      unsupportedProfileFeatures: 246
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -120666,7 +121365,7 @@ summary:
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 53
+      unsupportedProfileFeatures: 58
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
@@ -120676,15 +121375,15 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 24
       harnessFailures: 0
-      passes: 87
+      passes: 102
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 34
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 109
+      passes: 110
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 15
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -120827,9 +121526,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 457
       harnessFailures: 0
-      passes: 832
+      passes: 847
       semanticFailures: 0
-      unsupportedProfileFeatures: 546
+      unsupportedProfileFeatures: 556
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

@@ -29,6 +29,7 @@ supportedFeatures:
   - Symbol.iterator
   - Symbol.toPrimitive
   - Symbol.toStringTag
+  - template
   - top-level-await
   - well-known-symbols
 tests:
@@ -4844,8 +4845,8 @@ tests:
     expectedClassification: pass
     dependencies: [classes, functions]
   - path: test/language/expressions/new.target/value-via-tagged-template.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [functions]
+    expectedClassification: pass
+    dependencies: [expression-operators, functions]
   - path: test/language/expressions/new/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -5873,7 +5874,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, expression-operators]
   - path: test/language/expressions/optional-chaining/call-expression.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators]
   - path: test/language/expressions/optional-chaining/early-errors-tail-position-null-op-template-string-esi.js
     expectedClassification: expected-negative
@@ -6214,6 +6215,81 @@ tests:
   - path: test/language/expressions/super/prop-poisoned-underscore-proto.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-literals]
+  - path: test/language/expressions/tagged-template/cache-different-functions-same-site.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-differing-expressions-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/tagged-template/cache-differing-expressions-new-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/tagged-template/cache-differing-expressions.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-differing-raw-strings.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-differing-string-count.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-eval-inner-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/tagged-template/cache-identical-source-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/tagged-template/cache-identical-source-new-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/tagged-template/cache-identical-source.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/cache-same-site.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/call-expression-argument-list-evaluation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/call-expression-context-no-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/call-expression-context-strict.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/chained-application.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/constructor-invocation.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/invalid-escape-sequences.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/member-expression-argument-list-evaluation.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/member-expression-context.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/tco-call.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/tco-member.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/template-object-frozen-non-strict.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/template-object-frozen-strict.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/tagged-template/template-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [expression-operators]
   - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]

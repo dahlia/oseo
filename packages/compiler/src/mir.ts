@@ -137,6 +137,7 @@ export interface MirOperation {
     | "derived-return"
     | "error-intrinsic"
     | "symbol-intrinsic"
+    | "template-object"
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
@@ -185,6 +186,10 @@ export interface MirOperation {
   readonly mutable?: boolean;
   readonly namespaceBindingIds?: readonly number[];
   readonly namespaceNames?: readonly string[];
+  /** Cooked strings for one cached tagged-template object. */
+  readonly templateCooked?: readonly (string | undefined)[];
+  /** Raw strings paired with `templateCooked`. */
+  readonly templateRaw?: readonly string[];
   readonly checkedResult?: number;
   readonly abruptTarget?: MirControlTarget;
   readonly completionKind?: "jump" | "normal" | "return" | "throw";

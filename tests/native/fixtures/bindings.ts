@@ -1224,6 +1224,104 @@ console.log(\`\${logging("first")}-\${logging("second")}\`);
 `,
   },
   {
+    name: "tagged-templates",
+    nonStrictScript: true,
+    source: `
+function basic(strings) {
+  console.log("basic", strings[0], strings.length, strings.raw.length);
+}
+basic\`hello\`;
+
+function identity(strings) { return strings; }
+const identityResult = identity\`identity\`;
+console.log(
+  "identity",
+  identityResult[0],
+  identityResult.raw[0],
+);
+
+function inspect(strings, first, second) {
+  console.log(
+    "inspect",
+    strings[0] === "line\\n",
+    strings.raw[0] === "line\\\\n",
+    strings[1],
+    strings.raw[1],
+    first,
+    second,
+  );
+  return "custom-result";
+}
+console.log("custom", inspect\`line\\n\${1}middle\${2}tail\`);
+
+const descriptor = Object.getOwnPropertyDescriptor(identityResult, "0");
+const rawDescriptor =
+  Object.getOwnPropertyDescriptor(identityResult, "raw");
+console.log(
+  "descriptors",
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+  rawDescriptor.writable,
+  rawDescriptor.enumerable,
+  rawDescriptor.configurable,
+);
+identityResult.extra = 1;
+identityResult.raw.extra = 1;
+identityResult[0] = "changed";
+console.log(
+  "frozen",
+  identityResult.extra,
+  identityResult.raw.extra,
+  identityResult[0],
+);
+
+function cached() { return identity\`cache\`; }
+console.log("cached", cached() === cached());
+
+function invalidEscape(strings) {
+  console.log(
+    "invalid escape",
+    strings[0],
+    strings.raw[0] === "\\\\xg",
+  );
+}
+invalidEscape\`\\xg\`;
+
+const receiver = {
+  value: 9,
+  tag(strings, value) { return this.value + value; },
+};
+console.log("receiver", receiver.tag\`value \${3}\`);
+
+let tagOrder = "";
+function throwingTag() {
+  tagOrder = tagOrder + "tag ";
+  throw "tag-error";
+}
+function substitution() {
+  tagOrder = tagOrder + "substitution ";
+  return 1;
+}
+try {
+  throwingTag\`value \${substitution()}\`;
+} catch (error) {
+  console.log(error, tagOrder);
+}
+
+let substitutionCalls = 0;
+function untouched() {
+  substitutionCalls = substitutionCalls + 1;
+}
+function throwingSubstitution() { throw "substitution-error"; }
+try {
+  untouched\`value \${throwingSubstitution()}\`;
+} catch (error) {
+  console.log(error, substitutionCalls);
+}
+`,
+  },
+  {
     name: "sync-arrows",
     source: `
 const double = (value) => value * 2;

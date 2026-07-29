@@ -246,6 +246,16 @@ export interface HirArraySpreadElement extends LocatedSyntax {
 /** One ordinary, spread, or elided HIR array literal entry. */
 export type HirArrayElement = HirArraySpreadElement | HirExpression | undefined;
 
+/**
+ * One resolved template object argument. Its strings contain no bindings,
+ * so resolution preserves the owned frontend data unchanged.
+ */
+export interface HirTemplateObject extends LocatedSyntax {
+  readonly cooked: readonly (string | undefined)[];
+  readonly kind: "template-object";
+  readonly raw: readonly string[];
+}
+
 /** One resolved spread entry retained inside an HIR call argument list. */
 export interface HirSpreadArgument extends LocatedSyntax {
   readonly argument: HirExpression;
@@ -448,6 +458,7 @@ export type HirExpression =
       readonly elements: readonly HirArrayElement[];
       readonly kind: "array";
     })
+  | HirTemplateObject
   | (LocatedSyntax & {
       readonly kind: "binary";
       readonly left: HirExpression;
