@@ -153,6 +153,33 @@ function resolveCallArgument(
   return resolveExpression(argument, scopes, state);
 }
 
+/** Resolves one optional chain without inflating the recursive dispatcher. */
+function resolveOptionalChain(
+  expression: Extract<SyntaxExpression, { readonly kind: "optional-chain" }>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): Extract<HirExpression, { readonly kind: "optional-chain" }> | undefined {
+  const base = resolveExpression(expression.base, scopes, state);
+  if (base == null) return undefined;
+  const links: HirOptionalChainLink[] = [];
+  for (const link of expression.links) {
+    if (link.kind === "member") {
+      const key = resolveExpression(link.key, scopes, state);
+      if (key == null) return undefined;
+      links.push({ ...link, key });
+      continue;
+    }
+    const argumentsValue: HirCallArgument[] = [];
+    for (const argument of link.arguments) {
+      const resolved = resolveCallArgument(argument, scopes, state);
+      if (resolved == null) return undefined;
+      argumentsValue.push(resolved);
+    }
+    links.push({ ...link, arguments: argumentsValue });
+  }
+  return { ...expression, base, links };
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -424,25 +451,7 @@ function resolveExpression(
     return { ...expression, properties };
   }
   if (expression.kind === "optional-chain") {
-    const base = resolveExpression(expression.base, scopes, state);
-    if (base == null) return undefined;
-    const links: HirOptionalChainLink[] = [];
-    for (const link of expression.links) {
-      if (link.kind === "member") {
-        const key = resolveExpression(link.key, scopes, state);
-        if (key == null) return undefined;
-        links.push({ ...link, key });
-        continue;
-      }
-      const argumentsValue: HirCallArgument[] = [];
-      for (const argument of link.arguments) {
-        const resolved = resolveCallArgument(argument, scopes, state);
-        if (resolved == null) return undefined;
-        argumentsValue.push(resolved);
-      }
-      links.push({ ...link, arguments: argumentsValue });
-    }
-    return { ...expression, base, links };
+    return resolveOptionalChain(expression, scopes, state);
   }
   if (expression.kind === "class") {
     return resolveClassExpression(expression, scopes, state);
@@ -958,6 +967,20 @@ function hirCallArgumentHasAwait(argument: HirCallArgument): boolean {
   );
 }
 
+/** Finds an await in an optional chain outside the recursive dispatcher. */
+function hirOptionalChainHasAwait(
+  expression: Extract<HirExpression, { readonly kind: "optional-chain" }>,
+): boolean {
+  return (
+    hirExpressionHasAwait(expression.base) ||
+    expression.links.some((link) =>
+      link.kind === "member"
+        ? hirExpressionHasAwait(link.key)
+        : link.arguments.some(hirCallArgumentHasAwait),
+    )
+  );
+}
+
 export function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
   if (
@@ -1017,14 +1040,7 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
     );
   }
   if (expression.kind === "optional-chain") {
-    return (
-      hirExpressionHasAwait(expression.base) ||
-      expression.links.some((link) =>
-        link.kind === "member"
-          ? hirExpressionHasAwait(link.key)
-          : link.arguments.some(hirCallArgumentHasAwait),
-      )
-    );
+    return hirOptionalChainHasAwait(expression);
   }
   if (expression.kind === "class") {
     // Only the heritage operand and a computed element key evaluate in
