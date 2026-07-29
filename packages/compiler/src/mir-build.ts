@@ -18,6 +18,8 @@ import type {
   HirProgram,
   HirSpreadArgument,
   HirStatement,
+  HirWithBindingReference,
+  HirWithReference,
 } from "./hir.ts";
 import { declaredHirBindingIds, hirBindingIdentifiers } from "./hir-build.ts";
 import { numberText } from "./hir-print.ts";
@@ -744,6 +746,224 @@ function lowerPropertyWrite(
     range,
   );
   return recordRoot(builder, id, range);
+}
+
+interface LoweredWithReference {
+  readonly key: number;
+  readonly object: number;
+  /** An Oseo boolean naming whether `object` owns the selected reference. */
+  readonly property: number;
+}
+
+/**
+ * Resolve one identifier reference against its active `with` objects.
+ * The chosen object is fixed before an assignment evaluates its right
+ * operand, matching ResolveBinding and PutValue ordering.
+ */
+function lowerWithReference(
+  reference: Pick<HirWithReference, "name" | "objectBindingIds" | "range">,
+  builder: MirBuilder,
+): LoweredWithReference {
+  const key = lowerPropertyKey(
+    { kind: "string", range: reference.range, value: reference.name },
+    builder,
+  );
+  const joinBlock = createMirBlock(builder);
+  const selectedObject = builder.nextValue;
+  builder.nextValue += 1;
+  const selectedProperty = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [selectedObject, selectedProperty];
+  for (const bindingId of reference.objectBindingIds) {
+    const object = lowerBindingRead(
+      bindingId,
+      "<with object>",
+      reference.range,
+      builder,
+    );
+    const found = lowerBinaryValues(
+      key,
+      "in",
+      object,
+      reference.range,
+      builder,
+    );
+    const propertyBlock = createMirBlock(builder);
+    const nextBlock = createMirBlock(builder);
+    builder.current.terminator = {
+      kind: "branch",
+      test: found,
+      whenFalse: nextBlock.id,
+      whenTrue: propertyBlock.id,
+    };
+    builder.current = propertyBlock;
+    propertyBlock.terminator = {
+      kind: "jump",
+      target: joinBlock.id,
+      values: [object, found],
+    };
+    builder.current = nextBlock;
+  }
+  const noObject = lowerSyntheticUndefined(reference.range, builder);
+  const noProperty = lowerExpression(
+    { kind: "boolean", range: reference.range, value: false },
+    builder,
+  );
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [noObject, noProperty],
+  };
+  builder.current = joinBlock;
+  recordRoot(builder, selectedObject, reference.range);
+  recordRoot(builder, selectedProperty, reference.range);
+  return { key, object: selectedObject, property: selectedProperty };
+}
+
+function lowerWithRead(
+  reference: HirWithReference,
+  builder: MirBuilder,
+  retainReceiver: boolean,
+): { readonly receiver?: number; readonly value: number } {
+  const selected = lowerWithReference(reference, builder);
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const value = builder.nextValue;
+  builder.nextValue += 1;
+  const receiver = retainReceiver ? builder.nextValue : undefined;
+  if (receiver != null) builder.nextValue += 1;
+  joinBlock.parameters = receiver == null ? [value] : [value, receiver];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenFalse: fallbackBlock.id,
+    whenTrue: propertyBlock.id,
+  };
+  builder.current = propertyBlock;
+  const propertyValue = lowerPropertyRead(
+    selected.object,
+    selected.key,
+    reference.range,
+    builder,
+  );
+  propertyBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values:
+      receiver == null ? [propertyValue] : [propertyValue, selected.object],
+  };
+  builder.current = fallbackBlock;
+  const fallbackValue = lowerExpression(reference.fallback, builder);
+  const fallbackReceiver =
+    receiver == null
+      ? undefined
+      : lowerSyntheticUndefined(reference.range, builder);
+  fallbackBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values:
+      fallbackReceiver == null
+        ? [fallbackValue]
+        : [fallbackValue, fallbackReceiver],
+  };
+  builder.current = joinBlock;
+  recordRoot(builder, value, reference.range);
+  if (receiver != null) recordRoot(builder, receiver, reference.range);
+  return { ...(receiver == null ? {} : { receiver }), value };
+}
+
+function lowerWithBindingRead(
+  selected: LoweredWithReference,
+  fallback: HirWithBindingReference,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const value = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [value];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenFalse: fallbackBlock.id,
+    whenTrue: propertyBlock.id,
+  };
+  builder.current = propertyBlock;
+  const propertyValue = lowerPropertyRead(
+    selected.object,
+    selected.key,
+    range,
+    builder,
+  );
+  propertyBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [propertyValue],
+  };
+  builder.current = fallbackBlock;
+  const fallbackValue = lowerBindingRead(
+    fallback.bindingId,
+    fallback.name,
+    range,
+    builder,
+  );
+  fallbackBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [fallbackValue],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, value, range);
+}
+
+function lowerWithBindingWrite(
+  selected: LoweredWithReference,
+  fallback: HirWithBindingReference,
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenFalse: fallbackBlock.id,
+    whenTrue: propertyBlock.id,
+  };
+  builder.current = propertyBlock;
+  const propertyResult = lowerPropertyWrite(
+    selected.object,
+    selected.key,
+    value,
+    range,
+    builder,
+  );
+  propertyBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [propertyResult],
+  };
+  builder.current = fallbackBlock;
+  const fallbackResult = lowerBindingWrite(
+    { ...fallback, range },
+    value,
+    builder,
+  );
+  fallbackBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [fallbackResult],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, range);
 }
 
 function lowerBinaryValues(
@@ -2485,6 +2705,68 @@ function lowerExpression(
   inferredFunctionName?: number,
   accessorNamePrefix?: "get" | "set",
 ): number {
+  if (expression.kind === "with-get") {
+    return lowerWithRead(expression, builder, false).value;
+  }
+  if (expression.kind === "with-set") {
+    const selected = lowerWithReference(expression, builder);
+    const value = lowerExpression(expression.value, builder);
+    return lowerWithBindingWrite(
+      selected,
+      expression.fallback,
+      value,
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "with-update") {
+    const selected = lowerWithReference(expression, builder);
+    const current = lowerWithBindingRead(
+      selected,
+      expression.fallback,
+      expression.range,
+      builder,
+    );
+    return lowerAssignmentValue(
+      current,
+      expression.operator,
+      expression.value,
+      (value) =>
+        lowerWithBindingWrite(
+          selected,
+          expression.fallback,
+          value,
+          expression.range,
+          builder,
+        ),
+      expression.range,
+      builder,
+    );
+  }
+  if (expression.kind === "with-step") {
+    const selected = lowerWithReference(expression, builder);
+    const current = lowerWithBindingRead(
+      selected,
+      expression.fallback,
+      expression.range,
+      builder,
+    );
+    return lowerUpdateValue(
+      current,
+      expression.operator,
+      expression.prefix,
+      (value) =>
+        lowerWithBindingWrite(
+          selected,
+          expression.fallback,
+          value,
+          expression.range,
+          builder,
+        ),
+      expression.range,
+      builder,
+    );
+  }
   if (expression.kind === "module-namespace") {
     appendMirMetadata(
       builder,
@@ -3619,8 +3901,20 @@ function lowerExpression(
     let callee: number;
     let receiver: number;
     if (expression.target.kind === "dynamic") {
-      callee = lowerExpression(expression.target.callee, builder);
-      receiver = lowerSyntheticUndefined(expression.range, builder);
+      if (expression.target.callee.kind === "with-get") {
+        const reference = lowerWithRead(
+          expression.target.callee,
+          builder,
+          true,
+        );
+        callee = reference.value;
+        receiver =
+          reference.receiver ??
+          lowerSyntheticUndefined(expression.range, builder);
+      } else {
+        callee = lowerExpression(expression.target.callee, builder);
+        receiver = lowerSyntheticUndefined(expression.range, builder);
+      }
     } else if (expression.target.kind === "private-method") {
       // PrivateGet already resolves the element the object carries, so
       // a private method call needs no lookup of its own: it calls that
@@ -4108,6 +4402,22 @@ function lowerForOfTarget(
     recordRoot(builder, id, target.range);
     return;
   }
+  if (
+    target.kind === "binding" &&
+    target.withObjectBindingIds != null &&
+    target.withObjectBindingIds.length > 0
+  ) {
+    const selected = lowerWithReference(
+      {
+        name: target.name,
+        objectBindingIds: target.withObjectBindingIds,
+        range: target.range,
+      },
+      builder,
+    );
+    lowerWithBindingWrite(selected, target, value, target.range, builder);
+    return;
+  }
   if (target.kind === "binding" || target.kind === "declaration") {
     appendMirMetadata(
       builder,
@@ -4500,6 +4810,22 @@ function lowerBindingTarget(
   }
   if (pattern.kind === "object-binding-pattern") {
     lowerObjectBindingPattern(pattern, value, mode, builder);
+    return;
+  }
+  if (
+    mode === "write" &&
+    pattern.withObjectBindingIds != null &&
+    pattern.withObjectBindingIds.length > 0
+  ) {
+    const selected = lowerWithReference(
+      {
+        name: pattern.name,
+        objectBindingIds: pattern.withObjectBindingIds,
+        range: pattern.range,
+      },
+      builder,
+    );
+    lowerWithBindingWrite(selected, pattern, value, pattern.range, builder);
     return;
   }
   if (mode === "write") {
@@ -4946,6 +5272,35 @@ function lowerStatements(
       return true;
     } else if (statement.kind === "try") {
       if (lowerTryStatement(statement, builder)) return true;
+    } else if (statement.kind === "with") {
+      const input = lowerExpression(statement.object, builder);
+      const object = lowerObjectCoercible(input, statement.range, builder);
+      resetBinding(
+        statement.objectBindingId,
+        "<with object>",
+        statement.range,
+        builder,
+      );
+      for (const fallback of statement.fallbackBindings) {
+        resetBinding(
+          fallback.bindingId,
+          `<with fallback ${fallback.name}>`,
+          statement.range,
+          builder,
+        );
+      }
+      const initialized = builder.nextValue;
+      builder.nextValue += 1;
+      builder.current.operations.push({
+        arguments: [object],
+        bindingId: statement.objectBindingId,
+        detail: `%b${statement.objectBindingId} <with object>`,
+        id: initialized,
+        kind: "initialize",
+        range: statement.range,
+      });
+      recordRoot(builder, initialized, statement.range);
+      if (lowerStatementBody(statement.body, builder)) return true;
     } else if (statement.kind === "block") {
       resetBlockBindings(statement.body, builder);
       if (lowerStatements(statement.body, builder)) return true;
@@ -5430,6 +5785,7 @@ function buildMirFunction(
   initializesInstanceElements = false,
   fieldKeyBindingId?: number,
   asyncGenerator = false,
+  argumentsBindingId?: number,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -5486,6 +5842,7 @@ function buildMirFunction(
     }),
   );
   return {
+    ...(argumentsBindingId == null ? {} : { argumentsBindingId }),
     blocks: builder.blocks.map((block) => ({
       id: block.id,
       operations: block.operations,
@@ -5557,6 +5914,7 @@ export function buildMir(
         functionValue.initializesInstanceElements === true,
         functionValue.fieldKeyBindingId,
         functionValue.functionKind === "async-generator",
+        functionValue.argumentsBindingId,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

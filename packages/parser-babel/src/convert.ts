@@ -2008,6 +2008,18 @@ export function statement(
       ? undefined
       : { ...located, body, kind: "while", test };
   }
+  if (value.type === "WithStatement") {
+    const objectNode = node(value.object);
+    const bodyNode = node(value.body);
+    if (objectNode == null || bodyNode == null) {
+      return unsupported(context, value);
+    }
+    const object = expression(context, objectNode);
+    const body = statement(context, bodyNode, functionBody);
+    return object == null || body == null
+      ? undefined
+      : { ...located, body, kind: "with", object };
+  }
   if (value.type === "EmptyStatement") {
     return { ...located, body: [], kind: "block" };
   }
@@ -3103,7 +3115,8 @@ export function collectVarStatement(
   if (
     value.type === "WhileStatement" ||
     value.type === "DoWhileStatement" ||
-    value.type === "LabeledStatement"
+    value.type === "LabeledStatement" ||
+    value.type === "WithStatement"
   ) {
     const body = node(value.body);
     return (

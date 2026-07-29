@@ -92,6 +92,37 @@ test("preserves non-strict script parameter bindings", () => {
   }
 });
 
+test("binds arguments only in admitted non-strict functions", () => {
+  const admitted = compileSource(babelFrontend, {
+    source:
+      "function declared() { return arguments; }\n" +
+      "const expressed = function () { return arguments.length; };\n" +
+      "const object = { method() { return arguments[0]; } };\n",
+    sourceId: "arguments-object.ts",
+  });
+  assert.deepEqual(admitted.diagnostics, []);
+  assert.ok(admitted.hir != null);
+  assert.ok(admitted.mir != null);
+
+  const rejectedSources = [
+    'function strict() { "use strict"; return arguments; }',
+    "function outer() { return () => arguments; }",
+    "async function asynchronous() { return arguments; }",
+    "class Value { method() { return arguments; } }",
+  ];
+  for (const [index, source] of rejectedSources.entries()) {
+    const rejected = compileSource(babelFrontend, {
+      source,
+      sourceId: `unsupported-arguments-${index}.ts`,
+    });
+    assert.equal(rejected.mir, undefined);
+    assert.match(
+      rejected.diagnostics[0]?.message ?? "",
+      /Unknown binding 'arguments'/u,
+    );
+  }
+});
+
 test("converts function binding patterns through owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:

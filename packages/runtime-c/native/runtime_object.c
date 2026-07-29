@@ -1503,6 +1503,71 @@ static OseoResult ascii_string(OseoContext *context, const char *text) {
     return oseo_internal_allocate_string(context, units, length);
 }
 
+OseoResult oseo_arguments_create(
+    OseoContext *context,
+    OseoValue callee,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Arguments are missing.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[2] = callee;
+    result = oseo_object_literal_create(context);
+    frame.slots[0] = result.value;
+    const OseoPropertyAttributes indexed =
+        (OseoPropertyAttributes){true, true, true, false};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = oseo_property_key(context, oseo_number((double)index));
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                arguments[index],
+                indexed
+            );
+        }
+    }
+    const OseoPropertyAttributes metadata =
+        (OseoPropertyAttributes){true, false, true, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_string(context, "length");
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            oseo_number((double)argument_count),
+            metadata
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_string(context, "callee");
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            metadata
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static bool rest_key_is_excluded(
     OseoValue key,
     size_t excluded_count,

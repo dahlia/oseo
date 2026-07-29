@@ -328,6 +328,11 @@ export interface MirSpecialization {
 
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
+  /**
+   * The implicit non-strict `arguments` binding initialized by the backend
+   * from the generic call ABI.
+   */
+  readonly argumentsBindingId?: number;
   readonly blocks: readonly MirBlock[];
   /**
    * The `this` binding of a derived class constructor. Every `return`

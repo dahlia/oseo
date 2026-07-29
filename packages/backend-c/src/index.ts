@@ -2929,6 +2929,32 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
+  if (functionValue.argumentsBindingId != null) {
+    line(
+      state,
+      renderC(
+        emittedC.common.resultAssignOseoEnvironmentGetContextRoots,
+        environmentSlot,
+      ) +
+        renderC(
+          emittedC.common.positionSuffix,
+          functionValue.argumentsBindingId,
+        ),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(state, renderC(emittedC.common.rootAssignResultValue, temporarySlot));
+    line(state, renderC(emittedC.prologue.resultAssignOseoArgumentsCreate));
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      renderC(
+        emittedC.prologue.resultAssignContextRootsResultValue,
+        renderC(emittedC.prologue.oseoCellInitialize),
+        temporarySlot,
+      ),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  }
   const parameters = functionValue.parameters;
   const initializedParameters = new Set<number>();
   for (let index = 0; index < parameters.length; index += 1) {

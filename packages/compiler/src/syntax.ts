@@ -682,6 +682,13 @@ export type FunctionKind =
   | "method"
   | "ordinary";
 
+/** One non-strict `with` statement in the owned syntax tree. */
+export interface SyntaxWithStatement extends LocatedSyntax {
+  readonly body: SyntaxStatement;
+  readonly kind: "with";
+  readonly object: SyntaxExpression;
+}
+
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =
   | (LocatedSyntax & {
@@ -791,7 +798,8 @@ export type SyntaxStatement =
       readonly body: SyntaxStatement;
       readonly kind: "while";
       readonly test: SyntaxExpression;
-    });
+    })
+  | SyntaxWithStatement;
 
 /** A top-level function declaration in owned syntax. */
 export interface SyntaxFunction extends LocatedSyntax {
