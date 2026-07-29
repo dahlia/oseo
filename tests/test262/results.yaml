@@ -58175,6 +58175,1044 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/call-expression-super-no-base.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/call-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/call-expression.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/call-expression.js:144:29:
+        error[OSEO1001]: Tagged template expressions are
+        unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-null-op-template-string-esi.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-null-op-template-string.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-null-optchain-template-string-esi.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-null-optchain-template-string.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-op-template-string-esi.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-op-template-string.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-optchain-template-string-esi.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/early-errors-tail-position-optchain-template-string.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/eval-optional-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/optional-chaining/eval-optional-call\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/optional-chaining/eval-optio\
+        nal-call.js:101:10: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-do.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - optional-chaining
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-for-await-of.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - control-flow
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-for-in.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/iteration-statement-for-in.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/iteration-statement-for-in.js:88:1:
+        error[OSEO1001]: for-in statements are unsupported.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-for-of-type-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-for.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/iteration-statement-while.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - optional-chaining
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/expressions/optional-chaining/member-expression-async-identifier.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/member-expression-async-identifier.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:192:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - optional-chaining
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/expressions/optional-chaining/member-expression-async-literal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/member-expression-async-literal.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/member-expression-async-literal.js:190:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/member-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - expression-operators
+      - generators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/member-expression.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/member-expression.js:110:24:
+        error[OSEO1001]: RegExpLiteral is outside the M1 profile.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/new-target-optional-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/expressions/optional-chaining/new-target-optiona\
+        l-call.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/optional-chaining/new-target\
+        -optional-call.js:97:1: error[OSEO1001]: Unknown binding
+        'Reflect'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-call-preserves-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - optional-chaining
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js:191:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - optional-chaining
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js:191:3:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-expression-optional-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-prod-arguments.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/expressions/optional-chaining/optional-chain-pro\
+        d-arguments.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/optional-chaining/optional-c\
+        hain-prod-arguments.js:87:18: error[OSEO1001]: Unknown binding
+        'String'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-prod-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain-prod-identifiername.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-chain.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/optional-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/punctuator-decimal-lookahead.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/runtime-semantics-evaluation.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/short-circuiting.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/static-semantics-simple-assignment.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/super-property-optional-call.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - expression-operators
+    observation:
+      detail: 'test/language/expressions/optional-chaining/super-property-optional-call.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/optional-chaining/super-property-optional-call.js:93:7:
+        error[OSEO1001]: super is only valid as a call or as the object
+        of a property reference.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/update-expression-postfix.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-chaining
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/optional-chaining/update-expression-prefix.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -119575,11 +120613,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1107
+  expectedNegatives: 1119
   harnessFailures: 0
-  passes: 1758
+  passes: 1772
   semanticFailures: 0
-  unsupportedProfileFeatures: 1018
+  unsupportedProfileFeatures: 1029
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -119592,25 +120630,25 @@ summary:
       harnessFailures: 0
       passes: 301
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 19
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
-      passes: 528
+      passes: 529
       semanticFailures: 0
       unsupportedProfileFeatures: 645
     - dependency: classes
-      expectedNegatives: 563
+      expectedNegatives: 564
       harnessFailures: 0
       passes: 490
       semanticFailures: 0
-      unsupportedProfileFeatures: 244
+      unsupportedProfileFeatures: 247
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
-      passes: 353
+      passes: 358
       semanticFailures: 0
-      unsupportedProfileFeatures: 6
+      unsupportedProfileFeatures: 7
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -119628,7 +120666,7 @@ summary:
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 52
+      unsupportedProfileFeatures: 53
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
@@ -119636,27 +120674,27 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: expression-operators
-      expectedNegatives: 12
+      expectedNegatives: 24
       harnessFailures: 0
-      passes: 73
+      passes: 87
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 23
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 107
+      passes: 109
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 16
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
       passes: 151
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 36
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
-      passes: 648
+      passes: 649
       semanticFailures: 0
       unsupportedProfileFeatures: 39
     - dependency: lexical-bindings
@@ -119680,7 +120718,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 481
       harnessFailures: 0
-      passes: 565
+      passes: 571
       semanticFailures: 0
       unsupportedProfileFeatures: 188
     - dependency: promise-settlement
@@ -119787,11 +120825,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 445
+      expectedNegatives: 457
       harnessFailures: 0
-      passes: 818
+      passes: 832
       semanticFailures: 0
-      unsupportedProfileFeatures: 535
+      unsupportedProfileFeatures: 546
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

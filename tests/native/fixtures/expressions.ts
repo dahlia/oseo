@@ -51,6 +51,89 @@ console.log(touch() ?? "was-null", effects);
 `,
   },
   {
+    name: "optional-chaining",
+    source: `
+function optionalFunction(value) { return value + 1; }
+const optionalObject = {
+  nested: { value: 7 },
+  value: 10,
+  method(value) { return this.value + value; },
+};
+const optionalNull = null;
+let optionalUndefined;
+console.log(
+  optionalObject?.nested.value,
+  optionalNull?.nested.value,
+  optionalUndefined?.nested,
+);
+console.log(
+  optionalObject?.["nested"]?.["value"],
+  optionalNull?.["nested"],
+);
+console.log(
+  optionalFunction?.(4),
+  optionalNull?.(4),
+  optionalUndefined?.(4),
+);
+console.log(optionalObject?.method(2), optionalObject.method?.(3));
+console.log(
+  (optionalObject?.method)(4),
+  (optionalObject.method)?.(5),
+  (optionalObject?.method)?.(6),
+);
+console.log("text"?.length, (0)?.missing, false?.missing);
+
+let optionalOrder = "";
+function optionalBase(value) {
+  optionalOrder = optionalOrder + "base ";
+  return value;
+}
+function optionalKey() {
+  optionalOrder = optionalOrder + "key ";
+  return "method";
+}
+function optionalArgument() {
+  optionalOrder = optionalOrder + "argument ";
+  return 5;
+}
+const optionalOrdered = {
+  value: 20,
+  get method() {
+    optionalOrder = optionalOrder + "get ";
+    return function (value) {
+      optionalOrder = optionalOrder + "call ";
+      return this.value + value;
+    };
+  },
+};
+const orderedResult =
+  optionalBase(optionalOrdered)?.[optionalKey()]?.(optionalArgument());
+console.log(orderedResult, optionalOrder);
+optionalOrder = "";
+const skippedResult =
+  optionalBase(null)?.[optionalKey()]?.(optionalArgument()).missing;
+console.log(skippedResult, optionalOrder);
+
+let optionalBaseCount = 0;
+function optionalOnce() {
+  optionalBaseCount = optionalBaseCount + 1;
+  return { value: optionalBaseCount };
+}
+console.log(optionalOnce()?.value, optionalBaseCount);
+try {
+  const notCallable = 1;
+  notCallable?.();
+} catch (error) {
+  console.log(error instanceof TypeError);
+}
+try {
+  (optionalNull?.method)();
+} catch (error) {
+  console.log(error instanceof TypeError);
+}
+`,
+  },
+  {
     name: "numeric-bitwise-exponent",
     source: `
 console.log(2 ** 10, 2 ** 0.5, (-2) ** 2, 2 ** -2, 9 ** 0.5);

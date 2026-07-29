@@ -2284,6 +2284,201 @@ function lowerClassExpression(
   return constructorValue;
 }
 
+/**
+ * Branches to `shortBlock` when `value` is null or undefined, otherwise
+ * leaves the builder in a new continuation block.
+ */
+function lowerOptionalNullishGuard(
+  value: number,
+  shortBlock: MutableMirBlock,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  const undefinedCheckBlock = createMirBlock(builder);
+  const continueBlock = createMirBlock(builder);
+  const strictConstantTest = (constant: MirConstant): number => {
+    const constantId = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      constant,
+      detail: constant.kind,
+      id: constantId,
+      kind: "constant",
+      range,
+    });
+    const test = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [value, constantId],
+      detail: "===",
+      id: test,
+      kind: "binary",
+      operator: "===",
+      range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [test],
+      range,
+    );
+    return test;
+  };
+  const isNull = strictConstantTest({ kind: "null" });
+  appendMirMetadata(
+    builder,
+    "branch",
+    `?. null -> bb${shortBlock.id}, other -> bb${undefinedCheckBlock.id}`,
+    [isNull],
+    range,
+  );
+  builder.current.terminator = {
+    kind: "branch",
+    test: isNull,
+    whenFalse: undefinedCheckBlock.id,
+    whenTrue: shortBlock.id,
+  };
+  builder.current = undefinedCheckBlock;
+  const isUndefined = strictConstantTest({ kind: "undefined" });
+  appendMirMetadata(
+    builder,
+    "branch",
+    `?. undefined -> bb${shortBlock.id}, other -> bb${continueBlock.id}`,
+    [isUndefined],
+    range,
+  );
+  builder.current.terminator = {
+    kind: "branch",
+    test: isUndefined,
+    whenFalse: continueBlock.id,
+    whenTrue: shortBlock.id,
+  };
+  builder.current = continueBlock;
+}
+
+/** Lowers one optional chain without re-evaluating its base or references. */
+function lowerOptionalChain(
+  expression: Extract<HirExpression, { readonly kind: "optional-chain" }>,
+  builder: MirBuilder,
+): number {
+  const shortBlock = createMirBlock(builder);
+  let value = lowerExpression(expression.base, builder);
+  let receiver: number | undefined;
+  let shortConsumed = false;
+  for (const [index, link] of expression.links.entries()) {
+    if (link.optional) {
+      lowerOptionalNullishGuard(value, shortBlock, link.range, builder);
+    }
+    if (link.kind === "member") {
+      receiver = value;
+      if (link.key.kind === "string" && builder.specialization === "enabled") {
+        value = lowerSpecializedPropertyGet(
+          receiver,
+          link.key,
+          link.range,
+          builder,
+        );
+      } else {
+        const keyInput = lowerExpression(link.key, builder);
+        const key = convertPropertyKey(keyInput, link.key.range, builder);
+        value = lowerPropertyRead(receiver, key, link.range, builder);
+      }
+      continue;
+    }
+    let callReceiver: number;
+    if (link.chainBoundary === true) {
+      if (index !== expression.links.length - 1) {
+        throw new Error("An optional-chain boundary call must be last.");
+      }
+      const boundaryBlock = createMirBlock(builder);
+      const boundaryCallee = builder.nextValue;
+      builder.nextValue += 1;
+      const boundaryReceiver = builder.nextValue;
+      builder.nextValue += 1;
+      boundaryBlock.parameters = [boundaryCallee, boundaryReceiver];
+      const liveReceiver =
+        receiver ?? lowerSyntheticUndefined(link.range, builder);
+      builder.current.terminator = {
+        kind: "jump",
+        target: boundaryBlock.id,
+        values: [value, liveReceiver],
+      };
+      builder.current = shortBlock;
+      const undefinedValue = lowerSyntheticUndefined(link.range, builder);
+      shortBlock.terminator = {
+        kind: "jump",
+        target: boundaryBlock.id,
+        values: [undefinedValue, undefinedValue],
+      };
+      builder.current = boundaryBlock;
+      value = recordRoot(builder, boundaryCallee, link.range);
+      callReceiver = recordRoot(builder, boundaryReceiver, link.range);
+      shortConsumed = true;
+    } else {
+      callReceiver = receiver ?? lowerSyntheticUndefined(link.range, builder);
+    }
+    const lowered = lowerCallArguments(link.arguments, link.range, builder);
+    const callArguments = [value, callReceiver, ...lowered.ids];
+    const safepointArguments =
+      lowered.list == null ? callArguments : [...callArguments, lowered.list];
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "optional chain call",
+      safepointArguments,
+      link.range,
+    );
+    const called = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      ...(lowered.list == null ? {} : { argumentListId: lowered.list }),
+      arguments: callArguments,
+      detail: "optional chain function value",
+      id: called,
+      kind: "call",
+      range: link.range,
+      target: { kind: "dynamic" },
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [called],
+      link.range,
+    );
+    value = recordRoot(builder, called, link.range);
+    receiver = undefined;
+  }
+  if (shortConsumed) return value;
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [value],
+  };
+  builder.current = shortBlock;
+  const undefinedValue = lowerSyntheticUndefined(expression.range, builder);
+  shortBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [undefinedValue],
+  };
+  builder.current = joinBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `?. bb${shortBlock.id}`,
+    [],
+    expression.range,
+  );
+  return recordRoot(builder, result, expression.range);
+}
+
 function lowerExpression(
   expression: HirExpression,
   builder: MirBuilder,
@@ -2932,6 +3127,9 @@ function lowerExpression(
       recordRoot(builder, result, expression.range);
     }
     return id;
+  }
+  if (expression.kind === "optional-chain") {
+    return lowerOptionalChain(expression, builder);
   }
   if (expression.kind === "class") {
     return lowerClassExpression(expression, builder, inferredFunctionName);

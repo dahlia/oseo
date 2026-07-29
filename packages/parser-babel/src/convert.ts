@@ -21,6 +21,7 @@ import type {
   SyntaxModuleSpecifier,
   SyntaxObjectBindingPattern,
   SyntaxObjectProperty,
+  SyntaxOptionalChainLink,
   SyntaxParameter,
   SyntaxPrivateName,
   SyntaxProgram,
@@ -283,10 +284,7 @@ export function memberParts(
     return unsupported(context, value, "This property access is unsupported.");
   }
   const objectNode = node(value.object);
-  const propertyNode = node(value.property);
-  if (objectNode == null || propertyNode == null) {
-    return unsupported(context, value);
-  }
+  if (objectNode == null) return unsupported(context, value);
   const objectValue =
     objectNode.type === "Super"
       ? superAllowed
@@ -297,6 +295,25 @@ export function memberParts(
             "Property access through super is unsupported here.",
           )
       : expression(context, objectNode);
+  const key = memberKey(context, value);
+  return objectValue == null || key == null
+    ? undefined
+    : { key, object: objectValue };
+}
+
+/** Converts the property-name portion of an ordinary or optional member. */
+function memberKey(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  if (
+    value.type !== "MemberExpression" &&
+    value.type !== "OptionalMemberExpression"
+  ) {
+    return unsupported(context, value);
+  }
+  const propertyNode = node(value.property);
+  if (propertyNode == null) return unsupported(context, value);
   let key: SyntaxExpression | undefined;
   if (value.computed === true) {
     key = expression(context, propertyNode);
@@ -311,9 +328,122 @@ export function memberParts(
     if (name == null) return unsupported(context, propertyNode);
     key = { ...location(context, propertyNode), kind: "string", value: name };
   }
-  return objectValue == null || key == null
-    ? undefined
-    : { key, object: objectValue };
+  return key;
+}
+
+interface BabelOptionalChain {
+  readonly base: BabelNode;
+  readonly links: readonly BabelNode[];
+}
+
+/**
+ * Flattens Babel's nested optional member and call nodes while retaining
+ * ordinary member steps on the same reference spine. The owned node must keep
+ * the whole chain so a guarded step can skip an unguarded tail.
+ */
+function babelOptionalChain(value: BabelNode): BabelOptionalChain {
+  if (
+    value.type === "OptionalMemberExpression" ||
+    value.type === "MemberExpression"
+  ) {
+    const object = node(value.object);
+    if (object != null) {
+      const chain = babelOptionalChain(object);
+      return { base: chain.base, links: [...chain.links, value] };
+    }
+  }
+  if (value.type === "OptionalCallExpression") {
+    const callee = node(value.callee);
+    if (callee != null) {
+      const inner = unparenthesizedExpression(callee) ?? callee;
+      const chain = babelOptionalChain(inner);
+      return { base: chain.base, links: [...chain.links, value] };
+    }
+  }
+  return { base: value, links: [] };
+}
+
+function callArguments(
+  context: ConvertContext,
+  value: BabelNode,
+): readonly SyntaxCallArgument[] | undefined {
+  const argumentValues: SyntaxCallArgument[] = [];
+  for (const argumentValue of nodes(value.arguments)) {
+    if (argumentValue.type === "SpreadElement") {
+      const spreadArgument = node(argumentValue.argument);
+      if (spreadArgument == null) return unsupported(context, argumentValue);
+      const converted = expression(context, spreadArgument);
+      if (converted == null) return undefined;
+      argumentValues.push({
+        ...location(context, argumentValue),
+        argument: converted,
+        kind: "spread",
+      });
+      continue;
+    }
+    const converted = expression(context, argumentValue);
+    if (converted == null) return undefined;
+    argumentValues.push(converted);
+  }
+  return argumentValues;
+}
+
+function optionalChainExpression(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  const chain = babelOptionalChain(value);
+  const base = expression(context, chain.base);
+  if (base == null) return undefined;
+  const links: SyntaxOptionalChainLink[] = [];
+  for (const link of chain.links) {
+    if (
+      link.type === "MemberExpression" ||
+      link.type === "OptionalMemberExpression"
+    ) {
+      const object = node(link.object);
+      if (object?.type === "Super") {
+        return unsupported(
+          context,
+          link,
+          "Optional chaining through super is unsupported.",
+        );
+      }
+      const key = memberKey(context, link);
+      if (key == null) return undefined;
+      links.push({
+        ...location(context, link),
+        key,
+        kind: "member",
+        optional: link.optional === true,
+      });
+      continue;
+    }
+    if (link.typeArguments != null || link.typeParameters != null) {
+      return unsupported(
+        context,
+        link,
+        "Call type arguments are outside the M1 profile.",
+      );
+    }
+    const argumentsValue = callArguments(context, link);
+    if (argumentsValue == null) return undefined;
+    links.push({
+      ...location(context, link),
+      arguments: argumentsValue,
+      kind: "call",
+      optional: link.optional === true,
+    });
+  }
+  if (links.length === 0 || !links.some((link) => link.optional)) {
+    return unsupported(context, value);
+  }
+  return {
+    ...location(context, value),
+    base,
+    kind: "optional-chain",
+    links,
+  };
 }
 
 export function expression(
@@ -588,6 +718,12 @@ export function expression(
   }
   if (value.type === "ClassExpression") {
     return classExpression(context, value);
+  }
+  if (
+    value.type === "OptionalMemberExpression" ||
+    value.type === "OptionalCallExpression"
+  ) {
+    return optionalChainExpression(context, value);
   }
   if (value.type === "MemberExpression") {
     const name = privateMemberName(value);
@@ -890,25 +1026,33 @@ export function expression(
     }
     const callee = node(value.callee);
     if (callee == null) return unsupported(context, value);
-    const target = callTarget(context, callee);
-    const argumentValues: SyntaxCallArgument[] = [];
-    for (const argumentValue of nodes(value.arguments)) {
-      if (argumentValue.type === "SpreadElement") {
-        const spreadArgument = node(argumentValue.argument);
-        if (spreadArgument == null) return unsupported(context, argumentValue);
-        const converted = expression(context, spreadArgument);
-        if (converted == null) return undefined;
-        argumentValues.push({
-          ...location(context, argumentValue),
-          argument: converted,
-          kind: "spread",
-        });
-        continue;
-      }
-      const converted = expression(context, argumentValue);
-      if (converted == null) return undefined;
-      argumentValues.push(converted);
+    const argumentValues = callArguments(context, value);
+    if (argumentValues == null) return undefined;
+    const unparenthesized = unparenthesizedExpression(callee);
+    if (
+      unparenthesized?.type === "OptionalMemberExpression" ||
+      unparenthesized?.type === "OptionalCallExpression"
+    ) {
+      const chain = optionalChainExpression(context, unparenthesized);
+      if (chain == null || chain.kind !== "optional-chain") return undefined;
+      return {
+        ...located,
+        ...chain,
+        links: [
+          ...chain.links,
+          {
+            ...located,
+            arguments: argumentValues,
+            chainBoundary: true,
+            kind: "call",
+            optional: false,
+          },
+        ],
+        byteRange: located.byteRange,
+        range: located.range,
+      };
     }
+    const target = callTarget(context, callee);
     return target == null
       ? undefined
       : { ...located, arguments: argumentValues, kind: "call", target };

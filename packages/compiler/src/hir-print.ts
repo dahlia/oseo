@@ -143,6 +143,24 @@ function printHirExpression(expression: HirExpression): string {
       "}"
     );
   }
+  if (expression.kind === "optional-chain") {
+    const base =
+      expression.base.kind === "optional-chain"
+        ? `(${printHirExpression(expression.base)})`
+        : printHirExpression(expression.base);
+    return expression.links.reduce(
+      (printed, link) =>
+        link.kind === "member"
+          ? `${printed}${link.optional ? "?." : ""}[` +
+            `${printHirExpression(link.key)}]`
+          : link.chainBoundary === true
+            ? `(${printed})(` +
+              `${link.arguments.map(printHirCallArgument).join(", ")})`
+            : `${printed}${link.optional ? "?." : ""}(` +
+              `${link.arguments.map(printHirCallArgument).join(", ")})`,
+      base,
+    );
+  }
   if (expression.kind === "class") {
     return (
       "class" +

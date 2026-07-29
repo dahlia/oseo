@@ -18,6 +18,7 @@ import type {
   HirFunction,
   HirObjectBindingProperty,
   HirObjectProperty,
+  HirOptionalChainLink,
   HirParameter,
   HirPrivateName,
   HirPrivateNameKey,
@@ -421,6 +422,27 @@ function resolveExpression(
       });
     }
     return { ...expression, properties };
+  }
+  if (expression.kind === "optional-chain") {
+    const base = resolveExpression(expression.base, scopes, state);
+    if (base == null) return undefined;
+    const links: HirOptionalChainLink[] = [];
+    for (const link of expression.links) {
+      if (link.kind === "member") {
+        const key = resolveExpression(link.key, scopes, state);
+        if (key == null) return undefined;
+        links.push({ ...link, key });
+        continue;
+      }
+      const argumentsValue: HirCallArgument[] = [];
+      for (const argument of link.arguments) {
+        const resolved = resolveCallArgument(argument, scopes, state);
+        if (resolved == null) return undefined;
+        argumentsValue.push(resolved);
+      }
+      links.push({ ...link, arguments: argumentsValue });
+    }
+    return { ...expression, base, links };
   }
   if (expression.kind === "class") {
     return resolveClassExpression(expression, scopes, state);
@@ -992,6 +1014,16 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
         ? hirExpressionHasAwait(property.argument)
         : hirExpressionHasAwait(property.key) ||
           hirExpressionHasAwait(property.value),
+    );
+  }
+  if (expression.kind === "optional-chain") {
+    return (
+      hirExpressionHasAwait(expression.base) ||
+      expression.links.some((link) =>
+        link.kind === "member"
+          ? hirExpressionHasAwait(link.key)
+          : link.arguments.some(hirCallArgumentHasAwait),
+      )
     );
   }
   if (expression.kind === "class") {

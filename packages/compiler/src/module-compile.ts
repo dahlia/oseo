@@ -572,6 +572,19 @@ function extractModuleAwait(
   state: ModuleAsyncLoweringState,
 ): ExtractedModuleAwait | undefined {
   if (
+    expression.kind === "optional-chain" &&
+    hirExpressionHasAwait(expression)
+  ) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        expression,
+        "Await inside an optional chain is unsupported.",
+      ),
+    );
+    return undefined;
+  }
+  if (
     (expression.kind === "binding-update" ||
       expression.kind === "property-update") &&
     hirExpressionHasAwait(expression)

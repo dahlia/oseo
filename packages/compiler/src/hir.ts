@@ -255,6 +255,20 @@ export interface HirSpreadArgument extends LocatedSyntax {
 /** One ordinary or spread HIR call argument. */
 export type HirCallArgument = HirExpression | HirSpreadArgument;
 
+/** One resolved property or call step in an optional chain. */
+export type HirOptionalChainLink =
+  | (LocatedSyntax & {
+      readonly key: HirExpression;
+      readonly kind: "member";
+      readonly optional: boolean;
+    })
+  | (LocatedSyntax & {
+      readonly arguments: readonly HirCallArgument[];
+      readonly chainBoundary?: true;
+      readonly kind: "call";
+      readonly optional: boolean;
+    });
+
 /** One data, shorthand, method, or accessor HIR object literal entry. */
 export interface HirObjectDefinition {
   /** A get or set accessor; absent for a data, shorthand, or method
@@ -535,6 +549,11 @@ export type HirExpression =
   | (LocatedSyntax & {
       readonly kind: "object";
       readonly properties: readonly HirObjectProperty[];
+    })
+  | (LocatedSyntax & {
+      readonly base: HirExpression;
+      readonly kind: "optional-chain";
+      readonly links: readonly HirOptionalChainLink[];
     })
   | (LocatedSyntax & {
       readonly key: HirExpression;
