@@ -1151,6 +1151,11 @@ from unsupported only after every applicable variant executes. A changed
 upstream revision is a reviewed manifest change, not an automatic percentage
 update.
 
+The reviewed subset and the result manifest describe the same set of paths.
+Adding an entry to one without regenerating the other is not a state the
+repository holds, even briefly, because the gate then fails while every count
+still looks healthy.
+
 Measured compatibility moves in one direction. An upstream path recorded as a
 pass does not move to another classification, the reviewed subset does not lose
 a path, and a generated domain does not lose a seed or shrink its case budget.
