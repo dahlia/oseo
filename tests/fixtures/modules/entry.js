@@ -1,5 +1,8 @@
 import "./var-order.js";
 import * as values from "./values.js";
+import AnonymousDefault from "./default-class-anonymous.js";
+import DefaultNameMethod from "./default-class-name-method.js";
+import NamedDefault from "./default-class-named.js";
 import defaultFunction from "./cycle-a.js";
 import defaultExpression from "./default-expression.js";
 import "./default-order.js";
@@ -34,3 +37,15 @@ try {
 console.log(Object.setPrototypeOf(values, null) === values);
 console.log(defaultFunction.name);
 console.log(defaultExpression.name);
+console.log(
+  "named default import",
+  NamedDefault.name,
+  new NamedDefault(43).read(),
+  NamedDefault.self(),
+);
+console.log(
+  "anonymous default import",
+  AnonymousDefault.name,
+  new AnonymousDefault(44).read(),
+);
+console.log("anonymous name method", DefaultNameMethod.name());

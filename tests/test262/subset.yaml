@@ -3142,6 +3142,9 @@ tests:
   - path: test/language/expressions/class/elements/class-name-static-initializer-decl.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings, object-properties]
+  - path: test/language/expressions/class/elements/class-name-static-initializer-default-export.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings, module-linking, object-properties]
   - path: test/language/expressions/class/elements/class-name-static-initializer-expr.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings, object-properties]
@@ -6571,6 +6574,21 @@ tests:
   - path: test/language/module-code/early-undef-continue.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/eval-export-dflt-cls-anon-semi.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking]
+  - path: test/language/module-code/eval-export-dflt-cls-anon.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking, object-properties]
+  - path: test/language/module-code/eval-export-dflt-cls-name-meth.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking, object-properties]
+  - path: test/language/module-code/eval-export-dflt-cls-named-semi.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking]
+  - path: test/language/module-code/eval-export-dflt-cls-named.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking, object-properties]
   - path: test/language/module-code/eval-gtbndng-local-bndng-const.js
     expectedClassification: pass
     dependencies: [lexical-bindings, module-linking]
@@ -6676,6 +6694,9 @@ tests:
   - path: test/language/module-code/instn-named-bndng-const.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-cls.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking]
   - path: test/language/module-code/instn-named-bndng-dflt-expr.js
     expectedClassification: pass
     dependencies: [module-linking]

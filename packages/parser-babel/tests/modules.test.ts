@@ -114,6 +114,87 @@ test("names anonymous default export expressions", () => {
   assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
 });
 
+test("links a named default class through its declaration binding", () => {
+  const sourceId = "file:///app/default-named-class.js";
+  const result = babelModuleFrontend.parseModule({
+    source: "export default class Named {}",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  assert.equal(result.module.body[0]?.kind, "let");
+  assert.equal(
+    result.module.body[0]?.kind === "let"
+      ? result.module.body[0].name
+      : undefined,
+    "Named",
+  );
+  assert.deepEqual(
+    result.module.exports.map((entry) => ({
+      exportedName: entry.kind === "star" ? undefined : entry.exportedName,
+      kind: entry.kind,
+      localName: entry.kind === "local" ? entry.localName : undefined,
+    })),
+    [{ exportedName: "default", kind: "local", localName: "Named" }],
+  );
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "default-named-class",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const exported = compiled.graph?.modules[0]?.exports[0];
+  assert.equal(exported?.exportedName, "default");
+  assert.equal(
+    compiled.graph?.cells.find((cell) => cell.id === exported?.cellId)
+      ?.localName,
+    "Named",
+  );
+  assert.match(printMir(compiled.mir), /name="Named"/u);
+});
+
+test("names an anonymous default class during module lowering", () => {
+  const sourceId = "file:///app/default-anonymous-class.js";
+  const result = babelModuleFrontend.parseModule({
+    source: "export default class {}",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const exported = result.module.exports[0];
+  assert.equal(exported?.kind, "default");
+  if (exported?.kind !== "default") return;
+  assert.equal(exported.declaration.kind, "class");
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "default-anonymous-class",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /name="default"/u);
+  assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
+});
+
 test("lowers top-level await to an owned scheduler checkpoint", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const answer = 1 + await Promise.resolve(41);",

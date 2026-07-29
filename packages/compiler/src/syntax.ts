@@ -408,6 +408,11 @@ export type SyntaxExpression =
        * the operand evaluates to `null`.
        */
       readonly heritage?: SyntaxExpression;
+      /**
+       * NamedEvaluation name supplied by an enclosing default export.
+       * It names the constructor without creating a class-scope binding.
+       */
+      readonly inferredName?: string;
       readonly kind: "class";
       /**
        * The ClassName bound in the class's own lexical environment. Only
