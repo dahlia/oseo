@@ -15,6 +15,7 @@ import {
   type ParserError,
 } from "./babel.ts";
 import {
+  classExpression,
   expression,
   functionDeclaration,
   hoistedVarDeclarations,
@@ -285,6 +286,37 @@ export function moduleProgram(
           exportedName: "default",
           kind: "local",
           localName: declaration.name,
+          range: declaration.range,
+        });
+        continue;
+      }
+      if (declarationNode.type === "ClassDeclaration") {
+        const declaration = classExpression(context, declarationNode);
+        if (declaration == null) break;
+        if (declaration.kind !== "class") {
+          unsupported(context, declarationNode, "This export is unsupported.");
+          break;
+        }
+        if (declaration.nameBinding == null) {
+          exports.push({
+            ...location(context, item),
+            declaration,
+            exportedName: "default",
+            kind: "default",
+          });
+          continue;
+        }
+        body.push({
+          ...location(context, declarationNode),
+          hint: undefined,
+          initializer: declaration,
+          kind: "let",
+          name: declaration.nameBinding,
+        });
+        exports.push({
+          exportedName: "default",
+          kind: "local",
+          localName: declaration.nameBinding,
           range: declaration.range,
         });
         continue;

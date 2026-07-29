@@ -1683,7 +1683,7 @@ function resolveClassExpression(
     functionKind: resolvedConstructor.functionKind,
     functionLength: resolvedConstructor.functionLength,
     kind: "function",
-    name: expression.constructorFunction.name ?? "",
+    name: expression.inferredName ?? expression.constructorFunction.name ?? "",
     range: expression.range,
   };
   const elements: HirClassElement[] = [];

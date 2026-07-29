@@ -56,11 +56,18 @@ function moduleProgramBody(
       items.push({ ...entry.declaration, bindingName });
       continue;
     }
-    const initializer: SyntaxExpression =
+    let initializer: SyntaxExpression = entry.declaration;
+    if (
       entry.declaration.kind === "function" &&
       entry.declaration.functionValue.name == null
-        ? { ...entry.declaration, inferredName: "default" }
-        : entry.declaration;
+    ) {
+      initializer = { ...entry.declaration, inferredName: "default" };
+    } else if (
+      entry.declaration.kind === "class" &&
+      entry.declaration.constructorFunction.name == null
+    ) {
+      initializer = { ...entry.declaration, inferredName: "default" };
+    }
     items.push({
       ...(entry.byteRange == null ? {} : { byteRange: entry.byteRange }),
       hint: undefined,

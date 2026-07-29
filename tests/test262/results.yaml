@@ -30508,6 +30508,42 @@ results:
       async: false
       features:
         - class-static-fields-public
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/class/elements/class-name-static-initializer-default-export.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - lexical-bindings
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/class/elements/class-name-static-initializer-default-export.js
+          sourceHash: fnv1a64:6d4462e768d00764
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-public
       flags: []
       includes: []
       mode: script
@@ -65148,6 +65184,177 @@ results:
         - module
       includes: []
       mode: module
+      path: test/language/module-code/eval-export-dflt-cls-anon-semi.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-dflt-cls-anon-semi.js
+          sourceHash: fnv1a64:159c5d33089ac8ad
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-anon.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-export-dflt-cls-anon.js
+          id: test/language/module-code/eval-export-dflt-cls-anon.js
+          sourceHash: fnv1a64:a9e60c92ee99670f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-name-meth.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-export-dflt-cls-name-meth.js
+          id: test/language/module-code/eval-export-dflt-cls-name-meth.js
+          sourceHash: fnv1a64:56a5c5f49615c3e0
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-named-semi.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-dflt-cls-named-semi.js
+          sourceHash: fnv1a64:6cae0c91bbef74ec
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-named.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-export-dflt-cls-named.js
+          id: test/language/module-code/eval-export-dflt-cls-named.js
+          sourceHash: fnv1a64:15ca2ad0f710a97b
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
       path: test/language/module-code/eval-gtbndng-local-bndng-const.js
       strictness:
         - strict
@@ -65974,6 +66181,40 @@ results:
             - test/language/module-code/instn-named-bndng-const.js
           id: test/language/module-code/instn-named-bndng-const.js
           sourceHash: fnv1a64:1725fd825057f915
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-named-bndng-dflt-cls.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-cls.js
+          id: test/language/module-code/instn-named-bndng-dflt-cls.js
+          sourceHash: fnv1a64:b116c9e17d434082
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -123161,7 +123402,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 1891
+  passes: 1898
   semanticFailures: 0
   unsupportedProfileFeatures: 966
   dependencies:
@@ -123186,7 +123427,7 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 581
+      passes: 588
       semanticFailures: 0
       unsupportedProfileFeatures: 171
     - dependency: control-flow
@@ -123246,13 +123487,13 @@ summary:
     - dependency: lexical-bindings
       expectedNegatives: 81
       harnessFailures: 0
-      passes: 251
+      passes: 252
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: module-linking
       expectedNegatives: 166
       harnessFailures: 0
-      passes: 17
+      passes: 24
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - dependency: object-literals
@@ -123264,7 +123505,7 @@ summary:
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 674
+      passes: 678
       semanticFailures: 0
       unsupportedProfileFeatures: 113
     - dependency: promise-settlement
@@ -123379,7 +123620,7 @@ summary:
     - group: language/expressions
       expectedNegatives: 465
       harnessFailures: 0
-      passes: 892
+      passes: 893
       semanticFailures: 0
       unsupportedProfileFeatures: 524
     - group: language/identifier-resolution
@@ -123391,7 +123632,7 @@ summary:
     - group: language/module-code
       expectedNegatives: 165
       harnessFailures: 0
-      passes: 17
+      passes: 23
       semanticFailures: 0
       unsupportedProfileFeatures: 36
     - group: language/rest-parameters

@@ -1,4 +1,6 @@
+/* eslint-disable no-await-in-loop */
 import assert from "node:assert/strict";
+import process from "node:process";
 
 import { runNativeCli } from "../../../packages/cli/src/index.ts";
 import type { NativeScenarioContext } from "../scenario.ts";
@@ -47,24 +49,40 @@ export async function runNativeScenario2(
   );
 
   const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
-  const nativeModule = await runNativeCli(
-    {
-      args: [moduleEntry],
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
-  assert.equal(nativeModule.stderr, "");
-  assert.equal(
-    nativeModule.stdout,
-    "var order 1 2 undefined\n" +
-      "cycle b ready default ready\ncycle c ready\ncycle a\n" +
-      "default first\ndefault second\nidentity once\n" +
-      "answer increment 41\n" +
-      "42\ntrue true false\n" +
-      "immutable\nnonextensible\ntrue\ndefault\ndefault\n",
-  );
+  for (const specialization of ["disabled", "enabled"] as const) {
+    if (specialization === "enabled") {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    }
+    try {
+      const nativeModule = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            moduleEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeModule.exitStatus, 0, nativeModule.stderr);
+      assert.equal(nativeModule.stderr, "");
+      assert.equal(
+        nativeModule.stdout,
+        "var order 1 2 undefined\n" +
+          "named default local NamedDefault true\n" +
+          "cycle b ready default ready\ncycle c ready\ncycle a\n" +
+          "default first\ndefault second\nidentity once\n" +
+          "answer increment 41\n" +
+          "42\ntrue true false\n" +
+          "immutable\nnonextensible\ntrue\ndefault\ndefault\n" +
+          "named default import NamedDefault 43 true\n" +
+          "anonymous default import default 44\n" +
+          "anonymous name method name method\n",
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
 
   const importWriteEntry = [
     root,
