@@ -833,6 +833,71 @@ static OseoResult add_private_element(
     return result;
 }
 
+OseoResult oseo_class_static_private_method_define(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue name,
+    OseoValue value,
+    OseoPrivateMethodKind kind
+) {
+    if (!is_function(constructor)) {
+        return failure(context, "OSEO2001", "Class elements need a class.");
+    }
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A static private method needs a private name."
+        );
+    }
+    if (kind == OSEO_PRIVATE_METHOD) {
+        OseoPrivateElement added = {
+            name,
+            value,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_PRIVATE_ELEMENT_METHOD,
+        };
+        return add_private_element(context, constructor, added);
+    }
+    if (kind != OSEO_PRIVATE_GETTER && kind != OSEO_PRIVATE_SETTER) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A static private accessor needs a valid half."
+        );
+    }
+    OseoPrivateElement *existing = find_private_element(constructor, name);
+    if (existing != NULL) {
+        if (existing->kind != OSEO_PRIVATE_ELEMENT_ACCESSOR) {
+            return failure(
+                context,
+                "OSEO2001",
+                "A static private accessor conflicts with another element."
+            );
+        }
+        OseoValue *slot =
+            kind == OSEO_PRIVATE_GETTER ? &existing->getter : &existing->setter;
+        if (tag_of(*slot) != OSEO_TAG_UNDEFINED) {
+            return failure(
+                context,
+                "OSEO2001",
+                "A static private accessor half is already defined."
+            );
+        }
+        *slot = value;
+        return normal(constructor);
+    }
+    OseoPrivateElement added = {
+        name,
+        oseo_undefined(),
+        kind == OSEO_PRIVATE_GETTER ? value : oseo_undefined(),
+        kind == OSEO_PRIVATE_SETTER ? value : oseo_undefined(),
+        OSEO_PRIVATE_ELEMENT_ACCESSOR,
+    };
+    return add_private_element(context, constructor, added);
+}
+
 OseoResult oseo_private_name_create(OseoContext *context) {
     OseoPrivateName *name =
         oseo_internal_allocate_heap_bytes(context, sizeof(*name));

@@ -30112,11 +30112,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-metho\
+        d-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-method-rs-static-privatename-identifier-alt-by-classname.js:\
+        215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30142,11 +30143,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-metho\
+        d-rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-method-rs-static-privatename-identifier-by-classname.js:215:\
+        4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30172,11 +30174,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-metho\
+        d-rs-static-privatename-identifier-initializer-alt-by-classname\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-method-rs-static-privatename-identifier-initializer-alt-by-c\
+        lassname.js:209:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30204,11 +30208,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-async-method-rs-static-privatename-identifier-alt-by-classnam\
+        e.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-async-method-rs-static-privatename-identifier-alt-by-\
+        classname.js:228:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30236,11 +30242,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-async-method-rs-static-privatename-identifier-by-clas\
+        sname.js:228:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30268,11 +30275,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-async-method-rs-static-privatename-identifier-initializer-alt\
+        -by-classname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-async-method-rs-static-privatename-identifier-initial\
+        izer-alt-by-classname.js:222:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30298,11 +30307,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-method-rs-static-privatename-identifier-alt-by-classn\
+        ame.js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30328,11 +30338,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-method-rs-static-privatename-identifier-by-classname.\
+        js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -30358,11 +30369,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/after-same-line-stati\
+        c-method-rs-static-privatename-identifier-initializer-alt-by-cl\
+        assname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/after-same-li\
+        ne-static-method-rs-static-privatename-identifier-initializer-a\
+        lt-by-classname.js:209:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31628,11 +31641,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js:190:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-definitions-\
+        rs-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-defi\
+        nitions-rs-static-privatename-identifier-alt-by-classname.js:21\
+        9:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31658,11 +31672,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js:190:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-definitions-\
+        rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-defi\
+        nitions-rs-static-privatename-identifier-by-classname.js:219:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31688,11 +31703,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:190:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-definitions-\
+        rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-defi\
+        nitions-rs-static-privatename-identifier-initializer-alt-by-cla\
+        ssname.js:213:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31718,11 +31735,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js:188:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-stacked-defi\
+        nitions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-stac\
+        ked-definitions-rs-static-privatename-identifier-alt-by-classna\
+        me.js:217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31748,11 +31766,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js:188:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-stacked-defi\
+        nitions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-stac\
+        ked-definitions-rs-static-privatename-identifier-by-classname.j\
+        s:217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -31778,11 +31797,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:188:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/multiple-stacked-defi\
+        nitions-rs-static-privatename-identifier-initializer-alt-by-cla\
+        ssname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/multiple-stac\
+        ked-definitions-rs-static-privatename-identifier-initializer-al\
+        t-by-classname.js:211:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32612,11 +32633,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-no-sc-line-method\
+        -rs-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-no-sc-lin\
+        e-method-rs-static-privatename-identifier-alt-by-classname.js:2\
+        17:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32642,11 +32664,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-no-sc-line-method\
+        -rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-no-sc-lin\
+        e-method-rs-static-privatename-identifier-by-classname.js:217:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32672,11 +32695,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-no-sc-line-method\
+        -rs-static-privatename-identifier-initializer-alt-by-classname.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-no-sc-lin\
+        e-method-rs-static-privatename-identifier-initializer-alt-by-cl\
+        assname.js:211:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32702,11 +32727,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-sc-line-method-rs\
+        -static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-sc-line-m\
+        ethod-rs-static-privatename-identifier-alt-by-classname.js:217:\
+        4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32732,11 +32758,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-sc-line-method-rs\
+        -static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-sc-line-m\
+        ethod-rs-static-privatename-identifier-by-classname.js:217:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -32762,11 +32789,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/new-sc-line-method-rs\
+        -static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/new-sc-line-m\
+        ethod-rs-static-privatename-identifier-initializer-alt-by-class\
+        name.js:211:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -33226,19 +33254,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-field-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-field-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33326,19 +33361,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-field-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33445,19 +33487,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33474,19 +33523,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33504,19 +33560,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-shadowed-by-field-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33533,19 +33596,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-shadowed-by-getter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33562,19 +33632,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-shadowed-by-method-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33591,19 +33668,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-getter-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-getter-shadowed-by-setter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33708,19 +33792,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-method-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-method-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33807,19 +33898,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-method-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33837,19 +33935,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-method-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-method-shadowed-by-field-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33866,19 +33971,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-method-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-method-shadowed-by-getter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33895,19 +34007,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-method-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-method-shadowed-by-setter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -33966,11 +34085,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/private-methods/prod-private-async-method.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-methods/prod-private-async-method.js:181:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/private-methods/prod-\
+        private-async-method.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/private-metho\
+        ds/prod-private-async-method.js:164:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -34025,11 +34145,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/private-methods/prod-private-method-initialize-order.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-methods/prod-private-method-initialize-order.js:185:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/private-methods/prod-\
+        private-method-initialize-order.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/private-metho\
+        ds/prod-private-method-initialize-order.js:163:24:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -34053,11 +34174,11 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/private-methods/prod-private-method.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-methods/prod-private-method.js:165:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/private-methods/prod-\
+        private-method.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/private-metho\
+        ds/prod-private-method.js:148:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -34111,19 +34232,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-access-on-inner-function.js:99:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34140,19 +34268,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-on-nested-class.js:98:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34170,19 +34305,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-shadowed-by-field-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34199,19 +34341,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-shadowed-by-getter-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34228,19 +34377,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-shadowed-by-method-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34257,19 +34413,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-setter-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-setter-shadowed-by-setter-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34287,19 +34450,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-field-on-nested-class.js:145:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34317,19 +34487,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js:146:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34347,19 +34524,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-method-on-nested-class.js:146:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34377,19 +34561,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js:146:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34406,19 +34597,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-static-field-usage-inside-nested-class.js:140:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34436,16 +34634,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -34462,16 +34671,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -34488,16 +34708,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -34514,16 +34745,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -34777,19 +35019,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js:130:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34842,19 +35091,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js:130:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34871,19 +35127,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:130:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -35016,11 +35279,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-async-metho\
+        d-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-asy\
+        nc-method-rs-static-privatename-identifier-alt-by-classname.js:\
+        228:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35048,11 +35312,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-async-metho\
+        d-rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-asy\
+        nc-method-rs-static-privatename-identifier-by-classname.js:228:\
+        4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35080,11 +35345,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-async-metho\
+        d-rs-static-privatename-identifier-initializer-alt-by-classname\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-asy\
+        nc-method-rs-static-privatename-identifier-initializer-alt-by-c\
+        lassname.js:222:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35110,11 +35377,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-method-rs-s\
+        tatic-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-met\
+        hod-rs-static-privatename-identifier-alt-by-classname.js:216:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35140,11 +35408,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-method-rs-s\
+        tatic-privatename-identifier-by-classname.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-met\
+        hod-rs-static-privatename-identifier-by-classname.js:216:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35170,11 +35439,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/expressions/class/elements/same-line-method-rs-s\
+        tatic-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/same-line-met\
+        hod-rs-static-privatename-identifier-initializer-alt-by-classna\
+        me.js:210:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -35584,6 +35854,41 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class-static-methods-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-private-getter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -35651,16 +35956,62 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-methods-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/static-private-setter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -40833,19 +41184,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js:132:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -40898,19 +41256,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js:132:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -40927,19 +41292,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js:132:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -81743,11 +82115,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-method\
+        -rs-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-method-rs-static-privatename-identifier-alt-by-classname.js:2\
+        15:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81773,11 +82146,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-method\
+        -rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-method-rs-static-privatename-identifier-by-classname.js:215:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81803,11 +82177,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-method\
+        -rs-static-privatename-identifier-initializer-alt-by-classname.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-method-rs-static-privatename-identifier-initializer-alt-by-cl\
+        assname.js:209:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81835,11 +82211,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -async-method-rs-static-privatename-identifier-alt-by-classname\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-async-method-rs-static-privatename-identifier-alt-by-c\
+        lassname.js:228:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81867,11 +82245,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -async-method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-async-method-rs-static-privatename-identifier-by-class\
+        name.js:228:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81899,11 +82278,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -async-method-rs-static-privatename-identifier-initializer-alt-\
+        by-classname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-async-method-rs-static-privatename-identifier-initiali\
+        zer-alt-by-classname.js:222:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81929,11 +82310,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -method-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-method-rs-static-privatename-identifier-alt-by-classna\
+        me.js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81959,11 +82341,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -method-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-method-rs-static-privatename-identifier-by-classname.j\
+        s:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -81989,11 +82372,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/after-same-line-static-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/after-same-line-static\
+        -method-rs-static-privatename-identifier-initializer-alt-by-cla\
+        ssname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/after-same-lin\
+        e-static-method-rs-static-privatename-identifier-initializer-al\
+        t-by-classname.js:209:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83404,11 +83789,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js:190:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-definitions-r\
+        s-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-defin\
+        itions-rs-static-privatename-identifier-alt-by-classname.js:219\
+        :4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83434,11 +83820,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-by-classname.js:190:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-definitions-r\
+        s-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-defin\
+        itions-rs-static-privatename-identifier-by-classname.js:219:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83464,11 +83851,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:190:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-definitions-r\
+        s-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-defin\
+        itions-rs-static-privatename-identifier-initializer-alt-by-clas\
+        sname.js:213:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83494,11 +83882,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-alt-by-classname.js:188:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-stacked-defin\
+        itions-rs-static-privatename-identifier-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-stack\
+        ed-definitions-rs-static-privatename-identifier-alt-by-classnam\
+        e.js:217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83524,11 +83913,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-by-classname.js:188:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-stacked-defin\
+        itions-rs-static-privatename-identifier-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-stack\
+        ed-definitions-rs-static-privatename-identifier-by-classname.js\
+        :217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -83554,11 +83944,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/multiple-stacked-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:188:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/multiple-stacked-defin\
+        itions-rs-static-privatename-identifier-initializer-alt-by-clas\
+        sname.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-stack\
+        ed-definitions-rs-static-privatename-identifier-initializer-alt\
+        -by-classname.js:211:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84390,11 +84782,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-no-sc-line-method-\
+        rs-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-no-sc-line\
+        -method-rs-static-privatename-identifier-alt-by-classname.js:21\
+        7:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84420,11 +84813,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-no-sc-line-method-\
+        rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-no-sc-line\
+        -method-rs-static-privatename-identifier-by-classname.js:217:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84450,11 +84844,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-no-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-no-sc-line-method-\
+        rs-static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-no-sc-line\
+        -method-rs-static-privatename-identifier-initializer-alt-by-cla\
+        ssname.js:211:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84480,11 +84876,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-alt-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-sc-line-method-rs-\
+        static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-sc-line-me\
+        thod-rs-static-privatename-identifier-alt-by-classname.js:217:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84510,11 +84907,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-by-classname.js:187:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-sc-line-method-rs-\
+        static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-sc-line-me\
+        thod-rs-static-privatename-identifier-by-classname.js:217:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -84540,11 +84938,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/new-sc-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:187:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/new-sc-line-method-rs-\
+        static-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/new-sc-line-me\
+        thod-rs-static-privatename-identifier-initializer-alt-by-classn\
+        ame.js:211:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -85039,19 +85438,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-field-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-field-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85167,19 +85573,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-field-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85286,19 +85699,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85347,19 +85767,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-brand-check.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-brand-check.js:103:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85376,19 +85803,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85406,19 +85840,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-shadowed-by-field-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85435,19 +85876,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-shadowed-by-getter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85464,19 +85912,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-shadowed-by-method-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85493,19 +85948,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-shadowed-by-setter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85610,19 +86072,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-access-on-inner-function.js:99:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85671,19 +86140,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-brand-check.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-brand-check.js:103:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -85975,19 +86451,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-on-nested-class.js:98:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86005,19 +86488,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-shadowed-by-field-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86034,19 +86524,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-shadowed-by-getter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86063,19 +86560,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-method-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-method-shadowed-by-setter-on-nested-class.js:100:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86134,11 +86638,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/private-methods/prod-private-async-method.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-methods/prod-private-async-method.js:180:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/private-methods/prod-p\
+        rivate-async-method.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/statements/class/elements/private-method\
+        s/prod-private-async-method.js:163:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -86193,11 +86698,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/private-methods/prod-private-method-initialize-order.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-methods/prod-private-method-initialize-order.js:184:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/private-methods/prod-p\
+        rivate-method-initialize-order.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/private-method\
+        s/prod-private-method-initialize-order.js:162:24:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -86221,11 +86727,11 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/private-methods/prod-private-method.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-methods/prod-private-method.js:164:31:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/private-methods/prod-p\
+        rivate-method.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/private-method\
+        s/prod-private-method.js:147:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -86279,19 +86785,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-access-on-inner-function.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-access-on-inner-function.js:99:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86340,19 +86853,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-brand-check.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-brand-check.js:103:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86369,19 +86889,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-on-nested-class.js:98:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86399,19 +86926,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-shadowed-by-field-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86428,19 +86962,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-shadowed-by-getter-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86457,19 +86998,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-shadowed-by-method-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86486,19 +87034,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-setter-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-setter-shadowed-by-setter-on-nested-class.js:100:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86516,19 +87071,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-field-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-field-on-nested-class.js:145:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86546,19 +87108,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-getter-on-nested-class.js:146:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86576,19 +87145,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-method-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-method-on-nested-class.js:146:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86606,19 +87182,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-static-field-shadowed-by-setter-on-nested-class.js:146:7:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86635,19 +87218,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-static-field-usage-inside-nested-class.js:140:14:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86665,16 +87255,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -86691,16 +87292,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -86717,16 +87329,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features:
@@ -86743,16 +87366,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -86908,19 +87542,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldget-success-1.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldget-success-1.js:105:16:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -87174,19 +87815,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldget-typeerror-5.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldget-typeerror-5.js:112:16:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -87392,19 +88040,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-5.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-5.js:113:9:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -87727,19 +88382,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatename-valid-no-earlyerr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatename-valid-no-earlyerr.js:104:16:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -87950,19 +88612,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js:130:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88015,19 +88684,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-by-classname.js:130:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88044,19 +88720,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-initializer-alt-by-classname.js:130:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88189,11 +88872,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-alt-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-async-method\
+        -rs-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-asyn\
+        c-method-rs-static-privatename-identifier-alt-by-classname.js:2\
+        28:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88221,11 +88905,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-by-classname.js:200:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-async-method\
+        -rs-static-privatename-identifier-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-asyn\
+        c-method-rs-static-privatename-identifier-by-classname.js:228:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88253,11 +88938,13 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-async-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:200:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-async-method\
+        -rs-static-privatename-identifier-initializer-alt-by-classname.\
+        js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-asyn\
+        c-method-rs-static-privatename-identifier-initializer-alt-by-cl\
+        assname.js:222:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88283,11 +88970,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-alt-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-method-rs-st\
+        atic-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-meth\
+        od-rs-static-privatename-identifier-alt-by-classname.js:216:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88313,11 +89001,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-by-classname.js:186:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-method-rs-st\
+        atic-privatename-identifier-by-classname.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-meth\
+        od-rs-static-privatename-identifier-by-classname.js:216:4:
+        error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88343,11 +89032,12 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/same-line-method-rs-static-privatename-identifier-initializer-alt-by-classname.js:186:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
+      detail: "test/language/statements/class/elements/same-line-method-rs-st\
+        atic-privatename-identifier-initializer-alt-by-classname.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/same-line-meth\
+        od-rs-static-privatename-identifier-initializer-alt-by-classnam\
+        e.js:210:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -88962,6 +89652,41 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class-static-methods-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-private-getter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -89029,16 +89754,62 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
       harnessFailed: false
-      passed: false
-    unsupportedFeatures:
-      - class-static-methods-private
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-methods-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/static-private-setter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError
@@ -94340,19 +95111,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js:132:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -94405,19 +95183,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-by-classname.js:132:5:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -94434,19 +95219,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-initializer-alt-by-classname.js:132:12:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -96564,18 +97356,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/static-init-scope-private.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/static-init-scope-private.js:90:13:
-        error[OSEO1001]: A private member is reachable only through
-        this.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -121790,9 +122589,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1120
   harnessFailures: 0
-  passes: 1801
+  passes: 1883
   semanticFailures: 0
-  unsupportedProfileFeatures: 1041
+  unsupportedProfileFeatures: 963
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -121815,9 +122614,9 @@ summary:
     - dependency: classes
       expectedNegatives: 564
       harnessFailures: 0
-      passes: 491
+      passes: 573
       semanticFailures: 0
-      unsupportedProfileFeatures: 246
+      unsupportedProfileFeatures: 168
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -121893,9 +122692,9 @@ summary:
     - dependency: object-properties
       expectedNegatives: 482
       harnessFailures: 0
-      passes: 585
+      passes: 666
       semanticFailures: 0
-      unsupportedProfileFeatures: 190
+      unsupportedProfileFeatures: 113
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -122008,9 +122807,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 457
       harnessFailures: 0
-      passes: 847
+      passes: 884
       semanticFailures: 0
-      unsupportedProfileFeatures: 556
+      unsupportedProfileFeatures: 521
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
@@ -122032,6 +122831,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 790
+      passes: 835
       semanticFailures: 0
-      unsupportedProfileFeatures: 334
+      unsupportedProfileFeatures: 291

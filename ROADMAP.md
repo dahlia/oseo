@@ -491,7 +491,7 @@ merged units from `fa119c7` to `8f2fff6`.
 
 Units landed is not the same as fully admitted. The profile still records open
 behavior in every one of these families, including generator and asynchronous
-generator method definitions, static private class members,
+generator method definitions,
 `%GeneratorPrototype%.throw`, and the suspension model a `for await` step uses.
 Each count is the size of the family in the inventory, not a total of admitted
 paths.

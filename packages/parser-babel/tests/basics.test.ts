@@ -1011,8 +1011,8 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class extends Base { static #hidden() {} };",
-    sourceId: "class-static-private-method.ts",
+    source: "const value = class extends Base { static *#hidden() {} };",
+    sourceId: "class-static-private-generator.ts",
   });
   assert.ok(!result.parsed);
   assert.equal(result.program, undefined);
@@ -1178,14 +1178,6 @@ const outer = Named;`,
 
 test("rejects class elements outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "class C { static #hidden() {} }",
-      /Static private class methods and accessors/u,
-    ],
-    [
-      "class C { static get #hidden() {} }",
-      /Static private class methods and accessors/u,
-    ],
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
@@ -1354,6 +1346,7 @@ test("lowers private class elements to per-evaluation names", () => {
     source: `class Counter {
   #count = 0;
   #step;
+  static #total = 0;
   constructor(step) {
     this.#step = step;
   }
@@ -1366,14 +1359,32 @@ test("lowers private class elements to per-evaluation names", () => {
   set #doubled(value) {
     this.#count = value / 2;
   }
+  static #addTotal() {
+    Counter.#total++;
+  }
+  static get #summary() {
+    return Counter.#total;
+  }
+  static set #summary(value) {
+    Counter.#total = value;
+  }
   next() {
     this.#bump();
     this.#count++;
     this.#doubled = 8;
     return this.#doubled;
   }
+  read(other) {
+    return other.#count;
+  }
+  static run() {
+    Counter.#summary = 3;
+    Counter.#addTotal();
+    return Counter.#summary;
+  }
 }
-console.log(new Counter(1).next());
+const counter = new Counter(1);
+console.log(counter.next(), counter.read(new Counter(2)), Counter.run());
 `,
     sourceId: "class-private.ts",
   });
@@ -1389,22 +1400,29 @@ console.log(new Counter(1).next());
   assert.match(text, /private update this\.%b\d+ #count \+= /u);
   assert.match(text, /private update this\.%b\d+ #count\+\+/u);
   assert.match(text, /call this\.%b\d+ #bump\(\)/u);
+  assert.match(text, /private get %b\d+\(other\)\.%b\d+ #count/u);
+  assert.match(text, /private set %b\d+\(Counter\)\.%b\d+ #summary = /u);
+  assert.match(text, /call %b\d+\(Counter\)\.%b\d+ #addTotal\(\)/u);
   assert.ok(result.mir != null);
   const mir = printMir(result.mir);
   assert.match(mir, /private-name-create private name #count/u);
   assert.match(mir, /class-private-field-define record private instance/u);
   assert.match(mir, /class-private-method-define record private method/u);
   assert.match(mir, /class-private-method-define record private get/u);
+  assert.match(
+    mir,
+    /class-static-private-method-define define static private method/u,
+  );
+  assert.match(
+    mir,
+    /class-static-private-method-define define static private get/u,
+  );
   assert.match(mir, /private-get private-get/u);
   assert.match(mir, /private-set private-set/u);
 });
 
 test("rejects private references outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "class C { #x = 1; probe(o) { return o.#x; } }",
-      /reachable only through this/u,
-    ],
     [
       "class C { #x = 1; probe(o) { return #x in o; } }",
       /in operator on a private name/u,

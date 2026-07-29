@@ -78,9 +78,9 @@ export type SyntaxCallTarget =
     })
   | (LocatedSyntax & {
       /**
-       * A private member call, `this.#m()`. The callee is the private
+       * A private member call, `object.#m()`. The callee is the private
        * element the object carries, and the object stays the receiver,
-       * so the two are evaluated once each.
+       * so the base expression is evaluated once.
        */
       readonly kind: "private-method";
       readonly name: string;
@@ -462,10 +462,10 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       /**
-       * A private member reference, `this.#x`. The name resolves in the
-       * class body that declares it rather than against the object, so
-       * it carries the declared name instead of a key expression, and
-       * the object is checked for the element at run time.
+       * A private member reference, `object.#x`. The name resolves in
+       * the class body that declares it rather than against the object,
+       * so it carries the declared name instead of a key expression,
+       * and the selected object is checked for the element at run time.
        */
       readonly kind: "private-get";
       readonly name: string;

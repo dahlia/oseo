@@ -667,6 +667,9 @@ export const emittedC = {
     resultAssignOseoClassPrivateMethodDefine: [
       ["result = oseo_class_private_method_define(context, "],
     ],
+    resultAssignOseoClassStaticPrivateMethodDefine: [
+      ["result = oseo_class_static_private_method_define(context, "],
+    ],
   },
   privateGet: {
     resultAssignOseoPrivateGetContextRoots: [

@@ -1838,9 +1838,10 @@ function emitClassPrivateFieldDefine(
 }
 
 /**
- * Records one private method or accessor half on the constructor. A
- * getter and a setter under one private name merge into the single
- * accessor element that name reaches.
+ * Records one instance private method or accessor half, or installs one
+ * static half directly on the constructor. A getter and a setter under
+ * one private name merge into the single accessor element that name
+ * reaches.
  */
 function emitClassPrivateMethodDefine(
   state: EmitState,
@@ -1860,8 +1861,11 @@ function emitClassPrivateMethodDefine(
   line(
     state,
     renderC(
-      emittedC.classPrivateMethodDefine
-        .resultAssignOseoClassPrivateMethodDefine,
+      operation.kind === "class-static-private-method-define"
+        ? emittedC.classPrivateMethodDefine
+            .resultAssignOseoClassStaticPrivateMethodDefine
+        : emittedC.classPrivateMethodDefine
+            .resultAssignOseoClassPrivateMethodDefine,
     ) +
       renderC(emittedC.common.rootsRoots, constructorValue, privateName) +
       renderC(emittedC.common.rootsStatement, value, kind),
@@ -2178,6 +2182,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "class-private-field-define") {
     emitClassPrivateFieldDefine(state, operation);
   } else if (operation.kind === "class-private-method-define") {
+    emitClassPrivateMethodDefine(state, operation);
+  } else if (operation.kind === "class-static-private-method-define") {
     emitClassPrivateMethodDefine(state, operation);
   } else if (operation.kind === "class-static-field-define") {
     emitClassStaticFieldDefine(state, operation, false);
