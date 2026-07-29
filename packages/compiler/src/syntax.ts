@@ -472,6 +472,16 @@ export type SyntaxExpression =
       readonly object: SyntaxExpression;
     })
   | (LocatedSyntax & {
+      /**
+       * A private brand check, `#x in object`. The name resolves in the
+       * class body that declares it, while the object is evaluated once
+       * and checked for the corresponding private element at run time.
+       */
+      readonly kind: "private-in";
+      readonly name: string;
+      readonly object: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
       readonly kind: "private-set";
       readonly name: string;
       readonly object: SyntaxExpression;

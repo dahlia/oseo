@@ -1025,11 +1025,11 @@ export function expression(
     if (leftNode == null || rightNode == null)
       return unsupported(context, value);
     if (leftNode.type === "PrivateName") {
-      return unsupported(
-        context,
-        leftNode,
-        "The in operator on a private name is unsupported.",
-      );
+      const name = privateName(leftNode);
+      const object = expression(context, rightNode);
+      return name == null || object == null
+        ? undefined
+        : { ...located, kind: "private-in", name, object };
     }
     const left = expression(context, leftNode);
     const right = expression(context, rightNode);

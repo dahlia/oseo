@@ -1889,6 +1889,20 @@ function emitPrivateGet(state: EmitState, operation: MirOperation): void {
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
+/** PrivateBrandCheck: whether one object carries one private name. */
+function emitPrivateIn(state: EmitState, operation: MirOperation): void {
+  const object = operationArgument(operation, 0);
+  const privateName = operationArgument(operation, 1);
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    renderC(emittedC.privateIn.resultAssignOseoPrivateInContextRoots, object) +
+      renderC(emittedC.common.rootCallSuffix, privateName),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+}
+
 /** PrivateSet: replaces the value one private field element holds. */
 function emitPrivateSet(state: EmitState, operation: MirOperation): void {
   const object = operationArgument(operation, 0);
@@ -2191,6 +2205,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitClassStaticFieldDefine(state, operation, true);
   } else if (operation.kind === "private-get") {
     emitPrivateGet(state, operation);
+  } else if (operation.kind === "private-in") {
+    emitPrivateIn(state, operation);
   } else if (operation.kind === "private-set") {
     emitPrivateSet(state, operation);
   } else if (operation.kind === "instance-elements-init") {

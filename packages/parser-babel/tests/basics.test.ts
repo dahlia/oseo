@@ -1377,6 +1377,12 @@ test("lowers private class elements to per-evaluation names", () => {
   read(other) {
     return other.#count;
   }
+  has(other) {
+    return #count in other;
+  }
+  static hasStatic(other) {
+    return #total in other;
+  }
   static run() {
     Counter.#summary = 3;
     Counter.#addTotal();
@@ -1401,6 +1407,8 @@ console.log(counter.next(), counter.read(new Counter(2)), Counter.run());
   assert.match(text, /private update this\.%b\d+ #count\+\+/u);
   assert.match(text, /call this\.%b\d+ #bump\(\)/u);
   assert.match(text, /private get %b\d+\(other\)\.%b\d+ #count/u);
+  assert.match(text, /%b\d+ #count in %b\d+\(other\)/u);
+  assert.match(text, /%b\d+ #total in %b\d+\(other\)/u);
   assert.match(text, /private set %b\d+\(Counter\)\.%b\d+ #summary = /u);
   assert.match(text, /call %b\d+\(Counter\)\.%b\d+ #addTotal\(\)/u);
   assert.ok(result.mir != null);
@@ -1418,15 +1426,12 @@ console.log(counter.next(), counter.read(new Counter(2)), Counter.run());
     /class-static-private-method-define define static private get/u,
   );
   assert.match(mir, /private-get private-get/u);
+  assert.match(mir, /private-in private-in/u);
   assert.match(mir, /private-set private-set/u);
 });
 
 test("rejects private references outside the admitted profile", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "class C { #x = 1; probe(o) { return #x in o; } }",
-      /in operator on a private name/u,
-    ],
     [
       "class C { #x = 1; m() { [this.#x] = [1]; } }",
       /private member is unsupported in this position/u,

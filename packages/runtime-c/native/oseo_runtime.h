@@ -605,6 +605,16 @@ OseoResult oseo_private_get(
     OseoValue name
 );
 /*
+ * PrivateBrandCheck: reports whether `object` carries an element under
+ * one private name. An object with another brand returns false. A
+ * non-object operand throws a TypeError.
+ */
+OseoResult oseo_private_in(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name
+);
+/*
  * PrivateSet: replaces the value `object` carries under one private
  * name and reports the assigned value. Only a field element and an
  * accessor element with a setter accept a write; a method element, a

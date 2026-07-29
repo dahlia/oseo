@@ -162,7 +162,7 @@ its deliberate boundary and its evidence:
     distinct identity. Member tags retain their receiver, and tag lookup,
     template-object creation, substitutions, and invocation preserve
     ECMAScript evaluation and abrupt-completion order. The runtime ABI is
-    `oseo-runtime-m5-28`. Fixed native fixtures cover basic and identity
+    `oseo-runtime-m5-29`. Fixed native fixtures cover basic and identity
     tags, cooked and raw text, multiple substitutions, custom return
     values, errors from tags and substitutions, receiver preservation,
     invalid escapes, frozen descriptors, and site identity. Generated
@@ -590,7 +590,7 @@ its deliberate boundary and its evidence:
     otherwise unresolved reference keeps the ordinary source-located
     diagnostic. Parameter-index aliasing through a mapped arguments exotic
     object remains outside this ordinary-object unit. The runtime ABI is
-    `oseo-runtime-m5-28`. A generated property with seed `0x5eed001b` covers
+    `oseo-runtime-m5-29`. A generated property with seed `0x5eed001b` covers
     zero to six bounded arguments, in-range and absent indexed reads, writes,
     `length`, `callee`, fresh identity, both specialization policies, and
     forced collection. Fixed native evidence also covers property

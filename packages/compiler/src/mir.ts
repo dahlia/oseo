@@ -165,6 +165,7 @@ export interface MirOperation {
     | "object-rest"
     | "object-spread"
     | "private-get"
+    | "private-in"
     | "private-name-create"
     | "private-set"
     | "property-key"

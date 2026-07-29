@@ -1688,3 +1688,130 @@ test(
     );
   },
 );
+
+function privateBrandSource(testCase: PrivateAccessCase): string {
+  const modifier = testCase.staticPlacement ? "static " : "";
+  let element: string;
+  if (testCase.kind === "field") {
+    element = `  ${modifier}#item = ${testCase.initial};`;
+  } else if (testCase.kind === "method") {
+    element = [`  ${modifier}#item() {`, "    calls = calls + 1;", "  }"].join(
+      "\n",
+    );
+  } else if (testCase.kind === "getter") {
+    element = [
+      `  ${modifier}get #item() {`,
+      "    calls = calls + 1;",
+      "  }",
+    ].join("\n");
+  } else if (testCase.kind === "setter") {
+    element = [
+      `  ${modifier}set #item(value) {`,
+      "    calls = calls + value;",
+      "  }",
+    ].join("\n");
+  } else {
+    element = [
+      `  ${modifier}get #item() {`,
+      "    calls = calls + 1;",
+      "  }",
+      `  ${modifier}set #item(value) {`,
+      "    calls = calls + value;",
+      "  }",
+    ].join("\n");
+  }
+  const valid = testCase.staticPlacement ? "Vault" : "new Vault()";
+  const invalid = testCase.staticPlacement ? "Derived" : "{}";
+  return `
+let calls = 0;
+class Vault {
+${element}
+  static has(value) {
+    return #item in value;
+  }
+}
+${testCase.staticPlacement ? "class Derived extends Vault {}" : ""}
+console.log(Vault.has(${valid}), Vault.has(${invalid}), calls);
+try {
+  Vault.has(${testCase.input});
+} catch (error) {
+  console.log("non-object", error instanceof TypeError);
+}
+`;
+}
+
+test(
+  "generated private brand checks preserve identity and element bodies",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "private brand checks return presence without reading the element",
+      fc.asyncProperty(privateAccessCaseArbitrary, async (testCase) => {
+        const source = privateBrandSource(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: "true false 0\nnon-object true\n",
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-private-brand.ts" },
+            { specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          if (specialization === "enabled") {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          }
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) =>
+                assertMatchingObservations([expectedObservation, native]),
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one instance or static private field, method, getter, setter, or " +
+          "accessor pair checked against its branded object, an unbranded " +
+          "object, and a bounded primitive, comparing an independent " +
+          "presence, no-invocation, and TypeError model with Node.js, Deno, " +
+          "and both native specialization policies with forced collection " +
+          "on the enabled path",
+        numRuns: 10,
+        profile: "M5 private-in brand checks",
+        seed: 0x5eed_001d,
+        sizeLimit:
+          "one private element, one branded object, one unbranded object, " +
+          "and one bounded primitive",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);

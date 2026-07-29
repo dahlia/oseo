@@ -1899,6 +1899,43 @@ function lowerPrivateRead(
 }
 
 /**
+ * PrivateBrandCheck: reports whether one object carries the private
+ * element named by the enclosing class. An unbranded object produces
+ * false, while a non-object operand throws a `TypeError`.
+ */
+function lowerPrivateBrandCheck(
+  object: number,
+  privateNameValue: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "private brand check",
+    [object, privateNameValue],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, privateNameValue],
+    detail: "private-in",
+    id,
+    kind: "private-in",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+/**
  * PrivateSet: replaces the value the object carries under one private
  * name. Only a field element is writable, so a method element and a
  * getter-only accessor both report a `TypeError`, as does an object
@@ -3663,19 +3700,21 @@ function lowerExpression(
       builder,
     );
   }
-  if (expression.kind === "private-get") {
+  if (expression.kind === "private-get" || expression.kind === "private-in") {
     const object = lowerExpression(expression.object, builder);
     const privateNameValue = lowerPrivateName(
       expression.privateName,
       expression.range,
       builder,
     );
-    return lowerPrivateRead(
-      object,
-      privateNameValue,
-      expression.range,
-      builder,
-    );
+    return expression.kind === "private-get"
+      ? lowerPrivateRead(object, privateNameValue, expression.range, builder)
+      : lowerPrivateBrandCheck(
+          object,
+          privateNameValue,
+          expression.range,
+          builder,
+        );
   }
   if (expression.kind === "private-set") {
     const object = lowerExpression(expression.object, builder);

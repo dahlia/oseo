@@ -5,6 +5,7 @@ supportedFeatures:
   - async-iteration
   - class
   - class-fields-private
+  - class-fields-private-in
   - class-fields-public
   - class-methods-private
   - class-static-methods-private
@@ -4824,6 +4825,63 @@ tests:
   - path: test/language/expressions/generators/yield-weak-binding.js
     expectedClassification: expected-negative
     dependencies: [generators]
+  - path: test/language/expressions/in/private-field-in-nested.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-in.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-invalid-assignment-reference.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-invalid-assignment-target.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-invalid-identifier-complex.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-invalid-identifier-simple.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-invalid-rhs.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-accessor-shadowed.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-accessor.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-field-shadowed.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-field.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-method-shadowed.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-presence-method.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-rhs-await-absent.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-rhs-await-present.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, classes, expression-operators]
+  - path: test/language/expressions/in/private-field-rhs-non-object.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-rhs-unresolvable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators]
+  - path: test/language/expressions/in/private-field-rhs-yield-absent.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/in/private-field-rhs-yield-present.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators, generators]
   - path: test/language/expressions/in/rhs-yield-absent-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]

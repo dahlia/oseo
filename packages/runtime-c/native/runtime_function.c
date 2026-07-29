@@ -955,6 +955,28 @@ OseoResult oseo_private_get(
     );
 }
 
+OseoResult oseo_private_in(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue name
+) {
+    if (!is_private_name(name)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "A private brand check needs a private name."
+        );
+    }
+    if (!is_object(object)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A private brand check needs an object."
+        );
+    }
+    return normal(oseo_boolean(find_private_element(object, name) != NULL));
+}
+
 OseoResult oseo_private_set(
     OseoContext *context,
     OseoValue object,
