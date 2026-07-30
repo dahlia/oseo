@@ -524,6 +524,7 @@ static OseoResult generator_resume(
     size_t resume_kind
 ) {
     bool returning = resume_kind == OSEO_GENERATOR_RESUME_RETURN;
+    bool throwing = resume_kind == OSEO_GENERATOR_RESUME_THROW;
     /* An asynchronous generator reports its steps through promises, so
      * the synchronous resumption never drives one even when a caller
      * reaches this method with one as the receiver. */
@@ -533,7 +534,9 @@ static OseoResult generator_resume(
             OSEO_ERROR_TYPE,
             returning
                 ? "Generator return requires a generator receiver."
-                : "Generator next requires a generator receiver."
+                : throwing
+                    ? "Generator throw requires a generator receiver."
+                    : "Generator next requires a generator receiver."
         );
     }
     if (generator_state(generator)->state == OSEO_GENERATOR_EXECUTING) {
@@ -552,10 +555,17 @@ static OseoResult generator_resume(
     /* A return completion delivered before the body ever ran completes the
      * generator without entering it, so no `finally` in a body that never
      * started runs, and it reports the requested value. A completed
-     * generator reports it too, while `next` reports undefined. */
-    bool unstarted = returning && current == OSEO_GENERATOR_SUSPENDED_START;
+     * generator reports it too, while `next` reports undefined. A throw
+     * completion re-throws the value. */
+    bool unstarted =
+        (returning || throwing) && current == OSEO_GENERATOR_SUSPENDED_START;
     if (current == OSEO_GENERATOR_COMPLETED || unstarted) {
         if (unstarted) oseo_internal_generator_complete(frame.slots[0]);
+        if (throwing) {
+            result = (OseoResult){OSEO_STATUS_THROW, frame.slots[1]};
+            oseo_roots_release(context, &frame);
+            return result;
+        }
         result = oseo_internal_iterator_result(
             context,
             returning ? frame.slots[1] : oseo_undefined(),
@@ -637,5 +647,18 @@ OseoResult oseo_generator_return(
         generator,
         value,
         OSEO_GENERATOR_RESUME_RETURN
+    );
+}
+
+OseoResult oseo_generator_throw(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value
+) {
+    return generator_resume(
+        context,
+        generator,
+        value,
+        OSEO_GENERATOR_RESUME_THROW
     );
 }

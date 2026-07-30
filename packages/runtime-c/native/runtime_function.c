@@ -1363,6 +1363,12 @@ OseoResult oseo_call_function(
             receiver,
             argument_count > 0u ? arguments[0] : oseo_undefined()
         );
+    } else if (code_id == OSEO_GENERATOR_THROW_CODE_ID) {
+        result = oseo_generator_throw(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
     } else if (code_id == OSEO_ASYNC_ITERATOR_SELF_CODE_ID) {
         result = normal(receiver);
     } else if (code_id == OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID) {

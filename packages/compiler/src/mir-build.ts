@@ -1614,6 +1614,9 @@ function lowerYieldDelegation(
   const returnStepBlock = createMirBlock(builder);
   const returnYieldBlock = createMirBlock(builder);
   const returnExitBlock = createMirBlock(builder);
+  const throwResumeBlock = createMirBlock(builder);
+  const throwStepBlock = createMirBlock(builder);
+  const throwYieldBlock = createMirBlock(builder);
   const exitBlock = createMirBlock(builder);
   // A `branch` carries no argument list, so each side of a step reaches
   // the shared suspension through a jump that passes the yielded value.
@@ -1623,6 +1626,9 @@ function lowerYieldDelegation(
   const returnReceived = builder.nextValue;
   builder.nextValue += 1;
   returnStepBlock.parameters = [returnReceived];
+  const throwReceived = builder.nextValue;
+  builder.nextValue += 1;
+  throwStepBlock.parameters = [throwReceived];
   const yielded = builder.nextValue;
   builder.nextValue += 1;
   suspendBlock.parameters = [yielded];
@@ -1688,6 +1694,7 @@ function lowerYieldDelegation(
     resultObject: true,
     returnResume: returnResumeBlock.id,
     sent,
+    throwResume: throwResumeBlock.id,
     value: yielded,
   };
 
@@ -1704,6 +1711,55 @@ function lowerYieldDelegation(
     kind: "jump",
     target: returnStepBlock.id,
     values: [sent],
+  };
+
+  builder.current = throwResumeBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: throwStepBlock.id,
+    values: [sent],
+  };
+
+  builder.current = throwStepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "throw delegated iterator",
+    [iterator, throwReceived],
+    range,
+  );
+  const throwContinues = builder.nextValue;
+  builder.nextValue += 1;
+  const throwStepResult = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator, throwReceived],
+    detail: "GetMethod throw, IteratorComplete, and IteratorValue",
+    id: throwContinues,
+    iteratorValueResult: throwStepResult,
+    kind: "iterator-delegate-throw",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> throw",
+    [throwContinues],
+    range,
+  );
+  recordRoot(builder, throwStepResult, range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: throwContinues,
+    whenFalse: exitBlock.id,
+    whenTrue: throwYieldBlock.id,
+  };
+
+  builder.current = throwYieldBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: suspendBlock.id,
+    values: [throwStepResult],
   };
 
   builder.current = returnStepBlock;
@@ -3132,11 +3188,13 @@ function lowerExpression(
     builder.nextValue += 1;
     const resume = createMirBlock(builder);
     const returnResume = createMirBlock(builder);
+    const throwResume = createMirBlock(builder);
     builder.current.terminator = {
       kind: "generator-yield",
       resume: resume.id,
       returnResume: returnResume.id,
       sent,
+      throwResume: throwResume.id,
       value,
     };
     /* A return resumption leaves the body from the suspension point, so it
@@ -3147,6 +3205,8 @@ function lowerExpression(
     if (!enterFinalizer(builder, "return", expression.range, sent)) {
       builder.current.terminator = { kind: "return", value: sent };
     }
+    builder.current = throwResume;
+    lowerThrowValue(sent, expression.range, builder);
     builder.current = resume;
     return recordRoot(builder, sent, expression.range);
   }

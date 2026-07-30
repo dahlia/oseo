@@ -468,6 +468,17 @@ OseoResult oseo_generator_return(
     OseoValue value
 );
 /*
+ * %GeneratorPrototype%.throw: resumes a suspended generator with a
+ * throw completion. An unstarted or completed generator completes
+ * immediately and re-throws the value. A running generator throws a
+ * TypeError.
+ */
+OseoResult oseo_generator_throw(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value
+);
+/*
  * %AsyncGeneratorPrototype%.next, .return, and .throw. Each enqueues one
  * AsyncGeneratorRequest and returns its promise immediately: the step
  * runs only while the queue's head owns it, so a call that arrives while
@@ -969,6 +980,19 @@ OseoResult oseo_iterator_delegate_next(
  * completion the delegating body then leaves through.
  */
 OseoResult oseo_iterator_delegate_return(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *value,
+    bool *done
+);
+/*
+ * One `yield*` delegation step over a throw resumption: read the
+ * iterator's `throw` method and, when it exists, call it with `sent`
+ * and report the result's `done` and `value`. An iterator with no
+ * `throw` method closes the iterator and throws a TypeError.
+ */
+OseoResult oseo_iterator_delegate_throw(
     OseoContext *context,
     OseoValue iterator,
     OseoValue sent,
