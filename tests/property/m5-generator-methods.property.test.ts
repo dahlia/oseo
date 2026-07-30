@@ -9,6 +9,7 @@ import fc from "fast-check";
 import { cBackend } from "../../packages/backend-c/src/index.ts";
 import {
   compileSource,
+  describeTarget,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
@@ -43,7 +44,6 @@ const nativeTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 );
-assert.ok(nativeTarget != null, "Host target must be supported");
 
 const caseArbitrary: fc.Arbitrary<GeneratorMethodCase> = fc.record({
   baseValue: fc.integer({ max: 100, min: -100 }),
@@ -117,52 +117,65 @@ function synthesizeSource(c: GeneratorMethodCase): string {
   `;
 }
 
-test("generator method definitions match Node.js and Deno", async () => {
-  await assertAsyncProperty(
-    "generator method definitions match Node.js and Deno",
-    fc.asyncProperty(caseArbitrary, async (testCase: GeneratorMethodCase) => {
-      const source = synthesizeSource(testCase);
-      const compiled = compileSource(babelFrontend, {
-        source,
-        sourceId: "test.js",
-      });
-      assert.ok(compiled.mir != null, "Source must compile to MIR");
-      const expectedStdout = testCase.steps
-        .map((s) => `${s + testCase.baseValue}\n`)
-        .join("");
+test(
+  "generator method definitions match Node.js and Deno",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "generator method definitions match Node.js and Deno",
+      fc.asyncProperty(caseArbitrary, async (testCase: GeneratorMethodCase) => {
+        const source = synthesizeSource(testCase);
+        const compiled = compileSource(babelFrontend, {
+          source,
+          sourceId: "test.js",
+        });
+        assert.ok(compiled.mir != null, "Source must compile to MIR");
+        const expectedStdout = testCase.steps
+          .map((s) => `${s + testCase.baseValue}\n`)
+          .join("");
 
-      await withNativeFixture(
-        {
-          backend: cBackend,
-          host,
-          input: compiled.mir,
-          keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
-          operation: "execute",
-          runtime: cRuntimeProvider,
-          target: nativeTarget,
-          toolchain: zigToolchain,
-        },
-        (native) => {
-          assertMatchingObservations([
-            {
-              exitStatus: 0,
-              stderr: "",
-              stdout: expectedStdout,
-            },
-            native,
-          ]);
-        },
-      );
-    }),
-    {
-      domain:
-        "generator method definitions in object literals and class bodies " +
-        "(prototype, static, private), comparing Node.js, Deno, and native",
-      numRuns: 15,
-      profile: "M5 generator method definitions",
-      seed: 0x5eed_0018,
-      sizeLimit: "small generator methods with yield sequences",
-      timeLimitMilliseconds: 180_000,
-    },
-  );
-});
+        await withNativeFixture(
+          {
+            backend: cBackend,
+            host,
+            input: compiled.mir,
+            keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+            operation: "execute",
+            runtime: cRuntimeProvider,
+            target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+            toolchain: zigToolchain,
+          },
+          (native) => {
+            assertMatchingObservations([
+              {
+                exitStatus: 0,
+                stderr: "",
+                stdout: expectedStdout,
+              },
+              native,
+            ]);
+          },
+        );
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "generator method definitions in object literals and class bodies " +
+          "(prototype, static, private), comparing Node.js, Deno, and native",
+        numRuns: 15,
+        profile: "M5 generator method definitions",
+        seed: 0x5eed_0018,
+        sizeLimit: "small generator methods with yield sequences",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
