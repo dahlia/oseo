@@ -508,8 +508,8 @@ one heritage expression that MIR lowers in the class-scope environment before
 the constructor closure exists, so a heritage operand that reads the class
 name observes its temporal dead zone and a side effect in it runs before any
 element key. One new runtime entry point validates the operand and links both
-chains together: the constructor's [[Prototype]] becomes the parent
-constructor and the class `prototype` object's [[Prototype]] becomes
+chains together: the constructor's `[[Prototype]]` becomes the parent
+constructor and the class `prototype` object's `[[Prototype]]` becomes
 `Get(parent, "prototype")`. Static members therefore resolve through the
 constructor chain and instance members through the prototype chain, and both
 objects stay out of dictionary mode because a class definition allocates them
@@ -518,7 +518,7 @@ receiver, as a fresh uninitialized cell per invocation, so reading `this`
 before `super()` throws a `ReferenceError` through the temporal-dead-zone
 machinery lexical declarations already use, and every arrow function nested in
 the constructor shares that cell. `super()` reads the running constructor's
-own [[Prototype]], rejects a non-constructor with a `TypeError`, constructs it
+own `[[Prototype]]`, rejects a non-constructor with a `TypeError`, constructs it
 against the receiver the `new` expression allocated from `new.target`'s
 prototype, and binds the result; a second `super()` throws a `ReferenceError`,
 and a base constructor that returns its own object replaces the allocated
@@ -602,7 +602,7 @@ and executable syntax stream. A class definition records each element's home
 object through one new runtime binding: the class `prototype` object for an
 instance element and the constructor itself for a `static` one, which are the
 two objects the heritage link already relates. A reference reads the
-[[Prototype]] of the home object its running function carries, so an instance
+`[[Prototype]]` of the home object its running function carries, so an instance
 reference starts its lookup at the parent's `prototype` and a static one at
 the parent constructor, and both keep the enclosing element's `this` as the
 receiver. MIR therefore carries the lookup object and the receiver as separate
@@ -617,7 +617,7 @@ creates or updates an own property of `this` without consulting an accessor
 that only the receiver's own chain would find. A computed reference reads its
 receiver before its key, so `super[key()]` inside a derived constructor throws
 the uninitialized-`this` `ReferenceError` before `key` runs, and reads the home
-object's [[Prototype]] after that key, so a key expression that replaces the
+object's `[[Prototype]]` after that key, so a key expression that replaces the
 prototype is observed by the very reference it precedes. A reference stays
 rejected with a source-located diagnostic in a class body without `extends`
 and in an object literal method, because this runtime has no
@@ -654,7 +654,7 @@ Public instance class fields are now admitted, the seventh unit of the
 functions and executable syntax stream. A `field = expression` element pairs
 the key its class body evaluates once with a closure that produces the value
 once per instance, and one new runtime entry point records that pair on the
-constructor in class-body order, which is ECMA-262's [[Fields]]. A second
+constructor in class-body order, which is ECMA-262's `[[Fields]]`. A second
 entry point runs the list as InitializeInstanceElements against one instance,
 reading the field list from the running constructor rather than from an
 operand, so a base constructor reaches its own class's fields and a derived
@@ -675,7 +675,7 @@ it and a nested arrow captures the instance, and lets the existing static-key
 name inference reach the returned expression. A computed key that names an
 anonymous initializer travels to the closure through a fresh cell the class
 body fills with the one key evaluation it performs, which is ECMA-262's
-[[ClassFieldInitializerName]] without a second evaluation. The initializer
+`[[ClassFieldInitializerName]]` without a second evaluation. The initializer
 carries the class prototype as its home object, so `super.x` inside it starts
 at the parent's prototype with the instance as the receiver, including under
 the implicit derived constructor. Deliberate boundaries: a field named

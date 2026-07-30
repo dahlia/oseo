@@ -1057,15 +1057,15 @@ its deliberate boundary and its evidence:
     the class name observes its temporal dead zone and a side effect in it
     runs before any element key. A new `class-heritage` runtime entry point
     validates the operand and links both chains at once: the constructor's
-    [[Prototype]] becomes the parent constructor and the class `prototype`
-    object's [[Prototype]] becomes `Get(parent, "prototype")`. Static members
+    `[[Prototype]]` becomes the parent constructor and the class `prototype`
+    object's `[[Prototype]]` becomes `Get(parent, "prototype")`. Static members
     therefore resolve through the constructor chain and instance members
     through the prototype chain, `instanceof` walks the whole chain, and both
     objects stay out of dictionary mode because a class definition allocates
     them itself. An operand that is neither `null` nor a constructor throws a
     `TypeError`, as does a constructor whose `prototype` is a primitive; a
     `null` operand leaves both chains null, which is what an ordinary
-    function's [[Prototype]] already is in this runtime.
+    function's `[[Prototype]]` already is in this runtime.
     A derived class constructor owns a `this` binding instead of reading its
     receiver directly. The binding is a fresh uninitialized cell per
     invocation, so reading `this` before `super()` throws a `ReferenceError`
@@ -1073,7 +1073,7 @@ its deliberate boundary and its evidence:
     and every arrow function nested in the constructor shares that cell and
     therefore observes the receiver `super()` bound even when the arrow was
     created earlier. `super()` reads the running constructor's own
-    [[Prototype]], rejects a non-constructor with a `TypeError`, constructs it
+    `[[Prototype]]`, rejects a non-constructor with a `TypeError`, constructs it
     against the receiver the `new` expression allocated from `new.target`'s
     prototype, and binds the result; a second `super()` in one invocation
     throws a `ReferenceError`. Because the parent's completion value is what
@@ -1150,7 +1150,7 @@ its deliberate boundary and its evidence:
     definition records each element's home object: the class `prototype`
     object for an instance element and the constructor itself for a `static`
     one, which are the two objects `class-heritage` already links. A
-    reference reads the [[Prototype]] of the home object its running function
+    reference reads the `[[Prototype]]` of the home object its running function
     carries, so an instance reference starts at the parent's `prototype` and a
     static one at the parent constructor, and both keep the enclosing
     element's `this` as the receiver. `super.x`, `super[expr]`, and
@@ -1168,10 +1168,10 @@ its deliberate boundary and its evidence:
     a class body is strict. A computed reference reads its receiver before
     its key, so `super[key()]` inside a derived constructor throws the
     `ReferenceError` for an uninitialized `this` before `key` runs, and
-    reads the home object's [[Prototype]] after that key, so a key
+    reads the home object's `[[Prototype]]` after that key, so a key
     expression that replaces the prototype is observed by the very
     reference it precedes. A home
-    object whose [[Prototype]] is null, as `extends null` leaves it, reports
+    object whose `[[Prototype]]` is null, as `extends null` leaves it, reports
     the `TypeError` the read or write itself raises.
     Deliberate boundaries: a `super` property reference is rejected with a
     source-located diagnostic in a class body without `extends` and in an
@@ -1212,9 +1212,9 @@ its deliberate boundary and its evidence:
  -  Public instance class fields. A `field = expression` element records the
     key its class body evaluates once and a closure that produces the value
     once per instance, in class-body order, on the constructor itself. That
-    pair is ECMA-262's [[Fields]], and the constructor runs it as
+    pair is ECMA-262's `[[Fields]]`, and the constructor runs it as
     InitializeInstanceElements: a base constructor before its body, which is
-    where [[Construct]] performs it and therefore before a parameter default
+    where `[[Construct]]` performs it and therefore before a parameter default
     can observe the instance, and a derived constructor where `super()`
     returns, so a base constructor never observes a derived field and a
     second `super()` is rejected before it can initialize them again. A field

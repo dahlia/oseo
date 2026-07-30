@@ -7,7 +7,7 @@ experimental = true
 postinstall = "mise generate git-pre-commit --write --task=check"
 
 [tools]
-"aqua:dahlia/hongdown" = "0.5.1"
+"aqua:dahlia/hongdown" = "0.5.3"
 "aqua:nushell/nushell" = "0.114.1"
 actionlint = "1.7.12"
 aube = "1.26.0"
