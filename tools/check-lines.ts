@@ -29,7 +29,8 @@ function exemptLine(path: string, line: string): boolean {
   // is exempt only when removing that unbreakable token would fit.
   if (
     path === "tests/test262/subset.yaml" ||
-    path === "tests/test262/results.yaml"
+    path === "tests/test262/results.yaml" ||
+    path === "tests/compatibility-ratchet-overrides.yaml"
   ) {
     const token = line.match(/\btest\/[^\s"']+/u);
     if (token != null && line.length - token[0].length <= 80) return true;

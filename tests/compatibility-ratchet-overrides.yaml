@@ -1,1 +1,9 @@
-overrides: []
+overrides:
+  - invariant: subset-path
+    path: test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
+    reason: >-
+      Removes test calling Object.prototype.hasOwnProperty which is
+      unmaterialized in M5a
+    transition:
+      from: present
+      to: absent

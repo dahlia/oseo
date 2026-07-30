@@ -147,11 +147,6 @@ test("delegates an asynchronous yield* through the async protocol", () => {
 test("rejects asynchronous generator forms outside the admitted unit", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     [
-      "const holder = { async *method() { yield 1; } };",
-      /Generator method definitions/u,
-    ],
-    ["class C { async *step() { yield 1; } }", /Generator method definitions/u],
-    [
       "async function* defaulted(value = 1) { yield value; }",
       /default and binding-pattern parameters/u,
     ],
@@ -238,4 +233,25 @@ test("keeps an ordinary asynchronous function continuation-split", () => {
       ),
     ),
   );
+});
+
+test("admits async generator method definitions in objects and classes", () => {
+  const result = compileSource(babelFrontend, {
+    source: `
+      const obj = {
+        async *objMethod() { yield 1; }
+      };
+      class C {
+        async *classMethod() { yield 2; }
+        static async *staticMethod() { yield 3; }
+        async *#privateMethod() { yield 4; }
+      }
+    `,
+    sourceId: "async-generator-methods.js",
+  });
+  assert.ok(result.mir != null);
+  const generators = result.mir.functions.filter(
+    (f) => f.asyncGenerator === true,
+  );
+  assert.equal(generators.length, 4);
 });

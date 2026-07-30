@@ -196,10 +196,6 @@ test("resumes a yield* delegation at the matching step", () => {
 test("rejects generator forms outside the admitted unit", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     [
-      "const holder = { *method() { yield 1; } };",
-      /Generator method definitions/u,
-    ],
-    [
       "async function* defaulted(value = 1) { yield value; }",
       /default and binding-pattern parameters/u,
     ],
@@ -240,4 +236,23 @@ test("keeps yield inside the generator body that owns it", () => {
   });
   assert.equal(arrow.mir, undefined);
   assert.match(arrow.diagnostics[0]?.message ?? "", /could not be parsed/u);
+});
+
+test("admits generator method definitions in objects and classes", () => {
+  const result = compileSource(babelFrontend, {
+    source: `
+      const obj = {
+        *objMethod() { yield 1; }
+      };
+      class C {
+        *classMethod() { yield 2; }
+        static *staticMethod() { yield 3; }
+        *#privateMethod() { yield 4; }
+      }
+    `,
+    sourceId: "generator-methods.js",
+  });
+  assert.ok(result.mir != null);
+  const generators = result.mir.functions.filter((f) => f.generator === true);
+  assert.equal(generators.length, 4);
 });
