@@ -128,6 +128,14 @@ export const emittedC = {
       ["result = oseo_function_prototype(context, roots["],
       ["]);"],
     ],
+    resultAssignOseoFunctionPrototypeContextValue: [
+      ["result = oseo_function_prototype(context, "],
+      [");"],
+    ],
+    rootsAssignResultValueIfStatusNormal: [
+      ["if (result.status == OSEO_STATUS_NORMAL) roots["],
+      ["] = result.value;"],
+    ],
     rootsRootsRootsStatement: [
       ["roots["],
       ["], roots["],
@@ -452,12 +460,21 @@ export const emittedC = {
       ["result = oseo_call_function(context, roots["],
       ["], receiver, "],
     ],
+    callFunctionWithRootReceiverPrefix: [
+      ["result = oseo_call_function(context, roots["],
+      ["], roots["],
+      ["], "],
+    ],
     newTargetStatement: [[""], [", "], [", new_target);"]],
     resultAssignOseoConstructorResultContext: [
       [
         "    result = oseo_constructor_result(context, re",
         "sult.value, receiver);",
       ],
+    ],
+    resultAssignOseoConstructorResultContextValueRoot: [
+      ["    result = oseo_constructor_result(context, result.value, roots["],
+      ["]);"],
     ],
     oseoFunction: [["oseo_function_"], [""]],
     recursiveTarget: [["recursive_target_"], [""]],

@@ -81,6 +81,7 @@ function renderC<const Fragment extends RenderedCFragment>(
 interface EmitState {
   readonly argumentSlotStart: number;
   readonly completionSlotStart: number;
+  readonly derivedThisBindingId?: number;
   readonly functionId: number;
   readonly functionRootCounts: ReadonlyMap<number, number>;
   readonly lines: string[];
@@ -1153,14 +1154,40 @@ function emitCall(state: EmitState, operation: MirOperation): void {
       line(state, renderC(emittedC.common.closeBlock));
     }
   } else if (target.kind === "super") {
-    // The parent constructor runs against the receiver `new` already
-    // allocated from new.target's prototype and keeps that same new
-    // target, so a base constructor deeper in the chain sees the class
-    // the `new` expression names.
+    // Each super() call allocates a fresh receiver from new.target's
+    // prototype and invokes the super constructor with that receiver.
     const parent = operationArgument(operation, 0);
+    const newTarget = renderC(emittedC.functionCreate.newTarget);
     line(
       state,
-      renderC(emittedC.call.callFunctionWithReceiverPrefix, parent) +
+      renderC(
+        emittedC.common.resultAssignOseoFunctionPrototypeContextValue,
+        newTarget,
+      ),
+    );
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(
+      state,
+      renderC(
+        emittedC.constructReceiver.resultAssignOseoConstructorReceiverContext,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.common.rootsAssignResultValueIfStatusNormal,
+        operation.id,
+      ),
+    );
+    line(state, renderC(emittedC.common.closeBlock));
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(
+      state,
+      renderC(
+        emittedC.call.callFunctionWithRootReceiverPrefix,
+        parent,
+        operation.id,
+      ) +
         renderC(
           emittedC.call.newTargetStatement,
           argumentsValue.count,
@@ -1170,8 +1197,12 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     line(state, renderC(emittedC.common.statusNormalOpen));
     line(
       state,
-      renderC(emittedC.call.resultAssignOseoConstructorResultContext),
+      renderC(
+        emittedC.call.resultAssignOseoConstructorResultContextValueRoot,
+        operation.id,
+      ),
     );
+    line(state, renderC(emittedC.common.closeBlock));
     line(state, renderC(emittedC.common.closeBlock));
   } else {
     const targetRootCount = state.functionRootCounts.get(target.functionId);
@@ -2614,11 +2645,33 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
       line(state, renderC(emittedC.common.closeBlock));
     }
     line(state, renderC(emittedC.terminator.ifCompletionKindReturnOpen, slot));
-    emitNormalReturn(
-      state,
-      renderC(emittedC.common.rootUnsigned, state.completionSlotStart + slot),
-      renderC(emittedC.common.indent),
-    );
+    if (state.derivedThisBindingId != null) {
+      line(
+        state,
+        renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+          renderC(
+            emittedC.common.rootsUStatement,
+            state.environmentSlot,
+            state.derivedThisBindingId,
+          ),
+      );
+      line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+      line(
+        state,
+        renderC(
+          emittedC.derivedReturn.resultAssignOseoDerivedConstructorResult,
+          state.completionSlotStart + slot,
+        ) + renderC(emittedC.derivedReturn.resultValueStatement),
+      );
+      line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+      emitNormalReturn(state, "result.value", renderC(emittedC.common.indent));
+    } else {
+      emitNormalReturn(
+        state,
+        renderC(emittedC.common.rootUnsigned, state.completionSlotStart + slot),
+        renderC(emittedC.common.indent),
+      );
+    }
     line(state, renderC(emittedC.common.closeBlock));
     line(state, renderC(emittedC.common.ifCompletionKindThrowOpen, slot));
     line(
@@ -3233,6 +3286,9 @@ function emitFunction(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
     completionSlotStart: baseRootCount + argumentSlots,
+    ...(functionValue.derivedThisBindingId == null
+      ? {}
+      : { derivedThisBindingId: functionValue.derivedThisBindingId }),
     functionRootCounts,
     environmentSlot,
     nextRecursiveTarget: 0,
