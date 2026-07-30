@@ -698,6 +698,12 @@ static OseoResult object_get(
                     OSEO_GENERATOR_RETURN_CODE_ID
                 );
             }
+            if (oseo_internal_string_is_ascii(key, "throw")) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_GENERATOR_THROW_CODE_ID
+                );
+            }
             if (object->default_intrinsics &&
                 oseo_internal_iterator_key_matches(context, key)) {
                 return oseo_internal_iterator_method(

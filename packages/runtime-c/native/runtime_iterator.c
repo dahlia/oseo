@@ -512,6 +512,78 @@ OseoResult oseo_iterator_delegate_return(
     return result;
 }
 
+OseoResult oseo_iterator_delegate_throw(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *result_value,
+    bool *done
+) {
+    *result_value = oseo_undefined();
+    *done = true;
+    OseoValue slots[3] = {iterator, oseo_undefined(), sent};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "throw");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        result = oseo_iterator_close(context, slots[0], 0u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The iterator has no throw method."
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(slots[1])) {
+        result = oseo_iterator_close(context, slots[0], 0u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The iterator throw method is not callable."
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[0],
+            1u,
+            &slots[2],
+            oseo_undefined()
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator result is not an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = delegate_result_fields(
+            context,
+            slots[2],
+            result_value,
+            done
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /*
  * IteratorClose: if the iterator has a callable return method, call it.
  * When closing because of an in-flight error the original completion is

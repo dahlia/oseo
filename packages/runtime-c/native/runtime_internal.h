@@ -82,6 +82,8 @@
  * can still reach. */
 #define OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID \
     (SIZE_MAX - 23u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_GENERATOR_THROW_CODE_ID \
+    (SIZE_MAX - 24u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
