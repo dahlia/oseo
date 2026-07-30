@@ -193,30 +193,42 @@ test("resumes a yield* delegation at the matching step", () => {
   assert.ok(stepKinds(returnStep).includes("iterator-delegate-return"));
 });
 
-test("rejects generator forms outside the admitted unit", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "async function* defaulted(value = 1) { yield value; }",
-      /default and binding-pattern parameters/u,
-    ],
-    [
-      "function* defaulted(value = 1) { yield value; }",
-      /default and binding-pattern parameters/u,
-    ],
-    [
-      "function* destructured([value]) { yield value; }",
-      /default and binding-pattern parameters/u,
-    ],
-  ];
-  for (const [source, message] of cases) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "unsupported-generator.js",
-    });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
-  }
+test("separates generator parameter initialization from its body", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "function* consume(",
+      "  [first = 1, { value: second = 2 } = {}] = [],",
+      ") {",
+      "  yield first + second;",
+      "}",
+      "consume();",
+    ].join("\n"),
+    sourceId: "generator-parameters.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const generator = result.mir.functions.find(
+    (functionValue) => functionValue.generator === true,
+  );
+  assert.ok(generator != null);
+  assert.ok(generator.generatorBodyStart != null);
+  assert.notEqual(generator.generatorBodyStart, 0);
+  const callBlocks = generator.blocks.filter(
+    (block) => block.id < generator.generatorBodyStart!,
+  );
+  assert.ok(
+    callBlocks.some((block) =>
+      block.operations.some((operation) => operation.kind === "iterator-get"),
+    ),
+  );
+  assert.ok(
+    callBlocks.every((block) => block.terminator.kind !== "generator-yield"),
+  );
+  assert.ok(
+    generator.blocks
+      .filter((block) => block.id >= generator.generatorBodyStart!)
+      .some((block) => block.terminator.kind === "generator-yield"),
+  );
 });
 
 test("keeps yield inside the generator body that owns it", () => {

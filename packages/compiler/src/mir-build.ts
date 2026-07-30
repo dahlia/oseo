@@ -5956,6 +5956,7 @@ function buildMirFunction(
   fieldKeyBindingId?: number,
   asyncGenerator = false,
   argumentsBindingId?: number,
+  generatorCallStatementCount = 0,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -5984,7 +5985,29 @@ function buildMirFunction(
   if (initializesInstanceElements && derivedThisBindingId == null) {
     lowerInstanceElementsInit(lowerReceiver(range, builder), range, builder);
   }
-  const returned = lowerStatements(body, builder);
+  let generatorBodyStart: number | undefined;
+  let returned = false;
+  if (generator && generatorCallStatementCount > 0) {
+    returned = lowerStatements(
+      body.slice(0, generatorCallStatementCount),
+      builder,
+    );
+    if (!returned) {
+      const bodyStart = createMirBlock(builder);
+      builder.current.terminator = {
+        kind: "jump",
+        target: bodyStart.id,
+      };
+      builder.current = bodyStart;
+      generatorBodyStart = bodyStart.id;
+      returned = lowerStatements(
+        body.slice(generatorCallStatementCount),
+        builder,
+      );
+    }
+  } else {
+    returned = lowerStatements(body, builder);
+  }
   if (!returned) {
     const value = lowerSyntheticUndefined(range, builder);
     builder.current.terminator = { kind: "return", value };
@@ -6023,6 +6046,7 @@ function buildMirFunction(
     ...(derivedThisBindingId == null ? {} : { derivedThisBindingId }),
     functionLength,
     ...(generator ? { generator: true as const } : {}),
+    ...(generatorBodyStart == null ? {} : { generatorBodyStart }),
     id,
     kind: "mir-function",
     localBindingIds: [...localBindingIds],
@@ -6085,6 +6109,7 @@ export function buildMir(
         functionValue.fieldKeyBindingId,
         functionValue.functionKind === "async-generator",
         functionValue.argumentsBindingId,
+        functionValue.generatorCallStatementCount,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

@@ -3399,18 +3399,6 @@ export function functionDeclaration(
   });
   const defaultParameters = defaultParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
-  if (generator && parameterEnvironment) {
-    // A generator runs FunctionDeclarationInstantiation before it
-    // suspends, but this profile lowers defaults and patterns as body
-    // statements, which the generator body only reaches on the first
-    // resumption. Reject the observable ordering difference instead.
-    return unsupported(
-      context,
-      value,
-      "Generator function default and binding-pattern parameters are " +
-        "unsupported.",
-    );
-  }
   const parameterExpressions = parameterNodes.some(
     rawParameterContainsExpression,
   );
@@ -3620,6 +3608,10 @@ export function functionDeclaration(
     context.strictStack.pop();
     return undefined;
   }
+  const parameterCopyCount = hoisted.filter(
+    (declaration) =>
+      declaration.kind === "let" && copiedParameterNames.has(declaration.name),
+  ).length;
   const parameterizedBody = (
     executionBody: readonly (SyntaxFunction | SyntaxStatement)[],
   ): readonly (SyntaxFunction | SyntaxStatement)[] => {
@@ -3697,6 +3689,10 @@ export function functionDeclaration(
   context.functionStack.pop();
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
+  const generatorCallStatementCount =
+    generator && parameterEnvironment
+      ? parameterInitializers.length + parameterCopyCount
+      : 0;
   return {
     ...location(context, value),
     body,
@@ -3713,6 +3709,9 @@ export function functionDeclaration(
           : value.async === true
             ? "async"
             : (memberKind ?? "ordinary"),
+    ...(generatorCallStatementCount === 0
+      ? {}
+      : { generatorCallStatementCount }),
     kind: "function",
     name,
     parameters,

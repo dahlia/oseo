@@ -144,26 +144,31 @@ test("delegates an asynchronous yield* through the async protocol", () => {
   }
 });
 
-test("rejects asynchronous generator forms outside the admitted unit", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "async function* defaulted(value = 1) { yield value; }",
-      /default and binding-pattern parameters/u,
-    ],
-    [
-      "async function* destructured([value]) { yield value; }",
-      /default and binding-pattern parameters/u,
-    ],
-  ];
-  for (const [source, message] of cases) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "unsupported-async-generator.js",
-    });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
-  }
+test("separates async generator parameter initialization from its body", () => {
+  const generator = asyncGeneratorOf(
+    "async function* consume({ value = 1 } = {}) { yield value; }\n" +
+      "consume();",
+  );
+  assert.ok(generator.generatorBodyStart != null);
+  assert.notEqual(generator.generatorBodyStart, 0);
+  const callBlocks = generator.blocks.filter(
+    (block) => block.id < generator.generatorBodyStart!,
+  );
+  assert.ok(
+    callBlocks.some((block) =>
+      block.operations.some(
+        (operation) => operation.kind === "object-coercible",
+      ),
+    ),
+  );
+  assert.ok(
+    callBlocks.every((block) => block.terminator.kind !== "generator-yield"),
+  );
+  assert.ok(
+    generator.blocks
+      .filter((block) => block.id >= generator.generatorBodyStart!)
+      .some((block) => block.terminator.kind === "generator-yield"),
+  );
 });
 
 test("admits await in expression positions but not in patterns", () => {

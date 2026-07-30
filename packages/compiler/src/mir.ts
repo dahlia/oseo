@@ -358,6 +358,11 @@ export interface MirFunction extends LocatedSyntax {
    * run on resumption and may leave through `generator-yield`.
    */
   readonly generator?: true;
+  /**
+   * First block executed when a newly created generator is resumed. Blocks
+   * reachable before this one initialize non-simple parameters at call time.
+   */
+  readonly generatorBodyStart?: number;
   readonly id: number;
   readonly kind: "mir-function";
   readonly localBindingIds?: readonly number[];

@@ -39,6 +39,35 @@ async function* counted(first, second, third) {
   yield second;
   yield third;
 }
+let parameterStage = 0;
+function parameterFallback() {
+  parameterStage += 1;
+  return 4;
+}
+async function* defaultedParameter(value = parameterFallback()) {
+  console.log("default body", parameterStage);
+  yield value;
+}
+async function* recursiveParameters(
+  [head = 2, { value: nested = 3 } = {}, ...tail] = [],
+  { kept = 5, branch: [leaf = 7] = [], ...rest } = {},
+) {
+  yield head + nested + tail.length + kept + leaf + rest.extra;
+}
+/** @param {number} hinted */
+async function* falselyHinted([hinted]) {
+  yield hinted;
+}
+function throwDuringParameter() {
+  parameterStage += 1;
+  throw new RangeError("parameter");
+}
+async function* abruptParameter(value = throwDuringParameter()) {
+  yield value;
+}
+async function* laterParameter(first = second, second = 1) {
+  yield first + second;
+}
 async function main() {
   const once = single();
   const firstStep = await once.next();
@@ -67,6 +96,38 @@ async function main() {
   console.log("returned", returned.value, returned.done);
 
   for await (const value of yieldingPromise()) console.log("promised", value);
+
+  const defaulted = defaultedParameter();
+  console.log("default call", parameterStage);
+  const defaultedStep = await defaulted.next();
+  console.log(defaultedStep.value);
+  const undefinedStep = await defaultedParameter(undefined).next();
+  console.log(undefinedStep.value);
+  const nullStep = await defaultedParameter(null).next();
+  console.log(nullStep.value);
+  const recursiveStep = await recursiveParameters(
+    [1, { value: 4 }, 8, 9],
+    { kept: 6, branch: [10], extra: 11 },
+  ).next();
+  console.log("recursive", recursiveStep.value);
+  const recursiveDefaultStep = await recursiveParameters().next();
+  console.log("recursive defaults", recursiveDefaultStep.value);
+  const falseHintStep = await falselyHinted(["text"]).next();
+  console.log("false hint", falseHintStep.value);
+  try {
+    abruptParameter();
+  } catch (error) {
+    console.log(
+      "parameter abrupt",
+      parameterStage,
+      error instanceof RangeError,
+    );
+  }
+  try {
+    laterParameter();
+  } catch (error) {
+    console.log("parameter tdz", error instanceof ReferenceError);
+  }
 
   console.log(counted.length, counted.name, typeof counted);
   console.log(typeof counted.prototype);

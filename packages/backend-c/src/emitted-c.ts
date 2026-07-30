@@ -1015,6 +1015,7 @@ export const emittedC = {
       ["result = oseo_generator_create(context, callee, ", "receiver", ", "],
     ],
     frameSlotsAssignResultValueStatement: [["frame.slots[0] = result.value;"]],
+    frameSlotsZero: [["frame.slots[0]"]],
     rootsAssignOseoGeneratorSlotsFrameSlots: [
       ["roots = oseo_generator_slots(frame.slots[0]);"],
     ],

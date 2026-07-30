@@ -58,6 +58,9 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
       `function${functionValue.generator === true ? "*" : ""} ` +
       `@f${functionValue.id} ${functionValue.name} roots=` +
       `${functionValue.rootSlotCount}` +
+      (functionValue.generatorBodyStart == null
+        ? ""
+        : ` body=bb${functionValue.generatorBodyStart}`) +
       restText +
       ` @${rangeText(functionValue.range)}`,
   );

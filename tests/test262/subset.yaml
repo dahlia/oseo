@@ -1085,64 +1085,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-abrupt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-arg-val-not-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-arg-val-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-ref-later.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-ref-prior.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-ref-self.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dflt-params-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/dstr/ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -1151,64 +1151,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -1217,31 +1217,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -1250,7 +1250,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -1259,10 +1259,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -1286,43 +1286,43 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -1331,64 +1331,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -1397,31 +1397,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -1430,7 +1430,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -1439,10 +1439,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -1466,76 +1466,76 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -1553,55 +1553,55 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/dflt-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -1610,64 +1610,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -1676,31 +1676,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -1709,7 +1709,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -1718,10 +1718,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -1745,43 +1745,43 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -1790,64 +1790,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -1856,31 +1856,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -1889,7 +1889,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -1898,10 +1898,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -1925,76 +1925,76 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -2012,88 +2012,88 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -2111,88 +2111,88 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/named-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -2210,22 +2210,22 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/dstr/obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/expressions/async-generator/early-errors-expression-NSPL-with-USD.js
     expectedClassification: expected-negative
@@ -2348,31 +2348,31 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-abrupt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-arg-val-not-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-arg-val-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-ref-later.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-ref-prior.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-ref-self.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-dflt-params-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-eval-var-scope-syntax-err.js
     expectedClassification: unsupported-profile-feature
@@ -4775,7 +4775,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, generators]
   - path: test/language/expressions/generators/static-init-await-reference.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, generators]
   - path: test/language/expressions/generators/use-strict-with-non-simple-param.js
     expectedClassification: expected-negative
@@ -5915,7 +5915,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/object/method-definition/static-init-await-reference-generator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/object/method-definition/static-init-await-reference-normal.js
     expectedClassification: pass
@@ -7359,64 +7359,64 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-abrupt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-arg-val-not-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-arg-val-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-ref-later.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-ref-prior.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-ref-self.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dflt-params-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/statements/async-generator/dstr/ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -7425,64 +7425,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -7491,31 +7491,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -7524,7 +7524,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -7533,10 +7533,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -7560,43 +7560,43 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-init-iter-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-init-iter-get-err-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-init-iter-get-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-init-iter-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-name-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-elem-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-elem-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-elision-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-elision-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-empty-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-empty-iter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-rest-init.js
     expectedClassification: unsupported-profile-feature
@@ -7605,64 +7605,64 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-ary-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-hole.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-complete.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-done.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val-array-prototype.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-iter-val.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-obj-id-init.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-obj-prop-id-init.js
     expectedClassification: unsupported-profile-feature
@@ -7671,31 +7671,31 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-obj-val-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-obj-val-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elision-exhausted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elision-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-ary-elem.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-ary-elision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-ary-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-ary-rest.js
     expectedClassification: unsupported-profile-feature
@@ -7704,7 +7704,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-id-elision-next-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-id-elision.js
     expectedClassification: unsupported-profile-feature
@@ -7713,10 +7713,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-id-iter-step-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-id-iter-val-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-id.js
     expectedClassification: unsupported-profile-feature
@@ -7740,76 +7740,76 @@ tests:
     expectedClassification: expected-negative
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-obj-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-rest-obj-prop-id.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -7827,88 +7827,88 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/dflt-obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-init-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-init-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-fn-name-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-fn-name-class.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-fn-name-cover.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-fn-name-fn.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-fn-name-gen.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-skipped.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-id-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-list-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-ary-trailing-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-ary-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-ary.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-eval-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-id-get-value-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-id-init-skipped.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-id-init-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-id-init-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -7926,22 +7926,22 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-obj-value-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-obj-value-undef.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-prop-obj.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-rest-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-rest-skip-non-enumerable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/dstr/obj-ptrn-rest-val-obj.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, destructuring-bindings]
   - path: test/language/statements/async-generator/escaped-async.js
     expectedClassification: expected-negative
