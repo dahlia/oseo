@@ -36,20 +36,17 @@ export interface BabelNode {
 export type ReceiverKind =
   | "arrow"
   | "arrow-in-derived-constructor"
+  | "arrow-in-function"
   | "derived-constructor"
   | "function";
 
 /**
  * How the innermost enclosing function reaches a `super.x` reference.
- * `admitted` is a non-arrow, non-async element of a class with
- * `extends`, which is the only function whose own function object
- * carries the home object the reference starts its lookup from. The
- * remaining values name a position this profile rejects and select the
- * diagnostic that explains it: an arrow has no home object of its own,
- * and an async element runs its body in a synthesized function that
- * does not carry one either.
+ * A class element with `extends` supplies the home object, and every
+ * arrow nested in that element inherits it. Other functions stop the
+ * lexical lookup.
  */
-export type SuperPropertyContext = "admitted" | "arrow" | "async" | "none";
+export type SuperPropertyContext = "admitted" | "none";
 
 /** The receiver state of one enclosing function. */
 export interface ReceiverContext {

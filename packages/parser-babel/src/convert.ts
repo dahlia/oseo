@@ -145,15 +145,16 @@ export function callTarget(
   }
   if (value.type === "Super") {
     const receiver = context.receiverStack.at(-1);
-    if (receiver?.kind === "derived-constructor") {
+    if (
+      receiver?.kind === "derived-constructor" ||
+      receiver?.kind === "arrow-in-derived-constructor"
+    ) {
       return { ...location(context, value), kind: "super" };
     }
     return unsupported(
       context,
       value,
-      receiver?.kind === "arrow-in-derived-constructor"
-        ? "Calling super() from an arrow function is unsupported."
-        : "super() is only valid in a derived class constructor.",
+      "super() is only valid in a derived class constructor.",
     );
   }
   const name = identifierName(value);
@@ -232,9 +233,8 @@ export function callTarget(
 
 /**
  * Converts the `super` operand of a property reference. The reference is
- * admitted only where the running function's own function object carries
- * a home object, which is a non-arrow, non-async element of a class with
- * `extends`; every other position names the reason it is rejected.
+ * admitted where a class element with `extends` supplies a home object.
+ * An arrow inherits that object from its enclosing element.
  */
 function superBase(
   context: ConvertContext,
@@ -247,14 +247,8 @@ function superBase(
   return unsupported(
     context,
     value,
-    superProperty === "arrow"
-      ? "Property access through super inside an arrow function is " +
-          "unsupported."
-      : superProperty === "async"
-        ? "Property access through super inside an async function is " +
-          "unsupported."
-        : "Property access through super is only valid in the body of a " +
-          "class element whose class has an extends clause.",
+    "Property access through super is only valid in the body of a " +
+      "class element whose class has an extends clause.",
   );
 }
 
@@ -557,14 +551,11 @@ export function expression(
         "new.target is only valid inside a function.",
       );
     }
-    // An arrow takes new.target from the function that encloses it, which
-    // this profile does not capture yet.
-    return receiver.kind === "arrow" ||
-      receiver.kind === "arrow-in-derived-constructor"
+    return receiver.kind === "arrow"
       ? unsupported(
           context,
           value,
-          "new.target inside an arrow function is unsupported.",
+          "new.target is only valid inside an arrow enclosed by a function.",
         )
       : { ...located, kind: "new-target" };
   }
@@ -3439,20 +3430,16 @@ export function functionDeclaration(
     : enclosingReceiver?.kind === "derived-constructor" ||
         enclosingReceiver?.kind === "arrow-in-derived-constructor"
       ? "arrow-in-derived-constructor"
-      : "arrow";
-  // Only the class element's own function object carries a home object.
-  // An async element runs its body in a synthesized function, and an
-  // arrow never owns one, so both keep the enclosing admission for the
-  // sole purpose of reporting why the reference is rejected there.
+      : enclosingReceiver == null || enclosingReceiver.kind === "arrow"
+        ? "arrow"
+        : "arrow-in-function";
+  // A class element supplies the home object, and arrows inherit that
+  // context until an ordinary nested function stops it.
   const superProperty: SuperPropertyContext = functionProvidesThis
     ? derivedConstructor !== true && !derivedElement
       ? "none"
-      : value.async === true
-        ? "async"
-        : "admitted"
-    : enclosingReceiver == null || enclosingReceiver.superProperty === "none"
-      ? "none"
-      : "arrow";
+      : "admitted"
+    : (enclosingReceiver?.superProperty ?? "none");
   const receiver: ReceiverContext = { kind: receiverKind, superProperty };
   for (const parameterNode of parameterNodes) {
     const rest = parameterNode.type === "RestElement";

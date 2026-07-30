@@ -220,6 +220,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-super-static" ||
     fixture.name === "class-heritage-values" ||
     fixture.name === "class-new-target" ||
+    fixture.name === "class-lexical-super" ||
     fixture.name === "class-derived-return-hints" ||
     fixture.name === "class-error-subclass" ||
     fixture.name === "class-fields" ||

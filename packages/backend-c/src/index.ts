@@ -1668,6 +1668,22 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
       renderC(emittedC.common.callSuffix, namePrefix),
   );
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+  if (
+    operation.functionKind === "arrow" ||
+    operation.functionKind === "async-arrow"
+  ) {
+    const newTarget = state.generator
+      ? renderC(emittedC.common.undefinedValue)
+      : renderC(emittedC.functionCreate.newTarget);
+    line(
+      state,
+      renderC(
+        emittedC.functionCreate.bindArrowContext,
+        operation.id,
+        newTarget,
+      ),
+    );
+  }
 }
 
 function emitErrorIntrinsic(state: EmitState, operation: MirOperation): void {

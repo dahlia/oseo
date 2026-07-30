@@ -834,6 +834,24 @@ tests:
   - path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/arrow-function/lexical-new.target-closure-returned.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/lexical-new.target.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/lexical-super-call-from-within-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/arrow-function/lexical-super-property-from-within-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/arrow-function/lexical-super-property.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/arrow-function/lexical-supercall-from-immediately-invoked-arrow.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
   - path: test/language/expressions/arrow-function/params-duplicate.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -3236,7 +3254,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/fields-run-once-on-double-super.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/fields-string-name-propname-constructor.js
     expectedClassification: expected-negative
@@ -6185,7 +6203,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes]
   - path: test/language/expressions/super/prop-dot-cls-val-from-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-dot-cls-val-from-eval.js
     expectedClassification: unsupported-profile-feature
@@ -6236,7 +6254,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-val-from-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/super/prop-expr-cls-val-from-eval.js
     expectedClassification: unsupported-profile-feature
@@ -8408,6 +8426,22 @@ tests:
   - path: test/language/statements/class/definition/invalid-extends.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes]
+  - path: test/language/statements/class/definition/methods-async-super-call-body.js
+    expectedClassification: pass
+    dependencies:
+      - async-functions
+      - classes
+      - functions
+      - object-properties
+      - promise-settlement
+  - path: test/language/statements/class/definition/methods-async-super-call-param.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - classes
+      - functions
+      - object-properties
+      - promise-settlement
   - path: test/language/statements/class/definition/methods-gen-return.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, generators]
@@ -10029,13 +10063,13 @@ tests:
     expectedClassification: pass
     dependencies: [classes, functions]
   - path: test/language/statements/class/subclass/derived-class-return-override-catch-finally-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-catch-finally.js
     expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-catch-super-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-catch-super.js
     expectedClassification: pass
@@ -10044,13 +10078,13 @@ tests:
     expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-finally-super-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-finally-super.js
     expectedClassification: pass
     dependencies: [classes, abrupt-completion]
   - path: test/language/statements/class/subclass/derived-class-return-override-for-of-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, iterator-protocol]
   - path: test/language/statements/class/subclass/derived-class-return-override-for-of.js
     expectedClassification: pass

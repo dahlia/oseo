@@ -90,6 +90,8 @@ static void trace_object(
             OseoFunction *function = (OseoFunction *)object;
             mark_value(function->environment, worklist);
             mark_value(function->lexical_this, worklist);
+            mark_value(function->lexical_new_target, worklist);
+            mark_value(function->lexical_super, worklist);
             mark_value(function->prototype_object, worklist);
             mark_value(function->home_object, worklist);
             for (size_t index = 0u;

@@ -275,6 +275,8 @@ OseoResult oseo_function_create(
     function->ordinary.generator = NULL;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
+    function->lexical_new_target = oseo_undefined();
+    function->lexical_super = oseo_undefined();
     function->prototype_object = frame.slots[1];
     function->home_object = oseo_undefined();
     function->elements = NULL;
@@ -1225,6 +1227,22 @@ void oseo_bind_home_object(OseoValue function, OseoValue home) {
     function_object(function)->home_object = home;
 }
 
+void oseo_bind_arrow_context(
+    OseoValue function,
+    OseoValue enclosing,
+    OseoValue new_target
+) {
+    if (!function_has_lexical_this(function)) return;
+    OseoFunction *arrow = function_object(function);
+    arrow->lexical_new_target = new_target;
+    if (!is_function(enclosing)) return;
+    OseoFunction *outer = function_object(enclosing);
+    arrow->home_object = outer->home_object;
+    arrow->lexical_super = function_has_lexical_this(enclosing)
+        ? outer->lexical_super
+        : enclosing;
+}
+
 OseoValue oseo_super_base(OseoValue callee) {
     if (!is_function(callee)) return oseo_undefined();
     OseoValue home = function_object(callee)->home_object;
@@ -1233,8 +1251,12 @@ OseoValue oseo_super_base(OseoValue callee) {
 }
 
 OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
-    OseoValue parent = is_function(callee)
-        ? function_object(callee)->ordinary.prototype
+    OseoValue context_function = callee;
+    if (function_has_lexical_this(callee)) {
+        context_function = function_object(callee)->lexical_super;
+    }
+    OseoValue parent = is_function(context_function)
+        ? function_object(context_function)->ordinary.prototype
         : oseo_undefined();
     if (!function_is_constructible(parent)) {
         return oseo_internal_throw_error(
@@ -1302,7 +1324,9 @@ OseoResult oseo_call_function(
         );
     }
     if (function_has_lexical_this(callee)) {
-        receiver = function_object(callee)->lexical_this;
+        OseoFunction *function = function_object(callee);
+        receiver = function->lexical_this;
+        new_target = function->lexical_new_target;
     }
     size_t code_id = 0u;
     OseoResult result = oseo_function_code_id(context, callee, &code_id);

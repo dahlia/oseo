@@ -1151,6 +1151,61 @@ awaited().then((value) => console.log("async", value));
 `,
   },
   {
+    name: "class-lexical-super",
+    source: `
+class Base {
+  constructor(value) {
+    this.base = value;
+  }
+  describe() {
+    return "base:" + this.base;
+  }
+  get doubled() {
+    return this.base * 2;
+  }
+  static describe() {
+    return "static-base";
+  }
+}
+class Derived extends Base {
+  constructor(value) {
+    const initialize = () => super(value);
+    initialize();
+    this.constructorTarget = () => new.target;
+    this.parentDescription = () => super.describe();
+  }
+  describe() {
+    const read = () => super.describe();
+    return read() + ":" + (() => super.doubled)();
+  }
+  static describe() {
+    return (() => super.describe())() + ":derived";
+  }
+  async asyncDescription() {
+    const before = super.describe();
+    const after = await Promise.resolve(super.doubled);
+    return before + ":" + after;
+  }
+  async asyncDefault(value = super.describe()) {
+    return value;
+  }
+}
+const instance = new Derived(4);
+console.log(instance.base, instance.parentDescription());
+console.log(instance.describe(), Derived.describe());
+console.log(instance.constructorTarget() === Derived);
+instance.asyncDescription().then((value) => console.log("async", value));
+instance.asyncDefault().then((value) => console.log("default", value));
+// Nested arrows keep the same lexical construction and method context,
+// while an ordinary nested function starts a fresh one.
+function Target() {
+  this.read = () => () => new.target;
+}
+const target = new Target();
+console.log(target.read()() === Target);
+`,
+  },
+  {
     name: "class-derived-return-hints",
     source: `
 // Every return of a derived constructor leaves through the this binding

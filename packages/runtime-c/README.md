@@ -159,6 +159,10 @@ setter halves into one accessor element under their shared private name.
 The `m5-29` ABI adds `oseo_private_in`. It performs the private-name brand
 check used by `#name in object`, returning a boolean for object operands and
 throwing a `TypeError` for non-objects.
+The `m5-30` ABI adds `oseo_bind_arrow_context`. It captures the enclosing
+function's home object and super-constructor context plus the current
+`new.target`; arrow calls restore that context alongside their existing
+lexical receiver.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
