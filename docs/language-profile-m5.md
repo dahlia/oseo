@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,966 reviewed cases: 1,883 passes, 1,120
-expected negatives, and 963 unsupported profile features. It records no
+The current manifest contains 3,999 reviewed cases: 2,337 passes, 1,128
+expected negatives, and 534 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -788,19 +788,20 @@ its deliberate boundary and its evidence:
     from the inner iterator itself. `yield*` therefore delegates to arrays,
     other generators, nested delegations, and any hand-written iterable, and
     an `IteratorClose` on the delegating generator reaches the delegated
-    iterator first. Deliberate boundaries: `%GeneratorPrototype%.throw` and
-    generator method definitions in object literals are rejected with
-    source-located diagnostics. No throw
-    resumption can reach a synchronous body while
-    `%GeneratorPrototype%.throw` is unimplemented, so a synchronous
-    delegating expression never reads the inner
-    iterator's `throw` method. Default and
-    binding-pattern generator parameters are also rejected, because this
-    profile lowers them as body statements that the generator body would only
-    reach on the first resumption, which `FunctionDeclarationInstantiation`
-    requires to happen at the call instead. Simple and rest parameters are
-    admitted and keep the ordinary call ABI. `%GeneratorPrototype%` exists as a
-    reachable object with virtualized methods rather than own properties, and
+    iterator first. `%GeneratorPrototype%.throw(value)` resumes a suspended
+    body with a throw completion, which an enclosing `catch` can handle.
+    Synchronous `yield*` forwards that completion to the inner iterator's
+    `throw` method; a missing method closes the iterator and raises a
+    `TypeError`. Generator method definitions are admitted in object literals
+    and in prototype, static, and private class elements. Generator parameters
+    admit defaults and
+    recursive array and object binding patterns through the same parameter
+    environment as synchronous functions. Their initialization prefix runs
+    during the generator call, including abrupt completion and later-parameter
+    temporal dead zones, before the suspended body can first resume. Simple
+    and rest parameters keep the ordinary call ABI. `%GeneratorPrototype%`
+    exists as a reachable object with virtualized methods rather than own
+    properties, and
     `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized at all, matching how the array iterator prototype is already
     virtualized. ECMAScript exposes no `GeneratorFunction` global binding, so
@@ -833,6 +834,22 @@ its deliberate boundary and its evidence:
     driven by a bounded cycle of sent values and either drained or closed with
     `return` after a bounded number of yields, across Node.js, Deno, both
     specialization policies, and forced collection on the enabled path.
+    Fixed synchronous and asynchronous native fixtures cover top-level and
+    nested defaults, recursive array and object patterns, rest bindings,
+    explicit `undefined` and `null`, call-time abrupt completion,
+    later-parameter temporal dead zones, and false hints. A generated property
+    with seed `0x5eed001d` uses an independent call-time initialization oracle
+    over both generator kinds, both recursive pattern kinds, missing, present,
+    `undefined`, and `null` inputs, both specialization policies, truthful and
+    false JSDoc and TypeScript hints, deliberate guard misses, and forced
+    collection on the enabled path. Four hundred thirteen reviewed test262
+    cases move from unsupported to passing while the other reviewed
+    generator-parameter cases retain their independently observed
+    classifications.
+    A generated property with seed `0x5eed0017` covers caught and uncaught
+    throw resumptions, and one with seed `0x5eed0018` covers generator methods
+    in object literals and prototype, static, and private class elements
+    against Node.js, Deno, and native execution.
     Fifty-nine reviewed test262 cases newly pass and forty-nine new expected
     negatives cover generator declarations and expressions, `prototype` and
     `length` descriptors, `name` inference, non-constructibility, `yield` as a
@@ -862,9 +879,9 @@ its deliberate boundary and its evidence:
     no `return` method, with one new expected negative and four honestly
     unsupported cases that need `arguments`, the `Boolean` intrinsic, or an
     unresolvable reference. The fourteen `star-rhs-iter-thrw-*` and
-    `star-throw-is-null` cases stay out of the reviewed subset until
-    `%GeneratorPrototype%.throw` lands, and `star-string` stays out until
-    strings are iterable. The twenty-three reviewed
+    `star-throw-is-null` cases have not yet entered the reviewed subset, and
+    `star-string` stays out until strings are iterable. The twenty-three
+    reviewed
     *test/built-ins/GeneratorFunction/* cases are recorded as unsupported with
     the `dynamic-source` dependency tag, so the intrinsic boundary stays
     visible in the manifest rather than absent from it.
@@ -914,9 +931,10 @@ its deliberate boundary and its evidence:
     closure at run time. Deliberate boundary: `export default class` is
     rejected with a source-located diagnostic.
     Asynchronous class methods are admitted, because they reach the same
-    lowering object literal async methods already use; generator and
-    asynchronous generator methods stay rejected with that shared
-    diagnostic. Native differential fixtures retain the empty class,
+    lowering object literal async methods already use. Generator and
+    asynchronous generator methods are admitted through the same prototype,
+    static, and private method-definition paths. Native differential fixtures
+    retain the empty class,
     constructor-assigned fields, a method's `this` and prototype placement,
     class `name` and `length`, descriptor observations for `prototype`,
     `constructor`, and a method, method non-constructibility, the
@@ -1044,10 +1062,10 @@ its deliberate boundary and its evidence:
     previously unsupported prototype accessor descriptor and `name` cases
     whose classes also define static accessors. Fifteen new expected
     negatives cover static method parameter `yield` and the static class name
-    identifier early errors, and six new unsupported cases record the
+    identifier early errors, and the remaining unsupported cases record the
     unresolvable computed accessor key, the static field element name, and
-    the generator methods the `fn-name` and `fn-length` static precedence
-    cases require. The reviewed manifest moves to 950 passes, 379 expected
+    the `Object` intrinsic the `fn-name` and `fn-length` static-precedence
+    order cases require. The reviewed manifest moves to 950 passes, 379 expected
     negatives, and 156 unsupported profile features with no semantic or
     harness failures.
  -  Class inheritance through `extends`, the `super()` call, and
@@ -1533,12 +1551,13 @@ its deliberate boundary and its evidence:
     completion, and a throw ending it completes the delegating expression with
     the reported value. An inner iterator with no `throw` method is closed and
     the delegation reports a catchable `TypeError`.
-    Deliberate boundaries: asynchronous generator method definitions in object
-    literals and class bodies stay rejected with the same diagnostic
-    synchronous generator methods get, and default or binding-pattern
-    parameters stay rejected for the same ordering reason. The awaits a
-    `yield*` step takes drain the scheduler rather than returning to the
-    caller, which the `for await` gap entry below owns.
+    Default and recursive binding-pattern parameters use the ordinary
+    synchronous parameter machinery before the asynchronous generator object
+    is returned, so their initialization cannot be deferred until a queued
+    request resumes the body. Asynchronous generator method definitions are
+    admitted in object literals and prototype, static, and private class
+    elements. The awaits a `yield*` step takes drain the scheduler rather than
+    returning to the caller, which the `for await` gap entry below owns.
     Native differential fixtures cover single and repeated yields, sent
     values, awaited and promised operands, an empty body, an awaited explicit
     return, function `length`, `name`, and inferred `name`, self-iterability
@@ -1725,18 +1744,6 @@ must never shrink by reclassification alone.
     cases. Closing
     it needs `Promise` as a materialized intrinsic value to compare against.
     Owner: the intrinsics and built-in objects stream.
- -  `%GeneratorPrototype%.throw`, generator method definitions, and default
-    or binding-pattern generator parameters are outside the admitted
-    generator subset. Because no throw resumption can reach a synchronous
-    body, the `throw` branch of the synchronous `yield*` is unreachable and
-    unimplemented. The missing method is observable one step further out:
-    a `throw` delivered to an asynchronous generator suspended inside a
-    `yield*` over a synchronous generator finds no `throw` method on that
-    generator, so the delegation closes it and reports a `TypeError` where
-    the specification forwards the completion.
-    *test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result.js*
-    is the reviewed candidate that turns on it and stays outside the reviewed
-    subset. Owner: the functions and executable syntax stream.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. Reaching either needs `Object.getPrototypeOf`, and
     creating a generator function from one needs the dynamic-source

@@ -845,6 +845,11 @@ export interface SyntaxFunction extends LocatedSyntax {
   /** Internal declaration binding when it differs from the function name. */
   readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  /**
+   * Number of leading body statements that initialize a generator's
+   * non-simple parameters at call time, before its body is suspended.
+   */
+  readonly generatorCallStatementCount?: number;
   /** JavaScript `length`, which can differ from the ABI parameter count. */
   readonly functionLength?: number;
   readonly functionKind?: FunctionKind;

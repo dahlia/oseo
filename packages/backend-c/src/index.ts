@@ -96,6 +96,8 @@ interface EmitState {
    * must not release a frame that the suspended state still owns.
    */
   readonly generator: boolean;
+  /** Call-time generator blocks return before entering this body block. */
+  readonly generatorBodyStart?: number;
   nextRecursiveTarget: number;
   usesAbrupt: boolean;
   usesCompletion: boolean;
@@ -2584,6 +2586,10 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     );
     line(state, renderC(emittedC.common.returnResult));
   } else if (terminator.kind === "jump") {
+    if (!state.generator && state.generatorBodyStart === terminator.target) {
+      emitNormalReturn(state, renderC(emittedC.function.frameSlotsZero));
+      return;
+    }
     const parameters = state.blockParameters.get(terminator.target) ?? [];
     const values = terminator.values ?? [];
     if (parameters.length !== values.length) {
@@ -2843,15 +2849,19 @@ function rootCount(functionValue: MirFunction): number {
   );
 }
 
-function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
+function reachableBlocksFrom(
+  functionValue: MirFunction,
+  start: number,
+  excluded: ReadonlySet<number> = new Set<number>(),
+): readonly MirBlock[] {
   const blocks = new Map(
     functionValue.blocks.map((block) => [block.id, block]),
   );
-  const pending = [0];
+  const pending = [start];
   const reachable = new Set<number>();
   while (pending.length > 0) {
     const id = pending.pop();
-    if (id == null || reachable.has(id)) continue;
+    if (id == null || reachable.has(id) || excluded.has(id)) continue;
     const block = blocks.get(id);
     if (block == null) {
       throw new Error(
@@ -2893,6 +2903,10 @@ function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
     }
   }
   return functionValue.blocks.filter((block) => reachable.has(block.id));
+}
+
+function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
+  return reachableBlocksFrom(functionValue, 0);
 }
 
 function calledFunctionIds(functionValue: MirFunction): readonly number[] {
@@ -3207,6 +3221,9 @@ function emitGeneratorBody(
 ): string {
   const state: EmitState = {
     ...base,
+    blockParameters: new Map(
+      blocks.map((block) => [block.id, block.parameters ?? []]),
+    ),
     generator: true,
     lines: [],
     scalarKinds: new Map(),
@@ -3216,7 +3233,9 @@ function emitGeneratorBody(
     state,
     renderC(emittedC.generatorBody.switchOseoGeneratorResumePointGenerator),
   );
-  for (const resume of [0, ...resumePoints.keys()]) {
+  const bodyStart = functionValue.generatorBodyStart ?? 0;
+  line(state, renderC(emittedC.common.caseUGotoBbStatement, 0, bodyStart));
+  for (const resume of resumePoints.keys()) {
     line(state, renderC(emittedC.common.caseUGotoBbStatement, resume, resume));
   }
   line(state, renderC(emittedC.common.defaultAbortStatement));
@@ -3280,6 +3299,15 @@ function emitFunction(
     );
   }
   const generator = functionValue.generator === true;
+  const generatorBodyStart = functionValue.generatorBodyStart;
+  const entryBlocks =
+    generatorBodyStart == null
+      ? blocks
+      : reachableBlocksFrom(functionValue, 0, new Set([generatorBodyStart]));
+  const bodyBlocks =
+    generatorBodyStart == null
+      ? blocks
+      : reachableBlocksFrom(functionValue, generatorBodyStart);
   const base: Omit<EmitState, "generator" | "lines"> = {
     argumentSlotStart: baseRootCount,
     blockParameters: new Map(
@@ -3299,7 +3327,18 @@ function emitFunction(
     usesCompletion: false,
     functionId: functionValue.id,
   };
-  const state: EmitState = { ...base, generator: false, lines: [] };
+  const state: EmitState = {
+    ...base,
+    blockParameters: new Map(
+      (generatorBodyStart == null ? blocks : entryBlocks).map((block) => [
+        block.id,
+        block.parameters ?? [],
+      ]),
+    ),
+    generator: false,
+    ...(generatorBodyStart == null ? {} : { generatorBodyStart }),
+    lines: [],
+  };
   state.usesAbrupt = true;
   if (generator) {
     line(
@@ -3329,10 +3368,14 @@ function emitFunction(
     temporarySlot,
   );
   if (generator) {
-    line(
-      state,
-      renderC(emittedC.function.resultAssignOseoResultOseoStatusNormal),
-    );
+    if (generatorBodyStart == null) {
+      line(
+        state,
+        renderC(emittedC.function.resultAssignOseoResultOseoStatusNormal),
+      );
+    } else {
+      emitBlocks(state, entryBlocks, new Map<number, ResumePoint>());
+    }
   } else {
     emitBlocks(state, blocks, new Map<number, ResumePoint>());
   }
@@ -3379,7 +3422,7 @@ function emitFunction(
   return renderC(
     emittedC.function.newline,
     entry,
-    emitGeneratorBody(functionValue, blocks, completionSlots, base),
+    emitGeneratorBody(functionValue, bodyBlocks, completionSlots, base),
   );
 }
 

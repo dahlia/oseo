@@ -74,6 +74,67 @@ let restedText = "";
 for (const value of rested(1, 2, 3)) restedText += value + ";";
 console.log(restedText);
 
+let parameterStage = 0;
+function parameterFallback() {
+  parameterStage += 1;
+  return 4;
+}
+function* defaultedParameter(value = parameterFallback()) {
+  console.log("default body", parameterStage);
+  yield value;
+}
+const defaultedIterator = defaultedParameter();
+console.log("default call", parameterStage);
+console.log(defaultedIterator.next().value);
+console.log(defaultedParameter(undefined).next().value);
+console.log(defaultedParameter(null).next().value);
+
+function* recursiveParameters(
+  [head = 2, { value: nested = 3 } = {}, ...tail] = [],
+  { kept = 5, branch: [leaf = 7] = [], ...rest } = {},
+) {
+  yield head + nested + tail.length + kept + leaf + rest.extra;
+}
+console.log(
+  "recursive",
+  recursiveParameters(
+    [1, { value: 4 }, 8, 9],
+    { kept: 6, branch: [10], extra: 11 },
+  ).next().value,
+);
+console.log("recursive defaults", recursiveParameters().next().value);
+
+/** @param {number} hinted */
+function* falselyHinted([hinted]) {
+  yield hinted;
+}
+console.log("false hint", falselyHinted(["text"]).next().value);
+
+function throwDuringParameter() {
+  parameterStage += 1;
+  throw new RangeError("parameter");
+}
+function* abruptParameter(value = throwDuringParameter()) {
+  yield value;
+}
+try {
+  abruptParameter();
+} catch (error) {
+  console.log(
+    "parameter abrupt",
+    parameterStage,
+    error instanceof RangeError,
+  );
+}
+function* laterParameter(first = second, second = 1) {
+  yield first + second;
+}
+try {
+  laterParameter();
+} catch (error) {
+  console.log("parameter tdz", error instanceof ReferenceError);
+}
+
 function* looped(limit) {
   for (let index = 0; index < limit; index = index + 1) {
     yield index * index;

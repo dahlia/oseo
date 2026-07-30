@@ -903,6 +903,11 @@ export interface HirFunction extends LocatedSyntax {
   /** JavaScript `length`, independent from the call ABI parameter count. */
   readonly functionLength: number;
   readonly functionKind: FunctionKind;
+  /**
+   * Number of leading HIR statements that a generator call executes before
+   * returning its suspended generator object.
+   */
+  readonly generatorCallStatementCount?: number;
   readonly id: number;
   /**
    * True on a class constructor whose class declares instance fields.
