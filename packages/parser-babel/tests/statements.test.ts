@@ -330,6 +330,27 @@ test("converts for-of destructuring assignment heads to owned syntax", () => {
   );
 });
 
+test("converts private for-of assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "class Box {\n" +
+      "  #value = 0;\n" +
+      "  assign(values) {\n" +
+      "    for (this.#value of values) {}\n" +
+      "    return this.#value;\n" +
+      "  }\n" +
+      "}\n",
+    sourceId: "private-for-of-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /for \(this\.%b\d+ #value of/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /for-of private target/u);
+  assert.match(mir, /private-set for-of private target/u);
+});
+
 test("checks for-of assignment member bases before key conversion", () => {
   const result = compileSource(babelFrontend, {
     source:

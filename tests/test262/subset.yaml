@@ -9003,10 +9003,10 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-10.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-11.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-2.js
     expectedClassification: pass
@@ -9021,16 +9021,16 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-6.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-7.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-9.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatename-not-valid-earlyerr-script-1.js
     expectedClassification: expected-negative

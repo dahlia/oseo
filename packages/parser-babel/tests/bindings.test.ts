@@ -435,6 +435,30 @@ test("converts parenthesized destructuring assignment member targets", () => {
   assert.doesNotMatch(JSON.stringify(result.hir), /ParenthesizedExpression/u);
 });
 
+test("converts private destructuring assignment targets", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "class Box {\n" +
+      "  #first = 0;\n" +
+      "  #rest;\n" +
+      "  assign(input) {\n" +
+      "    ({ value: this.#first, ...this.#rest } = input);\n" +
+      "    return this.#first + this.#rest.extra;\n" +
+      "  }\n" +
+      "}\n",
+    sourceId: "private-destructuring-assignment.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /target this\.%b\d+ #first/u);
+  assert.match(hir, /target this\.%b\d+ #rest/u);
+  assert.match(mir, /destructuring private target/u);
+  assert.match(mir, /private-set destructuring private target/u);
+});
+
 test("rejects await inside destructuring assignment targets", () => {
   const result = compileSource(babelFrontend, {
     source:

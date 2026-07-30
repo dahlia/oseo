@@ -1625,15 +1625,12 @@ must never shrink by reclassification alone.
     [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
     matching, and ahead-of-time literal compilation owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  `export default class` is outside the admitted class subset. The
-    `#name in object` brand check, optional `?.#name` access, and a private
-    destructuring or `for-of` assignment target remain rejected. `super()`,
-    `super.x`, and `new.target` are rejected inside an arrow function, and
-    an optional call through a `super` property remains rejected. `super.x` is
-    also rejected inside an asynchronous class element, because
-    this profile captures none of them lexically yet. A `super` property
-    reference in a class body without `extends` and in an object literal
-    method stays rejected until the intrinsic graph provides the
+ -  `super()`, `super.x`, and `new.target` are rejected inside an arrow
+    function, and an optional call through a `super` property remains
+    rejected. `super.x` is also rejected inside an asynchronous class element,
+    because this profile captures none of them lexically yet. A `super`
+    property reference in a class body without `extends` and in an object
+    literal method stays rejected until the intrinsic graph provides the
     `Object.prototype` object such a lookup reaches. Owner: the functions and
     executable syntax stream.
  -  `super()` runs the parent against the receiver the `new` expression

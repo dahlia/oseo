@@ -63,7 +63,11 @@ function privateName(value: BabelNode): string | undefined {
  * it rather than against the object.
  */
 function privateMemberName(value: BabelNode): string | undefined {
-  if (value.type !== "MemberExpression" || value.computed === true) {
+  if (
+    (value.type !== "MemberExpression" &&
+      value.type !== "OptionalMemberExpression") ||
+    value.computed === true
+  ) {
     return undefined;
   }
   const property = node(value.property);
@@ -399,6 +403,16 @@ function optionalChainExpression(
           link,
           "Optional chaining through super is unsupported.",
         );
+      }
+      const name = privateMemberName(link);
+      if (name != null) {
+        links.push({
+          ...location(context, link),
+          kind: "private-member",
+          name,
+          optional: link.optional === true,
+        });
+        continue;
       }
       const key = memberKey(context, link);
       if (key == null) return undefined;
@@ -1199,6 +1213,18 @@ export function bindingPattern(
         "Await inside a destructuring assignment target is unsupported.",
       );
     }
+    const name = privateMemberName(value);
+    if (name != null) {
+      const object = privateReferenceObject(context, value);
+      return object == null
+        ? undefined
+        : {
+            ...location(context, value),
+            kind: "assignment-private",
+            name,
+            object,
+          };
+    }
     const member = memberParts(context, value);
     return member == null
       ? undefined
@@ -1240,7 +1266,8 @@ export function bindingPattern(
         const converted = bindingPattern(context, argument, assignment);
         if (
           converted?.kind !== "binding-identifier" &&
-          converted?.kind !== "assignment-member"
+          converted?.kind !== "assignment-member" &&
+          converted?.kind !== "assignment-private"
         ) {
           return unsupported(
             context,
@@ -2132,14 +2159,27 @@ export function statement(
           range: location(context, left).range,
         };
       } else {
-        const member = memberParts(context, assignmentTarget);
-        if (member != null) {
-          target = {
-            key: member.key,
-            kind: "property",
-            object: member.object,
-            range: location(context, left).range,
-          };
+        const targetPrivateName = privateMemberName(assignmentTarget);
+        if (targetPrivateName != null) {
+          const object = privateReferenceObject(context, assignmentTarget);
+          if (object != null) {
+            target = {
+              kind: "private",
+              name: targetPrivateName,
+              object,
+              range: location(context, left).range,
+            };
+          }
+        } else {
+          const member = memberParts(context, assignmentTarget);
+          if (member != null) {
+            target = {
+              key: member.key,
+              kind: "property",
+              object: member.object,
+              range: location(context, left).range,
+            };
+          }
         }
       }
     }

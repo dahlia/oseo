@@ -192,6 +192,16 @@ export type SyntaxOptionalChainLink =
       readonly optional: boolean;
     })
   | (LocatedSyntax & {
+      /**
+       * A private member step. Its name resolves in the declaring class
+       * rather than becoming a property key.
+       */
+      readonly kind: "private-member";
+      readonly name: string;
+      /** Whether this step performs the chain's nullish guard. */
+      readonly optional: boolean;
+    })
+  | (LocatedSyntax & {
       readonly arguments: readonly SyntaxCallArgument[];
       /**
        * True when parentheses ended the optional chain before this ordinary
@@ -562,6 +572,13 @@ export interface SyntaxAssignmentMemberTarget extends LocatedSyntax {
   readonly object: SyntaxExpression;
 }
 
+/** One private reference used as a destructuring assignment target. */
+export interface SyntaxAssignmentPrivateTarget extends LocatedSyntax {
+  readonly kind: "assignment-private";
+  readonly name: string;
+  readonly object: SyntaxExpression;
+}
+
 /** One initialized element in an owned recursive pattern. */
 export interface SyntaxBindingElement<
   Pattern = SyntaxBindingPattern,
@@ -606,6 +623,7 @@ export type SyntaxBindingTarget = SyntaxBindingIdentifier;
 /** One leaf admitted by a destructuring assignment pattern. */
 export type SyntaxAssignmentTarget =
   | SyntaxAssignmentMemberTarget
+  | SyntaxAssignmentPrivateTarget
   | SyntaxBindingIdentifier;
 
 /** One recursively owned declaration binding pattern. */
@@ -682,6 +700,12 @@ export type SyntaxForOfTarget =
   | {
       readonly key: SyntaxExpression;
       readonly kind: "property";
+      readonly object: SyntaxExpression;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly kind: "private";
+      readonly name: string;
       readonly object: SyntaxExpression;
       readonly range: SourceRange;
     };
