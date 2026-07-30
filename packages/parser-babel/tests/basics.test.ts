@@ -1011,7 +1011,7 @@ test("rejects only noncomputed __proto__ literals", () => {
 
 test("rejects the smallest syntax form outside the profile", () => {
   const result = babelFrontend.parse({
-    source: "const value = class extends Base { static *#hidden() {} };",
+    source: "const value = class extends Base { declare field: number; };",
     sourceId: "class-static-private-generator.ts",
   });
   assert.ok(!result.parsed);
@@ -1181,8 +1181,6 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
-    ["class C { *step() {} }", /Generator method definitions/u],
-    ["class C { static *step() {} }", /Generator method definitions/u],
     ["class C { constructor() {} constructor() {} }", /one constructor/u],
   ];
   for (const [source, message] of cases) {

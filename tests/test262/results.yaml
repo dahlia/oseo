@@ -33665,19 +33665,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/private-generator-method-name.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-generator-method-name.js:120:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -34356,11 +34363,11 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/expressions/class/elements/private-methods/prod-private-generator.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/private-methods/prod-private-generator.js:156:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+      detail: "test/language/expressions/class/elements/private-methods/prod-\
+        private-generator.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/private-metho\
+        ds/prod-private-generator.js:148:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -47990,20 +47997,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - expression-operators
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/in/private-field-rhs-yield-present.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/in/private-field-rhs-yield-present.js:94:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -58901,19 +58915,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-literals
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/object/method-definition/static-init-await-binding-generator.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/object/method-definition/static-init-await-binding-generator.js:85:7:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -59001,8 +59022,8 @@ results:
       detail: 'test/language/expressions/object/method-definition/static-init-await-reference-generator.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/expressions/object/method-definition/static-init-await-reference-generator.js:89:7:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+        error[OSEO1001]: Generator function default and binding-pattern
+        parameters are unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -82430,11 +82451,11 @@ results:
       - functions
       - generators
     observation:
-      detail: 'test/language/statements/class/definition/fn-length-static-precedence-order.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/fn-length-static-precedence-order.js:144:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+      detail: "test/language/statements/class/definition/fn-length-static-pre\
+        cedence-order.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/definition/fn-length-st\
+        atic-precedence-order.js:113:21: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -82451,20 +82472,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - functions
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/definition/fn-length-static-precedence.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/fn-length-static-precedence.js:140:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -82557,11 +82585,11 @@ results:
       - functions
       - generators
     observation:
-      detail: 'test/language/statements/class/definition/fn-name-static-precedence-order.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/fn-name-static-precedence-order.js:141:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+      detail: "test/language/statements/class/definition/fn-name-static-prece\
+        dence-order.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/definition/fn-name-stat\
+        ic-precedence-order.js:110:21: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -82578,20 +82606,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - functions
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/definition/fn-name-static-precedence.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/fn-name-static-precedence.js:137:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -82797,19 +82832,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/definition/methods-gen-return.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/methods-gen-return.js:82:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -86737,19 +86779,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-generator-method-name.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-generator-method-name.js:120:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -87769,11 +87818,11 @@ results:
       - classes
       - object-properties
     observation:
-      detail: 'test/language/statements/class/elements/private-methods/prod-private-generator.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-methods/prod-private-generator.js:155:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+      detail: "test/language/statements/class/elements/private-methods/prod-p\
+        rivate-generator.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/private-method\
+        s/prod-private-generator.js:147:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -95756,33 +95805,6 @@ results:
       features:
         - class-fields-public
         - class
-      flags: []
-      includes: []
-      mode: script
-      path: test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
-      strictness:
-        - non-strict
-        - strict
-      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
-    dependencies:
-      - classes
-      - object-properties
-    observation:
-      detail: 'test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js:109:3:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
-      harnessFailed: false
-      passed: false
-    unsupportedFeatures: []
-  - case:
-      async: false
-      features:
-        - class-fields-public
-        - class
       flags:
         - generated
       includes: []
@@ -98024,8 +98046,8 @@ results:
       detail: 'test/language/statements/class/static-init-arguments-methods.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/class/static-init-arguments-methods.js:111:7:
-        error[OSEO1001]: Generator method definitions are
-        unsupported.\n"'
+        error[OSEO1001]: Generator function default and binding-pattern
+        parameters are unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -123753,9 +123775,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 1917
+  passes: 1924
   semanticFailures: 0
-  unsupportedProfileFeatures: 955
+  unsupportedProfileFeatures: 947
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -123778,9 +123800,9 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 605
+      passes: 612
       semanticFailures: 0
-      unsupportedProfileFeatures: 160
+      unsupportedProfileFeatures: 152
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -123814,21 +123836,21 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 32
       harnessFailures: 0
-      passes: 110
+      passes: 111
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 36
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 129
+      passes: 131
       semanticFailures: 0
-      unsupportedProfileFeatures: 16
+      unsupportedProfileFeatures: 14
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
-      passes: 151
+      passes: 155
       semanticFailures: 0
-      unsupportedProfileFeatures: 37
+      unsupportedProfileFeatures: 33
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
@@ -123850,15 +123872,15 @@ summary:
     - dependency: object-literals
       expectedNegatives: 10
       harnessFailures: 0
-      passes: 362
+      passes: 363
       semanticFailures: 0
-      unsupportedProfileFeatures: 26
+      unsupportedProfileFeatures: 25
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 689
+      passes: 691
       semanticFailures: 0
-      unsupportedProfileFeatures: 108
+      unsupportedProfileFeatures: 105
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -123971,9 +123993,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 465
       harnessFailures: 0
-      passes: 902
+      passes: 905
       semanticFailures: 0
-      unsupportedProfileFeatures: 521
+      unsupportedProfileFeatures: 518
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
@@ -123995,6 +124017,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 845
+      passes: 849
       semanticFailures: 0
-      unsupportedProfileFeatures: 283
+      unsupportedProfileFeatures: 278

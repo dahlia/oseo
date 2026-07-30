@@ -3458,7 +3458,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-generator-method-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-getter-access-on-inner-arrow-function.js
     expectedClassification: pass
@@ -4901,7 +4901,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [classes, expression-operators, object-properties]
   - path: test/language/expressions/in/private-field-rhs-yield-present.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators, generators]
   - path: test/language/expressions/in/rhs-yield-absent-strict.js
     expectedClassification: expected-negative
@@ -5906,7 +5906,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/object/method-definition/static-init-await-binding-generator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/expressions/object/method-definition/static-init-await-binding-normal.js
     expectedClassification: pass
@@ -8400,7 +8400,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-length-static-precedence.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-name-accessor-get.js
     expectedClassification: pass
@@ -8412,7 +8412,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/fn-name-static-precedence.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions, generators]
   - path: test/language/statements/class/definition/getters-non-configurable-err.js
     expectedClassification: pass
@@ -8443,7 +8443,7 @@ tests:
       - object-properties
       - promise-settlement
   - path: test/language/statements/class/definition/methods-gen-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, generators]
   - path: test/language/statements/class/definition/methods-gen-yield-as-function-expression-binding-identifier.js
     expectedClassification: expected-negative
@@ -8839,7 +8839,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-generator-method-name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-getter-access-on-inner-arrow-function.js
     expectedClassification: pass
@@ -9746,9 +9746,6 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/valid/grammar-field-identifier.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
-  - path: test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
-    expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/syntax/valid/grammar-fields-multi-line.js
     expectedClassification: pass

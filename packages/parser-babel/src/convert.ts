@@ -3344,12 +3344,8 @@ export function functionDeclaration(
   // reaches the continuation split an ordinary asynchronous function
   // takes. Only the method definition forms stay outside the profile.
   const asyncGenerator = generator && value.async === true;
-  if (generator && memberKind != null) {
-    return unsupported(
-      context,
-      value,
-      "Generator method definitions are unsupported.",
-    );
+  if (generator && memberKind === "class") {
+    return unsupported(context, value, "Constructor cannot be a generator.");
   }
   if (value.typeParameters != null) {
     return unsupported(
