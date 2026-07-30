@@ -1430,24 +1430,6 @@ console.log(counter.next(), counter.read(new Counter(2)), Counter.run());
   assert.match(mir, /private-set private-set/u);
 });
 
-test("rejects private references outside the admitted profile", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "class C { #x = 1; m() { [this.#x] = [1]; } }",
-      /private member is unsupported in this position/u,
-    ],
-  ];
-  for (const [source, message] of cases) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "private-rejection.ts",
-    });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
-  }
-});
-
 test("locates the early errors a private name reports at parse time", () => {
   // Every one of these is an ECMA-262 early error, so the bootstrap
   // parser reports it before conversion; the profile still owes each a
@@ -1631,4 +1613,26 @@ test("converts optional member and call chains to owned syntax", () => {
   assert.match(hirText, /object\)\?\.\["method"\]\(/u);
   assert.match(hirText, /object\)\?\.\[call %b0\(key\)\(\)\]\?\.\(/u);
   assert.match(hirText, /\(object\)\?\.\["missing"\]\)\["value"\]\?\.\(/u);
+});
+
+test("converts optional private member chains to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "class Box {\n" +
+      "  #value = 1;\n" +
+      "  #method() { return this.#value; }\n" +
+      "  read(object) { return object?.#value; }\n" +
+      "  call(object) { return object?.#method(); }\n" +
+      "}\n",
+    sourceId: "optional-private-chain.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  const mir = printMir(result.mir);
+  assert.match(hir, /\?\.\[%b\d+ #value\]/u);
+  assert.match(hir, /\?\.\[%b\d+ #method\]\(\)/u);
+  assert.match(mir, /private-get private-get/u);
+  assert.match(mir, /optional chain function value/u);
 });

@@ -186,11 +186,14 @@ function printHirExpression(expression: HirExpression): string {
         link.kind === "member"
           ? `${printed}${link.optional ? "?." : ""}[` +
             `${printHirExpression(link.key)}]`
-          : link.chainBoundary === true
-            ? `(${printed})(` +
-              `${link.arguments.map(printHirCallArgument).join(", ")})`
-            : `${printed}${link.optional ? "?." : ""}(` +
-              `${link.arguments.map(printHirCallArgument).join(", ")})`,
+          : link.kind === "private-member"
+            ? `${printed}${link.optional ? "?." : "."}[` +
+              `${printHirPrivateName(link.privateName)}]`
+            : link.chainBoundary === true
+              ? `(${printed})(` +
+                `${link.arguments.map(printHirCallArgument).join(", ")})`
+              : `${printed}${link.optional ? "?." : ""}(` +
+                `${link.arguments.map(printHirCallArgument).join(", ")})`,
       base,
     );
   }
@@ -355,6 +358,12 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
       `${printHirExpression(pattern.key)}]`
     );
   }
+  if (pattern.kind === "assignment-private") {
+    return (
+      `target ${printHirExpression(pattern.object)}.` +
+      printHirPrivateName(pattern.privateName)
+    );
+  }
   if (pattern.kind === "binding-identifier") {
     return `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}`;
   }
@@ -501,8 +510,11 @@ function appendHirStatement(
             ? printHirBindingPattern(statement.target.pattern)
             : statement.target.kind === "binding"
               ? `%b${statement.target.bindingId} ${statement.target.name}`
-              : `${printHirExpression(statement.target.object)}[` +
-                `${printHirExpression(statement.target.key)}]`;
+              : statement.target.kind === "private"
+                ? `${printHirExpression(statement.target.object)}.` +
+                  printHirPrivateName(statement.target.privateName)
+                : `${printHirExpression(statement.target.object)}[` +
+                  `${printHirExpression(statement.target.key)}]`;
     lines.push(
       `${indent}for ${statement.awaited === true ? "await " : ""}` +
         `(${target} of ${printHirExpression(statement.iterable)})${location}`,

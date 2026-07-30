@@ -252,6 +252,17 @@ function resolveOptionalChain(
       links.push({ ...link, key });
       continue;
     }
+    if (link.kind === "private-member") {
+      const privateName = resolvePrivateName(link.name, link, scopes, state);
+      if (privateName == null) return undefined;
+      links.push({
+        ...locatedOf(link),
+        kind: "private-member",
+        optional: link.optional,
+        privateName,
+      });
+      continue;
+    }
     const argumentsValue: HirCallArgument[] = [];
     for (const argument of link.arguments) {
       const resolved = resolveCallArgument(argument, scopes, state);
@@ -861,7 +872,12 @@ export type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
 function syntaxBindingNames(
   pattern: SyntaxAssignmentPattern,
 ): readonly string[] {
-  if (pattern.kind === "assignment-member") return [];
+  if (
+    pattern.kind === "assignment-member" ||
+    pattern.kind === "assignment-private"
+  ) {
+    return [];
+  }
   if (pattern.kind === "binding-identifier") return [pattern.name];
   if (pattern.kind === "object-binding-pattern") {
     return [
@@ -1156,7 +1172,12 @@ function resolveFunction(
 export function hirBindingIdentifiers(
   pattern: HirBindingPattern,
 ): readonly HirBindingIdentifier[] {
-  if (pattern.kind === "assignment-member") return [];
+  if (
+    pattern.kind === "assignment-member" ||
+    pattern.kind === "assignment-private"
+  ) {
+    return [];
+  }
   if (pattern.kind === "binding-identifier") return [pattern];
   if (pattern.kind === "object-binding-pattern") {
     return [
@@ -1189,7 +1210,9 @@ function hirOptionalChainHasAwait(
     expression.links.some((link) =>
       link.kind === "member"
         ? hirExpressionHasAwait(link.key)
-        : link.arguments.some(hirCallArgumentHasAwait),
+        : link.kind === "private-member"
+          ? false
+          : link.arguments.some(hirCallArgumentHasAwait),
     )
   );
 }
@@ -1338,6 +1361,9 @@ export function hirBindingPatternHasAwait(pattern: HirBindingPattern): boolean {
       hirExpressionHasAwait(pattern.object) ||
       hirExpressionHasAwait(pattern.key)
     );
+  }
+  if (pattern.kind === "assignment-private") {
+    return hirExpressionHasAwait(pattern.object);
   }
   if (pattern.kind === "binding-identifier") return false;
   if (pattern.kind === "object-binding-pattern") {
@@ -1783,6 +1809,33 @@ function resolveBindingPattern(
       ? undefined
       : { ...pattern, key, object };
   }
+  if (pattern.kind === "assignment-private") {
+    if (!allowAssignmentTargets) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          pattern,
+          "Private targets are valid only in assignment patterns.",
+        ),
+      );
+      return undefined;
+    }
+    const object = resolveExpression(pattern.object, scopes, state);
+    const privateName = resolvePrivateName(
+      pattern.name,
+      pattern,
+      scopes,
+      state,
+    );
+    return object == null || privateName == null
+      ? undefined
+      : {
+          ...locatedOf(pattern),
+          kind: "assignment-private",
+          object,
+          privateName,
+        };
+  }
   if (pattern.kind === "binding-identifier") {
     const resolution =
       mode === "declare"
@@ -1870,7 +1923,8 @@ function resolveBindingPattern(
       );
       if (
         resolvedRest?.kind !== "binding-identifier" &&
-        resolvedRest?.kind !== "assignment-member"
+        resolvedRest?.kind !== "assignment-member" &&
+        resolvedRest?.kind !== "assignment-private"
       ) {
         return undefined;
       }
@@ -2410,11 +2464,27 @@ function resolveStatement(
             : { withObjectBindingIds: resolution.objectBindingIds }),
         };
       }
-    } else {
+    } else if (statement.target.kind === "property") {
       const object = resolveExpression(statement.target.object, scopes, state);
       const key = resolveExpression(statement.target.key, scopes, state);
       if (object != null && key != null) {
         target = { ...statement.target, key, object };
+      }
+    } else {
+      const object = resolveExpression(statement.target.object, scopes, state);
+      const privateName = resolvePrivateName(
+        statement.target.name,
+        statement.target,
+        scopes,
+        state,
+      );
+      if (object != null && privateName != null) {
+        target = {
+          ...locatedOf(statement.target),
+          kind: "private",
+          object,
+          privateName,
+        };
       }
     }
     const body = resolveStatement(

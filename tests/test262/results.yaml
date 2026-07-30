@@ -88697,19 +88697,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-10.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-10.js:108:9:
-        error[OSEO1001]: A private member is unsupported in this
-        position.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88724,19 +88731,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-11.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-11.js:108:10:
-        error[OSEO1001]: A private member is unsupported in this
-        position.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88887,19 +88901,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-6.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-6.js:108:10:
-        error[OSEO1001]: A private member is unsupported in this
-        position.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88940,19 +88961,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-8.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-8.js:108:6:
-        error[OSEO1001]: A private member is unsupported in this
-        position.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -88967,19 +88995,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/privatefieldset-typeerror-9.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/privatefieldset-typeerror-9.js:108:10:
-        error[OSEO1001]: A private member is unsupported in this
-        position.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -123402,9 +123437,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 1898
+  passes: 1903
   semanticFailures: 0
-  unsupportedProfileFeatures: 966
+  unsupportedProfileFeatures: 961
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -123427,9 +123462,9 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 588
+      passes: 593
       semanticFailures: 0
-      unsupportedProfileFeatures: 171
+      unsupportedProfileFeatures: 166
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -123505,9 +123540,9 @@ summary:
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 678
+      passes: 683
       semanticFailures: 0
-      unsupportedProfileFeatures: 113
+      unsupportedProfileFeatures: 108
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -123644,6 +123679,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 835
+      passes: 840
       semanticFailures: 0
-      unsupportedProfileFeatures: 291
+      unsupportedProfileFeatures: 286

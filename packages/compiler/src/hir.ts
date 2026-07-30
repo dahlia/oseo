@@ -50,6 +50,13 @@ export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly object: HirExpression;
 }
 
+/** One resolved private reference used as an assignment-pattern leaf. */
+export interface HirAssignmentPrivateTarget extends LocatedSyntax {
+  readonly kind: "assignment-private";
+  readonly object: HirExpression;
+  readonly privateName: HirPrivateName;
+}
+
 /** One resolved initialized element in an array binding pattern. */
 export interface HirBindingElement extends LocatedSyntax {
   readonly initializer?: HirExpression;
@@ -78,7 +85,10 @@ export interface HirObjectBindingPattern extends LocatedSyntax {
 }
 
 /** One resolved leaf admitted by a declaration or assignment pattern. */
-export type HirBindingTarget = HirAssignmentMemberTarget | HirBindingIdentifier;
+export type HirBindingTarget =
+  | HirAssignmentMemberTarget
+  | HirAssignmentPrivateTarget
+  | HirBindingIdentifier;
 
 /** One recursively resolved binding or assignment pattern. */
 export type HirBindingPattern =
@@ -152,6 +162,12 @@ export type HirForOfTarget =
       readonly key: HirExpression;
       readonly kind: "property";
       readonly object: HirExpression;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly kind: "private";
+      readonly object: HirExpression;
+      readonly privateName: HirPrivateName;
       readonly range: SourceRange;
     };
 
@@ -293,6 +309,11 @@ export type HirOptionalChainLink =
       readonly key: HirExpression;
       readonly kind: "member";
       readonly optional: boolean;
+    })
+  | (LocatedSyntax & {
+      readonly kind: "private-member";
+      readonly optional: boolean;
+      readonly privateName: HirPrivateName;
     })
   | (LocatedSyntax & {
       readonly arguments: readonly HirCallArgument[];

@@ -1947,6 +1947,7 @@ function lowerPrivateWrite(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
+  detail = "private-set",
 ): number {
   appendMirMetadata(
     builder,
@@ -1959,7 +1960,7 @@ function lowerPrivateWrite(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [object, privateNameValue, value],
-    detail: "private-set",
+    detail,
     id,
     kind: "private-set",
     range,
@@ -2654,6 +2655,16 @@ function lowerOptionalChain(
         const key = convertPropertyKey(keyInput, link.key.range, builder);
         value = lowerPropertyRead(receiver, key, link.range, builder);
       }
+      continue;
+    }
+    if (link.kind === "private-member") {
+      receiver = value;
+      const privateNameValue = lowerPrivateName(
+        link.privateName,
+        link.range,
+        builder,
+      );
+      value = lowerPrivateRead(receiver, privateNameValue, link.range, builder);
       continue;
     }
     let callReceiver: number;
@@ -4504,6 +4515,23 @@ function lowerForOfTarget(
     recordRoot(builder, id, target.range);
     return;
   }
+  if (target.kind === "private") {
+    const object = lowerExpression(target.object, builder);
+    const privateNameValue = lowerPrivateName(
+      target.privateName,
+      target.range,
+      builder,
+    );
+    lowerPrivateWrite(
+      object,
+      privateNameValue,
+      value,
+      target.range,
+      builder,
+      "for-of private target",
+    );
+    return;
+  }
   const object = lowerExpression(target.object, builder);
   const key = lowerPropertyKey(target.key, builder);
   appendMirMetadata(
@@ -4818,7 +4846,7 @@ function lowerBindingTarget(
   reference?: LoweredAssignmentReference,
 ): void {
   if (pattern.kind === "assignment-member") {
-    if (reference == null) {
+    if (reference?.kind !== "property") {
       throw new Error("Assignment member target was not prepared.");
     }
     const prepared = reference;
@@ -4853,6 +4881,20 @@ function lowerBindingTarget(
       pattern.range,
     );
     recordRoot(builder, id, pattern.range);
+    return;
+  }
+  if (pattern.kind === "assignment-private") {
+    if (reference?.kind !== "private") {
+      throw new Error("Assignment private target was not prepared.");
+    }
+    lowerPrivateWrite(
+      reference.object,
+      reference.privateName,
+      value,
+      pattern.range,
+      builder,
+      "destructuring private target",
+    );
     return;
   }
   if (pattern.kind === "array-binding-pattern") {
@@ -4915,22 +4957,39 @@ function lowerBindingTarget(
   recordRoot(builder, id, pattern.range);
 }
 
-interface LoweredAssignmentReference {
-  readonly key: number;
-  readonly object: number;
-}
+type LoweredAssignmentReference =
+  | {
+      readonly key: number;
+      readonly kind: "property";
+      readonly object: number;
+    }
+  | {
+      readonly kind: "private";
+      readonly object: number;
+      readonly privateName: number;
+    };
 
 function lowerAssignmentReference(
   pattern: HirBindingPattern,
   mode: BindingPatternMode,
   builder: MirBuilder,
 ): LoweredAssignmentReference | undefined {
-  if (pattern.kind !== "assignment-member" || mode !== "write") {
-    return undefined;
+  if (mode !== "write") return undefined;
+  if (pattern.kind === "assignment-member") {
+    const object = lowerExpression(pattern.object, builder);
+    const key = lowerExpression(pattern.key, builder);
+    return { key, kind: "property", object };
   }
-  const object = lowerExpression(pattern.object, builder);
-  const key = lowerExpression(pattern.key, builder);
-  return { key, object };
+  if (pattern.kind === "assignment-private") {
+    const object = lowerExpression(pattern.object, builder);
+    const privateName = lowerPrivateName(
+      pattern.privateName,
+      pattern.range,
+      builder,
+    );
+    return { kind: "private", object, privateName };
+  }
+  return undefined;
 }
 
 function lowerObjectBindingPattern(
