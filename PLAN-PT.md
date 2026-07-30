@@ -93,6 +93,14 @@ ahead-of-time literal strategies with both reference hosts. The matcher model
 does not become a second random-source framework; it composes with the same
 seed, replay, target, specialization, and forced-collection controls.
 
+The BigInt work in [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) adds structured sign
+and magnitude values, exact literals in every admitted radix, coercion cases,
+operator trees, and fixed-width conversions. Its shrinker preserves the
+mathematical boundary under test, including immediate-range transitions,
+carry and borrow edges, mixed numeric types, and allocation points. Bounded
+operations compare an independent sign-and-magnitude model as well as both
+reference hosts.
+
 Property tests do not replace test262 or later web-platform tests. Standards
 suites prove behavior for reviewed specification cases. Property tests explore
 combinations, values, transformations, and execution states that a fixed suite

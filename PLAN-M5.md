@@ -1108,7 +1108,8 @@ reviewed, which this unit does not attempt.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
+[*PLAN-NIO.md*](./PLAN-NIO.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), [*PLAN-GATE.md*](./PLAN-GATE.md), the
 frozen language profiles, and
@@ -1230,6 +1231,13 @@ Complete the remaining coercions, operators, declarations, destructuring,
 default values, rest and spread behavior, template literals, and control-flow
 forms required by later built-ins. Preserve left-to-right evaluation and
 abrupt-completion order before adding specialized paths.
+
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md) owns the exact literal, `ToNumeric`, value
+representation, operator, assignment, and update contracts that cross this
+stream and the built-in stream. BigInt remains outside the active profile until
+an admitted unit has generic semantics and representation evidence; the
+existing `Number` operators do not become BigInt behavior through implicit
+conversion.
 
 Array literal spread is complete for object iterables. Its generated property
 suite uses seed `0x5eed0005`, compares an independent accumulation model with
@@ -1458,8 +1466,8 @@ identifier and static or computed member targets. Each form reads the target
 once, applies Number coercion before adding or subtracting one, performs one
 checked write, and returns the assigned value for a prefix form or the coerced
 previous value for a postfix form. This Number path is complete for the current
-admitted value profile; BigInt update semantics remain with the later BigInt
-unit.
+admitted value profile; BigInt update semantics remain with the unit owned by
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
 
 A member target evaluates its object and property-key expression once. The raw
 key value converts for the read and converts again for the write, so the two
@@ -1482,6 +1490,12 @@ Establish the intrinsic graph, well-known symbols, iterator protocols, error
 objects, and property attributes needed by standard constructors and prototype
 methods. Add numeric, string, array, object, function, collection, regular
 expression, date, and binary-data families in dependency order.
+
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md) owns the `BigInt` intrinsic, prototype,
+wrappers, fixed-width conversion functions, and the primitive contracts later
+binary-data and atomic families consume. It defers the immediate tag, heap
+layout, limb representation, and external arithmetic choice until allocation,
+target, code-size, and failure probes compare them.
 
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns the regular expression family. It
 keeps one owned pattern and matcher model across dynamic construction and

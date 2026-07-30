@@ -46,6 +46,13 @@ state from shareable matcher artifacts, keeps dynamic patterns on the same
 semantic model as literals, and measures ahead-of-time C lowering against a
 compact generic matcher before selecting a backend.
 
+The M5 BigInt primitive and intrinsic are detailed in
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md). That plan keeps exact literals,
+`ToNumeric`, arithmetic, comparison, printing, and fixed-width conversion
+behind one private runtime boundary. It measures immediate and heap
+representations, limb layouts, and external arithmetic components before
+selecting the remaining NaN-box tag or a backend.
+
 A deferred code-generation track is recorded in
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md). C11 remains the implemented reference
 and portability backend. The track starts a candidate investigation only when
@@ -359,7 +366,8 @@ complete generic path before it receives a specialization.
 
 Proxies, weak references, finalization, symbols, big integers, classes, and
 other features enter M3 only through separate plans with their semantic
-prerequisites listed. They need not all block the first useful M3 release.
+prerequisites listed. [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) now owns the BigInt
+track. These features need not all block the first useful M3 release.
 
 ### Exit criteria
 
@@ -442,6 +450,8 @@ implementation task.
 
  -  expand syntax and semantics in dependency order;
  -  implement standard built-in objects and intrinsic functions;
+ -  add exact BigInt values and operators through the representation and
+    arithmetic gates in [*PLAN-BIGINT.md*](./PLAN-BIGINT.md);
  -  compile regular expression literals ahead of time while preserving one
     generic matcher contract for dynamic patterns;
  -  increase test262 coverage and publish reproducible result manifests;
@@ -518,6 +528,12 @@ families that those units left open. Reading the table as the complete
 remaining scope is what makes a finished work queue look like a finished
 checkpoint.
 
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md) coordinates the M5a literal, coercion,
+operator, assignment, and update work with the M5b intrinsic and prototype. It
+keeps BigInt outside the active profile until an admitted checkpoint has exact
+generic semantics and the selected representation has collector and target
+evidence.
+
 M5a is complete when no entry in the known-gaps list of
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) names the core
 expressions and bindings stream or the functions and executable syntax stream
@@ -534,8 +550,9 @@ The separate compact index records the denominator without duplicating the
 result manifest's observations.
 
 M5b adds the intrinsic graph, the global object, and the built-in families,
-including the regular expression family owned by
-[*PLAN-REGEXP.md*](./PLAN-REGEXP.md) and the `Date` family that depends on the
+including the BigInt intrinsic owned by
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md), the regular expression family owned by
+[*PLAN-REGEXP.md*](./PLAN-REGEXP.md), and the `Date` family that depends on the
 clock gate in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c closes the remaining results
 in the inventory or covers them with a record that authorizes the exclusion.
 
@@ -845,8 +862,11 @@ landed with the M5 intrinsics units. The remaining queue is:
     refactoring changed no language-profile or compatibility count.
 2.  Complete the remaining foundational expressions and coercions after the
     landed errors, symbols, synchronous iterator consumers, spread consumers,
-    and array binding declarations.
+    and array binding declarations. BigInt follows the representation,
+    `ToNumeric`, and arithmetic gates in
+    [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
 3.  Add built-in families and broader executable syntax in dependency order.
+    The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows
     [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), including the generic matcher before
     ahead-of-time literal lowering and measured fast paths.

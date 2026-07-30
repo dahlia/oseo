@@ -1618,13 +1618,18 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Big integers, regular expressions, and the remaining expression grammar,
-    excluding the admitted optional chaining and tagged template forms, are
-    outside the admitted syntax. Owner: the core expressions and bindings
-    stream in
-    [*PLAN-M5.md*](../PLAN-M5.md), with regular expression syntax, objects,
-    matching, and ahead-of-time literal compilation owned by
+ -  Big integers are outside the admitted syntax and value profile. Exact
+    literals, `ToNumeric`, operators, representation, the `BigInt` intrinsic,
+    and fixed-width conversion are owned by
+    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) across the core expressions and
+    bindings stream and the intrinsic stream in
+    [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Regular expression syntax, objects, matching, and ahead-of-time literal
+    compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+ -  The remaining expression grammar, excluding the admitted optional chaining
+    and tagged template forms, is outside the admitted syntax. Owner: the core
+    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
  -  `super()`, `super.x`, and `new.target` are rejected inside an arrow
     function, and an optional call through a `super` property remains
     rejected. `super.x` is also rejected inside an asynchronous class element,

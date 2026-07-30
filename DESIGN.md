@@ -283,6 +283,13 @@ registers. A value must be converted back to `OseoValue` before it crosses a
 generic ABI boundary, becomes visible to the garbage collector, or is stored in
 a generic heap slot.
 
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md) owns the exact BigInt value and arithmetic
+boundary. It compares an unused immediate tag plus a managed magnitude with
+all-heap representations, and an owned limb implementation with external
+components, before selecting a layout. BigInt constants, generic operations,
+and generated C depend on a private runtime interface rather than a chosen limb
+type or library structure.
+
 The M2 path recognizes and unboxes immediate values through private runtime
 inline primitives. Checked addition validates both operand and result ranges
 before C signed arithmetic. Overflow branches to generic addition before a
@@ -317,6 +324,12 @@ but each evaluation still allocates a fresh `RegExp` object. Matcher strategy,
 Unicode data, mutable object state, and collector-owned work areas remain
 separate contracts so a static fast path cannot replace generic ECMAScript
 behavior.
+
+BigInt adds a private exact-integer subsystem at the value boundary.
+[*PLAN-BIGINT.md*](./PLAN-BIGINT.md) keeps literal conversion, numeric
+coercion, arithmetic, comparison, printing, and fixed-width truncation behind
+one canonical value contract. A heap-backed magnitude remains a primitive, and
+an immediate or arithmetic fast path cannot replace the generic semantics.
 
 An ordinary object is expected to contain a header and indexed storage. The
 header identifies the object's runtime kind, garbage-collector state, and shape.
@@ -893,6 +906,9 @@ dependency of later milestones:
  -  the long-term collector organization, including moving generations,
     barriers, pinned or large objects, and pause policy, as scoped by
     [*PLAN-GC.md*](./PLAN-GC.md);
+ -  the BigInt immediate and heap representations, arithmetic component,
+    literal materialization, and replacement boundary, as scoped by
+    [*PLAN-BIGINT.md*](./PLAN-BIGINT.md);
  -  the native event-loop and system-library boundary, including the
     completion, cancellation, buffer-lifetime, and fallback decisions scoped by
     [*PLAN-NIO.md*](./PLAN-NIO.md);
