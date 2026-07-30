@@ -4,6 +4,7 @@ import process from "node:process";
 import test from "node:test";
 
 import { runNativeCli } from "../../packages/cli/src/index.ts";
+import { targetForExecutionHost } from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
 import * as testkit from "../../packages/testkit/src/index.ts";
 import fc from "fast-check";
@@ -29,6 +30,12 @@ const caseArbitrary: fc.Arbitrary<DefaultClassCase> = fc.record({
 });
 
 const host = createNodeHost();
+const nativeTarget = targetForExecutionHost(
+  host.executionHost ?? {
+    architecture: "unknown",
+    operatingSystem: "unknown",
+  },
+);
 
 function definitionSource(testCase: DefaultClassCase): string {
   const name = testCase.anonymous ? "" : " DefaultShape";
@@ -83,77 +90,81 @@ function expected(testCase: DefaultClassCase): string {
   );
 }
 
-test("generated default class exports preserve names", async () => {
-  await assertAsyncProperty(
-    "default class declarations preserve their export and " +
-      "constructor names",
-    fc.asyncProperty(caseArbitrary, async (testCase) => {
-      const directory = await host.makeTemporaryDirectory(
-        "oseo-default-class-property-",
-      );
-      const definitionPath = `${directory}/definition.mjs`;
-      const entryPath = `${directory}/entry.mjs`;
-      await host.writeTextFile(definitionPath, definitionSource(testCase));
-      await host.writeTextFile(entryPath, entrySource(testCase));
-      const expectedObservation = {
-        exitStatus: 0,
-        stderr: "",
-        stdout: expected(testCase),
-      };
-      try {
-        testkit.assertMatchingObservations([
-          expectedObservation,
-          await host.run({
-            args: [entryPath],
-            command: process.execPath,
-            cwd: directory,
-          }),
-          await host.run({
-            args: ["run", "--quiet", entryPath],
-            command: "deno",
-            cwd: directory,
-          }),
-        ]);
-        for (const specialization of ["disabled", "enabled"] as const) {
-          if (specialization === "enabled") {
-            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+test(
+  "generated default class exports preserve names",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "default class declarations preserve their export and " +
+        "constructor names",
+      fc.asyncProperty(caseArbitrary, async (testCase) => {
+        const directory = await host.makeTemporaryDirectory(
+          "oseo-default-class-property-",
+        );
+        const definitionPath = `${directory}/definition.mjs`;
+        const entryPath = `${directory}/entry.mjs`;
+        await host.writeTextFile(definitionPath, definitionSource(testCase));
+        await host.writeTextFile(entryPath, entrySource(testCase));
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expected(testCase),
+        };
+        try {
+          testkit.assertMatchingObservations([
+            expectedObservation,
+            await host.run({
+              args: [entryPath],
+              command: process.execPath,
+              cwd: directory,
+            }),
+            await host.run({
+              args: ["run", "--quiet", entryPath],
+              command: "deno",
+              cwd: directory,
+            }),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            if (specialization === "enabled") {
+              process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            }
+            try {
+              const native = await runNativeCli(
+                {
+                  args: [
+                    ...(specialization === "disabled"
+                      ? ["--no-specialization"]
+                      : []),
+                    entryPath,
+                  ],
+                  version: "0.1.0",
+                },
+                host,
+              );
+              testkit.assertMatchingObservations([expectedObservation, native]);
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
           }
-          try {
-            const native = await runNativeCli(
-              {
-                args: [
-                  ...(specialization === "disabled"
-                    ? ["--no-specialization"]
-                    : []),
-                  entryPath,
-                ],
-                version: "0.1.0",
-              },
-              host,
-            );
-            testkit.assertMatchingObservations([expectedObservation, native]);
-          } finally {
-            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-          }
+        } finally {
+          await host.remove(directory);
         }
-      } finally {
-        await host.remove(directory);
-      }
-    }),
-    {
-      context: ["module-goal=closed graph", "native-collector=forced"],
-      domain:
-        "named and anonymous default class declarations with optional static " +
-        "`name` replacement, a local named-class reference, bounded " +
-        "constructor input, a prototype method, and a heap-valued static " +
-        "field imported through the default export",
-      numRuns: 5,
-      profile: "M5 export default class declarations",
-      seed: 0x5eed_001e,
-      sizeLimit:
-        "one definition module, one importing entry module, and bounded " +
-        "integer values",
-      timeLimitMilliseconds: 180_000,
-    },
-  );
-});
+      }),
+      {
+        context: ["module-goal=closed graph", "native-collector=forced"],
+        domain:
+          "named and anonymous default class declarations with optional " +
+          "static `name` replacement, a local named-class reference, " +
+          "bounded constructor input, a prototype method, and a " +
+          "heap-valued static field imported through the default export",
+        numRuns: 5,
+        profile: "M5 export default class declarations",
+        seed: 0x5eed_001e,
+        sizeLimit:
+          "one definition module, one importing entry module, and bounded " +
+          "integer values",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
