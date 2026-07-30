@@ -376,6 +376,12 @@ typedef struct {
     OseoOrdinaryObject ordinary;
     OseoValue environment;
     OseoValue lexical_this;
+    /*
+     * Arrows capture the construction target and the function that
+     * supplies their `super()` context. Non-arrows keep both undefined.
+     */
+    OseoValue lexical_new_target;
+    OseoValue lexical_super;
     OseoValue prototype_object;
     /*
      * The object a `super.x` reference in this function's body looks

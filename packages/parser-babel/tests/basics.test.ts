@@ -1259,6 +1259,44 @@ console.log(new Derived().describe(), Derived.of());
   assert.match(mir, /home-object-bind home object/u);
 });
 
+test("lowers lexical super and new.target through arrows", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Base {
+  value() {
+    return 1;
+  }
+}
+class Derived extends Base {
+  constructor() {
+    const initialize = () => super();
+    initialize();
+    this.target = () => new.target;
+  }
+  value() {
+    return (() => super.value())();
+  }
+  async asyncValue() {
+    return super.value();
+  }
+}
+const instance = new Derived();
+console.log(instance.value(), instance.target() === Derived);
+instance.asyncValue().then((value) => console.log(value));
+`,
+    sourceId: "class-lexical-super.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const text = printHir(result.hir);
+  assert.match(text, /call super -> %b\d+ this\(\)/u);
+  assert.match(text, /call super -> this\["value"\]\(\)/u);
+  assert.match(text, /new\.target/u);
+  assert.ok(result.mir != null);
+  const mir = printMir(result.mir);
+  assert.match(mir, /super-base home object prototype/u);
+  assert.match(mir, /new-target new\.target/u);
+});
+
 test("lowers static class fields to definitions on the constructor", () => {
   const result = compileSource(babelFrontend, {
     source: `class Registry {
@@ -1453,7 +1491,7 @@ test("locates the early errors a private name reports at parse time", () => {
   }
 });
 
-test("rejects super and new.target outside their admitted positions", () => {
+test("rejects super outside its lexical class context", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
     [
       "class A { m() { return super.m; } }",
@@ -1464,28 +1502,12 @@ test("rejects super and new.target outside their admitted positions", () => {
       /only valid in the body of a class element whose class has an/u,
     ],
     [
-      "class A {}\nclass B extends A { m() { return (() => super.m)(); } }",
-      /super inside an arrow function is unsupported/u,
-    ],
-    [
-      "class A {}\nclass B extends A { async m() { return super.m; } }",
-      /super inside an async function is unsupported/u,
-    ],
-    [
       "class A {}\nclass B extends A { m() { return delete super.m; } }",
       /Property access through super is unsupported here/u,
     ],
     [
       "class A {}\nclass B extends A { m() { [super.m] = [1]; } }",
       /Property access through super is unsupported here/u,
-    ],
-    [
-      "class A {}\nclass B extends A { constructor() { (() => super())(); } }",
-      /super\(\) from an arrow function/u,
-    ],
-    [
-      "function f() { return (() => new.target)(); }",
-      /new\.target inside an arrow function/u,
     ],
   ];
   for (const [source, message] of cases) {

@@ -7905,6 +7905,204 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - arrow-function
+        - new.target
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-new.target-closure-returned.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - arrow-function
+        - new.target
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-new.target.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-super-call-from-within-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-super-property-from-within-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-super-property.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/lexical-supercall-from-immediately-invoked-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -31442,19 +31640,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/class/elements/fields-run-once-on-double-super.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/fields-run-once-on-double-super.js:103:41:
-        error[OSEO1001]: Calling super() from an arrow function is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -61659,18 +61864,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/super/prop-dot-cls-val-from-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-dot-cls-val-from-arrow.js:101:29:
-        error[OSEO1001]: Property access through super inside an arrow
-        function is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -62113,18 +62325,25 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/super/prop-expr-cls-val-from-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-cls-val-from-arrow.js:101:29:
-        error[OSEO1001]: Property access through super inside an arrow
-        function is unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -82498,6 +82717,75 @@ results:
       passed: false
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - async-functions
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/definition/methods-async-super-call-body.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - classes
+      - functions
+      - object-properties
+      - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-functions
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/definition/methods-async-super-call-param.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - classes
+      - functions
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/statements/class/definition/methods-async-super-call-param.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/definition/methods-async-super-call-param.js:104:5:
+        error[OSEO1001]: Await is supported in declarations, expression
+        statements, and returns.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - generators
@@ -98687,19 +98975,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/subclass/derived-class-return-override-catch-finally-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/subclass/derived-class-return-override-catch-finally-arrow.js:83:19:
-        error[OSEO1001]: Calling super() from an arrow function is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -98744,19 +99039,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/subclass/derived-class-return-override-catch-super-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/subclass/derived-class-return-override-catch-super-arrow.js:82:19:
-        error[OSEO1001]: Calling super() from an arrow function is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -98833,19 +99135,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/subclass/derived-class-return-override-finally-super-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/subclass/derived-class-return-override-finally-super-arrow.js:83:19:
-        error[OSEO1001]: Calling super() from an arrow function is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -98890,19 +99199,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/subclass/derived-class-return-override-for-of-arrow.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/subclass/derived-class-return-override-for-of-arrow.js:98:20:
-        error[OSEO1001]: Calling super() from an arrow function is
-        unsupported.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -123437,22 +123753,22 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 1903
+  passes: 1917
   semanticFailures: 0
-  unsupportedProfileFeatures: 961
+  unsupportedProfileFeatures: 955
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
       harnessFailures: 0
-      passes: 15
+      passes: 18
       semanticFailures: 0
-      unsupportedProfileFeatures: 10
+      unsupportedProfileFeatures: 7
     - dependency: async-functions
       expectedNegatives: 155
       harnessFailures: 0
-      passes: 301
+      passes: 302
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 21
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
@@ -123462,9 +123778,9 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 593
+      passes: 605
       semanticFailures: 0
-      unsupportedProfileFeatures: 166
+      unsupportedProfileFeatures: 160
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -123504,9 +123820,9 @@ summary:
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 122
+      passes: 129
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 16
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -123516,9 +123832,9 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
-      passes: 649
+      passes: 650
       semanticFailures: 0
-      unsupportedProfileFeatures: 39
+      unsupportedProfileFeatures: 38
     - dependency: lexical-bindings
       expectedNegatives: 81
       harnessFailures: 0
@@ -123540,15 +123856,15 @@ summary:
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 683
+      passes: 689
       semanticFailures: 0
       unsupportedProfileFeatures: 108
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
-      passes: 287
+      passes: 288
       semanticFailures: 0
-      unsupportedProfileFeatures: 39
+      unsupportedProfileFeatures: 40
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -123655,9 +123971,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 465
       harnessFailures: 0
-      passes: 893
+      passes: 902
       semanticFailures: 0
-      unsupportedProfileFeatures: 524
+      unsupportedProfileFeatures: 521
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
@@ -123679,6 +123995,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 840
+      passes: 845
       semanticFailures: 0
-      unsupportedProfileFeatures: 286
+      unsupportedProfileFeatures: 283

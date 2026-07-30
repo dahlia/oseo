@@ -618,6 +618,12 @@ export const emittedC = {
     ],
     rootsU: [["roots["], ["], "], [", "], ["u, "]],
     receiver: [[""], [", receiver, "], [", "]],
+    bindArrowContext: [
+      ["oseo_bind_arrow_context(roots["],
+      ["], callee, "],
+      [");"],
+    ],
+    newTarget: [["new_target"]],
   },
   errorIntrinsic: {
     oseoErrorError: [["OSEO_ERROR_ERROR"]],

@@ -674,6 +674,16 @@ OseoResult oseo_class_static_private_field_define(
  */
 void oseo_bind_home_object(OseoValue function, OseoValue home);
 /*
+ * Captures an arrow function's lexical execution context. The receiver
+ * is already supplied to function creation; this adds the enclosing
+ * function's home object and super-constructor context plus new.target.
+ */
+void oseo_bind_arrow_context(
+    OseoValue function,
+    OseoValue enclosing,
+    OseoValue new_target
+);
+/*
  * GetSuperBase: the [[Prototype]] of the running function's home
  * object, where a `super` property reference starts its lookup. A
  * function without a home object, or a home object without a prototype,
