@@ -17,8 +17,8 @@ an investigation, not a migration.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-GC.md*](./PLAN-GC.md),
-[*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
 [*PLAN-REPL.md*](./PLAN-REPL.md),
 [ADR 0003](./docs/adr/0003-c11-runtime-and-zig-boundary.md), and the target
 decisions under *docs/adr/*. Evidence that changes one of those contracts
@@ -141,6 +141,26 @@ An external IR tool, code-generation library, assembler, archiver, and linker
 have different versioning and distribution costs. A candidate records each
 one. Bundling a library does not make its target support or output
 reproducibility an Oseo guarantee.
+
+Pinned `zig cc` remains the canonical C11 adapter and reference evidence. A
+future same-host system adapter may invoke GCC or Clang on Linux and Apple
+Clang on macOS, but it must be selected explicitly or through a documented
+`auto` policy. Automatic fallback is permitted only when the Zig executable
+cannot be found or started. It must not retry a failed Zig compile or link with
+an ambient compiler, because doing so would hide a reproducibility, source, or
+dependency failure.
+
+Each adapter reports the compiler version and target, archiver and linker,
+C11 capability, libc, sysroot or SDK, deployment target, sanitizer support,
+complete arguments, and environment policy. That identity participates in
+runtime and dependency artifact keys. `linux-aarch64-musl` remains a Zig
+cross-target unless a named cross-compiler adapter supplies equivalent
+evidence. Future Windows support uses explicit MSVC, `clang-cl`, or MinGW
+adapters rather than assuming a Unix-shaped `cc`.
+
+Bundled runtime or dependency archives must prove compatibility with every
+supported adapter. [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) applies this policy to
+cryptography artifact packs; it does not choose the general C toolchain.
 
 ### Metadata ownership
 
@@ -363,6 +383,9 @@ conformance prerequisite.
 M6 and M7 contribute realistic compiler and runtime workloads. Their native I/O
 and system-library decisions remain runtime boundaries; a code generator
 consumes the resulting target dependencies without choosing them.
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns cryptography provider and pack
+selection, while this plan owns the compiler and linker adapter policy that
+consumes those packs.
 
 M8 can self-host the compiler while still using an external C compiler and
 linker. Removing Node.js and Deno from the trusted compiler path does not by

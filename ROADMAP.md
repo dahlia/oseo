@@ -53,6 +53,12 @@ behind one private runtime boundary. It measures immediate and heap
 representations, limb layouts, and external arithmetic components before
 selecting the remaining NaN-box tag or a backend.
 
+The M6 Web Crypto and selected M7 `node:crypto` surfaces are detailed in
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md). That plan keeps API semantics and opaque
+key ownership behind an Oseo-owned provider boundary, separates cryptographic
+arithmetic from ECMAScript BigInt, and requires validated target artifact packs
+instead of an ambient host OpenSSL installation.
+
 A deferred code-generation track is recorded in
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md). C11 remains the implemented reference
 and portability backend. The track starts a candidate investigation only when
@@ -589,6 +595,8 @@ still depend on completing the relevant ECMAScript work.
 boundary, and exit criteria in detail. Its monotonic-clock and `fetch()` work
 consume the native adapter gates in [*PLAN-NIO.md*](./PLAN-NIO.md); web API
 semantics, TLS client, and trust-store decisions remain owned by M6.
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns the separate Web Crypto algorithm,
+provider, packaging, and security-update boundary.
 
 ### Planned order
 
@@ -623,7 +631,10 @@ M7: Node.js and package compatibility
 M7 adds the parts of the Node.js ecosystem that measured package experiments
 show to be useful for Oseo's server-oriented audience. It does not add Node-API
 native addons. File and subprocess I/O reuse the adapter and target capability
-model established under [*PLAN-NIO.md*](./PLAN-NIO.md).
+model established under [*PLAN-NIO.md*](./PLAN-NIO.md). The selected
+`node:crypto` surface reuses the provider boundary under
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) while retaining a separate compatibility
+manifest from the M6 Web Crypto claim.
 
 ### Initial candidates
 

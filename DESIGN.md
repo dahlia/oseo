@@ -647,6 +647,10 @@ milestone.
 Zig is a pinned bootstrap tool, not part of the generated program's semantic
 contract. Toolchain selection stays behind an interface so another C compiler
 can replace Zig without changing backend lowering or runtime semantics.
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md) owns the future same-host system
+compiler adapters and their selection policy. An automatic adapter may fall
+back only when Zig cannot be found or started, not after a Zig compile or link
+failure, and every adapter identity participates in artifact reuse keys.
 
 Oseo target IDs use operating-system, architecture, and optional ABI order.
 They are stable compiler identifiers, not Zig or LLVM target strings. Concrete
@@ -691,6 +695,10 @@ and target under [*PLAN-NIO.md*](./PLAN-NIO.md), with a tested fallback rather
 than an assumption that one API covers every clock, socket, and file operation.
 The M6 compatibility boundary separately owns the TLS client, certificate and
 hostname verification, and trust-store decision layered over that transport.
+The Web Crypto and selected `node:crypto` surfaces use the separate
+provider-independent boundary in [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md).
+Official builds consume pinned, validated target artifact packs through exact
+paths rather than discovering an ambient host OpenSSL installation.
 
 The complete runtime archive is an implementation input, not a requirement that
 every executable retain every component. [*PLAN-DYN.md*](./PLAN-DYN.md) defines
@@ -909,6 +917,9 @@ dependency of later milestones:
  -  the BigInt immediate and heap representations, arithmetic component,
     literal materialization, and replacement boundary, as scoped by
     [*PLAN-BIGINT.md*](./PLAN-BIGINT.md);
+ -  the Web Crypto and selected `node:crypto` provider ABI, algorithm matrix,
+    target artifact packs, update policy, and platform-provider replacement
+    boundary, as scoped by [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md);
  -  the native event-loop and system-library boundary, including the
     completion, cancellation, buffer-lifetime, and fallback decisions scoped by
     [*PLAN-NIO.md*](./PLAN-NIO.md);

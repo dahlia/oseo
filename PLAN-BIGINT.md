@@ -19,7 +19,8 @@ intrinsic, collector, or later binary-data families cannot use.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-GC.md*](./PLAN-GC.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-PT.md*](./PLAN-PT.md),
 [ADR 0004](./docs/adr/0004-generic-tagged-value.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of
@@ -73,6 +74,13 @@ Typed arrays, `DataView`, and `Atomics` remain built-in families with their own
 object, buffer, and concurrency prerequisites. This plan owns the BigInt
 conversion and fixed-width contracts those families consume. It does not claim
 their full object models as part of the primitive implementation.
+
+Cryptographic multiprecision arithmetic is not an implementation shortcut for
+ECMAScript BigInt, and BigInt is not a cryptographic arithmetic component.
+Web Crypto and `node:crypto` keep private key material behind the opaque
+provider boundary in [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md). They do not expose
+provider integers as BigInt limbs or reuse this plan's arithmetic for RSA or
+elliptic-curve operations.
 
 
 Entry evidence
@@ -354,6 +362,12 @@ records:
 No library type crosses the private BigInt adapter. A later backend replacement
 must not change MIR, generated C, or observable JavaScript behavior.
 
+This evaluation covers arbitrary-precision JavaScript arithmetic only. A
+component such as GMP is not a cryptography provider, and accepting it here
+does not make it eligible for Web Crypto or `node:crypto`. Conversely, a
+cryptography provider's private multiprecision implementation cannot become
+the `OSEO_HEAP_BIGINT` representation.
+
 ### Literal and constant representation
 
 Compare exact digit parsing during frontend conversion, compiler-owned
@@ -527,6 +541,8 @@ The BigInt plan is complete only when:
     strict warnings, and sanitizers cover the selected representation;
  -  arithmetic thresholds, literal materialization, executable size, retained
     bytes, and allocation counts are reproducible from documented tasks;
+ -  no BigInt representation or arithmetic type crosses the opaque key and
+    secret boundary defined by [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md);
  -  the reviewed test262 inventory contains no BigInt result whose
     classification hides a semantic or harness failure; and
  -  `mise run check`, `mise run test`, and the extended property task pass from

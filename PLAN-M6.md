@@ -13,10 +13,10 @@ named by the targeted standard edition.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-DYN.md*](./PLAN-DYN.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md), the frozen language profiles, and accepted
-records under *docs/adr/*. The completed
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
+[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-GC.md*](./PLAN-GC.md),
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
+language profiles, and accepted records under *docs/adr/*. The completed
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
 the prerequisite for every large web API family: a new API lands in an
@@ -121,8 +121,10 @@ shared prerequisite; changing it updates this plan in the same change.
     decision described below.
 7.  **Web Crypto.** `crypto.getRandomValues()`, `crypto.randomUUID()`, and
     `SubtleCrypto`. Prerequisites: binary data and a reviewed cryptography
-    dependency decision; Oseo does not implement primitives itself without
-    recorded rationale.
+    dependency decision. [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns the frozen
+    algorithm matrix, provider-independent semantic boundary, target artifact
+    packs, security updates, and conformance evidence. Oseo does not implement
+    primitives itself without recorded rationale.
 8.  **WebAssembly.** The JavaScript and web APIs required by the targeted
     edition. Prerequisites: an architecture decision on the execution
     strategy, because ahead-of-time compiled WebAssembly shares the
@@ -252,9 +254,10 @@ Performance and code size
 
 Each group records generated C size, executable size, and startup cost
 before and after it lands. Streams, Web Crypto, and WebAssembly receive
-size budgets when their conformance matrices are written. A dependency
-added for TLS, cryptography, or compression needs the same pinning, target,
-and replacement-boundary treatment as the Zig toolchain.
+size budgets when their conformance matrices are written. TLS and compression
+dependencies need recorded pinning, target, and replacement boundaries.
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) defines the stronger pack, offline-build,
+identity, and update requirements for cryptography.
 
 Long-running group workloads also record live and peak memory, allocation
 rate, collection pauses, and tail latency through [*PLAN-GC.md*](./PLAN-GC.md).
@@ -283,7 +286,11 @@ Delivery order
 7.  Accept the TLS client and trust-store decision from that target evidence.
 8.  Implement group 6 with deterministic transport and TLS completion
     injection.
-9.  Resolve the Web Crypto dependency decision and implement group 7.
+9.  Freeze the Web Crypto edition, algorithm matrix, key formats, and
+    server-runtime deviations in the separate cryptography standards decision,
+    then complete the provider probes, accept the provider decision, build the
+    validated target packs, and implement group 7 through
+    [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md).
 10. Resolve the WebAssembly execution decision and implement group 8.
 11. Complete group 9, the deviation documentation, and the integration
     audit.
@@ -322,6 +329,9 @@ M6 is complete only when:
     supported target, validates certificate chains and hostnames, and passes the
     loopback security, cancellation, and failure corpus without a verification
     bypass;
+ -  Web Crypto satisfies the frozen algorithm matrix through an accepted
+    provider and validated target packs, without requiring or automatically
+    discovering a host cryptography installation;
  -  differential, property, sanitizer, dual-execution-target, and
     cross-link gates cover the complete web API corpus;
  -  capability, performance, and code-size reports are reproducible from
