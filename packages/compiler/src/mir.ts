@@ -151,6 +151,8 @@ export interface MirOperation {
     | "initialize"
     | "instance-elements-init"
     | "iterator-close"
+    | "iterator-await-result"
+    | "iterator-await-start"
     | "iterator-delegate-next"
     | "iterator-delegate-return"
     | "iterator-delegate-throw"
@@ -216,6 +218,21 @@ export interface MirOperation {
   readonly iteratorAsync?: true;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
+  /**
+   * The asynchronous iterator action started before a traced-frame await.
+   * Its promise settles to an iterator result object, except that a
+   * delegation return with no asynchronous `return` method settles to the
+   * directly awaited return value and records that mode separately.
+   */
+  readonly iteratorStepKind?:
+    | "delegate-next"
+    | "delegate-return"
+    | "delegate-throw"
+    | "next";
+  /** Root slot retaining the direct-value result mode across suspension. */
+  readonly iteratorValueOnlyResult?: number;
+  /** Read `IteratorValue` even when the settled result reports done. */
+  readonly iteratorValueWhenDone?: true;
   /**
    * The slot receiving the stepped value. `iterator-next` leaves it
    * `undefined` once the iterator reports exhaustion, while the two

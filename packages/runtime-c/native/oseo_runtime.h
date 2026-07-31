@@ -965,6 +965,24 @@ OseoResult oseo_async_iterator_next(
     OseoValue *value,
     bool *done
 );
+/*
+ * Start one asynchronous iterator step without draining jobs. The returned
+ * promise is awaited by generated traced-frame code, then inspected through
+ * oseo_async_iterator_result after the frame resumes.
+ */
+OseoResult oseo_async_iterator_next_start(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method
+);
+OseoResult oseo_async_iterator_result(
+    OseoContext *context,
+    OseoValue settled,
+    bool value_only,
+    bool value_when_done,
+    OseoValue *value,
+    bool *done
+);
 OseoResult oseo_async_iterator_close(
     OseoContext *context,
     OseoValue iterator,
@@ -1045,6 +1063,31 @@ OseoResult oseo_async_iterator_delegate_throw(
     OseoValue reason,
     OseoValue *value,
     bool *done
+);
+/*
+ * Start asynchronous yield-delegation steps without draining their result
+ * promises. `value_only` is true only when a native asynchronous iterator
+ * has no `return` method and the returned promise directly awaits the
+ * delivered completion value.
+ */
+OseoResult oseo_async_iterator_delegate_next_start(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue next_method,
+    OseoValue sent,
+    OseoValue *value_only
+);
+OseoResult oseo_async_iterator_delegate_return_start(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue sent,
+    OseoValue *value_only
+);
+OseoResult oseo_async_iterator_delegate_throw_start(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoValue reason,
+    OseoValue *value_only
 );
 OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_symbol_intrinsic(OseoContext *context);

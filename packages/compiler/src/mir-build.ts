@@ -1335,6 +1335,82 @@ function lowerAsyncGeneratorYield(
   return suspension.sent;
 }
 
+interface AwaitedIteratorStep {
+  readonly continues: number;
+  readonly value: number;
+}
+
+/**
+ * Starts one asynchronous iterator operation, suspends the owning frame on
+ * its promise, and inspects the settled result only after resumption. The
+ * mode slot preserves the one delegation-return path whose awaited result
+ * is a direct completion value rather than an iterator result object.
+ */
+function lowerAwaitedIteratorStep(
+  kind: NonNullable<MirOperation["iteratorStepKind"]>,
+  arguments_: readonly number[],
+  range: SourceRange,
+  detail: string,
+  valueWhenDone: boolean,
+  builder: MirBuilder,
+): AwaitedIteratorStep {
+  appendMirMetadata(builder, "safepoint", `start ${detail}`, arguments_, range);
+  const promise = builder.nextValue;
+  builder.nextValue += 1;
+  const valueOnly = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: arguments_,
+    detail: `start ${detail}`,
+    id: promise,
+    iteratorStepKind: kind,
+    iteratorValueOnlyResult: valueOnly,
+    kind: "iterator-await-start",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> suspend, abrupt -> return without close",
+    [promise],
+    range,
+  );
+  recordRoot(builder, promise, range);
+  recordRoot(builder, valueOnly, range);
+  const settled = lowerAsyncGeneratorAwait(promise, range, builder);
+
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    `inspect ${detail}`,
+    [settled, valueOnly],
+    range,
+  );
+  const continues = builder.nextValue;
+  builder.nextValue += 1;
+  const value = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [settled, valueOnly],
+    detail: `inspect ${detail}`,
+    id: continues,
+    iteratorStepKind: kind,
+    iteratorValueResult: value,
+    ...(valueWhenDone ? { iteratorValueWhenDone: true as const } : {}),
+    kind: "iterator-await-result",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> return without close",
+    [continues],
+    range,
+  );
+  recordRoot(builder, value, range);
+  return { continues, value };
+}
+
 /**
  * `yield* operand` inside an asynchronous generator body: acquire the
  * operand's asynchronous iterator once, then forward every resumption of
@@ -1432,50 +1508,34 @@ function lowerAsyncYieldDelegation(
     exit: (value: number) => void,
   ): void => {
     builder.current = block;
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      detail,
-      [iterator, sentValue],
-      range,
-    );
-    const continues = builder.nextValue;
-    builder.nextValue += 1;
-    const stepResult = builder.nextValue;
-    builder.nextValue += 1;
     const stepArguments =
       kind === "iterator-delegate-next"
         ? [iterator, nextMethod, sentValue]
         : [iterator, sentValue];
-    builder.current.operations.push({
-      arguments: stepArguments,
+    const step = lowerAwaitedIteratorStep(
+      kind === "iterator-delegate-next"
+        ? "delegate-next"
+        : kind === "iterator-delegate-return"
+          ? "delegate-return"
+          : "delegate-throw",
+      stepArguments,
+      range,
       detail,
-      id: continues,
-      iteratorAsync: true,
-      iteratorValueResult: stepResult,
-      kind,
-      range,
-    });
-    appendMirMetadata(
+      true,
       builder,
-      "check-status",
-      "normal -> branch, abrupt -> return without close",
-      [continues],
-      range,
     );
-    recordRoot(builder, stepResult, range);
     const yieldBlock = createMirBlock(builder);
     const exitStepBlock = createMirBlock(builder);
     builder.current.terminator = {
       kind: "branch",
-      test: continues,
+      test: step.continues,
       whenFalse: exitStepBlock.id,
       whenTrue: yieldBlock.id,
     };
     builder.current = exitStepBlock;
-    exit(stepResult);
+    exit(step.value);
     builder.current = yieldBlock;
-    const suspension = appendAsyncGeneratorYield(stepResult, range, builder);
+    const suspension = appendAsyncGeneratorYield(step.value, range, builder);
     builder.current.terminator = {
       kind: "jump",
       target: stepBlock.id,
@@ -4700,35 +4760,54 @@ function lowerForOfStatement(
     [iterator, nextMethod],
     statement.range,
   );
-  const hasValue = builder.nextValue;
-  builder.nextValue += 1;
-  const value = builder.nextValue;
-  builder.nextValue += 1;
-  builder.current.operations.push({
-    arguments: [iterator, nextMethod],
-    detail: awaited
-      ? "Await, IteratorStep, and IteratorValue"
-      : "IteratorStep and IteratorValue",
-    id: hasValue,
-    ...asynchronous,
-    iteratorValueResult: value,
-    kind: "iterator-next",
-    range: statement.range,
-  });
-  appendMirMetadata(
-    builder,
-    "check-status",
-    "normal -> branch, abrupt -> return without close",
-    [hasValue],
-    statement.range,
-  );
-  recordRoot(builder, value, statement.range);
-  builder.current.terminator = {
-    kind: "branch",
-    test: hasValue,
-    whenFalse: exitBlock.id,
-    whenTrue: bodyBlock.id,
-  };
+  let value: number;
+  if (awaited && (builder.asyncFunction || builder.asyncGenerator)) {
+    const step = lowerAwaitedIteratorStep(
+      "next",
+      [iterator, nextMethod],
+      statement.range,
+      "Await, IteratorStep, and IteratorValue",
+      false,
+      builder,
+    );
+    value = step.value;
+    builder.current.terminator = {
+      kind: "branch",
+      test: step.continues,
+      whenFalse: exitBlock.id,
+      whenTrue: bodyBlock.id,
+    };
+  } else {
+    const hasValue = builder.nextValue;
+    builder.nextValue += 1;
+    value = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [iterator, nextMethod],
+      detail: awaited
+        ? "Await, IteratorStep, and IteratorValue"
+        : "IteratorStep and IteratorValue",
+      id: hasValue,
+      ...asynchronous,
+      iteratorValueResult: value,
+      kind: "iterator-next",
+      range: statement.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> branch, abrupt -> return without close",
+      [hasValue],
+      statement.range,
+    );
+    recordRoot(builder, value, statement.range);
+    builder.current.terminator = {
+      kind: "branch",
+      test: hasValue,
+      whenFalse: exitBlock.id,
+      whenTrue: bodyBlock.id,
+    };
+  }
 
   builder.finalizers.push(closeTarget);
   builder.abruptTargets.push(closeTarget);

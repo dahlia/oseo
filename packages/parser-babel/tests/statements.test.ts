@@ -180,7 +180,15 @@ test("converts for-await-of heads to the asynchronous protocol", () => {
   assert.match(hir, /for await \(const %b\d+ item of %b\d+\(source\)\)/u);
   assert.match(hir, /for await \(%b\d+\(target\)\["value"\] of/u);
   assert.match(mir, /GetIterator async/u);
-  assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
+  assert.match(
+    mir,
+    /iterator-await-start start Await, IteratorStep, and IteratorValue/u,
+  );
+  assert.match(
+    mir,
+    /iterator-await-result inspect Await, IteratorStep, and IteratorValue/u,
+  );
+  assert.match(mir, /value-only=%\d+/u);
   assert.match(mir, /AsyncIteratorClose/u);
   assert.match(mir, /for-await-of bb\d+/u);
   // Destructuring the awaited value is ordinary array binding, so the
@@ -247,6 +255,7 @@ test("lowers a module top-level for-await head", () => {
   const mir = printMir(compiled.mir);
   assert.match(mir, /GetIterator async/u);
   assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
+  assert.doesNotMatch(mir, /iterator-await-start/u);
 });
 
 // The loop stays in place instead of splitting into continuations, so an

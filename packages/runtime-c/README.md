@@ -174,6 +174,13 @@ the reviewed thenable-await case. Its cached function is context-rooted, reads
 and converts an object receiver's `length`, performs ordered strict writes
 through the generic property path, and leaves array length and abrupt
 completion behavior to the existing object semantics.
+The `m5-32` ABI adds start and result entry points for asynchronous iterator
+steps and asynchronous generator delegation. Generated traced-frame code starts
+one step, retains its promise and direct-value mode in owned root slots, returns
+to the caller, and inspects the settled result only after a promise reaction
+resumes the frame. Async-from-Sync continuation promises use a runtime-owned
+fulfillment reaction to await the stepped value without draining the scheduler.
+Asynchronous iterator closing retains the existing drain-based entry point.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

@@ -360,6 +360,31 @@ export const emittedC = {
       ["roots["],
       ["] = oseo_boolean(false);"],
     ],
+    resultAssignOseoAsyncIteratorNextStartContext: [
+      ["result = oseo_async_iterator_next_start(context, roots["],
+      ["], roots["],
+      ["]);"],
+    ],
+    resultAssignOseoAsyncIteratorDelegateStartContext: [
+      ["result = oseo_async_iterator_delegate_"],
+      ["_start(context, roots["],
+      ["], "],
+    ],
+    rootsRootsAddressRootsStatementSuffix: [
+      ["roots["],
+      ["], roots["],
+      ["], &roots["],
+      ["]);"],
+    ],
+    rootsAddressRootsStatementSuffix: [["roots["], ["], &roots["], ["]);"]],
+    resultAssignOseoAsyncIteratorResultContext: [
+      ["result = oseo_async_iterator_result(context, roots["],
+      ["], oseo_to_boolean(roots["],
+      ["]), "],
+      [", &roots["],
+      ["], &iterator_done_"],
+      [");"],
+    ],
     boolIteratorDoneAssignFalseStatement: [
       ["bool iterator_done_"],
       [" = false;"],

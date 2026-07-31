@@ -135,13 +135,25 @@ test("delegates an asynchronous yield* through the async protocol", () => {
   );
   const operations = generator.blocks.flatMap((block) => block.operations);
   const kinds = new Set(operations.map((operation) => operation.kind));
-  assert.ok(kinds.has("iterator-delegate-next"));
-  assert.ok(kinds.has("iterator-delegate-return"));
-  assert.ok(kinds.has("iterator-delegate-throw"));
-  for (const operation of operations) {
-    if (!operation.kind.startsWith("iterator-")) continue;
-    assert.equal(operation.iteratorAsync, true, operation.kind);
-  }
+  assert.ok(kinds.has("iterator-await-start"));
+  assert.ok(kinds.has("iterator-await-result"));
+  assert.ok(!kinds.has("iterator-delegate-next"));
+  assert.ok(!kinds.has("iterator-delegate-return"));
+  assert.ok(!kinds.has("iterator-delegate-throw"));
+  const starts = operations.filter(
+    (operation) => operation.kind === "iterator-await-start",
+  );
+  assert.deepEqual(
+    new Set(starts.map((operation) => operation.iteratorStepKind)),
+    new Set(["delegate-next", "delegate-return", "delegate-throw"]),
+  );
+  assert.ok(
+    starts.every((operation) => operation.iteratorValueOnlyResult != null),
+  );
+  assert.ok(
+    suspensions(generator).filter((suspension) => suspension.awaited === true)
+      .length >= starts.length,
+  );
 });
 
 test("separates async generator parameter initialization from its body", () => {
