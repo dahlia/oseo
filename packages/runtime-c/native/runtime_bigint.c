@@ -933,8 +933,10 @@ OseoResult oseo_internal_string_to_bigint(
         *valid = true;
         return small_bigint(context, false, 0u);
     }
+    bool has_sign = false;
     bool negative = false;
     if (string->units[start] == '+' || string->units[start] == '-') {
+        has_sign = true;
         negative = string->units[start] == '-';
         start += 1u;
         if (start == end) {
@@ -949,7 +951,7 @@ OseoResult oseo_internal_string_to_bigint(
         else if (prefix == 'o' || prefix == 'O') radix = 8u;
         else if (prefix == 'x' || prefix == 'X') radix = 16u;
         if (radix != 10u) {
-            if (negative) {
+            if (has_sign) {
                 *valid = false;
                 return normal(oseo_undefined());
             }

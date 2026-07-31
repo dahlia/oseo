@@ -71,6 +71,9 @@ static bool same_property_value(OseoValue left, OseoValue right) {
         return left_number == right_number;
     }
     if (is_string(left) && is_string(right)) return string_equal(left, right);
+    if (is_bigint(left) && is_bigint(right)) {
+        return oseo_internal_bigint_equal(left, right);
+    }
     return left == right;
 }
 

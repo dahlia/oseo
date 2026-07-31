@@ -26,11 +26,37 @@ console.log(9007199254740993n === 9007199254740992n);
 console.log(9007199254740993n == "9007199254740993");
 console.log(255n == "0xFF", 255n == "0XfF", 5n == "0b101");
 console.log(63n == "0O77", 5n == "  +5  ", -5n == " -5 ");
+console.log(1n == "+0x1", 1n == "+0o1", 1n == "+0b1");
+console.log(0n < "+0x1", 0n < "+0o1", 0n < "+0b1");
+console.log(0n < "0x1", 0n < "0o1", 0n < "0b1");
+console.log(0n < "+1", 0n > "-1");
 console.log(9007199254740993n == 9007199254740992);
 console.log(9007199254740993n > 9007199254740992);
 console.log(9007199254740993n < 9007199254740994);
 console.log(10n < "11", 10n < "bad", -2n < -1.5);
 console.log(1n < Infinity, -1n > -Infinity, 1n < NaN);
+
+const lockedBigInt = {};
+Object.defineProperty(lockedBigInt, "value", {
+  value: 1n,
+  writable: false,
+  configurable: false,
+});
+Object.defineProperty(lockedBigInt, "value", {
+  value: 1n,
+  writable: false,
+  configurable: false,
+});
+console.log(lockedBigInt.value);
+try {
+  Object.defineProperty(lockedBigInt, "value", {
+    value: 2n,
+    writable: false,
+    configurable: false,
+  });
+} catch (error) {
+  console.log(error instanceof TypeError, lockedBigInt.value);
+}
 
 for (const operation of [
   function () { return 1n + 1; },
