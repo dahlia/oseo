@@ -1759,15 +1759,18 @@ must never shrink by reclassification alone.
     `0x5eed001a`, and reviewed test262 cases. The forms that remain outside the
     profile have specific boundaries: BigInt and regular expressions are
     recorded above, and dynamic import, `super`, and pattern-position `await`
-    are recorded below. Top-level `this` remains rejected because the profile
-    has no Script receiver. An object literal still rejects a noncomputed
-    `__proto__` property name in every syntactic form; a computed name remains
-    an ordinary property key. `delete` remains limited to ordinary property
-    references, so an identifier, non-reference, or optional chain operand is
-    rejected. `import.meta` is also rejected. Owner: the core expressions and
-    bindings stream for top-level `this`, object-literal `__proto__`, and the
-    remaining `delete` forms; the modules and asynchronous execution stream
-    for `import.meta`.
+    are recorded below. Script top-level `this` remains rejected because the
+    profile has no Script or global receiver model. An object literal still
+    rejects a noncomputed `__proto__` property name in every syntactic form; a
+    computed name remains an ordinary property key. `delete` remains limited
+    to ordinary property references, so an identifier, non-reference, or
+    optional chain operand is rejected. Owner: the core expressions and
+    bindings stream for Script top-level `this`, object-literal `__proto__`,
+    and the remaining `delete` forms.
+ -  Module top-level `this` is a separate gap. ECMAScript evaluates it to
+    `undefined`, but the current compiler rejects it, as
+    *test/language/module-code/eval-this.js* demonstrates. `import.meta` is
+    also rejected. Owner: the modules and asynchronous execution stream.
  -  `super()`, `super.x`, and `new.target` are rejected inside an arrow
     function, and an optional call through a `super` property remains
     rejected. `super.x` is also rejected inside an asynchronous class element,
