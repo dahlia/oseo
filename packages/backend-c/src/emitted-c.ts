@@ -360,6 +360,33 @@ export const emittedC = {
       ["roots["],
       ["] = oseo_boolean(false);"],
     ],
+    rootsAssignCompletionKindThrowStatement: [
+      ["roots["],
+      ["] = oseo_boolean(completion["],
+      ["u].kind == 2);"],
+    ],
+    boolIteratorCloseAwaitAssignFalseStatement: [
+      ["bool iterator_close_await_"],
+      [" = false;"],
+    ],
+    boolFastAssignIteratorCloseAwaitStatement: [
+      ["bool fast_"],
+      [" = iterator_close_await_"],
+      [";"],
+    ],
+    resultAssignOseoAsyncIteratorCloseStartContext: [
+      ["result = oseo_async_iterator_close_start(context, roots["],
+      ["], completion["],
+      ["u].kind == 2, &roots["],
+      ["], &iterator_close_await_"],
+      [");"],
+    ],
+    resultAssignOseoAsyncIteratorCloseResultContext: [
+      ["result = oseo_async_iterator_close_result(context, roots["],
+      ["], oseo_to_boolean(roots["],
+      ["]), oseo_to_boolean(roots["],
+      ["]));"],
+    ],
     resultAssignOseoAsyncIteratorNextStartContext: [
       ["result = oseo_async_iterator_next_start(context, roots["],
       ["], roots["],
@@ -381,6 +408,8 @@ export const emittedC = {
       ["result = oseo_async_iterator_result(context, roots["],
       ["], oseo_to_boolean(roots["],
       ["]), "],
+      [", roots["],
+      ["], "],
       [", &roots["],
       ["], &iterator_done_"],
       [");"],

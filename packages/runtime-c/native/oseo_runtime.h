@@ -980,6 +980,8 @@ OseoResult oseo_async_iterator_result(
     OseoValue settled,
     bool value_only,
     bool value_when_done,
+    OseoValue iterator,
+    bool throw_on_value_only,
     OseoValue *value,
     bool *done
 );
@@ -987,6 +989,25 @@ OseoResult oseo_async_iterator_close(
     OseoContext *context,
     OseoValue iterator,
     bool from_error
+);
+/*
+ * Start and finish AsyncIteratorClose around a traced-frame suspension.
+ * `needs_await` is false when no asynchronous return result exists.
+ * The saved throw mode preserves an in-flight throw, while
+ * `skip_validation` records result validation already owned by a wrapper.
+ */
+OseoResult oseo_async_iterator_close_start(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error,
+    OseoValue *skip_validation,
+    bool *needs_await
+);
+OseoResult oseo_async_iterator_close_result(
+    OseoContext *context,
+    OseoValue settled,
+    bool ignore_result,
+    bool skip_validation
 );
 /*
  * One `yield*` delegation step over a normal resumption: call the

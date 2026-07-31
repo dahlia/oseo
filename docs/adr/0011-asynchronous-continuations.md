@@ -48,15 +48,32 @@ iterator result is inspected. Async-from-Sync continuation promises use an
 internal fulfillment reaction, so awaiting the synchronous step value also
 retains no native frame.
 
+M5a Unit 7.6 uses the same frame for `AsyncIteratorClose` reached by abrupt
+`for await` completion in an ordinary asynchronous function or asynchronous
+generator, and by a native asynchronous `yield*` delegation whose iterator has
+no `throw` method. The close start retains its promise, saved throw mode, and
+wrapper result mode in traced roots. Its reaction resumes generated code,
+which applies close-result validation and restores the saved completion with
+the required precedence. A never-settling close therefore leaves its owning
+operation pending.
+
+AsyncFromSyncIteratorContinuation attaches a rejection reaction when
+`closeOnRejection` applies to a non-done step. That reaction closes the wrapped
+synchronous iterator before rejecting with the original reason, without
+retaining the native stack or allowing a close failure to replace that reason.
+When a wrapped synchronous `yield*` iterator has no `throw` method, its wrapper
+performs synchronous `IteratorClose` over the underlying record before
+rejecting. The asynchronous generator frame awaits that rejection without
+reading or awaiting the close result's `done` or `value` fields.
+
 Top-level await is a scheduler checkpoint in the dependency-ordered whole-graph
 script. It normalizes the value through one reaction and advances owned jobs and
 timer turns only until that reaction settles. If no owned task can make
 progress, it reports `OSEO3001` instead of retaining native recursion or
 blocking indefinitely.
 
-Asynchronous iterator closing retains its drain-based await, and module
-top-level `for await` retains the module checkpoint path. Units 7.6 and 7.7 own
-those boundaries.
+Module top-level `for await` retains the module checkpoint path. Unit 7.7 owns
+that boundary.
 
 
 Consequences

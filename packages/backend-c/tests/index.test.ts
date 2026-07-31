@@ -356,7 +356,7 @@ test("emits framed asynchronous iterator step entry points", () => {
               range,
             },
             {
-              arguments: [4, 3],
+              arguments: [4, 3, 0],
               detail: "inspect for-await step",
               id: 5,
               iteratorStepKind: "next",
@@ -394,6 +394,69 @@ test("emits framed asynchronous iterator step entry points", () => {
   assert.match(emitted.source, /oseo_async_iterator_delegate_next_start\(/u);
   assert.match(emitted.source, /roots\[3\] = oseo_boolean\(false\)/u);
   assert.match(emitted.source, /bool fast_5 = !iterator_done_5/u);
+});
+
+test("emits framed asynchronous iterator close entry points", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "async-iterator-close-frame.ts",
+    start: { column: 1, line: 1 },
+  };
+  const emitted = cBackend.emit({
+    functions: [],
+    globalBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              constant: { kind: "undefined" },
+              detail: "iterator",
+              id: 0,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0],
+              completionSlot: 0,
+              detail: "start AsyncIteratorClose",
+              id: 1,
+              iteratorCloseResultMode: 4,
+              iteratorValueOnlyResult: 3,
+              iteratorValueResult: 2,
+              kind: "iterator-close-start",
+              range,
+            },
+            {
+              arguments: [5, 3, 4],
+              detail: "complete AsyncIteratorClose",
+              id: 6,
+              kind: "iterator-close-result",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 6 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 7,
+    },
+    sourceId: "async-iterator-close-frame.ts",
+    specialization: "disabled",
+  });
+  assert.match(emitted.source, /oseo_async_iterator_close_start\(/u);
+  assert.match(emitted.source, /oseo_async_iterator_close_result\(/u);
+  assert.match(emitted.source, /bool fast_1 = iterator_close_await_1/u);
 });
 
 test("emits delegating iterator steps and a pass-through suspension", () => {

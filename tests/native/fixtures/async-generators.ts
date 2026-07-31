@@ -962,4 +962,104 @@ async function main() {
 main();
 `,
   },
+  {
+    name: "async-generator-missing-throw-close-suspension",
+    source: `
+function delegate(label, settlement) {
+  return {
+    [Symbol.asyncIterator]: function () {
+      return {
+        next: function () {
+          return Promise.resolve({ value: "open", done: false });
+        },
+        return: function () {
+          console.log(label, "close called");
+          return new Promise(function (resolve, reject) {
+            if (settlement === "never") return;
+            const settle = function () {
+              console.log(label, "close settled");
+              if (settlement === "reject") {
+                reject(new RangeError("close"));
+              } else {
+                resolve({ value: undefined, done: true });
+              }
+            };
+            if (settlement === "timer") setTimeout(settle, 1);
+            else Promise.resolve().then(settle);
+          });
+        },
+      };
+    },
+  };
+}
+function syncDelegate() {
+  return {
+    [Symbol.iterator]: function () {
+      return {
+        next: function () {
+          return { value: "sync-open", done: false };
+        },
+        return: function () {
+          console.log("sync close called");
+          return {
+            get done() {
+              console.log("unexpected sync done");
+              return true;
+            },
+            get value() {
+              console.log("unexpected sync value");
+              return Promise.reject(new Error("unexpected sync await"));
+            },
+          };
+        },
+      };
+    },
+  };
+}
+async function* forward(source) {
+  yield* source;
+}
+async function probe(label, settlement) {
+  const iterator = forward(delegate(label, settlement));
+  console.log(label, "first", (await iterator.next()).value);
+  const task = iterator.throw(new Error("sent"));
+  console.log(label, "caller resumed");
+  if (settlement === "never") {
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    console.log(label, "remains pending");
+    return;
+  }
+  await task.then(
+    function () { console.log(label, "resolved"); },
+    function (error) {
+      console.log(label, "caught", error.name);
+    },
+  );
+  console.log(label, "caller joined");
+}
+async function probeSync() {
+  const iterator = forward(syncDelegate());
+  console.log("sync first", (await iterator.next()).value);
+  const task = iterator.throw(new Error("sent"));
+  console.log("sync caller resumed");
+  await task.then(
+    function () { console.log("sync resolved"); },
+    function (error) { console.log("sync caught", error.name); },
+  );
+  console.log("sync caller joined");
+}
+async function main() {
+  await probe("reaction", "reaction");
+  await probe("timer", "timer");
+  await probe("reject", "reject");
+  await probe("never", "never");
+  await probeSync();
+  console.log("finished");
+}
+main();
+`,
+  },
 ];

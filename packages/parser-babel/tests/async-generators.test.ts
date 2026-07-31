@@ -150,6 +150,12 @@ test("delegates an asynchronous yield* through the async protocol", () => {
   assert.ok(
     starts.every((operation) => operation.iteratorValueOnlyResult != null),
   );
+  const throwResult = operations.find(
+    (operation) =>
+      operation.kind === "iterator-await-result" &&
+      operation.iteratorStepKind === "delegate-throw",
+  );
+  assert.equal(throwResult?.arguments.length, 3);
   assert.ok(
     suspensions(generator).filter((suspension) => suspension.awaited === true)
       .length >= starts.length,

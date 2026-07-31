@@ -151,6 +151,8 @@ export interface MirOperation {
     | "initialize"
     | "instance-elements-init"
     | "iterator-close"
+    | "iterator-close-result"
+    | "iterator-close-start"
     | "iterator-await-result"
     | "iterator-await-start"
     | "iterator-delegate-next"
@@ -218,6 +220,8 @@ export interface MirOperation {
   readonly iteratorAsync?: true;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
+  /** Skip outer AsyncIteratorClose result validation owned by a wrapper. */
+  readonly iteratorCloseResultMode?: number;
   /**
    * The asynchronous iterator action started before a traced-frame await.
    * Its promise settles to an iterator result object, except that a

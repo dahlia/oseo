@@ -776,6 +776,75 @@ function emitIteratorOperation(
     operation.iteratorAsync === true
       ? renderC(emittedC.iteratorOperation.asyncPrefix)
       : renderC(emittedC.common.empty);
+  if (operation.kind === "iterator-close-start") {
+    const promise = operation.iteratorValueResult;
+    const ignoreResult = operation.iteratorValueOnlyResult;
+    const skipValidation = operation.iteratorCloseResultMode;
+    const slot = operation.completionSlot;
+    if (
+      promise == null ||
+      ignoreResult == null ||
+      skipValidation == null ||
+      slot == null
+    ) {
+      throw new Error(
+        `MIR iterator close start %${operation.id} is incomplete.`,
+      );
+    }
+    state.usesCompletion = true;
+    state.scalarKinds.set(operation.id, "boolean");
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.rootsAssignCompletionKindThrowStatement,
+        ignoreResult,
+        slot,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.boolIteratorCloseAwaitAssignFalseStatement,
+        operation.id,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation
+          .resultAssignOseoAsyncIteratorCloseStartContext,
+        operationArgument(operation, 0),
+        slot,
+        skipValidation,
+        operation.id,
+      ),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, promise));
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.boolFastAssignIteratorCloseAwaitStatement,
+        operation.id,
+        operation.id,
+      ),
+    );
+    line(state, renderC(emittedC.common.voidFastStatement, operation.id));
+    return;
+  }
+  if (operation.kind === "iterator-close-result") {
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation
+          .resultAssignOseoAsyncIteratorCloseResultContext,
+        operationArgument(operation, 0),
+        operationArgument(operation, 1),
+        operationArgument(operation, 2),
+      ),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+    return;
+  }
   if (operation.kind === "iterator-await-start") {
     const stepKind = operation.iteratorStepKind;
     const valueOnly = operation.iteratorValueOnlyResult;
@@ -857,6 +926,8 @@ function emitIteratorOperation(
         operationArgument(operation, 0),
         operationArgument(operation, 1),
         operation.iteratorValueWhenDone === true,
+        operationArgument(operation, 2),
+        operation.iteratorStepKind === "delegate-throw",
         value,
         operation.id,
       ),
@@ -2535,7 +2606,9 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "iterator-delegate-next" ||
     operation.kind === "iterator-delegate-return" ||
     operation.kind === "iterator-delegate-throw" ||
-    operation.kind === "iterator-close"
+    operation.kind === "iterator-close" ||
+    operation.kind === "iterator-close-result" ||
+    operation.kind === "iterator-close-start"
   ) {
     emitIteratorOperation(state, operation);
   } else if (operation.kind === "load-fixed-slot") {
@@ -2860,6 +2933,9 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       if (operation.iteratorDoneState != null) {
         maximum = Math.max(maximum, operation.iteratorDoneState);
       }
+      if (operation.iteratorCloseResultMode != null) {
+        maximum = Math.max(maximum, operation.iteratorCloseResultMode);
+      }
       if (operation.iteratorValueResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueResult);
       }
@@ -2927,6 +3003,8 @@ function completionSlotCount(blocks: readonly MirBlock[]): number {
           operation.kind === "caught" ||
           operation.kind === "completion-set" ||
           (operation.kind === "iterator-close" &&
+            operation.completionSlot != null) ||
+          (operation.kind === "iterator-close-start" &&
             operation.completionSlot != null) ||
           (operation.kind === "check-status" && operation.abruptTarget != null),
       ),

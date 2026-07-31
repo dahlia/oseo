@@ -1391,7 +1391,7 @@ function lowerAwaitedIteratorStep(
   const value = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: [settled, valueOnly],
+    arguments: [settled, valueOnly, arguments_[0]!],
     detail: `inspect ${detail}`,
     id: continues,
     iteratorStepKind: kind,
@@ -1409,6 +1409,124 @@ function lowerAwaitedIteratorStep(
   );
   recordRoot(builder, value, range);
   return { continues, value };
+}
+
+/**
+ * Starts AsyncIteratorClose and suspends only when a present `return` method
+ * produced a promise to await. The pending completion remains in its saved
+ * slot while the owning frame is suspended, so an in-flight throw keeps its
+ * precedence and a never-settling close leaves the operation pending.
+ */
+function lowerAwaitedIteratorClose(
+  iterator: number,
+  completionSlot: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "start AsyncIteratorClose",
+    [iterator],
+    range,
+  );
+  const needsAwait = builder.nextValue;
+  builder.nextValue += 1;
+  const promise = builder.nextValue;
+  builder.nextValue += 1;
+  const ignoreResult = builder.nextValue;
+  builder.nextValue += 1;
+  const skipValidation = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [iterator],
+    completionSlot,
+    detail: "start AsyncIteratorClose",
+    id: needsAwait,
+    iteratorCloseResultMode: skipValidation,
+    iteratorValueOnlyResult: ignoreResult,
+    iteratorValueResult: promise,
+    kind: "iterator-close-start",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> await when required, abrupt -> override completion",
+    [needsAwait],
+    range,
+  );
+  recordRoot(builder, promise, range);
+  recordRoot(builder, ignoreResult, range);
+  recordRoot(builder, skipValidation, range);
+
+  const awaitBlock = createMirBlock(builder);
+  const resumeBlock = createMirBlock(builder);
+  builder.current.terminator = {
+    kind: "branch",
+    test: needsAwait,
+    whenFalse: resumeBlock.id,
+    whenTrue: awaitBlock.id,
+  };
+
+  builder.current = awaitBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "await AsyncIteratorClose",
+    [promise],
+    range,
+  );
+  const settled = builder.nextValue;
+  builder.nextValue += 1;
+  const fulfilledBlock = createMirBlock(builder);
+  const rejectedBlock = createMirBlock(builder);
+  const propagateBlock = createMirBlock(builder);
+  builder.current.terminator = {
+    awaited: true,
+    kind: "generator-yield",
+    resume: fulfilledBlock.id,
+    sent: settled,
+    throwResume: rejectedBlock.id,
+    value: promise,
+  };
+  builder.current = rejectedBlock;
+  builder.current.terminator = {
+    kind: "branch",
+    test: ignoreResult,
+    whenFalse: propagateBlock.id,
+    whenTrue: resumeBlock.id,
+  };
+  builder.current = propagateBlock;
+  lowerThrowValue(settled, range, builder);
+  builder.current = fulfilledBlock;
+  recordRoot(builder, settled, range);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "complete AsyncIteratorClose",
+    [settled, ignoreResult, skipValidation],
+    range,
+  );
+  const closed = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [settled, ignoreResult, skipValidation],
+    detail: "complete AsyncIteratorClose",
+    id: closed,
+    kind: "iterator-close-result",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> resume completion, abrupt -> override completion",
+    [closed],
+    range,
+  );
+  recordRoot(builder, closed, range);
+  builder.current.terminator = { kind: "jump", target: resumeBlock.id };
+  builder.current = resumeBlock;
 }
 
 /**
@@ -4842,25 +4960,34 @@ function lowerForOfStatement(
     [iterator],
     statement.range,
   );
-  const closed = builder.nextValue;
-  builder.nextValue += 1;
-  builder.current.operations.push({
-    arguments: [iterator],
-    completionSlot: closeBlock.id,
-    detail: awaited ? "AsyncIteratorClose" : "IteratorClose",
-    id: closed,
-    ...asynchronous,
-    kind: "iterator-close",
-    range: statement.range,
-  });
-  appendMirMetadata(
-    builder,
-    "check-status",
-    "normal -> resume completion, abrupt -> override completion",
-    [closed],
-    statement.range,
-  );
-  recordRoot(builder, closed, statement.range);
+  if (awaited && (builder.asyncFunction || builder.asyncGenerator)) {
+    lowerAwaitedIteratorClose(
+      iterator,
+      closeBlock.id,
+      statement.range,
+      builder,
+    );
+  } else {
+    const closed = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [iterator],
+      completionSlot: closeBlock.id,
+      detail: awaited ? "AsyncIteratorClose" : "IteratorClose",
+      id: closed,
+      ...asynchronous,
+      kind: "iterator-close",
+      range: statement.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> resume completion, abrupt -> override completion",
+      [closed],
+      statement.range,
+    );
+    recordRoot(builder, closed, statement.range);
+  }
   builder.current.terminator = {
     completionSlot: closeBlock.id,
     kind: "resume-completion",
