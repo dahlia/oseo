@@ -26,6 +26,11 @@ static void trace_object(
     OseoHeapObject *object,
     OseoHeapObject **worklist
 ) {
+    if (object->kind == OSEO_HEAP_BIGINT ||
+        object->kind == OSEO_HEAP_STRING ||
+        object->kind == OSEO_HEAP_PRIVATE_NAME) {
+        return;
+    }
     if (object->kind == OSEO_HEAP_ENVIRONMENT) {
         OseoEnvironment *environment = (OseoEnvironment *)object;
         for (size_t index = 0u; index < environment->slot_count; index += 1u) {

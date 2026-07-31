@@ -72,6 +72,56 @@ test("emits deterministic generic C without executing a toolchain", () => {
   assert.equal(emitted.sourceName, "generated.c");
 });
 
+test("rejects invalid exported MIR BigInt digits", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "invalid-bigint.ts",
+    start: { column: 1, line: 1 },
+  };
+  assert.throws(
+    () =>
+      cBackend.emit({
+        functions: [],
+        globalBindings: [],
+        kind: "mir-program",
+        observeSpecialization: false,
+        script: {
+          blocks: [
+            {
+              id: 0,
+              operations: [
+                {
+                  arguments: [],
+                  constant: {
+                    digits: '1"; abort(); /*',
+                    kind: "bigint",
+                    radix: 16,
+                  },
+                  detail: "invalid BigInt constant",
+                  id: 0,
+                  kind: "constant",
+                  range,
+                },
+              ],
+              terminator: { kind: "return", value: 0 },
+            },
+          ],
+          functionLength: 0,
+          id: -1,
+          kind: "mir-function",
+          name: "<script>",
+          parameterCount: 0,
+          parameters: [],
+          range,
+          rootSlotCount: 1,
+        },
+        sourceId: "invalid-bigint.ts",
+        specialization: "disabled",
+      }),
+    /invalid BigInt digits/u,
+  );
+});
+
 test("emits error intrinsic loads and thrown-value rendering", () => {
   const range = {
     end: { column: 1, line: 1 },

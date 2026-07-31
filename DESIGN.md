@@ -285,11 +285,11 @@ generic ABI boundary, becomes visible to the garbage collector, or is stored in
 a generic heap slot.
 
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) owns the exact BigInt value and arithmetic
-boundary. It compares an unused immediate tag plus a managed magnitude with
-all-heap representations, and an owned limb implementation with external
-components, before selecting a layout. BigInt constants, generic operations,
-and generated C depend on a private runtime interface rather than a chosen limb
-type or library structure.
+boundary. ADR 0023 selects an all-heap normalized sign-and-magnitude value with
+30-bit limbs for M5a. Tag 7 remains unused so any later immediate representation
+must earn its ABI cost with measured evidence. BigInt constants, generic
+operations, and generated C depend on a private runtime interface rather than
+the selected limb layout.
 
 The M2 path recognizes and unboxes immediate values through private runtime
 inline primitives. Checked addition validates both operand and result ranges

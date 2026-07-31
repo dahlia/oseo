@@ -192,6 +192,16 @@ The `m5-34` ABI removes `oseo_await_value` and changes
 the entry promise. Generated code using the two-argument entry point must pair
 with `m5-34` runtime assets.
 
+The `m5-35` ABI adds the *runtime\_bigint.c* component, exact BigInt literal
+construction, `ToNumeric`, and numeric-one dispatch for update
+expressions. Every BigInt is an `OSEO_HEAP_BIGINT` primitive with an inline,
+normalized sign and magnitude using 30-bit limbs in `uint32_t` storage. Generic
+arithmetic, comparison, decimal conversion, and signed shifts remain behind
+the `OseoValue` runtime boundary. The collector traces the BigInt object but no
+limb edges, and tag 7 remains unassigned. The baseline rejects magnitudes above
+65,536 bits with a catchable `RangeError` before allocating the oversized
+result.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

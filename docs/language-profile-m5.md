@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,006 reviewed cases: 2,358 passes, 1,128
-expected negatives, and 520 unsupported profile features. It records no
+The current manifest contains 4,174 reviewed cases: 2,448 passes, 1,167
+expected negatives, and 559 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -1734,6 +1734,71 @@ its deliberate boundary and its evidence:
     and each of `next`, `return`, and `throw` rejecting rather than throwing
     for a non-generator receiver, including the intrinsic prototype itself.
 
+### BigInt primitive and operators
+
+M5a Unit 8.1a admits exact decimal, binary, octal, and hexadecimal BigInt
+literals, including the candidate edition's numeric separators. The Babel
+adapter converts the source spelling directly to separator-free owned radix
+digits. Syntax, HIR, MIR, and generated C never route a BigInt constant through
+`Number` or `double`.
+
+Every BigInt is a primitive stored as a managed `OSEO_HEAP_BIGINT` with one
+normalized sign and magnitude. The inline magnitude uses little-endian 30-bit
+limbs in `uint32_t` storage and `uint64_t` arithmetic intermediates. Zero is
+never negative, equality compares mathematical values, and the collector marks
+the object without tracing its non-value limbs. Tag 7 remains unassigned.
+[ADR 0023](./adr/0023-bigint-representation.md) records the representation and
+replacement triggers.
+
+`typeof` reports `"bigint"`; Boolean conversion is false only for `0n`; string,
+template, property-key, strict equality, loose equality, and relational
+operations use the exact primitive value. Cross-type relational and loose
+comparisons do not round the BigInt through binary64.
+
+The shared `ToNumeric` dispatch preserves a BigInt result from primitive
+conversion and otherwise continues through `ToNumber`. Arithmetic requires
+matching numeric types after left-to-right conversion. Mixing a Number and a
+BigInt throws a catchable `TypeError`. Addition, subtraction, multiplication,
+division, remainder, exponentiation, bitwise AND, OR, XOR and NOT, signed left
+and right shifts, unary negation, compound assignment, and prefix and postfix
+update are exact. Division truncates toward zero. Division or remainder by
+zero and a negative exponent throw `RangeError`; unary plus and unsigned right
+shift throw `TypeError` for BigInt operands.
+
+The portable baseline limits a BigInt magnitude to 65,536 bits. An operation
+that would exceed that reviewed resource ceiling throws a catchable
+`RangeError` before allocating the oversized result. Allocation or host
+resource failure below the ceiling remains a non-catchable runtime diagnostic.
+
+Assignment and update reuse the existing reference lowering. Identifier and
+member targets retain their read, right-operand, conversion, second property-key
+conversion, write, and abrupt-completion order. Update first performs
+`ToNumeric`, selects `1n` or `1` from that numeric type, and preserves prefix or
+postfix result selection. False `number` hints still enter the compiled generic
+fallback after a deliberate guard miss.
+
+The runtime ABI is `m5-35`. It adds *runtime\_bigint.c*, exact literal
+construction, `ToNumeric`, and numeric-one entry points. Fixed
+native evidence compares Node.js, Deno, both specialization policies, forced
+collection, Linux AMD64 execution, and the AArch64 Linux cross-link. The
+generated property suite uses ordinary seed `0x5eed0022`, a 10-case ordinary
+budget, directly generated admitted operator domains, and a bounded independent
+integer oracle. The repository extended gate uses fixed seed `0x5eed0003` and a
+ten-times scale for a 100-case budget. Both native policies force collection.
+
+The reviewed Test262 manifest adds 168 pinned BigInt cases without changing the
+suite revision, inventory policy, schema, or classification vocabulary.
+Eighty-nine cases pass, 39 are expected syntax negatives, and 40 remain honestly
+unsupported because they also require an unimplemented intrinsic or object
+boundary. The complete manifest moves from 4,006 to 4,174 cases, 2,359 to 2,448
+passes, 1,128 to 1,167 expected negatives, and 519 to 559 unsupported profile
+features, with no semantic or harness failures.
+
+The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
+behavior, `BigInt.asIntN`, and `BigInt.asUintN` remain outside this M5a unit.
+They remain M5b work under [*PLAN-BIGINT.md*](../PLAN-BIGINT.md). Binary-data
+and atomic consumers also remain with their owning built-in families.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -1741,15 +1806,14 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Big integers remain outside the admitted syntax and value profile. The
-    frontend rejects `BigIntLiteral`, and the reviewed manifest retains its
-    BigInt-dependent case as `unsupported-profile-feature`. Exact literals,
-    `ToNumeric`, operators, and representation remain M5a work owned by the
-    core expressions and bindings stream. The `BigInt` intrinsic, prototype,
-    wrappers, and fixed-width conversion remain M5b work owned by the
-    intrinsics and built-in objects stream.
-    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns both checkpoints and records
-    their implementation status as planned.
+ -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
+    assignment, and update are admitted by M5a Unit 8.1a as recorded above.
+    The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
+    behavior, and fixed-width conversions remain M5b work owned by the
+    intrinsics and built-in objects stream. Reviewed cases that also require
+    those facilities or another unimplemented intrinsic remain
+    `unsupported-profile-feature` instead of borrowing a partial M5a result.
+    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns the remaining checkpoint.
  -  Regular expression syntax, objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).

@@ -1175,10 +1175,10 @@ function lowerUpdateValue(
   builder.nextValue += 1;
   builder.current.operations.push({
     arguments: [current],
-    detail: "+",
+    detail: "to-numeric",
     id: numeric,
     kind: "unary",
-    operator: "+",
+    operator: "to-numeric",
     range,
   });
   appendMirMetadata(
@@ -1189,7 +1189,31 @@ function lowerUpdateValue(
     range,
   );
   recordRoot(builder, numeric, range);
-  const one = lowerExpression({ kind: "number", range, value: 1 }, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "update numeric one",
+    [numeric],
+    range,
+  );
+  const one = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [numeric],
+    detail: "numeric-one",
+    id: one,
+    kind: "unary",
+    operator: "numeric-one",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [one],
+    range,
+  );
+  recordRoot(builder, one, range);
   const assigned = lowerBinaryValues(
     numeric,
     operator === "++" ? "+" : "-",
@@ -3431,14 +3455,17 @@ function lowerExpression(
     expression.kind === "undefined" ||
     expression.kind === "null" ||
     expression.kind === "boolean" ||
+    expression.kind === "bigint" ||
     expression.kind === "number" ||
     expression.kind === "string"
   ) {
-    if (expression.kind === "string") {
+    if (expression.kind === "string" || expression.kind === "bigint") {
       appendMirMetadata(
         builder,
         "safepoint",
-        "string allocation",
+        expression.kind === "string"
+          ? "string allocation"
+          : "BigInt literal allocation",
         [],
         expression.range,
       );
@@ -3454,6 +3481,12 @@ function lowerExpression(
       constant = { kind: "boolean", value: expression.value };
     } else if (expression.kind === "number") {
       constant = { kind: "number", value: expression.value };
+    } else if (expression.kind === "bigint") {
+      constant = {
+        digits: expression.digits,
+        kind: "bigint",
+        radix: expression.radix,
+      };
     } else {
       constant = { kind: "string", value: expression.value };
     }
@@ -3462,7 +3495,9 @@ function lowerExpression(
         ? constant.kind
         : constant.kind === "number"
           ? numberText(constant.value)
-          : JSON.stringify(constant.value);
+          : constant.kind === "bigint"
+            ? `${constant.radix}:${constant.digits}`
+            : JSON.stringify(constant.value);
     builder.current.operations.push({
       arguments: [],
       constant,
@@ -3471,7 +3506,7 @@ function lowerExpression(
       kind: "constant",
       range: expression.range,
     });
-    if (expression.kind === "string") {
+    if (expression.kind === "string" || expression.kind === "bigint") {
       appendMirMetadata(
         builder,
         "check-status",

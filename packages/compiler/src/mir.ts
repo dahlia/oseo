@@ -10,6 +10,11 @@ import type {
 } from "./syntax.ts";
 /** A primitive constant retained without lossy textual serialization. */
 export type MirConstant =
+  | {
+      readonly digits: string;
+      readonly kind: "bigint";
+      readonly radix: 2 | 8 | 10 | 16;
+    }
   | { readonly kind: "boolean"; readonly value: boolean }
   | { readonly kind: "null" }
   | { readonly kind: "number"; readonly value: number }

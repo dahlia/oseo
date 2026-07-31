@@ -707,6 +707,12 @@ export type HirExpression =
       readonly privateName: HirPrivateName;
     })
   | (LocatedSyntax & {
+      /** Separator-free source digits, without the radix prefix or `n`. */
+      readonly digits: string;
+      readonly kind: "bigint";
+      readonly radix: 2 | 8 | 10 | 16;
+    })
+  | (LocatedSyntax & {
       readonly kind: "number";
       readonly value: number;
     })

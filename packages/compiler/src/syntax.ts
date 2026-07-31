@@ -10,6 +10,7 @@ export type HintProvenance = "jsdoc" | "typescript";
 /** Primitive hint names accepted during M1. */
 export type HintName =
   | "any"
+  | "bigint"
   | "boolean"
   | "null"
   | "number"
@@ -122,6 +123,8 @@ export type UnaryOperator =
   | "!"
   | "+"
   | "-"
+  | "numeric-one"
+  | "to-numeric"
   | "to-string"
   | "typeof"
   | "void"
@@ -515,6 +518,12 @@ export type SyntaxExpression =
       readonly object: SyntaxExpression;
       readonly operator: UpdateOperator;
       readonly prefix: boolean;
+    })
+  | (LocatedSyntax & {
+      /** Separator-free source digits, without the radix prefix or `n`. */
+      readonly digits: string;
+      readonly kind: "bigint";
+      readonly radix: 2 | 8 | 10 | 16;
     })
   | (LocatedSyntax & {
       readonly kind: "number";

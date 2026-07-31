@@ -9,6 +9,8 @@ static OseoValue require_normal(OseoResult result) {
     return result.value;
 }
 
+static OseoValue make_text(OseoContext *context, const char *text);
+
 static void test_deep_graph(OseoContext *context, OseoValue *roots) {
     const size_t depth = 4096u;
     roots[0] = require_normal(oseo_environment_create(context, 1u));
@@ -97,6 +99,48 @@ static void test_allocation_failure(
     oseo_collect(context);
     (void)require_normal(oseo_environment_get(context, roots[0], 0u));
     oseo_context_fail_allocation_at(context, 0u);
+}
+
+static void test_bigint_survival(OseoContext *context, OseoValue *roots) {
+    roots[0] = require_normal(oseo_bigint_literal(
+        context,
+        "123456789012345678901234567890",
+        10u
+    ));
+    roots[1] = require_normal(oseo_bigint_literal(context, "2", 10u));
+    roots[2] = require_normal(oseo_add(context, roots[0], roots[1]));
+    roots[3] = require_normal(oseo_bigint_literal(
+        context,
+        "123456789012345678901234567892",
+        10u
+    ));
+    assert(
+        require_normal(oseo_strict_equal(context, roots[2], roots[3])) ==
+        oseo_boolean(true)
+    );
+    context->collect_every_safepoint = true;
+    roots[4] = require_normal(oseo_shift_left(context, roots[2], roots[1]));
+    roots[6] = require_normal(oseo_to_string(context, roots[3]));
+    assert(require_normal(oseo_loose_equal(
+        context,
+        roots[3],
+        roots[6]
+    )) == oseo_boolean(true));
+    roots[7] = make_text(context, "999");
+    assert(require_normal(oseo_greater_than(
+        context,
+        roots[3],
+        roots[7]
+    )) == oseo_boolean(true));
+    context->collect_every_safepoint = false;
+    oseo_collect(context);
+    roots[5] = require_normal(oseo_shift_right(context, roots[4], roots[1]));
+    assert(
+        require_normal(oseo_strict_equal(context, roots[5], roots[3])) ==
+        oseo_boolean(true)
+    );
+    assert(oseo_add(context, roots[0], oseo_number(1.0)).status ==
+           OSEO_STATUS_THROW);
 }
 
 static OseoValue make_key(
@@ -925,6 +969,7 @@ int main(void) {
     test_forward_graph(&context, frame.slots);
     test_cycle_and_sharing(&context, frame.slots);
     test_allocation_failure(&context, frame.slots);
+    test_bigint_survival(&context, frame.slots);
     test_ordinary_properties(&context, frame.slots);
     test_arrays(&context, frame.slots);
     test_array_accumulation(&context, frame.slots);

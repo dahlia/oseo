@@ -567,9 +567,9 @@ checkpoint.
 
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) coordinates the M5a literal, coercion,
 operator, assignment, and update work with the M5b intrinsic and prototype. It
-keeps BigInt outside the active profile until an admitted checkpoint has exact
-generic semantics and the selected representation has collector and target
-evidence.
+admits the M5a Unit 8.1a primitive checkpoint only after exact generic
+semantics and the selected all-heap representation have collector and target
+evidence. The M5b intrinsic and prototype remain outside that checkpoint.
 
 M5a is complete when no entry in the known-gaps list of
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) names the core
@@ -907,9 +907,9 @@ landed with the M5 intrinsics units. The remaining queue is:
     refactoring changed no language-profile or compatibility count.
 2.  Complete the remaining foundational expressions and coercions after the
     landed errors, symbols, synchronous iterator consumers, spread consumers,
-    and array binding declarations. BigInt follows the representation,
-    `ToNumeric`, and arithmetic gates in
-    [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
+    and array binding declarations. BigInt literals, primitive values,
+    `ToNumeric`, operators, assignment, and update have passed the M5a Unit
+    8.1a gate in [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

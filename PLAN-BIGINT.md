@@ -4,11 +4,13 @@ BigInt plan
 Status
 ------
 
-Implementation status: planned, design and probe work not started. This plan
-defines the M5 semantic, representation, and compilation boundary for
-ECMAScript BigInt. It does not admit BigInt syntax or values to the active
-language profile, assign the last unused NaN-box tag, select a limb layout, or
-add an external arithmetic library before implementation evidence exists.
+Implementation status: M5a Unit 8.1a is implemented. It admits exact BigInt
+literals, primitive values, `ToNumeric`, the M5a operator, assignment, update,
+comparison, conversion, and collector contracts.
+[ADR 0023](./docs/adr/0023-bigint-representation.md) selects an all-heap
+normalized sign-and-magnitude representation with 30-bit limbs and leaves the
+last unused NaN-box tag unassigned. The M5b intrinsic, prototype, wrappers,
+constructor behavior, and fixed-width conversions remain planned.
 
 BigInt crosses the M5 core-language and built-in checkpoints. Literals,
 operators, coercions, and update expressions belong to M5a, while the `BigInt`
@@ -55,14 +57,15 @@ ECMAScript `Number` remains an IEEE 754 binary64 type. Decimal floating point,
 rationals, operator overloading, and implementation-defined mixed `Number` and
 BigInt arithmetic are outside this plan.
 
-The unused NaN-box tag remains a candidate, not a decision. Spending the last
-immediate tag changes the private runtime ABI and needs target, allocation, and
-generated-code evidence.
+The unused NaN-box tag remains unassigned. Spending the last immediate tag is a
+future replacement decision that needs target, allocation, and generated-code
+evidence beyond the accepted all-heap M5a baseline.
 
-Limb width and the arithmetic component follow the probes. An external
-component remains a candidate only behind an Oseo-owned adapter and only after
-its observable behavior, allocator contract, static-link support, target
-support, license, code size, and failure behavior have been measured.
+The accepted owned arithmetic baseline uses 30 value bits in each `uint32_t`
+limb and `uint64_t` intermediates. An external component remains a replacement
+candidate only behind an Oseo-owned adapter and only after its observable
+behavior, allocator contract, static-link support, target support, license,
+code size, and failure behavior have been measured.
 
 A convenient subset of BigInt arithmetic cannot stand for the whole primitive.
 Internal checkpoints may land separately, but every profile update must name
@@ -121,6 +124,53 @@ extend:
 The first BigInt change replaces only the unsupported boundaries covered by
 its tests. Existing `Number` paths stay authoritative for programs that never
 produce a BigInt.
+
+
+M5a Unit 8.1a checkpoint
+------------------------
+
+Unit 8.1a admits the complete M5a-owned primitive boundary: exact literals,
+the selected representation, Boolean, string, property-key, equality and
+relational behavior, `ToNumeric`, arithmetic, bitwise and signed-shift
+operators, unary negation and bitwise NOT, compound assignment, and prefix and
+postfix update. Mixed Number and BigInt arithmetic, unary plus, unsigned right
+shift, division or remainder by zero, and negative exponents throw the
+specified catchable errors after the specified conversions.
+
+[ADR 0023](./docs/adr/0023-bigint-representation.md) selects the all-heap
+`OSEO_HEAP_BIGINT` representation with an inline normalized sign and magnitude,
+30 value bits per `uint32_t` limb, and `uint64_t` intermediates. The runtime ABI
+is `m5-35`; tag 7 remains unassigned.
+
+The generated native property uses ordinary seed `0x5eed0022`, directly
+generated admitted radix and operator domains, a bounded independent integer
+oracle, and a 10-case ordinary budget. The repository extended gate uses its
+fixed `0x5eed0003` seed and a ten-times scale for a 100-case budget. The suite
+compares Node.js, Deno, both native specialization policies, false hints,
+deliberate guard misses, mixed numeric errors, and forced collection under both
+policies. Fixed native fixtures retain larger exact arithmetic, comparison
+edges, assignment and update ordering, abrupt completion,
+target-width-independent shifts, and collector survival. The native gate
+executes the matching supported host with strict warnings and sanitizers and
+retains the AArch64 Linux cross-link.
+
+The reviewed Test262 manifest grows from 4,006 to 4,174 cases. It moves from
+2,359 to 2,448 passes, from 1,128 to 1,167 expected negatives, and from 519 to
+559 unsupported profile features. The 168 added cases therefore contribute 89
+passes, 39 syntax negatives, and 40 honest unsupported classifications for
+tests that also require an unimplemented intrinsic or object boundary. The pin,
+inventory policy, manifest schema, and classification vocabulary do not change.
+
+The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
+behavior, `BigInt.asIntN`, and `BigInt.asUintN` are not admitted by this
+checkpoint. They remain M5b work.
+
+The portable M5a baseline admits magnitudes through 65,536 bits. Literal
+construction and operations that would exceed that reviewed ceiling throw a
+catchable `RangeError` before allocating an oversized result. Allocation or
+host resource failure within the ceiling remains a non-catchable runtime
+diagnostic. This bound contains the initial schoolbook and long-division cost
+without changing exact results inside the admitted domain.
 
 
 Semantic boundary
@@ -219,7 +269,7 @@ Every accepted representation must maintain these invariants:
  -  no unrooted collector reference across a safepoint; and
  -  normalization after every operation that can remove leading limbs.
 
-### Immediate plus heap candidate
+### Deferred immediate plus heap candidate
 
 The leading candidate assigns tag 7 to a signed 48-bit immediate BigInt.
 Values from \(-2^{47}\) through \(2^{47}-1\) then remain inside one
@@ -236,32 +286,30 @@ small literal values. It consumes the final reserved non-number tag and adds a
 second representation to every BigInt operation. Those costs require a probe
 rather than an architectural assertion.
 
-### All-heap candidates
+### Selected all-heap representation
 
-The simplest alternative represents every BigInt as `OSEO_HEAP_BIGINT`.
-Another all-heap variant caches a bounded set of immutable small values. Both
-keep tag 7 available and reduce representation branches, but ordinary
-arithmetic still allocates results outside any cache.
+M5a represents every BigInt as `OSEO_HEAP_BIGINT` without a small-value cache.
+This keeps tag 7 available and gives generic construction, arithmetic, and
+comparison one canonical representation. Ordinary arithmetic allocates its
+result.
 
 The current collector allocates each object separately and sweeps one complete
-object list. An all-heap design therefore measures allocation and collection
-cost on small-BigInt loops before selection. A cache also measures persistent
-roots, startup size, and whether its extra identity-like storage creates any
-incorrect pointer-equality shortcut.
+object list. Small-BigInt allocation and collection cost are replacement
+triggers. A later cache would also need to measure persistent roots, startup
+size, and whether its extra identity-like storage creates an incorrect
+pointer-equality shortcut.
 
-### Heap magnitude candidates
+### Selected heap magnitude
 
-A heap BigInt should use one normalized sign and magnitude. An inline flexible
-array can keep the header and limbs in one managed allocation. A separate limb
-buffer needs explicit destruction, byte accounting, and allocation-failure
-cleanup, but may support capacity reuse for temporary arithmetic.
+A heap BigInt uses one normalized sign and magnitude. An inline flexible array
+keeps the header and limbs in one managed allocation. Temporary arithmetic
+buffers remain separately owned and are released before every normal or abrupt
+return.
 
-The first owned arithmetic candidate uses little-endian `uint32_t` storage
-with 30 value bits per limb and `uint64_t` intermediates. Other candidates
-include full 32-bit limbs with explicit carry handling and wider limbs where
-both native targets provide a checked intermediate type. The probe records
-object size, code quality, conversion cost, and algorithm throughput rather
-than assuming that a denser limb wins.
+The owned arithmetic baseline uses little-endian `uint32_t` storage with 30
+value bits per limb and `uint64_t` intermediates. Full 32-bit or wider limbs
+remain replacement candidates only after both native targets provide checked
+intermediate and performance evidence.
 
 
 Compiler and runtime architecture
@@ -322,10 +370,11 @@ through an untracked allocator.
 Probes and decisions
 --------------------
 
-The representation decision follows checked-in probes and an architecture
-decision. The probe corpus includes test262 values, boundary-focused generated
-cases, and large arithmetic workloads. Measurements distinguish facts from
-inferences.
+ADR 0023 records the M5a representation decision and its checked native,
+generated, collector, and target evidence. Later representation or arithmetic
+replacement follows checked-in probes whose corpus includes test262 values,
+boundary-focused generated cases, and large arithmetic workloads.
+Measurements distinguish facts from inferences.
 
 ### Immediate representation
 

@@ -272,6 +272,29 @@ function emitConstant(
 ): void {
   if (constant.kind === "string") {
     emitStringConstant(state, operation, constant.value);
+  } else if (constant.kind === "bigint") {
+    const digitPatterns = {
+      2: /^[01]+$/u,
+      8: /^[0-7]+$/u,
+      10: /^[0-9]+$/u,
+      16: /^[0-9a-f]+$/u,
+    } as const;
+    if (!digitPatterns[constant.radix].test(constant.digits)) {
+      throw new Error(
+        `MIR constant %${operation.id} has invalid BigInt digits.`,
+      );
+    }
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(
+      state,
+      renderC(
+        emittedC.constant.resultAssignBigIntLiteral,
+        constant.digits,
+        constant.radix,
+      ),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (constant.kind === "undefined") {
     line(
       state,
@@ -642,6 +665,8 @@ function emitUnary(state: EmitState, operation: MirOperation): void {
   const helpers = {
     "+": renderC(emittedC.common.unaryToNumber),
     "-": renderC(emittedC.common.unaryNegate),
+    "numeric-one": renderC(emittedC.common.unaryNumericOne),
+    "to-numeric": renderC(emittedC.common.unaryToNumeric),
     "to-string": renderC(emittedC.common.unaryToString),
     typeof: renderC(emittedC.common.unaryTypeof),
     "~": renderC(emittedC.common.unaryBitwiseNot),
@@ -665,6 +690,8 @@ function emitBinary(state: EmitState, operation: MirOperation): void {
   if (
     operator == null ||
     operator === "!" ||
+    operator === "numeric-one" ||
+    operator === "to-numeric" ||
     operator === "to-string" ||
     operator === "typeof" ||
     operator === "void" ||

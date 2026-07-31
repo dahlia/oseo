@@ -1114,7 +1114,14 @@ OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_symbol_intrinsic(OseoContext *context);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
+OseoResult oseo_bigint_literal(
+    OseoContext *context,
+    const char *digits,
+    uint32_t radix
+);
 OseoResult oseo_to_number(OseoContext *context, OseoValue value);
+OseoResult oseo_to_numeric(OseoContext *context, OseoValue value);
+OseoResult oseo_numeric_one(OseoContext *context, OseoValue value);
 OseoResult oseo_to_string(OseoContext *context, OseoValue value);
 OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value);
 OseoResult oseo_add(
