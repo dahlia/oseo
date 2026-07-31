@@ -769,9 +769,8 @@ OseoResult oseo_async_iterator_get(
  * promises a settled result object either way, and a rejected value
  * therefore reaches the head as a rejected step rather than as an
  * exhausted iterator. The specification closes the synchronous iterator
- * only when PromiseResolve itself completes abruptly, which a rejecting
- * thenable does not, so a rejection leaves the iterator open exactly as
- * a rejected asynchronous step does.
+ * when `close_on_rejection` applies and the awaited stepped value rejects.
+ * The original rejection remains authoritative over close-time failures.
  */
 static OseoResult async_from_sync_fields(
     OseoContext *context,
@@ -808,22 +807,38 @@ static OseoResult async_from_sync_fields(
 
 static OseoResult async_from_sync_continuation(
     OseoContext *context,
+    OseoValue sync_iterator,
     OseoValue step_result,
+    bool close_on_rejection,
     OseoValue *value,
     bool *done
 ) {
-    OseoValue slots[2] = {step_result, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
+    OseoValue slots[3] = {
+        sync_iterator,
+        step_result,
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
     bool is_done = true;
     OseoResult result = async_from_sync_fields(
         context,
-        slots[0],
-        &slots[1],
+        slots[1],
+        &slots[2],
         &is_done
     );
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_await_step(context, slots[1]);
+        result = oseo_internal_await_step(context, slots[2]);
+    }
+    if (result.status == OSEO_STATUS_THROW &&
+        !context->has_diagnostic && !is_done && close_on_rejection) {
+        slots[2] = result.value;
+        OseoResult closed = oseo_iterator_close(context, slots[0], true);
+        if (closed.status == OSEO_STATUS_THROW && context->has_diagnostic) {
+            result = closed;
+        } else {
+            result = (OseoResult){OSEO_STATUS_THROW, slots[2]};
+        }
     }
     /* Both roles this continuation serves read the awaited value: a
      * `for await` step ignores it once the iterator reports exhaustion,
@@ -897,6 +912,35 @@ OseoResult oseo_internal_async_from_sync_fulfilled(
 }
 
 /*
+ * Rejection reaction used when AsyncFromSyncIteratorContinuation was
+ * requested with closeOnRejection. IteratorClose observes the wrapped
+ * synchronous iterator, while its throw precedence keeps `reason` as the
+ * rejection even when `return` throws or reports a non-object result.
+ */
+OseoResult oseo_internal_async_from_sync_rejected(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue reason
+) {
+    OseoValue slots[2] = {callee, reason};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_function_environment(context, slots[0]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_get(context, slots[0], 0u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_iterator_close(context, result.value, true);
+    }
+    if (result.status == OSEO_STATUS_NORMAL || !context->has_diagnostic) {
+        result = (OseoResult){OSEO_STATUS_THROW, slots[1]};
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
  * Builds the promise returned by one AsyncFromSyncIterator method after
  * its synchronous result object has been obtained. The wrapper's own
  * continuation awaits the stepped value and creates a fresh iterator result;
@@ -904,17 +948,21 @@ OseoResult oseo_internal_async_from_sync_fulfilled(
  */
 static OseoResult async_from_sync_promise(
     OseoContext *context,
-    OseoValue step_result
+    OseoValue sync_iterator,
+    OseoValue step_result,
+    bool close_on_rejection
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = step_result;
+    frame.slots[0] = sync_iterator;
+    frame.slots[1] = step_result;
+    frame.slots[6] = oseo_undefined();
     bool done = true;
     result = async_from_sync_fields(
         context,
-        frame.slots[0],
-        &frame.slots[1],
+        frame.slots[1],
+        &frame.slots[2],
         &done
     );
     if (result.status != OSEO_STATUS_NORMAL) {
@@ -923,11 +971,11 @@ static OseoResult async_from_sync_promise(
         return result;
     }
     result = oseo_environment_create(context, 1u);
-    frame.slots[2] = result.value;
+    frame.slots[3] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_environment_set(
             context,
-            frame.slots[2],
+            frame.slots[3],
             0u,
             oseo_boolean(done)
         );
@@ -936,7 +984,7 @@ static OseoResult async_from_sync_promise(
         result = oseo_function_create(
             context,
             OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID,
-            frame.slots[2],
+            frame.slots[3],
             NULL,
             0u,
             1u,
@@ -945,18 +993,46 @@ static OseoResult async_from_sync_promise(
             oseo_undefined(),
             OSEO_FUNCTION_NAME_PREFIX_NONE
         );
-        frame.slots[3] = result.value;
+        frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_promise_resolve(context, frame.slots[1]);
-        frame.slots[4] = result.value;
+        result = oseo_promise_resolve(context, frame.slots[2]);
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        close_on_rejection && !done) {
+        result = oseo_environment_create(context, 1u);
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_set(
+                context,
+                frame.slots[3],
+                0u,
+                frame.slots[0]
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_function_create(
+                context,
+                OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID,
+                frame.slots[3],
+                NULL,
+                0u,
+                1u,
+                OSEO_FUNCTION_INTERNAL,
+                oseo_undefined(),
+                oseo_undefined(),
+                OSEO_FUNCTION_NAME_PREFIX_NONE
+            );
+            frame.slots[6] = result.value;
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_promise_then(
             context,
+            frame.slots[5],
             frame.slots[4],
-            frame.slots[3],
-            oseo_undefined()
+            frame.slots[6]
         );
     }
     oseo_roots_release(context, &frame);
@@ -972,7 +1048,8 @@ static OseoResult async_from_sync_start(
     OseoValue target,
     OseoValue method,
     size_t argument_count,
-    OseoValue *arguments
+    OseoValue *arguments,
+    bool close_on_rejection
 ) {
     OseoValue slots[3] = {target, method, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
@@ -994,7 +1071,12 @@ static OseoResult async_from_sync_start(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = async_from_sync_promise(context, slots[2]);
+        result = async_from_sync_promise(
+            context,
+            slots[0],
+            slots[2],
+            close_on_rejection
+        );
     } else {
         result = rejected_async_step(context, result);
     }
@@ -1075,7 +1157,8 @@ OseoResult oseo_async_iterator_next_start(
             slots[0],
             slots[1],
             0u,
-            NULL
+            NULL,
+            true
         );
     } else {
         result = oseo_call_function(
@@ -1100,12 +1183,29 @@ OseoResult oseo_async_iterator_result(
     OseoValue settled,
     bool value_only,
     bool value_when_done,
+    OseoValue iterator,
+    bool throw_on_value_only,
     OseoValue *value,
     bool *done
 ) {
     *value = oseo_undefined();
     *done = true;
     if (value_only) {
+        if (throw_on_value_only) {
+            if (!is_async_from_sync_iterator(iterator) &&
+                !is_object(settled)) {
+                return oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "The iterator return result is not an object."
+                );
+            }
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The delegated iterator has no throw method."
+            );
+        }
         *value = settled;
         return normal(oseo_boolean(false));
     }
@@ -1192,7 +1292,9 @@ OseoResult oseo_async_iterator_next(
         if (result.status == OSEO_STATUS_NORMAL) {
             result = async_from_sync_continuation(
                 context,
+                slots[0],
                 slots[2],
+                true,
                 &slots[3],
                 &stepped_done
             );
@@ -1247,6 +1349,114 @@ OseoResult oseo_async_iterator_next(
     oseo_roots_pop(context, &frame);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     return normal(oseo_boolean(!*done));
+}
+
+/*
+ * Starts AsyncIteratorClose without draining. A native asynchronous
+ * iterator with no `return` completes immediately. The internal
+ * Async-from-Sync wrapper instead always returns a promise, converting its
+ * synchronous abrupt paths into rejection before generated code awaits it.
+ */
+OseoResult oseo_async_iterator_close_start(
+    OseoContext *context,
+    OseoValue iterator,
+    bool from_error,
+    OseoValue *skip_validation,
+    bool *needs_await
+) {
+    *skip_validation = oseo_boolean(false);
+    *needs_await = false;
+    if (!is_object(iterator)) return normal(oseo_undefined());
+    bool from_sync = is_async_from_sync_iterator(iterator);
+    if (from_sync) *skip_validation = oseo_boolean(true);
+    OseoValue slots[3] = {
+        from_sync ? ordinary_object(iterator)->async_sync_iterator : iterator,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "return");
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[2]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        if (from_sync) {
+            result = oseo_promise_resolve(context, oseo_undefined());
+            *needs_await = result.status == OSEO_STATUS_NORMAL;
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL &&
+               !is_function(slots[1])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator return method is not callable."
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        slots[2] = result.value;
+        if (from_sync) {
+            if (result.status == OSEO_STATUS_NORMAL &&
+                !is_object(slots[2])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "The iterator return result is not an object."
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = async_from_sync_promise(
+                    context,
+                    slots[0],
+                    slots[2],
+                    false
+                );
+            } else {
+                result = rejected_async_step(context, result);
+            }
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_promise_resolve(context, slots[2]);
+        }
+        *needs_await = result.status == OSEO_STATUS_NORMAL;
+    }
+    if (from_sync && result.status == OSEO_STATUS_THROW &&
+        !context->has_diagnostic) {
+        result = rejected_async_step(context, result);
+        *needs_await = result.status == OSEO_STATUS_NORMAL;
+    } else if (from_error && result.status == OSEO_STATUS_THROW &&
+               !context->has_diagnostic) {
+        oseo_context_clear_language_error(context);
+        result = normal(oseo_undefined());
+        *needs_await = false;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_async_iterator_close_result(
+    OseoContext *context,
+    OseoValue settled,
+    bool ignore_result,
+    bool skip_validation
+) {
+    if (ignore_result || skip_validation) return normal(oseo_undefined());
+    if (!is_object(settled)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator return result is not an object."
+        );
+    }
+    return normal(oseo_undefined());
 }
 
 /*
@@ -1318,7 +1528,9 @@ OseoResult oseo_async_iterator_close(
             bool done = true;
             result = async_from_sync_continuation(
                 context,
+                slots[0],
                 slots[2],
+                false,
                 &stepped,
                 &done
             );
@@ -1405,6 +1617,7 @@ static OseoResult async_delegate_invoke(
     OseoContext *context,
     OseoValue target,
     bool from_sync,
+    bool close_on_rejection,
     OseoValue method,
     OseoValue argument,
     OseoValue *value,
@@ -1433,7 +1646,9 @@ static OseoResult async_delegate_invoke(
         if (result.status == OSEO_STATUS_NORMAL) {
             result = async_from_sync_continuation(
                 context,
+                slots[0],
                 slots[2],
+                close_on_rejection,
                 value,
                 done
             );
@@ -1482,6 +1697,7 @@ OseoResult oseo_async_iterator_delegate_next(
         context,
         delegation_target(iterator),
         is_async_from_sync_iterator(iterator),
+        true,
         next_method,
         sent,
         value,
@@ -1532,7 +1748,8 @@ static OseoResult async_delegate_start_invoke(
     OseoContext *context,
     OseoValue iterator,
     OseoValue method,
-    OseoValue argument
+    OseoValue argument,
+    bool close_on_rejection
 ) {
     bool from_sync = is_async_from_sync_iterator(iterator);
     OseoValue slots[4] = {
@@ -1550,7 +1767,8 @@ static OseoResult async_delegate_start_invoke(
             slots[1],
             slots[2],
             1u,
-            &slots[3]
+            &slots[3],
+            close_on_rejection
         );
     } else {
         result = oseo_call_function(
@@ -1582,7 +1800,8 @@ OseoResult oseo_async_iterator_delegate_next_start(
         context,
         iterator,
         next_method,
-        sent
+        sent,
+        true
     );
 }
 
@@ -1616,7 +1835,8 @@ OseoResult oseo_async_iterator_delegate_return_start(
             context,
             slots[0],
             slots[2],
-            slots[1]
+            slots[1],
+            false
         );
     } else if (is_async_from_sync_iterator(slots[0])) {
         result = oseo_internal_iterator_result(context, slots[1], true);
@@ -1658,25 +1878,47 @@ OseoResult oseo_async_iterator_delegate_throw_start(
         return result;
     }
     if (!present) {
-        /*
-         * AsyncIteratorClose remains the Unit 7.6 boundary. Its awaited
-         * return result still uses the existing close path; only the
-         * delegation method result moves through the traced frame here.
-         */
-        result = oseo_async_iterator_close(context, slots[0], false);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_throw_error(
+        if (is_async_from_sync_iterator(slots[0])) {
+            result = oseo_iterator_close(
                 context,
-                OSEO_ERROR_TYPE,
-                "The delegated iterator has no throw method."
+                delegation_target(slots[0]),
+                false
             );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "The delegated iterator has no throw method."
+                );
+            }
+            result = rejected_async_step(context, result);
+        } else {
+            bool needs_await = false;
+            OseoValue ignore_result = oseo_boolean(false);
+            result = oseo_async_iterator_close_start(
+                context,
+                slots[0],
+                false,
+                &ignore_result,
+                &needs_await
+            );
+            if (result.status == OSEO_STATUS_NORMAL && needs_await) {
+                *value_only = oseo_boolean(true);
+            } else if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "The delegated iterator has no throw method."
+                );
+            }
         }
     } else {
         result = async_delegate_start_invoke(
             context,
             slots[0],
             slots[2],
-            slots[1]
+            slots[1],
+            true
         );
     }
     oseo_roots_pop(context, &frame);
@@ -1731,6 +1973,7 @@ OseoResult oseo_async_iterator_delegate_return(
             context,
             delegation_target(slots[0]),
             is_async_from_sync_iterator(slots[0]),
+            false,
             slots[2],
             slots[1],
             value,
@@ -1765,7 +2008,14 @@ OseoResult oseo_async_iterator_delegate_throw(
      * iterator that declares no `throw`, so it closes that iterator and
      * reports a TypeError instead. An abrupt close replaces it. */
     if (result.status == OSEO_STATUS_NORMAL && !present) {
-        result = oseo_async_iterator_close(context, slots[0], false);
+        bool from_sync = is_async_from_sync_iterator(slots[0]);
+        result = from_sync
+            ? oseo_iterator_close(
+                context,
+                delegation_target(slots[0]),
+                false
+            )
+            : oseo_async_iterator_close(context, slots[0], false);
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_internal_throw_error(
                 context,
@@ -1781,6 +2031,7 @@ OseoResult oseo_async_iterator_delegate_throw(
             context,
             delegation_target(slots[0]),
             is_async_from_sync_iterator(slots[0]),
+            true,
             slots[2],
             slots[1],
             value,

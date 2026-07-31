@@ -25,6 +25,9 @@ function maximumMirValue(functionValue: MirFunction): number {
       if (operation.iteratorValueOnlyResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueOnlyResult);
       }
+      if (operation.iteratorCloseResultMode != null) {
+        maximum = Math.max(maximum, operation.iteratorCloseResultMode);
+      }
     }
   }
   return maximum;

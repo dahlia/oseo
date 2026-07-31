@@ -42,7 +42,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,000 reviewed cases: 2,352 passes, 1,128
+The current manifest contains 4,006 reviewed cases: 2,358 passes, 1,128
 expected negatives, and 520 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -1499,8 +1499,11 @@ its deliberate boundary and its evidence:
     and `value`, and both happen before completion precedence applies, so an
     in-flight body error still observes those getters. The reviewed
     *test/built-ins/AsyncFromSyncIteratorPrototype/* cases pin that wrapper
-    directly: twenty-five pass, four are unsupported, and the nine that stay
-    outside the reviewed subset belong to the three gap entries named below.
+    directly: thirty pass, four are unsupported, and four stay outside the
+    reviewed subset. Three poisoned-wrapper cases belong to the
+    `PromiseResolve` gap below. The remaining *throw/iterator-result.js* case
+    awaits separate review outside Unit 7.6; its former missing
+    `%GeneratorPrototype%.throw` attribution is stale.
     The head reuses the synchronous
     `for-of` lowering unchanged, so it admits the same `const`, `let`, `var`,
     existing binding, member target, and array or object pattern forms with
@@ -1543,9 +1546,13 @@ its deliberate boundary and its evidence:
     frame, and returns to the caller. A fulfillment resumes the frame before
     `done` and `value` are inspected; a rejection resumes it with a throw
     completion. A promise that never settles therefore leaves the function
-    pending instead of producing `OSEO3001`. Module top-level `for await`
-    retains the drain-based step path, and `AsyncIteratorClose` retains its
-    separate drain-based await. Those are the Units 7.7 and 7.6 boundaries.
+    pending instead of producing `OSEO3001`. A framed
+    `AsyncIteratorClose` now starts a promise-producing operation, retains the
+    promise and saved completion mode in traced roots, and restores that
+    completion only after its reaction resumes generated code. A close
+    promise that never settles therefore also leaves the enclosing operation
+    pending. Module top-level `for await` retains the drain-based step and
+    close paths as the Unit 7.7 boundary.
  -  Asynchronous generator functions. `async function*` declarations and
     function expressions are admitted, and calling one runs its parameter and
     environment prologue and returns a suspended asynchronous generator whose
@@ -1605,8 +1612,10 @@ its deliberate boundary and its evidence:
     promise-producing runtime entry point and suspends the generator's owned
     traced frame. The request method returns to its caller before settlement,
     and the frame inspects the result only after its reaction resumes. The
-    missing-`throw` path still performs `AsyncIteratorClose` through the
-    drain-based close operation, which remains the Unit 7.6 boundary.
+    missing-`throw` path for a native asynchronous iterator performs
+    `AsyncIteratorClose` through the generator's traced frame, so its request
+    promise returns before the close settles and remains pending when the
+    close promise never settles.
     Native differential fixtures cover single and repeated yields, sent
     values, awaited and promised operands, an empty body, an awaited explicit
     return, function `length`, `name`, and inferred `name`, self-iterability
@@ -1640,6 +1649,21 @@ its deliberate boundary and its evidence:
     a pass, moving the manifest to 4,000 cases: 2,352 passes, 1,128 expected
     negatives, and 520 unsupported profile features with no semantic or
     harness failures.
+    Unit 7.6 adds fixed reaction-, timer-, rejection-, non-object, and
+    never-settling close fixtures for abrupt `for await` completion and
+    missing-`throw` delegation, plus synchronous stepped-value rejection
+    fixtures that require the wrapped iterator to close without replacing the
+    original rejection. Wrapped synchronous missing-`throw` delegation closes
+    the underlying iterator synchronously without reading or awaiting the
+    close result's fields.
+    Generated properties with seeds `0x5eed001f` and `0x5eed0020` draw
+    structured close-frame and AsyncFromSync rejection domains against
+    independent completion models, Node.js, Deno, both specialization
+    policies, false hints, deliberate generic fallback, and forced
+    collection. Five reviewed *AsyncFromSyncIteratorPrototype* cases and
+    *iterator-close-non-throw-get-method-is-null.js* enter as passes, moving
+    the manifest to 4,006 cases: 2,358 passes, 1,128 expected negatives, and
+    520 unsupported profile features with no semantic or harness failures.
  -  The asynchronous generator intrinsic chain. `%AsyncIteratorPrototype%`,
     `%AsyncGeneratorPrototype%`, `%AsyncGeneratorFunction.prototype%`, and
     `%AsyncGeneratorFunction%` are materialized as one lazily created
@@ -1768,30 +1792,13 @@ must never shrink by reclassification alone.
     continuation model. Owner: the functions and executable syntax stream for
     pattern suspension, and the modules and asynchronous execution stream for
     cycles.
- -  `AsyncIteratorClose` still awaits a present `return` method by draining
-    the scheduler. This includes abrupt completion from `for await` and the
-    missing-`throw` branch of asynchronous generator `yield*`. Jobs and timers
-    keep their order, but the close does not return to its caller, and a close
-    promise that never settles reports `OSEO3001` instead of leaving the
-    enclosing operation pending. Unit 7.6 owns moving close completion and
-    precedence through the saved frame. Owner: the functions and executable
-    syntax stream.
  -  A module top-level `for await` step retains the drain-based iterator
-    operation because module evaluation does not own the ordinary asynchronous
-    function frame used by Unit 7.5. Top-level await keeps its scheduler
+    operation, including close, because module evaluation does not own the
+    ordinary asynchronous function frame used by Units 7.5 and 7.6. Top-level
+    await keeps its scheduler
     checkpoint in dependency order, and asynchronous module cycles remain
     unsupported. Unit 7.7 owns the module continuation and cycle boundary.
     Owner: the modules and asynchronous execution stream.
- -  AsyncFromSyncIteratorContinuation does not close the wrapped synchronous
-    iterator when the value it awaits rejects. The specification closes the
-    synchronous iterator before the wrapper's promise rejects whenever the
-    continuation was reached with `closeOnRejection` set, so a synchronous
-    iterator whose step reports a rejected promise never observes its own
-    `return` method here, while the rejection itself still reaches the
-    consumer unchanged. Five reviewed-candidate
-    *test/built-ins/AsyncFromSyncIteratorPrototype/* cases turn on the
-    difference and stay outside the reviewed subset, four under *next* and one
-    under *throw*. Owner: the functions and executable syntax stream.
  -  `PromiseResolve` does not read the resolved value's `constructor`. The
     specification returns an already-native promise unchanged only after
     `SameValue(value.constructor, %Promise%)` holds, so a value carrying a
@@ -1804,6 +1811,13 @@ must never shrink by reclassification alone.
     cases. Closing
     it needs `Promise` as a materialized intrinsic value to compare against.
     Owner: the intrinsics and built-in objects stream.
+ -  The reviewed-candidate
+    *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case stays
+    outside the subset pending targeted differential evidence for a throw
+    forwarded to a wrapped synchronous generator and the generator's
+    subsequent completed state. The behavior is no longer attributed to a
+    missing `%GeneratorPrototype%.throw`. Owner: the functions and executable
+    syntax stream after Unit 7.6.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. Reaching either needs `Object.getPrototypeOf`, and
     creating a generator function from one needs the dynamic-source

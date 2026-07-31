@@ -38,6 +38,12 @@ tests:
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/for-await-iterator-next-rejected-promise-close.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/for-await-next-rejected-promise-close.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/iterator-result-poisoned-done.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
@@ -55,6 +61,12 @@ tests:
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/return-promise.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/yield-iterator-next-rejected-promise-close.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/yield-next-rejected-promise-close.js
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-value-not-passed.js
     expectedClassification: unsupported-profile-feature
@@ -90,6 +102,9 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-poisoned-value.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-rejected-promise-close.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-unwrap-promise.js
@@ -14900,6 +14915,16 @@ tests:
         var-bindings,
       ]
   - path: test/language/statements/for-await-of/iterator-close-non-throw-get-method-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        iterator-protocol,
+        promise-settlement,
+      ]
+  - path: test/language/statements/for-await-of/iterator-close-non-throw-get-method-is-null.js
     expectedClassification: pass
     dependencies:
       [

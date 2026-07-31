@@ -190,6 +190,9 @@ test("converts for-await-of heads to the asynchronous protocol", () => {
   );
   assert.match(mir, /value-only=%\d+/u);
   assert.match(mir, /AsyncIteratorClose/u);
+  assert.match(mir, /iterator-close-start start AsyncIteratorClose/u);
+  assert.match(mir, /close-mode=%\d+/u);
+  assert.match(mir, /iterator-close-result complete AsyncIteratorClose/u);
   assert.match(mir, /for-await-of bb\d+/u);
   // Destructuring the awaited value is ordinary array binding, so the
   // pattern head still acquires a synchronous iterator over that value.
@@ -256,6 +259,9 @@ test("lowers a module top-level for-await head", () => {
   assert.match(mir, /GetIterator async/u);
   assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
   assert.doesNotMatch(mir, /iterator-await-start/u);
+  assert.match(mir, /iterator-close AsyncIteratorClose/u);
+  assert.doesNotMatch(mir, /iterator-close-start/u);
+  assert.doesNotMatch(mir, /iterator-close-result/u);
 });
 
 // The loop stays in place instead of splitting into continuations, so an

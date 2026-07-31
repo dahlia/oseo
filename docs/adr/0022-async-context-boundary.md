@@ -123,13 +123,14 @@ Decision
     proposal's web-integration rules once they settle, and listener
     records do not commit to retaining registration-time snapshots.
  -  Context propagation through every admitted asynchronous form depends
-    on the remaining drain-based M5 gaps: asynchronous iterator closing,
-    module top-level `for await`, and top-level await. Unit 7.4 moved ordinary
+    on the remaining drain-based M5 module gaps: module top-level `for await`
+    and top-level await. Unit 7.4 moved ordinary
     asynchronous `await` into a traced frame, and Unit 7.5 did the same for
     framed `for await` steps and asynchronous generator `yield*` delegation.
+    Unit 7.6 moved framed asynchronous iterator closing through that owner.
     A remaining drain-based form runs unrelated jobs before returning to its
     caller, so a dispatcher-level restore would leave the suspending job's
-    snapshot installed for those jobs. Units 7.6 and 7.7 move those forms to
+    snapshot installed for those jobs. Unit 7.7 moves the module forms to
     return-to-caller suspension before the feature is admitted.
  -  The admitting plan defines the snapshot representation and measures
     capture cost and the added per-reaction, per-job, and per-timer
@@ -148,9 +149,8 @@ Consequences
     save-and-restore precedents the runtime already contains. The
     admitting plan still owns the API, representation, and
     proposal-specific semantics.
- -  The remaining drain-based close and module suspension gaps gain a further
-    reason to close with return-to-caller semantics: they also block
-    AsyncContext.
+ -  The remaining drain-based module suspension gaps retain a further reason
+    to close with return-to-caller semantics: they also block AsyncContext.
  -  No *PLAN-ACTX.md* exists yet. When a replacement trigger below fires,
     that plan is written with this record in its entry evidence, and this
     record moves to accepted or superseded.

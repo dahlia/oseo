@@ -115,6 +115,10 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
         operation.iteratorValueOnlyResult == null
           ? ""
           : ` value-only=%${operation.iteratorValueOnlyResult}`;
+      const iteratorCloseModeText =
+        operation.iteratorCloseResultMode == null
+          ? ""
+          : ` close-mode=%${operation.iteratorCloseResultMode}`;
       lines.push(
         `    ${resultText} = ${operation.kind} ` +
           `${operation.detail}` +
@@ -122,7 +126,8 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
           `@${rangeText(operation.range)}${hintTextValue}${cacheText}` +
           argumentListText +
           iteratorStateText +
-          iteratorModeText,
+          iteratorModeText +
+          iteratorCloseModeText,
       );
     }
     lines.push(`    ${printTerminator(block.terminator)}`);

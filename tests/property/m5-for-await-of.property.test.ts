@@ -543,3 +543,506 @@ test(
     );
   },
 );
+
+type CloseCompletion = "break" | "throw";
+type CloseForm =
+  | "for-await-function"
+  | "for-await-generator"
+  | "yield-star-missing-throw";
+type CloseSettlement = "never" | "nonobject" | "reaction" | "reject" | "timer";
+
+interface AsyncCloseFrameCase {
+  readonly completion: CloseCompletion;
+  readonly falseHint: boolean;
+  readonly form: CloseForm;
+  readonly settlement: CloseSettlement;
+  readonly source: FrameSource;
+}
+
+const closeCompletionArbitrary = fc.constantFrom<CloseCompletion>(
+  "break",
+  "throw",
+);
+const closeSettlementArbitrary = fc.constantFrom<CloseSettlement>(
+  "never",
+  "nonobject",
+  "reaction",
+  "reject",
+  "timer",
+);
+const asyncCloseFrameArbitrary = fc.oneof(
+  fc.record({
+    completion: closeCompletionArbitrary,
+    falseHint: fc.boolean(),
+    form: fc.constantFrom<CloseForm>(
+      "for-await-function",
+      "for-await-generator",
+    ),
+    settlement: closeSettlementArbitrary,
+    source: fc.constantFrom<FrameSource>("async", "sync"),
+  }),
+  fc.record({
+    completion: closeCompletionArbitrary,
+    falseHint: fc.boolean(),
+    form: fc.constant<CloseForm>("yield-star-missing-throw"),
+    settlement: closeSettlementArbitrary,
+    source: fc.constant<FrameSource>("async"),
+  }),
+  fc.record({
+    completion: closeCompletionArbitrary,
+    falseHint: fc.boolean(),
+    form: fc.constant<CloseForm>("yield-star-missing-throw"),
+    settlement: fc.constant<CloseSettlement>("reaction"),
+    source: fc.constant<FrameSource>("sync"),
+  }),
+);
+
+function asyncCloseFrameSource(testCase: AsyncCloseFrameCase): string {
+  const key =
+    testCase.source === "async" ? "Symbol.asyncIterator" : "Symbol.iterator";
+  const next =
+    testCase.source === "async"
+      ? "return Promise.resolve({ value: 7, done: false });"
+      : "return { value: 7, done: false };";
+  const wrappedMissingThrow =
+    testCase.form === "yield-star-missing-throw" && testCase.source === "sync";
+  const closeResult = wrappedMissingThrow
+    ? `return {
+          get done() {
+            console.log("unexpected done");
+            return true;
+          },
+          get value() {
+            console.log("unexpected value");
+            return Promise.reject(new Error("unexpected await"));
+          },
+        };`
+    : testCase.settlement === "nonobject"
+      ? testCase.source === "async"
+        ? "return delayed(7);"
+        : "return 7;"
+      : testCase.source === "async"
+        ? "return delayed({ value: undefined, done: true });"
+        : `return {
+          value: delayed("closed"),
+          done: true,
+        };`;
+  const settle =
+    testCase.settlement === "never"
+      ? ""
+      : testCase.settlement === "timer"
+        ? `
+    setTimeout(function () {
+      console.log("close settled");
+      resolve(value);
+    }, 1);`
+        : testCase.settlement === "reject"
+          ? `
+    Promise.resolve().then(function () {
+      console.log("close settled");
+      reject(new TypeError("close"));
+    });`
+          : `
+    Promise.resolve().then(function () {
+      console.log("close settled");
+      resolve(value);
+    });`;
+  const input = testCase.falseHint
+    ? `{
+  valueOf: function () {
+    console.log("fallback");
+    return 4;
+  },
+}`
+    : "2";
+  const completion =
+    testCase.completion === "throw"
+      ? 'throw new RangeError("body");'
+      : "break;";
+  const execution =
+    testCase.form === "for-await-function"
+      ? `
+async function execute() {
+  const guard = hintedAdd(input, 1);
+  try {
+    for await (const value of iterable) {
+      console.log("body", value + guard);
+      ${completion}
+    }
+    console.log("completed");
+  } catch (error) {
+    console.log("caught", error.name);
+  }
+}
+async function main() {
+  const task = execute();
+  console.log("caller");
+  await observe(task);
+}`
+      : testCase.form === "for-await-generator"
+        ? `
+async function* generate() {
+  const guard = hintedAdd(input, 1);
+  for await (const value of iterable) {
+    console.log("body", value + guard);
+    ${completion}
+  }
+  console.log("completed");
+}
+async function main() {
+  const task = generate().next().then(
+    function () { console.log("resolved"); },
+    function (error) {
+      console.log("caught", error.name);
+    },
+  );
+  console.log("caller");
+  await observe(task);
+}`
+        : `
+async function* generate() {
+  const guard = hintedAdd(input, 1);
+  console.log("guard", guard);
+  yield* iterable;
+}
+async function main() {
+  const iterator = generate();
+  console.log("first", (await iterator.next()).value);
+  const task = iterator.throw(new Error("sent")).then(
+    function () { console.log("resolved"); },
+    function (error) { console.log("caught", error.name); },
+  );
+  console.log("caller");
+  await observe(task);
+}`;
+  return `
+/**
+ * @param {number} left
+ * @param {number} right
+ */
+function hintedAdd(left, right) {
+  return left + right;
+}
+function delayed(value) {
+  return new Promise(function (resolve, reject) {${settle}
+  });
+}
+const iterable = {
+  [${key}]: function () {
+    return {
+      next: function () { ${next} },
+      return: function () {
+        console.log("close called");
+        ${closeResult}
+      },
+    };
+  },
+};
+const input = ${input};
+async function observe(task) {
+  if (${JSON.stringify(testCase.settlement)} === "never") {
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    console.log("pending");
+  } else {
+    await task;
+    console.log("joined");
+  }
+}
+${execution}
+main();
+`;
+}
+
+function asyncCloseFrameExpected(testCase: AsyncCloseFrameCase): string {
+  const lines: string[] = [];
+  if (testCase.form === "yield-star-missing-throw") {
+    if (testCase.falseHint) lines.push("fallback");
+    lines.push(testCase.falseHint ? "guard 5" : "guard 3", "first 7");
+    lines.push("close called", "caller");
+  } else {
+    if (testCase.falseHint) lines.push("fallback");
+    lines.push("caller", testCase.falseHint ? "body 12" : "body 10");
+    lines.push("close called");
+  }
+  if (testCase.settlement === "never") {
+    lines.push("pending");
+    return `${lines.join("\n")}\n`;
+  }
+  const closeSettles =
+    testCase.settlement !== "nonobject" || testCase.source === "async";
+  if (
+    closeSettles &&
+    !(
+      testCase.form === "yield-star-missing-throw" && testCase.source === "sync"
+    )
+  ) {
+    lines.push("close settled");
+  }
+  if (testCase.form === "yield-star-missing-throw") {
+    lines.push("caught TypeError");
+  } else if (testCase.completion === "throw") {
+    lines.push("caught RangeError");
+  } else if (
+    testCase.settlement === "reject" ||
+    testCase.settlement === "nonobject"
+  ) {
+    lines.push("caught TypeError");
+  } else if (testCase.form === "for-await-generator") {
+    lines.push("completed", "resolved");
+  } else {
+    lines.push("completed");
+  }
+  lines.push("joined");
+  return `${lines.join("\n")}\n`;
+}
+
+async function assertGeneratedNative(
+  source: string,
+  sourceId: string,
+  stdout: string,
+): Promise<void> {
+  const expected = { exitStatus: 0, stderr: "", stdout };
+  assertMatchingObservations([expected, ...(await references(source))]);
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source, sourceId },
+      { specialization },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    if (specialization === "enabled") {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    }
+    try {
+      await withNativeFixture(
+        {
+          backend: cBackend,
+          host,
+          input: compiled.mir,
+          operation: "execute",
+          runtime: cRuntimeProvider,
+          target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+          toolchain: zigToolchain,
+        },
+        (native) => assertMatchingObservations([expected, native]),
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+}
+
+test(
+  "generated asynchronous close frames match the completion model",
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+  },
+  async () => {
+    await assertAsyncProperty(
+      "asynchronous closes suspend their owning frame",
+      fc.asyncProperty(asyncCloseFrameArbitrary, async (testCase) => {
+        await assertGeneratedNative(
+          asyncCloseFrameSource(testCase),
+          "generated-m5-async-close-frame.js",
+          asyncCloseFrameExpected(testCase),
+        );
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "async-function and async-generator for-await close frames, " +
+          "native async and wrapped sync missing-throw yield-star, " +
+          "completion precedence, reaction, timer, rejection, non-object, " +
+          "never settlement, and false hints",
+        numRuns: 12,
+        profile: "M5 Unit 7.6 asynchronous close frame suspension",
+        seed: 0x5eed_001f,
+        sizeLimit: "one iterator value and one abrupt completion",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+type RejectionForm = "for-await" | "yield-next" | "yield-throw";
+type RejectionReturn = "normal" | "nonobject" | "throw";
+
+interface AsyncFromSyncRejectionCase {
+  readonly done: boolean;
+  readonly falseHint: boolean;
+  readonly form: RejectionForm;
+  readonly returned: RejectionReturn;
+}
+
+const asyncFromSyncRejectionArbitrary = fc.record({
+  done: fc.boolean(),
+  falseHint: fc.boolean(),
+  form: fc.constantFrom<RejectionForm>(
+    "for-await",
+    "yield-next",
+    "yield-throw",
+  ),
+  returned: fc.constantFrom<RejectionReturn>("normal", "nonobject", "throw"),
+});
+
+function asyncFromSyncRejectionSource(
+  testCase: AsyncFromSyncRejectionCase,
+): string {
+  const returnStatement =
+    testCase.returned === "throw"
+      ? 'throw new TypeError("close");'
+      : testCase.returned === "nonobject"
+        ? "return 4;"
+        : "return { value: undefined, done: true };";
+  const input = testCase.falseHint
+    ? `{
+  valueOf: function () {
+    console.log("fallback");
+    return 4;
+  },
+}`
+    : "2";
+  const firstStep =
+    testCase.form === "yield-throw"
+      ? `if (steps === 1) return { value: "open", done: false };
+        return { value: undefined, done: true };`
+      : `return {
+          value: Promise.reject(new RangeError("step")),
+          done: ${String(testCase.done)},
+        };`;
+  const throwMethod =
+    testCase.form === "yield-throw"
+      ? `
+      throw: function () {
+        return {
+          value: Promise.reject(new RangeError("step")),
+          done: ${String(testCase.done)},
+        };
+      },`
+      : "";
+  const execution =
+    testCase.form === "for-await"
+      ? `
+async function execute() {
+  const guard = hintedAdd(input, 1);
+  try {
+    for await (const value of iterable) console.log(value, guard);
+  } catch (error) {
+    console.log("caught", error.name, error.message);
+  }
+}`
+      : `
+async function* generate() {
+  const guard = hintedAdd(input, 1);
+  console.log("guard", guard);
+  yield* iterable;
+}
+async function execute() {
+  const iterator = generate();
+  try {
+    ${
+      testCase.form === "yield-throw"
+        ? `console.log("first", (await iterator.next()).value);
+    await iterator.throw("sent");`
+        : "await iterator.next();"
+    }
+  } catch (error) {
+    console.log("caught", error.name, error.message);
+  }
+}`;
+  return `
+/** @param {number} left @param {number} right */
+function hintedAdd(left, right) { return left + right; }
+let closes = 0;
+let steps = 0;
+const iterable = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        steps += 1;
+        ${firstStep}
+      },${throwMethod}
+      return: function () {
+        closes += 1;
+        console.log("close called");
+        ${returnStatement}
+      },
+    };
+  },
+};
+const input = ${input};
+${execution}
+async function main() {
+  await execute();
+  console.log("closes", closes);
+}
+main();
+`;
+}
+
+function asyncFromSyncRejectionExpected(
+  testCase: AsyncFromSyncRejectionCase,
+): string {
+  const lines: string[] = [];
+  if (testCase.falseHint) lines.push("fallback");
+  if (testCase.form !== "for-await") {
+    lines.push(testCase.falseHint ? "guard 5" : "guard 3");
+  }
+  if (testCase.form === "yield-throw") lines.push("first open");
+  if (!testCase.done) lines.push("close called");
+  lines.push("caught RangeError step", `closes ${testCase.done ? 0 : 1}`);
+  return `${lines.join("\n")}\n`;
+}
+
+test(
+  "generated async-from-sync rejections match the close model",
+  {
+    skip: nativeTarget == null ? "requires a supported native host" : false,
+  },
+  async () => {
+    await assertAsyncProperty(
+      "rejected stepped values close their wrapped synchronous iterator",
+      fc.asyncProperty(asyncFromSyncRejectionArbitrary, async (testCase) => {
+        await assertGeneratedNative(
+          asyncFromSyncRejectionSource(testCase),
+          "generated-m5-async-from-sync-rejection.js",
+          asyncFromSyncRejectionExpected(testCase),
+        );
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "for-await and async yield-star over wrapped sync steps, done " +
+          "states, rejecting promised values, close result failures, and " +
+          "false hints",
+        numRuns: 10,
+        profile: "M5 Unit 7.6 AsyncFromSync rejection close",
+        seed: 0x5eed_0020,
+        sizeLimit: "one rejected step and one optional close",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

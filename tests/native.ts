@@ -251,11 +251,14 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-generator-delegation" ||
     fixture.name === "async-generator-delegation-suspension" ||
     fixture.name === "async-generator-for-await-suspension" ||
+    fixture.name === "async-generator-missing-throw-close-suspension" ||
+    fixture.name === "async-from-sync-rejection-close" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
     fixture.name === "for-await-of-frame-suspension" ||
+    fixture.name === "for-await-of-close-suspension" ||
     fixture.name === "in-and-instanceof" ||
     fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||

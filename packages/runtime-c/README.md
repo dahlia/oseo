@@ -180,7 +180,13 @@ one step, retains its promise and direct-value mode in owned root slots, returns
 to the caller, and inspects the settled result only after a promise reaction
 resumes the frame. Async-from-Sync continuation promises use a runtime-owned
 fulfillment reaction to await the stepped value without draining the scheduler.
-Asynchronous iterator closing retains the existing drain-based entry point.
+Module top-level asynchronous iterator closing retains the existing
+drain-based entry point.
+The `m5-33` ABI adds framed asynchronous iterator close start and result
+entry points. Generated code retains the pending completion in the owning
+traced frame while a present `return` method settles, and the runtime's
+Async-from-Sync rejection reaction closes the wrapped synchronous iterator
+before preserving the original rejection.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

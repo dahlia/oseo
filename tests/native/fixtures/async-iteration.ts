@@ -675,4 +675,119 @@ main();
       overflowMisses: 0,
     },
   },
+  {
+    name: "for-await-of-close-suspension",
+    source: `
+function closingIterator(label, settlement) {
+  return {
+    [Symbol.asyncIterator]: function () {
+      return {
+        next: function () {
+          return Promise.resolve({ value: 3, done: false });
+        },
+        return: function () {
+          console.log(label, "close called");
+          return new Promise(function (resolve, reject) {
+            if (settlement === "never") return;
+            const settle = function () {
+              console.log(label, "close settled");
+              if (settlement === "reject") {
+                reject(new TypeError("close"));
+              } else if (settlement === "nonobject") {
+                resolve(7);
+              } else {
+                resolve({ value: undefined, done: true });
+              }
+            };
+            if (settlement === "timer") setTimeout(settle, 1);
+            else Promise.resolve().then(settle);
+          });
+        },
+      };
+    },
+  };
+}
+async function consume(label, settlement, completion) {
+  try {
+    for await (const value of closingIterator(label, settlement)) {
+      console.log(label, "body", value);
+      if (completion === "throw") throw new RangeError("body");
+      break;
+    }
+    console.log(label, "completed");
+  } catch (error) {
+    console.log(label, "caught", error.name);
+  }
+}
+async function probe(label, settlement, completion) {
+  const task = consume(label, settlement, completion);
+  console.log(label, "caller resumed");
+  if (settlement === "never") {
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    console.log(label, "remains pending");
+    return;
+  }
+  await task;
+  console.log(label, "caller joined");
+}
+async function main() {
+  await probe("reaction", "reaction", "break");
+  await probe("timer", "timer", "break");
+  await probe("close-error", "reject", "break");
+  await probe("nonobject", "nonobject", "break");
+  await probe("body-error", "reject", "throw");
+  await probe("never", "never", "break");
+  console.log("finished");
+}
+main();
+`,
+  },
+  {
+    name: "async-from-sync-rejection-close",
+    source: `
+function rejectingIterable(label, done, returned) {
+  let closes = 0;
+  return {
+    closes: function () { return closes; },
+    [Symbol.iterator]: function () {
+      return {
+        next: function () {
+          return {
+            value: Promise.reject(new RangeError(label + " step")),
+            done: done,
+          };
+        },
+        return: function () {
+          closes += 1;
+          console.log(label, "close called");
+          if (returned === "throw") throw new TypeError("close");
+          if (returned === "nonobject") return 3;
+          return { value: undefined, done: true };
+        },
+      };
+    },
+  };
+}
+async function probe(label, done, returned) {
+  const iterable = rejectingIterable(label, done, returned);
+  try {
+    for await (const value of iterable) console.log(label, value);
+  } catch (error) {
+    console.log(label, "caught", error.name, error.message);
+  }
+  console.log(label, "closes", iterable.closes());
+}
+async function main() {
+  await probe("normal", false, "normal");
+  await probe("throwing", false, "throw");
+  await probe("nonobject", false, "nonobject");
+  await probe("done", true, "normal");
+  console.log("finished");
+}
+main();
+`,
+  },
 ];

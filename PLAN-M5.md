@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,000
-reviewed cases: 2,352 passes, 1,128 expected negatives, and 520 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,006
+reviewed cases: 2,358 passes, 1,128 expected negatives, and 520 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -901,8 +901,8 @@ At this checkpoint, a step suspended by draining the scheduler rather than by
 returning to the caller, because the frontend split an `await` expression into
 continuations and a loop had no such split. Unit 7.5 now closes that deviation
 inside ordinary asynchronous functions and asynchronous generators through
-their shared traced frame. Module top-level steps and asynchronous iterator
-closing remain the separate Units 7.7 and 7.6 boundaries.
+their shared traced frame. Unit 7.6 now closes through the same frame in those
+contexts. Module top-level steps remain the Unit 7.7 boundary.
 
 Native differential fixtures cover the synchronous fallback, generator and
 user iterables, `Symbol.asyncIterator` preference over `Symbol.iterator`,
@@ -964,8 +964,8 @@ resumption position under both specialization policies and forced collection.
 
 At this checkpoint, the awaits a `yield*` step took still drained the
 scheduler. Unit 7.5 now moves next, return, and throw delegation steps through
-the asynchronous generator's traced frame. A missing-`throw` delegation still
-closes through the drain-based Unit 7.6 path.
+the asynchronous generator's traced frame. Unit 7.6 now moves the
+missing-`throw` close through that frame as well.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act
@@ -1068,18 +1068,20 @@ boundary; nine further *AsyncIteratorPrototype/* paths are `Symbol.asyncDispose`
 cases that [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) places
 in the 2027 edition, outside the M5a denominator.
 
-Twelve cases stay outside the reviewed subset because they observe behavior
-this profile does not implement, and the measurement names all three causes.
-AsyncFromSyncIteratorContinuation does not close the wrapped synchronous
-iterator when the stepped value rejects, which four *next* cases and one
-*throw* case observe. `PromiseResolve` does not read the resolved value's
+Seven cases stay outside the reviewed subset. Unit 7.6 promotes the four
+*next* cases and one *throw* case that
+observe AsyncFromSyncIteratorContinuation closing the wrapped synchronous
+iterator when an awaited stepped value rejects. `PromiseResolve` does not read
+the resolved value's
 `constructor`, so a poisoned `constructor` getter neither rejects nor reaches
 the generator, which three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
 cases and the three *AsyncGeneratorPrototype/return/* broken-promise cases
-observe. The
-missing `%GeneratorPrototype%.throw` reaches one further case,
-*AsyncFromSyncIteratorPrototype/throw/iterator-result.js*, through a `throw`
-forwarded to a wrapped synchronous generator. Eight
+observe. The remaining
+*AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case awaits separate
+review outside Unit 7.6; its former missing `%GeneratorPrototype%.throw`
+attribution is stale. The functions and executable syntax stream owns targeted
+differential evidence for its forwarded throw and subsequent completed state.
+Eight
 *test/built-ins/Function/prototype/toString/* cases the `async-iteration` tag
 reaches need an *nativeFunctionMatcher.js* include that has no reviewed
 implementation. Each is now a profile gap entry with a named owner.
@@ -1530,7 +1532,36 @@ Deno, and native execution.
 The reviewed *yield-star-return-then-getter-ticks.js* test262 case enters as a
 pass. The manifest moves to 4,000 cases: 2,352 passes, 1,128 expected
 negatives, and 520 unsupported profile features with no semantic or harness
-failures. AsyncIteratorClose still drains and remains Unit 7.6. Module
+failures.
+
+M5a Unit 7.6 moves `AsyncIteratorClose` through the owning traced frame for
+abrupt `for await` completion in ordinary asynchronous functions and
+asynchronous generators. It also moves the missing-`throw` close of native
+asynchronous `yield*` delegation through the asynchronous generator frame. A
+start operation records the close promise and completion mode in traced roots;
+fulfillment or rejection resumes generated code, which restores the saved
+completion with the required precedence. A close promise that never settles
+therefore leaves the enclosing operation pending instead of producing
+`OSEO3001`.
+
+AsyncFromSyncIteratorContinuation now installs a rejection reaction when
+`closeOnRejection` applies. The reaction closes the wrapped synchronous
+iterator before rejecting with the original stepped-value reason; failures
+from that close do not replace the original rejection. Fixed native fixtures
+cover reaction, timer, rejection, non-object, and never-settling close results,
+abrupt completion precedence, native asynchronous and wrapped synchronous
+missing-`throw` delegation, and synchronous stepped-value rejection. The
+wrapped synchronous missing-`throw` path performs `IteratorClose` without
+reading or awaiting the close result's fields. Generated properties use seeds
+`0x5eed001f` and `0x5eed0020`, structured close and wrapper domains, independent
+completion models, both specialization policies, false hints, deliberate
+generic fallback, and forced collection against Node.js, Deno, and native
+execution.
+
+Five reviewed *AsyncFromSyncIteratorPrototype* cases and
+*iterator-close-non-throw-get-method-is-null.js* enter as passes. The manifest
+moves to 4,006 cases: 2,358 passes, 1,128 expected negatives, and 520
+unsupported profile features with no semantic or harness failures. Module
 top-level `for await`, top-level await checkpoints, and asynchronous module
 cycles retain the Unit 7.7 module-continuation boundary.
 
