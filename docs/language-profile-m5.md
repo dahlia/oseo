@@ -1741,18 +1741,36 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
- -  Big integers are outside the admitted syntax and value profile. Exact
-    literals, `ToNumeric`, operators, representation, the `BigInt` intrinsic,
-    and fixed-width conversion are owned by
-    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) across the core expressions and
-    bindings stream and the intrinsic stream in
-    [*PLAN-M5.md*](../PLAN-M5.md).
+ -  Big integers remain outside the admitted syntax and value profile. The
+    frontend rejects `BigIntLiteral`, and the reviewed manifest retains its
+    BigInt-dependent case as `unsupported-profile-feature`. Exact literals,
+    `ToNumeric`, operators, and representation remain M5a work owned by the
+    core expressions and bindings stream. The `BigInt` intrinsic, prototype,
+    wrappers, and fixed-width conversion remain M5b work owned by the
+    intrinsics and built-in objects stream.
+    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns both checkpoints and records
+    their implementation status as planned.
  -  Regular expression syntax, objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  The remaining expression grammar, excluding the admitted optional chaining
-    and tagged template forms, is outside the admitted syntax. Owner: the core
-    expressions and bindings stream in [*PLAN-M5.md*](../PLAN-M5.md).
+ -  There is no longer one undifferentiated remaining expression grammar gap.
+    The optional chaining and tagged template entries above name their fixed
+    native evidence, generated suites with seeds `0x5eed0019` and
+    `0x5eed001a`, and reviewed test262 cases. The forms that remain outside the
+    profile have specific boundaries: BigInt and regular expressions are
+    recorded above, and dynamic import, `super`, and pattern-position `await`
+    are recorded below. Script top-level `this` remains rejected because the
+    profile has no Script or global receiver model. An object literal still
+    rejects a noncomputed `__proto__` property name in every syntactic form; a
+    computed name remains an ordinary property key. `delete` remains limited
+    to ordinary property references, so an identifier, non-reference, or
+    optional chain operand is rejected. Owner: the core expressions and
+    bindings stream for Script top-level `this`, object-literal `__proto__`,
+    and the remaining `delete` forms.
+ -  Module top-level `this` is a separate gap. ECMAScript evaluates it to
+    `undefined`, but the current compiler rejects it, as
+    *test/language/module-code/eval-this.js* demonstrates. `import.meta` is
+    also rejected. Owner: the modules and asynchronous execution stream.
  -  `super()`, `super.x`, and `new.target` are rejected inside an arrow
     function, and an optional call through a `super` property remains
     rejected. `super.x` is also rejected inside an asynchronous class element,
