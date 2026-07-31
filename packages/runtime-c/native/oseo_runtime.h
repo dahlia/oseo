@@ -1288,7 +1288,6 @@ OseoResult oseo_promise_result(
     OseoContext *context,
     OseoValue promise
 );
-OseoResult oseo_await_value(OseoContext *context, OseoValue value);
 OseoResult oseo_jobs_drain(OseoContext *context);
 OseoResult oseo_rejection_checkpoint(OseoContext *context);
 OseoResult oseo_set_timeout(
@@ -1304,6 +1303,9 @@ OseoResult oseo_entry_task_checkpoint(
     OseoContext *context,
     OseoResult completion
 );
-OseoResult oseo_event_loop_run(OseoContext *context);
+OseoResult oseo_event_loop_run(
+    OseoContext *context,
+    OseoValue entry_promise
+);
 
 #endif

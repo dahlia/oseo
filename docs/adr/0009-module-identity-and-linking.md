@@ -4,7 +4,7 @@ ADR 0009: Canonical module identity and linking
 Status
 ------
 
-Accepted and implemented for M4.
+Accepted and implemented for M4 and M5a.
 
 
 Context
@@ -35,10 +35,12 @@ where source order cannot distinguish them.
 
 Each module body lowers to a private evaluator after graph-wide instantiation.
 Dependency-ready evaluators start in source order. A top-level suspension
-returns a promise and generated continuation instead of blocking the next
+returns a promise and traced module continuation instead of blocking the next
 independent sibling. An importer evaluator waits for every asynchronous
-dependency. Asynchronous cycles remain outside M4 and receive an owned
-diagnostic.
+dependency. M5a Unit 7.7 admits asynchronous strongly connected components:
+an evaluator waits for already-visited dependencies in its own component,
+ignores a DFS back edge, and maps a dependency from outside a completed
+asynchronous component to that component's cycle-root promise.
 
 
 Consequences
@@ -49,9 +51,10 @@ receives a closed, deterministic graph. Package resolution and loading policy
 remain replaceable host concerns.
 
 Module evaluation state remains explicit even though every evaluator and live
-cell is linked into one native executable. Synchronous cycles retain their
-source order, while an asynchronous dependency does not serialize unrelated
-siblings.
+cell is linked into one native executable. Synchronous and asynchronous cycles
+retain dependency order, while an asynchronous dependency does not serialize
+unrelated siblings. Every source module is still evaluated once under its
+canonical identity.
 
 Graph construction must diagnose missing, duplicate, and ambiguous exports
 before native compilation. Source changes alter the recorded hash even when a

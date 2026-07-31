@@ -258,24 +258,28 @@ test("lowers a module top-level for-await head", () => {
   const mir = printMir(compiled.mir);
   assert.match(mir, /GetIterator async/u);
   assert.match(mir, /Await, IteratorStep, and IteratorValue/u);
-  assert.doesNotMatch(mir, /iterator-await-start/u);
-  assert.match(mir, /iterator-close AsyncIteratorClose/u);
-  assert.doesNotMatch(mir, /iterator-close-start/u);
-  assert.doesNotMatch(mir, /iterator-close-result/u);
+  assert.match(mir, /iterator-await-start/u);
+  assert.match(mir, /iterator-close-start/u);
+  assert.match(mir, /iterator-close-result/u);
+  assert.match(mir, /generator-await/u);
 });
 
-// The loop stays in place instead of splitting into continuations, so an
-// awaited iterable would reach a position the module transform does not
-// own; it keeps the existing rejection rather than approximating one.
-test("rejects an awaited iterable inside a for-await head", () => {
+test("suspends an awaited iterable inside a for-await head", () => {
   const compiled = compileOneModule(
     "for await (const item of await Promise.resolve([])) {}\n",
     "file:///app/for-await-awaited-iterable.js",
   );
-  assert.equal(compiled.mir, undefined);
-  assert.match(
-    compiled.diagnostics[0]?.message ?? "",
-    /control-flow position/u,
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const continuation = compiled.mir.functions.find((functionValue) =>
+    functionValue.name.startsWith("*module:"),
+  );
+  assert.ok(
+    (continuation?.blocks.filter(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ).length ?? 0) >= 2,
   );
 });
 
@@ -530,7 +534,7 @@ test("admits await inside logical operands of async functions", () => {
   );
 });
 
-test("rejects top-level await inside logical operands", () => {
+test("suspends top-level await inside logical operands", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const ready = (await Promise.resolve(1)) && 2;",
     sourceId: "file:///app/logical-await.js",
@@ -550,10 +554,17 @@ test("rejects top-level await inside logical operands", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.match(
-    compiled.diagnostics[0]?.message ?? "",
-    /control-flow position/u,
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const continuation = compiled.mir.functions.find((functionValue) =>
+    functionValue.name.startsWith("*module:"),
+  );
+  assert.ok(
+    continuation?.blocks.some(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ),
   );
 });
 

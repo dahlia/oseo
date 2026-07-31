@@ -122,16 +122,14 @@ Decision
     listener invocation; which snapshot a listener observes follows the
     proposal's web-integration rules once they settle, and listener
     records do not commit to retaining registration-time snapshots.
- -  Context propagation through every admitted asynchronous form depends
-    on the remaining drain-based M5 module gaps: module top-level `for await`
-    and top-level await. Unit 7.4 moved ordinary
-    asynchronous `await` into a traced frame, and Unit 7.5 did the same for
-    framed `for await` steps and asynchronous generator `yield*` delegation.
-    Unit 7.6 moved framed asynchronous iterator closing through that owner.
-    A remaining drain-based form runs unrelated jobs before returning to its
-    caller, so a dispatcher-level restore would leave the suspending job's
-    snapshot installed for those jobs. Unit 7.7 moves the module forms to
-    return-to-caller suspension before the feature is admitted.
+ -  Context propagation through every admitted asynchronous form now has a
+    return-to-caller suspension owner. Unit 7.4 moved ordinary asynchronous
+    `await` into a traced frame, Unit 7.5 did the same for framed `for await`
+    steps and asynchronous generator `yield*` delegation, and Unit 7.6 moved
+    framed asynchronous iterator closing through that owner. Unit 7.7 gives
+    module top-level await and `for await` step and close operations a private
+    traced module continuation. AsyncContext remains unadmitted until its own
+    plan selects the snapshot representation and proposal semantics.
  -  The admitting plan defines the snapshot representation and measures
     capture cost and the added per-reaction, per-job, and per-timer
     retention under the accounting contract of
@@ -149,8 +147,8 @@ Consequences
     save-and-restore precedents the runtime already contains. The
     admitting plan still owns the API, representation, and
     proposal-specific semantics.
- -  The remaining drain-based module suspension gaps retain a further reason
-    to close with return-to-caller semantics: they also block AsyncContext.
+ -  Closing the drain-based module suspension gaps removes that prerequisite
+    without selecting or admitting an AsyncContext API.
  -  No *PLAN-ACTX.md* exists yet. When a replacement trigger below fires,
     that plan is written with this record in its entry evidence, and this
     record moves to accepted or superseded.

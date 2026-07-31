@@ -357,7 +357,8 @@ test("forces the module goal symbol with --module", async () => {
     host,
   );
   assert.equal(asModule.exitStatus, 0, asModule.stderr);
-  assert.match(asModule.stdout, /top-level await/u);
+  assert.match(asModule.stdout, /async function .*\*module:/u);
+  assert.match(asModule.stdout, /generator-await/u);
   const asScript = await runNativeCli(
     {
       args: ["--dump-mir", "/work/entry.js"],
@@ -366,7 +367,7 @@ test("forces the module goal symbol with --module", async () => {
     },
     host,
   );
-  assert.doesNotMatch(asScript.stdout, /top-level await/u);
+  assert.doesNotMatch(asScript.stdout, /generator-await/u);
   const strictModule = await runNativeCli(
     {
       args: ["--dump-mir", "--module", "/work/entry.js"],
@@ -420,7 +421,8 @@ test("recognizes top-level await without module declarations", async () => {
     host,
   );
   assert.equal(result.exitStatus, 0);
-  assert.match(result.stdout, /top-level await/u);
+  assert.match(result.stdout, /async function .*\*module:/u);
+  assert.match(result.stdout, /generator-await/u);
 });
 
 test("preserves module parsing for plain module entries", async () => {

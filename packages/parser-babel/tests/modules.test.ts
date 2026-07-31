@@ -195,7 +195,7 @@ test("names an anonymous default class during module lowering", () => {
   assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
 });
 
-test("lowers top-level await to an owned scheduler checkpoint", () => {
+test("lowers top-level await to a traced module continuation", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const answer = 1 + await Promise.resolve(41);",
     sourceId: "file:///app/answer.js",
@@ -217,15 +217,21 @@ test("lowers top-level await to an owned scheduler checkpoint", () => {
     ],
   });
   assert.deepEqual(compiled.diagnostics, []);
+  const continuation = compiled.mir?.functions.find((functionValue) =>
+    functionValue.name.startsWith("*module:"),
+  );
+  assert.equal(continuation?.asyncFunction, true);
   assert.ok(
-    compiled.mir?.script.blocks
-      .flatMap((block) => block.operations)
-      .some((operation) => operation.target?.kind === "await"),
+    continuation?.blocks.some(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ),
   );
   assert.doesNotMatch(JSON.stringify(result.module), /AwaitExpression/u);
 });
 
-test("rejects top-level await inside compound assignment", () => {
+test("suspends top-level await inside compound assignment", () => {
   const sourceId = "file:///app/compound-assignment-await.js";
   const result = babelModuleFrontend.parseModule({
     source: "let answer = 1;\nanswer += await Promise.resolve(41);",
@@ -247,17 +253,22 @@ test("rejects top-level await inside compound assignment", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Await inside a compound assignment is unsupported.",
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const continuation = compiled.mir.functions.find((functionValue) =>
+    functionValue.name.startsWith("*module:"),
   );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+  assert.equal(continuation?.asyncFunction, true);
+  assert.ok(
+    continuation?.blocks.some(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ),
+  );
 });
 
-test("extracts top-level await inside an update member target", () => {
+test("suspends top-level await inside an update member target", () => {
   const sourceId = "file:///app/update-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -288,12 +299,20 @@ test("extracts top-level await inside an update member target", () => {
   const operations = [...compiled.mir.functions, compiled.mir.script]
     .flatMap((functionValue) => functionValue.blocks)
     .flatMap((block) => block.operations);
-  assert.ok(operations.some((operation) => operation.target?.kind === "await"));
+  assert.ok(
+    compiled.mir.functions.some((functionValue) =>
+      functionValue.blocks.some(
+        (block) =>
+          block.terminator.kind === "generator-yield" &&
+          block.terminator.awaited === true,
+      ),
+    ),
+  );
   assert.ok(operations.some((operation) => operation.kind === "property-get"));
   assert.ok(operations.some((operation) => operation.kind === "property-set"));
 });
 
-test("rejects array spread before a top-level await point", () => {
+test("suspends after array spread before a top-level await point", () => {
   const sourceId = "file:///app/array-spread-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -317,17 +336,11 @@ test("rejects array spread before a top-level await point", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Array spread before a top-level await point is unsupported.",
-  );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
-test("rejects object spread before a top-level await point", () => {
+test("suspends after object spread before a top-level await point", () => {
   const sourceId = "file:///app/object-spread-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -351,14 +364,8 @@ test("rejects object spread before a top-level await point", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Object spread before a top-level await point is unsupported.",
-  );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
 test("accepts object spread after a top-level await point", () => {
@@ -389,7 +396,7 @@ test("accepts object spread after a top-level await point", () => {
   assert.ok(compiled.mir != null);
 });
 
-test("rejects call spread before a top-level await point", () => {
+test("suspends after call spread before a top-level await point", () => {
   const sourceId = "file:///app/call-spread-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -413,17 +420,11 @@ test("rejects call spread before a top-level await point", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Call argument spread before a top-level await point is unsupported.",
-  );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
-test("rejects constructor spread before a top-level await point", () => {
+test("suspends after constructor spread before a top-level await point", () => {
   const sourceId = "file:///app/constructor-spread-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -448,18 +449,11 @@ test("rejects constructor spread before a top-level await point", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Constructor argument spread before a top-level await point is " +
-      "unsupported.",
-  );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 3);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
-test("rejects Promise spread before a top-level await point", () => {
+test("suspends after Promise spread before a top-level await point", () => {
   const sourceId = "file:///app/promise-spread-await.js";
   const result = babelModuleFrontend.parseModule({
     source:
@@ -483,18 +477,11 @@ test("rejects Promise spread before a top-level await point", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics.length, 1);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    compiled.diagnostics[0]?.message,
-    "Constructor argument spread before a top-level await point is " +
-      "unsupported.",
-  );
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 2);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
-test("diagnoses excessive top-level await depth", () => {
+test("does not impose the former continuation count limit", () => {
   const sourceId = "file:///app/deep-await.js";
   const accepted = babelModuleFrontend.parseModule({
     source: "await 0;\n".repeat(256),
@@ -535,10 +522,8 @@ test("diagnoses excessive top-level await depth", () => {
       },
     ],
   });
-  assert.equal(compiled.mir, undefined);
-  assert.equal(compiled.diagnostics[0]?.code, "OSEO1001");
-  assert.match(compiled.diagnostics[0]?.message ?? "", /at most 256/u);
-  assert.equal(compiled.diagnostics[0]?.range.start.line, 257);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
 });
 
 test("lowers M4 promise construction and static methods", () => {

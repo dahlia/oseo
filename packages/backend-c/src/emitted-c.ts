@@ -456,10 +456,6 @@ export const emittedC = {
     ],
   },
   call: {
-    resultAssignOseoAwaitValueContextRoots: [
-      ["result = oseo_await_value(context, roots["],
-      ["]);"],
-    ],
     resultAssignOseoConsoleLogContext: [
       ["result = oseo_console_log(context, "],
       [", "],
@@ -1226,8 +1222,9 @@ export const emittedC = {
       ],
       [
         "u);\n    }\n    if (result.status == OSEO_STATUS_N",
-        "ORMAL) {\n        result = oseo_event_loop_run(&c",
-        "ontext);\n    } else {\n        result = oseo_entr",
+        "ORMAL) {\n        result = oseo_event_loop_run(\n  ",
+        "          &context, result.value);\n    } else {\n",
+        "        result = oseo_entr",
         "y_task_checkpoint(&context, result);\n    }\n    i",
         "f (result.status != OSEO_STATUS_NORMAL) {\n      ",
         "  oseo_context_print_thrown(&context, result.val",

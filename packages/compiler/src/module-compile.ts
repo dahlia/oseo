@@ -21,7 +21,7 @@ import {
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
 import { linkModuleGraph } from "./modules.ts";
-import type { LinkedModuleGraph } from "./modules.ts";
+import type { LinkedModuleGraph, ModuleComponent } from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
   ModuleGraph,
@@ -170,7 +170,9 @@ function hirStatementAwaits(
   if (statement.kind === "try") {
     return (
       recurse(statement.block) ||
-      (statement.handler != null && recurse(statement.handler.body)) ||
+      (statement.handler != null &&
+        (hirBindingPatternHasAwait(statement.handler.pattern) ||
+          recurse(statement.handler.body))) ||
       (statement.finalizer != null && recurse(statement.finalizer))
     );
   }
@@ -228,6 +230,205 @@ function hirStatementsAreAsynchronous(
   statements: readonly HirStatement[],
 ): boolean {
   return statements.some(hirStatementIsAsynchronous);
+}
+
+function moduleComponentRoot(
+  component: ModuleComponent,
+  evaluationIndices: ReadonlyMap<string, number>,
+): string {
+  let previousIndex = -1;
+  for (const moduleId of component.moduleIds) {
+    const index = evaluationIndices.get(moduleId);
+    if (index == null || index <= previousIndex) {
+      throw new Error(
+        `Module component '${component.id}' is not in evaluation order.`,
+      );
+    }
+    previousIndex = index;
+  }
+  const root = component.moduleIds.at(-1);
+  if (root == null) {
+    throw new Error(`Module component '${component.id}' has no root.`);
+  }
+  return root;
+}
+
+function hirExpressionHasPatternAwait(expression: HirExpression): boolean {
+  if (
+    expression.kind === "destructuring-set" &&
+    hirBindingPatternHasAwait(expression.pattern)
+  ) {
+    return true;
+  }
+  if (expression.kind === "logical" || expression.kind === "binary") {
+    return (
+      hirExpressionHasPatternAwait(expression.left) ||
+      hirExpressionHasPatternAwait(expression.right)
+    );
+  }
+  if (expression.kind === "conditional") {
+    return (
+      hirExpressionHasPatternAwait(expression.test) ||
+      hirExpressionHasPatternAwait(expression.consequent) ||
+      hirExpressionHasPatternAwait(expression.alternate)
+    );
+  }
+  if (expression.kind === "sequence") {
+    return expression.expressions.some(hirExpressionHasPatternAwait);
+  }
+  if (expression.kind === "optional-chain") {
+    return (
+      hirExpressionHasPatternAwait(expression.base) ||
+      expression.links.some((link) =>
+        link.kind === "member"
+          ? hirExpressionHasPatternAwait(link.key)
+          : link.kind === "private-member"
+            ? false
+            : link.arguments.some((argument) =>
+                hirExpressionHasPatternAwait(
+                  argument.kind === "spread" ? argument.argument : argument,
+                ),
+              ),
+      )
+    );
+  }
+  if (expression.kind === "class") {
+    return (
+      (expression.heritage != null &&
+        hirExpressionHasPatternAwait(expression.heritage)) ||
+      expression.elements.some(
+        (element) =>
+          element.kind !== "static-block" &&
+          element.key.kind !== "private-name" &&
+          hirExpressionHasPatternAwait(element.key),
+      )
+    );
+  }
+  if (expression.kind === "with-set" || expression.kind === "with-update") {
+    return hirExpressionHasPatternAwait(expression.value);
+  }
+  if (
+    expression.kind === "private-get" ||
+    expression.kind === "private-in" ||
+    expression.kind === "private-step"
+  ) {
+    return hirExpressionHasPatternAwait(expression.object);
+  }
+  if (
+    expression.kind === "private-set" ||
+    expression.kind === "private-update"
+  ) {
+    return (
+      hirExpressionHasPatternAwait(expression.object) ||
+      hirExpressionHasPatternAwait(expression.value)
+    );
+  }
+  if (expression.kind === "super-base") {
+    return hirExpressionHasPatternAwait(expression.receiver);
+  }
+  if (expression.kind === "yield" && expression.argument != null) {
+    return hirExpressionHasPatternAwait(expression.argument);
+  }
+  if (
+    expression.kind === "call" &&
+    expression.target.kind === "private-method" &&
+    hirExpressionHasPatternAwait(expression.target.object)
+  ) {
+    return true;
+  }
+  const parts = moduleExpressionParts(expression);
+  return parts?.children.some(hirExpressionHasPatternAwait) ?? false;
+}
+
+function hirStatementHasPatternAwait(statement: HirStatement): boolean {
+  const recurse = (child: HirStatement): boolean =>
+    hirStatementHasPatternAwait(child);
+  if (
+    statement.kind === "binding-pattern" &&
+    hirBindingPatternHasAwait(statement.pattern)
+  ) {
+    return true;
+  }
+  if (statement.kind === "block") return statement.body.some(recurse);
+  if (statement.kind === "if") {
+    return (
+      hirExpressionHasPatternAwait(statement.test) ||
+      recurse(statement.consequent) ||
+      (statement.alternate != null && recurse(statement.alternate))
+    );
+  }
+  if (statement.kind === "try") {
+    return (
+      recurse(statement.block) ||
+      (statement.handler != null &&
+        (hirBindingPatternHasAwait(statement.handler.pattern) ||
+          recurse(statement.handler.body))) ||
+      (statement.finalizer != null && recurse(statement.finalizer))
+    );
+  }
+  if (statement.kind === "labeled") return recurse(statement.body);
+  if (statement.kind === "switch") {
+    return (
+      hirExpressionHasPatternAwait(statement.discriminant) ||
+      statement.cases.some(
+        (switchCase) =>
+          (switchCase.test != null &&
+            hirExpressionHasPatternAwait(switchCase.test)) ||
+          switchCase.body.some(recurse),
+      )
+    );
+  }
+  if (statement.kind === "for") {
+    return (
+      (statement.declarations ?? []).some((declaration) =>
+        declaration.kind === "pattern"
+          ? hirBindingPatternHasAwait(declaration.pattern) ||
+            hirExpressionHasPatternAwait(declaration.initializer)
+          : hirExpressionHasPatternAwait(declaration.initializer),
+      ) ||
+      (statement.init != null &&
+        hirExpressionHasPatternAwait(statement.init)) ||
+      (statement.test != null &&
+        hirExpressionHasPatternAwait(statement.test)) ||
+      (statement.update != null &&
+        hirExpressionHasPatternAwait(statement.update)) ||
+      recurse(statement.body)
+    );
+  }
+  if (statement.kind === "for-of") {
+    return (
+      ((statement.target.kind === "pattern-declaration" ||
+        statement.target.kind === "assignment-pattern") &&
+        hirBindingPatternHasAwait(statement.target.pattern)) ||
+      (statement.target.kind === "property" &&
+        (hirExpressionHasPatternAwait(statement.target.object) ||
+          hirExpressionHasPatternAwait(statement.target.key))) ||
+      hirExpressionHasPatternAwait(statement.iterable) ||
+      recurse(statement.body)
+    );
+  }
+  if (statement.kind === "while" || statement.kind === "do-while") {
+    return (
+      hirExpressionHasPatternAwait(statement.test) || recurse(statement.body)
+    );
+  }
+  if (statement.kind === "with") {
+    return (
+      hirExpressionHasPatternAwait(statement.object) || recurse(statement.body)
+    );
+  }
+  const expression =
+    statement.kind === "expression" || statement.kind === "throw"
+      ? statement.expression
+      : statement.kind === "binding-init" ||
+          statement.kind === "const" ||
+          statement.kind === "let" ||
+          statement.kind === "binding-pattern"
+        ? statement.initializer
+        : statement.kind === "return"
+          ? statement.expression
+          : undefined;
+  return expression != null && hirExpressionHasPatternAwait(expression);
 }
 
 function collectHirBindings(
@@ -324,6 +525,7 @@ interface ModuleAwaitPoint {
 interface ModuleAsyncLoweringState {
   awaitCount: number;
   readonly diagnostics: Diagnostic[];
+  readonly framed: boolean;
   readonly functions: HirFunction[];
   readonly globalBindings: HirGlobalBinding[];
   nextBindingId: number;
@@ -801,6 +1003,16 @@ function lowerModuleEvaluationBody(
   range: SourceRange,
   state: ModuleAsyncLoweringState,
 ): readonly HirStatement[] | undefined {
+  if (state.framed) {
+    return [
+      ...statements,
+      {
+        expression: moduleUndefined(range),
+        kind: "return",
+        range,
+      },
+    ];
+  }
   const body: HirStatement[] = [];
   for (const [index, statement] of statements.entries()) {
     const diagnosticCount = state.diagnostics.length;
@@ -1033,6 +1245,19 @@ export function compileModuleGraph(
         evaluationBody.push(statement);
       }
     }
+    const patternAwait = evaluationBody.find(hirStatementHasPatternAwait);
+    if (patternAwait != null) {
+      return {
+        diagnostics: [
+          sourceDiagnostic(
+            moduleId,
+            patternAwait,
+            "Pattern-position top-level await is outside M5a Unit 7.7.",
+          ),
+        ],
+        graph: linked.graph,
+      };
+    }
     moduleBodies.set(moduleId, evaluationBody);
     functions.push(...retainModuleSource(result.program.functions, moduleId));
   }
@@ -1042,48 +1267,47 @@ export function compileModuleGraph(
       hirStatementsAreAsynchronous(moduleBodies.get(moduleId) ?? []),
     ),
   );
-  const asyncModules = new Set(directlyAsync);
-  let asyncChanged = true;
-  while (asyncChanged) {
-    asyncChanged = false;
-    for (const moduleId of linked.graph.evaluationOrder) {
-      if (asyncModules.has(moduleId)) continue;
-      const node = nodes.get(moduleId);
-      if (
-        node?.dependencies.some((dependency) =>
-          asyncModules.has(dependency.canonicalId),
-        ) !== true
-      ) {
-        continue;
+  const evaluationIndices = new Map(
+    linked.graph.evaluationOrder.map((moduleId, index) => [moduleId, index]),
+  );
+  const componentByModule = new Map(
+    linked.graph.components.flatMap((component) =>
+      component.moduleIds.map((moduleId) => [moduleId, component] as const),
+    ),
+  );
+  const componentRoots = new Map(
+    linked.graph.components.map((component) => [
+      component.id,
+      moduleComponentRoot(component, evaluationIndices),
+    ]),
+  );
+  const pendingAsync = new Set<string>();
+  for (const moduleId of linked.graph.evaluationOrder) {
+    const node = nodes.get(moduleId);
+    const component = componentByModule.get(moduleId);
+    const moduleIndex = evaluationIndices.get(moduleId);
+    if (node == null || component == null || moduleIndex == null) {
+      throw new Error(`Module async state '${moduleId}' is unavailable.`);
+    }
+    const waitsForPendingDependency = node.dependencies.some((dependency) => {
+      const dependencyId = dependency.canonicalId;
+      const dependencyComponent = componentByModule.get(dependencyId);
+      const dependencyIndex = evaluationIndices.get(dependencyId);
+      if (dependencyComponent == null || dependencyIndex == null) {
+        throw new Error(`Module dependency '${dependencyId}' is unavailable.`);
       }
-      asyncModules.add(moduleId);
-      asyncChanged = true;
+      if (dependencyComponent.id === component.id) {
+        return dependencyIndex < moduleIndex && pendingAsync.has(dependencyId);
+      }
+      const cycleRoot = dependencyComponent.cyclic
+        ? componentRoots.get(dependencyComponent.id)
+        : dependencyId;
+      return cycleRoot != null && pendingAsync.has(cycleRoot);
+    });
+    if (directlyAsync.has(moduleId) || waitsForPendingDependency) {
+      pendingAsync.add(moduleId);
     }
   }
-  for (const component of linked.graph.components) {
-    if (!component.cyclic) continue;
-    const asyncModuleId = component.moduleIds.find((moduleId) =>
-      asyncModules.has(moduleId),
-    );
-    if (asyncModuleId == null) continue;
-    const node = nodes.get(asyncModuleId);
-    if (node == null) {
-      throw new Error(`Asynchronous module '${asyncModuleId}' is missing.`);
-    }
-    const moduleBody = moduleBodies.get(asyncModuleId) ?? [];
-    const awaitStatement = moduleBody.find(hirStatementIsAsynchronous);
-    return {
-      diagnostics: [
-        sourceDiagnostic(
-          asyncModuleId,
-          awaitStatement ?? node.syntax,
-          "Asynchronous module cycles are outside M4.",
-        ),
-      ],
-      graph: linked.graph,
-    };
-  }
-
   const evaluators = new Map<string, HirFunction>();
   for (const moduleId of linked.graph.evaluationOrder) {
     const node = nodes.get(moduleId);
@@ -1096,6 +1320,7 @@ export function compileModuleGraph(
     const state: ModuleAsyncLoweringState = {
       awaitCount: 0,
       diagnostics: [],
+      framed: directlyAsync.has(moduleId),
       functions,
       globalBindings,
       nextBindingId,
@@ -1115,7 +1340,7 @@ export function compileModuleGraph(
     const evaluator: HirFunction = {
       body: evaluatorBody,
       functionLength: 0,
-      functionKind: "arrow",
+      functionKind: directlyAsync.has(moduleId) ? "async-arrow" : "arrow",
       id: evaluatorId,
       kind: "hir-function",
       localBindingIds: [],
@@ -1139,11 +1364,39 @@ export function compileModuleGraph(
     }
     const range = retainModuleSource(node.syntax.range, moduleId);
     const evaluatorExpression = moduleFunctionExpression(evaluator);
+    const moduleComponent = componentByModule.get(moduleId);
+    const moduleIndex = evaluationIndices.get(moduleId);
+    if (moduleComponent == null || moduleIndex == null) {
+      throw new Error(`Module schedule '${moduleId}' is unavailable.`);
+    }
     const asyncDependencies = [
       ...new Set(
         node.dependencies
           .map((dependency) => dependency.canonicalId)
-          .filter((dependencyId) => asyncModules.has(dependencyId)),
+          .flatMap((dependencyId) => {
+            const dependencyComponent = componentByModule.get(dependencyId);
+            const dependencyIndex = evaluationIndices.get(dependencyId);
+            if (dependencyComponent == null || dependencyIndex == null) {
+              throw new Error(
+                `Module dependency '${dependencyId}' is unavailable.`,
+              );
+            }
+            if (dependencyComponent.id === moduleComponent.id) {
+              return dependencyIndex < moduleIndex &&
+                pendingAsync.has(dependencyId)
+                ? [dependencyId]
+                : [];
+            }
+            const cycleRoot = dependencyComponent.cyclic
+              ? componentRoots.get(dependencyComponent.id)
+              : dependencyId;
+            if (cycleRoot == null) {
+              throw new Error(
+                `Module cycle root '${dependencyId}' is unavailable.`,
+              );
+            }
+            return pendingAsync.has(cycleRoot) ? [cycleRoot] : [];
+          }),
       ),
     ];
     let initializer: HirExpression;
@@ -1174,11 +1427,12 @@ export function compileModuleGraph(
         range,
       );
     } else if (directlyAsync.has(moduleId)) {
-      initializer = modulePromiseCall(
-        "asyncCall",
-        [evaluatorExpression],
+      initializer = {
+        arguments: [],
+        kind: "call",
         range,
-      );
+        target: { callee: evaluatorExpression, kind: "dynamic" },
+      };
     } else {
       const result: HirExpression = {
         arguments: [],
@@ -1215,16 +1469,12 @@ export function compileModuleGraph(
       ...moduleInitializers,
       {
         expression: {
-          argument: {
-            bindingId: entryPromiseId,
-            kind: "binding",
-            name: `*module-promise:${graph.entryId}*`,
-            range: entryRange,
-          },
-          kind: "await",
+          bindingId: entryPromiseId,
+          kind: "binding",
+          name: `*module-promise:${graph.entryId}*`,
           range: entryRange,
         },
-        kind: "expression",
+        kind: "return",
         range: entryRange,
       },
     ],

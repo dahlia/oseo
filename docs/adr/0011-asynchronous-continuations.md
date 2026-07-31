@@ -66,21 +66,21 @@ performs synchronous `IteratorClose` over the underlying record before
 rejecting. The asynchronous generator frame awaits that rejection without
 reading or awaiting the close result's `done` or `value` fields.
 
-Top-level await is a scheduler checkpoint in the dependency-ordered whole-graph
-script. It normalizes the value through one reaction and advances owned jobs and
-timer turns only until that reaction settles. If no owned task can make
-progress, it reports `OSEO3001` instead of retaining native recursion or
-blocking indefinitely.
-
-Module top-level `for await` retains the module checkpoint path. Unit 7.7 owns
-that boundary.
+M5a Unit 7.7 lowers every directly asynchronous source module to a private
+traced frame. Top-level await and top-level `for await` step and close
+operations save their roots, blocks, and pending completion state in that
+frame, then return the module promise to the graph caller. Promise reactions
+resume the frame through the same dispatcher used by other asynchronous
+bodies. The outer native event loop roots and observes the entry promise; it
+reports `OSEO3001` only when that promise remains pending and no owned job or
+timer can make progress.
 
 
 Consequences
 ------------
 
-Suspension blocks, saved roots and completions, and scheduler checkpoints are
-inspectable compiler output and explicit collector state. Every allocation,
+Suspension blocks, saved roots and completions, and entry-promise checkpoints
+are inspectable compiler output and explicit collector state. Every allocation,
 suspension, and resumption boundary is a MIR safepoint. Specialization can
 occur inside an asynchronous function but cannot duplicate a suspension path
 or reschedule visible work.
