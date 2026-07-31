@@ -126,6 +126,7 @@ typedef enum {
     OSEO_HEAP_ARGUMENT_LIST = 13,
     OSEO_HEAP_PRIVATE_NAME = 14,
     OSEO_HEAP_ASYNC_GENERATOR_REQUEST = 15,
+    OSEO_HEAP_BIGINT = 16,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -140,6 +141,14 @@ typedef struct {
     size_t length;
     uint16_t units[];
 } OseoString;
+
+/* One normalized, immutable arbitrary-precision integer. */
+typedef struct {
+    OseoHeapObject header;
+    bool negative;
+    size_t length;
+    uint32_t limbs[];
+} OseoBigInt;
 
 typedef struct {
     OseoHeapObject header;
@@ -575,6 +584,13 @@ static inline bool is_string(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_STRING;
 }
+static inline bool is_bigint(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_BIGINT;
+}
+static inline OseoBigInt *bigint_object(OseoValue value) {
+    return (OseoBigInt *)heap_object(value);
+}
 static inline bool is_environment(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_ENVIRONMENT;
@@ -709,6 +725,48 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+
+typedef enum {
+    OSEO_BIGINT_ADD,
+    OSEO_BIGINT_SUBTRACT,
+    OSEO_BIGINT_MULTIPLY,
+    OSEO_BIGINT_DIVIDE,
+    OSEO_BIGINT_REMAINDER,
+    OSEO_BIGINT_EXPONENTIATE,
+    OSEO_BIGINT_AND,
+    OSEO_BIGINT_OR,
+    OSEO_BIGINT_XOR,
+    OSEO_BIGINT_SHIFT_LEFT,
+    OSEO_BIGINT_SHIFT_RIGHT,
+} OseoBigIntOperator;
+
+OseoResult oseo_internal_bigint_binary(
+    OseoContext *context,
+    OseoValue left,
+    OseoValue right,
+    OseoBigIntOperator operator
+);
+OseoResult oseo_internal_bigint_negate(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_internal_bigint_not(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_internal_bigint_string(
+    OseoContext *context,
+    OseoValue value
+);
+OseoResult oseo_internal_string_to_bigint(
+    OseoContext *context,
+    const OseoString *string,
+    bool *valid
+);
+int oseo_internal_bigint_compare(OseoValue left, OseoValue right);
+int oseo_internal_bigint_compare_number(OseoValue integer, double number);
+bool oseo_internal_bigint_equal(OseoValue left, OseoValue right);
+bool oseo_internal_bigint_is_zero(OseoValue value);
 /*
  * Reads the own property descriptor named by key, including the
  * synthetic `prototype`, array `length`, and module namespace cell

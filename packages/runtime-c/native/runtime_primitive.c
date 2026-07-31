@@ -209,6 +209,13 @@ static OseoResult value_text(
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value) {
     uint64_t tag = tag_of(value);
     if (is_number(value)) return normal(value);
+    if (is_bigint(value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot convert a BigInt to a number."
+        );
+    }
     if (tag == OSEO_TAG_UNDEFINED) return normal(oseo_number(NAN));
     if (tag == OSEO_TAG_NULL) return normal(oseo_number(0.0));
     if (tag == OSEO_TAG_BOOLEAN) {
@@ -403,6 +410,9 @@ static OseoResult value_text(
     const ConversionAncestor *previous
 ) {
     if (is_string(value)) return normal(value);
+    if (is_bigint(value)) {
+        return oseo_internal_bigint_string(context, value);
+    }
     if (is_symbol(value)) {
         return oseo_internal_throw_error(
             context,
@@ -938,9 +948,17 @@ OseoResult oseo_property_key(OseoContext *context, OseoValue value) {
 }
 
 OseoResult oseo_negate(OseoContext *context, OseoValue value) {
-    OseoResult number = oseo_internal_to_number(context, value);
-    if (number.status != OSEO_STATUS_NORMAL) return number;
-    return normal(oseo_number(-number_value(number.value)));
+    OseoResult numeric = oseo_to_numeric(context, value);
+    if (numeric.status != OSEO_STATUS_NORMAL) return numeric;
+    if (is_bigint(numeric.value)) {
+        OseoValue slot = numeric.value;
+        OseoRootFrame frame = {NULL, &slot, 1u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_bigint_negate(context, slot);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    return normal(oseo_number(-number_value(numeric.value)));
 }
 
 OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
@@ -950,6 +968,7 @@ OseoResult oseo_typeof(OseoContext *context, OseoValue value) {
     else if (tag == OSEO_TAG_NULL) constant = "object";
     else if (tag == OSEO_TAG_BOOLEAN) constant = "boolean";
     else if (is_number(value)) constant = "number";
+    else if (is_bigint(value)) constant = "bigint";
     else if (is_string(value)) constant = "string";
     else if (is_symbol(value)) constant = "symbol";
     else if (is_function(value)) constant = "function";
@@ -971,18 +990,59 @@ static OseoResult numeric_binary(
     OseoValue right,
     char operator
 ) {
-    OseoResult left_number = oseo_internal_to_number(context, left);
-    if (left_number.status != OSEO_STATUS_NORMAL) return left_number;
-    OseoResult right_number = oseo_internal_to_number(context, right);
-    if (right_number.status != OSEO_STATUS_NORMAL) return right_number;
-    double left_value = number_value(left_number.value);
-    double right_value = number_value(right_number.value);
+    OseoValue slots[2] = {left, right};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult converted = oseo_to_numeric(context, slots[0]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[0] = converted.value;
+    converted = oseo_to_numeric(context, slots[1]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[1] = converted.value;
+    if (is_bigint(slots[0]) != is_bigint(slots[1])) {
+        oseo_roots_pop(context, &frame);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot mix BigInt and Number operands."
+        );
+    }
+    if (is_bigint(slots[0])) {
+        OseoBigIntOperator operation = OSEO_BIGINT_DIVIDE;
+        if (operator == '+') operation = OSEO_BIGINT_ADD;
+        else if (operator == '-') operation = OSEO_BIGINT_SUBTRACT;
+        else if (operator == '*') operation = OSEO_BIGINT_MULTIPLY;
+        else if (operator == '%') operation = OSEO_BIGINT_REMAINDER;
+        else if (operator == 'e') operation = OSEO_BIGINT_EXPONENTIATE;
+        OseoResult result = oseo_internal_bigint_binary(
+            context,
+            slots[0],
+            slots[1],
+            operation
+        );
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    double left_value = number_value(slots[0]);
+    double right_value = number_value(slots[1]);
     double value;
     if (operator == '+') value = left_value + right_value;
     else if (operator == '-') value = left_value - right_value;
     else if (operator == '*') value = left_value * right_value;
     else if (operator == '%') value = fmod(left_value, right_value);
+    else if (operator == 'e') {
+        if (isnan(right_value)) value = NAN;
+        else if (fabs(left_value) == 1.0 && isinf(right_value)) value = NAN;
+        else value = pow(left_value, right_value);
+    }
     else value = left_value / right_value;
+    oseo_roots_pop(context, &frame);
     return normal(oseo_number(value));
 }
 
@@ -1118,6 +1178,24 @@ OseoResult oseo_to_number(OseoContext *context, OseoValue value) {
     return oseo_internal_to_number(context, value);
 }
 
+OseoResult oseo_to_numeric(OseoContext *context, OseoValue value) {
+    OseoResult primitive = to_primitive_value(
+        context,
+        value,
+        OSEO_TO_PRIMITIVE_NUMERIC,
+        NULL
+    );
+    if (primitive.status != OSEO_STATUS_NORMAL) return primitive;
+    if (is_bigint(primitive.value)) return primitive;
+    return oseo_internal_to_number(context, primitive.value);
+}
+
+OseoResult oseo_numeric_one(OseoContext *context, OseoValue value) {
+    if (is_bigint(value)) return oseo_bigint_literal(context, "1", 10u);
+    if (is_number(value)) return normal(oseo_number(1.0));
+    return failure(context, "OSEO2001", "Value is not numeric.");
+}
+
 OseoResult oseo_to_string(OseoContext *context, OseoValue value) {
     return value_text(context, value, NULL);
 }
@@ -1127,21 +1205,7 @@ OseoResult oseo_exponentiate(
     OseoValue left,
     OseoValue right
 ) {
-    OseoResult base = oseo_internal_to_number(context, left);
-    if (base.status != OSEO_STATUS_NORMAL) return base;
-    OseoResult exponent = oseo_internal_to_number(context, right);
-    if (exponent.status != OSEO_STATUS_NORMAL) return exponent;
-    double base_value = number_value(base.value);
-    double exponent_value = number_value(exponent.value);
-    double value;
-    if (isnan(exponent_value)) {
-        value = NAN;
-    } else if (fabs(base_value) == 1.0 && isinf(exponent_value)) {
-        value = NAN;
-    } else {
-        value = pow(base_value, exponent_value);
-    }
-    return normal(oseo_number(value));
+    return numeric_binary(context, left, right, 'e');
 }
 
 /* The modular 32-bit patterns shared by ToInt32 and ToUint32. */
@@ -1164,32 +1228,86 @@ static OseoResult int32_binary(
     OseoValue right,
     char operator
 ) {
-    OseoResult left_number = oseo_internal_to_number(context, left);
-    if (left_number.status != OSEO_STATUS_NORMAL) return left_number;
-    OseoResult right_number = oseo_internal_to_number(context, right);
-    if (right_number.status != OSEO_STATUS_NORMAL) return right_number;
-    uint32_t left_bits = uint32_bits(number_value(left_number.value));
-    uint32_t right_bits = uint32_bits(number_value(right_number.value));
+    OseoValue slots[2] = {left, right};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult converted = oseo_to_numeric(context, slots[0]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[0] = converted.value;
+    converted = oseo_to_numeric(context, slots[1]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[1] = converted.value;
+    if (is_bigint(slots[0]) != is_bigint(slots[1])) {
+        oseo_roots_pop(context, &frame);
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Cannot mix BigInt and Number operands."
+        );
+    }
+    if (is_bigint(slots[0])) {
+        if (operator == 'u') {
+            oseo_roots_pop(context, &frame);
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "BigInt has no unsigned right shift."
+            );
+        }
+        OseoBigIntOperator operation = OSEO_BIGINT_SHIFT_RIGHT;
+        if (operator == '&') operation = OSEO_BIGINT_AND;
+        else if (operator == '|') operation = OSEO_BIGINT_OR;
+        else if (operator == '^') operation = OSEO_BIGINT_XOR;
+        else if (operator == '<') operation = OSEO_BIGINT_SHIFT_LEFT;
+        OseoResult result = oseo_internal_bigint_binary(
+            context,
+            slots[0],
+            slots[1],
+            operation
+        );
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    uint32_t left_bits = uint32_bits(number_value(slots[0]));
+    uint32_t right_bits = uint32_bits(number_value(slots[1]));
     if (operator == '&') {
-        return normal(oseo_number(int32_number(left_bits & right_bits)));
+        converted = normal(oseo_number(int32_number(left_bits & right_bits)));
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     if (operator == '|') {
-        return normal(oseo_number(int32_number(left_bits | right_bits)));
+        converted = normal(oseo_number(int32_number(left_bits | right_bits)));
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     if (operator == '^') {
-        return normal(oseo_number(int32_number(left_bits ^ right_bits)));
+        converted = normal(oseo_number(int32_number(left_bits ^ right_bits)));
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     uint32_t shift = right_bits & 31u;
     if (operator == '<') {
-        return normal(oseo_number(int32_number(left_bits << shift)));
+        converted = normal(oseo_number(int32_number(left_bits << shift)));
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     if (operator == '>') {
         uint32_t shifted = (left_bits & 2147483648u) != 0u
             ? ~(~left_bits >> shift)
             : left_bits >> shift;
-        return normal(oseo_number(int32_number(shifted)));
+        converted = normal(oseo_number(int32_number(shifted)));
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
-    return normal(oseo_number((double)(left_bits >> shift)));
+    converted = normal(oseo_number((double)(left_bits >> shift)));
+    oseo_roots_pop(context, &frame);
+    return converted;
 }
 
 OseoResult oseo_bitwise_and(
@@ -1241,8 +1359,16 @@ OseoResult oseo_shift_right_unsigned(
 }
 
 OseoResult oseo_bitwise_not(OseoContext *context, OseoValue value) {
-    OseoResult number = oseo_internal_to_number(context, value);
+    OseoResult number = oseo_to_numeric(context, value);
     if (number.status != OSEO_STATUS_NORMAL) return number;
+    if (is_bigint(number.value)) {
+        OseoValue slot = number.value;
+        OseoRootFrame frame = {NULL, &slot, 1u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_bigint_not(context, slot);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
     uint32_t bits = ~uint32_bits(number_value(number.value));
     return normal(oseo_number(int32_number(bits)));
 }
@@ -1253,6 +1379,9 @@ static bool strict_equal_value(OseoValue left, OseoValue right) {
         double right_number = number_value(right);
         return !isnan(left_number) && !isnan(right_number) &&
             left_number == right_number;
+    }
+    if (is_bigint(left) && is_bigint(right)) {
+        return oseo_internal_bigint_equal(left, right);
     }
     uint64_t left_tag = tag_of(left);
     if (left_tag != tag_of(right)) return false;
@@ -1295,6 +1424,18 @@ static OseoResult loose_equal_value(
         *equal = strict_equal_value(left, right);
         return normal(oseo_undefined());
     }
+    if (is_bigint(left) && is_bigint(right)) {
+        *equal = oseo_internal_bigint_equal(left, right);
+        return normal(oseo_undefined());
+    }
+    if ((is_bigint(left) && is_number(right)) ||
+        (is_number(left) && is_bigint(right))) {
+        OseoValue integer = is_bigint(left) ? left : right;
+        double number = number_value(is_number(left) ? left : right);
+        *equal = isfinite(number) && trunc(number) == number &&
+            oseo_internal_bigint_compare_number(integer, number) == 0;
+        return normal(oseo_undefined());
+    }
     uint64_t left_tag = tag_of(left);
     uint64_t right_tag = tag_of(right);
     bool left_nullish =
@@ -1324,6 +1465,29 @@ static OseoResult loose_equal_value(
         *equal = strict_equal_value(left, right);
         return normal(oseo_undefined());
     }
+    if ((is_bigint(left) && is_string(right)) ||
+        (is_string(left) && is_bigint(right))) {
+        OseoValue slots[2] = {left, right};
+        OseoRootFrame frame = {NULL, slots, 2u};
+        oseo_roots_push(context, &frame);
+        OseoValue integer = is_bigint(slots[0]) ? slots[0] : slots[1];
+        OseoString *string = string_object(
+            is_string(slots[0]) ? slots[0] : slots[1]
+        );
+        bool valid = false;
+        OseoResult converted = oseo_internal_string_to_bigint(
+            context,
+            string,
+            &valid
+        );
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            *equal = valid &&
+                oseo_internal_bigint_equal(integer, converted.value);
+            converted = normal(oseo_undefined());
+        }
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
     if (is_number(left) && is_string(right)) {
         OseoResult converted = string_number(context, string_object(right));
         if (converted.status != OSEO_STATUS_NORMAL) return converted;
@@ -1339,24 +1503,48 @@ static OseoResult loose_equal_value(
         return normal(oseo_undefined());
     }
     if (is_object(left)) {
+        OseoValue slots[2] = {left, right};
+        OseoRootFrame frame = {NULL, slots, 2u};
+        oseo_roots_push(context, &frame);
         OseoResult converted = to_primitive_value(
             context,
-            left,
+            slots[0],
             OSEO_TO_PRIMITIVE_DEFAULT,
             NULL
         );
-        if (converted.status != OSEO_STATUS_NORMAL) return converted;
-        return loose_equal_value(context, converted.value, right, equal);
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            slots[0] = converted.value;
+            converted = loose_equal_value(
+                context,
+                slots[0],
+                slots[1],
+                equal
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     if (is_object(right)) {
+        OseoValue slots[2] = {left, right};
+        OseoRootFrame frame = {NULL, slots, 2u};
+        oseo_roots_push(context, &frame);
         OseoResult converted = to_primitive_value(
             context,
-            right,
+            slots[1],
             OSEO_TO_PRIMITIVE_DEFAULT,
             NULL
         );
-        if (converted.status != OSEO_STATUS_NORMAL) return converted;
-        return loose_equal_value(context, left, converted.value, equal);
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            slots[1] = converted.value;
+            converted = loose_equal_value(
+                context,
+                slots[0],
+                slots[1],
+                equal
+            );
+        }
+        oseo_roots_pop(context, &frame);
+        return converted;
     }
     return failure(
         context,
@@ -1544,9 +1732,11 @@ static OseoResult relational(
             );
             slots[1] = converted.value;
         }
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            converted = relational(context, slots[0], slots[1], operator);
+        }
         oseo_roots_pop(context, &frame);
-        if (converted.status != OSEO_STATUS_NORMAL) return converted;
-        return relational(context, slots[0], slots[1], operator);
+        return converted;
     }
     if (is_string(left) && is_string(right)) {
         int order = compare_strings(string_object(left), string_object(right));
@@ -1557,12 +1747,88 @@ static OseoResult relational(
         else result = order >= 0;
         return normal(oseo_boolean(result));
     }
-    OseoResult left_number = oseo_internal_to_number(context, left);
-    if (left_number.status != OSEO_STATUS_NORMAL) return left_number;
-    OseoResult right_number = oseo_internal_to_number(context, right);
-    if (right_number.status != OSEO_STATUS_NORMAL) return right_number;
-    double left_value = number_value(left_number.value);
-    double right_value = number_value(right_number.value);
+    if ((is_bigint(left) && is_string(right)) ||
+        (is_string(left) && is_bigint(right))) {
+        OseoValue slots[2] = {left, right};
+        OseoRootFrame frame = {NULL, slots, 2u};
+        oseo_roots_push(context, &frame);
+        bool left_bigint = is_bigint(slots[0]);
+        OseoValue integer = left_bigint ? slots[0] : slots[1];
+        OseoString *string = string_object(
+            left_bigint ? slots[1] : slots[0]
+        );
+        bool valid = false;
+        OseoResult converted = oseo_internal_string_to_bigint(
+            context,
+            string,
+            &valid
+        );
+        if (converted.status == OSEO_STATUS_NORMAL) {
+            if (!valid) {
+                converted = normal(oseo_boolean(false));
+            } else {
+                int order = left_bigint
+                    ? oseo_internal_bigint_compare(integer, converted.value)
+                    : oseo_internal_bigint_compare(
+                        converted.value,
+                        integer
+                    );
+                bool result = operator == '<'
+                    ? order < 0
+                    : operator == 'l'
+                      ? order <= 0
+                      : operator == '>'
+                        ? order > 0
+                        : order >= 0;
+                converted = normal(oseo_boolean(result));
+            }
+        }
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    OseoValue slots[2] = {left, right};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult converted = oseo_to_numeric(context, slots[0]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[0] = converted.value;
+    converted = oseo_to_numeric(context, slots[1]);
+    if (converted.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return converted;
+    }
+    slots[1] = converted.value;
+    if (is_bigint(slots[0]) || is_bigint(slots[1])) {
+        int order;
+        bool unordered = false;
+        if (is_bigint(slots[0]) && is_bigint(slots[1])) {
+            order = oseo_internal_bigint_compare(slots[0], slots[1]);
+        } else {
+            OseoValue integer = is_bigint(slots[0]) ? slots[0] : slots[1];
+            double number = number_value(
+                is_number(slots[0]) ? slots[0] : slots[1]
+            );
+            unordered = isnan(number);
+            order = unordered
+                ? 0
+                : oseo_internal_bigint_compare_number(integer, number);
+            if (is_bigint(slots[1])) order = -order;
+        }
+        bool result = !unordered && (operator == '<'
+            ? order < 0
+            : operator == 'l'
+              ? order <= 0
+              : operator == '>'
+                ? order > 0
+                : order >= 0);
+        oseo_roots_pop(context, &frame);
+        return normal(oseo_boolean(result));
+    }
+    double left_value = number_value(slots[0]);
+    double right_value = number_value(slots[1]);
     bool result = false;
     if (!isnan(left_value) && !isnan(right_value)) {
         if (operator == '<') result = left_value < right_value;
@@ -1570,6 +1836,7 @@ static OseoResult relational(
         else if (operator == '>') result = left_value > right_value;
         else result = left_value >= right_value;
     }
+    oseo_roots_pop(context, &frame);
     return normal(oseo_boolean(result));
 }
 

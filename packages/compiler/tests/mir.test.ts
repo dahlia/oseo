@@ -34,6 +34,31 @@ test("prints distinct non-finite MIR constants", () => {
   assert.doesNotMatch(text, /constant null/u);
 });
 
+test("preserves exact BigInt digits and allocation safepoints", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          digits: "123456789012345678901234567890",
+          kind: "bigint",
+          radix: 10,
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "bigint.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const text = printMir(buildMir(hir));
+  assert.match(text, /safepoint BigInt literal allocation/u);
+  assert.match(text, /constant 10:123456789012345678901234567890/u);
+});
+
 test("distinguishes binding initialization in MIR", () => {
   const syntax: SyntaxProgram = {
     body: [

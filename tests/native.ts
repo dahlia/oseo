@@ -32,6 +32,7 @@ import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
+import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
@@ -80,6 +81,7 @@ const fixtures: readonly Fixture[] = [
   ...objectFixtures,
   ...classFixtures,
   ...bindingFixtures,
+  ...bigintFixtures,
   ...expressionFixtures,
   ...generatorFixtures,
   ...asyncFixtures,
@@ -262,6 +264,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "in-and-instanceof" ||
     fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||
+    fixture.name === "bigint-primitive" ||
+    fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals"
   ) {

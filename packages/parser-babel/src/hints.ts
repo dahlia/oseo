@@ -9,6 +9,7 @@ import { sourceRange, unsupported } from "./locations.ts";
 
 const hintNames: ReadonlyMap<string, HintName> = new Map<string, HintName>([
   ["TSAnyKeyword", "any"],
+  ["TSBigIntKeyword", "bigint"],
   ["TSBooleanKeyword", "boolean"],
   ["TSNullKeyword", "null"],
   ["TSNumberKeyword", "number"],
@@ -47,6 +48,7 @@ export function typeHint(
 export function hintName(value: string): HintName | undefined {
   if (
     value === "any" ||
+    value === "bigint" ||
     value === "boolean" ||
     value === "null" ||
     value === "number" ||

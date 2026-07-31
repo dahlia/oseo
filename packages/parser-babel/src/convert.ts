@@ -48,6 +48,54 @@ export function identifierName(value: BabelNode): string | undefined {
     : undefined;
 }
 
+/** Convert one parser literal into an exact owned radix-and-digits value. */
+function bigintLiteral(
+  context: ConvertContext,
+  value: BabelNode,
+): SyntaxExpression | undefined {
+  const start = value.start ?? 0;
+  const end = value.end ?? start;
+  const raw = context.input.source.slice(start, end);
+  if (!raw.endsWith("n")) {
+    return earlyError(context, value, "A BigInt literal must end in n.");
+  }
+  let body = raw.slice(0, -1);
+  let radix: 2 | 8 | 10 | 16 = 10;
+  if (/^0[bB]/u.test(body)) {
+    radix = 2;
+    body = body.slice(2);
+  } else if (/^0[oO]/u.test(body)) {
+    radix = 8;
+    body = body.slice(2);
+  } else if (/^0[xX]/u.test(body)) {
+    radix = 16;
+    body = body.slice(2);
+  }
+  const digits = body.replaceAll("_", "");
+  const patterns = {
+    2: /^[01]+$/u,
+    8: /^[0-7]+$/u,
+    10: /^\d+$/u,
+    16: /^[\da-f]+$/iu,
+  } as const;
+  if (!patterns[radix].test(digits)) {
+    return earlyError(context, value, "A BigInt literal has invalid digits.");
+  }
+  if (radix === 10 && digits.length > 1 && digits.startsWith("0")) {
+    return earlyError(
+      context,
+      value,
+      "A decimal BigInt literal cannot have a leading zero.",
+    );
+  }
+  return {
+    ...location(context, value),
+    digits: digits.toLowerCase(),
+    kind: "bigint",
+    radix,
+  };
+}
+
 /** The declared name a `PrivateName` node carries, including its `#`. */
 function privateName(value: BabelNode): string | undefined {
   if (value.type !== "PrivateName") return undefined;
@@ -507,6 +555,7 @@ export function expression(
   if (value.type === "NumericLiteral" && typeof value.value === "number") {
     return { ...located, kind: "number", value: value.value };
   }
+  if (value.type === "BigIntLiteral") return bigintLiteral(context, value);
   if (value.type === "StringLiteral" && typeof value.value === "string") {
     return { ...located, kind: "string", value: value.value };
   }

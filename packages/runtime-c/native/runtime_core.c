@@ -343,6 +343,7 @@ bool oseo_to_boolean(OseoValue value) {
         double number = number_value(value);
         return number != 0.0 && !isnan(number);
     }
+    if (is_bigint(value)) return !oseo_internal_bigint_is_zero(value);
     if (is_string(value)) return string_object(value)->length != 0u;
     return tag == OSEO_TAG_HEAP;
 }

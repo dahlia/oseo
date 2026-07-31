@@ -135,6 +135,17 @@ function printHirExpression(expression: HirExpression): string {
     return expression.kind;
   }
   if (expression.kind === "string") return JSON.stringify(expression.value);
+  if (expression.kind === "bigint") {
+    const prefix =
+      expression.radix === 2
+        ? "0b"
+        : expression.radix === 8
+          ? "0o"
+          : expression.radix === 16
+            ? "0x"
+            : "";
+    return `${prefix}${expression.digits}n`;
+  }
   if (expression.kind === "number") return numberText(expression.value);
   if (expression.kind === "boolean") return String(expression.value);
   if (expression.kind === "unary") {

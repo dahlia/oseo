@@ -466,6 +466,7 @@ function resolveExpression(
   }
   if (
     expression.kind === "boolean" ||
+    expression.kind === "bigint" ||
     expression.kind === "new-target" ||
     expression.kind === "null" ||
     expression.kind === "number" ||

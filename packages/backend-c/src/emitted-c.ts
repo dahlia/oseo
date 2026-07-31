@@ -74,6 +74,8 @@ export const emittedC = {
     rootCallSuffix: [["roots["], ["]);"]],
     rootsAssign: [["roots["], ["] = "]],
     unaryToNumber: [["oseo_to_number"]],
+    unaryToNumeric: [["oseo_to_numeric"]],
+    unaryNumericOne: [["oseo_numeric_one"]],
     unaryNegate: [["oseo_negate"]],
     unaryToString: [["oseo_to_string"]],
     unaryTypeof: [["oseo_typeof"]],
@@ -248,6 +250,11 @@ export const emittedC = {
     ],
   },
   constant: {
+    resultAssignBigIntLiteral: [
+      ['result = oseo_bigint_literal(context, "'],
+      ['", '],
+      ["u);"],
+    ],
     rootsAssignOseoNullStatement: [["roots["], ["] = oseo_null();"]],
     rootsAssignOseoNumberStatement: [["roots["], ["] = oseo_number("], [");"]],
   },

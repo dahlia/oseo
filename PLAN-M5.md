@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,006
-reviewed cases: 2,358 passes, 1,128 expected negatives, and 520 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,174
+reviewed cases: 2,448 passes, 1,167 expected negatives, and 559 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1460,11 +1460,12 @@ separate continuation restriction.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
-once, applies Number coercion before adding or subtracting one, performs one
-checked write, and returns the assigned value for a prefix form or the coerced
-previous value for a postfix form. This Number path is complete for the current
-admitted value profile; BigInt update semantics remain with the unit owned by
-[*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
+once, applies `ToNumeric` before adding or subtracting the matching numeric one,
+performs one checked write, and returns the assigned value for a prefix form or
+the coerced previous value for a postfix form. M5a Unit 8.1a extends this path
+to exact BigInt values while preserving the established reference, conversion,
+write, and abrupt-completion order. [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) records
+the representation and generated evidence.
 
 A member target evaluates its object and property-key expression once. The raw
 key value converts for the read and converts again for the write, so the two
@@ -1610,9 +1611,9 @@ expression, date, and binary-data families in dependency order.
 
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md) owns the `BigInt` intrinsic, prototype,
 wrappers, fixed-width conversion functions, and the primitive contracts later
-binary-data and atomic families consume. It defers the immediate tag, heap
-layout, limb representation, and external arithmetic choice until allocation,
-target, code-size, and failure probes compare them.
+binary-data and atomic families consume. M5a Unit 8.1a selects the all-heap
+30-bit-limb primitive representation. The intrinsic, prototype, wrappers, and
+fixed-width conversions remain an M5b boundary.
 
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns the regular expression family. It
 keeps one owned pattern and matcher model across dynamic construction and

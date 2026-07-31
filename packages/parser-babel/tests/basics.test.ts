@@ -80,6 +80,38 @@ test("preserves prefix and postfix update references in owned IR", () => {
   assert.equal(mir.match(/property-set property-set/gu)?.length, 2);
 });
 
+test("preserves exact BigInt literals and numeric update lowering", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "/** @type {bigint} */ let value: bigint = " +
+      "123_456_789_012_345_678_901n;\n" +
+      "console.log(0b1010_0101n, 0o765n, 0xdead_beefn, value++);\n",
+    sourceId: "bigint-literals.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /123456789012345678901n/u);
+  assert.match(hir, /0b10100101n/u);
+  assert.match(hir, /0o765n/u);
+  assert.match(hir, /0xdeadbeefn/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /constant 10:123456789012345678901/u);
+  assert.match(mir, /unary to-numeric/u);
+  assert.match(mir, /unary numeric-one/u);
+});
+
+test("normalizes invalid BigInt literal diagnostics", () => {
+  const result = babelFrontend.parse({
+    source: "console.log(01n);",
+    sourceId: "invalid-bigint.js",
+  });
+  assert.ok(!result.parsed);
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.equal(result.diagnostics[0]?.sourceId, "invalid-bigint.js");
+});
+
 test("preserves non-strict script parameter bindings", () => {
   for (const name of ["eval", "arguments"]) {
     const result = compileSource(babelFrontend, {

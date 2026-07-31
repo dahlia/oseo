@@ -1,5 +1,6 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
+  - BigInt
   - arrow-function
   - async-functions
   - async-iteration
@@ -21,7 +22,9 @@ supportedFeatures:
   - for-of
   - generators
   - let
+  - logical-assignment-operators
   - new.target
+  - numeric-separator-literal
   - object-rest
   - object-spread
   - optional-chaining
@@ -821,6 +824,32 @@ tests:
   - path: test/language/computed-property-names/class/method/constructor-can-be-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/addition/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/addition/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/addition/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/addition/coerce-bigint-to-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/array/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -2914,6 +2943,78 @@ tests:
   - path: test/language/expressions/await/no-operand.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/bitwise-and/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-and/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-and/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-not/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-or/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-or/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-or/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-xor/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-xor/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-xor/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/call/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -4606,9 +4707,57 @@ tests:
   - path: test/language/expressions/conditional/in-condition.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/division/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/division/bigint-complex-infinity.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - path: test/language/expressions/division/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/division/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/does-not-equals/S11.9.2_A3.1.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-incomparable-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, expression-operators, object-properties, symbols]
+  - path: test/language/expressions/does-not-equals/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/does-not-equals/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/equals/S11.9.1_A1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, expression-operators]
@@ -4621,9 +4770,60 @@ tests:
   - path: test/language/expressions/equals/S11.9.1_A3.3.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - path: test/language/expressions/equals/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/equals/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/equals/bigint-and-incomparable-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, expression-operators, object-properties, symbols]
+  - path: test/language/expressions/equals/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/equals/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/equals/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/equals/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/exponentiation/applying-the-exp-operator_A1.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - path: test/language/expressions/exponentiation/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/exponentiation/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/exponentiation/bigint-negative-exponent-throws.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - path: test/language/expressions/exponentiation/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/exponentiation/bigint-zero-base-zero-exponent.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -4861,6 +5061,55 @@ tests:
   - path: test/language/expressions/generators/yield-weak-binding.js
     expectedClassification: expected-negative
     dependencies: [generators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-incomparable-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than-or-equal/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-incomparable-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/greater-than/bigint-and-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/in/private-field-in-nested.js
     expectedClassification: expected-negative
     dependencies: [classes, expression-operators, object-properties]
@@ -4924,15 +5173,148 @@ tests:
   - path: test/language/expressions/instanceof/S11.8.6_A3.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - path: test/language/expressions/left-shift/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/left-shift/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/left-shift/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-incomparable-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than-or-equal/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-incomparable-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/less-than/bigint-and-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/logical-assignment/lgcl-and-assignment-operator-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/logical-assignment/lgcl-nullish-assignment-operator-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/logical-assignment/lgcl-or-assignment-operator-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/logical-not/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
   - path: test/language/expressions/logical-or/S11.11.2_A3_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
   - path: test/language/expressions/modulus/S11.5.3_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/modulus/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/modulus/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/modulus/bigint-modulo-zero.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - path: test/language/expressions/modulus/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/multiplication/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/multiplication/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/multiplication/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/new.target/asi.js
     expectedClassification: pass
     dependencies: [functions]
@@ -5818,6 +6200,9 @@ tests:
   - path: test/language/expressions/object/let-non-strict-syntax.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/literal-property-name-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, object-literals]
   - path: test/language/expressions/object/method-definition/async-meth-dflt-params-abrupt.js
     expectedClassification: pass
     dependencies: [object-literals]
@@ -6100,24 +6485,126 @@ tests:
   - path: test/language/expressions/optional-chaining/update-expression-prefix.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/postfix-decrement/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
   - path: test/language/expressions/postfix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/postfix-increment/11.3.1-2-1gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - path: test/language/expressions/postfix-increment/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
   - path: test/language/expressions/postfix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/prefix-decrement/11.4.5-2-2gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - path: test/language/expressions/prefix-decrement/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
   - path: test/language/expressions/prefix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-increment/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, var-bindings]
   - path: test/language/expressions/prefix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/right-shift/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/right-shift/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/right-shift/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-incomparable-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, expression-operators, object-properties, symbols]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-does-not-equals/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-boolean.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-incomparable-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, expression-operators, object-properties, symbols]
+  - path: test/language/expressions/strict-equals/bigint-and-non-finite.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-number-extremes.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/strict-equals/bigint-and-string.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/subtraction/bigint-arithmetic.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/subtraction/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/subtraction/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/super/call-bind-this-value-twice.js
     expectedClassification: pass
     dependencies: [classes]
@@ -6436,6 +6923,35 @@ tests:
   - path: test/language/expressions/typeof/unresolvable-reference.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/unary-minus/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/unary-plus/bigint-throws.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - path: test/language/expressions/unsigned-right-shift/bigint-errors.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/unsigned-right-shift/bigint-toprimitive.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/unsigned-right-shift/bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics, expression-operators]
   - path: test/language/expressions/void/S11.4.2_A2_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
@@ -6520,6 +7036,183 @@ tests:
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
+  - path: test/language/literals/bigint/binary-invalid-digit.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/exponent-part.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/hexadecimal-invalid-digit.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/legacy-octal-like-invalid-00n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/legacy-octal-like-invalid-01n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/legacy-octal-like-invalid-07n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/mv-is-not-integer-dil-dot-dds.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/mv-is-not-integer-dot-dds.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/non-octal-like-invalid-0008n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/non-octal-like-invalid-012348n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/non-octal-like-invalid-08n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/non-octal-like-invalid-09n.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-bd-nsl-bd-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-bd-nsl-bd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-bd-nsl-bds.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-bds-nsl-bd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-bds-nsl-bds.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-nsl-bd-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-bil-nsl-bd-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dd-nsl-dd-one-of.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dd-nsl-dds-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dd-nsl-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dds-nsl-dds-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dds-nsl-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-hd-nsl-hd-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-hd-nsl-hd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-hd-nsl-hds.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-hds-nsl-hd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-hds-nsl-hds.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-nsl-hd-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-nsl-hd-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-hil-od-nsl-od-one-of.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-00-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-01-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-07-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-0_0-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-0_1-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-lol-0_7-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nonoctal-08-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nonoctal-09-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nonoctal-0_8-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nonoctal-0_9-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nzd-nsl-dd-one-of.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nzd-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nzd-nsl-dds-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nzd-nsl-dds-leading-zero-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-nzd-nsl-dds.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-nsl-od-dunder-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-nsl-od-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-od-nsl-od-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-od-nsl-od-one-of.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-od-nsl-od.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-od-nsl-ods.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-ods-nsl-od.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-ods-nsl-ods.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-sign-minus-dds-nsl-dd.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-unicode-err.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
+  - path: test/language/literals/bigint/octal-invalid-digit.js
+    expectedClassification: expected-negative
+    dependencies: [bigint-primitive]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
