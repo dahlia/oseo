@@ -1424,6 +1424,12 @@ OseoResult oseo_call_function(
                 code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID
             );
         }
+    } else if (code_id == OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID) {
+        result = oseo_internal_async_from_sync_fulfilled(
+            context,
+            callee,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
     } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
         OseoValue description_input = argument_count > 0u
             ? arguments[0]

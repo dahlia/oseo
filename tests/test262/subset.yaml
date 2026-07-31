@@ -8204,6 +8204,9 @@ tests:
   - path: test/language/statements/async-generator/yield-star-return-notdone-iter-value-throws.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/language/statements/async-generator/yield-star-return-then-getter-ticks.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-sync-next.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, iterator-protocol]

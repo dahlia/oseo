@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 3,999
-reviewed cases: 2,351 passes, 1,128 expected negatives, and 520 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,000
+reviewed cases: 2,352 passes, 1,128 expected negatives, and 520 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -897,15 +897,12 @@ and `continue` keeps the iterator open. `Symbol.asyncIterator` joins the
 well-known symbols, and the runtime gains three entry points, which bumps the
 ABI to `m5-23`.
 
-A step suspends by draining the scheduler rather than by returning to the
-caller, because the frontend splits an `await` expression into continuations
-and a loop has no such split. Interleaving with jobs already queued is
-preserved, but the enclosing asynchronous function does not return to its
-caller at a step, and a step whose promise can never settle reports
-`OSEO3001` instead of leaving the function pending forever. That is the one
-deviation this unit accepts; the profile's gap entry owns it, and closing it
-needs the same suspension record asynchronous generators need, so the two
-land together.
+At this checkpoint, a step suspended by draining the scheduler rather than by
+returning to the caller, because the frontend split an `await` expression into
+continuations and a loop had no such split. Unit 7.5 now closes that deviation
+inside ordinary asynchronous functions and asynchronous generators through
+their shared traced frame. Module top-level steps and asynchronous iterator
+closing remain the separate Units 7.7 and 7.6 boundaries.
 
 Native differential fixtures cover the synchronous fallback, generator and
 user iterables, `Symbol.asyncIterator` preference over `Symbol.iterator`,
@@ -965,15 +962,10 @@ reactions. A generated property with seed `0x5eed0018` draws bounded bodies,
 awaited and promised operands, three delegation kinds, guards, and every
 resumption position under both specialization policies and forced collection.
 
-The awaits a `yield*` step takes still drain the scheduler, so the `for await`
-gap entry now names both. Asynchronous generator method definitions stay
-rejected with the diagnostic synchronous generator methods already get, and
-default or binding-pattern parameters stay rejected for the same ordering
-reason. `%GeneratorPrototype%.throw` staying unimplemented becomes observable
-one step further out: a `throw` delivered to an asynchronous generator
-suspended inside a `yield*` over a synchronous generator reports a `TypeError`
-where the specification forwards the completion, which that gap entry now
-records.
+At this checkpoint, the awaits a `yield*` step took still drained the
+scheduler. Unit 7.5 now moves next, return, and throw delegation steps through
+the asynchronous generator's traced frame. A missing-`throw` delegation still
+closes through the drain-based Unit 7.6 path.
 
 V8 enumerates an accessor defined after an object literal spread property
 last instead of in property-creation order, so Node.js and Deno cannot act
@@ -1495,7 +1487,7 @@ operands, calls, compound member assignments, loop positions, and `try`,
 `catch`, and `finally` preserve ordinary evaluation and completion precedence.
 Promise reaction construction and dispatch remain centralized under
 [ADR 0022](./docs/adr/0022-async-context-boundary.md); module await and
-drain-based asynchronous iterator steps remain separate units.
+drain-based asynchronous iterator closing remain separate units.
 
 The generated property suite uses seed `0x5eed001d` across six expression
 position families, fulfillment and rejection, ordinary functions and arrows,
@@ -1512,6 +1504,35 @@ generic body preserves ordered strict writes, abrupt completion, accessors, and
 array length semantics. Binding-pattern subexpressions retain their explicit
 suspension restrictions, and asynchronous module cycles remain outside this
 unit.
+
+M5a Unit 7.5 moves `for await` iterator steps inside ordinary asynchronous
+functions and asynchronous generators, plus asynchronous generator `yield*`
+next, return, and throw delegation steps, through the traced frame those bodies
+already own. A step starts a promise-producing runtime operation, saves its
+promise and direct-value mode in traced root slots, and returns to the caller.
+Fulfillment or rejection resumes the saved block before generated code
+inspects the iterator result. Queued jobs and timer turns retain their
+observable order, while a promise that never settles now leaves the enclosing
+operation pending instead of producing `OSEO3001`.
+
+The Async-from-Sync wrapper builds its continuation promise with an internal
+fulfillment reaction, so the stepped value and the outer iterator result await
+also leave no suspended native stack. Fixed native fixtures cover caller
+return, reaction and timer order, next, return, and throw delegation, a false
+number hint with a deliberate generic fallback, forced collection, and a
+never-settling step, and `for await` inside an asynchronous generator with a
+`yield` and return resumption while its iterator remains open. The generated
+property uses seed `0x5eed001e`, an independent schedule model, both iterator
+sources and all three framed forms, both specialization policies, false hints,
+reaction, timer, and never settlements, and forced collection against Node.js,
+Deno, and native execution.
+
+The reviewed *yield-star-return-then-getter-ticks.js* test262 case enters as a
+pass. The manifest moves to 4,000 cases: 2,352 passes, 1,128 expected
+negatives, and 520 unsupported profile features with no semantic or harness
+failures. AsyncIteratorClose still drains and remains Unit 7.6. Module
+top-level `for await`, top-level await checkpoints, and asynchronous module
+cycles retain the Unit 7.7 module-continuation boundary.
 
 ### Intrinsics and built-in objects
 

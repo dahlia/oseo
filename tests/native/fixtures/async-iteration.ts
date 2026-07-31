@@ -604,4 +604,75 @@ async function main() {
 main();
 `,
   },
+  {
+    name: "for-await-of-frame-suspension",
+    source: `
+function delayedIterator() {
+  let index = 0;
+  return {
+    [Symbol.asyncIterator]: function () {
+      return {
+        next: function () {
+          index += 1;
+          if (index > 1) return { done: true };
+          return new Promise(function (resolve) {
+            setTimeout(function () {
+              console.log("step timer");
+              resolve({ value: 3, done: false });
+            }, 1);
+          });
+        },
+      };
+    },
+  };
+}
+function pendingIterator() {
+  return {
+    [Symbol.asyncIterator]: function () {
+      return {
+        next: function () {
+          return new Promise(function () {});
+        },
+      };
+    },
+  };
+}
+/**
+ * @param {number} left
+ * @param {number} right
+ */
+function hintedAdd(left, right) {
+  return left + right;
+}
+async function consume(iterable, hinted) {
+  const guarded = hintedAdd(hinted, 1);
+  console.log("body start", guarded);
+  for await (const value of iterable) {
+    console.log("body value", value, guarded);
+  }
+  console.log("body done");
+}
+async function main() {
+  const task = consume(delayedIterator(), {
+    valueOf: function () {
+      console.log("guard miss fallback");
+      return 4;
+    },
+  });
+  console.log("caller resumed");
+  await task;
+  console.log("caller joined");
+  consume(pendingIterator(), 1);
+  console.log("never-settled remains pending");
+}
+main();
+`,
+    specialization: {
+      genericCallsDisabled: 4,
+      genericCallsEnabled: 3,
+      hits: 1,
+      misses: 3,
+      overflowMisses: 0,
+    },
+  },
 ];

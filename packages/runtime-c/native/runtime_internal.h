@@ -86,6 +86,8 @@
     (SIZE_MAX - 24u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_ARRAY_PUSH_CODE_ID \
     (SIZE_MAX - 25u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID \
+    (SIZE_MAX - 26u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -824,6 +826,11 @@ bool oseo_internal_iterator_key_matches(
 OseoResult oseo_internal_iterator_method(
     OseoContext *context,
     size_t code_id
+);
+OseoResult oseo_internal_async_from_sync_fulfilled(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue value
 );
 /* The cached virtualized %Array.prototype%.push function and its generic
  * body. The body deliberately uses ordinary Get and Set so borrowed calls

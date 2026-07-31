@@ -36,7 +36,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,999 reviewed cases: 2,351 passes, 1,128
+The current manifest contains 4,000 reviewed cases: 2,352 passes, 1,128
 expected negatives, and 520 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -209,7 +209,7 @@ its deliberate boundary and its evidence:
     dependency reads and converts `length`, performs each indexed write and the
     final length write in strict source order, propagates accessor and
     writability failures, and works when borrowed by an ordinary object. The
-    generated manifest records 3,999 cases: 2,351 passes, 1,128 expected
+    generated manifest records 4,000 cases: 2,352 passes, 1,128 expected
     negatives, and 520 unsupported profile features with no semantic or
     harness failures.
  -  `var` declarations with function-scope hoisting, multiple
@@ -1531,8 +1531,15 @@ its deliberate boundary and its evidence:
     generators stay rejected, so the asynchronous generator cases the
     `async-iteration` tag reaches stay outside the reviewed subset, and a
     `for await` head over a string still fails, because primitive iteration
-    is unsupported. A suspension inside the loop drains the scheduler instead
-    of returning to the caller, which the gap entry below owns.
+    is unsupported. Inside an ordinary asynchronous function or asynchronous
+    generator, each iterator step now starts a promise-producing runtime
+    operation, saves that promise and its result mode in the owning traced
+    frame, and returns to the caller. A fulfillment resumes the frame before
+    `done` and `value` are inspected; a rejection resumes it with a throw
+    completion. A promise that never settles therefore leaves the function
+    pending instead of producing `OSEO3001`. Module top-level `for await`
+    retains the drain-based step path, and `AsyncIteratorClose` retains its
+    separate drain-based await. Those are the Units 7.7 and 7.6 boundaries.
  -  Asynchronous generator functions. `async function*` declarations and
     function expressions are admitted, and calling one runs its parameter and
     environment prologue and returns a suspended asynchronous generator whose
@@ -1588,8 +1595,12 @@ its deliberate boundary and its evidence:
     is returned, so their initialization cannot be deferred until a queued
     request resumes the body. Asynchronous generator method definitions are
     admitted in object literals and prototype, static, and private class
-    elements. The awaits a `yield*` step takes drain the scheduler rather than
-    returning to the caller, which the `for await` gap entry below owns.
+    elements. Each `yield*` next, return, and throw step starts through a
+    promise-producing runtime entry point and suspends the generator's owned
+    traced frame. The request method returns to its caller before settlement,
+    and the frame inspects the result only after its reaction resumes. The
+    missing-`throw` path still performs `AsyncIteratorClose` through the
+    drain-based close operation, which remains the Unit 7.6 boundary.
     Native differential fixtures cover single and repeated yields, sent
     values, awaited and promised operands, an empty body, an awaited explicit
     return, function `length`, `name`, and inferred `name`, self-iterability
@@ -1610,6 +1621,19 @@ its deliberate boundary and its evidence:
     bounded bodies, awaited and promised operands, three delegation kinds,
     `try`/`catch` and `try`/`finally` guards, and every resumption position
     under both specialization policies and forced collection.
+    Unit 7.5 adds fixed reaction- and timer-ordered delegation fixtures plus a
+    generated property with seed `0x5eed001e`. The property draws `for await`
+    in ordinary asynchronous functions and asynchronous generators, plus
+    `yield*`, native asynchronous and wrapped synchronous iterators, reaction,
+    timer, and never-settling results, and truthful and false hints. Its
+    independent schedule model is compared with Node.js, Deno, both native
+    specialization policies, and forced collection. Fixed native evidence
+    also delivers a return resumption while an asynchronous generator is
+    suspended at a `yield` inside its still-open `for await` loop. The reviewed
+    *yield-star-return-then-getter-ticks.js* case enters the test262 subset as
+    a pass, moving the manifest to 4,000 cases: 2,352 passes, 1,128 expected
+    negatives, and 520 unsupported profile features with no semantic or
+    harness failures.
  -  The asynchronous generator intrinsic chain. `%AsyncIteratorPrototype%`,
     `%AsyncGeneratorPrototype%`, `%AsyncGeneratorFunction.prototype%`, and
     `%AsyncGeneratorFunction%` are materialized as one lazily created
@@ -1738,25 +1762,20 @@ must never shrink by reclassification alone.
     continuation model. Owner: the functions and executable syntax stream for
     pattern suspension, and the modules and asynchronous execution stream for
     cycles.
- -  A `for await` step, and each step of a `yield*` inside an asynchronous
-    generator, suspends by draining the scheduler rather than by
-    returning to the caller. Ordinary `await` now uses a traced suspension
-    frame, but these iterator operations still call the drain-based scheduler
-    path directly. Each step therefore resolves its promise, runs the queued
-    jobs in order, and advances timers until that promise settles, then resumes
-    the loop directly. Interleaving with jobs
-    already queued is preserved, but the enclosing asynchronous function does
-    not return to its caller at a step, so work sequenced after the call
-    observes the loop's effects first, and a step whose promise can never
-    settle reports the host diagnostic `OSEO3001` instead of leaving the
-    function pending forever. Four test262 cases turn on the difference and
-    stay outside the reviewed subset:
-    *async-from-sync-iterator-continuation-abrupt-completion-get-constructor.js*
-    and the three _ticks-with-\*-constructor-lookup_ cases, which also need
-    `Promise` as a value. Closing it needs the suspension record asynchronous
-    generators now own to reach ordinary asynchronous function bodies and the
-    delegation steps as well. Owner: the functions and executable syntax
-    stream.
+ -  `AsyncIteratorClose` still awaits a present `return` method by draining
+    the scheduler. This includes abrupt completion from `for await` and the
+    missing-`throw` branch of asynchronous generator `yield*`. Jobs and timers
+    keep their order, but the close does not return to its caller, and a close
+    promise that never settles reports `OSEO3001` instead of leaving the
+    enclosing operation pending. Unit 7.6 owns moving close completion and
+    precedence through the saved frame. Owner: the functions and executable
+    syntax stream.
+ -  A module top-level `for await` step retains the drain-based iterator
+    operation because module evaluation does not own the ordinary asynchronous
+    function frame used by Unit 7.5. Top-level await keeps its scheduler
+    checkpoint in dependency order, and asynchronous module cycles remain
+    unsupported. Unit 7.7 owns the module continuation and cycle boundary.
+    Owner: the modules and asynchronous execution stream.
  -  AsyncFromSyncIteratorContinuation does not close the wrapped synchronous
     iterator when the value it awaits rejects. The specification closes the
     synchronous iterator before the wrapper's promise rejects whenever the

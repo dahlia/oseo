@@ -776,6 +776,102 @@ function emitIteratorOperation(
     operation.iteratorAsync === true
       ? renderC(emittedC.iteratorOperation.asyncPrefix)
       : renderC(emittedC.common.empty);
+  if (operation.kind === "iterator-await-start") {
+    const stepKind = operation.iteratorStepKind;
+    const valueOnly = operation.iteratorValueOnlyResult;
+    if (stepKind == null || valueOnly == null) {
+      throw new Error(
+        `MIR iterator await start %${operation.id} is incomplete.`,
+      );
+    }
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.rootsAssignOseoBooleanFalseStatement,
+        valueOnly,
+      ),
+    );
+    if (stepKind === "next") {
+      line(
+        state,
+        renderC(
+          emittedC.iteratorOperation
+            .resultAssignOseoAsyncIteratorNextStartContext,
+          operationArgument(operation, 0),
+          operationArgument(operation, 1),
+        ),
+      );
+    } else {
+      const step =
+        stepKind === "delegate-next"
+          ? renderC(emittedC.common.iteratorDelegateNext)
+          : stepKind === "delegate-return"
+            ? renderC(emittedC.common.iteratorDelegateReturn)
+            : renderC(emittedC.common.iteratorDelegateThrow);
+      const iterator = operationArgument(operation, 0);
+      const trailing =
+        stepKind === "delegate-next"
+          ? renderC(
+              emittedC.iteratorOperation.rootsRootsAddressRootsStatementSuffix,
+              operationArgument(operation, 1),
+              operationArgument(operation, 2),
+              valueOnly,
+            )
+          : renderC(
+              emittedC.iteratorOperation.rootsAddressRootsStatementSuffix,
+              operationArgument(operation, 1),
+              valueOnly,
+            );
+      line(
+        state,
+        renderC(
+          emittedC.iteratorOperation
+            .resultAssignOseoAsyncIteratorDelegateStartContext,
+          step,
+          iterator,
+        ) + trailing,
+      );
+    }
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+    return;
+  }
+  if (operation.kind === "iterator-await-result") {
+    const value = operation.iteratorValueResult;
+    if (value == null) {
+      throw new Error(
+        `MIR iterator await result %${operation.id} has no value.`,
+      );
+    }
+    state.scalarKinds.set(operation.id, "boolean");
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.boolIteratorDoneAssignTrueStatement,
+        operation.id,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.resultAssignOseoAsyncIteratorResultContext,
+        operationArgument(operation, 0),
+        operationArgument(operation, 1),
+        operation.iteratorValueWhenDone === true,
+        value,
+        operation.id,
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.iteratorOperation.boolFastAssignIteratorDoneStatement,
+        operation.id,
+        operation.id,
+      ),
+    );
+    line(state, renderC(emittedC.common.voidFastStatement, operation.id));
+    return;
+  }
   if (operation.kind === "iterator-get") {
     const iterable = operationArgument(operation, 0);
     const nextMethod = operation.iteratorNextMethodResult;
@@ -2432,6 +2528,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "box-smi") {
     emitBoxSmi(state, operation);
   } else if (
+    operation.kind === "iterator-await-result" ||
+    operation.kind === "iterator-await-start" ||
     operation.kind === "iterator-get" ||
     operation.kind === "iterator-next" ||
     operation.kind === "iterator-delegate-next" ||
@@ -2764,6 +2862,9 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       }
       if (operation.iteratorValueResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueResult);
+      }
+      if (operation.iteratorValueOnlyResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueOnlyResult);
       }
       for (const argument of operation.arguments) {
         maximum = Math.max(maximum, argument);

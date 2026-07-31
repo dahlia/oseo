@@ -836,4 +836,130 @@ async function* counterHolder() {
 main();
 `,
   },
+  {
+    name: "async-generator-delegation-suspension",
+    source: `
+function pendingDelegate() {
+  let resolveStep;
+  let index = 0;
+  return {
+    iterator: {
+      [Symbol.asyncIterator]: function () { return this; },
+      next: function () {
+        index += 1;
+        if (index > 1) return { value: "end", done: true };
+        return new Promise(function (resolve) {
+          resolveStep = resolve;
+        });
+      },
+    },
+    resolve: function () {
+      resolveStep({ value: "first", done: false });
+    },
+  };
+}
+async function* delegate(source) {
+  const result = yield* source;
+  console.log("delegation done", result);
+}
+async function main() {
+  const pending = pendingDelegate();
+  const iterator = delegate(pending.iterator);
+  const first = iterator.next();
+  console.log("next caller resumed");
+  Promise.resolve().then(function () {
+    console.log("resolve delegated next");
+    pending.resolve();
+  });
+  const firstStep = await first;
+  console.log("first step", firstStep.value, firstStep.done);
+  const finalStep = await iterator.next();
+  console.log("final step", finalStep.value, finalStep.done);
+
+  const returning = {
+    [Symbol.asyncIterator]: function () { return this; },
+    next: function () { return { value: "open", done: false }; },
+    return: function () {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          console.log("return timer");
+          resolve({ value: "closed", done: true });
+        }, 1);
+      });
+    },
+  };
+  const returnedIterator = delegate(returning);
+  console.log("return open", (await returnedIterator.next()).value);
+  const returned = returnedIterator.return("requested");
+  console.log("return caller resumed");
+  const returnedStep = await returned;
+  console.log("return step", returnedStep.value, returnedStep.done);
+
+  const throwing = {
+    [Symbol.asyncIterator]: function () { return this; },
+    next: function () { return { value: "open", done: false }; },
+    throw: function () {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          console.log("throw timer");
+          resolve({ value: "caught", done: true });
+        }, 1);
+      });
+    },
+  };
+  const thrownIterator = delegate(throwing);
+  console.log("throw open", (await thrownIterator.next()).value);
+  const thrown = thrownIterator.throw("reason");
+  console.log("throw caller resumed");
+  const thrownStep = await thrown;
+  console.log("throw step", thrownStep.value, thrownStep.done);
+}
+main();
+`,
+  },
+  {
+    name: "async-generator-for-await-suspension",
+    source: `
+function source() {
+  let index = 0;
+  return {
+    [Symbol.asyncIterator]: function () {
+      return {
+        next: function () {
+          index += 1;
+          return new Promise(function (resolve) {
+            setTimeout(function () {
+              console.log("step timer", index);
+              resolve({ value: index, done: false });
+            }, 1);
+          });
+        },
+        return: function () {
+          console.log("close called");
+          return Promise.resolve({ value: undefined, done: true });
+        },
+      };
+    },
+  };
+}
+async function* consume(iterable) {
+  for await (const value of iterable) {
+    console.log("loop value", value);
+    yield value * 2;
+  }
+}
+async function main() {
+  const iterator = consume(source());
+  const pending = iterator.next();
+  console.log("next caller resumed");
+  const first = await pending;
+  console.log("first yield", first.value, first.done);
+  const returned = iterator.return("stopped");
+  console.log("return caller resumed");
+  const final = await returned;
+  console.log("return result", final.value, final.done);
+}
+main();
+`,
+  },
 ];

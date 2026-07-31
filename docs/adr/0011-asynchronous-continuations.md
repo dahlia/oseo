@@ -38,11 +38,25 @@ at the suspension point, so every enclosing handler, finalizer, and iterator
 cleanup keeps its ordinary precedence. A body return resolves the capability,
 and an uncaught throw rejects it.
 
+M5a Unit 7.5 uses the same frame for `for await` iterator steps inside an
+ordinary asynchronous function or asynchronous generator and for `yield*`
+delegation steps inside an asynchronous generator. Generated code starts a
+promise-producing iterator operation, retains its promise and any direct-value
+result mode in traced root slots, and returns to the caller. Fulfillment and
+rejection resume the saved block through the same dispatcher before the
+iterator result is inspected. Async-from-Sync continuation promises use an
+internal fulfillment reaction, so awaiting the synchronous step value also
+retains no native frame.
+
 Top-level await is a scheduler checkpoint in the dependency-ordered whole-graph
 script. It normalizes the value through one reaction and advances owned jobs and
 timer turns only until that reaction settles. If no owned task can make
 progress, it reports `OSEO3001` instead of retaining native recursion or
 blocking indefinitely.
+
+Asynchronous iterator closing retains its drain-based await, and module
+top-level `for await` retains the module checkpoint path. Units 7.6 and 7.7 own
+those boundaries.
 
 
 Consequences

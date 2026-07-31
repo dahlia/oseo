@@ -84046,6 +84046,44 @@ results:
   - case:
       async: true
       features:
+        - async-iteration
+      flags:
+        - async
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/language/statements/async-generator/yield-star-return-then-getter-ticks.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - compareArray.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
         - Symbol.iterator
         - async-iteration
         - Symbol.asyncIterator
@@ -127400,7 +127438,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 2351
+  passes: 2352
   semanticFailures: 0
   unsupportedProfileFeatures: 520
   dependencies:
@@ -127419,7 +127457,7 @@ summary:
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
-      passes: 941
+      passes: 942
       semanticFailures: 0
       unsupportedProfileFeatures: 233
     - dependency: classes
@@ -127479,7 +127517,7 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
-      passes: 650
+      passes: 651
       semanticFailures: 0
       unsupportedProfileFeatures: 38
     - dependency: lexical-bindings
@@ -127642,6 +127680,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 994
+      passes: 995
       semanticFailures: 0
       unsupportedProfileFeatures: 133
