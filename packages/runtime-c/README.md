@@ -163,6 +163,17 @@ The `m5-30` ABI adds `oseo_bind_arrow_context`. It captures the enclosing
 function's home object and super-constructor context plus the current
 `new.target`; arrow calls restore that context alongside their existing
 lexical receiver.
+The `m5-31` ABI adds `oseo_async_function_start` and
+`oseo_async_function_reject`. Ordinary asynchronous functions now keep their
+locals, roots, and completion records in a traced suspension frame. A call
+drives that hidden frame until it completes or awaits, settles one capability
+promise, and resumes awaited operands through the existing centralized promise
+reaction paths.
+The same ABI virtualizes the narrow `%Array.prototype.push%` dependency used by
+the reviewed thenable-await case. Its cached function is context-rooted, reads
+and converts an object receiver's `length`, performs ordered strict writes
+through the generic property path, and leaves array length and abrupt
+completion behavior to the existing object semantics.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

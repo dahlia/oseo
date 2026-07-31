@@ -161,7 +161,8 @@ struct OseoContext {
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
     OseoValue well_known_symbols[4];
-    /* Cached virtualized iterator methods, permanently rooted. */
+    /* Cached virtualized Array and iterator methods, permanently rooted. */
+    OseoValue array_push_function;
     OseoValue iterator_values_function;
     OseoValue iterator_next_function;
     OseoValue iterator_self_function;
@@ -501,6 +502,18 @@ OseoResult oseo_async_generator_return(
 OseoResult oseo_async_generator_throw(
     OseoContext *context,
     OseoValue generator,
+    OseoValue reason
+);
+/*
+ * Starts the hidden traced frame of an ordinary asynchronous function, or
+ * converts an abrupt parameter prologue into its returned rejection.
+ */
+OseoResult oseo_async_function_start(
+    OseoContext *context,
+    OseoValue frame
+);
+OseoResult oseo_async_function_reject(
+    OseoContext *context,
     OseoValue reason
 );
 OseoResult oseo_argument_list_create(OseoContext *context);

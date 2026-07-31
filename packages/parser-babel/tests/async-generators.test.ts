@@ -219,24 +219,26 @@ test("admits await in expression positions but not in patterns", () => {
   }
 });
 
-test("keeps an ordinary asynchronous function continuation-split", () => {
+test("keeps ordinary async distinct in a traced suspension frame", () => {
   const result = compileSource(babelFrontend, {
     source: "async function plain(value) { const x = await value; }\nplain(1);",
     sourceId: "plain-async.js",
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.ok(
-    result.mir.functions.every(
-      (functionValue) => functionValue.asyncGenerator !== true,
-    ),
+  const asynchronous = result.mir.functions.find(
+    (functionValue) => functionValue.asyncFunction === true,
   );
-  assert.ok(
-    result.mir.functions.every((functionValue) =>
-      functionValue.blocks.every(
-        (block) => block.terminator.kind !== "generator-yield",
-      ),
-    ),
+  assert.ok(asynchronous != null);
+  assert.notEqual(asynchronous.asyncGenerator, true);
+  assert.equal(asynchronous.generator, true);
+  assert.equal(
+    asynchronous.blocks.filter(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ).length,
+    1,
   );
 });
 

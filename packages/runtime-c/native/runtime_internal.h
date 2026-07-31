@@ -84,6 +84,8 @@
     (SIZE_MAX - 23u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_GENERATOR_THROW_CODE_ID \
     (SIZE_MAX - 24u - OSEO_ERROR_KIND_COUNT)
+#define OSEO_ARRAY_PUSH_CODE_ID \
+    (SIZE_MAX - 25u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -227,6 +229,11 @@ typedef struct {
     OseoValue receiver;
     /* The value the pending resumption delivers as the yield result. */
     OseoValue sent;
+    /*
+     * The promise capability owned by an ordinary asynchronous function
+     * frame. Generator records leave it undefined.
+     */
+    OseoValue async_function_capability;
     /* The pending AsyncGeneratorRequest queue, empty on a synchronous
      * generator. The head request owns the running or parked step. */
     OseoValue request_head;
@@ -257,6 +264,11 @@ typedef struct {
      * operands suspend the same frame.
      */
     bool asynchronous;
+    /*
+     * True when this internal frame belongs to an ordinary asynchronous
+     * function. The object carrying the frame is never exposed.
+     */
+    bool async_function;
     /*
      * True while the generator is parked on AsyncGeneratorAwaitReturn:
      * `return` reached a body that never started or already completed,
@@ -610,14 +622,6 @@ static inline bool function_has_prototype_property(OseoValue value) {
         kind == OSEO_FUNCTION_ASYNC_GENERATOR ||
         kind == OSEO_FUNCTION_CLASS;
 }
-/* True for the two function kinds whose call returns a suspended
- * generator instead of running their body to completion. */
-static inline bool function_is_generator(OseoValue value) {
-    if (!is_function(value)) return false;
-    OseoFunctionKind kind = function_object(value)->function_kind;
-    return kind == OSEO_FUNCTION_GENERATOR ||
-        kind == OSEO_FUNCTION_ASYNC_GENERATOR;
-}
 static inline bool is_generator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
@@ -627,7 +631,8 @@ static inline bool is_generator(OseoValue value) {
  * created, which reports every step through a promise. */
 static inline bool is_async_generator(OseoValue value) {
     return is_generator(value) &&
-        ordinary_object(value)->generator->asynchronous;
+        ordinary_object(value)->generator->asynchronous &&
+        !ordinary_object(value)->generator->async_function;
 }
 static inline bool function_has_lexical_this(OseoValue value) {
     if (!is_function(value)) return false;
@@ -819,6 +824,16 @@ bool oseo_internal_iterator_key_matches(
 OseoResult oseo_internal_iterator_method(
     OseoContext *context,
     size_t code_id
+);
+/* The cached virtualized %Array.prototype%.push function and its generic
+ * body. The body deliberately uses ordinary Get and Set so borrowed calls
+ * preserve accessors, abrupt completion, and array length semantics. */
+OseoResult oseo_internal_array_push_function(OseoContext *context);
+OseoResult oseo_internal_array_push(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
 );
 OseoResult oseo_internal_value_string(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_jobs_drain_until(

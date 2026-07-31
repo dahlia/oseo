@@ -53,9 +53,14 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
     .filter((parameter) => parameter != null);
   const restText =
     restParameters.length === 0 ? "" : ` rest=[${restParameters.join()}]`;
+  const asynchronous =
+    functionValue.asyncGenerator === true ||
+    functionValue.asyncFunction === true;
+  const generator =
+    functionValue.generator === true && functionValue.asyncFunction !== true;
   lines.push(
-    `${functionValue.asyncGenerator === true ? "async " : ""}` +
-      `function${functionValue.generator === true ? "*" : ""} ` +
+    `${asynchronous ? "async " : ""}` +
+      `function${generator ? "*" : ""} ` +
       `@f${functionValue.id} ${functionValue.name} roots=` +
       `${functionValue.rootSlotCount}` +
       (functionValue.generatorBodyStart == null

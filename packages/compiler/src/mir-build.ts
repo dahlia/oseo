@@ -3123,7 +3123,7 @@ function lowerExpression(
   }
   if (expression.kind === "await") {
     const argument = lowerExpression(expression.argument, builder);
-    if (builder.asyncGenerator) {
+    if (builder.asyncGenerator || builder.asyncFunction) {
       return lowerAsyncGeneratorAwait(argument, expression.range, builder);
     }
     appendMirMetadata(
@@ -5955,6 +5955,7 @@ function buildMirFunction(
   initializesInstanceElements = false,
   fieldKeyBindingId?: number,
   asyncGenerator = false,
+  asyncFunction = false,
   argumentsBindingId?: number,
   generatorCallStatementCount = 0,
 ): MirFunction {
@@ -5965,6 +5966,7 @@ function buildMirFunction(
   };
   const builder: MirBuilder = {
     abruptTargets: [],
+    asyncFunction,
     asyncGenerator,
     blocks: [entry],
     current: entry,
@@ -6043,6 +6045,7 @@ function buildMirFunction(
       terminator: block.terminator ?? { kind: "unreachable" },
     })),
     ...(asyncGenerator ? { asyncGenerator: true as const } : {}),
+    ...(asyncFunction ? { asyncFunction: true as const } : {}),
     ...(derivedThisBindingId == null ? {} : { derivedThisBindingId }),
     functionLength,
     ...(generator ? { generator: true as const } : {}),
@@ -6103,11 +6106,15 @@ export function buildMir(
         specialization,
         functionValue.strict === true,
         functionValue.functionKind === "generator" ||
-          functionValue.functionKind === "async-generator",
+          functionValue.functionKind === "async-generator" ||
+          functionValue.functionKind === "async" ||
+          functionValue.functionKind === "async-arrow",
         functionValue.derivedThisBindingId,
         functionValue.initializesInstanceElements === true,
         functionValue.fieldKeyBindingId,
         functionValue.functionKind === "async-generator",
+        functionValue.functionKind === "async" ||
+          functionValue.functionKind === "async-arrow",
         functionValue.argumentsBindingId,
         functionValue.generatorCallStatementCount,
       );

@@ -528,13 +528,218 @@ OseoResult oseo_async_generator_throw(
     );
 }
 
+/*
+ * Settles the one capability owned by an ordinary asynchronous frame and
+ * discards the frame before returning. The capability is rooted separately
+ * because completing the frame clears every retained execution value.
+ */
+static OseoResult complete_async_function(
+    OseoContext *context,
+    OseoValue generator,
+    OseoValue value,
+    bool rejected
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = generator;
+    frame.slots[1] = value;
+    OseoGenerator *state = generator_state(frame.slots[0]);
+    frame.slots[2] = state->async_function_capability;
+    if (!is_promise(frame.slots[2])) {
+        oseo_roots_release(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "An asynchronous function frame has no promise capability."
+        );
+    }
+    state->async_function_capability = oseo_undefined();
+    oseo_internal_generator_complete(frame.slots[0]);
+    result = rejected
+        ? oseo_promise_reject_into(context, frame.slots[2], frame.slots[1])
+        : oseo_promise_resolve_into(context, frame.slots[2], frame.slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result.value = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Runs an ordinary asynchronous body until it completes or parks on an
+ * await. The frame uses the asynchronous-generator body dispatcher, but it
+ * has no request queue and never exposes an iterator result.
+ */
+static OseoResult drive_async_function(
+    OseoContext *context,
+    OseoValue generator,
+    bool resumed,
+    OseoValue resumption_value,
+    bool rejected
+) {
+    if (!is_generator(generator) ||
+        !generator_state(generator)->async_function) {
+        return failure(
+            context,
+            "OSEO2001",
+            "An asynchronous function requires its internal frame."
+        );
+    }
+    OseoGenerator *state = generator_state(generator);
+    if (resumed && state->state != OSEO_GENERATOR_AWAITING) {
+        return failure(
+            context,
+            "OSEO2001",
+            "An await resumed an asynchronous function that was not awaiting."
+        );
+    }
+    if (!resumed && state->state != OSEO_GENERATOR_SUSPENDED_START) {
+        return failure(
+            context,
+            "OSEO2001",
+            "An asynchronous function frame was started more than once."
+        );
+    }
+    if (context->generator_dispatcher == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "No generated generator dispatcher is installed."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = generator;
+    frame.slots[1] = resumption_value;
+    state = generator_state(frame.slots[0]);
+    if (resumed) {
+        state->state = OSEO_GENERATOR_SUSPENDED_YIELD;
+        state->suspend_reason = OSEO_GENERATOR_SUSPEND_YIELD;
+    }
+    state->sent = frame.slots[1];
+    state->resume_kind = rejected
+        ? OSEO_GENERATOR_RESUME_THROW
+        : OSEO_GENERATOR_RESUME_NEXT;
+    state->state = OSEO_GENERATOR_EXECUTING;
+    result = oseo_call_enter(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = context->generator_dispatcher(context, frame.slots[0]);
+        oseo_call_leave(context);
+    }
+    state = generator_state(frame.slots[0]);
+    state->sent = oseo_undefined();
+    state->resume_kind = OSEO_GENERATOR_RESUME_NEXT;
+    frame.slots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) {
+        if (context->has_diagnostic) {
+            oseo_internal_generator_complete(frame.slots[0]);
+        } else {
+            oseo_context_clear_language_error(context);
+            result = complete_async_function(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                true
+            );
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (state->state == OSEO_GENERATOR_SUSPENDED_YIELD) {
+        if (state->suspend_reason != OSEO_GENERATOR_SUSPEND_AWAIT) {
+            oseo_roots_release(context, &frame);
+            return failure(
+                context,
+                "OSEO2001",
+                "An ordinary asynchronous function tried to yield."
+            );
+        }
+        state->state = OSEO_GENERATOR_AWAITING;
+        result = install_await_reactions(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result.value = oseo_undefined();
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    result = complete_async_function(
+        context,
+        frame.slots[0],
+        frame.slots[1],
+        false
+    );
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_async_function_start(
+    OseoContext *context,
+    OseoValue generator
+) {
+    OseoValue slots[2] = {generator, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    if (!is_generator(slots[0]) ||
+        !generator_state(slots[0])->async_function) {
+        oseo_roots_pop(context, &frame);
+        return failure(
+            context,
+            "OSEO2001",
+            "An asynchronous call did not create its internal frame."
+        );
+    }
+    OseoResult result = oseo_internal_promise_create(context);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        generator_state(slots[0])->async_function_capability = slots[1];
+        result = drive_async_function(
+            context,
+            slots[0],
+            false,
+            oseo_undefined(),
+            false
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_async_function_reject(
+    OseoContext *context,
+    OseoValue reason
+) {
+    OseoValue slots[2] = {reason, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_promise_create(context);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_promise_reject_into(
+            context,
+            slots[1],
+            slots[0]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_async_generator_awaited(
     OseoContext *context,
     OseoValue generator,
     OseoValue value,
     bool rejected
 ) {
-    if (!is_async_generator(generator)) {
+    if (!is_generator(generator) ||
+        !generator_state(generator)->asynchronous) {
         return failure(
             context,
             "OSEO2001",
@@ -555,6 +760,17 @@ OseoResult oseo_internal_async_generator_awaited(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = generator;
     frame.slots[1] = value;
+    if (state->async_function) {
+        result = drive_async_function(
+            context,
+            frame.slots[0],
+            true,
+            frame.slots[1],
+            rejected
+        );
+        oseo_roots_release(context, &frame);
+        return result;
+    }
     if (state->awaiting_return) {
         state->awaiting_return = false;
         state->state = OSEO_GENERATOR_COMPLETED;

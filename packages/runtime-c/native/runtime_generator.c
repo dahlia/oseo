@@ -359,15 +359,30 @@ OseoResult oseo_generator_create(
     size_t slot_count,
     size_t completion_count
 ) {
-    if (!function_is_generator(callee)) {
+    if (!is_function(callee)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "A generator requires a generator function."
+            "A suspension frame requires an asynchronous or generator "
+            "function."
         );
     }
+    OseoFunctionKind function_kind = function_object(callee)->function_kind;
+    if (function_kind != OSEO_FUNCTION_GENERATOR &&
+        function_kind != OSEO_FUNCTION_ASYNC_GENERATOR &&
+        function_kind != OSEO_FUNCTION_ASYNC &&
+        function_kind != OSEO_FUNCTION_ASYNC_ARROW) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "A suspension frame requires an asynchronous or generator "
+            "function."
+        );
+    }
+    bool async_function = function_kind == OSEO_FUNCTION_ASYNC ||
+        function_kind == OSEO_FUNCTION_ASYNC_ARROW;
     bool asynchronous =
-        function_object(callee)->function_kind == OSEO_FUNCTION_ASYNC_GENERATOR;
+        function_kind == OSEO_FUNCTION_ASYNC_GENERATOR || async_function;
     if (slot_count > (SIZE_MAX - sizeof(OseoGenerator)) / sizeof(OseoValue)) {
         return failure(context, "OSEO2001", "Generator frame is too large.");
     }
@@ -382,10 +397,12 @@ OseoResult oseo_generator_create(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = callee;
     frame.slots[1] = receiver;
-    frame.slots[2] = function_object(callee)->prototype_object;
+    frame.slots[2] = async_function
+        ? oseo_null()
+        : function_object(callee)->prototype_object;
     /* GetPrototypeFromConstructor falls back to the intrinsic whenever
      * the function's `prototype` is not an object. */
-    if (!is_object(frame.slots[2])) {
+    if (!async_function && !is_object(frame.slots[2])) {
         result = asynchronous
             ? oseo_internal_async_generator_prototype(context)
             : oseo_internal_generator_prototype(context);
@@ -413,6 +430,7 @@ OseoResult oseo_generator_create(
     state->callee = frame.slots[0];
     state->receiver = frame.slots[1];
     state->sent = oseo_undefined();
+    state->async_function_capability = oseo_undefined();
     state->request_head = oseo_undefined();
     state->request_tail = oseo_undefined();
     state->slots = (OseoValue *)(void *)(state + 1);
@@ -425,6 +443,7 @@ OseoResult oseo_generator_create(
     state->suspend_reason = OSEO_GENERATOR_SUSPEND_YIELD;
     state->state = OSEO_GENERATOR_SUSPENDED_START;
     state->asynchronous = asynchronous;
+    state->async_function = async_function;
     state->awaiting_return = false;
     state->yielded_result_object = false;
     for (size_t index = 0u; index < slot_count; index += 1u) {

@@ -210,7 +210,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/built-ins/AsyncGeneratorPrototype/next/request-queue-order-state-executing.js
     expectedClassification: pass
@@ -2891,7 +2891,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/expressions/await/await-non-promise-thenable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/expressions/await/early-errors-await-not-simple-assignment-target.js
     expectedClassification: expected-negative
@@ -4889,7 +4889,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, expression-operators, object-properties]
   - path: test/language/expressions/in/private-field-rhs-await-present.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions, classes, expression-operators]
   - path: test/language/expressions/in/private-field-rhs-non-object.js
     expectedClassification: pass
@@ -6029,7 +6029,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/member-expression-async-literal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/member-expression.js
     expectedClassification: unsupported-profile-feature
@@ -6041,10 +6041,10 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/optional-chain-expression-optional-expression.js
     expectedClassification: pass
@@ -7311,28 +7311,28 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/statements/async-function/try-reject-finally-reject.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-reject-finally-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-reject-finally-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-return-finally-reject.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-return-finally-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-return-finally-throw.js
     expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-throw-finally-reject.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-throw-finally-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [abrupt-completion, async-functions]
   - path: test/language/statements/async-function/try-throw-finally-throw.js
     expectedClassification: pass
@@ -8435,7 +8435,7 @@ tests:
       - object-properties
       - promise-settlement
   - path: test/language/statements/class/definition/methods-async-super-call-param.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       - async-functions
       - classes

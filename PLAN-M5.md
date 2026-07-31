@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 3,966
-reviewed cases: 1,883 passes, 1,120 expected negatives, and 963 unsupported
+honest unsupported classifications. The current reviewed manifest records 3,999
+reviewed cases: 2,351 passes, 1,128 expected negatives, and 520 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -859,10 +859,11 @@ the `await`, `arguments`, `return`, `super()`, `yield`, and unlabeled
 control-flow early errors, and eight new unsupported cases record the
 boundaries this unit keeps. The reviewed subset gains the
 `class-static-block` feature tag; the one remaining case that tag reaches
-inside the admitted syntax, *static-init-sequence.js*, needs
-`Array.prototype.push` and stays outside the reviewed subset until the unit
-that owns it lands, with the same interleaving covered by a native fixture
-meanwhile. The manifest moves to 1230 passes, 898 expected negatives, and 373
+inside the admitted syntax, *static-init-sequence.js*, stays outside the
+reviewed subset pending separate review. The same interleaving remains covered
+by a native fixture; Unit 7.4's later narrow `%Array.prototype.push%`
+dependency does not reclassify this class case. The manifest moves to 1230
+passes, 898 expected negatives, and 373
 unsupported profile features with no semantic or harness failures.
 
 The asynchronous iterator protocol and the `for await (... of ...)` statement
@@ -1457,9 +1458,9 @@ retain every operator, expression results, logical short-circuiting, computed
 property references, observable read and write key conversions, identifier
 function-name inference, and immutable failure. Forty-two reviewed test262
 `for-of` binding cases now pass because their `+=` loop bodies use the same
-lowering. Await inside a compound assignment remains unsupported until
-continuation extraction can retain the already-read target value across
-suspension.
+lowering. An ordinary asynchronous function now retains the reference and
+already-read target value across suspension; module top level keeps its
+separate continuation restriction.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
@@ -1483,6 +1484,34 @@ a nullish base, and immutable-target failure. Four reviewed test262 cases cover
 the four forms across whitespace boundaries, two parse negatives retain the
 strict `arguments` early errors, and the admitted classic `for` update promotes
 one existing exponentiation case to pass.
+
+Ordinary asynchronous functions and asynchronous arrows now use the traced
+suspension record already owned by asynchronous generators instead of recursive
+frontend continuation functions. Their calls still expose only one capability
+promise, while the hidden frame retains locals, roots, expression temporaries,
+and pending completion records across every admitted `await`. Fulfillment
+resumes with a value and rejection resumes with a throw completion, so nested
+operands, calls, compound member assignments, loop positions, and `try`,
+`catch`, and `finally` preserve ordinary evaluation and completion precedence.
+Promise reaction construction and dispatch remain centralized under
+[ADR 0022](./docs/adr/0022-async-context-boundary.md); module await and
+drain-based asynchronous iterator steps remain separate units.
+
+The generated property suite uses seed `0x5eed001d` across six expression
+position families, fulfillment and rejection, ordinary functions and arrows,
+truthful and false hints, both native specialization policies, and forced
+collection. Its independent model is compared with Node.js, Deno, and native
+execution. Fixed native fixtures additionally retain loop positions, nested
+cleanup, heap locals, deliberate guard misses, and the generic fallback.
+Fourteen reviewed test262 cases move from unsupported to pass, covering
+expression positions, asynchronous method parameters, asynchronous generator
+request ordering reached through an ordinary asynchronous callback,
+`try`/`finally` completion precedence, and non-promise thenable assimilation.
+The last case uses the unit's narrow `%Array.prototype.push%` dependency, whose
+generic body preserves ordered strict writes, abrupt completion, accessors, and
+array length semantics. Binding-pattern subexpressions retain their explicit
+suspension restrictions, and asynchronous module cycles remain outside this
+unit.
 
 ### Intrinsics and built-in objects
 
