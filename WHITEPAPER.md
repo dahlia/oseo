@@ -103,10 +103,11 @@ one already guarantees.
 ### WinterTC baseline
 
 Implement the shared web-platform surface: `fetch`, the URL and stream
-types, the Web Crypto API, the rest of what every major edge runtime
-already has. This alone should be enough to run web-standards-oriented
-libraries and frameworks with no Node.js-specific compatibility layer at
-all.
+types, Web Crypto, WebAssembly, and the rest of what every major edge runtime
+already has. Static *.wasm* dependencies can join Oseo's closed native build
+ahead of the complete runtime-byte API. This baseline should be enough to run
+web-standards-oriented libraries and frameworks with no Node.js-specific
+compatibility layer at all.
 
 ### Selected Node.js APIs
 

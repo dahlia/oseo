@@ -159,9 +159,10 @@ explicit imports. That gives it a strong sandbox and makes a JavaScript or
 standalone WebAssembly host part of the application design. Oseo currently
 emits native executables and owns a private runtime ABI, collector, module
 linker, promise jobs, and scheduler. Its future web and Node.js layers are
-intended to make the executable itself a server runtime. WebAssembly appears in
-Oseo's roadmap as a JavaScript and web API that the runtime must eventually
-provide, not as the current program-code target.
+intended to make the executable itself a server runtime. Oseo plans to compile
+statically imported *.wasm* dependencies into the same native executable and
+later provide the dynamic JavaScript and web APIs. Neither capability makes
+WebAssembly the output target for Oseo's JavaScript compiler.
 
 AssemblyScript is a good choice when a developer can write or port a
 computation into a statically typed WebAssembly-oriented language. Oseo is

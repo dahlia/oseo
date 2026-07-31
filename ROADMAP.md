@@ -59,6 +59,13 @@ key ownership behind an Oseo-owned provider boundary, separates cryptographic
 arithmetic from ECMAScript BigInt, and requires validated target artifact packs
 instead of an ambient host OpenSSL installation.
 
+WebAssembly integration is detailed in [*PLAN-WASM.md*](./PLAN-WASM.md). Its
+first checkpoint compiles statically imported *.wasm* modules inside the closed
+native graph without placing a compiler in the produced executable. Its second
+checkpoint supplies the runtime-byte JavaScript and web APIs required by M6.
+The plan keeps both capabilities distinct from a JavaScript-to-WebAssembly
+program target.
+
 A deferred code-generation track is recorded in
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md). C11 remains the implemented reference
 and portability backend. The track starts a candidate investigation only when
@@ -181,6 +188,30 @@ compiler depends on M8, the global-binding decision, code-lifetime evidence,
 and target support for executable code loading. None of this changes the M5
 unsupported classifications until a feature-specific decision updates ADR
 0016.
+
+
+WebAssembly track
+-----------------
+
+Static *.wasm* imports preserve Oseo's closed build: the binary module is
+resolved and validated with the source graph, compiled for the selected native
+target, and linked before execution. That checkpoint may be probed before M6
+without admitting `eval`, runtime source, or a general WebAssembly engine.
+[*PLAN-WASM.md*](./PLAN-WASM.md) owns the mixed module graph, feature matrix,
+AOT compiler, JavaScript wrappers, runtime state, target artifacts, and
+evidence.
+
+The complete M6 surface also accepts arbitrary module bytes through the
+WebAssembly JavaScript and streaming APIs. That later checkpoint requires an
+accepted runtime execution strategy. An interpreter and runtime native
+compiler have different code-lifetime, target, size, and security costs; the
+roadmap selects neither before bounded probes. Static module support must not
+be reported as M6 group completion.
+
+BigInt delivery does not block the static checkpoint unless its frozen feature
+matrix admits `i64` at the JavaScript boundary. Before that dependency lands,
+an `i64` import, export, global, or reflected signature that needs a JavaScript
+value fails with the owned build-time diagnostic.
 
 
 Interactive development track
@@ -597,6 +628,9 @@ consume the native adapter gates in [*PLAN-NIO.md*](./PLAN-NIO.md); web API
 semantics, TLS client, and trust-store decisions remain owned by M6.
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns the separate Web Crypto algorithm,
 provider, packaging, and security-update boundary.
+[*PLAN-WASM.md*](./PLAN-WASM.md) owns static *.wasm* module integration, the
+AOT compiler decision, the JavaScript value and runtime-store boundary, and the
+runtime execution decision consumed by the WebAssembly API group.
 
 ### Planned order
 
@@ -912,6 +946,10 @@ The roadmap should be revised when evidence changes one of these assumptions:
  -  The Minimum common web API includes several large standards, including
     streams, cryptography, and WebAssembly. M6 is divided by API group and test
     surface.
+ -  Static WebAssembly modules fit closed AOT compilation, but the dynamic
+    JavaScript API accepts bytes after startup. [*PLAN-WASM.md*](./PLAN-WASM.md)
+    keeps the build-side compiler, runtime engine, feature matrix, and
+    executable-memory policy from collapsing into one unmeasured choice.
  -  Native I/O facilities differ by operation, kernel, sandbox, and target. The
     probes and fallbacks in [*PLAN-NIO.md*](./PLAN-NIO.md) keep one fashionable
     backend name from becoming an unmeasured portability requirement.

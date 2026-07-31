@@ -21,7 +21,7 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
 [*PLAN-M6.md*](./PLAN-M6.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
-[*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0006](./docs/adr/0006-root-stack-and-safepoints.md), and
 [ADR 0008](./docs/adr/0008-object-layout-and-shapes.md). Evidence that changes
 one of those contracts updates the affected document in the same change.
@@ -43,7 +43,8 @@ roots to the same runtime collector and pass the same liveness evidence.
 Adding a backend does not create another heap or another collector policy.
 A target with an incompatible memory model, such as a future WebAssembly
 strategy that uses host-managed references, requires its own representation
-decision rather than an accidental copy of the native collector.
+decision under [*PLAN-WASM.md*](./PLAN-WASM.md) rather than an accidental copy
+of the native collector.
 
 The likely long-term shape is a copying nursery beside a non-moving old
 generation and separate large or pinned storage. That shape is a hypothesis,
@@ -437,6 +438,13 @@ M6 supplies the first long-running web workloads likely to expose retained
 memory and tail pauses. API components still own their JavaScript roots and
 resource cleanup. A collector optimization cannot replace an explicit abort,
 stream, fetch, or shutdown lifetime.
+
+[*PLAN-WASM.md*](./PLAN-WASM.md) owns WebAssembly stores, instances, linear
+memories, tables, globals, references, wrappers, and compiled artifacts. This
+plan owns their managed-slot tracing, native and external byte accounting,
+stable-address or pinning costs, and collector verification. Linear bytes are
+not scanned as `OseoValue` slots, while tables or globals that retain JavaScript
+references must expose mutable slots through the ordinary tracing contract.
 
 [*PLAN-NIO.md*](./PLAN-NIO.md) owns operation completion and native buffer
 lifetime. This plan owns stable heap addresses, pinned spaces, and the

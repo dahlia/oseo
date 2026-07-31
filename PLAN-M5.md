@@ -1602,6 +1602,12 @@ and top-level asynchronous cycles from the M4 subset. Preserve canonical module
 identity, one evaluation per module, live cells, job FIFO order, and
 deterministic shutdown while broadening syntax.
 
+Static *.wasm* imports are host module integration, not an ECMAScript grammar
+or M5 compatibility unit. [*PLAN-WASM.md*](./PLAN-WASM.md) may reuse the closed
+module graph after its own feature, linking, target, and evidence decisions
+land. That checkpoint does not change the M5 test262 denominator or claim
+boundary.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

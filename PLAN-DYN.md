@@ -20,9 +20,9 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
-[*PLAN-REPL.md*](./PLAN-REPL.md), and the accepted records under *docs/adr/*.
-Evidence that changes one of those contracts updates the affected document in
-the same change.
+[*PLAN-REPL.md*](./PLAN-REPL.md), [*PLAN-WASM.md*](./PLAN-WASM.md), and the
+accepted records under *docs/adr/*. Evidence that changes one of those
+contracts updates the affected document in the same change.
 
 
 Goal
@@ -85,6 +85,11 @@ incremental artifact loader or runtime compiler.
 This remains Oseo's default deployment model. A language or host feature may
 still need generic runtime helpers, reflection, promises, or I/O; those costs
 do not imply dynamic source compilation.
+
+A statically imported *.wasm* module under
+[*PLAN-WASM.md*](./PLAN-WASM.md) remains closed source in this classification.
+Its build-side AOT compiler does not enter the produced executable, even though
+the executable retains WebAssembly instance state and wrappers.
 
 ### Closed dynamic module set
 
@@ -149,6 +154,13 @@ Source acquisition is separate from compilation. M6 owns web transport and
 M7 owns selected file, package, and module-resolution behavior. Admitting
 dynamic import does not silently grant filesystem or network access.
 
+Runtime WebAssembly bytes are not ECMAScript source. Their execution strategy,
+feature matrix, and JavaScript API belong to
+[*PLAN-WASM.md*](./PLAN-WASM.md) and do not admit `eval` or the `Function`
+constructor. A runtime native compiler selected there reuses this plan's
+applicable artifact publication and code-lifetime contracts; an interpreter
+does not create a late native artifact.
+
 
 Relationship to the roadmap
 ---------------------------
@@ -163,6 +175,11 @@ closed dynamic module set can be admitted without waiting for either milestone
 when its entire graph is build input. A loader that reads new source or
 artifacts uses only host capabilities already present in its selected runtime
 profile.
+
+The static WebAssembly checkpoint is another closed-graph consumer, but it is
+not dynamic import. M6's WebAssembly API later accepts runtime bytes and follows
+[*PLAN-WASM.md*](./PLAN-WASM.md); only a selected native-code publication path
+shares the late-artifact target and lifetime work here.
 
 The REPL track supplies a persistent-session consumer for late native
 artifacts. Its loader, ABI, and lifetime probes should be shared where their

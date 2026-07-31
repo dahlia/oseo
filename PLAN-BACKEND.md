@@ -19,7 +19,7 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
-[*PLAN-REPL.md*](./PLAN-REPL.md),
+[*PLAN-REPL.md*](./PLAN-REPL.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0003](./docs/adr/0003-c11-runtime-and-zig-boundary.md), and the target
 decisions under *docs/adr/*. Evidence that changes one of those contracts
 updates the affected document in the same change.
@@ -400,6 +400,13 @@ plan owns any conclusion about Oseo's general code-generation backend.
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns matcher representation and lowering.
 A future program backend must consume or lower its backend-neutral artifact
 without changing regular expression semantics.
+
+[*PLAN-WASM.md*](./PLAN-WASM.md) owns the compiler for WebAssembly dependency
+modules and the engine for runtime module bytes. Neither is a backend for
+Oseo's JavaScript MIR. A static Wasm compiler may share final linking, target
+artifacts, or a future lower machine-operation layer, but its measurements do
+not trigger a general program-backend migration without evidence from this
+plan's corpus.
 
 [*PLAN-GC.md*](./PLAN-GC.md) owns collector evolution. A backend candidate may
 share root-map or barrier probes with that track, but changing the program

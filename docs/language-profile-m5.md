@@ -26,6 +26,12 @@ outside the claim; host hooks, realms, agents, shared memory, `eval`, the
 gaps until owned decisions land. No release uses the conformance label while
 a known language gap remains inside this boundary.
 
+This profile measures ECMAScript source modules. Loading a binary *.wasm*
+module through static module syntax is a future host integration owned by
+[*PLAN-WASM.md*](../PLAN-WASM.md); it neither adds an M5 pass nor classifies a
+test262 path as unsupported. The WebAssembly JavaScript and web APIs remain M6
+work under the same plan.
+
 The checked-in compatibility manifest under *tests/test262/* is the source
 of truth for progress against this boundary. *subset.yaml* pins the suite
 revision, supported features, and expected classifications; *results.yaml*

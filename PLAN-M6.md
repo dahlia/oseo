@@ -15,9 +15,9 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
 [*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-GC.md*](./PLAN-GC.md),
-[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), the frozen
-language profiles, and accepted records under *docs/adr/*. The completed
-runtime componentization recorded in
+[*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-WASM.md*](./PLAN-WASM.md), the frozen language profiles, and accepted
+records under *docs/adr/*. The completed runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) satisfies
 the prerequisite for every large web API family: a new API lands in an
 owned runtime component, not in a catch-all translation unit. Evidence
@@ -61,7 +61,9 @@ M6 group work begins from these contracts:
     keeps dynamic source evaluation explicitly unsupported while
     [*PLAN-DYN.md*](./PLAN-DYN.md) owns its deferred capability track;
  -  property suites retain seeds, replay paths, and structured inputs under
-    [*PLAN-PT.md*](./PLAN-PT.md); and
+    [*PLAN-PT.md*](./PLAN-PT.md);
+ -  [*PLAN-WASM.md*](./PLAN-WASM.md) keeps build-time static modules separate
+    from APIs that accept bytes after execution starts; and
  -  strict C warnings, sanitizers, Linux AMD64 execution, macOS AArch64
     execution, and AArch64 Linux compile-link evidence gate every native
     change.
@@ -126,10 +128,12 @@ shared prerequisite; changing it updates this plan in the same change.
     packs, security updates, and conformance evidence. Oseo does not implement
     primitives itself without recorded rationale.
 8.  **WebAssembly.** The JavaScript and web APIs required by the targeted
-    edition. Prerequisites: an architecture decision on the execution
-    strategy, because ahead-of-time compiled WebAssembly shares the
-    constraints recorded in
-    [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md).
+    edition. [*PLAN-WASM.md*](./PLAN-WASM.md) owns the core and API feature
+    matrices, runtime store, JavaScript value boundary, execution engine,
+    artifacts, limits, security policy, and conformance evidence. A prior
+    static-import checkpoint may precompile known *.wasm* modules, but group 8
+    additionally requires an architecture decision for arbitrary runtime bytes
+    and does not count that checkpoint as API completion.
 9.  **Remaining globals and integration.** `globalThis` surface audit,
     `console` beyond the M1 intrinsic, base64 and timer edge behavior, and
     the documented server-runtime deviations.
@@ -202,11 +206,16 @@ HTTPS endpoint.
 Compiler and runtime invariants
 -------------------------------
 
-Web APIs are runtime capabilities, not language semantics. The compiler
-core stays free of web-platform knowledge; API surfaces enter through the
-same intrinsic and host interfaces the M5 built-in streams use, inside
-the components recorded in
+Web APIs are runtime capabilities, not language semantics. The compiler core
+stays free of web-platform API knowledge; their surfaces enter through the same
+intrinsic and host interfaces the M5 built-in streams use, inside the
+components recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md).
+Static WebAssembly module loading is a deliberate build-side module exception,
+not a web API lowering. The generic loader and graph contract admits a binary
+module node, while the frontend and linker owned by
+[*PLAN-WASM.md*](./PLAN-WASM.md) handle WebAssembly semantics without adding
+web-platform API types or operations to JavaScript MIR.
 
 Every new heap kind defines tracing before allocation can collect it.
 Callbacks, listeners, stream queues, and in-flight operations are rooted
@@ -235,6 +244,8 @@ Each API group contributes, before it is considered complete:
     the same standardized behavior;
  -  reviewed web-platform-test cases wired through the owned harness
     adapter, with honest unsupported classifications;
+ -  for WebAssembly, pinned core specification tests and a separate static
+    module integration manifest under [*PLAN-WASM.md*](./PLAN-WASM.md);
  -  property suites extending the [*PLAN-PT.md*](./PLAN-PT.md) models,
     including generated event orderings, stream command sequences, abort
     schedules, and encoding round trips; and
@@ -258,6 +269,8 @@ size budgets when their conformance matrices are written. TLS and compression
 dependencies need recorded pinning, target, and replacement boundaries.
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) defines the stronger pack, offline-build,
 identity, and update requirements for cryptography.
+[*PLAN-WASM.md*](./PLAN-WASM.md) separately measures the static AOT compiler,
+linked artifacts, runtime support layer, and dynamic execution engine.
 
 Long-running group workloads also record live and peak memory, allocation
 rate, collection pauses, and tail latency through [*PLAN-GC.md*](./PLAN-GC.md).
@@ -267,6 +280,10 @@ collector by itself.
 
 Delivery order
 --------------
+
+The static WebAssembly module checkpoint in [*PLAN-WASM.md*](./PLAN-WASM.md)
+may proceed when its graph, compiler, target, and standards entry criteria pass.
+It does not depend on the earlier M6 API groups and does not complete group 8.
 
 1.  Freeze the targeted Minimum common web API edition, web-platform-test
     revision, deviation policy, and per-interface denominator in an
@@ -291,7 +308,9 @@ Delivery order
     then complete the provider probes, accept the provider decision, build the
     validated target packs, and implement group 7 through
     [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md).
-10. Resolve the WebAssembly execution decision and implement group 8.
+10. Freeze the WebAssembly API matrix, resolve the runtime execution decision,
+    and implement group 8 through [*PLAN-WASM.md*](./PLAN-WASM.md), reusing the
+    static checkpoint where its semantics and artifacts match.
 11. Complete group 9, the deviation documentation, and the integration
     audit.
 12. Publish the reproducible conformance evidence and, only when every
@@ -332,6 +351,10 @@ M6 is complete only when:
  -  Web Crypto satisfies the frozen algorithm matrix through an accepted
     provider and validated target packs, without requiring or automatically
     discovering a host cryptography installation;
+ -  WebAssembly satisfies its frozen core and API matrices through an accepted
+    runtime execution engine, while static-import evidence remains separately
+    identifiable and arbitrary runtime bytes are not limited to build-known
+    modules;
  -  differential, property, sanitizer, dual-execution-target, and
     cross-link gates cover the complete web API corpus;
  -  capability, performance, and code-size reports are reproducible from

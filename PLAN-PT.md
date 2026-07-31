@@ -12,10 +12,11 @@ does not replace [*PLAN-M5.md*](./PLAN-M5.md).
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-GC.md*](./PLAN-GC.md), the frozen language profiles, and the accepted
-records under *docs/adr/*. When generated evidence invalidates an assumption in
-one of those documents, the implementation change must update the affected
-document rather than weakening the property.
+[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-WASM.md*](./PLAN-WASM.md), the frozen
+language profiles, and the accepted records under *docs/adr/*. When generated
+evidence invalidates an assumption in one of those documents, the
+implementation change must update the affected document rather than weakening
+the property.
 
 
 Goal
@@ -100,6 +101,13 @@ mathematical boundary under test, including immediate-range transitions,
 carry and borrow edges, mixed numeric types, and allocation points. Bounded
 operations compare an independent sign-and-magnitude model as well as both
 reference hosts.
+
+The WebAssembly work in [*PLAN-WASM.md*](./PLAN-WASM.md) adds typed binary
+module models, controlled invalid encodings, mixed ECMAScript and WebAssembly
+graphs, store command sequences, and JavaScript boundary values. Static AOT and
+runtime execution compare the same admitted module where both paths exist. The
+shrinker preserves validation, import, trap, conversion, memory, table, or
+reference behavior rather than reducing every failure to an empty module.
 
 Property tests do not replace test262 or later web-platform tests. Standards
 suites prove behavior for reviewed specification cases. Property tests explore
@@ -423,6 +431,40 @@ source. They must not wait for real time. Generated schedules vary deadlines,
 equal-deadline insertion order, microtasks created by tasks, referenced handles,
 and pending promises. The model decides whether the executable should make
 progress, remain alive, or exit.
+
+
+WebAssembly properties
+----------------------
+
+WebAssembly generators begin only after the applicable core feature and module
+integration matrices are frozen. A typed structured module is the primary
+input. Binary encoding is derived from that model so valid properties do not
+filter arbitrary bytes until one happens to validate.
+
+The valid model covers admitted types, functions, blocks, imports, exports,
+globals, memories, tables, data and element segments, start functions, and
+references. It can compose a mixed graph whose WebAssembly imports resolve to
+ECMAScript or WebAssembly exports. An independent model predicts validation,
+instantiation order, results, mutations, traps, and published exports.
+
+Controlled invalid generators mutate one length, index, opcode, type,
+declaration, limit, import, or section rule at a time. They compare the owned
+build diagnostic or specified JavaScript error phase without requiring hosts to
+word diagnostics identically. Shrinking retains the invalid rule and byte
+offset relationship.
+
+Stateful commands instantiate modules, invoke exports, grow memories, read and
+write linear bytes, mutate tables and globals, trigger traps, and release
+wrappers. Properties compare static AOT with independent reference engines and,
+once M6 lands, with Oseo's runtime-byte engine. Ordinary and forced collection
+must retain every JavaScript reference reachable from a store, instance, table,
+global, wrapper, or suspended imported call.
+
+Failure records add the minimized module model, encoded bytes, feature matrix,
+mixed graph, import object, compiler and engine identities, target artifacts,
+and trap or publication schedule to the shared seed and replay contract. A
+fixed defect leaves an ordinary binary or source fixture even when its random
+seed remains useful exploration evidence.
 
 
 M5 synchronous iterator properties
@@ -978,6 +1020,9 @@ Delivery order
     milestone task.
 9.  Expand the same infrastructure into M5 grammar-based differential
     generation, standards-derived domains, and broader value combinations.
+10. Extend it with each admitted WebAssembly static-module and runtime-API
+    checkpoint, sharing the typed module, mixed-graph, store, shrink, and replay
+    contracts owned by [*PLAN-WASM.md*](./PLAN-WASM.md).
 
 Each checkpoint lands with ordinary example tests for fixed defects, current
 documentation, and `mise run check` plus the applicable test tasks passing. A

@@ -92,6 +92,7 @@ that may change after the first vertical slice.
 | Initial value layout   | NaN-boxing with an immediate signed 48-bit integer            | Accepted for both execution targets |
 | Initial collector      | Non-moving, stop-the-world mark and sweep with explicit roots | Implemented in M1                   |
 | First specialization   | Guarded signed 48-bit addition with one generic fallback      | Implemented in M2                   |
+| Static Wasm modules    | Compile closed *.wasm* dependencies ahead of time             | Planned under *PLAN-WASM.md*        |
 
 The accepted M0 choices and their replacement triggers are recorded under
 [*docs/adr/*](./docs/adr/). Choices that remain provisional require an
@@ -375,7 +376,7 @@ backends that share this object model.
 A backend may choose its root encoding, but the compiler owns the live-set and
 safepoint facts and the runtime owns tracing and collection policy. A future
 WebAssembly strategy with an incompatible memory model requires its own
-representation decision.
+representation decision under [*PLAN-WASM.md*](./PLAN-WASM.md).
 
 
 Calls, exceptions, and abrupt completion
@@ -560,6 +561,13 @@ each module body into a private evaluator. Imports reuse exporter cell
 identifiers, so evaluator boundaries do not copy a binding or make C
 declaration order semantic.
 
+Static WebAssembly modules may later join the same closed graph without
+becoming ECMAScript source. Their binary imports and exports, content digests,
+instance identity, start order, and native artifacts need an explicit graph
+node and linking contract. [*PLAN-WASM.md*](./PLAN-WASM.md) separates that
+build-time AOT path from the runtime-byte JavaScript and web APIs required by
+M6.
+
 An evaluator with top-level await returns a promise backed by generated
 continuation closures. Evaluation starts every dependency-ready module in
 source order, so an independent sibling can run while another module is
@@ -666,6 +674,13 @@ optimizations must not become prerequisites for correctness.
 triggers, and candidate boundaries for that deferred decision. It does not
 schedule a migration or weaken the C11 path as the reference and portability
 backend.
+
+A static WebAssembly compiler is a separate frontend and artifact producer,
+not an alternate backend for Oseo's JavaScript MIR. It may share the pinned
+toolchain, final linker, or a future lower machine-operation layer only after
+WebAssembly validation, traps, memory accesses, calls, and metadata are fixed
+before that boundary. [*PLAN-WASM.md*](./PLAN-WASM.md) owns that compiler and
+the runtime engine needed for arbitrary module bytes.
 
 The backend lowers MIR blocks, operations, and terminators directly. HIR is not
 retained in `MirFunction`, and changing a MIR operation changes emitted C. This
@@ -932,8 +947,10 @@ dependency of later milestones:
  -  the interactive session and incremental artifact boundary, including
     cross-unit bindings, code lifetime, reclamation, and target support, as
     scoped by [*PLAN-REPL.md*](./PLAN-REPL.md);
- -  the WebAssembly implementation strategy required by the intended WinterTC
-    profile.
+ -  the static WebAssembly module integration, AOT compiler, JavaScript value
+    boundary, runtime store, and dynamic execution strategy required by the
+    intended WinterTC profile, as scoped by
+    [*PLAN-WASM.md*](./PLAN-WASM.md).
 
 [*ROADMAP.md*](./ROADMAP.md) orders the experiments and implementation work that
 resolve these questions.

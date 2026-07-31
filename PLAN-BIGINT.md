@@ -20,7 +20,7 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-GC.md*](./PLAN-GC.md),
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0004](./docs/adr/0004-generic-tagged-value.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of
@@ -74,6 +74,12 @@ Typed arrays, `DataView`, and `Atomics` remain built-in families with their own
 object, buffer, and concurrency prerequisites. This plan owns the BigInt
 conversion and fixed-width contracts those families consume. It does not claim
 their full object models as part of the primitive implementation.
+
+WebAssembly may execute `i64` operations internally without using ECMAScript
+BigInt. [*PLAN-WASM.md*](./PLAN-WASM.md) owns that machine representation and
+the JavaScript interoperation rule. This plan supplies the BigInt value and
+conversion behavior required when an `i64` import, export, global, or reflected
+signature crosses the JavaScript boundary.
 
 Cryptographic multiprecision arithmetic is not an implementation shortcut for
 ECMAScript BigInt, and BigInt is not a cryptographic arithmetic component.

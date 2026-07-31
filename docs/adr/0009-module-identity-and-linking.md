@@ -74,3 +74,9 @@ Revisit the canonical URL representation if package or network resolution
 proves that URL identity cannot express a required host policy. Preserve the
 owned resolver boundary, one-instance rule, live cells, and deterministic graph
 evidence in any replacement.
+
+Amend or supersede this decision before admitting a non-source module such as a
+static WebAssembly binary into the graph. That decision must define a
+discriminated loader result and graph node while preserving canonical identity,
+content digests, deterministic dependencies, and the one-instance rule across
+module kinds.
