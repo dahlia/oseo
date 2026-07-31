@@ -3304,31 +3304,9 @@ function lowerExpression(
     if (builder.asyncGenerator || builder.asyncFunction) {
       return lowerAsyncGeneratorAwait(argument, expression.range, builder);
     }
-    appendMirMetadata(
-      builder,
-      "safepoint",
-      "top-level await checkpoint",
-      [argument],
-      expression.range,
+    throw new Error(
+      "Await reached a MIR body without a traced asynchronous owner.",
     );
-    const id = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [argument],
-      detail: "top-level await",
-      id,
-      kind: "call",
-      range: expression.range,
-      target: { kind: "await" },
-    });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> return",
-      [id],
-      expression.range,
-    );
-    return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "yield") {
     if (!builder.generator) {

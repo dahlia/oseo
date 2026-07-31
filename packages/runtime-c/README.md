@@ -187,6 +187,10 @@ entry points. Generated code retains the pending completion in the owning
 traced frame while a present `return` method settles, and the runtime's
 Async-from-Sync rejection reaction closes the wrapped synchronous iterator
 before preserving the original rejection.
+The `m5-34` ABI removes `oseo_await_value` and changes
+`oseo_event_loop_run` from a context-only entry point to one that also accepts
+the entry promise. Generated code using the two-argument entry point must pair
+with `m5-34` runtime assets.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

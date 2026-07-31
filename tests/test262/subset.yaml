@@ -7181,7 +7181,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/module-import-resolution.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/new-await.js
     expectedClassification: expected-negative

@@ -216,8 +216,8 @@ object spread, which copies into the literal's object with no excluded
 keys. The Annex B `__proto__` property-name special case remains rejected
 with a source-located diagnostic in every syntactic form, including
 shorthand and method keys, and a spread preceding a later top-level await
-point is rejected for the same evaluation-order reason as array, call, and
-constructor spread. The generated property suite uses seed `0x5eed0015`
+point remains completed in the traced module continuation. The generated
+property suite uses seed `0x5eed0015`
 across zero to four data, shorthand, method, getter, setter, object spread,
 and nullish spread properties over a shared five-name key pool and bounded
 integer values, comparing an independent key-order, last-definition, and
@@ -902,7 +902,9 @@ returning to the caller, because the frontend split an `await` expression into
 continuations and a loop had no such split. Unit 7.5 now closes that deviation
 inside ordinary asynchronous functions and asynchronous generators through
 their shared traced frame. Unit 7.6 now closes through the same frame in those
-contexts. Module top-level steps remain the Unit 7.7 boundary.
+contexts. Module top-level steps remained the Unit 7.7 boundary.
+Unit 7.7 now closes that final drain-based boundary through a private traced
+module continuation.
 
 Native differential fixtures cover the synchronous fallback, generator and
 user iterables, `Symbol.asyncIterator` preference over `Symbol.iterator`,
@@ -1488,8 +1490,8 @@ resumes with a value and rejection resumes with a throw completion, so nested
 operands, calls, compound member assignments, loop positions, and `try`,
 `catch`, and `finally` preserve ordinary evaluation and completion precedence.
 Promise reaction construction and dispatch remain centralized under
-[ADR 0022](./docs/adr/0022-async-context-boundary.md); module await and
-drain-based asynchronous iterator closing remain separate units.
+[ADR 0022](./docs/adr/0022-async-context-boundary.md); module suspension
+remains a separate unit.
 
 The generated property suite uses seed `0x5eed001d` across six expression
 position families, fulfillment and rejection, ordinary functions and arrows,
@@ -1564,6 +1566,40 @@ moves to 4,006 cases: 2,358 passes, 1,128 expected negatives, and 520
 unsupported profile features with no semantic or harness failures. Module
 top-level `for await`, top-level await checkpoints, and asynchronous module
 cycles retain the Unit 7.7 module-continuation boundary.
+
+M5a Unit 7.7 gives each directly asynchronous source module one private traced
+continuation. Top-level await plus `for await` step and close operations now
+save their roots and completion state in that frame, return to the graph
+caller, and resume only from their queued reaction. The outer native event loop
+owns entry-promise settlement and the `OSEO3001` no-progress decision, so a
+module suspension does not drain unrelated work on its native stack.
+
+The module scheduler admits asynchronous strongly connected components. A
+module waits for already-visited members of its own component, ignores its DFS
+back edge, and maps dependencies from outside a completed asynchronous cycle
+to that cycle's root promise. Canonical URLs still select one evaluator and one
+set of live cells. Dependency order, independent sibling progress, promise-job
+FIFO order, rejection propagation, and deterministic shutdown remain graph
+contracts. Static WebAssembly imports retain the separate host-integration
+boundary in [*PLAN-WASM.md*](./PLAN-WASM.md); this unit does not introduce a
+non-source graph node.
+
+Fixed native fixtures cover dependency and cycle scheduling, canonical aliases,
+one evaluation, live cells, caller return, spread-prefix retention,
+fulfillment, rejection, never-settling step and close promises, abrupt close
+precedence, both specialization policies, a false number hint with a deliberate
+guard miss, and forced collection. The generated property suite uses seed
+`0x5eed0021`, a
+structured two-to-four-node asynchronous SCC, non-root observer, and
+sibling-schedule domain, an independent ordering oracle, eight ordinary cases,
+replay metadata, and forced collection under both specialization policies. The
+reviewed
+*module-import-resolution.js* test262 case moves from unsupported to pass. The
+manifest remains at 4,006 cases and moves to 2,359 passes, 1,128 expected
+negatives, and 519 unsupported profile features with no semantic or harness
+failures. Pattern-position await, `PromiseResolve` constructor semantics,
+Async-from-Sync throw and iterator-result gaps, and M5b intrinsics remain
+outside this unit.
 
 ### Intrinsics and built-in objects
 

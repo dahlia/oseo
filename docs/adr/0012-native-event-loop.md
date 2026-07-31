@@ -29,10 +29,14 @@ The scheduler advances its logical clock directly to the next deadline. M4 has
 no language-visible wall-clock API, so native and generated tests observe the
 same ordering without sleeping.
 
-The entry module is the first task. Each completed or suspended task drains the
-FIFO microtask queue before another task begins. Shutdown is a query over
-runnable jobs and referenced handles, not over allocated promises or incidental
-runtime objects.
+The entry module is the first task. Its evaluator returns an entry promise to
+the outer native event loop whenever evaluation suspends. The loop roots and
+observes that promise while each completed or suspended task drains the FIFO
+microtask queue before another task begins. A rejected entry promise restores
+its source location at this boundary. A pending entry promise with no runnable
+job or referenced timer reports `OSEO3001`. Shutdown is a query over the entry
+promise, runnable jobs, and referenced handles, not over other allocated
+promises or incidental runtime objects.
 
 
 Consequences

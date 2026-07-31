@@ -464,8 +464,8 @@ its deliberate boundary and its evidence:
     the iterator's `next` method once and never calls `IteratorClose` for
     acquisition, step, value, or append failures. Literals without spread keep
     fixed-length lowering. A spread preceding a later top-level await point is
-    rejected because the current continuation representation cannot preserve
-    completed iteration without observing it again. Native differential
+    retained in the traced module continuation without repeating completed
+    iteration. Native differential
     fixtures, generated Node, Deno, and native properties under both
     specialization policies and forced collection, MIR structural tests, and
     five reviewed test262 cases cover accumulation. Deliberate
@@ -486,8 +486,8 @@ its deliberate boundary and its evidence:
     retain fixed positional arguments. Dynamic arity does not bypass admitted
     intrinsic contracts, so `Object.create(...values)` still rejects a
     descriptor-map argument. A spread preceding a later top-level await point
-    is rejected until continuation extraction can retain an accumulated
-    argument prefix. Native differential fixtures, generated Node, Deno, and
+    retains the accumulated argument list in the traced module continuation.
+    Native differential fixtures, generated Node, Deno, and
     native properties under both specialization policies and forced collection,
     and MIR structural tests cover the dynamic-list path. Ten reviewed test262
     cases pin iterator acquisition and step failures across calls and
@@ -735,9 +735,9 @@ its deliberate boundary and its evidence:
     copies into the literal's object with no excluded keys. Deliberate
     boundaries: the Annex B `__proto__` property-name special case is
     rejected with a source-located diagnostic in every syntactic form
-    including shorthand and method keys, and an object spread preceding a
-    later top-level await point is rejected for the same evaluation-order
-    reason as array, call, and constructor spread. Native differential
+    including shorthand and method keys. An object spread preceding a later
+    top-level await point remains completed in the traced module continuation.
+    Native differential
     fixtures retain the empty object, single and multiple data properties,
     shorthand from a local binding and from a parameter, a method's `this`
     reference and non-constructible identity, getter-only and setter-only
@@ -1516,8 +1516,8 @@ its deliberate boundary and its evidence:
     acquires its own synchronous iterator. `for await` is admitted only where
     the bootstrap parser already allows it, inside an asynchronous function
     body and at module top level. An awaited iterable expression in the head
-    uses the ordinary function's traced suspension frame, while module top
-    level keeps its separate continuation restriction. Native differential
+    uses the owning traced suspension frame, including the private module frame
+    at top level. Native differential
     fixtures cover the synchronous fallback,
     generator and user iterables, `Symbol.asyncIterator` preference over
     `Symbol.iterator`, promised and direct step results, `done` and `value`
@@ -1551,8 +1551,26 @@ its deliberate boundary and its evidence:
     promise and saved completion mode in traced roots, and restores that
     completion only after its reaction resumes generated code. A close
     promise that never settles therefore also leaves the enclosing operation
-    pending. Module top-level `for await` retains the drain-based step and
-    close paths as the Unit 7.7 boundary.
+    pending. Module top-level `for await` now uses the same return-to-caller
+    step and close behavior through its private traced module continuation.
+    Top-level await uses that continuation in ordinary expression and
+    control-flow positions, while pattern-position await remains rejected.
+    Asynchronous source-module cycles are admitted through their SCC order: an
+    evaluator waits for earlier members, ignores its DFS back edge, and an
+    external dependency waits for the cycle root. Canonical identity, one
+    evaluation, live cells, independent sibling progress, FIFO promise jobs,
+    and deterministic no-progress shutdown remain unchanged. The generated
+    property suite uses seed `0x5eed0021` over structured asynchronous SCC,
+    non-root observer, and sibling schedules with an independent oracle, eight
+    ordinary cases, replay metadata, and forced collection under both
+    specialization policies. Fixed native fixtures cover spread-prefix
+    retention, fulfillment, rejection, never settlement, abrupt close
+    precedence, a false hint and deliberate generic fallback, canonical
+    aliases, and live cycle cells. The reviewed
+    *module-import-resolution.js* case moves to pass, producing 2,359 passes,
+    1,128 expected negatives, and 519 unsupported profile features among 4,006
+    reviewed cases. Static WebAssembly imports retain the separate
+    host-integration boundary in [*PLAN-WASM.md*](../PLAN-WASM.md).
  -  Asynchronous generator functions. `async function*` declarations and
     function expressions are admitted, and calling one runs its parameter and
     environment prologue and returns a suspended asynchronous generator whose
@@ -1788,17 +1806,7 @@ must never shrink by reclassification alone.
     property name, or an array or object binding default remains unsupported
     in ordinary asynchronous and asynchronous generator bodies. Those pattern
     subexpressions lower before the suspension machinery reaches them.
-    Asynchronous module cycles remain unsupported under the separate module
-    continuation model. Owner: the functions and executable syntax stream for
-    pattern suspension, and the modules and asynchronous execution stream for
-    cycles.
- -  A module top-level `for await` step retains the drain-based iterator
-    operation, including close, because module evaluation does not own the
-    ordinary asynchronous function frame used by Units 7.5 and 7.6. Top-level
-    await keeps its scheduler
-    checkpoint in dependency order, and asynchronous module cycles remain
-    unsupported. Unit 7.7 owns the module continuation and cycle boundary.
-    Owner: the modules and asynchronous execution stream.
+    Owner: the functions and executable syntax stream for pattern suspension.
  -  `PromiseResolve` does not read the resolved value's `constructor`. The
     specification returns an already-native promise unchanged only after
     `SameValue(value.constructor, %Promise%)` holds, so a value carrying a

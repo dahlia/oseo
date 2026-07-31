@@ -751,7 +751,7 @@ test("creates one live namespace binding for imports and re-exports", () => {
   );
 });
 
-test("rejects asynchronous module cycles before scheduling", () => {
+test("schedules async module cycles through traced continuations", () => {
   const canonicalId = "file:///cycle.js";
   const specifier = graphSpecifier("./cycle.js", 0);
   const module = {
@@ -788,8 +788,19 @@ test("rejects asynchronous module cycles before scheduling", () => {
     kind: "module-graph",
     modules: [module],
   });
-  assert.equal(result.mir, undefined);
-  assert.match(result.diagnostics[0]?.message ?? "", /asynchronous module/iu);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const continuation = result.mir.functions.find(
+    (functionValue) => functionValue.name === `*module:${canonicalId}*`,
+  );
+  assert.equal(continuation?.asyncFunction, true);
+  assert.ok(
+    continuation?.blocks.some(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ),
+  );
 });
 
 function forOfStatement(awaited: boolean) {
@@ -842,11 +853,9 @@ function selfCyclicModule(
   });
 }
 
-// A `for await` head is asynchronous module evaluation even though the loop
-// stays in place instead of becoming a continuation, so it reaches the same
-// cycle rejection an extractable top-level await does, wherever it appears
-// in the module body.
-test("rejects asynchronous module cycles reached through for-await", () => {
+// A `for await` head is asynchronous module evaluation wherever it appears
+// in the module body, and its step checkpoints use the module frame.
+test("schedules asynchronous cycles reached through for-await", () => {
   const nested = [
     ["direct", forOfStatement(true)],
     ["block", { body: [forOfStatement(true)], kind: "block" as const, range }],
@@ -871,10 +880,18 @@ test("rejects asynchronous module cycles reached through for-await", () => {
   ] as const;
   for (const [name, statement] of nested) {
     const result = selfCyclicModule(`for-await-cycle-${name}`, [statement]);
-    assert.equal(result.mir, undefined, name);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /asynchronous module/iu,
+    assert.deepEqual(result.diagnostics, [], name);
+    assert.ok(result.mir != null, name);
+    const continuation = result.mir.functions.find((functionValue) =>
+      functionValue.name.includes(`for-await-cycle-${name}`),
+    );
+    assert.equal(continuation?.asyncFunction, true, name);
+    assert.ok(
+      continuation?.blocks.some(
+        (block) =>
+          block.terminator.kind === "generator-yield" &&
+          block.terminator.awaited === true,
+      ),
       name,
     );
   }
@@ -932,7 +949,137 @@ test("rejects await in object-rest assignment member targets", () => {
   assert.equal(result.mir, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /top-level await.*outside M4/iu,
+    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+  );
+});
+
+test("rejects pattern await nested in expression containers", () => {
+  const patternAwait = {
+    kind: "destructuring-set" as const,
+    pattern: {
+      elements: [
+        {
+          pattern: {
+            key: {
+              argument: { kind: "string" as const, range, value: "key" },
+              kind: "await" as const,
+              range,
+            },
+            kind: "assignment-member" as const,
+            object: { kind: "object" as const, properties: [], range },
+            range,
+          },
+          range,
+        },
+      ],
+      kind: "array-binding-pattern" as const,
+      range,
+    },
+    range,
+    value: { elements: [], kind: "array" as const, range },
+  };
+  const expressions = [
+    {
+      kind: "logical" as const,
+      left: { kind: "boolean" as const, range, value: true },
+      operator: "&&" as const,
+      range,
+      right: patternAwait,
+    },
+    {
+      alternate: { kind: "number" as const, range, value: 0 },
+      consequent: patternAwait,
+      kind: "conditional" as const,
+      range,
+      test: { kind: "boolean" as const, range, value: true },
+    },
+    {
+      elements: [{ argument: patternAwait, kind: "spread" as const, range }],
+      kind: "array" as const,
+      range,
+    },
+  ];
+  for (const [index, expression] of expressions.entries()) {
+    const canonicalId = `file:///nested-pattern-await-${index}.js`;
+    const module = {
+      canonicalId,
+      dependencies: [],
+      resolutions: [],
+      sourceHash: `nested-pattern-await-${index}`,
+      syntax: {
+        ...testModule(canonicalId, ""),
+        body: [{ expression, kind: "expression" as const, range }],
+      },
+    };
+    const result = compileModuleGraph({
+      entryId: canonicalId,
+      kind: "module-graph",
+      modules: [module],
+    });
+    assert.equal(result.mir, undefined);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+    );
+  }
+});
+
+test("rejects await in a top-level catch binding pattern", () => {
+  const canonicalId = "file:///catch-pattern-await.js";
+  const module = {
+    canonicalId,
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "catch-pattern-await",
+    syntax: {
+      ...testModule(canonicalId, ""),
+      body: [
+        {
+          block: { body: [], kind: "block" as const, range },
+          finalizer: undefined,
+          handler: {
+            body: { body: [], kind: "block" as const, range },
+            pattern: {
+              kind: "object-binding-pattern" as const,
+              properties: [
+                {
+                  key: {
+                    argument: {
+                      kind: "string" as const,
+                      range,
+                      value: "key",
+                    },
+                    kind: "await" as const,
+                    range,
+                  },
+                  pattern: {
+                    hints: [],
+                    kind: "binding-identifier" as const,
+                    name: "value",
+                    range,
+                  },
+                  range,
+                },
+              ],
+              range,
+            },
+            range,
+          },
+          kind: "try" as const,
+          range,
+        },
+      ],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [module],
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
   );
 });
 
@@ -984,6 +1131,6 @@ test("rejects await in top-level binding-pattern keys", () => {
   assert.equal(result.mir, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /top-level await.*outside M4/iu,
+    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
   );
 });

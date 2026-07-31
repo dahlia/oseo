@@ -323,4 +323,114 @@ await Promise.reject("bad");
     topLevelAwaitRejection.stderr,
     /top-level-await-rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
   );
+
+  const continuationRoot = [root, "tests/fixtures/module-continuations"].join(
+    "/",
+  );
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    const args = specialization === "disabled" ? ["--no-specialization"] : [];
+    try {
+      const cycle = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/cycle-entry.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(cycle.exitStatus, 0, cycle.stderr);
+      assert.equal(cycle.stderr, "");
+      assert.equal(
+        cycle.stdout,
+        "cycle b start\n" +
+          "guard miss fallback\n" +
+          "sibling returned-to-caller\n" +
+          "cycle b done x1\n" +
+          "cycle a start\n" +
+          "cycle a done b ready\n" +
+          "observer b ready\n" +
+          "entry a ready b ready\n",
+      );
+
+      const spread = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/spread.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(spread.exitStatus, 0, spread.stderr);
+      assert.equal(spread.stderr, "");
+      assert.equal(spread.stdout, "spread iterator 1\nspread values 4 5 1\n");
+
+      const close = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/close.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(close.exitStatus, 0, close.stderr);
+      assert.equal(close.stderr, "");
+      assert.equal(
+        close.stdout,
+        "fulfilled body 3\n" +
+          "fulfilled close called\n" +
+          "fulfilled close settled\n" +
+          "fulfilled completed\n" +
+          "close-error body 3\n" +
+          "close-error close called\n" +
+          "close-error close settled\n" +
+          "close-error caught TypeError\n" +
+          "body-error body 3\n" +
+          "body-error close called\n" +
+          "body-error close settled\n" +
+          "body-error caught RangeError\n",
+      );
+
+      const rejection = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/rejection.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(rejection.exitStatus, 1);
+      assert.equal(rejection.stdout, "rejection before\n");
+      assert.match(
+        rejection.stderr,
+        /module-continuations\/rejection\.mjs:2:\d+: error\[OSEO2001\]/u,
+      );
+
+      const never = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/never.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(never.exitStatus, 1);
+      assert.equal(never.stdout, "never body 1\nnever close called\n");
+      assert.match(
+        never.stderr,
+        /error\[OSEO3001\].*Top-level await cannot make progress/u,
+      );
+
+      const neverStep = await runNativeCli(
+        {
+          args: [...args, `${continuationRoot}/never-step.mjs`],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(neverStep.exitStatus, 1);
+      assert.equal(neverStep.stdout, "never step called\n");
+      assert.match(
+        neverStep.stderr,
+        /error\[OSEO3001\].*Top-level await cannot make progress/u,
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
 }

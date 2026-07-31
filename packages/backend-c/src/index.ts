@@ -1193,13 +1193,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
   const argumentsValue = emitArguments(state, callArguments);
-  if (target.kind === "await") {
-    const value = operationArgument(operation, 0);
-    line(
-      state,
-      renderC(emittedC.call.resultAssignOseoAwaitValueContextRoots, value),
-    );
-  } else if (target.kind === "console-log") {
+  if (target.kind === "console-log") {
     line(
       state,
       renderC(

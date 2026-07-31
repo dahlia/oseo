@@ -139,6 +139,7 @@ export interface LinkedModule {
 export interface ModuleComponent {
   readonly cyclic: boolean;
   readonly id: number;
+  /** Module IDs in evaluation order, ending with the component root. */
   readonly moduleIds: readonly string[];
 }
 

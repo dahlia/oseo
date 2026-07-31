@@ -192,13 +192,10 @@ static OseoResult run_timer_turn(
 }
 
 /*
- * One Await that runs the scheduler until the awaited promise settles.
- * Every caller is an outermost suspension point: the entry await of the
- * linked module graph, or one step of a `for await` head, whose loop the
- * frontend keeps in the enclosing body instead of splitting it into
- * continuations. A body that can make no further progress is a stalled
- * program rather than a language error, so it reports a host diagnostic
- * naming the position that stalled.
+ * An internal compatibility checkpoint for iterator adapter operations that
+ * do not yet own a traced frame. Module top-level await and `for await` never
+ * use this path. A body that can make no further progress reports a host
+ * diagnostic naming the stalled operation.
  */
 static OseoResult await_settled_value(
     OseoContext *context,
@@ -254,14 +251,6 @@ static OseoResult await_settled_value(
     return result;
 }
 
-OseoResult oseo_await_value(OseoContext *context, OseoValue value) {
-    return await_settled_value(
-        context,
-        value,
-        "Top-level await cannot make progress."
-    );
-}
-
 OseoResult oseo_internal_await_step(OseoContext *context, OseoValue value) {
     return await_settled_value(
         context,
@@ -307,14 +296,60 @@ OseoResult oseo_entry_task_checkpoint(
     return result;
 }
 
-OseoResult oseo_event_loop_run(OseoContext *context) {
+static OseoResult entry_promise_completion(
+    OseoContext *context,
+    OseoValue entry_promise
+) {
+    if (!is_promise(entry_promise)) return normal(oseo_undefined());
+    OseoPromise *promise = promise_object(entry_promise);
+    if (promise->state == OSEO_PROMISE_PENDING) {
+        return normal(oseo_undefined());
+    }
+    if (promise->state == OSEO_PROMISE_FULFILLED) {
+        return normal(promise->result);
+    }
+    context->source_id = promise->rejection_source_id;
+    context->source_id_length = promise->rejection_source_id_length;
+    context->line = promise->rejection_line;
+    context->column = promise->rejection_column;
+    return (OseoResult){OSEO_STATUS_THROW, promise->result};
+}
+
+OseoResult oseo_event_loop_run(
+    OseoContext *context,
+    OseoValue entry_promise
+) {
+    OseoValue slots[1] = {entry_promise};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    if (is_promise(frame.slots[0])) {
+        OseoPromise *promise = promise_object(frame.slots[0]);
+        promise->handled = true;
+        promise->pending_report = false;
+    }
     OseoResult result = oseo_jobs_drain(context);
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_rejection_checkpoint(context);
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = entry_promise_completion(context, frame.slots[0]);
+    }
     while (result.status == OSEO_STATUS_NORMAL &&
            tag_of(context->timer_head) != OSEO_TAG_UNDEFINED) {
         result = run_timer_turn(context, oseo_undefined());
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = entry_promise_completion(context, frame.slots[0]);
+        }
     }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_promise(frame.slots[0]) &&
+        promise_object(frame.slots[0])->state == OSEO_PROMISE_PENDING) {
+        result = failure(
+            context,
+            "OSEO3001",
+            "Top-level await cannot make progress."
+        );
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
