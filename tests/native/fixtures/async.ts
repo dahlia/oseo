@@ -162,6 +162,116 @@ console.log("sync end");
 `,
   },
   {
+    name: "async-await-positions",
+    source: `
+function trace(label, value) {
+  console.log(label);
+  return value;
+}
+function hintedAdd(left: number, right: number) {
+  return left + right;
+}
+async function positions(input) {
+  const retained = { value: 10 };
+  const nested = trace("binary left", 1) +
+    await Promise.resolve(trace("binary operand", input));
+  const called = trace("call target", function (value) {
+    console.log("call body", value);
+    return value;
+  })(await Promise.resolve(trace("call argument", nested)));
+  retained.value += await Promise.resolve(
+    trace("assignment operand", called),
+  );
+  const values = [
+    trace("array before", retained),
+    await Promise.resolve(trace("array operand", retained.value)),
+  ];
+  const actual = [];
+  const pushed = actual.push(
+    trace("push before", "before"),
+    "Await:" + await {
+      then: function (resolve) {
+        trace("push thenable", 0);
+        resolve("value");
+      },
+    },
+    trace("push after", "after"),
+  );
+  console.log(
+    "push result",
+    pushed,
+    actual.length,
+    actual[0],
+    actual[1],
+    actual[2],
+  );
+  const borrowedPush = [].push;
+  const generic = { 0: "kept", length: 1, push: borrowedPush };
+  console.log(
+    "generic push",
+    generic.push("second", "third"),
+    generic.length,
+    generic[0],
+    generic[1],
+    generic[2],
+  );
+  const frozenLength = [];
+  Object.defineProperty(frozenLength, "length", { writable: false });
+  try {
+    frozenLength.push("blocked");
+  } catch (error) {
+    console.log("push rejected", frozenLength.length);
+  }
+  let loops = 0;
+  for (
+    let index = 0;
+    await Promise.resolve(index < 2);
+    index += await Promise.resolve(1)
+  ) {
+    loops += index;
+  }
+  try {
+    await Promise.reject("caught");
+  } catch (error) {
+    console.log("caught", error, retained.value, values[1], loops);
+  } finally {
+    retained.value += await Promise.resolve(1);
+    console.log("inner finally", retained.value);
+  }
+  try {
+    return {
+      hinted: hintedAdd({
+        valueOf: function () {
+          console.log("guard miss fallback");
+          return 4;
+        },
+      }, 1),
+      result: retained.value,
+    };
+  } finally {
+    console.log("outer finally before");
+    await Promise.resolve(0);
+    console.log("outer finally after");
+  }
+}
+const arrow = async (value) =>
+  trace("arrow before", value) + await Promise.resolve(2);
+positions(2).then(function (value) {
+  console.log("positions result", value.result, value.hinted);
+});
+arrow(3).then(function (value) {
+  console.log("arrow result", value);
+});
+`,
+    specialization: {
+      genericCallsDisabled: 10,
+      genericCallsEnabled: 10,
+      hits: 0,
+      misses: 11,
+      overflowMisses: 0,
+    },
+  },
+  {
     name: "timer-event-loop",
     source: `
 function microtask(value) { console.log("microtask", value); }

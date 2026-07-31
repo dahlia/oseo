@@ -200,6 +200,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "async-continuations" ||
+    fixture.name === "async-await-positions" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||

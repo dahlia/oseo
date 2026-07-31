@@ -496,13 +496,23 @@ test("converts comma sequences and nullish coalescing", () => {
   assert.match(hirText, /\(1, 2\)/u);
 });
 
-test("rejects await inside logical operands of async functions", () => {
+test("admits await inside logical operands of async functions", () => {
   const result = compileSource(babelFrontend, {
     source: "async function first(input) { return input && (await input); }",
     sourceId: "async-logical.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /Await is supported/u);
+  assert.deepEqual(result.diagnostics, []);
+  const asynchronous = result.mir?.functions.find(
+    (functionValue) => functionValue.asyncFunction === true,
+  );
+  assert.equal(
+    asynchronous?.blocks.filter(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ).length,
+    1,
+  );
 });
 
 test("rejects top-level await inside logical operands", () => {

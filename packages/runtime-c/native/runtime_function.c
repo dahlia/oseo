@@ -1345,6 +1345,13 @@ OseoResult oseo_call_function(
         );
     } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
         result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_ARRAY_PUSH_CODE_ID) {
+        result = oseo_internal_array_push(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
     } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
         result = oseo_internal_array_values(context, receiver);
     } else if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
@@ -1602,6 +1609,18 @@ OseoResult oseo_call_function(
             arguments,
             new_target
         );
+        OseoFunctionKind kind = function_object(callee)->function_kind;
+        bool async_function = kind == OSEO_FUNCTION_ASYNC ||
+            kind == OSEO_FUNCTION_ASYNC_ARROW;
+        if (async_function && result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_async_function_start(context, result.value);
+        } else if (async_function &&
+                   result.status == OSEO_STATUS_THROW &&
+                   !context->has_diagnostic) {
+            OseoValue reason = result.value;
+            oseo_context_clear_language_error(context);
+            result = oseo_async_function_reject(context, reason);
+        }
     }
     oseo_call_leave(context);
     return result;

@@ -716,12 +716,16 @@ static OseoResult object_get(
          * brand here: their methods are ordinary own properties of the
          * intrinsic objects the cluster in *runtime_generator.c* builds,
          * so the own-descriptor read above already found them. */
-        if (is_array(current) && object->default_intrinsics &&
-            oseo_internal_iterator_key_matches(context, key)) {
-            return oseo_internal_iterator_method(
-                context,
-                OSEO_ARRAY_VALUES_CODE_ID
-            );
+        if (is_array(current) && object->default_intrinsics) {
+            if (oseo_internal_string_is_ascii(key, "push")) {
+                return oseo_internal_array_push_function(context);
+            }
+            if (oseo_internal_iterator_key_matches(context, key)) {
+                return oseo_internal_iterator_method(
+                    context,
+                    OSEO_ARRAY_VALUES_CODE_ID
+                );
+            }
         }
         current = object->prototype;
     }
@@ -1507,6 +1511,126 @@ static OseoResult ascii_string(OseoContext *context, const char *text) {
         units[index] = (uint16_t)(unsigned char)text[index];
     }
     return oseo_internal_allocate_string(context, units, length);
+}
+
+OseoResult oseo_internal_array_push_function(OseoContext *context) {
+    if (tag_of(context->array_push_function) != OSEO_TAG_UNDEFINED) {
+        return normal(context->array_push_function);
+    }
+    static const uint16_t name[] = {'p', 'u', 's', 'h'};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_environment_create(context, 0u);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            OSEO_ARRAY_PUSH_CODE_ID,
+            frame.slots[0],
+            name,
+            sizeof(name) / sizeof(*name),
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->array_push_function = result.value;
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_array_push(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_object(receiver)) {
+        return type_error(
+            context,
+            "Array.prototype.push requires an object receiver."
+        );
+    }
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Push arguments are missing.");
+    }
+    if (argument_count > SIZE_MAX - 4u) {
+        return failure(context, "OSEO2001", "Push argument list is too large.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result =
+        oseo_roots_allocate(context, &frame, argument_count + 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    for (size_t index = 0u; index < argument_count; index += 1u) {
+        frame.slots[index + 4u] = arguments[index];
+    }
+    result = ascii_string(context, "length");
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_number(context, frame.slots[2]);
+        frame.slots[2] = result.value;
+    }
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const double number = number_value(frame.slots[2]);
+        const double maximum_safe_integer = 9007199254740991.0;
+        if (isnan(number) || number <= 0.0) {
+            length = 0.0;
+        } else if (!isfinite(number) || number > maximum_safe_integer) {
+            length = maximum_safe_integer;
+        } else {
+            length = floor(number);
+        }
+        if ((double)argument_count > maximum_safe_integer - length) {
+            result = type_error(
+                context,
+                "Array.prototype.push exceeds the maximum safe integer."
+            );
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = oseo_property_key(
+            context,
+            oseo_number(length + (double)index)
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_set(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[index + 4u],
+                true
+            );
+        }
+    }
+    const double new_length = length + (double)argument_count;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_set(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            oseo_number(new_length),
+            true
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(oseo_number(new_length));
+    }
+    oseo_roots_release(context, &frame);
+    return result;
 }
 
 OseoResult oseo_arguments_create(

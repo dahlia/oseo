@@ -1790,18 +1790,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-iteration
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/AsyncGeneratorPrototype/next/request-queue-await-order.js:229:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -30139,18 +30149,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - compareArray.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/await/await-non-promise-thenable.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/await/await-non-promise-thenable.js:125:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -50214,20 +50234,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - classes
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/in/private-field-rhs-await-present.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/in/private-field-rhs-await-present.js:110:5:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -62387,11 +62416,11 @@ results:
       - async-functions
       - expression-operators
     observation:
-      detail: 'test/language/expressions/optional-chaining/member-expression-async-identifier.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:192:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
+      detail: "test/language/expressions/optional-chaining/member-expression-\
+        async-identifier.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/optional-chaining/member-exp\
+        ression-async-identifier.js:195:3: error[OSEO1001]: Unknown
+        binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -62410,19 +62439,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/member-expression-async-literal.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/member-expression-async-literal.js:190:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -62524,19 +62563,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/optional-chain-async-optional-chain-square-brackets.js:191:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -62552,19 +62601,29 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/optional-chain-async-square-brackets.js:191:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -73897,19 +73956,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-reject-finally-reject.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-reject.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -73923,19 +73991,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-reject-finally-return.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-return.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -73949,19 +74026,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-reject-finally-throw.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-reject-finally-throw.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -73975,19 +74061,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-return-finally-reject.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-return-finally-reject.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -74001,19 +74096,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-return-finally-return.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-return-finally-return.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -74062,19 +74166,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-throw-finally-reject.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-throw-finally-reject.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -74088,19 +74201,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - async-functions
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/async-function/try-throw-finally-return.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/async-function/try-throw-finally-return.js:97:3:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -86297,22 +86419,31 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - classes
       - functions
       - object-properties
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/definition/methods-async-super-call-param.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/definition/methods-async-super-call-param.js:104:5:
-        error[OSEO1001]: Await is supported in declarations, expression
-        statements, and returns.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -127269,34 +127400,34 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1128
   harnessFailures: 0
-  passes: 2337
+  passes: 2351
   semanticFailures: 0
-  unsupportedProfileFeatures: 534
+  unsupportedProfileFeatures: 520
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
       harnessFailures: 0
-      passes: 18
+      passes: 25
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 0
     - dependency: async-functions
       expectedNegatives: 155
       harnessFailures: 0
-      passes: 302
+      passes: 315
       semanticFailures: 0
-      unsupportedProfileFeatures: 21
+      unsupportedProfileFeatures: 8
     - dependency: async-iteration
       expectedNegatives: 209
       harnessFailures: 0
-      passes: 940
+      passes: 941
       semanticFailures: 0
-      unsupportedProfileFeatures: 234
+      unsupportedProfileFeatures: 233
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 614
+      passes: 616
       semanticFailures: 0
-      unsupportedProfileFeatures: 150
+      unsupportedProfileFeatures: 148
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -127330,15 +127461,15 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 32
       harnessFailures: 0
-      passes: 111
+      passes: 115
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 32
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 131
+      passes: 132
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 13
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -127372,15 +127503,15 @@ summary:
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 691
+      passes: 692
       semanticFailures: 0
-      unsupportedProfileFeatures: 105
+      unsupportedProfileFeatures: 104
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
-      passes: 288
+      passes: 289
       semanticFailures: 0
-      unsupportedProfileFeatures: 40
+      unsupportedProfileFeatures: 39
     - dependency: rest-parameters
       expectedNegatives: 12
       harnessFailures: 0
@@ -127421,9 +127552,9 @@ summary:
     - group: built-ins/AsyncGeneratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
-      passes: 22
+      passes: 23
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 22
     - group: built-ins/AsyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -127487,9 +127618,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 465
       harnessFailures: 0
-      passes: 1181
+      passes: 1186
       semanticFailures: 0
-      unsupportedProfileFeatures: 242
+      unsupportedProfileFeatures: 237
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
@@ -127511,6 +127642,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 986
+      passes: 994
       semanticFailures: 0
-      unsupportedProfileFeatures: 141
+      unsupportedProfileFeatures: 133

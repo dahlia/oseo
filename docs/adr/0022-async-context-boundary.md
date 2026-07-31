@@ -46,9 +46,9 @@ saves and restores source-location state around reaction callbacks.
 [ADR 0011](./0011-asynchronous-continuations.md) lowers ordinary `await`
 resumption to a promise reaction, and an asynchronous generator also
 resumes through an ordinary reaction, so later propagation can attach to
-reaction construction and dispatch rather than to continuation closure
-layouts. M5 asynchronous expansion, the native I/O adapter, and M6 event
-work must preserve equivalent boundaries.
+reaction construction and dispatch rather than to suspension-frame layouts.
+M5 asynchronous expansion, the native I/O adapter, and M6 event work must
+preserve equivalent boundaries.
 
 [AsyncContext proposal]: https://github.com/tc39/proposal-async-context
 [Node.js async context]: https://nodejs.org/docs/latest/api/async_context.html

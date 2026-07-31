@@ -336,6 +336,12 @@ export interface MirFunction extends LocatedSyntax {
    * from the generic call ABI.
    */
   readonly argumentsBindingId?: number;
+  /**
+   * An ordinary asynchronous body backed by a traced suspension frame.
+   * Calling it still returns one capability promise rather than exposing
+   * the frame.
+   */
+  readonly asyncFunction?: true;
   readonly blocks: readonly MirBlock[];
   /**
    * The `this` binding of a derived class constructor. Every `return`
@@ -396,6 +402,12 @@ export interface MutableMirBlock {
 
 export interface MirBuilder {
   readonly abruptTargets: MirControlTarget[];
+  /**
+   * True while lowering an ordinary asynchronous body. Its `await`
+   * operands suspend through the traced frame, while `return` resolves
+   * the function capability without AsyncGeneratorAwaitReturn.
+   */
+  readonly asyncFunction: boolean;
   readonly blocks: MutableMirBlock[];
   readonly loops: {
     readonly breakTarget: MirControlTarget;

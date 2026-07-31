@@ -4,7 +4,7 @@ ADR 0011: Traced asynchronous continuations
 Status
 ------
 
-Accepted and implemented for M4.
+Accepted and implemented for M4 and M5a.
 
 
 Context
@@ -18,17 +18,25 @@ implementation details.
 Decision
 --------
 
-Each admitted asynchronous function lowers to continuation-passing form. Its
-entry creates a capability promise and runs synchronously until the first
-`await`. Each remaining suffix becomes a private generated function. Its traced
-closure environment is the continuation record and contains exactly the
-bindings referenced by that suffix.
+M4 lowered each admitted asynchronous function to continuation-passing form.
+Its direct statement-level await points became private generated suffix
+functions with traced closure environments.
 
-At `await`, lowering resolves the operand, attaches the continuation as a
-reaction, and returns normally from native code. The reaction invokes the next
-generated function through the shared dispatcher. Rejection bypasses the
-fulfillment continuation and rejects the returned chain. Resolving the outer
-capability with that chain preserves returned and thrown completion.
+M5a Unit 7.4 replaces that frontend split for ordinary asynchronous functions
+and arrows with a traced suspension frame. The frame uses the generator-shaped
+root and completion layout already owned by the runtime, but the object that
+carries it is private and never becomes the call result. A call creates one
+capability promise, runs synchronously until the body completes or reaches
+`await`, and keeps locals, expression temporaries, pending completions, and
+collector roots in the frame while native code returns.
+
+At `await`, lowering resolves the operand and attaches fulfillment and
+rejection reactions through the centralized promise reaction constructor. A
+reaction resumes the saved block through the shared generated dispatcher.
+Fulfillment supplies the expression value. Rejection raises a throw completion
+at the suspension point, so every enclosing handler, finalizer, and iterator
+cleanup keeps its ordinary precedence. A body return resolves the capability,
+and an uncaught throw rejects it.
 
 Top-level await is a scheduler checkpoint in the dependency-ordered whole-graph
 script. It normalizes the value through one reaction and advances owned jobs and
@@ -40,11 +48,11 @@ blocking indefinitely.
 Consequences
 ------------
 
-Continuation functions, closure captures, and scheduler checkpoints are
-inspectable compiler output and explicit collector roots. Every allocation,
+Suspension blocks, saved roots and completions, and scheduler checkpoints are
+inspectable compiler output and explicit collector state. Every allocation,
 suspension, and resumption boundary is a MIR safepoint. Specialization can
-occur inside an asynchronous function but cannot duplicate a suffix or
-reschedule visible work.
+occur inside an asynchronous function but cannot duplicate a suspension path
+or reschedule visible work.
 
 
 Alternatives
@@ -59,7 +67,7 @@ were rejected because native executables cannot depend on a bootstrap runtime.
 Replacement trigger
 -------------------
 
-Revisit continuation closure granularity if liveness measurements show
-unacceptable retained state or if broader M5 control flow needs a numeric state
-dispatcher. Preserve heap ownership, explicit roots, one resume per reaction,
-and no suspended native stack in any replacement.
+Revisit suspension-frame liveness if measurements show unacceptable retained
+state. Preserve heap ownership, explicit roots, one resume per reaction, the
+centralized construction and dispatch boundaries of ADR 0022, and no suspended
+native stack in any replacement.

@@ -559,15 +559,14 @@ test("supports parenthesized direct await points", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  const operations = [
-    ...result.mir.script.blocks,
-    ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
-  ].flatMap((block) => block.operations);
+  const asynchronous = result.mir.functions.find(
+    (functionValue) => functionValue.asyncFunction === true,
+  );
   assert.equal(
-    operations.filter(
-      (operation) =>
-        operation.target?.kind === "promise-intrinsic" &&
-        operation.target.method === "awaitThen",
+    asynchronous?.blocks.filter(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
     ).length,
     3,
   );

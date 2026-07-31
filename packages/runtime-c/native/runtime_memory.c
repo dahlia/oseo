@@ -57,6 +57,7 @@ static void trace_object(
             mark_value(generator->callee, worklist);
             mark_value(generator->receiver, worklist);
             mark_value(generator->sent, worklist);
+            mark_value(generator->async_function_capability, worklist);
             /* The pending AsyncGeneratorRequest queue is reachable only
              * through the generator that accepted it. */
             mark_value(generator->request_head, worklist);
@@ -186,6 +187,7 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
+    mark_value(context->array_push_function, &worklist);
     mark_value(context->iterator_values_function, &worklist);
     mark_value(context->iterator_next_function, &worklist);
     mark_value(context->iterator_self_function, &worklist);

@@ -5,7 +5,7 @@ import { compileSource } from "@oseo/compiler";
 
 import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
-test("lowers async functions into owned continuations", () => {
+test("lowers async functions into traced suspension frames", () => {
   const result = compileSource(babelFrontend, {
     source: [
       "async function add(value) {",
@@ -24,25 +24,24 @@ test("lowers async functions into owned continuations", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.ok(result.mir.functions.length >= 9);
+  const asynchronous = result.mir.functions.filter(
+    (functionValue) => functionValue.asyncFunction === true,
+  );
+  assert.equal(asynchronous.length, 3);
+  assert.ok(asynchronous.every((functionValue) => functionValue.generator));
+  assert.ok(
+    asynchronous.some((functionValue) =>
+      functionValue.blocks.some(
+        (block) =>
+          block.terminator.kind === "generator-yield" &&
+          block.terminator.awaited === true,
+      ),
+    ),
+  );
   const operations = [
     ...result.mir.script.blocks,
     ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
   ].flatMap((block) => block.operations);
-  assert.ok(
-    operations.some(
-      (operation) =>
-        operation.target?.kind === "promise-intrinsic" &&
-        operation.target.method === "asyncCall",
-    ),
-  );
-  assert.ok(
-    operations.some(
-      (operation) =>
-        operation.target?.kind === "promise-intrinsic" &&
-        operation.target.method === "awaitThen",
-    ),
-  );
   const functionKinds = new Set(
     operations.flatMap((operation) =>
       operation.kind === "function-create" ? [operation.functionKind] : [],
@@ -50,7 +49,6 @@ test("lowers async functions into owned continuations", () => {
   );
   assert.ok(functionKinds.has("async"));
   assert.ok(functionKinds.has("async-arrow"));
-  assert.ok(functionKinds.has("arrow"));
 });
 
 test("lowers non-simple async parameters inside the async execution", () => {
@@ -71,35 +69,33 @@ test("lowers non-simple async parameters inside the async execution", () => {
   assert.ok(result.mir != null);
 });
 
-test("diagnoses excessive async continuation depth", () => {
-  const accepted = compileSource(babelFrontend, {
-    source: `async function deep() {\n${"await 0;\n".repeat(256)}}`,
-    sourceId: "accepted-async.js",
-  });
-  assert.deepEqual(accepted.diagnostics, []);
-  assert.ok(accepted.mir != null);
-
+test("avoids recursive continuations for sequential awaits", () => {
   const result = compileSource(babelFrontend, {
-    source: `async function deep() {\n${"await 0;\n".repeat(1_200)}}`,
+    source: `async function deep() {\n${"await 0;\n".repeat(64)}}`,
     sourceId: "deep-async.js",
   });
-  assert.equal(result.mir, undefined);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
-  assert.equal(result.diagnostics[0]?.range.start.line, 258);
+  assert.deepEqual(result.diagnostics, []);
+  const asynchronous = result.mir?.functions.find(
+    (functionValue) => functionValue.asyncFunction === true,
+  );
+  assert.equal(
+    asynchronous?.blocks.filter(
+      (block) => block.terminator.kind === "generator-yield",
+    ).length,
+    64,
+  );
 });
 
-test("counts awaited destructuring assignments as async continuations", () => {
+test("admits awaited destructuring assignments in the async frame", () => {
   const result = compileSource(babelFrontend, {
     source:
       "async function deep() {\nlet value;\n" +
-      "[value] = await [0];\n".repeat(257) +
+      "[value] = await [0];\n".repeat(8) +
       "}\n",
     sourceId: "deep-await-destructuring-assignment.js",
   });
-  assert.equal(result.mir, undefined);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /at most 256/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
 });
 
 test("preserves async returns and bindings across await", () => {
@@ -160,8 +156,8 @@ test("validates unreachable async statements", () => {
     source: "async function invalid() { throw 1; if (true) await 0; }",
     sourceId: "async-unreachable-await.js",
   });
-  assert.equal(awaitValue.mir, undefined);
-  assert.match(awaitValue.diagnostics[0]?.message ?? "", /Await/u);
+  assert.deepEqual(awaitValue.diagnostics, []);
+  assert.ok(awaitValue.mir != null);
 
   const continuation = compileSource(babelFrontend, {
     source:
@@ -173,7 +169,7 @@ test("validates unreachable async statements", () => {
   assert.match(continuation.diagnostics[0]?.message ?? "", /class element/u);
 });
 
-test("rejects nested async await operands", () => {
+test("admits nested async await operands", () => {
   for (const source of [
     "async function nested(ready) { return await (await ready); }",
     "async function nested(ready) { await (await ready); }",
@@ -184,9 +180,8 @@ test("rejects nested async await operands", () => {
       source,
       sourceId: "nested-await.js",
     });
-    assert.equal(result.mir, undefined);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", /Nested await/u);
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
   }
 });
 

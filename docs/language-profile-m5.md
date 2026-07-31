@@ -36,8 +36,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 3,999 reviewed cases: 2,337 passes, 1,128
-expected negatives, and 534 unsupported profile features. It records no
+The current manifest contains 3,999 reviewed cases: 2,351 passes, 1,128
+expected negatives, and 520 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -93,11 +93,11 @@ its deliberate boundary and its evidence:
     The untaken operand never evaluates, the produced value is the operand
     value rather than a coerced boolean, and evaluation order and abrupt
     completion follow the lowered control flow. `??` and the logical
-    assignment operators remain rejected. `await` inside a logical or
-    conditional operand is rejected with a source-located diagnostic in
-    both async function bodies and module top level, because a
-    conditionally evaluated suspension has no owned continuation contract
-    yet.
+    assignment operators remain rejected. Ordinary asynchronous functions
+    retain the selected path in their traced suspension frame, so `await`
+    is admitted in logical and conditional operands there. Module top level
+    keeps its separate source-located rejection for this conditionally
+    evaluated suspension.
  -  Labeled statements with labeled `break` and `continue`. Labels on
     loops bind to the loop's break and continue targets, labels on any
     other statement are break-only, chained labels share one target, and
@@ -173,9 +173,10 @@ its deliberate boundary and its evidence:
     twelve unsupported cases retain independent dynamic-source, realm,
     `arguments`, top-level `this`, tail-call optimization, and `Array`
     intrinsic prerequisites. The two remaining directory cases stay
-    outside the reviewed subset because they require
-    `Array.prototype.push`. The tagged-template cases under `new.target`
-    and optional chaining also move from unsupported to pass.
+    outside the reviewed subset pending their separate review. Unit 7.4 admits
+    only the narrow `%Array.prototype.push%` dependency exercised by its
+    ordinary-async evidence. The tagged-template cases under `new.target` and
+    optional chaining also move from unsupported to pass.
  -  Synchronous arrow functions with block and expression bodies,
     reusing the arrow function kind, lexical receiver, and
     non-constructibility the runtime already owns for asynchronous
@@ -183,6 +184,34 @@ its deliberate boundary and its evidence:
     function provides it, so a top-level arrow reading `this` is
     rejected with a source-located diagnostic instead of approximating
     the script receiver.
+ -  Ordinary asynchronous functions and asynchronous arrows retain their
+    locals, roots, pending completion records, and expression temporaries in a
+    traced suspension frame. `await` is admitted throughout ordinary
+    expression and control-flow positions, including nested operands, calls,
+    compound assignments, conditionals, loops, and `try`, `catch`, and
+    `finally`. A fulfilled operand resumes with its value, and a rejected one
+    raises a throw completion at the await position, so enclosing handlers and
+    cleanup keep their ordinary precedence. The call returns one capability
+    promise, every suspension leaves the native stack, and resumption uses the
+    centralized promise reaction construction and dispatch paths required by
+    [ADR 0022](./adr/0022-async-context-boundary.md). Binding-pattern
+    subexpressions keep their existing explicit restrictions, and top-level
+    module await keeps its separate continuation model. Fixed native evidence
+    covers evaluation order, nested and loop positions, abrupt completion,
+    awaited cleanup, heap locals across suspension, both specialization
+    policies, false hints, a deliberate guard miss, and forced collection. A
+    generated property with seed `0x5eed001d` compares an independent model,
+    Node.js, Deno, and both native specialization policies across six position
+    families, fulfillment and rejection, ordinary functions and arrows, and
+    truthful and false hints. Fourteen existing reviewed test262 cases move
+    from unsupported to pass, including
+    *await-non-promise-thenable.js*. Its narrow `%Array.prototype.push%`
+    dependency reads and converts `length`, performs each indexed write and the
+    final length write in strict source order, propagates accessor and
+    writability failures, and works when borrowed by an ordinary object. The
+    generated manifest records 3,999 cases: 2,351 passes, 1,128 expected
+    negatives, and 520 unsupported profile features with no semantic or
+    harness failures.
  -  `var` declarations with function-scope hoisting, multiple
     declarators, redeclaration, parameter and declared-function name
     sharing, and awaited initializers in async functions and module top
@@ -270,8 +299,9 @@ its deliberate boundary and its evidence:
     differential fixtures and a generated property with seed `0x5eed000d`
     cover all 15 operators, both target forms, short-circuiting, reference and
     conversion counts, both specialization policies, and forced collection.
-    Await inside a compound assignment remains rejected until continuation
-    extraction can retain the already-read current value.
+    An ordinary asynchronous function retains the reference and current value
+    in its traced frame when the right operand awaits. Top-level module await
+    keeps its separate continuation restriction.
  -  Prefix and postfix `++` and `--` for identifiers and static or computed
     member references. Each form reads once, coerces through the admitted
     Number path, adds or subtracts one, and performs a checked write. Prefix
@@ -1434,11 +1464,12 @@ its deliberate boundary and its evidence:
     and eight new unsupported cases record the boundaries this unit keeps. The
     reviewed subset gains the `class-static-block` feature tag; the one
     remaining case that tag reaches inside the admitted syntax,
-    *static-init-sequence.js*, needs `Array.prototype.push` and stays outside
-    the reviewed subset until the unit that owns it lands, with the same
-    interleaving covered by a native fixture meanwhile. The reviewed manifest
-    moves to 1,230 passes, 898 expected negatives, and 373 unsupported
-    profile features with no semantic or harness failures.
+    *static-init-sequence.js*, stays outside the reviewed subset pending
+    separate review. The same interleaving remains covered by a native
+    fixture; Unit 7.4's later narrow `%Array.prototype.push%` dependency does
+    not reclassify this class case. The reviewed manifest moves to 1,230
+    passes, 898 expected negatives, and 373 unsupported profile features with
+    no semantic or harness failures.
  -  The asynchronous iterator protocol and the `for await (... of ...)`
     statement. `GetIterator(value, async)` reads the value's
     `Symbol.asyncIterator` method, calls it, and captures the resulting
@@ -1475,9 +1506,10 @@ its deliberate boundary and its evidence:
     awaited value is ordinary array or object binding over that value, so it
     acquires its own synchronous iterator. `for await` is admitted only where
     the bootstrap parser already allows it, inside an asynchronous function
-    body and at module top level; an awaited iterable expression in the head
-    keeps the existing rejection for an await outside the M4 continuation
-    positions. Native differential fixtures cover the synchronous fallback,
+    body and at module top level. An awaited iterable expression in the head
+    uses the ordinary function's traced suspension frame, while module top
+    level keeps its separate continuation restriction. Native differential
+    fixtures cover the synchronous fallback,
     generator and user iterables, `Symbol.asyncIterator` preference over
     `Symbol.iterator`, promised and direct step results, `done` and `value`
     accessor order, timer-driven steps, the turns a wrapped step and a
@@ -1698,18 +1730,21 @@ must never shrink by reclassification alone.
     `unsupported-profile-feature` until this global binding model lands.
     Owner: the intrinsics and built-in objects stream; the surface audit in
     [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
- -  Inside an ordinary asynchronous function body, `await` is restricted to
-    the M4 continuation positions, and asynchronous module cycles are
-    unsupported. An asynchronous generator body has no such restriction,
-    because it suspends through its own saved frame rather than through the
-    frontend's continuation split. Owner: the functions and executable syntax
-    stream.
+ -  Await inside a computed member of an assignment target, a computed binding
+    property name, or an array or object binding default remains unsupported
+    in ordinary asynchronous and asynchronous generator bodies. Those pattern
+    subexpressions lower before the suspension machinery reaches them.
+    Asynchronous module cycles remain unsupported under the separate module
+    continuation model. Owner: the functions and executable syntax stream for
+    pattern suspension, and the modules and asynchronous execution stream for
+    cycles.
  -  A `for await` step, and each step of a `yield*` inside an asynchronous
     generator, suspends by draining the scheduler rather than by
-    returning to the caller. The frontend splits an `await` expression into
-    continuations, and a loop has no such split, so each step resolves its
-    promise, runs the queued jobs in order, and advances timers until that
-    promise settles, then resumes the loop directly. Interleaving with jobs
+    returning to the caller. Ordinary `await` now uses a traced suspension
+    frame, but these iterator operations still call the drain-based scheduler
+    path directly. Each step therefore resolves its promise, runs the queued
+    jobs in order, and advances timers until that promise settles, then resumes
+    the loop directly. Interleaving with jobs
     already queued is preserved, but the enclosing asynchronous function does
     not return to its caller at a step, so work sequenced after the call
     observes the loop's effects first, and a step whose promise can never
