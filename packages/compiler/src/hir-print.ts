@@ -183,9 +183,11 @@ function printHirExpression(expression: HirExpression): string {
         .map((property) =>
           property.kind === "spread"
             ? `...${printHirExpression(property.argument)}`
-            : (property.accessorKind == null
-                ? ""
-                : `${property.accessorKind} `) +
+            : (property.prototypeSetter === true
+                ? "proto-set "
+                : property.accessorKind == null
+                  ? ""
+                  : `${property.accessorKind} `) +
               `${printHirExpression(property.key)}: ` +
               printHirExpression(property.value),
         )

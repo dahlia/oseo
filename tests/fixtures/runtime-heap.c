@@ -239,6 +239,32 @@ static void test_ordinary_properties(
         oseo_object_set_prototype(context, roots[0], roots[1]).status ==
         OSEO_STATUS_THROW
     );
+    roots[5] = require_normal(oseo_object_create(context, oseo_null()));
+    (void)require_normal(
+        oseo_object_set(
+            context, roots[5], roots[2], oseo_number(5.0), false
+        )
+    );
+    roots[6] = require_normal(oseo_object_literal_create(context));
+    (void)require_normal(
+        oseo_object_literal_set_prototype(context, roots[6], roots[5])
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[6], roots[2])) ==
+        oseo_number(5.0)
+    );
+    roots[7] = require_normal(oseo_object_literal_create(context));
+    assert(
+        require_normal(oseo_object_literal_set_prototype(
+            context,
+            roots[7],
+            oseo_number(1.0)
+        )) == roots[7]
+    );
+    assert(
+        require_normal(oseo_object_has_own(context, roots[7], roots[2])) ==
+        oseo_boolean(false)
+    );
     (void)require_normal(
         oseo_object_set(context, roots[1], roots[2], roots[1], false)
     );

@@ -1450,6 +1450,18 @@ OseoResult oseo_object_set_prototype(
     return normal(object_value);
 }
 
+OseoResult oseo_object_literal_set_prototype(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue prototype
+) {
+    if (!is_object(object_value) || tag_of(prototype) == OSEO_TAG_NULL ||
+        is_object(prototype)) {
+        return oseo_object_set_prototype(context, object_value, prototype);
+    }
+    return normal(object_value);
+}
+
 static OseoValue builtin_argument(
     size_t argument_count,
     const OseoValue *arguments,

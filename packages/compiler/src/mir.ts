@@ -172,6 +172,7 @@ export interface MirOperation {
     | "object-coercible"
     | "object-create"
     | "object-rest"
+    | "object-set-prototype"
     | "object-spread"
     | "private-get"
     | "private-in"

@@ -5502,6 +5502,9 @@ tests:
   - path: test/language/expressions/object/S11.1.5_A4.3.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/__proto__-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [object-literals]
   - path: test/language/expressions/object/accessor-name-computed-err-evaluation.js
     expectedClassification: pass
     dependencies: [object-literals]

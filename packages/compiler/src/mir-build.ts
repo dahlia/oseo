@@ -3854,6 +3854,34 @@ function lowerExpression(
         recordRoot(builder, copied, property.range);
         continue;
       }
+      if (property.prototypeSetter === true) {
+        const value = lowerExpression(property.value, builder);
+        appendMirMetadata(
+          builder,
+          "safepoint",
+          "object literal prototype setter",
+          [id, value],
+          expression.range,
+        );
+        const result = builder.nextValue;
+        builder.nextValue += 1;
+        builder.current.operations.push({
+          arguments: [id, value],
+          detail: "set object literal prototype",
+          id: result,
+          kind: "object-set-prototype",
+          range: expression.range,
+        });
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [result],
+          expression.range,
+        );
+        recordRoot(builder, result, expression.range);
+        continue;
+      }
       const key = lowerPropertyKey(property.key, builder);
       const value = lowerExpression(
         property.value,

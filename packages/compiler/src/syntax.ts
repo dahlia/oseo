@@ -224,6 +224,12 @@ export interface SyntaxObjectDefinition {
   readonly accessorKind?: "get" | "set";
   readonly key: SyntaxExpression;
   readonly kind: "definition";
+  /**
+   * Whether this colon-form definition sets [[Prototype]] instead of an
+   * own property. A frontend must report a syntax error if one object
+   * literal contains more than one such definition.
+   */
+  readonly prototypeSetter?: true;
   readonly value: SyntaxExpression;
 }
 

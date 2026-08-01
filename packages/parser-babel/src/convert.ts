@@ -718,21 +718,17 @@ export function expression(
       }
       const keyNode = node(property.key);
       if (keyNode == null) return unsupported(context, property);
+      const prototypeSetter =
+        property.type === "ObjectProperty" &&
+        property.computed !== true &&
+        property.shorthand !== true &&
+        (identifierName(keyNode) === "__proto__" ||
+          (keyNode.type === "StringLiteral" && keyNode.value === "__proto__"));
       let key: SyntaxExpression | undefined;
       if (property.computed === true) {
         key = expression(context, keyNode);
       } else {
         const name = identifierName(keyNode);
-        if (
-          name === "__proto__" ||
-          (keyNode.type === "StringLiteral" && keyNode.value === "__proto__")
-        ) {
-          return unsupported(
-            context,
-            property,
-            "The __proto__ property name is unsupported.",
-          );
-        }
         if (name != null) {
           key = { ...location(context, keyNode), kind: "string", value: name };
         } else if (keyNode.type === "NumericLiteral") {
@@ -783,6 +779,7 @@ export function expression(
         ...(accessorKind == null ? {} : { accessorKind }),
         key,
         kind: "definition",
+        ...(prototypeSetter ? { prototypeSetter: true as const } : {}),
         value: propertyValue,
       });
     }

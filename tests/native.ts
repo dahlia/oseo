@@ -206,6 +206,11 @@ for (const fixture of selectedFixtures) {
     assert.match(enabledText, /property-get generic/u);
   }
 
+  if (fixture.name === "object-literal-prototype-setter") {
+    assert.match(printMir(enabledMir), /guard-smi/u);
+    assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
+  }
+
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
@@ -218,6 +223,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-bindings" ||
     fixture.name === "object-bindings" ||
     fixture.name === "object-literals" ||
+    fixture.name === "object-literal-prototype-setter" ||
     fixture.name === "class-definitions" ||
     fixture.name === "class-identity" ||
     fixture.name === "class-name-binding" ||
@@ -338,6 +344,12 @@ for (const fixture of selectedFixtures) {
           }
           if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "object-literal-prototype-setter") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
             assert.equal(native.counters.allocations, 5);

@@ -705,6 +705,23 @@ function resolveExpression(
     return { ...expression, expressions };
   }
   if (expression.kind === "object") {
+    let foundPrototypeSetter = false;
+    for (const property of expression.properties) {
+      if (property.kind !== "definition" || property.prototypeSetter !== true) {
+        continue;
+      }
+      if (foundPrototypeSetter) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            property.key,
+            "An object literal cannot contain multiple prototype setters.",
+          ),
+        );
+        return undefined;
+      }
+      foundPrototypeSetter = true;
+    }
     const properties: HirObjectProperty[] = [];
     for (const property of expression.properties) {
       if (property.kind === "spread") {
@@ -722,8 +739,13 @@ function resolveExpression(
           : { accessorKind: property.accessorKind }),
         key,
         kind: "definition",
+        ...(property.prototypeSetter === true
+          ? { prototypeSetter: true as const }
+          : {}),
         value:
-          key.kind === "string" ? inferFunctionName(value, key.value) : value,
+          key.kind === "string" && property.prototypeSetter !== true
+            ? inferFunctionName(value, key.value)
+            : value,
       });
     }
     return { ...expression, properties };

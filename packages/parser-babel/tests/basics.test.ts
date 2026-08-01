@@ -1123,26 +1123,58 @@ const value = { ...base, b: 2 };`,
   assert.match(mir, /property-define-data create data property/u);
 });
 
-test("rejects only noncomputed __proto__ literals", () => {
-  const rejected = compileSource(babelFrontend, {
-    source: "const value = { __proto__: null };",
+test("lowers only colon-form __proto__ as a prototype setter", () => {
+  const result = compileSource(babelFrontend, {
+    source: `const __proto__ = 1;
+const prototype = {};
+const value = {
+  __proto__: prototype,
+  ["__proto__"]: 2,
+  __proto__,
+  __proto__() {},
+  get __proto__() {},
+  set __proto__(value) {},
+};`,
     sourceId: "proto-literal.ts",
   });
-  assert.equal(rejected.diagnostics[0]?.code, "OSEO1001");
-  assert.match(rejected.diagnostics[0]?.message ?? "", /__proto__/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /proto-set "__proto__": %b\d+\(prototype\)/u);
+  assert.match(hir, /"__proto__": 2/u);
+  assert.match(hir, /"__proto__": %b\d+\(__proto__\)/u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /safepoint object literal prototype setter/u);
+  assert.match(mir, /object-set-prototype set object literal prototype/u);
+  assert.match(mir, /property-define-data create data property/u);
+  assert.match(mir, /property-define-accessor define get accessor property/u);
+  assert.match(mir, /property-define-accessor define set accessor property/u);
 
-  const quoted = compileSource(babelFrontend, {
-    source: 'const value = { "__proto__": null };',
-    sourceId: "quoted-proto.ts",
+  const setterOnly = compileSource(babelFrontend, {
+    source: "({ __proto__: null });",
+    sourceId: "proto-literal-only.js",
   });
-  assert.equal(quoted.diagnostics[0]?.code, "OSEO1001");
-  assert.match(quoted.diagnostics[0]?.message ?? "", /__proto__/u);
+  assert.deepEqual(setterOnly.diagnostics, []);
+  assert.ok(setterOnly.mir != null);
+  assert.doesNotMatch(printMir(setterOnly.mir), /property-key/u);
+});
 
-  const accepted = compileSource(babelFrontend, {
-    source: 'const value = { ["__proto__"]: null };',
-    sourceId: "computed-proto.ts",
+test("keeps duplicate object prototype setters as an early error", () => {
+  const result = compileSource(babelFrontend, {
+    source: `({
+  __proto__: null,
+  ["__proto__"]: 1,
+  __proto__() {},
+  "__proto__": {},
+});`,
+    sourceId: "duplicate-proto-literal.js",
   });
-  assert.deepEqual(accepted.diagnostics, []);
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.deepEqual(result.diagnostics[0]?.range.start, {
+    column: 3,
+    line: 5,
+  });
 });
 
 test("rejects the smallest syntax form outside the profile", () => {
