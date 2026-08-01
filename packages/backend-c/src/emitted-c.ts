@@ -577,6 +577,10 @@ export const emittedC = {
       ["result = oseo_require_object_coercible(context, ", "roots["],
       ["]);"],
     ],
+    resultAssignOseoRequireDeleteObjectCoercible: [
+      ["result = oseo_require_delete_object_coercible(context, ", "roots["],
+      ["]);"],
+    ],
     objectRestExcluded: [["object_rest_excluded_"], [""]],
     oseoValueUAssignOpen: [["OseoValue "], ["["], ["u] = {"]],
     initializerSuffix: [["};"]],

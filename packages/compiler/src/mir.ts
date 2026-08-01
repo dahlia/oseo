@@ -141,6 +141,7 @@ export interface MirOperation {
     | "construct"
     | "construct-receiver"
     | "derived-return"
+    | "delete-object-coercible"
     | "error-intrinsic"
     | "symbol-intrinsic"
     | "template-object"

@@ -42,7 +42,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,174 reviewed cases: 2,448 passes, 1,167
+The current manifest contains 4,202 reviewed cases: 2,474 passes, 1,169
 expected negatives, and 559 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -273,12 +273,33 @@ its deliberate boundary and its evidence:
     independent prerequisites including dynamic source, `for-in`, restricted
     asynchronous `await` positions, `String`, `Reflect`,
     regular expressions, and an optional call through a `super` property.
-    Deliberate boundary: `delete value?.property` is rejected with a
-    source-located diagnostic, because optional chaining as a `delete` operand
-    is not lowered yet. The
-    remaining directory case stays outside the reviewed subset because its
+    The remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
     not materialized yet.
+ -  The `delete` operator for identifier, non-reference, ordinary member, and
+    optional-chain operands. A resolved declarative identifier returns `false`
+    without reading its cell, including while that cell is uninitialized; an
+    unresolvable name returns `true`, and a `with` environment deletes the
+    first object binding it selects before using that static fallback. Strict
+    identifier deletion remains an early error. A non-reference operand is
+    evaluated for its effects and abrupt completion before `true` is returned.
+    An optional chain returns `true` on a nullish guard without evaluating its
+    key or later steps, while a live path deletes its final property reference.
+    Ordinary and live optional deletion preserve static and computed keys,
+    property attributes, strict `TypeError` behavior, and result booleans. A
+    computed ordinary member evaluates its key expression before rejecting a
+    nullish base but does not convert that key. Private-name deletion remains
+    an early error, and deleting a `super` property stays source-located
+    invalid until that reference can throw the required runtime
+    `ReferenceError`. Deleting a runtime-owned intrinsic identifier also stays
+    invalid until the global-object model can make the deletion affect later
+    name resolution. Fixed Node.js, Deno, and native fixtures cover both Script
+    modes, effects, abrupt completion, live and nullish paths, a false hint, a
+    deliberate property-guard miss, both specialization policies, and forced
+    collection. A directly generated property uses ordinary seed `0x5eed0023`
+    and 16 cases across the same domain; the extended gate uses seed
+    `0x5eed0003` and runs 160. Twenty-six applicable reviewed test262 cases pass
+    and two strict identifier cases are expected parse negatives.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the
@@ -1777,7 +1798,8 @@ conversion, write, and abrupt-completion order. Update first performs
 postfix result selection. False `number` hints still enter the compiled generic
 fallback after a deliberate guard miss.
 
-The runtime ABI is `m5-35`. It adds *runtime\_bigint.c*, exact literal
+M5a Unit 8.1a advances the runtime ABI to `m5-35`. It adds
+*runtime\_bigint.c*, exact literal
 construction, `ToNumeric`, and numeric-one entry points. Fixed
 native evidence compares Node.js, Deno, both specialization policies, forced
 collection, Linux AMD64 execution, and the AArch64 Linux cross-link. The
@@ -1798,6 +1820,54 @@ The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
 behavior, `BigInt.asIntN`, and `BigInt.asUintN` remain outside this M5a unit.
 They remain M5b work under [*PLAN-BIGINT.md*](../PLAN-BIGINT.md). Binary-data
 and atomic consumers also remain with their owning built-in families.
+
+### Delete expressions
+
+M5a Unit 8.1b admits the remaining core `delete` operands without changing the
+ordinary property-reference runtime operation. Owned syntax retains a general
+operand until HIR resolution distinguishes declarative, unresolvable, dynamic
+`with`, non-reference, and optional-chain cases. MIR uses constants for static
+identifier results, evaluates and discards non-reference values only after
+their abrupt checks, and branches optional deletion to `true` without entering
+the skipped reference spine. A live optional path reuses the ordinary property
+delete operation for its final member.
+
+Fixed differential fixtures compare Node.js, Deno, specialization disabled and
+enabled, forced collection, Linux AMD64 execution, and the AArch64 Linux
+cross-link. They retain strict and non-strict behavior, resolved and unresolved
+names, temporal-dead-zone independence, `with` selection, operand, key,
+conversion, and call order, abrupt completion, nullish short-circuiting, later
+chain suppression, live static and computed deletion, non-configurable
+properties, a false number hint, and a deliberate intermediate property-guard
+miss. The directly generated property uses seed `0x5eed0023`, a 16-case
+ordinary budget, a directly generated structured domain, and an independent
+reference-and-effect oracle. The extended gate uses seed `0x5eed0003` and
+scales it to 160 cases. Initial and intermediate nullish bases prove key
+expression evaluation before coercibility and key conversion after it. Both
+native specialization policies force collection.
+
+This unit advances the runtime ABI to `m5-36` with a delete-specific
+object-coercibility entry point. It preserves the existing delete nullish error
+while keeping object-binding diagnostics separate.
+
+The reviewed test262 subset adds 28 applicable pinned cases without changing
+the suite revision, inventory policy, manifest schema, or classification
+vocabulary. Twenty-six pass and two are expected strict identifier parse
+negatives. The manifest moves from 4,174 to 4,202 cases, from 2,448 to 2,474
+passes, and from 1,167 to 1,169 expected negatives; its 559 unsupported profile
+features do not move, and it records no semantic or harness failures.
+
+Private-name deletion remains an early error. `delete super.property` remains
+a source-located invalid boundary instead of being lowered as an ordinary
+property delete; admitting it requires the runtime `ReferenceError` and the
+specified receiver, key-expression, and `ToPropertyKey` suppression order.
+Deleting `Symbol` or a named error intrinsic as an identifier remains invalid
+until the global-object model can remove the property and change subsequent
+name resolution consistently. Deleting `arguments` in a function form whose
+arguments object is not admitted remains a source-located invalid boundary
+instead of being misclassified as an unresolvable global name. Deleting a
+hidden `with` fallback that a prior unresolved assignment allocated is likewise
+invalid until the global-object model can remove that cell consistently.
 
 
 Known gaps inside the claim
@@ -1826,11 +1896,9 @@ must never shrink by reclassification alone.
     are recorded below. Script top-level `this` remains rejected because the
     profile has no Script or global receiver model. An object literal still
     rejects a noncomputed `__proto__` property name in every syntactic form; a
-    computed name remains an ordinary property key. `delete` remains limited
-    to ordinary property references, so an identifier, non-reference, or
-    optional chain operand is rejected. Owner: the core expressions and
-    bindings stream for Script top-level `this`, object-literal `__proto__`,
-    and the remaining `delete` forms.
+    computed name remains an ordinary property key. Owner: the core expressions
+    and bindings stream for Script top-level `this` and object-literal
+    `__proto__`.
  -  Module top-level `this` is a separate gap. ECMAScript evaluates it to
     `undefined`, but the current compiler rejects it, as
     *test/language/module-code/eval-this.js* demonstrates. `import.meta` is

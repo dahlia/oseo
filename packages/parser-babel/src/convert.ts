@@ -633,10 +633,46 @@ export function expression(
           "A private member cannot be deleted.",
         );
       }
-      const member = memberParts(context, argumentNode);
-      return member == null
+      if (
+        argumentNode.type === "OptionalMemberExpression" ||
+        argumentNode.type === "OptionalCallExpression"
+      ) {
+        const argument = optionalChainExpression(context, argumentNode);
+        return argument == null
+          ? undefined
+          : { ...located, argument, kind: "delete" };
+      }
+      if (argumentNode.type === "Identifier") {
+        if (context.strictStack.at(-1) === true) {
+          return earlyError(
+            context,
+            argumentNode,
+            "An identifier cannot be deleted in strict code.",
+          );
+        }
+        const name = identifierName(argumentNode);
+        return name == null
+          ? unsupported(context, argumentNode)
+          : {
+              ...located,
+              argument: {
+                ...location(context, argumentNode),
+                kind: "identifier",
+                name,
+              },
+              kind: "delete",
+            };
+      }
+      if (argumentNode.type === "MemberExpression") {
+        const member = memberParts(context, argumentNode);
+        return member == null
+          ? undefined
+          : { ...located, ...member, kind: "property-delete" };
+      }
+      const argument = expression(context, argumentNode);
+      return argument == null
         ? undefined
-        : { ...located, ...member, kind: "property-delete" };
+        : { ...located, argument, kind: "delete" };
     }
     if (
       value.operator !== "-" &&

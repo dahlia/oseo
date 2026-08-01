@@ -695,6 +695,61 @@ test("lowers optional chains through one nullish branch and join", () => {
   );
 });
 
+test("lowers optional delete short paths to true", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: {
+            base: { kind: "null", range },
+            kind: "optional-chain",
+            links: [
+              {
+                key: { kind: "string", range, value: "item" },
+                kind: "member",
+                optional: true,
+                range,
+              },
+            ],
+            range,
+          },
+          kind: "delete",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "optional-delete.js",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  assert.match(printHir(hir), /delete null\?\./u);
+  const script = buildMir(hir).script;
+  const operations = script.blocks.flatMap((block) => block.operations);
+  assert.ok(
+    operations.some((operation) => operation.kind === "property-delete"),
+  );
+  const coercibleIndex = operations.findIndex(
+    (operation) => operation.kind === "delete-object-coercible",
+  );
+  const keyIndex = operations.findIndex(
+    (operation) => operation.kind === "property-key",
+  );
+  assert.ok(coercibleIndex >= 0);
+  assert.ok(keyIndex > coercibleIndex);
+  assert.ok(
+    operations.some(
+      (operation) =>
+        operation.kind === "constant" &&
+        operation.constant?.kind === "boolean" &&
+        operation.constant.value,
+    ),
+  );
+});
+
 test("lowers comma sequences to their final operand", () => {
   const syntax: SyntaxProgram = {
     body: [

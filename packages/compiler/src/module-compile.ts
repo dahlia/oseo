@@ -254,6 +254,9 @@ function moduleComponentRoot(
 }
 
 function hirExpressionHasPatternAwait(expression: HirExpression): boolean {
+  if (expression.kind === "delete-value") {
+    return hirExpressionHasPatternAwait(expression.argument);
+  }
   if (
     expression.kind === "destructuring-set" &&
     hirBindingPatternHasAwait(expression.pattern)
@@ -579,6 +582,12 @@ function objectPropertyChildOffsets(
 function moduleExpressionParts(
   expression: HirExpression,
 ): ModuleExpressionParts | undefined {
+  if (expression.kind === "delete-value") {
+    return {
+      children: [expression.argument],
+      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
+    };
+  }
   if (expression.kind === "await") {
     return {
       children: [expression.argument],

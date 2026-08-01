@@ -886,6 +886,98 @@ test("converts ordinary object operations to owned syntax", () => {
   assert.doesNotMatch(genericText, /guard-(?:object|shape)/u);
 });
 
+test("converts every admitted delete operand to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source: [
+      "let binding = 1;",
+      "const object = { item: 2, nested: { kept: 3 } };",
+      'function unresolvedKey() { return "item"; }',
+      "delete binding;",
+      "delete unresolved;",
+      "delete (binding + 1);",
+      "delete object?.item;",
+      'delete object?.nested["kept"];',
+      "delete null?.[unresolvedKey()];",
+    ].join("\n"),
+    sourceId: "delete-operands.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.syntax != null);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const syntaxDeletes = result.syntax.body
+    .slice(3)
+    .map((statement) =>
+      statement.kind === "expression" ? statement.expression.kind : undefined,
+    );
+  assert.deepEqual(syntaxDeletes, [
+    "delete",
+    "delete",
+    "delete",
+    "delete",
+    "delete",
+    "delete",
+  ]);
+  const hir = printHir(result.hir);
+  assert.match(hir, /\n  false/u);
+  assert.match(hir, /\n  true/u);
+  assert.match(hir, /delete value/u);
+  assert.match(hir, /delete .*\?\./u);
+  const mir = printMir(result.mir);
+  assert.match(mir, /property-delete property-delete/u);
+  assert.match(mir, /join \?\./u);
+});
+
+test("retains closed-world and early-error delete boundaries", () => {
+  const cases: readonly (readonly [string, string, RegExp])[] = [
+    [
+      '"use strict"; delete binding;',
+      "OSEO0001",
+      /Source could not be parsed/u,
+    ],
+    [
+      '"use strict"; delete ((binding));',
+      "OSEO0001",
+      /identifier cannot be deleted in strict code/u,
+    ],
+    [
+      "delete Error;",
+      "OSEO1001",
+      /outside the admitted global-object profile/u,
+    ],
+    [
+      "delete console;",
+      "OSEO1001",
+      /outside the admitted global-object profile/u,
+    ],
+    [
+      "async function unavailable() { return delete arguments; }",
+      "OSEO1001",
+      /outside the admitted function profile/u,
+    ],
+    [
+      "with ({}) { unavailable = 1; delete unavailable; }",
+      "OSEO1001",
+      /Deleting with fallback binding/u,
+    ],
+    [
+      "class A extends Object { m() { delete super.x; } }",
+      "OSEO1001",
+      /Property access through super is unsupported here/u,
+    ],
+  ];
+  for (const [source, code, message] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "invalid-delete.js",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, code, source);
+    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+    assert.ok((result.diagnostics[0]?.range.start.column ?? 0) > 0, source);
+  }
+});
+
 test("lowers the admitted Object reflection intrinsics", () => {
   const result = compileSource(babelFrontend, {
     source:

@@ -202,6 +202,11 @@ limb edges, and tag 7 remains unassigned. The baseline rejects magnitudes above
 65,536 bits with a catchable `RangeError` before allocating the oversized
 result.
 
+The `m5-36` ABI adds `oseo_require_delete_object_coercible`. Generated delete
+lowering uses it after evaluating a computed key expression but before
+`ToPropertyKey`, preserving the delete-specific nullish `TypeError` while
+leaving the object-binding helper and message unchanged.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

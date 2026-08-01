@@ -152,8 +152,8 @@ static OseoValue make_key(
 
 static OseoValue make_text(OseoContext *context, const char *text) {
     size_t length = strlen(text);
-    assert(length <= 16u);
-    uint16_t units[16];
+    assert(length <= 64u);
+    uint16_t units[64];
     for (size_t index = 0u; index < length; index += 1u) {
         units[index] = (uint16_t)(unsigned char)text[index];
     }
@@ -211,6 +211,10 @@ static void test_ordinary_properties(
             oseo_object_delete(context, roots[1], roots[3], false)
         ) ==
         oseo_boolean(false)
+    );
+    assert(
+        oseo_object_delete(context, roots[1], roots[3], true).status ==
+        OSEO_STATUS_THROW
     );
     (void)require_normal(
         oseo_object_set(
@@ -590,6 +594,27 @@ static void test_cell_initialization(
     );
     assert(
         require_normal(oseo_cell_get(context, roots[0])) == oseo_number(2.0)
+    );
+}
+
+static void test_delete_object_coercible(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    OseoResult result =
+        oseo_require_delete_object_coercible(context, oseo_null());
+    assert(result.status == OSEO_STATUS_THROW);
+    roots[0] = result.value;
+    roots[1] = require_normal(
+        oseo_object_get(context, roots[0], make_text(context, "message"))
+    );
+    roots[2] = make_text(
+        context,
+        "Cannot delete properties of a nullish value."
+    );
+    assert(
+        require_normal(oseo_strict_equal(context, roots[1], roots[2])) ==
+        oseo_boolean(true)
     );
 }
 
@@ -976,6 +1001,7 @@ int main(void) {
     test_argument_lists(&context, frame.slots);
     test_function_cells(&context, frame.slots);
     test_cell_initialization(&context, frame.slots);
+    test_delete_object_coercible(&context, frame.slots);
     test_loose_equality_boundary(&context, frame.slots);
     test_to_primitive_conversion(&context, frame.slots);
     test_error_intrinsics(&context, frame.slots);

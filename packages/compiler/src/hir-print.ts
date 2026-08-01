@@ -120,6 +120,12 @@ function printHirExpression(expression: HirExpression): string {
       `${expression.name} fallback ${printHirExpression(expression.fallback)}`
     );
   }
+  if (expression.kind === "with-delete") {
+    return (
+      `delete with[${withObjectText(expression.objectBindingIds)}] ` +
+      `${expression.name} fallback ${expression.fallbackResult}`
+    );
+  }
   if (expression.kind === "error-intrinsic") {
     return `intrinsic ${expression.errorName}`;
   }
@@ -192,7 +198,7 @@ function printHirExpression(expression: HirExpression): string {
       expression.base.kind === "optional-chain"
         ? `(${printHirExpression(expression.base)})`
         : printHirExpression(expression.base);
-    return expression.links.reduce(
+    const chain = expression.links.reduce(
       (printed, link) =>
         link.kind === "member"
           ? `${printed}${link.optional ? "?." : ""}[` +
@@ -207,6 +213,10 @@ function printHirExpression(expression: HirExpression): string {
                 `${link.arguments.map(printHirCallArgument).join(", ")})`,
       base,
     );
+    return expression.delete === true ? `delete ${chain}` : chain;
+  }
+  if (expression.kind === "delete-value") {
+    return `delete value ${printHirExpression(expression.argument)}`;
   }
   if (expression.kind === "class") {
     return (

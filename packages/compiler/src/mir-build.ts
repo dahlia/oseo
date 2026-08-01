@@ -701,12 +701,78 @@ function lowerObjectCoercible(
   return recordRoot(builder, id, range);
 }
 
+/** Reject a nullish property-delete base before converting its key. */
+function lowerDeleteObjectCoercible(
+  input: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "require delete base object-coercible",
+    [input],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "RequireObjectCoercible for property delete",
+    id,
+    kind: "delete-object-coercible",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> convert delete property key, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
 /**
  * Marks one property assignment or deletion as strict when it is lowered
  * inside a region that is strict regardless of the enclosing function.
  */
 function strictCodeFlag(builder: MirBuilder): { readonly strict?: true } {
   return builder.strictCode ? { strict: true } : {};
+}
+
+/** Delete one already-evaluated ordinary property reference. */
+function lowerPropertyDelete(
+  object: number,
+  key: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "property deletion error",
+    [object, key],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [object, key],
+    detail: "property-delete",
+    id,
+    kind: "property-delete",
+    range,
+    ...strictCodeFlag(builder),
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
 }
 
 function lowerPropertyWrite(
@@ -871,6 +937,54 @@ function lowerWithRead(
   recordRoot(builder, value, reference.range);
   if (receiver != null) recordRoot(builder, receiver, reference.range);
   return { ...(receiver == null ? {} : { receiver }), value };
+}
+
+/** Delete the binding selected by one non-strict `with` environment chain. */
+function lowerWithDelete(
+  reference: Extract<HirExpression, { readonly kind: "with-delete" }>,
+  builder: MirBuilder,
+): number {
+  const selected = lowerWithReference(reference, builder);
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue;
+  builder.nextValue += 1;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenFalse: fallbackBlock.id,
+    whenTrue: propertyBlock.id,
+  };
+  builder.current = propertyBlock;
+  const propertyResult = lowerPropertyDelete(
+    selected.object,
+    selected.key,
+    reference.range,
+    builder,
+  );
+  propertyBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [propertyResult],
+  };
+  builder.current = fallbackBlock;
+  const fallbackResult = lowerExpression(
+    {
+      kind: "boolean",
+      range: reference.range,
+      value: reference.fallbackResult,
+    },
+    builder,
+  );
+  fallbackBlock.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [fallbackResult],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, reference.range);
 }
 
 function lowerWithBindingRead(
@@ -2901,6 +3015,17 @@ function lowerOptionalChain(
     }
     if (link.kind === "member") {
       receiver = value;
+      if (expression.delete === true && index === expression.links.length - 1) {
+        const keyInput = lowerExpression(link.key, builder);
+        const object = lowerDeleteObjectCoercible(
+          receiver,
+          link.range,
+          builder,
+        );
+        const key = convertPropertyKey(keyInput, link.key.range, builder);
+        value = lowerPropertyDelete(object, key, link.range, builder);
+        continue;
+      }
       if (link.key.kind === "string" && builder.specialization === "enabled") {
         value = lowerSpecializedPropertyGet(
           receiver,
@@ -2989,6 +3114,15 @@ function lowerOptionalChain(
     value = recordRoot(builder, called, link.range);
     receiver = undefined;
   }
+  if (
+    expression.delete === true &&
+    expression.links.at(-1)?.kind !== "member"
+  ) {
+    value = lowerExpression(
+      { kind: "boolean", range: expression.range, value: true },
+      builder,
+    );
+  }
   if (shortConsumed) return value;
   const joinBlock = createMirBlock(builder);
   const result = builder.nextValue;
@@ -3000,11 +3134,17 @@ function lowerOptionalChain(
     values: [value],
   };
   builder.current = shortBlock;
-  const undefinedValue = lowerSyntheticUndefined(expression.range, builder);
+  const shortValue =
+    expression.delete === true
+      ? lowerExpression(
+          { kind: "boolean", range: expression.range, value: true },
+          builder,
+        )
+      : lowerSyntheticUndefined(expression.range, builder);
   shortBlock.terminator = {
     kind: "jump",
     target: joinBlock.id,
-    values: [undefinedValue],
+    values: [shortValue],
   };
   builder.current = joinBlock;
   appendMirMetadata(
@@ -3023,6 +3163,16 @@ function lowerExpression(
   inferredFunctionName?: number,
   accessorNamePrefix?: "get" | "set",
 ): number {
+  if (expression.kind === "delete-value") {
+    lowerExpression(expression.argument, builder);
+    return lowerExpression(
+      { kind: "boolean", range: expression.range, value: true },
+      builder,
+    );
+  }
+  if (expression.kind === "with-delete") {
+    return lowerWithDelete(expression, builder);
+  }
   if (expression.kind === "with-get") {
     return lowerWithRead(expression, builder, false).value;
   }
@@ -3784,13 +3934,25 @@ function lowerExpression(
         superReceiver,
       );
     }
-    const { keyInput, object } = lowerReferenceObject(
+    const reference = lowerReferenceObject(
       expression.object,
       expression.key,
       operand,
       builder,
     );
-    const key = convertPropertyKey(keyInput, expression.key.range, builder);
+    const object =
+      expression.kind === "property-delete"
+        ? lowerDeleteObjectCoercible(
+            reference.object,
+            expression.object.range,
+            builder,
+          )
+        : reference.object;
+    const key = convertPropertyKey(
+      reference.keyInput,
+      expression.key.range,
+      builder,
+    );
     if (expression.kind === "property-get") {
       appendMirMetadata(
         builder,
@@ -3800,13 +3962,7 @@ function lowerExpression(
         expression.range,
       );
     } else {
-      appendMirMetadata(
-        builder,
-        "safepoint",
-        "property deletion error",
-        [object, key],
-        expression.range,
-      );
+      return lowerPropertyDelete(object, key, expression.range, builder);
     }
     const id = builder.nextValue;
     builder.nextValue += 1;
@@ -3817,7 +3973,6 @@ function lowerExpression(
       id,
       kind: expression.kind,
       range: expression.range,
-      ...(expression.kind === "property-delete" ? strictCodeFlag(builder) : {}),
       ...(superReceiver == null ? {} : { superReference: true as const }),
     });
     appendMirMetadata(

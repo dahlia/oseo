@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,174
-reviewed cases: 2,448 passes, 1,167 expected negatives, and 559 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,202
+reviewed cases: 2,474 passes, 1,169 expected negatives, and 559 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -37,7 +37,9 @@ Delivery item 5 is substantially in progress. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
-`instanceof`), optional chaining for property, computed, and call steps,
+`instanceof`), optional chaining for property, computed, and call steps, and
+`delete` for identifier, non-reference, ordinary member, and optional-chain
+operands,
 `var` declarations with function-scope hoisting,
 synchronous arrow functions, untagged template literals, and the
 control-flow statements `do-while`, classic `for` with per-iteration
@@ -1481,6 +1483,35 @@ a nullish base, and immutable-target failure. Four reviewed test262 cases cover
 the four forms across whitespace boundaries, two parse negatives retain the
 strict `arguments` early errors, and the admitted classic `for` update promotes
 one existing exponentiation case to pass.
+
+M5a Unit 8.1b admits `delete` for identifier, non-reference, ordinary member,
+and optional-chain operands. Resolved declarative identifiers return `false`
+without reading their cells, unresolvable names return `true`, and dynamic
+`with` bindings delete the selected object property. Strict identifier
+deletion remains an early error. Non-reference operands run their effects and
+abrupt completion before returning `true`. A nullish optional guard returns
+`true` without evaluating computed keys or later chain steps; a live chain
+deletes its final property reference. Ordinary and optional member deletion
+preserve property attributes, strict failure, result booleans, and the
+specified key evaluation and conversion order.
+
+The directly generated property suite uses ordinary seed `0x5eed0023` with 16
+cases. The repository extended gate uses seed `0x5eed0003` and scales that
+budget to 160 cases. Its structured domain and independent oracle cover all
+four operand families, both Script modes, static and computed keys, live,
+initial-nullish, and intermediate-nullish bases, effects, abrupt completion,
+false hints, a deliberate guard miss, both specialization policies, and forced
+collection. Fixed Node.js, Deno, and native fixtures retain the same
+boundaries. Twenty-six new reviewed
+test262 cases pass and two strict identifier cases are expected parse
+negatives, moving the manifest from 4,174 to 4,202 cases. Private-name deletion
+remains an early error. `super` property deletion and runtime-owned intrinsic
+identifier deletion remain source-located invalid boundaries until their
+runtime reference behavior can be admitted completely. Deleting `arguments`
+where this profile does not admit its implicit object also remains a
+source-located invalid boundary. A hidden `with` fallback allocated by an
+unresolved assignment cannot be deleted until the global-object model owns its
+lifetime, so that combination is rejected rather than returning a stale cell.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive

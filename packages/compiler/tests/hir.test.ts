@@ -62,6 +62,51 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
   assert.doesNotMatch(firstMir, /guard-smi|add-smi-checked/u);
 });
 
+test("resolves delete identifiers without reading their bindings", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "let",
+        name: "present",
+        range,
+      },
+      {
+        expression: {
+          argument: { kind: "identifier", name: "present", range },
+          kind: "delete",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: {
+          argument: { kind: "identifier", name: "absent", range },
+          kind: "delete",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "delete-identifiers.js",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  assert.match(printHir(hir), /\n  false[\s\S]*\n  true/u);
+  const operations = buildMir(hir).script.blocks.flatMap(
+    (block) => block.operations,
+  );
+  assert.equal(
+    operations.filter((operation) => operation.kind === "read").length,
+    0,
+  );
+});
+
 test("rejects duplicate names in owned catch binding patterns", () => {
   const identifier = {
     hints: [],
