@@ -819,6 +819,10 @@ OseoResult oseo_require_object_coercible(
     OseoContext *context,
     OseoValue value
 );
+OseoResult oseo_require_delete_object_coercible(
+    OseoContext *context,
+    OseoValue value
+);
 OseoResult oseo_object_rest(
     OseoContext *context,
     OseoValue source,

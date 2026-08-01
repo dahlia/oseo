@@ -43,6 +43,15 @@ export interface HirWithReference extends LocatedSyntax {
   readonly objectBindingIds: readonly number[];
 }
 
+/** One identifier deletion resolved through active object environments. */
+export interface HirWithDeleteReference extends LocatedSyntax {
+  /** Result when no active object environment supplies the name. */
+  readonly fallbackResult: boolean;
+  readonly kind: "with-delete";
+  readonly name: string;
+  readonly objectBindingIds: readonly number[];
+}
+
 /** One resolved member reference used as an assignment-pattern leaf. */
 export interface HirAssignmentMemberTarget extends LocatedSyntax {
   readonly key: HirExpression;
@@ -632,9 +641,17 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly base: HirExpression;
+      /** Delete the final live reference, or return true on a short path. */
+      readonly delete?: true;
       readonly kind: "optional-chain";
       readonly links: readonly HirOptionalChainLink[];
     })
+  | (LocatedSyntax & {
+      /** The evaluated non-reference value is discarded after abrupt checks. */
+      readonly argument: HirExpression;
+      readonly kind: "delete-value";
+    })
+  | HirWithDeleteReference
   | (LocatedSyntax & {
       readonly key: HirExpression;
       readonly kind: "property-delete";
@@ -967,6 +984,11 @@ export interface Binding {
 }
 
 export interface ResolveState {
+  /**
+   * True while resolving a function form whose implicit `arguments` object
+   * is deliberately unavailable in the current function profile.
+   */
+  argumentsObjectUnavailable: boolean;
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
   readonly functionInfo: Map<

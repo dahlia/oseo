@@ -147,9 +147,11 @@ async function references(fixture: Fixture): Promise<
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
   try {
-    const source = fixture.nonStrictScript
-      ? `new Function(${JSON.stringify(fixture.source)})();\n`
-      : fixture.source;
+    const source = fixture.globalScriptReference
+      ? `(0, eval)(${JSON.stringify(fixture.source)});\n`
+      : fixture.nonStrictScript
+        ? `new Function(${JSON.stringify(fixture.source)})();\n`
+        : fixture.source;
     await host.writeTextFile(path, referencePrelude + source);
     return [
       await requireSuccess(process.execPath, [path]),
@@ -196,6 +198,12 @@ for (const fixture of selectedFixtures) {
     assert.match(enabledText, /join property read/u);
     assert.doesNotMatch(enabledText, /property-get-cached/u);
     assert.doesNotMatch(printMir(disabledMir), /guard-(?:object|shape)/u);
+  }
+
+  if (fixture.name === "delete-non-strict") {
+    const enabledText = printMir(enabledMir);
+    assert.match(enabledText, /guard-object/u);
+    assert.match(enabledText, /property-get generic/u);
   }
 
   if (
@@ -257,6 +265,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-from-sync-rejection-close" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
+    fixture.name === "delete-non-strict" ||
+    fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
     fixture.name === "for-await-of-frame-suspension" ||
@@ -318,6 +328,15 @@ for (const fixture of selectedFixtures) {
             assert.match(native.emittedC, /oseo_smi_try_add/u);
             assert.match(native.emittedC, /oseo_value_box_smi/u);
             assert.ok(native.counters.allocations > 0);
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "delete-non-strict") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
+          if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {

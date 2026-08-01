@@ -134,6 +134,112 @@ try {
 `,
   },
   {
+    globalScriptReference: true,
+    name: "delete-non-strict",
+    nonStrictScript: true,
+    source: `
+let declared = 1;
+console.log(
+  delete declared,
+  declared,
+  delete unresolvedDeleteName,
+  delete arguments,
+);
+function deleteOrdinaryArguments() { return delete arguments; }
+console.log(deleteOrdinaryArguments());
+function tdzDelete() {
+  console.log(delete later);
+  let later = 2;
+}
+tdzDelete();
+
+let order = "";
+function effect(value) { order = order + value + " "; return value; }
+console.log(delete effect("value"), order);
+try {
+  delete (function () { throw new Error("operand"); })();
+} catch (error) {
+  console.log(error.message);
+}
+
+const ordinary = { static: 1, computed: 2 };
+console.log(delete ordinary.static, ordinary.static);
+console.log(delete ordinary[effect("computed")], ordinary.computed, order);
+Object.defineProperty(ordinary, "fixed", {
+  configurable: false,
+  value: 3,
+});
+console.log(delete ordinary.fixed, ordinary.fixed);
+
+let skipped = 0;
+function skippedKey() { skipped = skipped + 1; return "item"; }
+console.log(delete null?.[skippedKey()], skipped);
+console.log(delete undefined?.missing.next, skipped);
+const live = { item: 4, nested: { kept: 5 } };
+console.log(delete live?.item, live.item);
+console.log(delete live?.[skippedKey()], skipped);
+console.log(delete live?.nested.kept, live.nested.kept);
+let tailOrder = "";
+function tailKey() {
+  tailOrder = tailOrder + "key ";
+  return {
+    toString() {
+      tailOrder = tailOrder + "convert ";
+      throw new Error("tail conversion");
+    },
+  };
+}
+try {
+  delete ({ nested: null })?.nested[tailKey()];
+} catch (error) {
+  console.log(error instanceof TypeError, tailOrder);
+}
+function create() { return { final: 6 }; }
+console.log(delete create?.().final);
+console.log(delete create?.(), typeof create);
+
+/** @param {number} value */
+function hinted(value) {
+  return delete value?.nested.item;
+}
+const first = { nested: { item: 7 } };
+const second = { extra: 1, nested: { item: 8 } };
+console.log(hinted(first), first.nested.item);
+console.log(hinted(second), second.nested.item);
+
+const environment = { selected: 9 };
+let fallback = 10;
+with (environment) {
+  console.log(delete selected, delete fallback, delete missingWithName);
+}
+console.log(environment.selected, fallback);
+`,
+  },
+  {
+    name: "delete-strict",
+    source: `
+function strictDelete() {
+  "use strict";
+  const fixed = {};
+  Object.defineProperty(fixed, "item", {
+    configurable: false,
+    value: 1,
+  });
+  try {
+    delete fixed.item;
+  } catch (error) {
+    console.log(error instanceof TypeError, fixed.item);
+  }
+  let effects = 0;
+  console.log(delete (effects = effects + 1), effects);
+  const live = { item: 2 };
+  console.log(delete live?.item, live.item);
+  console.log(delete null?.[(effects = effects + 1)], effects);
+}
+strictDelete();
+`,
+  },
+  {
     name: "numeric-bitwise-exponent",
     source: `
 console.log(2 ** 10, 2 ** 0.5, (-2) ** 2, 2 ** -2, 9 ** 0.5);

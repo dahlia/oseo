@@ -92,6 +92,10 @@ Object binding declarations use the `oseo_require_object_coercible`
 generated-code ABI operation owned by *runtime\_object.c*, followed by the
 existing property-key conversion and property-read operations. The compiler
 owns recursive target initialization and default selection.
+Property deletion uses the separate
+`oseo_require_delete_object_coercible` operation after key-expression
+evaluation and before property-key conversion. The separate entry point keeps
+the delete-specific nullish error while preserving object-binding diagnostics.
 Catch binding patterns reuse the same iterator, coercibility, property-read,
 array-append, and object-rest operations after generated code captures the
 pending thrown value. They add no runtime ABI entry point; compiler-owned

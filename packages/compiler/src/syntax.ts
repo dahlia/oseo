@@ -449,6 +449,14 @@ export type SyntaxExpression =
       readonly links: readonly SyntaxOptionalChainLink[];
     })
   | (LocatedSyntax & {
+      /**
+       * An operand whose reference category must survive name resolution.
+       * Property references keep their existing dedicated representation.
+       */
+      readonly argument: SyntaxExpression;
+      readonly kind: "delete";
+    })
+  | (LocatedSyntax & {
       readonly key: SyntaxExpression;
       readonly kind: "property-delete";
       readonly object: SyntaxExpression;

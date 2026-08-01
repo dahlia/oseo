@@ -274,11 +274,117 @@ function resolveOptionalChain(
   return { ...expression, base, links };
 }
 
+/** Whether a global name is implemented without a deletable global object. */
+function isRuntimeOwnedIntrinsicName(name: string): boolean {
+  return (
+    name === "console" ||
+    name === "Object" ||
+    name === "Promise" ||
+    name === "Symbol" ||
+    name === "setTimeout" ||
+    name === "clearTimeout" ||
+    errorIntrinsicName(name) != null
+  );
+}
+
+/**
+ * Resolve an identifier delete without reading the selected binding. The
+ * closed-world profile can decide declarative and unresolvable references
+ * statically. Runtime-owned intrinsic globals stay invalid until deleting a
+ * global property can also affect later name resolution.
+ */
+function resolveIdentifierDelete(
+  expression: Extract<SyntaxExpression, { readonly kind: "delete" }>,
+  argument: Extract<SyntaxExpression, { readonly kind: "identifier" }>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirExpression | undefined {
+  const resolution = resolveName(scopes, state, argument.name);
+  let fallbackResult: boolean;
+  if (resolution.binding != null) {
+    fallbackResult = false;
+  } else if (
+    argument.name === "undefined" ||
+    argument.name === "NaN" ||
+    argument.name === "Infinity"
+  ) {
+    fallbackResult = false;
+  } else if (isRuntimeOwnedIntrinsicName(argument.name)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        argument,
+        `Deleting runtime intrinsic binding '${argument.name}' is outside ` +
+          "the admitted global-object profile.",
+      ),
+    );
+    return undefined;
+  } else if (
+    argument.name === "arguments" &&
+    state.argumentsObjectUnavailable
+  ) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        argument,
+        "Deleting an unavailable 'arguments' binding is outside the " +
+          "admitted function profile.",
+      ),
+    );
+    return undefined;
+  } else {
+    fallbackResult = true;
+  }
+  if (resolution.objectBindingIds.length > 0) {
+    if (state.withFallbacks.some((owner) => owner.has(argument.name))) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          argument,
+          `Deleting with fallback binding '${argument.name}' is outside ` +
+            "the admitted global-object profile.",
+        ),
+      );
+      return undefined;
+    }
+    return {
+      ...locatedOf(expression),
+      fallbackResult,
+      kind: "with-delete",
+      name: argument.name,
+      objectBindingIds: resolution.objectBindingIds,
+    };
+  }
+  return {
+    kind: "boolean",
+    range: expression.range,
+    value: fallbackResult,
+  };
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | undefined {
+  if (expression.kind === "delete") {
+    if (expression.argument.kind === "identifier") {
+      return resolveIdentifierDelete(
+        expression,
+        expression.argument,
+        scopes,
+        state,
+      );
+    }
+    if (expression.argument.kind === "optional-chain") {
+      const chain = resolveOptionalChain(expression.argument, scopes, state);
+      return chain == null ? undefined : { ...chain, delete: true };
+    }
+    const argument = resolveExpression(expression.argument, scopes, state);
+    return argument == null
+      ? undefined
+      : { ...expression, argument, kind: "delete-value" };
+  }
   if (
     expression.kind === "binding-set" ||
     expression.kind === "binding-update"
@@ -1086,6 +1192,8 @@ function resolveFunction(
   derivedThisBinding?: HirClassThisBinding,
 ): HirFunction {
   const outerThisBinding = state.thisBinding;
+  const outerArgumentsObjectUnavailable = state.argumentsObjectUnavailable;
+  state.argumentsObjectUnavailable = !admitsArgumentsObject(functionValue);
   if (derivedThisBinding != null) {
     state.thisBinding = derivedThisBinding;
   } else if (!lexicalReceiver(functionValue)) {
@@ -1140,6 +1248,7 @@ function resolveFunction(
     bodyScope,
   );
   state.labels.push(...outerLabels);
+  state.argumentsObjectUnavailable = outerArgumentsObjectUnavailable;
   state.thisBinding = outerThisBinding;
   const resolved: HirFunction = {
     ...functionValue,
@@ -1220,6 +1329,9 @@ function hirOptionalChainHasAwait(
 
 export function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
+  if (expression.kind === "delete-value") {
+    return hirExpressionHasAwait(expression.argument);
+  }
   if (
     expression.kind === "binding-set" ||
     expression.kind === "binding-update" ||
@@ -2630,6 +2742,7 @@ export function buildSeededHir(
 ): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
+    argumentsObjectUnavailable: false,
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],
