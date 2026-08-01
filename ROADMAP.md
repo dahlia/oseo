@@ -912,7 +912,12 @@ landed with the M5 intrinsics units. The remaining queue is:
     8.1a gate in [*PLAN-BIGINT.md*](./PLAN-BIGINT.md). Delete expressions have
     passed Unit 8.1b, object-literal prototype setters and their duplicate
     early error have passed Unit 8.1c, and Script and module top-level `this`
-    have passed Unit 8.1d.
+    have passed Unit 8.1d. Unit 8.2 reconciles the class follow-ups: arrows
+    capture lexical `super()` and `new.target`, asynchronous class elements
+    retain `super` property context, each `super()` call performs a fresh
+    `Construct`, and optional calls through `super` properties are admitted.
+    Class bodies without `extends` and object-literal methods still wait for
+    the M5b `Object.prototype` intrinsic.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

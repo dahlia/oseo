@@ -1189,13 +1189,27 @@ class Derived extends Base {
   async asyncDefault(value = super.describe()) {
     return value;
   }
+  optionalDescription() {
+    return super.describe?.();
+  }
+  optionalMissing() {
+    return super.missing?.();
+  }
+  async asyncOptionalDescription() {
+    await Promise.resolve(0);
+    return super.describe?.();
+  }
 }
 const instance = new Derived(4);
 console.log(instance.base, instance.parentDescription());
 console.log(instance.describe(), Derived.describe());
 console.log(instance.constructorTarget() === Derived);
+console.log(instance.optionalDescription(), instance.optionalMissing());
 instance.asyncDescription().then((value) => console.log("async", value));
 instance.asyncDefault().then((value) => console.log("default", value));
+instance
+  .asyncOptionalDescription()
+  .then((value) => console.log("optional-async", value));
 // Nested arrows keep the same lexical construction and method context,
 // while an ordinary nested function starts a fresh one.
 function Target() {
@@ -1203,6 +1217,37 @@ function Target() {
 }
 const target = new Target();
 console.log(target.read()() === Target);
+`,
+  },
+  {
+    name: "class-super-fresh-construct",
+    source: `
+const published = [];
+class Base {
+  #brand = true;
+  constructor(label) {
+    this.label = label;
+    published.push(this);
+  }
+}
+class Derived extends Base {
+  constructor() {
+    super("first");
+    const first = this;
+    try {
+      super("second");
+    } catch (error) {
+      console.log(
+        error instanceof ReferenceError,
+        published.length,
+        published[0] === first,
+        published[1] !== first,
+        published[1].label,
+      );
+    }
+  }
+}
+new Derived();
 `,
   },
   {
@@ -1585,6 +1630,9 @@ class Swap extends Old {
   invoke() {
     return super[swap("run")]();
   }
+  optionalInvoke() {
+    return super[swap("run")]?.();
+  }
   store() {
     super[swap("slot")] = "v";
   }
@@ -1601,6 +1649,8 @@ reset();
 console.log(swapper.read());
 reset();
 console.log(swapper.invoke());
+reset();
+console.log(swapper.optionalInvoke());
 reset();
 order = "";
 swapper.store();

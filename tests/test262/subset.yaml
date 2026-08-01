@@ -6571,7 +6571,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/optional-chaining/super-property-optional-call.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, expression-operators]
   - path: test/language/expressions/optional-chaining/update-expression-postfix.js
     expectedClassification: expected-negative
