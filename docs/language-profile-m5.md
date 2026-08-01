@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,215 reviewed cases: 2,481 passes, 1,179
-expected negatives, and 555 unsupported profile features. It records no
+The current manifest contains 4,215 reviewed cases: 2,482 passes, 1,179
+expected negatives, and 554 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -268,12 +268,13 @@ its deliberate boundary and its evidence:
     preservation, abrupt non-callable values, evaluation order, one base
     evaluation, and skipped keys and arguments. A generated property with seed
     `0x5eed0019` covers the same forms across both specialization policies and
-    forced collection. Fifteen reviewed test262 cases pass and twelve
+    forced collection. Sixteen reviewed test262 cases pass and twelve
     expected negatives retain the tagged-template, assignment-target, update,
-    and invalid `super()` grammar errors. Ten unsupported cases record
+    and invalid `super()` grammar errors. Nine unsupported cases record
     independent prerequisites including dynamic source, `for-in`, restricted
     asynchronous `await` positions, `String`, `Reflect`,
-    regular expressions, and an optional call through a `super` property.
+    regular expressions. Optional calls through `super` properties are
+    admitted by M5a Unit 8.2 as recorded below.
     The remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
     not materialized yet.
@@ -1154,11 +1155,14 @@ its deliberate boundary and its evidence:
     therefore observes the receiver `super()` bound even when the arrow was
     created earlier. `super()` reads the running constructor's own
     `[[Prototype]]`, rejects a non-constructor with a `TypeError`, constructs it
-    against the receiver the `new` expression allocated from `new.target`'s
-    prototype, and binds the result; a second `super()` in one invocation
-    throws a `ReferenceError`. Because the parent's completion value is what
-    gets bound, a base constructor that returns its own object replaces the
-    allocated receiver for the rest of the derived constructor. An error
+    with a fresh receiver allocated from `new.target`'s prototype, and binds
+    the result. A second `super()` performs that construction again before
+    `BindThisValue` throws a `ReferenceError`, so a parent that publishes its
+    receiver exposes two distinct objects and private instance initialization
+    does not replace that error with an earlier `TypeError`. Because the
+    parent's completion value is what gets bound, a base constructor that
+    returns its own object replaces the fresh receiver for the rest of the
+    derived constructor. An error
     constructor reached through `super()` takes its instance prototype from
     the same new target rather than from its own `prototype`, so
     `class AppError extends Error {}` produces instances whose prototype is
@@ -1178,11 +1182,11 @@ its deliberate boundary and its evidence:
     carries: it is the constructed class through every `super()` hop, and
     `undefined` for an ordinary call, a method call, a generator body, and an
     asynchronous function, none of which are constructors.
-    Deliberate boundaries: `super()` and `new.target` inside an arrow
-    function are rejected with a source-located diagnostic, because an arrow
-    takes both from the function enclosing it and this profile captures
-    neither lexically yet. Native differential
-    fixtures cover a two-level and a three-level chain, an inherited method,
+    An arrow captures the enclosing function's `super()` constructor context
+    and `new.target` alongside its lexical receiver. Nested arrows retain that
+    context, while an intervening ordinary function starts its own. Native
+    differential fixtures cover a two-level and a three-level chain, an
+    inherited method,
     accessor, and static member, a derived class with no constructor, a
     derived class expression both named and anonymous, a class extending an
     ordinary function, derived `name` and `length`, the `prototype` descriptor
@@ -1216,10 +1220,11 @@ its deliberate boundary and its evidence:
     member expressions, `new`, and `super()`. Three new expected negatives
     record the escaped `new.target` early errors and the module-goal
     `new.target` early error the added feature tag now reaches. Seventeen new
-    unsupported cases record this unit's boundaries: `super()` from an arrow
-    function, `super.property`, and the `Reflect`, tagged template,
+    unsupported cases originally recorded `super()` from an arrow function,
+    `super.property`, and the `Reflect`, tagged template,
     `Function.prototype.bind`, typed-array, and `Object` intrinsics that other
-    inheritance cases need. The tagged-template case from that set now passes.
+    inheritance cases need. Unit 6.6 promotes the lexical arrow cases, and the
+    tagged-template case from that set now passes.
     The two `definition/prototype-getter` and
     `definition/prototype-setter` cases leave the reviewed subset until
     `Function.prototype.bind` exists, because the heritage they build starts
@@ -1253,14 +1258,16 @@ its deliberate boundary and its evidence:
     reference it precedes. A home
     object whose `[[Prototype]]` is null, as `extends null` leaves it, reports
     the `TypeError` the read or write itself raises.
-    Deliberate boundaries: a `super` property reference is rejected with a
-    source-located diagnostic in a class body without `extends` and in an
-    object literal method, because this runtime has no `Object.prototype`
-    object for such a lookup to reach; inside an arrow function, which owns
-    no home object; inside an asynchronous class element, whose body runs in
-    a synthesized function that carries none; and as the operand of `delete`,
-    a destructuring assignment target, or a `for` head, which name a target
-    this lowering does not carry a receiver through. Native differential
+    Arrows capture the enclosing class element's home object, and asynchronous
+    class elements carry it through their synthesized execution function. An
+    optional call such as `super.m?.()` guards the looked-up value and calls a
+    present method with the same derived receiver. Deliberate boundaries: a
+    `super` property reference is rejected with a source-located diagnostic in
+    a class body without `extends` and in an object literal method, because
+    this runtime has no `Object.prototype` object for such a lookup to reach,
+    and as the operand of `delete`, a destructuring assignment target, or a
+    `for` head, which name a target this lowering does not carry a receiver
+    through. Native differential
     fixtures cover a read, a method call, and a detached method value through
     a two-level and a three-level chain, an override reached from the parent
     through the derived receiver, an accessor read and its receiver, a write
@@ -1276,17 +1283,21 @@ its deliberate boundary and its evidence:
     reads with their guard hit and miss counts. The generated class property
     suite now draws a reading body that returns a base member reached through
     `super` and a setter clause that stores through `super`, on the prototype
-    and on the constructor. Eighteen reviewed test262 cases newly pass:
+    and on the constructor. Unit 6.6 adds a directly generated lexical-arrow
+    domain, and Unit 8.2 adds a separate present-and-absent optional-call
+    domain without changing that reviewed property.
+    Eighteen reviewed test262 cases newly pass:
     fifteen newly reviewed cases covering the `prop-dot` and `prop-expr`
     value, receiver, null-prototype, and uninitialized-`this` families and
     the `super` in-method, in-accessor, and static in-accessor cases, and
     three that leave the unsupported list, including the three-level
     `prop-dot-cls-val` chain and the `new.target` value read through a
-    `super` property. Thirty-three new unsupported cases record this unit's
-    boundaries: an object literal `super`, a class body without `extends`, an
-    arrow, and `eval`, together with the `Object.freeze`,
+    `super` property. Thirty-three new unsupported cases originally record
+    this unit's boundaries: an object literal `super`, a class body without
+    `extends`, an arrow, and `eval`, together with the `Object.freeze`,
     `Object.setPrototypeOf` ordering, `Object` heritage, and `Test262Error`
-    observations the remaining cases need. The reviewed manifest moves to
+    observations the remaining cases need. Unit 6.6 later promotes the arrow
+    cases. The reviewed manifest moves to
     1034 passes, 382 expected negatives, and 199 unsupported profile features
     with no semantic or harness failures.
  -  Public instance class fields. A `field = expression` element records the
@@ -2091,6 +2102,43 @@ profile features fall from 559 to 555. The suite revision, inventory policy,
 manifest schema, and classification vocabulary do not change, and there are no
 semantic or harness failures.
 
+### Lexical and constructed `super`
+
+M5a Unit 8.2 reconciles the profile with the semantics completed in Units 6.6
+and 6.7 and admits the remaining optional-call form. An arrow captures the
+enclosing function's `super()` constructor context, home object, and
+`new.target` alongside its lexical receiver. The same captured home object
+reaches `super` property references in nested arrows and in asynchronous class
+elements. An intervening ordinary function still starts its own execution
+context.
+
+`super.m?.()` and `super[key]?.()` first perform the ordinary `super` property
+lookup with the class element's home object and derived receiver kept separate.
+They then guard the resulting value. A nullish value skips argument evaluation
+and produces `undefined`; a present value is called with the derived receiver.
+The form composes with lexical arrows and asynchronous class elements.
+
+Every `super()` call performs a fresh construction from `new.target`'s
+prototype before `BindThisValue`. A second call therefore runs the parent
+against a distinct receiver and then throws the required `ReferenceError` when
+it attempts to rebind the derived constructor's `this`. A private element on
+the parent is installed on that fresh receiver and does not cause an earlier
+duplicate-brand `TypeError`.
+
+The existing lexical-super property retains seed `0x5eed001d`. A separate
+optional-call property uses seed `0x5eed0027` across one to three nested arrows,
+literal and side-effecting computed keys, and present and absent methods. Both
+run under both
+specialization policies with forced collection and compare independent
+bounded-integer models with Node.js, Deno, and native execution. Fixed native
+fixtures cover synchronous and asynchronous optional calls and distinguish
+fresh construction from receiver reuse with a parent that publishes each
+receiver and installs a private element. The reviewed
+*super-property-optional-call.js* test262 case moves from unsupported to pass.
+The manifest stays at 4,215 cases and moves to 2,482 passes, 1,179 expected
+negatives, and 554 unsupported profile features with no semantic or harness
+failures.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -2114,34 +2162,16 @@ must never shrink by reclassification alone.
     native evidence, generated suites with seeds `0x5eed0019` and
     `0x5eed001a`, and reviewed test262 cases. The forms that remain outside the
     profile have specific boundaries: BigInt and regular expressions are
-    recorded above, and dynamic import, `super`, and pattern-position `await`
-    are recorded below. M5a Unit 8.1c admits the object-literal prototype
-    setter and M5a Unit 8.1d admits Script and module top-level `this`, both
-    as recorded above.
+    recorded above, and dynamic import and pattern-position `await` are
+    recorded below. M5a Unit 8.1c admits the object-literal prototype setter,
+    Unit 8.1d admits Script and module top-level `this`, and Unit 8.2 admits the
+    remaining M5a `super` and `new.target` forms, as recorded above.
  -  `import.meta` remains rejected with a source-located diagnostic. Owner:
     the modules and asynchronous execution stream.
- -  `super()`, `super.x`, and `new.target` are rejected inside an arrow
-    function, and an optional call through a `super` property remains
-    rejected. `super.x` is also rejected inside an asynchronous class element,
-    because this profile captures none of them lexically yet. A `super`
-    property reference in a class body without `extends` and in an object
-    literal method stays rejected until the intrinsic graph provides the
-    `Object.prototype` object such a lookup reaches. Owner: the functions and
-    executable syntax stream.
- -  `super()` runs the parent against the receiver the `new` expression
-    already allocated instead of performing a fresh `Construct` per call, so a
-    second `super()` in one invocation runs the parent a second time against
-    that same receiver rather than a new one. When the parent declares no
-    private element, the `ReferenceError` the second call must throw still
-    follows and the parent still runs exactly twice, so the difference is
-    observable only to a parent that publishes or mutates its receiver during
-    a call that is already doomed. When the parent does declare a private
-    element, reinstalling it on the receiver that already carries it throws a
-    `TypeError` from InitializeInstanceElements before the parent body runs a
-    second time, so that case reports the wrong error type and runs the parent
-    once rather than twice. Closing both needs a runtime `Construct` path that
-    allocates at the base-constructor boundary. Owner: the functions and
-    executable syntax stream.
+ -  A `super` property reference in a class body without `extends` and in an
+    object literal method stays rejected until the intrinsic graph provides
+    the `Object.prototype` object such a lookup reaches. Owner: the intrinsics
+    and built-in objects stream.
  -  The intrinsic
     graph behind standard constructors other than the error and symbol
     families is

@@ -538,7 +538,10 @@ function optionalChainExpression(
   value: BabelNode,
 ): SyntaxExpression | undefined {
   const chain = babelOptionalChain(value);
-  const base = expression(context, chain.base);
+  const base =
+    chain.base.type === "Super"
+      ? superBase(context, chain.base)
+      : expression(context, chain.base);
   if (base == null) return undefined;
   const links: SyntaxOptionalChainLink[] = [];
   for (const link of chain.links) {
@@ -546,14 +549,6 @@ function optionalChainExpression(
       link.type === "MemberExpression" ||
       link.type === "OptionalMemberExpression"
     ) {
-      const object = node(link.object);
-      if (object?.type === "Super") {
-        return unsupported(
-          context,
-          link,
-          "Optional chaining through super is unsupported.",
-        );
-      }
       const name = privateMemberName(link);
       if (name != null) {
         links.push({

@@ -3055,14 +3055,48 @@ function lowerOptionalChain(
   builder: MirBuilder,
 ): number {
   const shortBlock = createMirBlock(builder);
-  let value = lowerExpression(expression.base, builder);
+  let pendingSuper = superOperand(expression.base);
+  let value =
+    pendingSuper == null
+      ? lowerExpression(expression.base, builder)
+      : lowerSuperReceiver(pendingSuper, builder);
   let receiver: number | undefined;
   let shortConsumed = false;
   for (const [index, link] of expression.links.entries()) {
+    if (pendingSuper != null && link.kind !== "member") {
+      throw new Error(
+        "An optional-chain super base must precede a property reference.",
+      );
+    }
     if (link.optional) {
+      if (pendingSuper != null) {
+        throw new Error("An optional-chain super property cannot be optional.");
+      }
       lowerOptionalNullishGuard(value, shortBlock, link.range, builder);
     }
     if (link.kind === "member") {
+      if (pendingSuper != null) {
+        receiver = value;
+        if (
+          link.key.kind === "string" &&
+          builder.specialization === "enabled"
+        ) {
+          value = lowerSpecializedPropertyGet(
+            lowerSuperBase(pendingSuper, builder),
+            link.key,
+            link.range,
+            builder,
+            receiver,
+          );
+        } else {
+          const keyInput = lowerExpression(link.key, builder);
+          const lookup = lowerSuperBase(pendingSuper, builder);
+          const key = convertPropertyKey(keyInput, link.key.range, builder);
+          value = lowerPropertyRead(lookup, key, link.range, builder, receiver);
+        }
+        pendingSuper = undefined;
+        continue;
+      }
       receiver = value;
       if (expression.delete === true && index === expression.links.length - 1) {
         const keyInput = lowerExpression(link.key, builder);
@@ -4572,10 +4606,11 @@ function lowerExpression(
 /**
  * Lowers one `super()` call. The parent constructor is the running
  * constructor's own [[Prototype]], so it is read from the callee rather
- * than from any expression, and it is constructed against the receiver
- * the `new` expression already allocated from `new.target`'s prototype.
- * Whatever the parent produced then initializes the derived
- * constructor's `this` binding, which a second `super()` cannot rebind.
+ * than from any expression. Each call constructs that parent with the
+ * running `new.target`, which allocates a fresh receiver from the new
+ * target's prototype. Whatever the parent produced then initializes the
+ * derived constructor's `this` binding, which a second `super()` cannot
+ * rebind.
  */
 function lowerSuperCall(
   expression: HirExpression & { readonly kind: "call" },

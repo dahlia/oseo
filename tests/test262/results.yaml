@@ -66590,19 +66590,26 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/super-property-optional-call.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/super-property-optional-call.js:93:7:
-        error[OSEO1001]: super is only valid as a call or as the object
-        of a property reference.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -133937,9 +133944,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1179
   harnessFailures: 0
-  passes: 2481
+  passes: 2482
   semanticFailures: 0
-  unsupportedProfileFeatures: 555
+  unsupportedProfileFeatures: 554
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -133968,9 +133975,9 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 618
+      passes: 619
       semanticFailures: 0
-      unsupportedProfileFeatures: 146
+      unsupportedProfileFeatures: 145
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -134004,9 +134011,9 @@ summary:
     - dependency: expression-operators
       expectedNegatives: 41
       harnessFailures: 0
-      passes: 214
+      passes: 215
       semanticFailures: 0
-      unsupportedProfileFeatures: 71
+      unsupportedProfileFeatures: 70
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
@@ -134161,9 +134168,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 475
       harnessFailures: 0
-      passes: 1283
+      passes: 1284
       semanticFailures: 0
-      unsupportedProfileFeatures: 276
+      unsupportedProfileFeatures: 275
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

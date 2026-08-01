@@ -252,6 +252,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-super-assignment" ||
     fixture.name === "class-super-computed" ||
     fixture.name === "class-super-static" ||
+    fixture.name === "class-super-fresh-construct" ||
     fixture.name === "class-heritage-values" ||
     fixture.name === "class-new-target" ||
     fixture.name === "class-lexical-super" ||

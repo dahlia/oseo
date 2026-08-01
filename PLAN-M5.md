@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records 4,215
-reviewed cases: 2,481 passes, 1,179 expected negatives, and 555 unsupported
+reviewed cases: 2,482 passes, 1,179 expected negatives, and 554 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -521,9 +521,11 @@ before `super()` throws a `ReferenceError` through the temporal-dead-zone
 machinery lexical declarations already use, and every arrow function nested in
 the constructor shares that cell. `super()` reads the running constructor's
 own `[[Prototype]]`, rejects a non-constructor with a `TypeError`, constructs it
-against the receiver the `new` expression allocated from `new.target`'s
-prototype, and binds the result; a second `super()` throws a `ReferenceError`,
-and a base constructor that returns its own object replaces the allocated
+with a fresh receiver allocated from `new.target`'s prototype, and binds the
+result. A second `super()` performs that construction again before
+`BindThisValue` throws a `ReferenceError`, so the parent runs against a distinct
+receiver even when its instance initialization includes private elements. A
+base constructor that returns its own object replaces the freshly allocated
 receiver. An error constructor reached through `super()` takes its instance
 prototype from the same new target rather than from its own `prototype`, so
 `class AppError extends Error {}` produces instances whose prototype is
@@ -532,18 +534,10 @@ target and is unchanged. The addition specialization declines a derived
 constructor, because its fast path would leave the block before the
 `derived-return` operation the `this` binding routes every `return` through,
 so a parameter hint cannot change what a derived constructor returns. Because
-`super()` reuses the receiver the `new` expression allocated instead of
-performing a fresh `Construct` per call, a second `super()` runs the parent
-against that same receiver rather than a new one. When the parent declares no
-private element, the required `ReferenceError` still follows and the parent
-still runs exactly twice, so the difference reaches only a parent that
-publishes or mutates its receiver during a call that is already doomed. When
-the parent declares a private element, reinstalling it on a receiver that
-already carries it throws a `TypeError` from InitializeInstanceElements before
-the parent body runs again, so that case reports the wrong error type and runs
-the parent once. Closing both needs a runtime `Construct` path that allocates
-at the base-constructor boundary, and the language profile records it as a
-known gap. Every `return` of a derived constructor leaves
+each call constructs a fresh receiver, a parent that publishes its receiver
+exposes two distinct objects across two calls and private instance elements do
+not turn the required second-call `ReferenceError` into an earlier
+`TypeError`. Every `return` of a derived constructor leaves
 through that binding,
 so an object stands as written, `undefined` yields the bound `this`, and any
 other value is a `TypeError`; MIR rewrites the terminators after the body is
@@ -553,11 +547,11 @@ A body without a `constructor` gets the implicit
 name and a `length` of zero. `new.target` is admitted as its own expression
 over the construction target the call ABI already carries: it is the
 constructed class through every `super()` hop and `undefined` for an ordinary
-call, a method call, a generator body, and an asynchronous function.
-`super()` and `new.target` inside an arrow function stay rejected with a
-source-located diagnostic, because an arrow takes both from the function
-enclosing it and this profile captures neither
-lexically yet. Fixed native fixtures cover two-level and three-level chains,
+call, a method call, a generator body, and an asynchronous function. An arrow
+captures the enclosing function's `super()` constructor context and
+`new.target` alongside its lexical receiver. Nested arrows retain that context,
+while an intervening ordinary function starts its own. Fixed native fixtures
+cover two-level and three-level chains,
 an inherited method, accessor, and static member, a derived class with no
 constructor, named and anonymous derived class expressions, a class extending
 an ordinary function, derived `name` and `length`, the derived `prototype`
@@ -589,10 +583,10 @@ asynchronous, and accessor heritage, a parent `prototype` setter, a static
 method override, `extends null` prototype wiring, and the `new.target` value
 through calls, member expressions, `new`, and `super()`. Three new expected
 negatives record the escaped `new.target` early errors and the module-goal
-`new.target` early error the added feature tag now reaches, and seventeen new
-unsupported cases record `super()` from an arrow function, `super.property`,
-and the `Reflect`, tagged template, `Function.prototype.bind`, typed-array,
-and `Object` intrinsics other inheritance cases need. The two
+`new.target` early error the added feature tag now reaches. Unit 6.6 later
+promotes the lexical arrow cases. The remaining unsupported cases require
+`Reflect`, `Function.prototype.bind`, typed-array, or `Object` intrinsics. The
+two
 `definition/prototype-getter` and `definition/prototype-setter` cases leave
 the reviewed subset until `Function.prototype.bind` exists, because the
 heritage they build starts from a bound function. The manifest moves to 1016
@@ -623,10 +617,12 @@ object's `[[Prototype]]` after that key, so a key expression that replaces the
 prototype is observed by the very reference it precedes. A reference stays
 rejected with a source-located diagnostic in a class body without `extends`
 and in an object literal method, because this runtime has no
-`Object.prototype` object for that lookup to reach, inside an arrow function,
-which owns no home object, inside an asynchronous class element, whose body
-runs in a synthesized function that carries none, and as the operand of
-`delete`, a destructuring assignment target, or a `for` head. Fixed native
+`Object.prototype` object for that lookup to reach, and as the operand of
+`delete`, a destructuring assignment target, or a `for` head. Arrows capture
+the enclosing class element's home object, and asynchronous class elements
+carry it through their synthesized execution function. An optional call such
+as `super.m?.()` guards the looked-up method value and calls a present method
+with the same derived receiver. Fixed native
 fixtures cover a read, a method call, and a detached method value through
 two-level and three-level chains, an override reached from the parent through
 the derived receiver, an accessor read and its receiver, a write that reaches
@@ -641,7 +637,10 @@ constructor chain, a nested class taking its own home object, and cached,
 inherited, and accessor reads with their guard hit and miss counts. The
 generated class property suite now draws a reading body that returns a base
 member reached through `super` and a setter clause that stores through
-`super`, on the prototype and on the constructor. Eighteen reviewed test262
+`super`, on the prototype and on the constructor. Unit 6.6 adds a directly
+generated lexical-arrow domain, and Unit 8.2 adds a separate present-and-absent
+optional-call domain without changing that reviewed property. Eighteen reviewed
+test262
 cases newly pass, fifteen of them newly reviewed and three leaving the
 unsupported list, covering the `prop-dot` and `prop-expr` value, receiver,
 null-prototype, and uninitialized-`this` families, the `super` in-method and
@@ -1663,6 +1662,32 @@ unit does not claim, including `$262.evalScript`, `hasOwnProperty`, Annex B
 block-level function hoisting, `yield` as an identifier, and resolution of an
 undeclared global name. Promoting them needs the per-case dependency review
 the subset requires, not this unit's implementation.
+
+M5a Unit 8.2 reconciles the remaining `super` and `new.target` profile claims
+with Units 6.6 and 6.7. Arrows already capture the enclosing function's
+`super()` constructor context, home object, and `new.target`; asynchronous
+class elements already carry their home object; and each `super()` call already
+constructs a fresh receiver before `BindThisValue`. This unit admits the one
+remaining M5a form, an optional call through a `super` property. The lookup
+keeps the home object's prototype separate from the derived receiver, guards
+the resulting method value, skips arguments for a nullish value, and calls a
+present method with the derived receiver.
+
+The existing lexical-super property retains seed `0x5eed001d`, and the optional
+call property uses seed `0x5eed0027` across one to three nested arrows, literal
+and side-effecting computed keys, and present and absent methods. Both
+properties run under
+both specialization policies with forced collection against independent
+bounded-integer models, Node.js, Deno, and native execution. Fixed native
+fixtures add
+optional calls in synchronous and asynchronous class elements and distinguish
+fresh `Construct` from receiver reuse with a parent that publishes each
+receiver and installs a private element. The reviewed optional-super-call
+test262 case moves from unsupported to pass. The manifest stays at 4,215 cases
+and moves to 2,482 passes, 1,179 expected negatives, and 554 unsupported
+profile features with no semantic or harness failures. A `super` property
+reference in a class without `extends` or an object-literal method remains M5b
+work because its lookup needs a materialized `Object.prototype`.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive

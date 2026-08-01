@@ -1905,6 +1905,26 @@ test("converts optional member and call chains to owned syntax", () => {
   assert.match(hirText, /\(object\)\?\.\["missing"\]\)\["value"\]\?\.\(/u);
 });
 
+test("converts an optional call through a super property", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "class Base { method() { return this.value; } }\n" +
+      "class Derived extends Base {\n" +
+      "  method() { return super.method?.(); }\n" +
+      "}\n",
+    sourceId: "optional-super-call.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(
+    printHir(result.hir),
+    /super -> this strict\["method"\]\?\.\(\)/u,
+  );
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /super-base home object prototype/u);
+  assert.match(printMir(result.mir), /property-get generic %\d+, %\d+, %\d+/u);
+});
+
 test("converts optional private member chains to owned syntax", () => {
   const result = compileSource(babelFrontend, {
     source:
