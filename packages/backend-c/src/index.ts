@@ -1547,6 +1547,17 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
         object,
       ) + renderC(emittedC.common.rootCallSuffix, source),
     );
+  } else if (operation.kind === "object-set-prototype") {
+    const object = operationArgument(operation, 0);
+    const prototypeValue = operationArgument(operation, 1);
+    line(
+      state,
+      renderC(
+        emittedC.objectOperation
+          .resultAssignOseoObjectLiteralSetPrototypeContextRoots,
+        object,
+      ) + renderC(emittedC.common.rootCallSuffix, prototypeValue),
+    );
   } else if (operation.kind === "property-key") {
     const input = operationArgument(operation, 0);
     line(
@@ -2680,6 +2691,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
     operation.kind === "object-rest" ||
+    operation.kind === "object-set-prototype" ||
     operation.kind === "object-spread" ||
     operation.kind === "property-key" ||
     operation.kind === "property-define-accessor" ||

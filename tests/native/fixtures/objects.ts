@@ -1183,6 +1183,136 @@ console.log(accessorSteps, accessorChain.depth);
 `,
   },
   {
+    name: "object-literal-prototype-setter",
+    source: `
+let inheritedStore = 0;
+const prototype = {
+  inherited: 7,
+  set inheritedWrite(value) { inheritedStore = value; },
+};
+let order = "";
+const object = {
+  first: (order = order + "F", 1),
+  __proto__: (order = order + "P", prototype),
+  last: (order = order + "L", 2),
+};
+console.log(order, object.inherited);
+object.inheritedWrite = 9;
+console.log(
+  inheritedStore,
+  Object.getOwnPropertyDescriptor(object, "inheritedWrite"),
+);
+const objectKeys = Object.keys(object);
+console.log(objectKeys[0], objectKeys[1], objectKeys.length);
+console.log(Object.getOwnPropertyDescriptor(object, "__proto__"));
+
+const nullPrototype = { __proto__: null };
+console.log(
+  nullPrototype.missing,
+  Object.keys(nullPrototype).length,
+  Object.getOwnPropertyDescriptor(nullPrototype, "__proto__"),
+);
+const primitivePrototypes = [
+  { __proto__: undefined },
+  { __proto__: 1 },
+  { __proto__: false },
+  { __proto__: "text" },
+  { __proto__: Symbol("value") },
+];
+for (const primitivePrototype of primitivePrototypes) {
+  console.log(
+    primitivePrototype.missing,
+    Object.keys(primitivePrototype).length,
+    Object.getOwnPropertyDescriptor(primitivePrototype, "__proto__"),
+  );
+}
+
+const anonymousPrototype = { __proto__: function () {} };
+console.log(anonymousPrototype.name === "");
+
+const __proto__ = 12;
+let ownSetterStore = 0;
+const permitted = {
+  __proto__: prototype,
+  ["__proto__"]: 10,
+  __proto__,
+  __proto__() { return 13; },
+  get __proto__() { return 14; },
+  set __proto__(value) { ownSetterStore = value; },
+  ...{ ["__proto__"]: 15 },
+};
+const permittedDescriptor = Object.getOwnPropertyDescriptor(
+  permitted,
+  "__proto__",
+);
+console.log(
+  permittedDescriptor.value,
+  permittedDescriptor.writable,
+  permittedDescriptor.enumerable,
+  permittedDescriptor.configurable,
+  permitted.inherited,
+);
+const permittedKeys = Object.keys(permitted);
+console.log(permittedKeys[0], permittedKeys.length, ownSetterStore);
+
+const methodProperty = { __proto__() { return 16; } };
+console.log(
+  methodProperty.__proto__(),
+  methodProperty.__proto__.name,
+  "prototype" in methodProperty.__proto__,
+);
+let accessorStore = 0;
+const accessorProperty = {
+  get __proto__() { return accessorStore; },
+  set __proto__(value) { accessorStore = value; },
+};
+accessorProperty.__proto__ = 17;
+const accessorDescriptor = Object.getOwnPropertyDescriptor(
+  accessorProperty,
+  "__proto__",
+);
+console.log(
+  accessorProperty.__proto__,
+  accessorDescriptor.get.name,
+  accessorDescriptor.set.name,
+);
+
+let abruptOrder = "";
+function failPrototype() { throw new RangeError("prototype"); }
+try {
+  const abrupt = {
+    before: (abruptOrder = abruptOrder + "B", 1),
+    __proto__: (abruptOrder = abruptOrder + "P", failPrototype()),
+    after: (abruptOrder = abruptOrder + "A", 2),
+  };
+  console.log(abrupt);
+} catch (error) {
+  console.log(error instanceof RangeError, abruptOrder);
+}
+
+/**
+ * @param {number} left
+ * @param {number} right
+ */
+function hintedAdd(left, right) { return left + right; }
+const guardMissPrototype = {
+  inherited: hintedAdd("x", 1),
+};
+const guardMissObject = { __proto__: guardMissPrototype };
+console.log(guardMissObject.inherited);
+
+let collected = { inherited: 0 };
+for (let index = 0; index < 20; index = index + 1) {
+  collected = {
+    before: { index },
+    __proto__: collected,
+    after: { index: index + 1 },
+  };
+}
+console.log(collected.inherited, collected.before.index, collected.after.index);
+`,
+  },
+  {
     name: "object-literal-spread",
     source: `
 const empty = { ...{} };

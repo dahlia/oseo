@@ -42,7 +42,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,202 reviewed cases: 2,474 passes, 1,169
+The current manifest contains 4,203 reviewed cases: 2,474 passes, 1,170
 expected negatives, and 559 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -757,10 +757,11 @@ its deliberate boundary and its evidence:
     `CopyDataProperties` helper between object binding rest, which copies
     into a fresh object with excluded keys, and object spread, which
     copies into the literal's object with no excluded keys. Deliberate
-    boundaries: the Annex B `__proto__` property-name special case is
-    rejected with a source-located diagnostic in every syntactic form
-    including shorthand and method keys. An object spread preceding a later
-    top-level await point remains completed in the traced module continuation.
+    boundaries: M5a Unit 8.1c gives the noncomputed colon-form `__proto__`
+    property its prototype-setter semantics. Computed, shorthand, method,
+    accessor, and spread forms remain ordinary own properties. An object spread
+    preceding a later top-level await point remains completed in the traced
+    module continuation.
     Native differential
     fixtures retain the empty object, single and multiple data properties,
     shorthand from a local binding and from a parameter, a method's `this`
@@ -1877,6 +1878,48 @@ Deleting a hidden `with` fallback that a prior unresolved assignment allocated
 is likewise invalid until the global-object model can remove that cell
 consistently.
 
+### Object-literal prototype setters
+
+M5a Unit 8.1c admits the noncomputed colon-form `__proto__` definition as the
+object-literal prototype setter. The value expression is evaluated in source
+order. An object or null value replaces the fresh literal object's
+`[[Prototype]]`; any other primitive is ignored without creating an own
+property. Abrupt completion stops later definitions, and the literal and value
+remain rooted across the runtime operation. An anonymous function used as the
+prototype value does not receive `"__proto__"` as its inferred name.
+
+Computed, shorthand, method, getter, setter, and spread `__proto__` definitions
+remain ordinary properties. They preserve their existing descriptors,
+function names, replacement order, and own-key observations while coexisting
+with one prototype setter. Two prototype setters in one literal are a
+parse-time `SyntaxError`, including an identifier spelling paired with a
+quoted spelling. Permitted ordinary forms do not participate in that early
+error.
+
+The generated property uses fixed seed `0x5eed0024` and a 16-case ordinary
+budget. Its independent oracle directly generates null, object, and primitive
+prototype values, all four definition positions, each permitted ordinary
+`__proto__` form, inherited reads and writes versus own descriptors, effects,
+abrupt completion, a false number hint and deliberate guard miss, both
+specialization policies, and forced collection. The duplicate early-error
+property uses seed `0x5eed0025` under both policies. Fixed Node.js, Deno, and
+native fixtures cover the same boundary, including forced collection and the
+AArch64 Linux cross-link.
+
+This unit advances the runtime ABI to `m5-37` with
+`oseo_object_literal_set_prototype`. The helper ignores primitive prototype
+values and delegates object and null values to the existing prototype-mutation
+authority.
+
+The reviewed test262 subset adds the directly applicable duplicate-setter parse
+negative. Positive upstream cases that also require `Object` reflection,
+`Object.prototype`, or object-method `super` remain outside this unit instead
+of borrowing partial results. The manifest moves from 4,202 to 4,203 cases and
+from 1,169 to 1,170 expected negatives. Its 2,474 passes and 559 unsupported
+profile features do not move. The suite revision, inventory policy, schema,
+and classification vocabulary do not change, and there are no semantic or
+harness failures.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -1902,11 +1945,9 @@ must never shrink by reclassification alone.
     profile have specific boundaries: BigInt and regular expressions are
     recorded above, and dynamic import, `super`, and pattern-position `await`
     are recorded below. Script top-level `this` remains rejected because the
-    profile has no Script or global receiver model. An object literal still
-    rejects a noncomputed `__proto__` property name in every syntactic form; a
-    computed name remains an ordinary property key. Owner: the core expressions
-    and bindings stream for Script top-level `this` and object-literal
-    `__proto__`.
+    profile has no Script or global receiver model. M5a Unit 8.1c admits the
+    object-literal prototype setter as recorded above. Owner: the core
+    expressions and bindings stream for Script top-level `this`.
  -  Module top-level `this` is a separate gap. ECMAScript evaluates it to
     `undefined`, but the current compiler rejects it, as
     *test/language/module-code/eval-this.js* demonstrates. `import.meta` is

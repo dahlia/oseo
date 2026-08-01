@@ -588,6 +588,10 @@ export const emittedC = {
       ["result = oseo_object_rest(context, roots["],
       ["], "],
     ],
+    resultAssignOseoObjectLiteralSetPrototypeContextRoots: [
+      ["result = oseo_object_literal_set_prototype(con", "text, roots["],
+      ["], "],
+    ],
     nullStatement: [["NULL);"]],
     resultAssignOseoObjectSpreadContextRoots: [
       ["result = oseo_object_spread(context, roots["],

@@ -338,6 +338,11 @@ export interface HirObjectDefinition {
   readonly accessorKind?: "get" | "set";
   readonly key: HirExpression;
   readonly kind: "definition";
+  /**
+   * Whether this colon-form definition sets [[Prototype]] instead of an
+   * own property. At most one may appear in each object literal.
+   */
+  readonly prototypeSetter?: true;
   readonly value: HirExpression;
 }
 

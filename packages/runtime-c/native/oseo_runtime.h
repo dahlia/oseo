@@ -905,6 +905,13 @@ OseoResult oseo_object_set_prototype(
     OseoValue object,
     OseoValue prototype
 );
+/** Implements the object-literal prototype setter while leaving the existing
+ * object prototype mutation path authoritative for object and null values. */
+OseoResult oseo_object_literal_set_prototype(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue prototype
+);
 OseoResult oseo_object_builtin_create(
     OseoContext *context,
     size_t argument_count,

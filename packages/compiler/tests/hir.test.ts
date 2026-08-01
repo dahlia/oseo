@@ -62,6 +62,48 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
   assert.doesNotMatch(firstMir, /guard-smi|add-smi-checked/u);
 });
 
+test("rejects duplicate prototype setters at the HIR boundary", () => {
+  const result = buildHir({
+    body: [
+      {
+        expression: {
+          kind: "object",
+          properties: [
+            {
+              key: { kind: "string", range, value: "__proto__" },
+              kind: "definition",
+              prototypeSetter: true,
+              value: { kind: "null", range },
+            },
+            {
+              key: { kind: "string", range, value: "__proto__" },
+              kind: "definition",
+              prototypeSetter: true,
+              value: { kind: "object", properties: [], range },
+            },
+          ],
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "duplicate-object-prototype-setters.js",
+  });
+  assert.equal(result.program, undefined);
+  assert.deepEqual(result.diagnostics, [
+    {
+      byteRange: { end: 0, start: 0 },
+      code: "OSEO1001",
+      message: "An object literal cannot contain multiple prototype setters.",
+      range,
+      sourceId: "duplicate-object-prototype-setters.js",
+    },
+  ]);
+});
+
 test("resolves delete identifiers without reading their bindings", () => {
   const syntax: SyntaxProgram = {
     body: [

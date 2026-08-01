@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,202
-reviewed cases: 2,474 passes, 1,169 expected negatives, and 559 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,203
+reviewed cases: 2,474 passes, 1,170 expected negatives, and 559 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -215,10 +215,10 @@ contributes its index properties and every other primitive contributes
 none. The runtime shares one `CopyDataProperties` helper between object
 binding rest, which copies into a fresh object with excluded keys, and
 object spread, which copies into the literal's object with no excluded
-keys. The Annex B `__proto__` property-name special case remains rejected
-with a source-located diagnostic in every syntactic form, including
-shorthand and method keys, and a spread preceding a later top-level await
-point remains completed in the traced module continuation. The generated
+keys. M5a Unit 8.1c adds the noncomputed colon-form `__proto__` prototype
+setter without changing computed, shorthand, method, accessor, or spread
+definitions. A spread preceding a later top-level await point remains
+completed in the traced module continuation. The generated
 property suite uses seed `0x5eed0015`
 across zero to four data, shorthand, method, getter, setter, object spread,
 and nullish spread properties over a shared five-name key pool and bounded
@@ -1516,6 +1516,42 @@ functions. Strict identifier deletion remains an early error. A hidden `with`
 fallback allocated by an unresolved assignment cannot be deleted until the
 global-object model owns its lifetime, so that combination is rejected rather
 than returning a stale cell.
+
+M5a Unit 8.1c admits the object-literal noncomputed colon-form `__proto__`
+prototype setter. An object or null value replaces the fresh literal object's
+`[[Prototype]]`; every other primitive is evaluated and ignored without
+creating an own property. The setter retains its source position, value
+effects, abrupt completion, and collector roots. It does not infer
+`"__proto__"` as the name of an anonymous function used as its value.
+Computed, shorthand, method, getter, setter, and spread definitions remain
+ordinary own properties, and their source-order replacement behavior is
+unchanged. A second colon-form prototype setter is a parse-time `SyntaxError`,
+including when quoted and separated from the first by permitted ordinary
+`__proto__` forms.
+
+The directly generated property suite uses seed `0x5eed0024` with 16 cases.
+Its independent oracle covers null, object, and primitive prototype values,
+all four definition positions, every permitted ordinary `__proto__` form,
+inherited reads and writes versus own descriptors, effects, abrupt completion,
+a false number hint and deliberate guard miss, both specialization policies,
+and forced collection. A second generated suite uses seed `0x5eed0025` to
+retain the duplicate early error across both specialization policies. Fixed
+Node.js, Deno, and native fixtures cover the same boundary, including forced
+collection and the AArch64 Linux cross-link.
+
+This unit advances the runtime ABI to `m5-37`. It adds
+`oseo_object_literal_set_prototype`, which filters primitive prototype values
+before delegating object and null values to the existing prototype-mutation
+authority.
+
+The reviewed test262 subset adds the directly applicable duplicate-setter parse
+negative. The positive upstream cases also require `Object` reflection,
+`Object.prototype`, or object-method `super`, so they remain outside this unit
+instead of borrowing partial results. The manifest moves from 4,202 to 4,203
+cases and from 1,169 to 1,170 expected negatives. Its 2,474 passes and 559
+unsupported profile features do not move. The suite revision, inventory
+policy, manifest schema, and classification vocabulary do not change, and
+there are no semantic or harness failures.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive

@@ -55134,6 +55134,28 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/object/__proto__-duplicate.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - object-literals
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags:
         - generated
@@ -69176,8 +69198,10 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js:116:3:
-        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-getvalue.js:118:12:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -69200,8 +69224,10 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js:116:3:
-        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-compound-assign.js:118:12:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -69224,8 +69250,10 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js:116:3:
-        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue-increment.js:118:14:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -69248,8 +69276,10 @@ results:
     observation:
       detail: 'test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js:122:3:
-        error[OSEO1001]: The __proto__ property name is unsupported.\n"'
+        stderr="test/language/expressions/super/prop-expr-getsuperbase-before-topropertykey-putvalue.js:124:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -133576,7 +133606,7 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1169
+  expectedNegatives: 1170
   harnessFailures: 0
   passes: 2474
   semanticFailures: 0
@@ -133679,7 +133709,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 35
     - dependency: object-literals
-      expectedNegatives: 10
+      expectedNegatives: 11
       harnessFailures: 0
       passes: 369
       semanticFailures: 0
@@ -133800,7 +133830,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 467
+      expectedNegatives: 468
       harnessFailures: 0
       passes: 1281
       semanticFailures: 0

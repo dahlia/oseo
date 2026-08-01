@@ -207,6 +207,10 @@ lowering uses it after evaluating a computed key expression but before
 `ToPropertyKey`, preserving the delete-specific nullish `TypeError` while
 leaving the object-binding helper and message unchanged.
 
+The `m5-37` ABI adds `oseo_object_literal_set_prototype`. It ignores primitive
+prototype values and delegates object and null values to the existing
+`oseo_object_set_prototype` authority.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

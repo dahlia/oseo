@@ -377,3 +377,369 @@ test(
     );
   },
 );
+
+type PrototypeValueKind =
+  | "boolean"
+  | "null"
+  | "number"
+  | "object-data"
+  | "object-getter"
+  | "object-setter"
+  | "string"
+  | "symbol"
+  | "undefined";
+
+type ProtoOrdinaryKind =
+  | "computed"
+  | "getter"
+  | "method"
+  | "setter"
+  | "shorthand"
+  | "spread";
+
+interface ProtoLiteralCase {
+  readonly abrupt: boolean;
+  readonly ordinaryKind: ProtoOrdinaryKind;
+  readonly position: number;
+  readonly prototypeValue: PrototypeValueKind;
+}
+
+const protoLiteralArbitrary: fc.Arbitrary<ProtoLiteralCase> = fc.record({
+  abrupt: fc.boolean(),
+  ordinaryKind: fc.constantFrom<ProtoOrdinaryKind>(
+    "computed",
+    "getter",
+    "method",
+    "setter",
+    "shorthand",
+    "spread",
+  ),
+  position: fc.integer({ max: 3, min: 0 }),
+  prototypeValue: fc.constantFrom<PrototypeValueKind>(
+    "boolean",
+    "null",
+    "number",
+    "object-data",
+    "object-getter",
+    "object-setter",
+    "string",
+    "symbol",
+    "undefined",
+  ),
+});
+
+function prototypeSetup(kind: PrototypeValueKind): string {
+  if (kind === "object-data") {
+    return "const prototypeValue = { inherited: 7 };";
+  }
+  if (kind === "object-getter") {
+    return `const prototypeValue = {
+  get inherited() { order = order + "G"; return 7; },
+};`;
+  }
+  if (kind === "object-setter") {
+    return `let inheritedStore = 0;
+const prototypeValue = {
+  set inherited(value) { inheritedStore = value; },
+};`;
+  }
+  const value =
+    kind === "null"
+      ? "null"
+      : kind === "undefined"
+        ? "undefined"
+        : kind === "number"
+          ? "17"
+          : kind === "boolean"
+            ? "false"
+            : kind === "string"
+              ? '"primitive"'
+              : 'Symbol("prototype")';
+  return `const prototypeValue = ${value};`;
+}
+
+function ordinaryProtoToken(kind: ProtoOrdinaryKind): string {
+  if (kind === "computed") return '["__proto__"]: 20';
+  if (kind === "shorthand") return "__proto__";
+  if (kind === "method") return "__proto__() { return 23; }";
+  if (kind === "getter") return "get __proto__() { return 24; }";
+  if (kind === "setter") {
+    return "set __proto__(value) { ownSetterStore = value; }";
+  }
+  return '...(order = order + "S", { ["__proto__"]: 26 })';
+}
+
+function printProtoLiteralCase(testCase: ProtoLiteralCase): string {
+  const tokens = [
+    'first: (order = order + "F", 1)',
+    ordinaryProtoToken(testCase.ordinaryKind),
+    'last: (order = order + "L", guardMiss)',
+  ];
+  tokens.splice(
+    testCase.position,
+    0,
+    `__proto__: (order = order + "P", ${
+      testCase.abrupt ? "fail()" : "prototypeValue"
+    })`,
+  );
+  const ownObservation =
+    testCase.ordinaryKind === "method"
+      ? `console.log(
+  "own-method",
+  ownDescriptor.value(),
+  ownDescriptor.value.name,
+  "prototype" in ownDescriptor.value,
+);`
+      : testCase.ordinaryKind === "getter"
+        ? `console.log(
+  "own-getter",
+  ownDescriptor.get(),
+  ownDescriptor.set,
+  ownDescriptor.enumerable,
+  ownDescriptor.configurable,
+);`
+        : testCase.ordinaryKind === "setter"
+          ? `object.__proto__ = 44;
+console.log(
+  "own-setter",
+  ownSetterStore,
+  ownDescriptor.get,
+  ownDescriptor.set.name,
+);`
+          : `console.log(
+  "own-data",
+  ownDescriptor.value,
+  ownDescriptor.writable,
+  ownDescriptor.enumerable,
+  ownDescriptor.configurable,
+);`;
+  const prototypeObservation =
+    testCase.prototypeValue === "object-data"
+      ? `console.log("inherited-read", object.inherited);
+object.inherited = 8;
+const inheritedDescriptor = Object.getOwnPropertyDescriptor(
+  object,
+  "inherited",
+);
+console.log("inherited-write", inheritedDescriptor.value);`
+      : testCase.prototypeValue === "object-getter"
+        ? `console.log("inherited-getter", object.inherited, order);
+console.log(
+  "inherited-own",
+  Object.getOwnPropertyDescriptor(object, "inherited"),
+);`
+        : testCase.prototypeValue === "object-setter"
+          ? `console.log("inherited-read", object.inherited);
+object.inherited = 8;
+console.log(
+  "inherited-setter",
+  inheritedStore,
+  Object.getOwnPropertyDescriptor(object, "inherited"),
+);`
+          : 'console.log("inherited-read", object.inherited);';
+  return `
+let order = "";
+let ownSetterStore = 0;
+const __proto__ = 21;
+${prototypeSetup(testCase.prototypeValue)}
+/**
+ * @param {number} left
+ * @param {number} right
+ */
+function hintedAdd(left, right) { return left + right; }
+const guardMiss = hintedAdd("x", 1);
+function fail() { throw new RangeError("prototype"); }
+try {
+  const object = { ${tokens.join(", ")} };
+  let keys = "";
+  for (const key of Object.keys(object)) { keys = keys + key + ","; }
+  console.log("order", order);
+  console.log("keys", keys);
+  const ownDescriptor = Object.getOwnPropertyDescriptor(
+    object,
+    "__proto__",
+  );
+  ${ownObservation}
+  ${prototypeObservation}
+  console.log("guard", guardMiss);
+} catch (error) {
+  console.log("abrupt", error instanceof RangeError, order);
+}
+`;
+}
+
+function protoEffects(testCase: ProtoLiteralCase): string {
+  const effects = ["F", testCase.ordinaryKind === "spread" ? "S" : "", "L"];
+  effects.splice(testCase.position, 0, "P");
+  if (!testCase.abrupt) return effects.join("");
+  return effects.slice(0, testCase.position + 1).join("");
+}
+
+function expectedProtoLiteralCase(testCase: ProtoLiteralCase): string {
+  const effects = protoEffects(testCase);
+  if (testCase.abrupt) return `abrupt true ${effects}\n`;
+  const own =
+    testCase.ordinaryKind === "method"
+      ? "own-method 23 __proto__ false"
+      : testCase.ordinaryKind === "getter"
+        ? "own-getter 24 undefined true true"
+        : testCase.ordinaryKind === "setter"
+          ? "own-setter 44 undefined set __proto__"
+          : `own-data ${
+              testCase.ordinaryKind === "computed"
+                ? 20
+                : testCase.ordinaryKind === "shorthand"
+                  ? 21
+                  : 26
+            } true true true`;
+  const prototype =
+    testCase.prototypeValue === "object-data"
+      ? "inherited-read 7\ninherited-write 8"
+      : testCase.prototypeValue === "object-getter"
+        ? `inherited-getter 7 ${effects}G\ninherited-own undefined`
+        : testCase.prototypeValue === "object-setter"
+          ? "inherited-read undefined\ninherited-setter 8 undefined"
+          : "inherited-read undefined";
+  return (
+    `order ${effects}\n` +
+    "keys first,__proto__,last,\n" +
+    `${own}\n${prototype}\nguard x1\n`
+  );
+}
+
+test("prototype setter separates own keys and [[Prototype]]", () => {
+  const testCase: ProtoLiteralCase = {
+    abrupt: false,
+    ordinaryKind: "spread",
+    position: 2,
+    prototypeValue: "object-setter",
+  };
+  assert.equal(
+    expectedProtoLiteralCase(testCase),
+    "order FSPL\n" +
+      "keys first,__proto__,last,\n" +
+      "own-data 26 true true true\n" +
+      "inherited-read undefined\n" +
+      "inherited-setter 8 undefined\n" +
+      "guard x1\n",
+  );
+});
+
+test(
+  "generated object prototype setters match the M5 property model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "object prototype setters preserve prototypes and ordinary properties",
+      fc.asyncProperty(protoLiteralArbitrary, async (testCase) => {
+        const source = printProtoLiteralCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expectedProtoLiteralCase(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-object-prototype.ts" },
+            { specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) =>
+                assertMatchingObservations([expectedObservation, native]),
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "object literals with one colon-form prototype setter at any of " +
+          "four positions, null, object, and primitive prototype values, " +
+          "computed, shorthand, method, accessor, and spread __proto__ " +
+          "properties, inherited reads and writes, effects and abrupt " +
+          "completion, a false number hint and deliberate guard miss, both " +
+          "specialization policies, and forced collection",
+        numRuns: 16,
+        profile: "M5 object literal prototype setters",
+        seed: 0x5eed_0024,
+        sizeLimit:
+          "four definitions, one prototype setter, one ordinary __proto__ " +
+          "form, and bounded scalar observations",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+const duplicateOrdinaryArbitrary = fc.constantFrom<ProtoOrdinaryKind>(
+  "computed",
+  "getter",
+  "method",
+  "setter",
+  "shorthand",
+  "spread",
+);
+
+test("generated duplicate prototype setters remain early errors", async () => {
+  await assertAsyncProperty(
+    "only a second colon-form prototype setter is invalid",
+    fc.asyncProperty(duplicateOrdinaryArbitrary, async (ordinaryKind) => {
+      const source = `
+const __proto__ = 21;
+({
+  __proto__: null,
+  ${ordinaryProtoToken(ordinaryKind)},
+  "__proto__": {},
+});`;
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const compiled = compileSource(
+          babelFrontend,
+          { source, sourceId: "duplicate-m5-object-prototype.js" },
+          { specialization },
+        );
+        assert.equal(compiled.diagnostics[0]?.code, "OSEO0001");
+        assert.equal(compiled.hir, undefined);
+        assert.equal(compiled.mir, undefined);
+      }
+    }),
+    {
+      context: ["phase=parse", "expected=SyntaxError"],
+      domain:
+        "two noncomputed colon-form __proto__ definitions separated by one " +
+        "computed, shorthand, method, accessor, or spread ordinary property",
+      numRuns: 12,
+      profile: "M5 object literal prototype setter early errors",
+      seed: 0x5eed_0025,
+      sizeLimit: "three definitions and six permitted intervening forms",
+      timeLimitMilliseconds: 30_000,
+    },
+  );
+});
