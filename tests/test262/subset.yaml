@@ -987,6 +987,12 @@ tests:
   - path: test/language/expressions/assignment/dstr/obj-rest-valid-object.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -6576,6 +6582,9 @@ tests:
   - path: test/language/expressions/postfix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/postfix-decrement/this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/postfix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
@@ -6585,6 +6594,9 @@ tests:
   - path: test/language/expressions/postfix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/postfix-increment/this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/postfix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
@@ -6594,12 +6606,18 @@ tests:
   - path: test/language/expressions/prefix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-decrement/this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/prefix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/prefix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-increment/this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/prefix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
@@ -6949,7 +6967,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/call-expression-context-no-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/call-expression-context-strict.js
     expectedClassification: pass
@@ -6988,6 +7006,12 @@ tests:
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/this/11.1.1-1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/this/S11.1.1_A1.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/boolean.js
@@ -7124,6 +7148,12 @@ tests:
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
+  - path: test/language/identifiers/val-this.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/keywords/ident-ref-this.js
+    expectedClassification: expected-negative
+    dependencies: [object-literals]
   - path: test/language/literals/bigint/binary-invalid-digit.js
     expectedClassification: expected-negative
     dependencies: [bigint-primitive]
@@ -7410,7 +7440,7 @@ tests:
     expectedClassification: pass
     dependencies: [lexical-bindings, module-linking]
   - path: test/language/module-code/eval-this.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-default-asyncfunction-declaration-binding-exists.js
     expectedClassification: expected-negative
@@ -7973,6 +8003,9 @@ tests:
   - path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, top-level-await]
   - path: test/language/rest-parameters/array-pattern.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, functions, rest-parameters]
@@ -8085,6 +8118,9 @@ tests:
   - path: test/language/statements/async-function/evaluation-default-that-throws.js
     expectedClassification: pass
     dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/evaluation-this-value-global.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement]
   - path: test/language/statements/async-function/let-newline-await-in-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -9629,14 +9665,14 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-field-is-visible-in-computed-properties.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [classes, object-properties]
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/statements/class/elements/private-field-on-nested-class.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-field-with-initialized-id-is-visible-in-computed-properties.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [classes, object-properties]
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/statements/class/elements/private-generator-method-name.js
     expectedClassification: pass
     dependencies: [classes, object-properties]

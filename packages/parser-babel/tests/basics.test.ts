@@ -669,35 +669,137 @@ test("retains script and function strictness in owned IR", () => {
   assert.equal(functionOnly.mir?.functions[0]?.strict, true);
 });
 
-test("rejects top-level this until script receivers exist", () => {
+test("resolves each this expression through its own environment", () => {
   const script = compileSource(babelFrontend, {
-    source: "console.log(this);",
+    source:
+      "console.log(this);\n" +
+      "const read = () => this;\n" +
+      "function sloppy() { return this; }\n" +
+      'function strictly() { "use strict"; return (() => this)(); }\n' +
+      "const holder = { method() { return this; } };\n" +
+      "class Owner { value() { return this; } }\n" +
+      "function defaulted(value = this) { return value; }\n",
     sourceId: "script-this.ts",
   });
-  assert.equal(script.diagnostics[0]?.code, "OSEO1001");
-  assert.match(script.diagnostics[0]?.message ?? "", /non-arrow function/u);
+  assert.deepEqual(script.diagnostics, []);
+  assert.ok(script.hir != null);
+  const text = printHir(script.hir);
+  // Script top level, a non-strict function, and a non-strict method all
+  // resolve through a global this environment, and an arrow keeps the
+  // mode of the position it is written in. A strict function and a class
+  // body stop the substitution for themselves and their own arrows. A
+  // parameter default reads the mode of the function it belongs to, not
+  // the mode of the position the call is written in.
+  assert.equal(text.match(/this global/gu)?.length, 5);
+  assert.equal(text.match(/this strict/gu)?.length, 2);
+  assert.doesNotMatch(text, /this module/u);
+  assert.ok(script.mir != null);
+  const mir = printMir(script.mir);
+  assert.equal(mir.match(/global-this global this/gu)?.length, 5);
+  assert.equal(mir.match(/= receiver this/gu)?.length, 2);
 
-  const topLevelArrow = compileSource(babelFrontend, {
-    source: "const read = () => this;",
-    sourceId: "arrow-this.ts",
+  const strictScript = compileSource(babelFrontend, {
+    source:
+      '"use strict";\n' +
+      "console.log(this);\n" +
+      "const read = () => this;\n" +
+      "function defaulted(value = this) { return value; }\n",
+    sourceId: "strict-script-this.ts",
   });
-  assert.equal(topLevelArrow.diagnostics[0]?.code, "OSEO1001");
+  assert.deepEqual(strictScript.diagnostics, []);
+  assert.ok(strictScript.hir != null);
+  // A Script's this binding lives in the Global Environment Record, so
+  // a top-level directive does not turn it into a receiver read, while a
+  // function the directive makes strict reads its own receiver.
+  const strictText = printHir(strictScript.hir);
+  assert.equal(strictText.match(/this global/gu)?.length, 2);
+  assert.equal(strictText.match(/this strict/gu)?.length, 1);
+});
+
+test("rejects every binding position that declares this", () => {
+  // The bootstrap parser accepts TypeScript's `this` parameter spelling
+  // wherever a binding identifier is written, so each declaration
+  // position raises the ECMA-262 early error itself. A position that
+  // routes through binding-pattern conversion and one that reads the
+  // declarator identifier directly must both reject, and neither may
+  // report the reserved word twice or blame unrelated syntax.
+  const sources = [
+    "var this = 1;",
+    "let this = 1;",
+    "const this = 1;",
+    "var first = 1, this = 2;",
+    "for (var this of [1]);",
+    "for (let this = 0; ; ) break;",
+    "try {} catch (this) {}",
+    "var [this] = [1];",
+    // A pattern that names the reserved word is a SyntaxError every
+    // engine rejects, so syntax the profile merely does not admit yet
+    // must neither add a second diagnostic nor report before it, wherever
+    // that syntax sits in the pattern.
+    "var [this = /pattern/] = [];",
+    "let {[/pattern/]: this} = {};",
+    "var [first = /pattern/, [this]] = [];",
+    "var {outer: {inner: this}} = {};",
+    "var [...this] = [];",
+    "try {} catch ({ outer: this }) {}",
+    "function patterned([this]) {}",
+    // Only a plain first parameter is TypeScript's receiver annotation,
+    // so every other parameter shape is a binding position instead.
+    "function later(first, this) {}",
+    "function rested(...this) {}",
+    "function defaulted(this = 1) {}",
+  ];
+  for (const source of sources) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "this-binding.ts",
+    });
+    assert.equal(result.diagnostics.length, 1, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /reserved word this cannot be a binding name/u,
+      source,
+    );
+  }
+
+  // The bootstrap parser rejects a destructuring assignment target
+  // named `this` itself, before the declarator identifier is read.
+  const assignmentTarget = compileSource(babelFrontend, {
+    source: "({ value: this } = { value: 1 });",
+    sourceId: "this-binding.ts",
+  });
+  assert.equal(assignmentTarget.diagnostics[0]?.code, "OSEO0001");
+
+  // A plain first parameter named `this` is TypeScript's receiver
+  // annotation rather than a binding, so it keeps the unsupported
+  // classification that boundary already had.
+  const parameter = compileSource(babelFrontend, {
+    source: "function receiver(this) {}",
+    sourceId: "this-binding.ts",
+  });
+  assert.equal(parameter.diagnostics.length, 1);
+  assert.equal(parameter.diagnostics[0]?.code, "OSEO1001");
   assert.match(
-    topLevelArrow.diagnostics[0]?.message ?? "",
-    /non-arrow function/u,
+    parameter.diagnostics[0]?.message ?? "",
+    /this parameters are unsupported/u,
   );
 
-  const functionBody = compileSource(babelFrontend, {
-    source: "function receiver() { return this; }",
-    sourceId: "function-this.ts",
+  // The reserved word check reads binding positions only, so a property
+  // key spelled `this` still names an ordinary property, and a pattern
+  // that binds no `this` still reports the syntax the profile lacks.
+  const keyNamedThis = compileSource(babelFrontend, {
+    source: "const { this: named } = { this: 1 };\nconsole.log(named);",
+    sourceId: "this-binding.ts",
   });
-  assert.deepEqual(functionBody.diagnostics, []);
+  assert.deepEqual(keyNamedThis.diagnostics, []);
 
-  const nestedArrow = compileSource(babelFrontend, {
-    source: "function receiver() { return (() => this)(); }",
-    sourceId: "nested-arrow-this.ts",
+  const unsupportedDefault = compileSource(babelFrontend, {
+    source: "var [first = /pattern/] = [];",
+    sourceId: "this-binding.ts",
   });
-  assert.deepEqual(nestedArrow.diagnostics, []);
+  assert.equal(unsupportedDefault.diagnostics.length, 1);
+  assert.equal(unsupportedDefault.diagnostics[0]?.code, "OSEO1001");
 });
 
 test("ignores tag-shaped text outside JSDoc comments", () => {
@@ -1416,9 +1518,9 @@ console.log(new Derived().describe(), Derived.of());
   // Every reference names the receiver it carries, so a static element
   // and an instance element are distinguishable only by the home object
   // lowering records, not by the reference itself.
-  assert.match(text, /call super -> this\["describe"\]\(\)/u);
-  assert.match(text, /set super -> this\[%b\d+\(key\)\]/u);
-  assert.match(text, /get super -> this\["describe"\]/u);
+  assert.match(text, /call super -> this strict\["describe"\]\(\)/u);
+  assert.match(text, /set super -> this strict\[%b\d+\(key\)\]/u);
+  assert.match(text, /get super -> this strict\["describe"\]/u);
   assert.ok(result.mir != null);
   const mir = printMir(result.mir);
   assert.match(mir, /super-base home object prototype/u);
@@ -1455,7 +1557,7 @@ instance.asyncValue().then((value) => console.log(value));
   assert.ok(result.hir != null);
   const text = printHir(result.hir);
   assert.match(text, /call super -> %b\d+ this\(\)/u);
-  assert.match(text, /call super -> this\["value"\]\(\)/u);
+  assert.match(text, /call super -> this strict\["value"\]\(\)/u);
   assert.match(text, /new\.target/u);
   assert.ok(result.mir != null);
   const mir = printMir(result.mir);
@@ -1605,11 +1707,11 @@ console.log(counter.next(), counter.read(new Counter(2)), Counter.run());
   // property key, and the getter and setter share the one binding.
   assert.match(text, /field %b\d+ #count = /u);
   assert.match(text, /get %b(\d+) #doubled: .*set %b\1 #doubled: /su);
-  assert.match(text, /private get this\.%b\d+ #count/u);
-  assert.match(text, /private set this\.%b\d+ #step = /u);
-  assert.match(text, /private update this\.%b\d+ #count \+= /u);
-  assert.match(text, /private update this\.%b\d+ #count\+\+/u);
-  assert.match(text, /call this\.%b\d+ #bump\(\)/u);
+  assert.match(text, /private get this strict\.%b\d+ #count/u);
+  assert.match(text, /private set this strict\.%b\d+ #step = /u);
+  assert.match(text, /private update this strict\.%b\d+ #count \+= /u);
+  assert.match(text, /private update this strict\.%b\d+ #count\+\+/u);
+  assert.match(text, /call this strict\.%b\d+ #bump\(\)/u);
   assert.match(text, /private get %b\d+\(other\)\.%b\d+ #count/u);
   assert.match(text, /%b\d+ #count in %b\d+\(other\)/u);
   assert.match(text, /%b\d+ #total in %b\d+\(other\)/u);

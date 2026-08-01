@@ -18,6 +18,7 @@ import type {
   SyntaxForDeclaration,
   SyntaxForOfTarget,
   SyntaxFunction,
+  SyntaxGlobalObjectName,
   SyntaxModuleSpecifier,
   SyntaxObjectBindingPattern,
   SyntaxObjectProperty,
@@ -27,6 +28,7 @@ import type {
   SyntaxProgram,
   SyntaxStatement,
   SyntaxSwitchCase,
+  SyntaxThisMode,
 } from "@oseo/compiler";
 import {
   hasUseStrictDirective,
@@ -42,10 +44,116 @@ import {
 import { jsdocHints, typeHint } from "./hints.ts";
 import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
 
+/**
+ * The this mode of the environment a `this` expression at the current
+ * position resolves through. The stack always carries the entry for the
+ * top level of the source kind, so a top-level `this` reads it directly.
+ */
+function currentThisMode(context: ConvertContext): SyntaxThisMode {
+  return context.thisModeStack.at(-1) ?? "global";
+}
+
+/**
+ * The this mode one nested function contributes. Only a non-arrow
+ * function establishes a this environment, and its mode follows its own
+ * strictness; an arrow keeps the enclosing environment's mode.
+ */
+function nestedThisMode(
+  context: ConvertContext,
+  providesThis: boolean,
+  strict: boolean,
+): SyntaxThisMode {
+  if (!providesThis) return currentThisMode(context);
+  return strict ? "strict" : "global";
+}
+
 export function identifierName(value: BabelNode): string | undefined {
   return value.type === "Identifier" && typeof value.name === "string"
     ? value.name
     : undefined;
+}
+
+/**
+ * Reports the ECMA-262 early error for a binding position that declares
+ * the reserved word `this`, and answers whether it did.
+ *
+ * The bootstrap parser accepts TypeScript's `this` parameter spelling
+ * wherever a binding identifier is written, so a declaration, `for`
+ * head, catch parameter, or assignment target named `this` reaches
+ * conversion instead of failing in the parser. Admitting it would create
+ * a binding no `this` expression can ever resolve to, so every position
+ * that names a binding checks the reserved word here.
+ */
+function rejectedThisBindingName(
+  context: ConvertContext,
+  value: BabelNode,
+  name: string | undefined,
+): boolean {
+  if (name !== "this") return false;
+  earlyError(
+    context,
+    value,
+    "The reserved word this cannot be a binding name.",
+  );
+  return true;
+}
+
+/**
+ * The first binding identifier named `this` inside one raw pattern.
+ *
+ * Only positions that declare a name are walked. A property key, a
+ * computed key, a default initializer, and a member target are
+ * expressions rather than binding positions, so `({ this: x } = value)`
+ * and `[object.this] = value` name no binding and are not reported here.
+ */
+function thisBindingNode(value: BabelNode): BabelNode | undefined {
+  if (value.type === "Identifier") {
+    return identifierName(value) === "this" ? value : undefined;
+  }
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null ? undefined : thisBindingNode(inner);
+  }
+  if (value.type === "AssignmentPattern") {
+    const left = node(value.left);
+    return left == null ? undefined : thisBindingNode(left);
+  }
+  if (value.type === "RestElement") {
+    const argument = node(value.argument);
+    return argument == null ? undefined : thisBindingNode(argument);
+  }
+  if (value.type === "ArrayPattern") {
+    for (const element of nodes(value.elements)) {
+      const found = thisBindingNode(element);
+      if (found != null) return found;
+    }
+    return undefined;
+  }
+  if (value.type !== "ObjectPattern") return undefined;
+  for (const property of nodes(value.properties)) {
+    const target =
+      property.type === "RestElement"
+        ? node(property.argument)
+        : node(property.value);
+    const found = target == null ? undefined : thisBindingNode(target);
+    if (found != null) return found;
+  }
+  return undefined;
+}
+
+/**
+ * Reports the ECMA-262 early error before one pattern is converted, so
+ * an invalid binding name is never masked by syntax the profile merely
+ * does not admit yet. A pattern that names `this` is a `SyntaxError`
+ * every engine rejects, which is a different answer from an unsupported
+ * profile feature, and the reader has to be told the one that holds.
+ */
+function rejectedThisBindingPattern(
+  context: ConvertContext,
+  value: BabelNode,
+): boolean {
+  const found = thisBindingNode(value);
+  return found != null && rejectedThisBindingName(context, found, "this");
 }
 
 /** Convert one parser literal into an exact owned radix-and-digits value. */
@@ -564,14 +672,7 @@ export function expression(
   }
   if (value.type === "NullLiteral") return { ...located, kind: "null" };
   if (value.type === "ThisExpression") {
-    return context.functionStack.at(-1) !== true
-      ? unsupported(
-          context,
-          value,
-          "The profile admits this only where an enclosing non-arrow " +
-            "function provides it.",
-        )
-      : { ...located, kind: "this" };
+    return { ...located, kind: "this", thisMode: currentThisMode(context) };
   }
   if (value.type === "Super") {
     return unsupported(
@@ -1230,6 +1331,10 @@ export function bindingPattern(
   assignment = false,
   structuredAnnotations = false,
 ): SyntaxAssignmentPattern | undefined {
+  // The whole pattern is checked for the reserved word before any part
+  // of it is converted, so a key, default, or later element the profile
+  // does not admit cannot report first and hide an invalid binding name.
+  if (rejectedThisBindingPattern(context, value)) return undefined;
   if (value.type === "ParenthesizedExpression") {
     const inner = node(value.expression);
     return inner == null
@@ -1387,6 +1492,10 @@ export function bindingPattern(
           key = expression(context, keyNode);
         }
       }
+      // A rejected key already named its own reason, so the target and
+      // the default stay unconverted rather than adding diagnostics for
+      // syntax the reader has not been told about yet.
+      if (key == null) return undefined;
       const left =
         valueNode.type === "AssignmentPattern"
           ? node(valueNode.left)
@@ -1404,15 +1513,12 @@ export function bindingPattern(
         );
       }
       const pattern = bindingPattern(context, left, assignment);
+      // A rejected target already named its own reason, so the default
+      // is not converted and cannot add an unrelated second diagnostic.
+      if (pattern == null) return undefined;
       const initializer =
         right == null ? undefined : expression(context, right);
-      if (
-        key == null ||
-        pattern == null ||
-        (right != null && initializer == null)
-      ) {
-        return undefined;
-      }
+      if (right != null && initializer == null) return undefined;
       properties.push({
         ...location(context, property),
         ...(property.computed === true ? { computed: true as const } : {}),
@@ -1466,10 +1572,11 @@ export function bindingPattern(
       );
     }
     const pattern = bindingPattern(context, left, assignment);
+    // A rejected target already named its own reason, so the default is
+    // not converted and cannot add an unrelated second diagnostic.
+    if (pattern == null) return undefined;
     const initializer = right == null ? undefined : expression(context, right);
-    if (pattern == null || (right != null && initializer == null)) {
-      return undefined;
-    }
+    if (right != null && initializer == null) return undefined;
     elements.push({
       ...location(context, element),
       ...(initializer == null ? {} : { initializer }),
@@ -1974,12 +2081,15 @@ export function statement(
         }
         const name =
           identifier == null ? undefined : identifierName(identifier);
-        if (name == null) {
+        if (identifier == null || name == null) {
           return unsupported(
             context,
             declarator,
             "var destructuring is unsupported.",
           );
+        }
+        if (rejectedThisBindingName(context, identifier, name)) {
+          return undefined;
         }
         if (initializerNode == null) continue;
         const assigned = expression(context, initializerNode);
@@ -2055,6 +2165,7 @@ export function statement(
         "A const binding needs one identifier and an initializer.",
       );
     }
+    if (rejectedThisBindingName(context, identifier, name)) return undefined;
     const initializer =
       initializerNode == null
         ? { ...location(context, declaration), kind: "undefined" as const }
@@ -2190,6 +2301,7 @@ export function statement(
           "A for-of declaration needs one uninitialized binding.",
         );
       }
+      if (rejectedThisBindingName(context, identifier, name)) return undefined;
       if (name != null) {
         target = {
           declarationKind: left.kind,
@@ -2317,6 +2429,9 @@ export function statement(
         }
         const declaratorRange = location(context, declarator);
         const name = identifierName(identifier);
+        if (rejectedThisBindingName(context, identifier, name)) {
+          return undefined;
+        }
         if (name != null) {
           if (initNode.kind === "var" && initializerNode == null) continue;
           const initializer =
@@ -2598,18 +2713,36 @@ export function gatherLexicalNames(
   return names;
 }
 
-export function varScopedFunctionNames(
+/**
+ * Every var-scoped function declaration in one statement list, keyed by
+ * the name it declares and valued by the declaration that a
+ * global-object property for that name is located at.
+ *
+ * A repeated name is ordered by its last declaration, which is the one
+ * GlobalDeclarationInstantiation initializes and the position its
+ * functionsToInitialize list gives it, so a repeated key is removed
+ * before it is stored again rather than left at its first position.
+ */
+export function varScopedFunctionDeclarations(
   values: readonly BabelNode[],
-): ReadonlySet<string> {
-  const names = new Set<string>();
+): ReadonlyMap<string, BabelNode> {
+  const declarations = new Map<string, BabelNode>();
   for (const value of values) {
     const declaration = unwrapExportDeclaration(value);
     if (declaration.type !== "FunctionDeclaration") continue;
     const identifier = node(declaration.id);
     const name = identifier == null ? undefined : identifierName(identifier);
-    if (name != null) names.add(name);
+    if (name == null) continue;
+    declarations.delete(name);
+    declarations.set(name, declaration);
   }
-  return names;
+  return declarations;
+}
+
+export function varScopedFunctionNames(
+  values: readonly BabelNode[],
+): ReadonlySet<string> {
+  return new Set(varScopedFunctionDeclarations(values).keys());
 }
 
 export function collectVarStatement(
@@ -3005,7 +3138,7 @@ export function functionDeclaration(
       : "admitted"
     : (enclosingReceiver?.superProperty ?? "none");
   const receiver: ReceiverContext = { kind: receiverKind, superProperty };
-  for (const parameterNode of parameterNodes) {
+  for (const [parameterIndex, parameterNode] of parameterNodes.entries()) {
     const rest = parameterNode.type === "RestElement";
     const parameterPattern =
       parameterNode.type === "AssignmentPattern"
@@ -3019,11 +3152,27 @@ export function functionDeclaration(
         : undefined;
     if (parameterPattern == null) return unsupported(context, parameterNode);
     const parameterName = identifierName(parameterPattern);
-    if (parameterName === "this" || parameterPattern.optional === true) {
+    if (parameterPattern.optional === true) {
       return unsupported(
         context,
         parameterPattern,
-        "Optional and TypeScript this parameters are unsupported.",
+        "Optional parameters are unsupported.",
+      );
+    }
+    if (parameterName === "this") {
+      // TypeScript spells its receiver annotation as a plain first
+      // parameter named `this`, and that spelling erases to nothing.
+      // Every other shape is an ECMA-262 binding position naming the
+      // reserved word, so it takes the early error instead of claiming
+      // an unsupported TypeScript feature.
+      if (parameterIndex !== 0 || rest || defaultNode != null) {
+        rejectedThisBindingName(context, parameterPattern, parameterName);
+        return undefined;
+      }
+      return unsupported(
+        context,
+        parameterPattern,
+        "TypeScript this parameters are unsupported.",
       );
     }
     if (parameterEnvironment) {
@@ -3038,15 +3187,15 @@ export function functionDeclaration(
           ? parameterPattern
           : { ...parameterPattern, typeAnnotation: undefined };
       context.strictStack.push(strict);
-      context.functionStack.push(
-        functionProvidesThis ? true : context.functionStack.at(-1) === true,
+      context.thisModeStack.push(
+        nestedThisMode(context, functionProvidesThis, strict),
       );
       context.receiverStack.push(receiver);
       let pattern = bindingPattern(context, conversionPattern);
       let defaultInitializer =
         defaultNode == null ? undefined : expression(context, defaultNode);
       context.receiverStack.pop();
-      context.functionStack.pop();
+      context.thisModeStack.pop();
       context.strictStack.pop();
       if (pattern == null) return undefined;
       if (parameterName == null) {
@@ -3140,12 +3289,10 @@ export function functionDeclaration(
   returnHints.push(...jsdoc.returns);
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
-  // Arrows do not provide their own receiver, so this stays admitted
-  // inside one only when an enclosing non-arrow function provides it.
-  context.functionStack.push(
-    value.type === "ArrowFunctionExpression"
-      ? context.functionStack.at(-1) === true
-      : true,
+  // Arrows do not provide their own receiver, so `this` inside one
+  // keeps resolving through the enclosing this environment.
+  context.thisModeStack.push(
+    nestedThisMode(context, functionProvidesThis, strict),
   );
   context.receiverStack.push(receiver);
   const children =
@@ -3184,7 +3331,7 @@ export function functionDeclaration(
   );
   if (hoisted == null) {
     context.receiverStack.pop();
-    context.functionStack.pop();
+    context.thisModeStack.pop();
     context.strictStack.pop();
     return undefined;
   }
@@ -3228,7 +3375,7 @@ export function functionDeclaration(
         : statement(context, child, true);
     if (converted == null) {
       context.receiverStack.pop();
-      context.functionStack.pop();
+      context.thisModeStack.pop();
       context.strictStack.pop();
       return undefined;
     }
@@ -3236,7 +3383,7 @@ export function functionDeclaration(
   }
   body.push(...parameterizedBody(executionBody));
   context.receiverStack.pop();
-  context.functionStack.pop();
+  context.thisModeStack.pop();
   context.strictStack.pop();
   if (context.diagnostics.length > 0) return undefined;
   const generatorCallStatementCount =
@@ -3387,14 +3534,16 @@ function classField(
   if (valueNode == null) {
     return { ...location(context, element), key, kind: "field", ...placement };
   }
-  context.functionStack.push(true);
+  // A class body is strict code, so a field initializer takes its
+  // receiver from the instance or constructor without substitution.
+  context.thisModeStack.push("strict");
   context.receiverStack.push({
     kind: "function",
     superProperty: derived ? "admitted" : "none",
   });
   const initializer = expression(context, valueNode);
   context.receiverStack.pop();
-  context.functionStack.pop();
+  context.thisModeStack.pop();
   if (initializer == null) return undefined;
   return {
     ...location(context, element),
@@ -3596,6 +3745,24 @@ export function classExpression(
   };
 }
 
+/**
+ * One reported global-object name, located at the declaration that
+ * creates its property. A byte range is copied only when the located
+ * value carries one, because a hoisted `var` statement is synthesized
+ * from a declarator rather than converted from one parser node.
+ */
+function globalObjectName(
+  located: { readonly byteRange?: ByteRange; readonly range: SourceRange },
+  declaration: "function" | "var",
+  name: string,
+): SyntaxGlobalObjectName {
+  const range = located.range;
+  const byteRange = located.byteRange;
+  return byteRange == null
+    ? { declaration, name, range }
+    : { byteRange, declaration, name, range };
+}
+
 export function program(
   context: ConvertContext,
   file: BabelNode,
@@ -3605,14 +3772,33 @@ export function program(
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
   const items = nodes(programNode.body);
-  const hoisted = hoistedVarDeclarations(
-    context,
-    items,
-    varScopedFunctionNames(items),
-  );
+  const functionDeclarations = varScopedFunctionDeclarations(items);
+  const functionNames = new Set(functionDeclarations.keys());
+  const hoisted = hoistedVarDeclarations(context, items, functionNames);
   if (hoisted == null) {
     context.strictStack.pop();
     return undefined;
+  }
+  // GlobalDeclarationInstantiation creates one global-object property
+  // for every var-scoped top-level name: the function declarations in
+  // source order, then the hoisted `var` names a function declaration
+  // does not already own. Hoisting reuses the lexical statement form for
+  // a var binding, so the two lists rather than the statement kind
+  // decide which names the global object binds. Each entry keeps the
+  // location of the declaration that creates the property, which is the
+  // function declaration itself or the statement the var name hoisted
+  // to.
+  const globalObjectNames: SyntaxGlobalObjectName[] = [];
+  for (const [name, declaration] of functionDeclarations) {
+    globalObjectNames.push(
+      globalObjectName(location(context, declaration), "function", name),
+    );
+  }
+  for (const declaration of hoisted) {
+    if (declaration.kind !== "let") continue;
+    globalObjectNames.push(
+      globalObjectName(declaration, "var", declaration.name),
+    );
   }
   body.push(...hoisted);
   for (const item of items) {
@@ -3630,6 +3816,7 @@ export function program(
   return {
     ...location(context, programNode),
     body,
+    globalObjectNames,
     kind: "program",
     sourceId: context.input.sourceId,
     strict,

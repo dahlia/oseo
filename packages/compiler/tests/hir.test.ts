@@ -62,6 +62,188 @@ test("resolves owned syntax and prints deterministic generic IR", () => {
   assert.doesNotMatch(firstMir, /guard-smi|add-smi-checked/u);
 });
 
+test("lowers each this mode to its own value production", () => {
+  const modes = ["global", "module", "strict"] as const;
+  const syntax: SyntaxProgram = {
+    body: modes.map((thisMode) => ({
+      expression: { kind: "this", range, thisMode },
+      kind: "expression",
+      range,
+    })),
+    kind: "program",
+    range,
+    sourceId: "this-modes.js",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const hir = printHir(hirResult.program);
+  for (const thisMode of modes) {
+    assert.match(hir, new RegExp(`this ${thisMode}`, "u"));
+  }
+
+  const mir = printMir(buildMir(hirResult.program));
+  // A global this environment reaches an allocating runtime operation
+  // that resolves a nullish receiver, a module this binding is the
+  // undefined constant, and a strict receiver read allocates nothing.
+  assert.match(mir, /safepoint global this allocation/u);
+  assert.match(mir, /= global-this global this/u);
+  assert.match(mir, /= constant module this/u);
+  assert.match(mir, /= receiver this/u);
+  assert.equal(mir.match(/= global-this /gu)?.length, 1);
+  assert.equal(mir.match(/= constant module this/gu)?.length, 1);
+  assert.equal(mir.match(/= receiver this/gu)?.length, 1);
+});
+
+test("resolves global object properties to script bindings", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "undefined", range },
+        kind: "let",
+        name: "answer",
+        range,
+      },
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "const",
+        name: "fixed",
+        range,
+      },
+    ],
+    globalObjectNames: [{ declaration: "var", name: "answer", range }],
+    kind: "program",
+    range,
+    sourceId: "global-object.js",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const bindings = hirResult.program.globalObjectBindings ?? [];
+  assert.equal(bindings.length, 1);
+  const answer = bindings[0];
+  assert.ok(answer != null);
+  assert.equal(answer.name, "answer");
+  // The declaration kind reaches HIR and MIR, because it is what
+  // decides whether the property ECMA-262 creates is this profile's
+  // uniform one.
+  assert.equal(answer.declaration, "var");
+  assert.deepEqual(buildMir(hirResult.program).globalObjectBindings, [
+    { declaration: "var", id: answer.id, name: "answer" },
+  ]);
+  // The property names the binding the body already declared rather
+  // than a second binding created for the global object.
+  const hir = printHir(hirResult.program);
+  assert.match(hir, new RegExp(`global-object %b${answer.id} answer`, "u"));
+  assert.match(hir, new RegExp(`let %b${answer.id} answer`, "u"));
+  const mir = printMir(buildMir(hirResult.program));
+  assert.match(mir, new RegExp(`global-object %b${answer.id} answer`, "u"));
+  assert.doesNotMatch(mir, /global-object %b\d+ fixed/u);
+});
+
+test("rejects a global object name with no script binding", () => {
+  assert.throws(
+    () =>
+      buildHir({
+        body: [],
+        globalObjectNames: [{ declaration: "var", name: "missing", range }],
+        kind: "program",
+        range,
+        sourceId: "global-object-missing.js",
+      }),
+    /Global object name 'missing' has no script binding\./u,
+  );
+});
+
+/**
+ * One Script whose only top-level declaration binds `name`, so the
+ * global-object entry the frontend would report is the single input the
+ * intrinsic-collision decision reads.
+ */
+function intrinsicGlobalProgram(
+  declaration: "function" | "var",
+  name: string,
+): SyntaxProgram {
+  return {
+    body:
+      declaration === "function"
+        ? [
+            {
+              body: [],
+              kind: "function",
+              name,
+              parameters: [],
+              range,
+              returnHints: [],
+            },
+          ]
+        : [
+            {
+              hint: undefined,
+              initializer: { kind: "undefined", range },
+              kind: "let",
+              name,
+              range,
+            },
+          ],
+    globalObjectNames: [{ declaration, name, range }],
+    kind: "program",
+    range,
+    sourceId: "intrinsic-global.js",
+  };
+}
+
+test("admits a function declaration that replaces a replaceable global", () => {
+  // CreateGlobalFunctionBinding redefines a configurable intrinsic
+  // property whole, which is exactly this profile's uniform writable,
+  // enumerable, non-configurable property.
+  for (const name of ["Symbol", "TypeError"]) {
+    const result = buildHir(intrinsicGlobalProgram("function", name));
+    assert.deepEqual(result.diagnostics, []);
+    assert.deepEqual(result.program?.globalObjectBindings, [
+      { declaration: "function", id: 0, name },
+    ]);
+  }
+});
+
+test("rejects a top-level declaration of an intrinsic global", () => {
+  // Every other collision needs an answer the realm's global object
+  // does not carry yet, so it is reported rather than compiled into a
+  // property that silently differs from ECMA-262's.
+  const cases = [
+    { declaration: "var" as const, name: "undefined" },
+    { declaration: "var" as const, name: "NaN" },
+    { declaration: "var" as const, name: "Infinity" },
+    { declaration: "var" as const, name: "Symbol" },
+    { declaration: "var" as const, name: "RangeError" },
+    { declaration: "function" as const, name: "undefined" },
+    { declaration: "function" as const, name: "NaN" },
+    { declaration: "function" as const, name: "Infinity" },
+  ];
+  for (const { declaration, name } of cases) {
+    const result = buildHir(intrinsicGlobalProgram(declaration, name));
+    assert.equal(result.program, undefined);
+    assert.equal(result.diagnostics.length, 1);
+    const diagnostic = result.diagnostics[0];
+    assert.equal(diagnostic?.code, "OSEO1001");
+    assert.match(
+      diagnostic?.message ?? "",
+      new RegExp(`Declaring the intrinsic global '${name}' `, "u"),
+    );
+    assert.equal(diagnostic?.sourceId, "intrinsic-global.js");
+  }
+});
+
+test("keeps an ordinary top-level name clear of the collision check", () => {
+  const result = buildHir(intrinsicGlobalProgram("var", "Symbolic"));
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.program?.globalObjectBindings, [
+    { declaration: "var", id: 0, name: "Symbolic" },
+  ]);
+});
+
 test("rejects duplicate prototype setters at the HIR boundary", () => {
   const result = buildHir({
     body: [

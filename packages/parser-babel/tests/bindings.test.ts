@@ -27,6 +27,171 @@ test("hoists var declarations to initialized bindings", () => {
   assert.ok(hoistedIndex >= 0 && hoistedIndex < useIndex);
 });
 
+test("binds every var-scoped script name on the global object", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function shown() { return 1; }\n" +
+      "var counted = 2;\n" +
+      "if (counted) { var nested = 3; }\n" +
+      "for (var stepped = 0; stepped < 1; stepped += 1) {}\n" +
+      "let lexical = 4;\n" +
+      "const fixed = 5;\n" +
+      "class Named {}\n" +
+      "function inner() { var hidden = 6; return hidden; }\n" +
+      "console.log(shown(), counted, nested, stepped);\n" +
+      "console.log(lexical, fixed, inner(), typeof Named);\n",
+    sourceId: "global-object-names.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  // GlobalDeclarationInstantiation creates the function bindings before
+  // the var names, and a lexical declaration, a class, and a name
+  // declared inside a function are never global-object properties.
+  const names = (result.hir.globalObjectBindings ?? []).map(
+    (binding) => binding.name,
+  );
+  assert.deepEqual(names, ["shown", "inner", "counted", "nested", "stepped"]);
+  // Each entry names the binding the script statement list writes, so
+  // the property and the binding cannot become separate storage.
+  const hirText = printHir(result.hir);
+  for (const binding of result.hir.globalObjectBindings ?? []) {
+    assert.match(
+      hirText,
+      new RegExp(`global-object %b${binding.id} ${binding.name}\\b`, "u"),
+    );
+  }
+  assert.ok(result.mir != null);
+  const mirText = printMir(result.mir);
+  assert.match(mirText, /global-object %b\d+ shown/u);
+  assert.doesNotMatch(mirText, /global-object %b\d+ lexical/u);
+  assert.doesNotMatch(mirText, /global-object %b\d+ hidden/u);
+  // Which ECMA-262 operation creates each property reaches MIR, because
+  // it is what decides whether this profile's uniform property is the
+  // one ECMA-262 would create.
+  assert.deepEqual(
+    result.mir.globalObjectBindings.map((binding) => [
+      binding.name,
+      binding.declaration,
+    ]),
+    [
+      ["shown", "function"],
+      ["inner", "function"],
+      ["counted", "var"],
+      ["nested", "var"],
+      ["stepped", "var"],
+    ],
+  );
+});
+
+test("replaces a replaceable intrinsic global with a function", () => {
+  // CreateGlobalFunctionBinding redefines a configurable intrinsic
+  // property whole, which is this profile's writable, enumerable,
+  // non-configurable property, so the declaration stays admitted.
+  const result = compileSource(babelFrontend, {
+    source: "function Symbol() { return 1; }\nconsole.log(typeof Symbol);\n",
+    sourceId: "replaceable-global.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.deepEqual(
+    result.mir.globalObjectBindings.map((binding) => binding.name),
+    ["Symbol"],
+  );
+});
+
+test("rejects a top-level declaration of an intrinsic global", () => {
+  // GlobalDeclarationInstantiation answers each of these with behavior
+  // the realm's global object does not carry yet: CreateGlobalVarBinding
+  // leaves the existing property and its attributes alone, and
+  // CanDeclareGlobalFunction throws a TypeError for a restricted
+  // global. Creating this profile's uniform property instead would
+  // silently differ, so each is reported where it is written.
+  const cases = [
+    { column: 5, name: "undefined", source: "var undefined = 1;\n" },
+    { column: 5, name: "NaN", source: "var NaN = 1;\n" },
+    { column: 1, name: "Infinity", source: "function Infinity() {}\n" },
+    { column: 5, name: "Symbol", source: "var Symbol = 1;\n" },
+    { column: 5, name: "TypeError", source: "var TypeError = 1;\n" },
+  ];
+  for (const { column, name, source } of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "intrinsic-global.ts",
+    });
+    assert.equal(result.hir, undefined);
+    assert.equal(result.diagnostics.length, 1);
+    const diagnostic = result.diagnostics[0];
+    assert.equal(diagnostic?.code, "OSEO1001");
+    assert.match(
+      diagnostic?.message ?? "",
+      new RegExp(`Declaring the intrinsic global '${name}' `, "u"),
+    );
+    // The diagnostic names the declaration that would create the
+    // property rather than the whole program.
+    assert.deepEqual(diagnostic?.range.start, { column, line: 1 });
+  }
+});
+
+test("keeps an intrinsic global name usable inside module code", () => {
+  // A module's var-scoped names are Module Environment Record bindings
+  // and add nothing to the global object, so no collision exists.
+  const sourceId = "file:///app/module-intrinsic-global.js";
+  const parsed = babelModuleFrontend.parseModule({
+    source: "var Symbol = 1;\nconsole.log(Symbol);\n",
+    sourceId,
+  });
+  assert.deepEqual(parsed.diagnostics, []);
+  assert.ok(parsed.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "module-intrinsic-global",
+        syntax: parsed.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.deepEqual(compiled.mir.globalObjectBindings, []);
+});
+
+test("keeps module code clear of global object bindings", () => {
+  const sourceId = "file:///app/module-global-object.js";
+  const parsed = babelModuleFrontend.parseModule({
+    source:
+      "var moduleVar = 1;\n" +
+      "function moduleFunction() { return moduleVar; }\n" +
+      "console.log(moduleFunction());\n",
+    sourceId,
+  });
+  assert.deepEqual(parsed.diagnostics, []);
+  assert.ok(parsed.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "module-global-object",
+        syntax: parsed.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  // Module code adds nothing to the global object, so a module's
+  // var-scoped names stay ordinary module-level bindings.
+  assert.deepEqual(compiled.mir.globalObjectBindings, []);
+  assert.doesNotMatch(printMir(compiled.mir), /global-object %b/u);
+});
+
 test("keeps var assignments on parameters and declared functions", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -453,8 +618,8 @@ test("converts private destructuring assignment targets", () => {
   assert.ok(result.mir != null);
   const hir = printHir(result.hir);
   const mir = printMir(result.mir);
-  assert.match(hir, /target this\.%b\d+ #first/u);
-  assert.match(hir, /target this\.%b\d+ #rest/u);
+  assert.match(hir, /target this strict\.%b\d+ #first/u);
+  assert.match(hir, /target this strict\.%b\d+ #rest/u);
   assert.match(mir, /destructuring private target/u);
   assert.match(mir, /private-set destructuring private target/u);
 });

@@ -78,6 +78,7 @@ function fixtureOptions(
     input: {
       functions: [],
       globalBindings: [],
+      globalObjectBindings: [],
       kind: "mir-program",
       observeSpecialization: false,
       script: {

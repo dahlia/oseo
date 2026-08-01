@@ -135,7 +135,7 @@ function printHirExpression(expression: HirExpression): string {
   if (expression.kind === "function") {
     return `function @f${expression.functionId} ${expression.name}`;
   }
-  if (expression.kind === "this") return "this";
+  if (expression.kind === "this") return `this ${expression.thisMode}`;
   if (expression.kind === "new-target") return "new.target";
   if (expression.kind === "undefined" || expression.kind === "null") {
     return expression.kind;
@@ -571,6 +571,9 @@ function appendHirStatement(
 /** Print deterministic, source-located HIR for review and snapshots. */
 export function printHir(program: HirProgram): string {
   const lines = [`hir ${JSON.stringify(program.sourceId)}`];
+  for (const binding of program.globalObjectBindings ?? []) {
+    lines.push(`global-object %b${binding.id} ${binding.name}`);
+  }
   for (const functionValue of program.functions) {
     const parameters = functionValue.parameters
       .map(

@@ -96,6 +96,7 @@ OseoResult oseo_cell_create(OseoContext *context, OseoValue value) {
         return failure(context, "OSEO2001", "Binding cell allocation failed.");
     }
     cell->value = value;
+    cell->writable = true;
     return oseo_internal_publish_heap(context, &cell->header, OSEO_HEAP_CELL);
 }
 
@@ -191,4 +192,123 @@ OseoResult oseo_module_namespace_create(
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+/*
+ * The realm's global this value, created on first use. It is an
+ * ordinary extensible object with a null [[Prototype]], created the way
+ * this profile creates an object literal so that it answers the same
+ * virtualized %Object.prototype% methods every other ordinary object
+ * answers. Storing it before returning keeps one identity for the whole
+ * realm and permanently roots it, so a collection between two `this`
+ * reads cannot replace it.
+ *
+ * The object is not put in dictionary mode. A var-scoped Script property
+ * stores its binding cell rather than its value, but the property cache
+ * excludes those slots individually, so the cache still serves the
+ * ordinary properties a program adds to this object.
+ */
+static OseoResult global_this_object(OseoContext *context) {
+    if (tag_of(context->global_this) != OSEO_TAG_UNDEFINED) {
+        return normal(context->global_this);
+    }
+    OseoResult result = oseo_object_literal_create(context);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    ordinary_object(result.value)->global_object = true;
+    context->global_this = result.value;
+    return result;
+}
+
+OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {
+    if (!is_nullish(receiver)) return normal(receiver);
+    return global_this_object(context);
+}
+
+OseoResult oseo_global_object_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t count,
+    const uint16_t *const *names,
+    const size_t *name_lengths,
+    const size_t *binding_ids
+) {
+    if (count > 0u &&
+        (names == NULL || name_lengths == NULL || binding_ids == NULL)) {
+        return failure(context, "OSEO2001", "Invalid global object.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = global_this_object(context);
+    frame.slots[0] = result.value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count;
+         index += 1u) {
+        result = oseo_string_from_units(
+            context,
+            names[index],
+            name_lengths[index]
+        );
+        frame.slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        /*
+         * The property stores the binding cell itself, which is why the
+         * environment slot rather than its current value is read here.
+         * CreateGlobalVarBinding and CreateGlobalFunctionBinding both
+         * create a writable, enumerable, non-configurable property.
+         */
+        result = oseo_environment_get(
+            context,
+            environment,
+            binding_ids[index]
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_cell(frame.slots[2])) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "A global object property needs a binding cell."
+            );
+            break;
+        }
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            (OseoPropertyAttributes){false, true, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_global_binding_set(
+    OseoContext *context,
+    OseoValue cell_value,
+    OseoValue value,
+    bool strict
+) {
+    if (!is_cell(cell_value)) {
+        return failure(context, "OSEO2001", "Value is not a binding cell.");
+    }
+    /*
+     * A global var or function binding is an object environment record
+     * binding, so SetMutableBinding writes through the global object's
+     * property. Once [[DefineOwnProperty]] made that property
+     * non-writable, the assignment fails: silently outside strict code
+     * and with a TypeError inside it.
+     */
+    if (!cell_object(cell_value)->writable) {
+        return strict
+            ? oseo_internal_throw_error(
+                  context,
+                  OSEO_ERROR_TYPE,
+                  "Cannot assign to a read-only property."
+              )
+            : normal(value);
+    }
+    return oseo_cell_set(context, cell_value, value);
 }

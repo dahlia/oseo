@@ -77,6 +77,22 @@ static bool same_property_value(OseoValue left, OseoValue right) {
     return left == right;
 }
 
+/*
+ * True when one own property of `object_value` keeps its value in the
+ * binding cell `stored` instead of the property slot. A module
+ * namespace and the realm's global this value are the two objects whose
+ * properties are views of a binding: the namespace exposes an imported
+ * binding, and the global object exposes a var-scoped Script binding.
+ * Every read of such a property dereferences the cell, and every write
+ * that ECMA-262 admits goes through it, so a property and its binding
+ * are one storage location rather than two copies.
+ */
+static bool cell_backed_property(OseoValue object_value, OseoValue stored) {
+    if (!is_object(object_value) || !is_cell(stored)) return false;
+    const OseoOrdinaryObject *object = ordinary_object(object_value);
+    return object->module_namespace || object->global_object;
+}
+
 static size_t own_property_index(
     const OseoOrdinaryObject *object,
     OseoValue key
@@ -272,6 +288,7 @@ static OseoResult object_create(
     object->length_writable = false;
     object->extensible = true;
     object->module_namespace = false;
+    object->global_object = false;
     object->error_data = false;
     object->array_iterator = false;
     object->iterator_array = oseo_undefined();
@@ -339,6 +356,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->length_writable = true;
     array->extensible = true;
     array->module_namespace = false;
+    array->global_object = false;
     array->error_data = false;
     array->array_iterator = false;
     array->iterator_array = oseo_undefined();
@@ -661,7 +679,7 @@ static OseoResult object_get(
                 oseo_roots_release(context, &frame);
                 return result;
             }
-            if (object->module_namespace && is_cell(value)) {
+            if (cell_backed_property(current, value)) {
                 return oseo_cell_get(context, value);
             }
             return normal(value);
@@ -803,9 +821,14 @@ void oseo_property_cache_update(
     OseoOrdinaryObject *object = ordinary_object(object_value);
     size_t slot = own_property_index(object, key);
     /* An accessor slot must always dispatch through the generic getter
-     * call, never the direct fixed-slot load. */
+     * call, never the direct fixed-slot load. A cell-backed slot holds
+     * the binding cell rather than the value, so it is excluded for the
+     * same reason: the fixed-slot load would hand generated code the
+     * cell. Excluding the slot rather than the whole object keeps the
+     * cache working for the global object's ordinary properties. */
     if (!object->dictionary && slot != SIZE_MAX &&
-        !object->properties[slot].attributes.accessor) {
+        !object->properties[slot].attributes.accessor &&
+        !cell_backed_property(object_value, object->properties[slot].value)) {
         cache->shape_id = object->shape_id;
         cache->slot = slot;
     } else {
@@ -953,6 +976,12 @@ OseoResult oseo_object_set(
             if (index == SIZE_MAX) break;
             OseoProperty *property = &owner->properties[index];
             if (current == object_value) {
+                /* A cell-backed property is a view of a binding, so the
+                 * assignment updates the binding rather than replacing
+                 * the view with a plain value. */
+                if (cell_backed_property(current, property->value)) {
+                    return oseo_cell_set(context, property->value, value);
+                }
                 property->value = value;
                 if (extends_array) receiver->array_length = receiver_index + 1u;
                 return normal(value);
@@ -1207,17 +1236,44 @@ OseoResult oseo_object_define(
     size_t index = own_property_index(object, key);
     if (index != SIZE_MAX) {
         OseoProperty *property = &object->properties[index];
+        /* ValidateAndApplyPropertyDescriptor compares the property's
+         * current value, which a cell-backed property keeps in its
+         * binding cell. Reading it allocates nothing on the normal path,
+         * so the property pointer stays valid. */
+        bool cell_backed = cell_backed_property(object_value, property->value);
+        OseoValue current_value = property->value;
+        if (cell_backed) {
+            OseoResult read = oseo_cell_get(context, property->value);
+            if (read.status != OSEO_STATUS_NORMAL) return read;
+            current_value = read.value;
+        }
         if (!property->attributes.configurable &&
             (property->attributes.accessor ||
              attributes.configurable ||
              attributes.enumerable != property->attributes.enumerable ||
              (!property->attributes.writable && attributes.writable) ||
              (!property->attributes.writable &&
-              !same_property_value(property->value, value)))) {
+              !same_property_value(current_value, value)))) {
             return type_error(
                 context,
                 "Cannot redefine a non-configurable property."
             );
+        }
+        if (cell_backed) {
+            /* The binding stays the one storage location the property
+             * views, so the accepted redefinition writes through the
+             * cell and records the new [[Writable]] on it. A binding
+             * assignment then fails exactly where a property assignment
+             * would. */
+            OseoValue cell = property->value;
+            OseoResult written = oseo_cell_set(context, cell, value);
+            if (written.status != OSEO_STATUS_NORMAL) return written;
+            cell_object(cell)->writable = attributes.writable;
+            property->attributes = attributes;
+            object->dictionary = true;
+            object->shape_id = context->next_shape_id;
+            context->next_shape_id += 1u;
+            return normal(object_value);
         }
         property->attributes = attributes;
         property->value = value;
@@ -2057,6 +2113,16 @@ OseoResult oseo_object_builtin_define_property(
         &current_getter,
         &current_setter
     );
+    /* A descriptor with no value field keeps the property's current
+     * value, which a cell-backed property holds in its binding cell. */
+    if (exists && cell_backed_property(object_value, current_value)) {
+        result = oseo_cell_get(context, current_value);
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+        current_value = result.value;
+    }
     if (has_getter || has_setter ||
         (!has_value && !has_writable &&
          exists && current_attributes.accessor)) {
@@ -2209,9 +2275,7 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL && exists &&
-        is_object(object_value) &&
-        ordinary_object(object_value)->module_namespace &&
-        is_cell(value)) {
+        cell_backed_property(object_value, value)) {
         result = oseo_cell_get(context, value);
         value = result.value;
     }

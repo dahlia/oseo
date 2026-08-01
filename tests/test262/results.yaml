@@ -6387,10 +6387,10 @@ results:
     dependencies:
       - promise-settlement
     observation:
-      detail: 'test/built-ins/Promise/promise.js non-strict disabled failed
-        (1): stdout="" stderr="test/built-ins/Promise/promise.js:144:16:
-        error[OSEO1001]: The profile admits this only where an enclosing
-        non-arrow function provides it.\n"'
+      detail: "test/built-ins/Promise/promise.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/built-ins/Promise/promise.js:145:10:
+        error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -9091,6 +9091,52 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/assignmenttargettype/direct-primaryexpression-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -66640,6 +66686,28 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/postfix-decrement/this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -66726,6 +66794,28 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/postfix-increment/this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -66818,6 +66908,28 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/prefix-decrement/this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -66881,6 +66993,28 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/prefix-increment/this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -70061,18 +70195,21 @@ results:
       strictness:
         - non-strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
-      detail: 'test/language/expressions/tagged-template/call-expression-context-no-strict.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/tagged-template/call-expression-context-no-strict.js:91:27:
-        error[OSEO1001]: The profile admits this only where an enclosing
-        non-arrow function provides it.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -70403,6 +70540,59 @@ results:
       includes: []
       mode: script
       path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/this/11.1.1-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/this/S11.1.1_A1.js
       strictness:
         - non-strict
         - strict
@@ -71642,6 +71832,50 @@ results:
     dependencies:
       - classes
       - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/identifiers/val-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/keywords/ident-ref-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - object-literals
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -74177,16 +74411,26 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-this.js
+          sourceHash: fnv1a64:29c3303ecc97755c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/eval-this.js:114:18: error[OSEO1001]:
-        The profile admits this only where an enclosing non-arrow
-        function provides it."
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -78889,6 +79133,41 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
+          sourceHash: fnv1a64:febb40a19109cf64
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -79887,6 +80166,40 @@ results:
           strictness: strict
         - specialization: enabled
           strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features: []
+      flags:
+        - noStrict
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/statements/async-function/evaluation-this-value-global.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - functions
+      - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
       harnessFailed: false
       passed: true
@@ -96478,19 +96791,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
+      - expression-operators
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-field-is-visible-in-computed-properties.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-field-is-visible-in-computed-properties.js:111:14:
-        error[OSEO1001]: The profile admits this only where an enclosing
-        non-arrow function provides it.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -96542,19 +96863,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
+      - expression-operators
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-field-with-initialized-id-is-visible-in-computed-properties.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-field-with-initialized-id-is-visible-in-computed-properties.js:138:14:
-        error[OSEO1001]: The profile admits this only where an enclosing
-        non-arrow function provides it.\n"'
-      unsupportedCapability: profile-syntax
       harnessFailed: false
-      passed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -133606,11 +133935,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1170
+  expectedNegatives: 1179
   harnessFailures: 0
-  passes: 2474
+  passes: 2481
   semanticFailures: 0
-  unsupportedProfileFeatures: 559
+  unsupportedProfileFeatures: 555
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -133621,7 +133950,7 @@ summary:
     - dependency: async-functions
       expectedNegatives: 155
       harnessFailures: 0
-      passes: 316
+      passes: 317
       semanticFailures: 0
       unsupportedProfileFeatures: 8
     - dependency: async-iteration
@@ -133639,9 +133968,9 @@ summary:
     - dependency: classes
       expectedNegatives: 572
       harnessFailures: 0
-      passes: 616
+      passes: 618
       semanticFailures: 0
-      unsupportedProfileFeatures: 148
+      unsupportedProfileFeatures: 146
     - dependency: control-flow
       expectedNegatives: 115
       harnessFailures: 0
@@ -133673,15 +134002,15 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 26
     - dependency: expression-operators
-      expectedNegatives: 34
+      expectedNegatives: 41
       harnessFailures: 0
-      passes: 210
+      passes: 214
       semanticFailures: 0
-      unsupportedProfileFeatures: 72
+      unsupportedProfileFeatures: 71
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 139
+      passes: 140
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - dependency: generators
@@ -133705,11 +134034,11 @@ summary:
     - dependency: module-linking
       expectedNegatives: 166
       harnessFailures: 0
-      passes: 25
+      passes: 27
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 34
     - dependency: object-literals
-      expectedNegatives: 11
+      expectedNegatives: 12
       harnessFailures: 0
       passes: 369
       semanticFailures: 0
@@ -133717,13 +134046,13 @@ summary:
     - dependency: object-properties
       expectedNegatives: 490
       harnessFailures: 0
-      passes: 707
+      passes: 709
       semanticFailures: 0
-      unsupportedProfileFeatures: 128
+      unsupportedProfileFeatures: 126
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
-      passes: 290
+      passes: 291
       semanticFailures: 0
       unsupportedProfileFeatures: 39
     - dependency: rest-parameters
@@ -133741,11 +134070,11 @@ summary:
     - dependency: top-level-await
       expectedNegatives: 3
       harnessFailures: 0
-      passes: 2
+      passes: 3
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: var-bindings
-      expectedNegatives: 34
+      expectedNegatives: 35
       harnessFailures: 0
       passes: 183
       semanticFailures: 0
@@ -133830,12 +134159,24 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 468
+      expectedNegatives: 475
       harnessFailures: 0
-      passes: 1281
+      passes: 1283
       semanticFailures: 0
-      unsupportedProfileFeatures: 277
+      unsupportedProfileFeatures: 276
     - group: language/identifier-resolution
+      expectedNegatives: 1
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
+    - group: language/identifiers
+      expectedNegatives: 1
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
+    - group: language/keywords
       expectedNegatives: 1
       harnessFailures: 0
       passes: 0
@@ -133850,9 +134191,9 @@ summary:
     - group: language/module-code
       expectedNegatives: 165
       harnessFailures: 0
-      passes: 24
+      passes: 26
       semanticFailures: 0
-      unsupportedProfileFeatures: 35
+      unsupportedProfileFeatures: 34
     - group: language/rest-parameters
       expectedNegatives: 1
       harnessFailures: 0
@@ -133862,6 +134203,6 @@ summary:
     - group: language/statements
       expectedNegatives: 496
       harnessFailures: 0
-      passes: 996
+      passes: 999
       semanticFailures: 0
-      unsupportedProfileFeatures: 133
+      unsupportedProfileFeatures: 131

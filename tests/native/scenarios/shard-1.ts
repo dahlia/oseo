@@ -1,12 +1,180 @@
+/* eslint-disable no-await-in-loop -- Native scenario builds are isolated. */
+
 import assert from "node:assert/strict";
+import process from "node:process";
 
 import { runNativeCli } from "../../../packages/cli/src/index.ts";
 import type { NativeScenarioContext } from "../scenario.ts";
+
+/**
+ * A global Script whose top-level declarations are observed through its
+ * `this` binding. Indirect `eval`, the only global-Script position both
+ * reference hosts expose, creates its var-scoped global properties with
+ * `[[Configurable]]` true and shares no `functionsToInitialize` ordering
+ * with a Script, so this source is compared with fixed ECMA-262
+ * expectations instead of a host observation.
+ */
+const globalDeclarationSource = `
+function first() { return counted; }
+var counted = 1;
+var hoisted;
+function second() { return "second"; }
+let lexicalName = 2;
+const constantName = 3;
+class ClassName {}
+const declaredNames = ["first", "second", "counted", "hoisted"];
+let order = "";
+for (const key of Object.keys(this)) {
+  for (const name of declaredNames) {
+    if (key === name) order += key + " ";
+  }
+}
+console.log(order);
+const countedDescriptor = Object.getOwnPropertyDescriptor(this, "counted");
+console.log(
+  countedDescriptor.value,
+  countedDescriptor.writable,
+  countedDescriptor.enumerable,
+  countedDescriptor.configurable,
+);
+const firstDescriptor = Object.getOwnPropertyDescriptor(this, "first");
+console.log(
+  typeof firstDescriptor.value,
+  firstDescriptor.writable,
+  firstDescriptor.enumerable,
+  firstDescriptor.configurable,
+);
+console.log("lexicalName" in this, "constantName" in this, "ClassName" in this);
+console.log(delete this.counted, counted, this.counted);
+this.appended = 4;
+const appendedDescriptor = Object.getOwnPropertyDescriptor(this, "appended");
+console.log(
+  appendedDescriptor.writable,
+  appendedDescriptor.enumerable,
+  appendedDescriptor.configurable,
+  delete this.appended,
+  "appended" in this,
+);
+Object.defineProperty(this, "counted", { value: 5, writable: false });
+counted = 6;
+this.counted = 7;
+console.log(counted, this.counted, first());
+function strictAssign() { "use strict"; counted = 8; }
+try { strictAssign(); } catch (error) { console.log(error.constructor.name); }
+console.log(counted, first());
+`;
+
+/**
+ * GlobalDeclarationInstantiation creates every function binding before
+ * every `var` binding, so `first second counted hoisted` is the order
+ * ECMA-262 requires even though both reference hosts, which share V8,
+ * create global declarations in source order instead. The remaining
+ * lines are the Script-only descriptor, deletion, and shared-storage
+ * boundaries: a var-scoped property is writable, enumerable, and
+ * non-configurable, an ordinary property the Script adds itself is
+ * configurable, and `[[DefineOwnProperty]]` owns the `[[Writable]]`
+ * attribute that the binding's own assignment path then observes.
+ */
+const globalDeclarationExpectation =
+  "first second counted hoisted \n" +
+  "1 true true false\n" +
+  "function true true false\n" +
+  "false false false\n" +
+  "false 1 1\n" +
+  "true true true true false\n" +
+  "5 5 5\n" +
+  "TypeError\n" +
+  "5 5\n";
+
+/**
+ * A strict Script keeps the same global bindings, because strictness
+ * does not change GlobalDeclarationInstantiation, and turns every
+ * refused write into a TypeError.
+ */
+const strictGlobalDeclarationSource = `
+"use strict";
+var counted = 1;
+function declared() { return counted; }
+let lexicalName = 2;
+console.log(this.counted, declared(), typeof this.declared);
+console.log("lexicalName" in this, "counted" in this, "declared" in this);
+this.counted = 2;
+console.log(counted, declared());
+counted = 3;
+console.log(this.counted);
+try {
+  console.log(delete this.counted);
+} catch (error) {
+  console.log("delete", error.constructor.name);
+}
+Object.defineProperty(this, "counted", { writable: false });
+try {
+  counted = 4;
+} catch (error) {
+  console.log("binding", error.constructor.name);
+}
+try {
+  this.counted = 5;
+} catch (error) {
+  console.log("property", error.constructor.name);
+}
+console.log(counted, this.counted, declared());
+`;
+
+const strictGlobalDeclarationExpectation =
+  "1 1 function\n" +
+  "false true true\n" +
+  "2 2\n" +
+  "3\n" +
+  "delete TypeError\n" +
+  "binding TypeError\n" +
+  "property TypeError\n" +
+  "3 3 3\n";
 
 export async function runNativeScenario1(
   context: NativeScenarioContext,
 ): Promise<void> {
   const { host } = context;
+
+  // Script global declarations reach the global object identically under
+  // both specialization policies and with a collection forced at every
+  // safepoint, which keeps the object, its properties, and the binding
+  // cells they share reachable together.
+  for (const [name, source, expected] of [
+    [
+      "global-declarations.js",
+      globalDeclarationSource,
+      globalDeclarationExpectation,
+    ],
+    [
+      "global-declarations-strict.js",
+      strictGlobalDeclarationSource,
+      strictGlobalDeclarationExpectation,
+    ],
+  ] as const) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+      try {
+        const observed = await runNativeCli(
+          {
+            args: [
+              ...(specialization === "disabled" ? ["--no-specialization"] : []),
+              name,
+            ],
+            source,
+            sourceId: name,
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(observed.exitStatus, 0, observed.stderr);
+        assert.equal(observed.stderr, "");
+        assert.equal(observed.stdout, expected, `${name} ${specialization}`);
+      } finally {
+        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      }
+    }
+  }
 
   const nulSourceId = "source\0identifier.ts";
   const nulSourceDiagnostic = await runNativeCli(

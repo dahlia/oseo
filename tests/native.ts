@@ -38,6 +38,7 @@ import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
+import { receiverFixtures } from "./native/fixtures/receivers.ts";
 
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -83,6 +84,7 @@ const fixtures: readonly Fixture[] = [
   ...bindingFixtures,
   ...bigintFixtures,
   ...expressionFixtures,
+  ...receiverFixtures,
   ...generatorFixtures,
   ...asyncFixtures,
   ...asyncIterationFixtures,
@@ -211,6 +213,21 @@ for (const fixture of selectedFixtures) {
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
   }
 
+  if (fixture.name === "script-this") {
+    // Script top level and a non-strict function share one lowering,
+    // while the strict function in the same Script reads its receiver.
+    // Neither depends on the specialization policy.
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /global-this global this/u);
+      assert.match(text, /= receiver this/u);
+    }
+  }
+
+  if (fixture.name === "script-this-hints") {
+    assert.match(printMir(enabledMir), /guard-smi/u);
+    assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
+  }
+
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
@@ -272,6 +289,10 @@ for (const fixture of selectedFixtures) {
     fixture.name === "catch-bindings" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
+    fixture.name === "script-this" ||
+    fixture.name === "script-this-strict" ||
+    fixture.name === "script-this-hints" ||
+    fixture.name === "script-global-bindings" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -344,6 +365,39 @@ for (const fixture of selectedFixtures) {
           }
           if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "script-global-bindings") {
+            // The global object's properties are installed once from the
+            // script's binding cells, and the binding assignment path
+            // carries the writing code's strictness.
+            assert.match(
+              native.emittedC,
+              /oseo_global_object_create\(context, roots\[/u,
+            );
+            assert.match(
+              native.emittedC,
+              /oseo_global_binding_set\(context, result\.value/u,
+            );
+            assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "script-this" ||
+            fixture.name === "script-this-strict"
+          ) {
+            // Resolving the global this value allocates once and then
+            // survives every forced collection that follows it.
+            assert.match(
+              native.emittedC,
+              /oseo_this_value\(context, receiver\)/u,
+            );
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "script-this-hints") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardHits > 0);
+              assert.ok(native.counters.guardMisses > 0);
+            }
           }
           if (fixture.name === "object-literal-prototype-setter") {
             assert.ok(native.counters.collections > 0);

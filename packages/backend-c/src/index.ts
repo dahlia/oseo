@@ -3,6 +3,7 @@ import type {
   MirBlock,
   MirConstant,
   MirFunction,
+  MirGlobalBinding,
   MirOperation,
   MirProgram,
   MirTerminator,
@@ -86,6 +87,13 @@ interface EmitState {
   readonly functionRootCounts: ReadonlyMap<number, number>;
   readonly lines: string[];
   readonly environmentSlot: number;
+  /**
+   * Bindings the global object also exposes as properties. Their
+   * assignment path is the one ECMA-262 gives an object environment
+   * record binding, so it can fail on a non-writable property where an
+   * ordinary declarative binding never can.
+   */
+  readonly globalObjectBindingIds: ReadonlySet<number>;
   readonly blockParameters: ReadonlyMap<number, readonly number[]>;
   readonly scalarKinds: Map<number, "boolean" | "smi">;
   readonly strict: boolean;
@@ -591,6 +599,22 @@ function emitWrite(state: EmitState, operation: MirOperation): void {
       ),
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  if (state.globalObjectBindingIds.has(bindingId)) {
+    // The global object exposes this binding as a property, so the
+    // runtime owns the [[Writable]] check the property carries and the
+    // assignment strictness ECMA-262 takes from this code.
+    line(
+      state,
+      renderC(
+        emittedC.write.resultAssignOseoGlobalBindingSet,
+        value,
+        state.strict
+          ? renderC(emittedC.common.trueValue)
+          : renderC(emittedC.common.falseValue),
+      ),
+    );
+    return;
+  }
   line(
     state,
     renderC(emittedC.write.resultAssignOseoCellSetContextResultValue, value),
@@ -2492,6 +2516,17 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state,
       renderC(emittedC.operation.rootsAssignReceiverStatement, operation.id),
     );
+  } else if (operation.kind === "global-this") {
+    // The runtime owns the nullish-receiver substitution and the one
+    // global this object it resolves to, so generated C never decides
+    // which receiver a non-strict function or Script top level observes.
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(
+      state,
+      renderC(emittedC.operation.resultAssignOseoThisValueContextReceiver),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "new-target") {
     // A generator body resumes outside any construction, and a generator
     // function is not a constructor, so its new.target is undefined.
@@ -3196,12 +3231,89 @@ function yieldResumePoints(
   return points;
 }
 
+/**
+ * GlobalDeclarationInstantiation's global-object bindings, installed
+ * once at the start of the script after every binding cell exists and
+ * before any statement runs. Each property stores the cell itself, so
+ * the property and the binding are one storage location for the whole
+ * execution and no initial value is copied between them.
+ */
+function emitGlobalObject(
+  state: EmitState,
+  bindings: readonly MirGlobalBinding[],
+): void {
+  if (bindings.length === 0) return;
+  const pointers: string[] = [];
+  const lengths: number[] = [];
+  for (const [index, binding] of bindings.entries()) {
+    const units = utf16Units(binding.name);
+    lengths.push(units.length);
+    if (units.length === 0) {
+      pointers.push(renderC(emittedC.common.nullPointer));
+      continue;
+    }
+    const constantName = renderC(emittedC.globalObject.units, index);
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        constantName,
+        units.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    pointers.push(constantName);
+  }
+  const prefix = renderC(emittedC.globalObject.prefix);
+  line(
+    state,
+    renderC(
+      emittedC.moduleNamespace.staticConstUint16TPointerConstNamesAssign,
+      prefix,
+    ) +
+      renderC(
+        emittedC.common.bracedInitializer,
+        pointers.join(renderC(emittedC.common.commaSpace)),
+      ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.moduleNamespace.staticConstSizeTLengthsAssignStatement,
+      prefix,
+      lengths.join(renderC(emittedC.common.commaSpace)),
+    ),
+  );
+  line(
+    state,
+    renderC(emittedC.moduleNamespace.staticConstSizeTBindingsAssign, prefix) +
+      renderC(
+        emittedC.common.bracedInitializer,
+        bindings
+          .map((binding) => binding.id)
+          .join(renderC(emittedC.common.commaSpace)),
+      ),
+  );
+  line(
+    state,
+    renderC(emittedC.globalObject.resultAssignOseoGlobalObjectCreate) +
+      renderC(emittedC.common.rootsU, state.environmentSlot, bindings.length) +
+      renderC(
+        emittedC.moduleNamespace.namesLengthsBindingsStatement,
+        prefix,
+        prefix,
+        prefix,
+      ),
+  );
+  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+}
+
 function emitPrologue(
   state: EmitState,
   functionValue: MirFunction,
   bindingIdValues: readonly number[],
   totalBindingCount: number,
   temporarySlot: number,
+  globalObjectBindings: readonly MirGlobalBinding[],
 ): void {
   const environmentSlot = state.environmentSlot;
   if (functionValue.id < 0) {
@@ -3238,6 +3350,7 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
+  if (functionValue.id < 0) emitGlobalObject(state, globalObjectBindings);
   if (functionValue.selfBindingId != null) {
     line(
       state,
@@ -3493,6 +3606,7 @@ function emitFunction(
   functionRootCounts: ReadonlyMap<number, number>,
   totalBindingCount: number,
   observeSpecialization: boolean,
+  globalObjectBindings: readonly MirGlobalBinding[],
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -3538,6 +3652,9 @@ function emitFunction(
       : { derivedThisBindingId: functionValue.derivedThisBindingId }),
     functionRootCounts,
     environmentSlot,
+    globalObjectBindingIds: new Set(
+      globalObjectBindings.map((binding) => binding.id),
+    ),
     nextRecursiveTarget: 0,
     observeSpecialization,
     scalarKinds: new Map(),
@@ -3585,6 +3702,7 @@ function emitFunction(
     bindingIdValues,
     totalBindingCount,
     temporarySlot,
+    globalObjectBindings,
   );
   if (generator) {
     if (generatorBodyStart == null) {
@@ -3715,11 +3833,28 @@ function emitFunctionDispatcher(
   return renderC(emittedC.functionDispatcher.source, casesSection);
 }
 
+/**
+ * The global this value is reachable only through the operation that
+ * resolves it, so a program that never resolves one cannot observe the
+ * global object, its properties, or their descriptors. Such a program
+ * installs nothing and keeps the ordinary binding assignment path.
+ */
+function observesGlobalThis(functions: readonly MirFunction[]): boolean {
+  return functions.some((functionValue) =>
+    functionValue.blocks.some((block) =>
+      block.operations.some((operation) => operation.kind === "global-this"),
+    ),
+  );
+}
+
 /** Deterministic C11 lowering whose only semantic input is MIR. */
 export const cBackend: NativeBackend = {
   emit(input) {
     const declaredFunctions = reachableFunctions(input);
     const functions = [...declaredFunctions, input.script];
+    const globalObjectBindings = observesGlobalThis(functions)
+      ? input.globalObjectBindings
+      : [];
     const functionRootCounts = new Map(
       functions.map((functionValue) => [
         functionValue.id,
@@ -3757,6 +3892,9 @@ export const cBackend: NativeBackend = {
     for (const binding of input.globalBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
+    for (const binding of input.globalObjectBindings) {
+      totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
+    }
     const declarations = functions
       .map(prototype)
       .join(renderC(emittedC.common.newline));
@@ -3777,6 +3915,7 @@ export const cBackend: NativeBackend = {
           functionRootCounts,
           totalBindingCount,
           input.observeSpecialization === true,
+          globalObjectBindings,
         ),
       )
       .join(renderC(emittedC.common.newline));

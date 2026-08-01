@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,203
-reviewed cases: 2,474 passes, 1,170 expected negatives, and 559 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,215
+reviewed cases: 2,481 passes, 1,179 expected negatives, and 555 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1552,6 +1552,117 @@ cases and from 1,169 to 1,170 expected negatives. Its 2,474 passes and 559
 unsupported profile features do not move. The suite revision, inventory
 policy, manifest schema, and classification vocabulary do not change, and
 there are no semantic or harness failures.
+
+M5a Unit 8.1d admits `this` at the top level of both source kinds. Owned
+syntax records the this mode of every `this` expression, so an arrow carries
+the mode of the position it is written in instead of a mode of its own. Script
+top level and any non-strict function share a global this environment that
+resolves a nullish receiver to the realm's global this value; a strict
+function, including every class element, keeps its call-site receiver
+unchanged. Module top level and an arrow beside it lower to the `undefined`
+constant a Module Environment Record binds, while an ordinary function in the
+same module still reads its own receiver. `this` remains an invalid assignment
+and update target.
+
+The receiver model is the smallest one that makes these positions correct. The
+runtime creates one ordinary extensible object with a null `[[Prototype]]` on
+first use, the same way it creates an object literal, roots it permanently, and
+returns it for every nullish receiver.
+
+Its own properties are the Script bindings GlobalDeclarationInstantiation
+creates on the global object, and nothing else: every top-level function
+declaration in source order, then every hoisted `var` name no function
+declaration already owns. The frontend reports those names, HIR resolves each
+to the binding the script statement list already writes, and the backend
+installs the list once in the script prologue, after every binding cell exists
+and before the first statement runs. Each property stores the binding cell
+itself, so the property and the binding are one storage location: a binding
+write, a property write, and a closure read all reach the same value, and no
+value is copied between them. Each is writable, enumerable, and
+non-configurable, and `Object.defineProperty` owns the `[[Writable]]` attribute
+that the binding's own assignment path then observes. Lexical top-level
+declarations are absent, a name declared inside a function is absent, and
+module code adds nothing at all.
+
+The global object is still not admitted. `globalThis`, the standard globals,
+indirect `eval` var bindings, Annex B block-level function hoisting, and the
+restricted-global and non-extensible cases stay M5b work, and reviewed cases
+that need them keep their unsupported classification. Owned syntax records
+which declaration creates each property, because that is what decides whether
+this unit's uniform writable, enumerable, non-configurable property is the one
+ECMA-262 creates. It is, for a function declaration over a replaceable
+intrinsic such as `Symbol` or `TypeError`, whose property is configurable and
+is therefore redefined whole. Every other collision with an intrinsic global
+needs CreateGlobalVarBinding to leave the existing property untouched or
+CanDeclareGlobalFunction to throw a `TypeError`, so it takes a source-located
+diagnostic at the HIR boundary rather than a property that silently differs.
+Three further boundaries are named in the profile rather than left implicit: a
+block-level function declaration at Script top level has no var-scoped
+binding, so it is absent from the global object where ECMA-262's Annex B would
+bind it; property creation order follows ECMA-262's functions-before-vars
+rather than the source order both reference hosts produce, because they share
+V8; and a lexical top-level declaration of a restricted global is not reported,
+because HasRestrictedGlobalProperty needs the lexical names this unit's
+frontend contract does not carry.
+
+The directly generated property suite uses seed `0x5eed0026` with 32 cases.
+Its independent oracle names the binding each position observes and its domain
+holds fifteen positions across Script and module sources, a Script strict
+directive, arrows, ordinary, own-strict, generator, asynchronous, and
+parameter-default functions, object and detached methods, class instance
+methods, static methods, and fields, a detached class method, a module
+continuation resumed after top-level await, an absent, `var`, function, or
+lexical top-level declaration observed through the captured receiver, a false
+number hint whose guarded addition misses into the compiled generic fallback,
+both specialization policies, and forced collection. A strict indirect `eval`
+gets its own variable environment, so the generated Script directive appears
+only beside a declaration the global object never binds. The 32-case budget
+samples thirteen of the fifteen positions and all four declaration kinds at
+this seed, and the extended budget reaches all fifteen positions, so the object
+method and the parameter default are not left to sampling: the fixed Script,
+strict Script, and module fixtures pin them at both budgets. Those fixed
+Node.js, Deno, and native fixtures retain the same boundaries, including the
+AArch64 Linux cross-link. A fixed native scenario compares a Script and a
+strict Script against ECMA-262 expectations for the declaration order,
+descriptors, deletion, and `[[Writable]]` interaction that indirect `eval`
+cannot reproduce, and the reviewed C heap fixture retains the global this
+value's identity and reachability across a forced collection and pins the
+property cache's cell-backed exclusion.
+
+This unit advances the runtime ABI to `m5-38` with `oseo_this_value`,
+`oseo_global_object_create`, and `oseo_global_binding_set`. The first resolves
+a nullish receiver, the second installs one Script's global-object properties
+from existing binding cells, and the third owns the `[[Writable]]` check a
+shared storage location carries, so generated C never decides which receiver a
+position observes or whether an assignment through a binding is admitted.
+Because a fixed-slot property load would hand generated code the binding cell,
+the property cache excludes cell-backed slots individually and keeps working
+for the global object's ordinary properties.
+
+The reviewed test262 subset adds twelve directly applicable cases: three
+positive top-level `this` cases and the nine parse negatives that keep `this`
+an invalid assignment, update, and binding target. Four already reviewed cases
+move from unsupported to pass because a top-level `this` was their only
+missing prerequisite, including the two class private-field
+computed-property cases whose bodies begin `const self = this`. The manifest
+moves from 4,203 to 4,215 cases, from 2,474 to 2,481 passes, and from 1,170 to
+1,179 expected negatives, and unsupported profile features fall from 559 to
+555. The suite revision, inventory policy, manifest schema, and classification
+vocabulary do not change, and there are no semantic or harness failures. Every
+one of those 4,215 classifications was re-observed against the global-object
+binding model and none moved, so the model changes no already reviewed case.
+
+The counts remain a floor, because the directly applicable
+*test/language/global-code/* directory is still outside the reviewed subset
+and is reviewed into it before this unit closes. Direct execution of its 42
+inventory paths already separates them: *decl-var.js*, *decl-func.js*,
+*decl-lex-deletion.js*, *S10.1.7\_A1\_T1.js*, and *S10.4.1\_A1\_T1.js* pass on
+the model as it stands; the `new.target`, `super`, top-level `return`, and
+module-syntax cases are parse negatives; and the rest need capabilities this
+unit does not claim, including `$262.evalScript`, `hasOwnProperty`, Annex B
+block-level function hoisting, `yield` as an identifier, and resolution of an
+undeclared global name. Promoting them needs the per-case dependency review
+the subset requires, not this unit's implementation.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive

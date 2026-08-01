@@ -96,6 +96,7 @@ test("prints iterator operations with their rooted secondary results", () => {
   const mir: MirProgram = {
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -144,6 +145,7 @@ test("prints dynamic argument-list ownership", () => {
   const mir: MirProgram = {
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {

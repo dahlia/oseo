@@ -159,6 +159,14 @@ typedef struct {
 typedef struct {
     OseoHeapObject header;
     OseoValue value;
+    /*
+     * False only after [[DefineOwnProperty]] made the global-object
+     * property this cell backs non-writable. A global var or function
+     * binding and its property share this one storage location, so the
+     * property's [[Writable]] attribute has to reach the binding's own
+     * assignment path as well.
+     */
+    bool writable;
 } OseoCell;
 
 typedef struct {
@@ -342,6 +350,13 @@ typedef struct {
     /* [[Extensible]], false for frozen arrays and module namespaces. */
     bool extensible;
     bool module_namespace;
+    /*
+     * The realm's global this value, whose var-scoped Script bindings
+     * are own properties storing the binding cell instead of the value.
+     * Every operation that reads or writes such a property goes through
+     * the cell, so a binding and its property never diverge.
+     */
+    bool global_object;
     bool default_intrinsics;
     /* The [[ErrorData]] brand Object.prototype.toString observes. */
     bool error_data;

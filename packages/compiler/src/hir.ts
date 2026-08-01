@@ -9,6 +9,7 @@ import type {
   LogicalOperator,
   SyntaxFunction,
   SyntaxParameter,
+  SyntaxThisMode,
   UnaryOperator,
 } from "./syntax.ts";
 /** One resolved identifier leaf with explicit binding identity. */
@@ -208,6 +209,41 @@ export function errorIntrinsicName(
   name: string,
 ): ErrorIntrinsicName | undefined {
   return errorIntrinsicNames.find((candidate) => candidate === name);
+}
+
+/**
+ * How ECMA-262's global object already binds one intrinsic global name,
+ * which is what decides whether a Script's own top-level declaration of
+ * that name creates an ordinary global-object property.
+ *
+ * `restricted` names the three value properties ECMA-262 defines as
+ * non-writable, non-enumerable, and non-configurable, which is what
+ * makes HasRestrictedGlobalProperty true for them. `replaceable` names
+ * the intrinsic objects, which are writable and configurable, so a
+ * function declaration may legally replace them.
+ *
+ * Only names this profile admits as values belong here. A name it
+ * recognizes solely as a call target, such as `Object` or `console`,
+ * is not a value in this realm; referring to one by name is already a
+ * source-located diagnostic, so no declaration of it can collide with
+ * an intrinsic property.
+ */
+export type IntrinsicGlobalKind = "replaceable" | "restricted";
+
+/**
+ * How the global object binds `name`, or `undefined` when it is an
+ * ordinary name this realm gives no intrinsic value.
+ */
+export function intrinsicGlobalKind(
+  name: string,
+): IntrinsicGlobalKind | undefined {
+  if (name === "undefined" || name === "NaN" || name === "Infinity") {
+    return "restricted";
+  }
+  if (name === "Symbol" || errorIntrinsicName(name) != null) {
+    return "replaceable";
+  }
+  return undefined;
 }
 
 /**
@@ -744,6 +780,7 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "this";
+      readonly thisMode: SyntaxThisMode;
     })
   | (LocatedSyntax & {
       /**
@@ -959,11 +996,27 @@ export interface HirGlobalBinding {
   readonly name: string;
 }
 
+/**
+ * One resolved global-object property and the declaration that creates
+ * it. The declaration kind selects between CreateGlobalVarBinding and
+ * CreateGlobalFunctionBinding when the name already has a property.
+ */
+export interface HirGlobalObjectBinding extends HirGlobalBinding {
+  readonly declaration: "function" | "var";
+}
+
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
   readonly body: readonly HirStatement[];
   readonly functions: readonly HirFunction[];
   readonly globalBindings?: readonly HirGlobalBinding[];
+  /**
+   * The resolved var-scoped top-level bindings a Script's global object
+   * binds as properties, in GlobalDeclarationInstantiation order. Each
+   * entry names the same binding the script statement list writes, so a
+   * property read and a binding read observe one storage location.
+   */
+  readonly globalObjectBindings?: readonly HirGlobalObjectBinding[];
   readonly kind: "hir-program";
   readonly range: SourceRange;
   readonly sourceId: string;

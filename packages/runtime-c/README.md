@@ -211,6 +211,30 @@ The `m5-37` ABI adds `oseo_object_literal_set_prototype`. It ignores primitive
 prototype values and delegates object and null values to the existing
 `oseo_object_set_prototype` authority.
 
+The `m5-38` ABI adds `oseo_this_value`, `oseo_global_object_create`, and
+`oseo_global_binding_set`. `oseo_this_value` returns a non-nullish receiver
+unchanged and otherwise resolves the realm's global this value, which it
+creates on first use as an ordinary extensible object with a null
+`[[Prototype]]`. The context permanently roots that one object, so Script
+top-level `this` and every non-strict nullish receiver observe one identity
+across collection.
+
+`oseo_global_object_create` performs GlobalDeclarationInstantiation's binding
+creation for one Script. Each named entry becomes a writable, enumerable,
+non-configurable own property of that object whose stored value is the binding
+cell in the passed environment, so the property and the binding are one
+storage location and no value is ever copied between them. A backend calls it
+once, after every binding cell exists and before the script body runs; module
+code never calls it.
+
+`oseo_global_binding_set` is SetMutableBinding for a binding the global object
+also exposes. It writes the cell unless `[[DefineOwnProperty]]` made that
+property non-writable, in which case it fails the way the equivalent property
+assignment fails: with a `TypeError` in strict code and silently outside it.
+Object reads, writes, descriptor queries, and definitions resolve such a
+property through its cell, and the fixed-slot property cache excludes
+cell-backed slots so that a cached load never yields the cell itself.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
