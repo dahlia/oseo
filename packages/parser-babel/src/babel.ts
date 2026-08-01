@@ -3,6 +3,7 @@ import type {
   SourceInput,
   SyntaxArrayBindingPattern,
   SyntaxAssignmentPattern,
+  SyntaxThisMode,
 } from "@oseo/compiler";
 
 export interface ParserError {
@@ -56,12 +57,20 @@ export interface ReceiverContext {
 
 export interface ConvertContext {
   readonly diagnostics: Diagnostic[];
-  readonly functionStack: boolean[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;
   readonly receiverStack: ReceiverContext[];
   readonly strictStack: boolean[];
   syntheticIndex: number;
+  /**
+   * The this mode of each enclosing this environment, innermost last.
+   * A non-arrow function pushes its own mode and an arrow pushes the
+   * mode it inherits, so the top entry always describes the environment
+   * a `this` expression at that position resolves through. The stack is
+   * created with the top-level entry for the source kind, so it is never
+   * empty.
+   */
+  readonly thisModeStack: SyntaxThisMode[];
 }
 
 export interface SourceIndex {

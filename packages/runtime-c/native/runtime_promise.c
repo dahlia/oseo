@@ -30,6 +30,7 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
     promise->ordinary.length_writable = false;
     promise->ordinary.extensible = true;
     promise->ordinary.module_namespace = false;
+    promise->ordinary.global_object = false;
     promise->ordinary.error_data = false;
     promise->ordinary.array_iterator = false;
     promise->ordinary.iterator_array = oseo_undefined();

@@ -195,6 +195,43 @@ test("names an anonymous default class during module lowering", () => {
   assert.doesNotMatch(printMir(compiled.mir), /name="\*default:/u);
 });
 
+test("lowers module top-level this to undefined", () => {
+  const sourceId = "file:///app/module-this.js";
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "console.log(this);\n" +
+      "const read = () => this;\n" +
+      "function inner() { return this; }\n" +
+      "export const values = [read(), inner()];\n",
+    sourceId,
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "module-this",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const mir = printMir(compiled.mir);
+  // A Module Environment Record binds `this` to undefined, so the module
+  // body and an arrow written in it read a constant. Module code is
+  // strict, so a nested function still reads its own receiver.
+  assert.equal(mir.match(/constant module this/gu)?.length, 2);
+  assert.equal(mir.match(/= receiver this/gu)?.length, 1);
+  assert.doesNotMatch(mir, /global-this/u);
+});
+
 test("lowers top-level await to a traced module continuation", () => {
   const result = babelModuleFrontend.parseModule({
     source: "export const answer = 1 + await Promise.resolve(41);",

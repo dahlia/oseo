@@ -48,6 +48,54 @@ export async function runNativeScenario2(
       "shown,copied,tail,\n",
   );
 
+  // A Module Environment Record binds `this` to undefined, so the entry
+  // module, an arrow written in it, a continuation resumed after
+  // top-level await, and an imported module all observe undefined while
+  // ordinary member and class receivers stay unchanged. Node.js and Deno
+  // evaluate the same file as a real module, so both are references.
+  const moduleThisEntry = `${root}/tests/fixtures/module-this/entry.mjs`;
+  const moduleThisReferences = [
+    await host.run({
+      args: [moduleThisEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", moduleThisEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of moduleThisReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeModuleThis = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            moduleThisEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeModuleThis.exitStatus, 0, nativeModuleThis.stderr);
+      assert.equal(nativeModuleThis.stderr, "");
+      for (const reference of moduleThisReferences) {
+        assert.equal(
+          nativeModuleThis.stdout,
+          reference.stdout,
+          `module this ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
   for (const specialization of ["disabled", "enabled"] as const) {
     if (specialization === "enabled") {

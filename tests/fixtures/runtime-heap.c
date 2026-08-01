@@ -1011,6 +1011,178 @@ static void test_accessor_descriptor_gc_safety(
     oseo_context_set_function_dispatcher(context, NULL);
 }
 
+static void test_this_value(OseoContext *context, OseoValue *roots) {
+    /* A non-nullish receiver stands unchanged and allocates nothing. */
+    roots[0] = require_normal(oseo_object_create(context, oseo_null()));
+    assert(require_normal(oseo_this_value(context, roots[0])) == roots[0]);
+    assert(
+        require_normal(oseo_this_value(context, oseo_number(1.0))) ==
+        oseo_number(1.0)
+    );
+    /* Both nullish receivers resolve to the one global this value. */
+    roots[1] = require_normal(oseo_this_value(context, oseo_undefined()));
+    assert(roots[1] != oseo_undefined());
+    assert(require_normal(oseo_this_value(context, oseo_null())) == roots[1]);
+    roots[2] = make_text(context, "marker");
+    /* The value starts with no own properties of its own. */
+    assert(
+        require_normal(oseo_object_has_own(context, roots[1], roots[2])) ==
+        oseo_boolean(false)
+    );
+    roots[3] = require_normal(oseo_object_create(context, oseo_null()));
+    (void)require_normal(
+        oseo_object_set(context, roots[1], roots[2], roots[3], false)
+    );
+    /*
+     * The context roots the value permanently, so a collection between
+     * two reads keeps both its identity and everything reachable from
+     * it even when no local root frame holds them.
+     */
+    roots[1] = oseo_undefined();
+    roots[3] = oseo_undefined();
+    oseo_collect(context);
+    roots[1] = require_normal(oseo_this_value(context, oseo_undefined()));
+    roots[3] = require_normal(oseo_object_get(context, roots[1], roots[2]));
+    assert(
+        require_normal(oseo_object_has_own(context, roots[1], roots[2])) ==
+        oseo_boolean(true)
+    );
+    (void)require_normal(
+        oseo_object_set(
+            context, roots[3], roots[2], oseo_number(7.0), false
+        )
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[3], roots[2])) ==
+        oseo_number(7.0)
+    );
+}
+
+/*
+ * The var-scoped Script bindings the global object exposes. Each
+ * property is a view of the binding cell rather than a copy of its
+ * value, so a write through either side is visible through the other,
+ * and a forced collection between them keeps both alive.
+ */
+static void test_global_object_bindings(
+    OseoContext *context,
+    OseoValue *roots
+) {
+    static const uint16_t answer_units[] = {'a', 'n', 's', 'w', 'e', 'r'};
+    static const uint16_t frozen_units[] = {'f', 'r', 'o', 'z', 'e', 'n'};
+    static const uint16_t *const names[] = {answer_units, frozen_units};
+    static const size_t lengths[] = {6u, 6u};
+    static const size_t binding_ids[] = {0u, 1u};
+    roots[0] = require_normal(oseo_environment_create(context, 2u));
+    for (size_t index = 0u; index < 2u; index += 1u) {
+        roots[1] = require_normal(oseo_cell_create(context, oseo_number(1.0)));
+        (void)require_normal(
+            oseo_environment_set(context, roots[0], index, roots[1])
+        );
+    }
+    roots[2] = require_normal(
+        oseo_global_object_create(context, roots[0], 2u, names, lengths,
+            binding_ids)
+    );
+    assert(roots[2] == require_normal(oseo_this_value(context,
+        oseo_undefined())));
+    roots[3] = make_text(context, "answer");
+    /* A property read observes the binding's current value. */
+    roots[1] = require_normal(oseo_environment_get(context, roots[0], 0u));
+    (void)require_normal(oseo_cell_set(context, roots[1], oseo_number(2.0)));
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(2.0)
+    );
+    /* A property write reaches the binding rather than replacing it. */
+    (void)require_normal(
+        oseo_object_set(context, roots[2], roots[3], oseo_number(3.0), false)
+    );
+    assert(
+        require_normal(oseo_cell_get(context, roots[1])) == oseo_number(3.0)
+    );
+    /* A cell-backed slot is never cached, because a fixed-slot load
+     * would hand generated code the binding cell instead of the value it
+     * holds. The exclusion is per slot, so an ordinary property the
+     * program adds to the same object is still cached and loads its own
+     * value. */
+    OseoPropertyCache cache = {0u, 0u};
+    oseo_property_cache_update(roots[2], roots[3], &cache);
+    assert(!oseo_property_cache_matches(roots[2], &cache));
+    roots[4] = make_text(context, "ordinary");
+    (void)require_normal(
+        oseo_object_set(context, roots[2], roots[4], oseo_number(7.0), false)
+    );
+    oseo_property_cache_update(roots[2], roots[4], &cache);
+    assert(oseo_property_cache_matches(roots[2], &cache));
+    assert(oseo_property_cache_load(roots[2], &cache) == oseo_number(7.0));
+    /* The property is writable, enumerable, and non-configurable, so a
+     * delete reports failure and changes nothing. */
+    assert(
+        require_normal(oseo_object_delete(context, roots[2], roots[3], false))
+        == oseo_boolean(false)
+    );
+    assert(
+        oseo_object_delete(context, roots[2], roots[3], true).status ==
+        OSEO_STATUS_THROW
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(3.0)
+    );
+    /* Nothing but the context roots the object now, and the binding, its
+     * cell, and its property all survive collection together. */
+    roots[1] = oseo_undefined();
+    roots[2] = oseo_undefined();
+    oseo_collect(context);
+    roots[2] = require_normal(oseo_this_value(context, oseo_undefined()));
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(3.0)
+    );
+    /* Making the property non-writable through [[DefineOwnProperty]]
+     * also stops the binding assignment the shared cell would otherwise
+     * accept, silently outside strict code and by throwing inside it. */
+    roots[3] = make_text(context, "frozen");
+    roots[4] = require_normal(oseo_object_create(context, oseo_null()));
+    (void)require_normal(oseo_object_set(context, roots[4],
+        make_text(context, "writable"), oseo_boolean(false), false));
+    (void)require_normal(oseo_object_set(context, roots[4],
+        make_text(context, "value"), oseo_number(4.0), false));
+    OseoValue arguments[3] = {roots[2], roots[3], roots[4]};
+    (void)require_normal(
+        oseo_object_builtin_define_property(context, 3u, arguments)
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(4.0)
+    );
+    roots[1] = require_normal(oseo_environment_get(context, roots[0], 1u));
+    assert(
+        require_normal(
+            oseo_global_binding_set(context, roots[1], oseo_number(5.0), false)
+        ) == oseo_number(5.0)
+    );
+    assert(
+        oseo_global_binding_set(context, roots[1], oseo_number(5.0), true)
+            .status == OSEO_STATUS_THROW
+    );
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(4.0)
+    );
+    /* A writable global binding still accepts the same assignment. */
+    roots[1] = require_normal(oseo_environment_get(context, roots[0], 0u));
+    (void)require_normal(
+        oseo_global_binding_set(context, roots[1], oseo_number(6.0), true)
+    );
+    roots[3] = make_text(context, "answer");
+    assert(
+        require_normal(oseo_object_get(context, roots[2], roots[3])) ==
+        oseo_number(6.0)
+    );
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -1034,6 +1206,8 @@ int main(void) {
     test_symbols(&context, frame.slots);
     test_iterators(&context, frame.slots);
     test_accessor_descriptor_gc_safety(&context, frame.slots);
+    test_this_value(&context, frame.slots);
+    test_global_object_bindings(&context, frame.slots);
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
     return 0;

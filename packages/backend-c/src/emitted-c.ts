@@ -301,6 +301,15 @@ export const emittedC = {
       ["result = oseo_cell_set(context, result.value, ro", "ots["],
       ["]);"],
     ],
+    resultAssignOseoGlobalBindingSet: [
+      [
+        "result = oseo_global_binding_set(context, result.",
+        "value, ro",
+        "ots[",
+      ],
+      ["], "],
+      [");"],
+    ],
   },
   initialize: {
     resultAssignOseoCellInitializeContext: [
@@ -837,11 +846,21 @@ export const emittedC = {
       ["_bindings);"],
     ],
   },
+  globalObject: {
+    units: [["global_object_units_"], [""]],
+    prefix: [["global_object"]],
+    resultAssignOseoGlobalObjectCreate: [
+      ["result = oseo_global_object_create(context, "],
+    ],
+  },
   operation: {
     resultAssignOseoSymbolIntrinsicContext: [
       ["result = oseo_symbol_intrinsic(context);"],
     ],
     rootsAssignReceiverStatement: [["roots["], ["] = receiver;"]],
+    resultAssignOseoThisValueContextReceiver: [
+      ["result = oseo_this_value(context, receiver);"],
+    ],
     undefinedExpressionStatement: [["oseo_undefined();"]],
     newTargetStatement: [["new_target;"]],
     rootsAssignRootsUStatement: [["roots["], ["] = roots["], ["u];"]],

@@ -192,6 +192,7 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
+    mark_value(context->global_this, &worklist);
     mark_value(context->array_push_function, &worklist);
     mark_value(context->iterator_values_function, &worklist);
     mark_value(context->iterator_next_function, &worklist);

@@ -386,12 +386,12 @@ export function convertModule(
   }
   const context: ConvertContext = {
     diagnostics: [],
-    functionStack: [],
     input,
     locations,
     receiverStack: [],
     strictStack: [],
     syntheticIndex: 0,
+    thisModeStack: ["module"],
   };
   const converted = moduleProgram(context, file);
   return converted == null || context.diagnostics.length > 0

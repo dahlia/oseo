@@ -30,6 +30,22 @@ export interface LocatedSyntax {
   readonly byteRange?: ByteRange;
 }
 
+/**
+ * How one `this` expression reaches its value.
+ *
+ * ECMA-262 resolves `this` through the nearest environment record that
+ * has a this binding, so an arrow function carries the mode of the
+ * enclosing non-arrow function rather than a mode of its own. `strict`
+ * is a function whose [[ThisMode]] is strict: the call-site receiver
+ * stands unchanged, including when it is `undefined`. `global` covers
+ * both a non-strict function, whose [[ThisMode]] is global, and Script
+ * top level, whose Global Environment Record this binding is the realm's
+ * global this value; both resolve a nullish receiver to that one value.
+ * `module` is a Module Environment Record this binding, which ECMA-262
+ * defines as `undefined`.
+ */
+export type SyntaxThisMode = "global" | "module" | "strict";
+
 /** A call target admitted by the M1 language profile. */
 export type SyntaxCallTarget =
   | (LocatedSyntax & {
@@ -549,6 +565,7 @@ export type SyntaxExpression =
     })
   | (LocatedSyntax & {
       readonly kind: "this";
+      readonly thisMode: SyntaxThisMode;
     })
   | (LocatedSyntax & {
       /**
@@ -890,9 +907,38 @@ export interface SyntaxFunction extends LocatedSyntax {
   readonly strict?: boolean;
 }
 
+/**
+ * One var-scoped top-level name a Script's global object binds as a
+ * property. The declaration kind decides what happens when the global
+ * object already has a property of that name: ECMA-262's
+ * CreateGlobalVarBinding keeps the existing property untouched, while
+ * CreateGlobalFunctionBinding redefines a configurable one.
+ *
+ * The range locates the declaration that creates the property, so a
+ * later stage can name it in a diagnostic without searching the body
+ * for a statement that happens to share the name.
+ */
+export interface SyntaxGlobalObjectName extends LocatedSyntax {
+  readonly declaration: "function" | "var";
+  readonly name: string;
+}
+
 /** One owned M1 script, with no parser-specific values. */
 export interface SyntaxProgram extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  /**
+   * The var-scoped top-level names a Script's Global Environment Record
+   * must also bind as properties of its global object, in the order
+   * ECMA-262's GlobalDeclarationInstantiation creates them: every
+   * top-level function declaration in source order, then every hoisted
+   * `var` name that no function declaration already owns.
+   *
+   * Lexical top-level names are absent, because a Script's `let`,
+   * `const`, and `class` declarations live in the global declarative
+   * record and are never global-object properties. A module frontend
+   * leaves this absent: module code adds nothing to the global object.
+   */
+  readonly globalObjectNames?: readonly SyntaxGlobalObjectName[];
   readonly kind: "program";
   readonly sourceId: string;
   readonly strict?: boolean;

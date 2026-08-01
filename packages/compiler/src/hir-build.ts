@@ -1,4 +1,8 @@
-import { anonymousDefinition, errorIntrinsicName } from "./hir.ts";
+import {
+  anonymousDefinition,
+  errorIntrinsicName,
+  intrinsicGlobalKind,
+} from "./hir.ts";
 import type {
   Binding,
   HirArrayElement,
@@ -16,6 +20,7 @@ import type {
   HirForDeclaration,
   HirForOfTarget,
   HirFunction,
+  HirGlobalObjectBinding,
   HirObjectBindingProperty,
   HirObjectProperty,
   HirOptionalChainLink,
@@ -25,6 +30,7 @@ import type {
   HirResult,
   HirStatement,
   HirSwitchCase,
+  IntrinsicGlobalKind,
   ResolveState,
 } from "./hir.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
@@ -36,6 +42,7 @@ import type {
   SyntaxClassField,
   SyntaxExpression,
   SyntaxFunction,
+  SyntaxGlobalObjectName,
   SyntaxProgram,
   SyntaxStatement,
 } from "./syntax.ts";
@@ -554,7 +561,9 @@ function resolveExpression(
     // inside a derived constructor reads the binding `super()`
     // initializes and observes its temporal dead zone before then.
     const receiver = resolveExpression(
-      { kind: "this", range: expression.range },
+      // Every admitted `super` property reference sits in a class body,
+      // which is strict code, so its receiver is the call-site receiver.
+      { kind: "this", range: expression.range, thisMode: "strict" },
       scopes,
       state,
     );
@@ -2747,6 +2756,42 @@ function resolveStatement(
   return { ...statement, alternate, consequent, test };
 }
 
+/**
+ * Whether this profile's uniform global-object property is what
+ * ECMA-262 produces for a Script top-level declaration of a name the
+ * realm already binds as an intrinsic global.
+ *
+ * This unit creates every property with the writable, enumerable, and
+ * non-configurable attributes GlobalDeclarationInstantiation gives a
+ * name the global object does not already have. That is the exact
+ * outcome of CreateGlobalFunctionBinding over a replaceable intrinsic,
+ * whose property is configurable and is therefore redefined whole.
+ *
+ * Every other collision needs behavior the realm's global object does
+ * not yet carry: CreateGlobalVarBinding must leave the existing
+ * property, and its attributes, untouched, and CanDeclareGlobalFunction
+ * must reject a restricted global with a TypeError before any statement
+ * runs. Creating the uniform property instead would silently answer
+ * both differently, so those declarations stay unadmitted.
+ */
+function admitsGlobalObjectProperty(
+  intrinsic: IntrinsicGlobalKind,
+  entry: SyntaxGlobalObjectName,
+): boolean {
+  return intrinsic === "replaceable" && entry.declaration === "function";
+}
+
+/** Name the ECMA-262 operation an unadmitted collision would need. */
+function globalObjectCollisionMessage(entry: SyntaxGlobalObjectName): string {
+  return entry.declaration === "var"
+    ? `Declaring the intrinsic global '${entry.name}' with var at Script ` +
+        "top level is outside the admitted global-object profile; " +
+        "CreateGlobalVarBinding keeps the realm's existing property."
+    : `Declaring the intrinsic global '${entry.name}' as a function at ` +
+        "Script top level is outside the admitted global-object profile; " +
+        "CanDeclareGlobalFunction rejects a non-configurable property.";
+}
+
 interface HirSeed {
   readonly bindings?: ReadonlyMap<string, Binding>;
   readonly nextBindingId?: number;
@@ -2791,6 +2836,43 @@ export function buildSeededHir(
       nextFunctionId: state.nextFunctionId,
     };
   }
+  // A var-scoped top-level name reaches its global-object property
+  // through the binding the script scope already resolved, so the
+  // property and the binding can never drift apart. A name the frontend
+  // reports without a script binding would silently drop that property,
+  // which is a frontend contract violation rather than a source error.
+  const globalObjectBindings: HirGlobalObjectBinding[] = [];
+  for (const entry of program.globalObjectNames ?? []) {
+    const binding = scriptScope.get(entry.name);
+    if (binding == null) {
+      throw new Error(
+        `Global object name '${entry.name}' has no script binding.`,
+      );
+    }
+    const intrinsic = intrinsicGlobalKind(entry.name);
+    if (intrinsic != null && !admitsGlobalObjectProperty(intrinsic, entry)) {
+      diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          entry,
+          globalObjectCollisionMessage(entry),
+        ),
+      );
+      continue;
+    }
+    globalObjectBindings.push({
+      declaration: entry.declaration,
+      id: binding.id,
+      name: entry.name,
+    });
+  }
+  if (diagnostics.length > 0) {
+    return {
+      diagnostics,
+      nextBindingId: state.nextBindingId,
+      nextFunctionId: state.nextFunctionId,
+    };
+  }
   return {
     diagnostics,
     nextBindingId: state.nextBindingId,
@@ -2798,6 +2880,7 @@ export function buildSeededHir(
     program: {
       body,
       functions: state.hirFunctions,
+      globalObjectBindings,
       kind: "hir-program",
       range: program.range,
       sourceId: program.sourceId,

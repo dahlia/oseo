@@ -364,7 +364,7 @@ test("converts private for-of assignment targets", () => {
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
-  assert.match(printHir(result.hir), /for \(this\.%b\d+ #value of/u);
+  assert.match(printHir(result.hir), /for \(this strict\.%b\d+ #value of/u);
   const mir = printMir(result.mir);
   assert.match(mir, /for-of private target/u);
   assert.match(mir, /private-set for-of private target/u);

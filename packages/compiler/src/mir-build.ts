@@ -30,6 +30,7 @@ import type {
   MirConstant,
   MirControlTarget,
   MirFunction,
+  MirGlobalObjectBinding,
   MirOperation,
   MirParameter,
   MirProgram,
@@ -2158,7 +2159,10 @@ function lowerHomeObjectBind(
   });
 }
 
-/** The dynamic `this` of the running function, taken from its receiver. */
+/**
+ * The dynamic `this` of the running strict function, taken from its
+ * receiver without substitution.
+ */
 function lowerReceiver(range: SourceRange, builder: MirBuilder): number {
   const id = builder.nextValue;
   builder.nextValue += 1;
@@ -2167,6 +2171,51 @@ function lowerReceiver(range: SourceRange, builder: MirBuilder): number {
     detail: "this",
     id,
     kind: "receiver",
+    range,
+  });
+  return recordRoot(builder, id, range);
+}
+
+/**
+ * The `this` of Script top level or of a running non-strict function,
+ * which resolves a nullish receiver to the realm's global this value.
+ * The runtime creates that one object on first use, so the read is an
+ * allocating operation with an abrupt result.
+ */
+function lowerGlobalThis(range: SourceRange, builder: MirBuilder): number {
+  appendMirMetadata(builder, "safepoint", "global this allocation", [], range);
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "global this",
+    id,
+    kind: "global-this",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
+/**
+ * Module top-level `this`. A Module Environment Record's this binding is
+ * `undefined`, so the value is a constant rather than a receiver read.
+ */
+function lowerModuleThis(range: SourceRange, builder: MirBuilder): number {
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    constant: { kind: "undefined" },
+    detail: "module this",
+    id,
+    kind: "constant",
     range,
   });
   return recordRoot(builder, id, range);
@@ -3341,7 +3390,11 @@ function lowerExpression(
     return recordRoot(builder, id, expression.range);
   }
   if (expression.kind === "this") {
-    return lowerReceiver(expression.range, builder);
+    return expression.thisMode === "strict"
+      ? lowerReceiver(expression.range, builder)
+      : expression.thisMode === "module"
+        ? lowerModuleThis(expression.range, builder)
+        : lowerGlobalThis(expression.range, builder);
   }
   if (expression.kind === "new-target") {
     const id = builder.nextValue;
@@ -6494,6 +6547,15 @@ export function buildMir(
       ]),
     ).values(),
   ];
+  // Every global-object property names a script binding, so the entries
+  // stay inside the script environment the backend already creates.
+  const globalObjectBindings = (program.globalObjectBindings ?? []).map(
+    (binding): MirGlobalObjectBinding => ({
+      declaration: binding.declaration,
+      id: binding.id,
+      name: binding.name,
+    }),
+  );
   return {
     functions: program.functions.map((functionValue) => {
       const generic = buildMirFunction(
@@ -6525,6 +6587,7 @@ export function buildMir(
         : generic;
     }),
     globalBindings,
+    globalObjectBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
     script: buildMirFunction(

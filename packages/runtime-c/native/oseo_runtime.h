@@ -161,6 +161,13 @@ struct OseoContext {
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
     OseoValue well_known_symbols[4];
+    /*
+     * The realm's global this value, which is the [[GlobalThisValue]] a
+     * Global Environment Record binds. It is created on first use and
+     * permanently rooted afterwards so every Script top-level `this` and
+     * every non-strict nullish receiver observe one identity.
+     */
+    OseoValue global_this;
     /* Cached virtualized Array and iterator methods, permanently rooted. */
     OseoValue array_push_function;
     OseoValue iterator_values_function;
@@ -351,6 +358,38 @@ OseoResult oseo_module_namespace_create(
     const uint16_t *const *names,
     const size_t *name_lengths,
     const size_t *binding_ids
+);
+/*
+ * GlobalDeclarationInstantiation's binding creation for one Script.
+ * Every named entry becomes a writable, enumerable, non-configurable
+ * own property of the realm's global this value whose stored value is
+ * the binding cell in `environment`, so the property and the binding
+ * are one storage location: an assignment through either is visible
+ * through the other, and no value is ever copied between them. The
+ * caller passes the names in ECMA-262's creation order, and the cells
+ * must already exist. Module code never calls this; it adds no global
+ * object property.
+ */
+OseoResult oseo_global_object_create(
+    OseoContext *context,
+    OseoValue environment,
+    size_t count,
+    const uint16_t *const *names,
+    const size_t *name_lengths,
+    const size_t *binding_ids
+);
+/*
+ * SetMutableBinding for a binding the global object also exposes as a
+ * property. It writes the cell unless [[DefineOwnProperty]] made that
+ * property non-writable, in which case the assignment fails the way the
+ * equivalent property assignment fails: with a TypeError in strict code
+ * and silently outside it.
+ */
+OseoResult oseo_global_binding_set(
+    OseoContext *context,
+    OseoValue cell,
+    OseoValue value,
+    bool strict
 );
 OseoResult oseo_function_create(
     OseoContext *context,
@@ -1123,6 +1162,19 @@ OseoResult oseo_async_iterator_delegate_throw_start(
 );
 OseoResult oseo_error_intrinsic(OseoContext *context, OseoErrorKind kind);
 OseoResult oseo_symbol_intrinsic(OseoContext *context);
+/*
+ * ResolveThisBinding for a this environment whose [[ThisMode]] is
+ * global. A nullish receiver resolves to the realm's global this value,
+ * which this call creates on first use and then keeps permanently
+ * rooted; any other receiver stands unchanged. Script top level reaches
+ * the same value through its own undefined receiver, so one entry point
+ * serves both positions. The value is an ordinary extensible object
+ * whose own properties are the var-scoped bindings
+ * `oseo_global_object_create` installed for the running Script. It is
+ * not yet the complete global object: the standard globals and
+ * `globalThis` remain a later unit.
+ */
+OseoResult oseo_this_value(OseoContext *context, OseoValue receiver);
 OseoResult oseo_negate(OseoContext *context, OseoValue value);
 OseoResult oseo_typeof(OseoContext *context, OseoValue value);
 OseoResult oseo_bigint_literal(

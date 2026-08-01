@@ -40,12 +40,12 @@ export const babelFrontend: SourceFrontend = {
       }
       const context: ConvertContext = {
         diagnostics: [],
-        functionStack: [],
         input,
         locations,
         receiverStack: [],
         strictStack: [],
         syntheticIndex: 0,
+        thisModeStack: ["global"],
       };
       const converted = program(context, file);
       if (converted == null || context.diagnostics.length > 0) {

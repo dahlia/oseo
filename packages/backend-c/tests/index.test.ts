@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import type { MirProgram } from "@oseo/compiler";
+
 import { cBackend } from "../src/index.ts";
 
 test("emits deterministic generic C without executing a toolchain", () => {
@@ -12,6 +14,7 @@ test("emits deterministic generic C without executing a toolchain", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -72,6 +75,105 @@ test("emits deterministic generic C without executing a toolchain", () => {
   assert.equal(emitted.sourceName, "generated.c");
 });
 
+/**
+ * A one-binding script that writes `answer` and, when `observesThis`
+ * holds, also resolves the realm's global this value. The two programs
+ * differ only in that operation, which is the single input the global
+ * object's installation decision reads.
+ */
+function globalObjectProgram(observesThis: boolean): MirProgram {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "global-object.js",
+    start: { column: 1, line: 1 },
+  };
+  return {
+    functions: [],
+    globalBindings: [{ id: 0, name: "answer" }],
+    globalObjectBindings: [{ declaration: "var", id: 0, name: "answer" }],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              constant: { kind: "number", value: 1 },
+              detail: "1",
+              id: 0,
+              kind: "constant",
+              range,
+            },
+            {
+              arguments: [0],
+              bindingId: 0,
+              detail: "answer",
+              id: 1,
+              kind: "write",
+              mutable: true,
+              range,
+            },
+            ...(observesThis
+              ? ([
+                  {
+                    arguments: [],
+                    detail: "global this",
+                    id: 2,
+                    kind: "global-this",
+                    range,
+                  },
+                ] as const)
+              : []),
+          ],
+          terminator: { kind: "return", value: 1 },
+        },
+      ],
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [0],
+      name: "<script>",
+      functionLength: 0,
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 4,
+    },
+    sourceId: "global-object.js",
+    specialization: "disabled",
+  };
+}
+
+test("installs global object properties before the script body", () => {
+  const emitted = cBackend.emit(globalObjectProgram(true));
+  // The property list is installed in the prologue, after every binding
+  // cell exists and before the first body operation.
+  const created = emitted.source.indexOf("oseo_global_object_create");
+  const cellCreated = emitted.source.indexOf("oseo_cell_create");
+  const written = emitted.source.indexOf("oseo_global_binding_set");
+  assert.ok(cellCreated >= 0 && cellCreated < created);
+  assert.ok(created >= 0 && created < written);
+  // A global-object binding assignment carries the writing code's
+  // strictness, because the property it writes can be non-writable.
+  assert.match(
+    emitted.source,
+    /oseo_global_binding_set\(context, result\.value, roots\[\d+\], false\)/u,
+  );
+  assert.doesNotMatch(emitted.source, /oseo_cell_set\(context/u);
+});
+
+test("keeps the plain binding path when no position observes this", () => {
+  // Nothing but a resolved global this value can reach the global
+  // object, so a program that never resolves one installs no property
+  // and writes its bindings through the ordinary declarative path. The
+  // two programs' MIR differs only in the `global-this` operation.
+  const emitted = cBackend.emit(globalObjectProgram(false));
+  assert.doesNotMatch(emitted.source, /oseo_global_object_create/u);
+  assert.doesNotMatch(emitted.source, /oseo_global_binding_set/u);
+  assert.match(emitted.source, /oseo_cell_set\(context/u);
+});
+
 test("rejects invalid exported MIR BigInt digits", () => {
   const range = {
     end: { column: 1, line: 1 },
@@ -83,6 +185,7 @@ test("rejects invalid exported MIR BigInt digits", () => {
       cBackend.emit({
         functions: [],
         globalBindings: [],
+        globalObjectBindings: [],
         kind: "mir-program",
         observeSpecialization: false,
         script: {
@@ -131,6 +234,7 @@ test("emits error intrinsic loads and thrown-value rendering", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -189,6 +293,7 @@ test("emits rooted iterator protocol operations", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -293,6 +398,7 @@ test("emits the asynchronous iterator protocol entry points", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -389,6 +495,7 @@ test("emits framed asynchronous iterator step entry points", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -455,6 +562,7 @@ test("emits framed asynchronous iterator close entry points", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -572,6 +680,7 @@ test("emits delegating iterator steps and a pass-through suspension", () => {
       },
     ],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -649,6 +758,7 @@ test("emits dynamic array accumulation operations", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -732,6 +842,7 @@ test("emits GC-rooted dynamic argument lists", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -827,6 +938,7 @@ test("scans large MIR argument lists without spreading them", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -873,6 +985,7 @@ test("scans large MIR binding sets without spreading them", () => {
       id,
       name: `binding${id}`,
     })),
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -906,6 +1019,7 @@ test("keeps string constant units out of generated stack frames", () => {
   const emitted = cBackend.emit({
     functions: [],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -1002,6 +1116,7 @@ test("emits a generator entry and a separately resumable body", () => {
       },
     ],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -1159,6 +1274,7 @@ test("emits an awaited suspension and a throw resumption branch", () => {
       },
     ],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {
@@ -1316,6 +1432,7 @@ test("keeps a generator body's iterator done state in its root slots", () => {
       },
     ],
     globalBindings: [],
+    globalObjectBindings: [],
     kind: "mir-program",
     observeSpecialization: false,
     script: {

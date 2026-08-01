@@ -85,6 +85,16 @@ export interface MirGlobalBinding {
   readonly name: string;
 }
 
+/**
+ * One global-object property and the declaration that creates it. A
+ * backend passes the declaration kind through so the runtime can apply
+ * CreateGlobalVarBinding or CreateGlobalFunctionBinding when the name
+ * already names an intrinsic global property.
+ */
+export interface MirGlobalObjectBinding extends MirGlobalBinding {
+  readonly declaration: "function" | "var";
+}
+
 /** One control destination and the cleanup nesting active at that point. */
 export interface MirControlTarget {
   readonly blockId: number;
@@ -149,6 +159,7 @@ export interface MirOperation {
     | "count-guard-miss"
     | "count-overflow-miss"
     | "function-create"
+    | "global-this"
     | "guard-object"
     | "guard-shape"
     | "guard-smi"
@@ -413,6 +424,14 @@ export interface MirFunction extends LocatedSyntax {
 export interface MirProgram {
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
+  /**
+   * The script bindings the global object also binds as properties, in
+   * GlobalDeclarationInstantiation order. A backend installs them once,
+   * before the script body runs, so that the property and the binding
+   * share one storage location for the whole execution. The list is
+   * empty for module code, which adds nothing to the global object.
+   */
+  readonly globalObjectBindings: readonly MirGlobalObjectBinding[];
   readonly kind: "mir-program";
   readonly script: MirFunction;
   readonly sourceId: string;

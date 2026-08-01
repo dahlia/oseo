@@ -44,8 +44,8 @@ Ownership follows the plan's target layout:
     tracing, collection, and destruction; [*PLAN-GC.md*](../PLAN-GC.md)
     owns the planned policy, accounting, slot, descriptor, and collector
     evolution boundaries;
- -  *runtime\_binding.c*: environments, binding cells, and module
-    namespaces;
+ -  *runtime\_binding.c*: environments, binding cells, module
+    namespaces, and the realm's global this value;
  -  *runtime\_object.c*: strings used as property keys, arrays, ordinary
     objects, descriptors, prototypes, property caches, and the `Object`
     built-ins;
@@ -177,8 +177,13 @@ express observable language semantics:
     `oseo_internal_to_number`, while coercions and operators use public
     object reads and `oseo_internal_own_descriptor`;
  -  binding and object: module-namespace creation builds its backing
-    object through public object operations, while object property reads
-    resolve module-namespace entries through `oseo_cell_get`;
+    object through public object operations, the global this value a
+    nullish receiver resolves to is one ordinary object created through
+    `oseo_object_literal_create` whose var-scoped Script properties are
+    defined through `oseo_object_define`, and object reads, writes,
+    descriptor queries, and definitions resolve both a module-namespace
+    entry and a global-object binding through the cell the property
+    stores;
  -  error and the throwing components: core, binding, object, function,
     primitive, promise, and event-loop semantics create typed catchable
     errors through `oseo_internal_throw_error`, while error-intrinsic

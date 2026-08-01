@@ -910,8 +910,9 @@ landed with the M5 intrinsics units. The remaining queue is:
     and array binding declarations. BigInt literals, primitive values,
     `ToNumeric`, operators, assignment, and update have passed the M5a Unit
     8.1a gate in [*PLAN-BIGINT.md*](./PLAN-BIGINT.md). Delete expressions have
-    passed Unit 8.1b, and object-literal prototype setters and their duplicate
-    early error have passed Unit 8.1c.
+    passed Unit 8.1b, object-literal prototype setters and their duplicate
+    early error have passed Unit 8.1c, and Script and module top-level `this`
+    have passed Unit 8.1d.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows
