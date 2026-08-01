@@ -279,10 +279,13 @@ its deliberate boundary and its evidence:
  -  The `delete` operator for identifier, non-reference, ordinary member, and
     optional-chain operands. A resolved declarative identifier returns `false`
     without reading its cell, including while that cell is uninitialized; an
-    unresolvable name returns `true`, and a `with` environment deletes the
-    first object binding it selects before using that static fallback. Strict
-    identifier deletion remains an early error. A non-reference operand is
-    evaluated for its effects and abrupt completion before `true` is returned.
+    unresolvable name returns `true`, including top-level `arguments` in a
+    non-strict Script with no global binding. An admitted ordinary function's
+    implicit `arguments` object is a resolved binding and returns `false`. A
+    `with` environment deletes the first object binding it selects before using
+    that static fallback. Strict identifier deletion remains an early error. A
+    non-reference operand is evaluated for its effects and abrupt completion
+    before `true` is returned.
     An optional chain returns `true` on a nullish guard without evaluating its
     key or later steps, while a live path deletes its final property reference.
     Ordinary and live optional deletion preserve static and computed keys,
@@ -1863,11 +1866,16 @@ property delete; admitting it requires the runtime `ReferenceError` and the
 specified receiver, key-expression, and `ToPropertyKey` suppression order.
 Deleting `Symbol` or a named error intrinsic as an identifier remains invalid
 until the global-object model can remove the property and change subsequent
-name resolution consistently. Deleting `arguments` in a function form whose
-arguments object is not admitted remains a source-located invalid boundary
-instead of being misclassified as an unresolvable global name. Deleting a
-hidden `with` fallback that a prior unresolved assignment allocated is likewise
-invalid until the global-object model can remove that cell consistently.
+name resolution consistently. At non-strict Script top level,
+`delete arguments` is an unresolvable-reference delete and returns `true` when
+no global binding exists. An admitted ordinary function instead resolves its
+implicit `arguments` object and returns `false`. Deleting `arguments` remains a
+source-located invalid boundary only inside a function form whose implicit
+object is deliberately unavailable, including an asynchronous function under
+the current profile. Strict identifier deletion remains an early error.
+Deleting a hidden `with` fallback that a prior unresolved assignment allocated
+is likewise invalid until the global-object model can remove that cell
+consistently.
 
 
 Known gaps inside the claim

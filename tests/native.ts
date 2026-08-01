@@ -147,9 +147,11 @@ async function references(fixture: Fixture): Promise<
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
   try {
-    const source = fixture.nonStrictScript
-      ? `new Function(${JSON.stringify(fixture.source)})();\n`
-      : fixture.source;
+    const source = fixture.globalScriptReference
+      ? `(0, eval)(${JSON.stringify(fixture.source)});\n`
+      : fixture.nonStrictScript
+        ? `new Function(${JSON.stringify(fixture.source)})();\n`
+        : fixture.source;
     await host.writeTextFile(path, referencePrelude + source);
     return [
       await requireSuccess(process.execPath, [path]),

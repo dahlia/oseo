@@ -134,11 +134,19 @@ try {
 `,
   },
   {
+    globalScriptReference: true,
     name: "delete-non-strict",
     nonStrictScript: true,
     source: `
 let declared = 1;
-console.log(delete declared, declared, delete unresolvedDeleteName);
+console.log(
+  delete declared,
+  declared,
+  delete unresolvedDeleteName,
+  delete arguments,
+);
+function deleteOrdinaryArguments() { return delete arguments; }
+console.log(deleteOrdinaryArguments());
 function tdzDelete() {
   console.log(delete later);
   let later = 2;

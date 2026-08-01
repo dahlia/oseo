@@ -984,6 +984,11 @@ export interface Binding {
 }
 
 export interface ResolveState {
+  /**
+   * True while resolving a function form whose implicit `arguments` object
+   * is deliberately unavailable in the current function profile.
+   */
+  argumentsObjectUnavailable: boolean;
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
   readonly functionInfo: Map<

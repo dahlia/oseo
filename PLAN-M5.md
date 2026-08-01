@@ -1507,11 +1507,15 @@ test262 cases pass and two strict identifier cases are expected parse
 negatives, moving the manifest from 4,174 to 4,202 cases. Private-name deletion
 remains an early error. `super` property deletion and runtime-owned intrinsic
 identifier deletion remain source-located invalid boundaries until their
-runtime reference behavior can be admitted completely. Deleting `arguments`
-where this profile does not admit its implicit object also remains a
-source-located invalid boundary. A hidden `with` fallback allocated by an
-unresolved assignment cannot be deleted until the global-object model owns its
-lifetime, so that combination is rejected rather than returning a stale cell.
+runtime reference behavior can be admitted completely. Top-level non-strict
+Script `delete arguments` is an unresolvable-reference delete and returns
+`true`; an admitted ordinary function resolves its implicit object and returns
+`false`. The source-located invalid boundary applies only inside function forms
+where this profile deliberately omits that object, including asynchronous
+functions. Strict identifier deletion remains an early error. A hidden `with`
+fallback allocated by an unresolved assignment cannot be deleted until the
+global-object model owns its lifetime, so that combination is rejected rather
+than returning a stale cell.
 
 Ordinary asynchronous functions and asynchronous arrows now use the traced
 suspension record already owned by asynchronous generators instead of recursive

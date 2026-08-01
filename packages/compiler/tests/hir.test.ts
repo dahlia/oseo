@@ -90,6 +90,15 @@ test("resolves delete identifiers without reading their bindings", () => {
         kind: "expression",
         range,
       },
+      {
+        expression: {
+          argument: { kind: "identifier", name: "arguments", range },
+          kind: "delete",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
     ],
     kind: "program",
     range,
@@ -97,7 +106,7 @@ test("resolves delete identifiers without reading their bindings", () => {
   };
   const hir = buildHir(syntax).program;
   assert.ok(hir != null);
-  assert.match(printHir(hir), /\n  false[\s\S]*\n  true/u);
+  assert.match(printHir(hir), /\n  false[\s\S]*\n  true[\s\S]*\n  true/u);
   const operations = buildMir(hir).script.blocks.flatMap(
     (block) => block.operations,
   );
@@ -105,6 +114,76 @@ test("resolves delete identifiers without reading their bindings", () => {
     operations.filter((operation) => operation.kind === "read").length,
     0,
   );
+});
+
+test("rejects delete arguments only in unavailable function profiles", () => {
+  const ordinary = buildHir({
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              argument: { kind: "identifier", name: "arguments", range },
+              kind: "delete",
+              range,
+            },
+            kind: "return",
+            range,
+          },
+        ],
+        kind: "function",
+        name: "available",
+        parameters: [],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "delete-ordinary-arguments.js",
+  });
+  assert.deepEqual(ordinary.diagnostics, []);
+  const ordinaryReturn = ordinary.program?.functions[0]?.body[0];
+  assert.equal(ordinaryReturn?.kind, "return");
+  if (ordinaryReturn?.kind === "return") {
+    assert.equal(ordinaryReturn.expression?.kind, "boolean");
+    if (ordinaryReturn.expression?.kind === "boolean") {
+      assert.equal(ordinaryReturn.expression.value, false);
+    }
+  }
+
+  const result = buildHir({
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              argument: { kind: "identifier", name: "arguments", range },
+              kind: "delete",
+              range,
+            },
+            kind: "return",
+            range,
+          },
+        ],
+        functionKind: "async",
+        kind: "function",
+        name: "unavailable",
+        parameters: [],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "delete-arguments-function.js",
+  });
+  assert.equal(result.program, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Deleting an unavailable 'arguments' binding/u,
+  );
+  assert.equal(result.diagnostics[0]?.range.start.column, 1);
 });
 
 test("rejects duplicate names in owned catch binding patterns", () => {

@@ -928,6 +928,18 @@ test("converts every admitted delete operand to owned syntax", () => {
   assert.match(mir, /join \?\./u);
 });
 
+test("resolves top-level delete arguments as an unresolvable reference", () => {
+  const result = compileSource(babelFrontend, {
+    source: "delete arguments;",
+    sourceId: "delete-top-level-arguments.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.syntax != null);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  assert.match(printHir(result.hir), /\n  true/u);
+});
+
 test("retains closed-world and early-error delete boundaries", () => {
   const cases: readonly (readonly [string, string, RegExp])[] = [
     [

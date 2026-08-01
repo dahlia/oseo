@@ -319,7 +319,10 @@ function resolveIdentifierDelete(
       ),
     );
     return undefined;
-  } else if (argument.name === "arguments") {
+  } else if (
+    argument.name === "arguments" &&
+    state.argumentsObjectUnavailable
+  ) {
     state.diagnostics.push(
       sourceDiagnostic(
         state.sourceId,
@@ -1189,6 +1192,8 @@ function resolveFunction(
   derivedThisBinding?: HirClassThisBinding,
 ): HirFunction {
   const outerThisBinding = state.thisBinding;
+  const outerArgumentsObjectUnavailable = state.argumentsObjectUnavailable;
+  state.argumentsObjectUnavailable = !admitsArgumentsObject(functionValue);
   if (derivedThisBinding != null) {
     state.thisBinding = derivedThisBinding;
   } else if (!lexicalReceiver(functionValue)) {
@@ -1243,6 +1248,7 @@ function resolveFunction(
     bodyScope,
   );
   state.labels.push(...outerLabels);
+  state.argumentsObjectUnavailable = outerArgumentsObjectUnavailable;
   state.thisBinding = outerThisBinding;
   const resolved: HirFunction = {
     ...functionValue,
@@ -2736,6 +2742,7 @@ export function buildSeededHir(
 ): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
+    argumentsObjectUnavailable: false,
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],
