@@ -236,6 +236,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-pattern-await-positions" ||
     fixture.name === "async-pattern-await-abrupt" ||
     fixture.name === "async-generator-pattern-await" ||
+    fixture.name === "async-declaration-list-await" ||
+    fixture.name === "lexical-declaration-lists" ||
+    fixture.name === "lexical-declaration-list-hints" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
@@ -382,6 +385,23 @@ for (const fixture of selectedFixtures) {
             // frame's root slots, so every forced collection between the
             // suspension and the resumption must keep them alive.
             assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "lexical-declaration-lists" ||
+            fixture.name === "async-declaration-list-await"
+          ) {
+            // The cells a declaration list creates before its first
+            // initializer runs must survive every forced collection
+            // between the declarators, including across a suspension,
+            // and a closure that captured them keeps the same cells.
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "lexical-declaration-list-hints") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardHits > 0);
+              assert.ok(native.counters.guardMisses > 0);
+            }
           }
           if (fixture.name === "script-global-bindings") {
             // The global object's properties are installed once from the

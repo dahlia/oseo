@@ -768,11 +768,68 @@ export interface SyntaxWithStatement extends LocatedSyntax {
   readonly object: SyntaxExpression;
 }
 
+/**
+ * One declarator of a `const` or `let` declaration, either a single
+ * identifier binding or a recursive binding pattern.
+ *
+ * The shapes repeat the corresponding `SyntaxStatement` members rather
+ * than being extracted from them, because a declarator is also a
+ * statement in its own right when a declaration list holds exactly one.
+ * A statement-list consumer may therefore lower a declarator with the
+ * same code path either way.
+ */
+export type SyntaxLexicalDeclarator =
+  | (LocatedSyntax & {
+      readonly declarationKind: "const" | "let";
+      readonly initializer: SyntaxExpression;
+      readonly kind: "binding-pattern";
+      readonly mode: "declare";
+      readonly pattern: SyntaxBindingPattern;
+    })
+  | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
+      readonly kind: "const";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
+      readonly hint: Hint | undefined;
+      readonly initializer: SyntaxExpression;
+      readonly kind: "let";
+      readonly name: string;
+    });
+
 /** A statement in the parser-independent M1 syntax tree. */
 export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
       readonly kind: "block";
+    })
+  | (LocatedSyntax & {
+      /**
+       * One `const` or `let` declaration that binds more than one
+       * declarator, kept as one declaration rather than as separate
+       * statements so that its source shape survives into owned syntax.
+       *
+       * ECMAScript admits a lexical declaration only where a
+       * StatementList is admitted, so a consumer expands the declarators
+       * into the enclosing list. Wrapping them in a block instead would
+       * create a lexical scope the source does not have and would reset
+       * the declared cells a second time.
+       *
+       * The tuple shape keeps a list of fewer than two declarators
+       * unrepresentable, because a one-declarator declaration stays the
+       * declarator statement it has always been. One LetOrConst covers
+       * the whole BindingList, so every declarator declares the same
+       * kind; HIR construction rejects a mixed list rather than choosing
+       * a mutability for it.
+       */
+      readonly declarations: readonly [
+        SyntaxLexicalDeclarator,
+        SyntaxLexicalDeclarator,
+        ...SyntaxLexicalDeclarator[],
+      ];
+      readonly kind: "declaration-list";
     })
   | (LocatedSyntax & {
       readonly kind: "break";

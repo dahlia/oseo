@@ -19,6 +19,7 @@ import type {
   SyntaxForOfTarget,
   SyntaxFunction,
   SyntaxGlobalObjectName,
+  SyntaxLexicalDeclarator,
   SyntaxModuleSpecifier,
   SyntaxObjectBindingPattern,
   SyntaxObjectProperty,
@@ -1980,6 +1981,67 @@ function rawParameterContainsExpression(value: BabelNode): boolean {
   return false;
 }
 
+/**
+ * Converts one declarator of a `const` or `let` declaration. Every
+ * declarator of a list converts the same way, so a list of one and a
+ * list of many share this path and only differ in the owned range each
+ * declarator carries.
+ */
+function lexicalDeclarator(
+  context: ConvertContext,
+  declarationKind: "const" | "let",
+  declaration: BabelNode,
+  located: { readonly byteRange: ByteRange; readonly range: SourceRange },
+): SyntaxLexicalDeclarator | undefined {
+  const identifier = node(declaration.id);
+  const initializerNode = node(declaration.init);
+  if (
+    identifier?.type === "ArrayPattern" ||
+    identifier?.type === "ObjectPattern"
+  ) {
+    if (initializerNode == null) {
+      return unsupported(
+        context,
+        declaration,
+        "A binding pattern declaration needs an initializer.",
+      );
+    }
+    const pattern = bindingPattern(context, identifier, false, true);
+    const initializer = expression(context, initializerNode);
+    return pattern == null || initializer == null
+      ? undefined
+      : {
+          ...located,
+          declarationKind,
+          initializer,
+          kind: "binding-pattern",
+          mode: "declare",
+          pattern,
+        };
+  }
+  const name = identifier == null ? undefined : identifierName(identifier);
+  if (
+    identifier == null ||
+    name == null ||
+    (declarationKind === "const" && initializerNode == null)
+  ) {
+    return unsupported(
+      context,
+      declaration,
+      "A const binding needs one identifier and an initializer.",
+    );
+  }
+  if (rejectedThisBindingName(context, identifier, name)) return undefined;
+  const initializer =
+    initializerNode == null
+      ? { ...location(context, declaration), kind: "undefined" as const }
+      : expression(context, initializerNode);
+  if (initializer == null) return undefined;
+  const hint = typeHint(context, identifier.typeAnnotation);
+  if (context.diagnostics.length > 0) return undefined;
+  return { ...located, hint, initializer, kind: declarationKind, name };
+}
+
 export function statement(
   context: ConvertContext,
   value: BabelNode,
@@ -2085,62 +2147,34 @@ export function statement(
       );
     }
     const declarations = nodes(value.declarations);
-    if (declarations.length !== 1) {
-      return unsupported(
-        context,
-        value,
-        "An M1 const declaration contains exactly one binding.",
-      );
+    if (declarations.length === 0) return unsupported(context, value);
+    // A list of exactly one declarator stays the declaration statement it
+    // has always been, so its owned range keeps naming the declaration
+    // rather than the declarator.
+    if (declarations.length === 1) {
+      const declaration = declarations[0];
+      return declaration == null
+        ? unsupported(context, value)
+        : lexicalDeclarator(context, value.kind, declaration, located);
     }
-    const declaration = declarations[0];
-    if (declaration == null) return unsupported(context, value);
-    const identifier = node(declaration.id);
-    const initializerNode = node(declaration.init);
-    if (
-      identifier?.type === "ArrayPattern" ||
-      identifier?.type === "ObjectPattern"
-    ) {
-      if (initializerNode == null) {
-        return unsupported(
-          context,
-          declaration,
-          "A binding pattern declaration needs an initializer.",
-        );
-      }
-      const pattern = bindingPattern(context, identifier, false, true);
-      const initializer = expression(context, initializerNode);
-      return pattern == null || initializer == null
-        ? undefined
-        : {
-            ...located,
-            declarationKind: value.kind,
-            initializer,
-            kind: "binding-pattern",
-            mode: "declare",
-            pattern,
-          };
-    }
-    const name = identifier == null ? undefined : identifierName(identifier);
-    if (
-      identifier == null ||
-      name == null ||
-      (value.kind === "const" && initializerNode == null)
-    ) {
-      return unsupported(
+    const declarators: SyntaxLexicalDeclarator[] = [];
+    for (const declaration of declarations) {
+      const declarator = lexicalDeclarator(
         context,
+        value.kind,
         declaration,
-        "A const binding needs one identifier and an initializer.",
+        location(context, declaration),
       );
+      if (declarator == null) return undefined;
+      declarators.push(declarator);
     }
-    if (rejectedThisBindingName(context, identifier, name)) return undefined;
-    const initializer =
-      initializerNode == null
-        ? { ...location(context, declaration), kind: "undefined" as const }
-        : expression(context, initializerNode);
-    if (initializer == null) return undefined;
-    const hint = typeHint(context, identifier.typeAnnotation);
-    if (context.diagnostics.length > 0) return undefined;
-    return { ...located, hint, initializer, kind: value.kind, name };
+    const [first, second, ...rest] = declarators;
+    if (first == null || second == null) return unsupported(context, value);
+    return {
+      ...located,
+      declarations: [first, second, ...rest],
+      kind: "declaration-list",
+    };
   }
   if (value.type === "BreakStatement" || value.type === "ContinueStatement") {
     const labelNode = node(value.label);

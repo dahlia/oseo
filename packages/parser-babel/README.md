@@ -59,9 +59,12 @@ The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
 `/** ... */` block comments contribute JSDoc hints; ordinary block and line
 comments never do.
-Standalone one-declarator `const` and `let` binding declarations and standalone
-`var` declaration lists are converted into compiler-owned recursive patterns.
-A `var` list may mix plain and pattern declarators; every pattern name joins the
+Standalone `const`, `let`, and `var` declaration lists are converted into
+compiler-owned recursive patterns. A `const` or `let` list with more than one
+declarator becomes one owned `declaration-list` statement whose members are
+the same declarator shapes a one-declarator list produces, so the compiler
+decides the scope the declarators join. Any list may mix plain and pattern
+declarators; every `var` pattern name joins the
 existing function-scope hoisting and redeclaration pass. Array patterns admit
 elisions, defaults, nesting, and a final identifier or nested
 array rest target. Object patterns admit static and computed properties,

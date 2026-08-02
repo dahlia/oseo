@@ -37,6 +37,18 @@ import {
 export function exportForDeclaration(
   declaration: SyntaxFunction | SyntaxStatement,
 ): readonly SyntaxExportEntry[] | undefined {
+  // A lexical declaration list exports every name it binds, in
+  // declarator order, because ExportedNames of an ExportDeclaration is
+  // the BoundNames of its whole declaration.
+  if (declaration.kind === "declaration-list") {
+    const entries: SyntaxExportEntry[] = [];
+    for (const declarator of declaration.declarations) {
+      const declaratorEntries = exportForDeclaration(declarator);
+      if (declaratorEntries == null) return undefined;
+      entries.push(...declaratorEntries);
+    }
+    return entries;
+  }
   if (
     declaration.kind === "binding-pattern" &&
     declaration.declarationKind !== "var"

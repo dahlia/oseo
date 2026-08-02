@@ -928,7 +928,10 @@ landed with the M5 intrinsics units. The remaining queue is:
     its own method-cache identity, the synchronous `yield*` exit reports the
     ending step's own value, and the reviewed
     *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case enters as
-    a pass.
+    a pass. Unit 8.5a admits the multi-declarator `const` and `let`
+    declaration list: the compiler expands its declarators into the enclosing
+    statement list rather than a block, so the whole list keeps one temporal
+    dead zone, one set of cells, and its existing early errors.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

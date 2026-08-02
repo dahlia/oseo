@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,215 reviewed cases: 2,482 passes, 1,179
-expected negatives, and 554 unsupported profile features. It records no
+The current manifest contains 4,332 reviewed cases: 2,563 passes, 1,211
+expected negatives, and 558 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -228,10 +228,13 @@ its deliberate boundary and its evidence:
     Deliberate boundaries, each rejected with a source-located
     diagnostic: `export var`, ambient `declare` declarations, a `var` sharing a
     catch parameter name (ECMAScript
-    allows it), a `var` sharing a block-level function declaration name,
+    allows it), and a `var` sharing a block-level function declaration name,
     because Annex B function hoisting would make the difference
-    observable, and an awaited initializer in a declaration list with
-    more than one declarator. Top-level Script
+    observable. This entry previously also recorded an awaited initializer
+    in a `var` list with more than one declarator as a rejection. M5a Unit
+    8.5a re-measured every such form in an asynchronous function and at
+    module top level and found all of them admitted, so the stale
+    rejection is removed rather than reworded. Top-level Script
     `var` creates a script binding rather than a global-object property;
     the difference is unobservable while `globalThis` remains outside
     the profile, and the `globalThis` gap entry owns the revisit.
@@ -519,8 +522,43 @@ its deliberate boundary and its evidence:
     cases pin iterator acquisition and step failures across calls and
     construction. Call and constructor spread inherit the object-iterable
     boundary.
- -  Array binding declarations. A standalone one-declarator `const` or `let`
-    statement and each declarator in a standalone `var` statement admit empty
+ -  Lexical declaration lists. A `const` or `let` declaration binds any number
+    of declarators, and every declarator form the one-declarator statement
+    already admitted is admitted in a list: an identifier with or without an
+    initializer, a recursive array or object pattern, and a TypeScript
+    annotation on each declarator separately. The frontend keeps the list as
+    one owned declaration and the compiler expands its declarators into the
+    statement list that contains the declaration, because ECMAScript admits a
+    lexical declaration only where a StatementList is admitted and gives the
+    declarators the scope that contains them. A block would create a lexical
+    scope the source does not have and would reset the declared cells a second
+    time, so a closure made between the two resets would observe a different
+    cell. Every name of the list therefore enters its temporal dead zone before
+    the first initializer runs, initialization is left to right, an abrupt
+    initializer stops the list and leaves the names after it uninitialized,
+    each pattern closes its own unexhausted iterator in declarator order, and a
+    duplicate name inside a list or against its enclosing scope stays an early
+    error. Lists are admitted in every statement list the profile already
+    admits, including script and module top level, block statements, function
+    and arrow bodies, class static blocks, switch clauses, and `export` at
+    module top level, where the declaration exports every name it binds. An
+    initializer may await in an asynchronous function, an asynchronous arrow,
+    an asynchronous generator, and at module top level. Fixed Node.js, Deno,
+    and native fixtures cover ordering, both temporal dead zone shapes, abrupt
+    completion, mixed pattern and identifier declarators, iterator close order,
+    per-iteration loop cells, switch clauses, class static blocks, awaited
+    declarators, a false hint reaching the compiled generic fallback, both
+    specialization policies, and forced collection. A generated property with
+    seed `0x5eed0029` compares an independent model, Node.js, Deno, and both
+    native specialization policies across one list of two to four declarators
+    per case in five statement-list positions. Seventy-eight reviewed test262
+    cases pass, twenty nine record the parse negatives that keep a lexical
+    declaration out of a single-statement position and a `const` declarator
+    without an initializer, and five record for-await-of destructuring cases
+    whose remaining prerequisites are the `arguments` object and `Object` as a
+    value.
+ -  Array binding declarations. A `const` or `let` declarator
+    and each declarator in a standalone `var` statement admit empty
     patterns, elisions, defaults, nested array patterns, and a final identifier
     or nested array rest target. Every lexical name enters its temporal dead
     zone before the initializer runs. Each `var` name is function-scope hoisted,
@@ -553,8 +591,8 @@ its deliberate boundary and its evidence:
     boundaries. Assignment member targets and `export var` remain outside this
     array declaration syntax unit; M5a Unit 8.3 later admits `await` inside a
     default, as recorded below.
- -  Object binding declarations. A standalone one-declarator `const` or `let`
-    statement and each declarator in a standalone `var` statement admit static,
+ -  Object binding declarations. A `const` or `let` declarator
+    and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
     array properties. Every lexical name enters its temporal dead zone before
     the initializer runs, and every `var` name joins function-scope hoisting.
@@ -2257,6 +2295,16 @@ added; the existing generator throw-resumption and delegation suites keep
 their seeds and domains. The reviewed case enters as a pass, and the manifest
 grows to 4,220 cases: 2,483 passes, 1,182 expected negatives, and 555
 unsupported profile features with no semantic or harness failures.
+
+M5a Unit 8.5a admits the multi-declarator `const` and `let` declaration list
+recorded above. The reviewed subset grows by 112 cases and the manifest
+reaches 4,332 cases: 2,563 passes, 1,211 expected negatives, and 558
+unsupported profile features with no semantic or harness failures. Eighty of
+the new passes are the two reviewed cases the old rejection blocked plus
+seventy-eight promotions from *language/statementList/*,
+*statements/let/syntax/*, *statements/const/syntax/*, *statements/for/*, and
+the *for-await-of* destructuring family whose generated preludes declare
+several names in one `let`.
 
 
 Known gaps inside the claim

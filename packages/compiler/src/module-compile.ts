@@ -24,6 +24,7 @@ import { linkModuleGraph } from "./modules.ts";
 import type { LinkedModuleGraph, ModuleComponent } from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
+  LocatedSyntax,
   ModuleGraph,
   SyntaxExpression,
   SyntaxModule,
@@ -82,6 +83,34 @@ function moduleProgramBody(
       (left.byteRange?.start ?? Number.MAX_SAFE_INTEGER) -
       (right.byteRange?.start ?? Number.MAX_SAFE_INTEGER),
   );
+}
+
+/**
+ * The top-level declaration that binds one name, used to locate a
+ * duplicate-declaration diagnostic. A lexical declaration list is
+ * searched by declarator, so the diagnostic names the declarator rather
+ * than the whole module.
+ */
+function declarationNamed(
+  items: readonly SyntaxStatementItem[],
+  name: string,
+): LocatedSyntax | undefined {
+  for (const item of items) {
+    if (item.kind === "declaration-list") {
+      const declarator = declarationNamed(item.declarations, name);
+      if (declarator != null) return declarator;
+      continue;
+    }
+    if (
+      (item.kind === "const" ||
+        item.kind === "let" ||
+        item.kind === "function") &&
+      item.name === name
+    ) {
+      return item;
+    }
+  }
+  return undefined;
 }
 
 function isSourceRange(value: unknown): value is SourceRange {
@@ -1204,13 +1233,7 @@ export function compileModuleGraph(
       const cell = cells.get(cellId);
       if (cell == null) throw new Error(`Module cell '${cellId}' is missing.`);
       if (bindings.has(cell.localName)) {
-        const declaration = node.syntax.body.find(
-          (item) =>
-            (item.kind === "const" ||
-              item.kind === "let" ||
-              item.kind === "function") &&
-            item.name === cell.localName,
-        );
+        const declaration = declarationNamed(node.syntax.body, cell.localName);
         return {
           diagnostics: [
             sourceDiagnostic(

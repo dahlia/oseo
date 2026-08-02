@@ -908,3 +908,236 @@ test("rejects var exports explicitly", () => {
   assert.ok(!result.parsed);
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
 });
+
+test("admits a multi-declarator lexical declaration list", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let first = 1, second = first + 1;\n" +
+      "const third = second + 1, fourth = third + 1;\n" +
+      "console.log(first, second, third, fourth);\n",
+    sourceId: "lexical-declaration-list.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  // Every declarator is a sibling of the statement list that contains
+  // the declaration, so the list never introduces its own scope.
+  const declarations = hirText
+    .split("\n")
+    .filter((line) => /^ {2}(?:const|let) %b\d+ /u.test(line))
+    .map((line) => line.replace(/^ {2}(const|let) %b\d+ (\w+).*$/u, "$1 $2"));
+  assert.deepEqual(declarations, [
+    "let first",
+    "let second",
+    "const third",
+    "const fourth",
+  ]);
+  assert.doesNotMatch(hirText, /^\s*block/mu);
+});
+
+test("gives each declaration-list name exactly one lexical cell", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "{\n" +
+      "  let first = 1, second = 2;\n" +
+      "  console.log(first, second);\n" +
+      "}\n",
+    sourceId: "declaration-list-cells.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const mirText = printMir(result.mir);
+  // A false nested block would reset the same cells twice and break the
+  // identity of a closure captured between the two resets.
+  for (const name of ["first", "second"]) {
+    assert.equal(
+      mirText.split(`fresh lexical cell for ${name}`).length - 1,
+      1,
+      `expected exactly one cell reset for ${name}`,
+    );
+  }
+});
+
+test("predeclares every list name before the first initializer", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let outcome = 'none';\n" +
+      "try {\n" +
+      "  const read = () => later;\n" +
+      "  let first = read(), later = 2;\n" +
+      "  console.log(first, later);\n" +
+      "} catch (error) {\n" +
+      "  outcome = error.name;\n" +
+      "}\n" +
+      "console.log(outcome);\n",
+    sourceId: "declaration-list-tdz.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  // The closure the first initializer calls reads the binding the second
+  // declarator declares, rather than an outer or unresolved name, so the
+  // read reaches that binding's temporal dead zone.
+  const declared = /let %b(\d+) later = 2/u.exec(hirText)?.[1];
+  assert.ok(declared != null);
+  assert.match(hirText, new RegExp(`return %b${declared}\\(later\\)`, "u"));
+  // Both declarators of the list are siblings inside the try block, so
+  // the first one is resolved before the second one is written.
+  const firstIndex = hirText.indexOf("let %b2 first = call");
+  const laterIndex = hirText.indexOf(`let %b${declared} later = 2`);
+  assert.ok(firstIndex >= 0 && firstIndex < laterIndex);
+});
+
+test("admits patterns and bare names inside a lexical declaration list", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const [first, second] = [1, 2], { third } = { third: 3 };\n" +
+      "let fourth, fifth = first + second + third;\n" +
+      "console.log(first, second, third, fourth, fifth);\n",
+    sourceId: "declaration-list-patterns.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /const declare \[%b\d+ first/u);
+  assert.match(hirText, /const declare \{"third": %b\d+ third\}/u);
+  assert.match(hirText, /let %b\d+ fourth = undefined/u);
+});
+
+test("keeps a declaration list out of a nested lexical scope", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let captured;\n" +
+      "{\n" +
+      "  let counter = 0, reader = () => counter;\n" +
+      "  counter = counter + 1;\n" +
+      "  captured = reader;\n" +
+      "}\n" +
+      "console.log(captured());\n",
+    sourceId: "declaration-list-closure.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const mirText = printMir(result.mir);
+  assert.equal(
+    mirText.split("fresh lexical cell for counter").length - 1,
+    1,
+    "the captured cell is created once for the block",
+  );
+});
+
+test("admits a declaration list in a switch clause and a static block", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "class Holder {\n" +
+      "  static value;\n" +
+      "  static {\n" +
+      "    let first = 1, second = first + 1;\n" +
+      "    Holder.value = first + second;\n" +
+      "  }\n" +
+      "}\n" +
+      "switch (Holder.value) {\n" +
+      "  case 3: {\n" +
+      "    let inner = 1, other = inner + 1;\n" +
+      "    console.log(inner, other);\n" +
+      "    break;\n" +
+      "  }\n" +
+      "  default:\n" +
+      "    let fallback = 0, spare = fallback;\n" +
+      "    console.log(fallback, spare);\n" +
+      "}\n",
+    sourceId: "declaration-list-positions.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  assert.match(hirText, /let %b\d+ second/u);
+  assert.match(hirText, /let %b\d+ other/u);
+  assert.match(hirText, /let %b\d+ spare/u);
+});
+
+test("admits awaited initializers in a declaration list", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function run() {\n" +
+      "  let first = await Promise.resolve(1), second = first + 1;\n" +
+      "  const third = await Promise.resolve(second), fourth = third + 1;\n" +
+      "  return fourth;\n" +
+      "}\n" +
+      "run().then(function (value) { console.log(value); });\n",
+    sourceId: "declaration-list-await.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const asynchronous = result.mir.functions.find(
+    (functionValue) => functionValue.asyncFunction === true,
+  );
+  assert.equal(
+    asynchronous?.blocks.filter(
+      (block) =>
+        block.terminator.kind === "generator-yield" &&
+        block.terminator.awaited === true,
+    ).length,
+    2,
+  );
+});
+
+test("exports every name of a module lexical declaration list", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "export let first = 1, second = first + 1;\n",
+    sourceId: "file:///app/export-list.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  assert.deepEqual(
+    result.module.exports.map((entry) =>
+      entry.kind === "local" ? entry.exportedName : entry.kind,
+    ),
+    ["first", "second"],
+  );
+});
+
+test("awaits a module declaration list initializer at top level", () => {
+  const result = babelModuleFrontend.parseModule({
+    source:
+      "let first = await Promise.resolve(1), second = first + 1;\n" +
+      "console.log(first, second);\n",
+    sourceId: "file:///app/module-list-await.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/module-list-await.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/module-list-await.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "module-list-await",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+test("keeps lexical declaration list early errors", () => {
+  const rejected = [
+    ["duplicate-in-list.ts", "let first = 1, first = 2;\n"],
+    ["duplicate-const-in-list.ts", "const first = 1, first = 2;\n"],
+    [
+      "duplicate-across-lists.ts",
+      "let first = 1;\nlet second = 2, first = 3;\n",
+    ],
+    ["const-without-initializer.ts", "const first = 1, second;\n"],
+    ["var-redeclares-list.ts", "let first = 1, second = 2;\nvar second = 3;\n"],
+    ["list-in-if-body.ts", "if (1) let first = 1, second = 2;\n"],
+    ["list-in-label-body.ts", "outer: let first = 1, second = 2;\n"],
+  ] as const;
+  for (const [sourceId, source] of rejected) {
+    const result = compileSource(babelFrontend, { source, sourceId });
+    assert.equal(result.diagnostics.length, 1, sourceId);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", sourceId);
+  }
+});

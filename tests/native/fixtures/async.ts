@@ -581,4 +581,56 @@ main();
       overflowMisses: 0,
     },
   },
+  {
+    name: "async-declaration-list-await",
+    source: `
+function settle(label, value, reject) {
+  console.log("settle", label);
+  return reject ? Promise.reject(label) : Promise.resolve(value);
+}
+async function ordered() {
+  // Each declarator suspends in turn, and a later initializer reads the
+  // cell an earlier one filled across the suspension.
+  let first = await settle("first", 1, false),
+    second = first + (await settle("second", 2, false));
+  const [third, fourth = await settle("fourth", 4, false)] =
+      await settle("third", [3], false),
+    fifth = first + second + third + fourth;
+  console.log("ordered", first, second, third, fourth, fifth);
+}
+async function rejected() {
+  let reader;
+  try {
+    reader = () => trailing;
+    let leading = await settle("leading", 1, false),
+      stopped = await settle("stopped", 0, true),
+      trailing = await settle("trailing", 3, false);
+    console.log("unreachable", leading, stopped, trailing);
+  } catch (error) {
+    console.log("rejected", error);
+  }
+  try {
+    reader();
+  } catch (error) {
+    console.log("rejected-tdz", error instanceof ReferenceError);
+  }
+}
+async function loops() {
+  const captured = [];
+  for (let index = 0; index < 2; index = index + 1) {
+    let held = await settle("loop", index, false), capture = () => held;
+    held = held + 10;
+    captured[index] = capture;
+  }
+  console.log("loops", captured[0](), captured[1]());
+}
+async function main() {
+  await ordered();
+  await rejected();
+  await loops();
+  console.log("finished");
+}
+main();
+`,
+  },
 ];
