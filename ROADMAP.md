@@ -959,7 +959,12 @@ landed with the M5 intrinsics units. The remaining queue is:
     admits the optional catch binding: a `catch` clause without a parameter
     discards the thrown value, creates no catch-parameter environment, and
     keeps the block's own lexical scope and the parameterized clause's
-    completion precedence.
+    completion precedence. Unit 8.5c admits a simple catch parameter sharing a
+    name with a var-scoped declaration: the enclosing function, Script, or
+    module keeps its hoisted outer cell, while the catch clause creates a fresh
+    cell and a same-name initializer inside the catch writes only that cell.
+    Recursive catch patterns, same-scope lexical errors, and the Annex B
+    block-function boundary remain unchanged.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

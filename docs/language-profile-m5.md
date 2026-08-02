@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,339 reviewed cases: 2,566 passes, 1,214
-expected negatives, and 559 unsupported profile features. It records no
+The current manifest contains 4,340 reviewed cases: 2,566 passes, 1,214
+expected negatives, and 560 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -225,12 +225,13 @@ its deliberate boundary and its evidence:
     level. The frontend normalizes each function, script, or module body
     into hoisted bindings initialized to `undefined` plus in-place
     assignments, so no separate binding kind reaches HIR or the runtime.
-    Deliberate boundaries, each rejected with a source-located
-    diagnostic: `export var`, ambient `declare` declarations, a `var` sharing a
-    catch parameter name (ECMAScript
-    allows it), and a `var` sharing a block-level function declaration name,
-    because Annex B function hoisting would make the difference
-    observable. This entry previously also recorded an awaited initializer
+    A simple catch parameter may share a name with one of these declarations,
+    as M5a Unit 8.5c records below. Deliberate boundaries, each rejected with a
+    source-located diagnostic: `export var`, ambient `declare` declarations,
+    a recursive catch pattern sharing a var name, and a `var` sharing a
+    block-level function declaration name, because Annex B function hoisting
+    would make the difference observable. This entry previously also recorded
+    an awaited initializer
     in a `var` list with more than one declarator as a rejection. M5a Unit
     8.5a re-measured every such form in an asynchronous function and at
     module top level and found all of them admitted, so the stale
@@ -765,6 +766,24 @@ its deliberate boundary and its evidence:
     catch-less `try {};` rejected; and *optional-catch-binding-lexical.js*
     stays `unsupported-profile-feature` because its final assertion reads an
     unresolved global name, which the global binding model gap below owns.
+ -  Catch parameter and `var` coexistence. M5a Unit 8.5c admits a simple catch
+    parameter sharing its name with a var-scoped declaration in the enclosing
+    function, Script, or module. The outer var cell is hoisted and initialized
+    normally, even when its only declaration occurs in the catch body. Each
+    catch evaluation creates a distinct catch cell, and a same-name `var`
+    declaration creates no additional body cell. Its initializer is an
+    ordinary assignment resolved inside the catch environment, so it writes
+    the catch cell and leaves the outer cell unchanged. After the clause, the
+    outer value is therefore its earlier value or `undefined`. Recursive array
+    and object catch patterns keep their var-name redeclaration restriction,
+    same-scope lexical declarations remain early errors, and the block-level
+    function and optional-catch boundaries are unchanged. Fixed Node.js, Deno,
+    and native evidence covers non-strict Script code, strict and non-strict
+    ordinary function bodies, modules, generator and asynchronous bodies,
+    closure identity, abrupt initializers, `finally` precedence, both
+    specialization policies, forced collection, and the AArch64 Linux
+    cross-link. The deterministic name rule has no useful generated domain, so
+    no property suite is added.
  -  Destructuring assignment with identifier and member targets. An assignment
     expression admits recursive array and object patterns whose leaves and rest
     targets name existing bindings or evaluate static or computed member
@@ -2345,6 +2364,17 @@ and one unresolved-global read that stays `unsupported-profile-feature` under
 the global binding model gap. The manifest reaches 4,339 cases: 2,566 passes,
 1,214 expected negatives, and 559 unsupported profile features with no
 semantic or harness failures.
+
+M5a Unit 8.5c admits the simple catch parameter and same-name `var`
+coexistence recorded above. The reviewed subset adds
+*test/language/statements/try/scope-catch-param-var-none.js* as inventory
+evidence for retaining the existing variable environment across a catch
+parameter. Its direct `eval` dependency remains outside the profile under ADR
+0016, so it is recorded as `unsupported-profile-feature`; the fixed
+differential fixture provides the same-name positive evidence the upstream
+case does not isolate. The manifest reaches 4,340 cases: 2,566 passes, 1,214
+expected negatives, and 560 unsupported profile features with no semantic or
+harness failures.
 
 
 Known gaps inside the claim

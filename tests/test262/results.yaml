@@ -137166,6 +137166,33 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/try/scope-catch-param-var-none.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - destructuring-bindings
+      - dynamic-source
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/statements/try/scope-catch-param-var-none.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/try/scope-catch-param-var-non\
+        e.js:86:16: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -138354,14 +138381,14 @@ summary:
   harnessFailures: 0
   passes: 2566
   semanticFailures: 0
-  unsupportedProfileFeatures: 559
+  unsupportedProfileFeatures: 560
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 4
       harnessFailures: 0
       passes: 28
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
     - dependency: async-functions
       expectedNegatives: 156
       harnessFailures: 0
@@ -138403,13 +138430,13 @@ summary:
       harnessFailures: 0
       passes: 966
       semanticFailures: 0
-      unsupportedProfileFeatures: 140
+      unsupportedProfileFeatures: 141
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 58
+      unsupportedProfileFeatures: 59
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
@@ -138427,7 +138454,7 @@ summary:
       harnessFailures: 0
       passes: 146
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 15
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -138493,7 +138520,7 @@ summary:
       harnessFailures: 0
       passes: 183
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 2
   groups:
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
@@ -138626,4 +138653,4 @@ summary:
       harnessFailures: 0
       passes: 1078
       semanticFailures: 0
-      unsupportedProfileFeatures: 135
+      unsupportedProfileFeatures: 136

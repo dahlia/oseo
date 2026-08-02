@@ -2927,7 +2927,7 @@ export function collectVarStatement(
       const parameter = node(handler.param);
       const handlerBody = node(handler.body);
       const handlerCatch =
-        parameter == null
+        parameter == null || parameter.type === "Identifier"
           ? catchParameters
           : new Set([...catchParameters, ...rawPatternNames(parameter)]);
       if (

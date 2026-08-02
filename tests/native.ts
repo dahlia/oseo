@@ -296,6 +296,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-generator-missing-throw-close-suspension" ||
     fixture.name === "async-from-sync-rejection-close" ||
     fixture.name === "catch-bindings" ||
+    fixture.name === "catch-var-coexistence" ||
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
@@ -395,6 +396,11 @@ for (const fixture of selectedFixtures) {
             // initializer runs must survive every forced collection
             // between the declarators, including across a suspension,
             // and a closure that captured them keeps the same cells.
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "catch-var-coexistence") {
+            // Catch and outer var cells remain independently reachable
+            // across closures, suspension, and cleanup.
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "lexical-declaration-list-hints") {
