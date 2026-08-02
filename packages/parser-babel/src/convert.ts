@@ -3316,6 +3316,7 @@ export function functionDeclaration(
       {
         body: executionBody,
         kind: "block",
+        parameterEnvironmentBody: true,
         range,
       },
     ];

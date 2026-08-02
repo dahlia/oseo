@@ -1243,17 +1243,24 @@ function resolveStatementList(
   state: ResolveState,
   functionBody: boolean,
   existingLocal?: Map<string, Binding>,
+  lexicalScope = true,
   loopDepth = 0,
   breakDepth = 0,
 ): readonly HirStatement[] {
   const local = existingLocal ?? new Map<string, Binding>();
-  // `resolveStatementList` predeclares its own scope only for a genuine
-  // nested Block, whose FunctionDeclarations are LexicallyDeclaredNames;
-  // a caller that already predeclared `existingLocal` owns a Script,
-  // module, or FunctionBody top level instead and already chose that
-  // scope's own policy: var-like for a Script or FunctionBody, lexical
-  // for a module.
-  if (existingLocal == null) predeclareBindings(statements, local, state, true);
+  // `resolveStatementList` predeclares its own scope only when it owns a
+  // genuine nested Block, whose FunctionDeclarations are
+  // LexicallyDeclaredNames (`lexicalScope` true, the default a real
+  // Block's own caller relies on); a caller that already predeclared
+  // `existingLocal` owns a Script, module, or FunctionBody top level
+  // instead and already chose that scope's own policy: var-like for a
+  // Script or FunctionBody, lexical for a module. A parameter-environment
+  // function's synthetic body wrapper is a Block in shape only: it is not
+  // a source Block, so its caller passes `lexicalScope` false to keep its
+  // FunctionDeclarations the FunctionBody's own var-like ones.
+  if (existingLocal == null) {
+    predeclareBindings(statements, local, state, lexicalScope);
+  }
   const scopes = [...parentScopes, local];
   const result: HirStatement[] = [
     ...buildFunctionInits(statements, local, scopes, state),
@@ -2517,6 +2524,7 @@ function resolveStatement(
         state,
         functionBody,
         undefined,
+        statement.parameterEnvironmentBody !== true,
         loopDepth,
         breakDepth,
       ),

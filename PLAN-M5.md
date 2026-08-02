@@ -2315,6 +2315,32 @@ fixtures and scenario above supply that evidence directly. The manifest
 reaches 4,372 cases: 2,568 passes, 1,235 expected negatives, and 569
 unsupported profile features with no semantic or harness failures.
 
+A follow-up review found that `predeclareBindings`'s new `lexicalScope`
+flag reached one caller too many. A parameter-environment function
+(default or destructuring parameters) wraps its own FunctionBody in a
+synthetic block so the body has a scope distinct from its separate
+parameter scope; that wrapper is a Block in shape only; it carries no
+source block of its own. `resolveStatementList`'s “block” branch could
+not tell the two apart, so it predeclared a parameter-environment body's
+top-level function declarations with the Block/CaseBlock lexical policy
+instead of the FunctionBody's own var-like one, reporting a false
+`Duplicate declaration` for code such as
+`function outer(x = 0) { function f() {} function f() {} }` that a
+simple-parameter or rest-only body already admitted. The owned syntax's
+`block` statement gains a `parameterEnvironmentBody` marker the frontend
+sets only on this synthetic wrapper, and `resolveStatementList` now takes
+an explicit `lexicalScope` argument from its “block” caller instead of
+assuming every block it predeclares is a genuine one, so the wrapper
+keeps the var-like policy while a real nested block or switch inside a
+parameter-environment body still rejects a duplicate function name.
+Focused regression tests cover default, destructuring, rest, and simple
+parameter forms admitting a duplicate ordinary or mismatched-kind
+function name, a genuine nested block and a switch inside a
+parameter-environment body still rejecting one, and the same contract
+proven directly at the `buildHir` boundary. The manifest is unchanged,
+because no promoted test262 case exercises a parameter-environment
+function body.
+
 ### Intrinsics and built-in objects
 
 Establish the intrinsic graph, well-known symbols, iterator protocols, error

@@ -898,6 +898,80 @@ test("admits a top-level function redeclaration of any kind", () => {
   }
 });
 
+test("keeps a parameter-environment body wrapper var-like", () => {
+  // A parameter-environment function's synthetic body wrapper is a Block
+  // in shape only, not a source Block: the frontend uses it only to give
+  // the FunctionBody a scope distinct from its own separate parameter
+  // scope. Its own top-level function declarations must keep the
+  // FunctionBody's var-like redeclaration policy, so
+  // `parameterEnvironmentBody` marks the wrapper and the duplicate below
+  // stays admitted, unlike the identical duplicate inside a genuine
+  // nested block.
+  const declaration = (value: number) => ({
+    body: [
+      {
+        expression: { kind: "number" as const, range, value },
+        kind: "return" as const,
+        range,
+      },
+    ],
+    kind: "function" as const,
+    name: "f",
+    parameters: [],
+    range,
+    returnHints: [],
+  });
+  const wrappedBody = (parameterEnvironmentBody: boolean) => [
+    {
+      body: [declaration(1), declaration(2)],
+      kind: "block" as const,
+      range,
+      ...(parameterEnvironmentBody ? { parameterEnvironmentBody } : {}),
+    },
+  ];
+  const wrapped = buildHir({
+    body: [
+      {
+        body: wrappedBody(true),
+        kind: "function",
+        name: "outer",
+        parameters: [],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "parameter-environment-body.ts",
+  });
+  assert.deepEqual(wrapped.diagnostics, []);
+  assert.ok(wrapped.program != null);
+  assert.match(printHir(wrapped.program), /return 2/u);
+
+  const genuine = buildHir({
+    body: [
+      {
+        body: wrappedBody(false),
+        kind: "function",
+        name: "outer",
+        parameters: [],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "genuine-block-body.ts",
+  });
+  assert.equal(genuine.program, undefined);
+  assert.equal(genuine.diagnostics.length, 1);
+  assert.equal(genuine.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    genuine.diagnostics[0]?.message ?? "",
+    /Duplicate declaration 'f'/u,
+  );
+});
+
 test("uses the last repeated top-level function declaration", () => {
   const declaration = (value: number) => ({
     body: [

@@ -813,6 +813,15 @@ export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
       readonly kind: "block";
+      /**
+       * True only for the synthetic block a parameter-environment
+       * function's own FunctionBody is wrapped in to give it a scope
+       * distinct from its separate parameter scope. It carries no source
+       * block of its own, so its FunctionDeclarations stay the
+       * FunctionBody's own var-like top-level declarations rather than
+       * becoming a genuine nested Block's LexicallyDeclaredNames.
+       */
+      readonly parameterEnvironmentBody?: true;
     })
   | (LocatedSyntax & {
       /**
