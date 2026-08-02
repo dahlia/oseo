@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,353 reviewed cases: 2,568 passes, 1,220
-expected negatives, and 565 unsupported profile features. It records no
+The current manifest contains 4,372 reviewed cases: 2,568 passes, 1,235
+expected negatives, and 569 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -116,8 +116,22 @@ its deliberate boundary and its evidence:
     position, and one case-block scope shared by every clause, so a
     lexical clause binding read before its clause runs stays a runtime
     TDZ error. `break` targets the switch while `continue` passes
-    through to the enclosing loop. Function declarations inside switch
-    clauses stay rejected with a source-located diagnostic.
+    through to the enclosing loop. M5a Unit 8.5e admits a function
+    declaration in a switch clause: every clause's function is
+    instantiated once, at CaseBlock entry, sharing the same scope its
+    `let`, `const`, and class declarations already share, so a function
+    is callable through any clause the discriminant reaches regardless
+    of which clause declares it or whether that clause ever runs. A
+    duplicate function name in the shared scope is always the early
+    error the existing scope already enforces for any other duplicate:
+    ECMA-262 exempts it only for a host that implements Annex B's
+    Block-Level Function Declarations Web Legacy Compatibility
+    Semantics, which this profile does not, so no duplicate function
+    name is admitted regardless of a matching ordinary kind or the
+    code's strictness, the same boundary Unit 8.5d records for a
+    block-level function. Annex B's paired web legacy semantics, which
+    would also copy a function's value out to a same-name var-scoped
+    binding in sloppy mode, remain unimplemented as well.
  -  The classic `for` statement with expression, `var`, `let`, `const`,
     and empty heads. Mutable lexical head bindings follow
     `CreatePerIterationEnvironment`: each iteration reads the current
@@ -2397,6 +2411,19 @@ outside the declaring block that the frontend instead reports as a
 compile-time diagnostic. The manifest reaches 4,353 cases: 2,568 passes,
 1,220 expected negatives, and 565 unsupported profile features with no
 semantic or harness failures.
+
+M5a Unit 8.5e admits the switch-clause function declaration recorded above.
+The reviewed subset adds nineteen cases: fifteen expected negatives from
+*test/language/statements/switch/syntax/redeclaration/* for the CaseBlock
+duplicate and var-overlap conflicts the shared scope keeps rejecting, and
+four `unsupported-profile-feature` results, *scope-lex-async-function.js*,
+*scope-lex-async-generator.js*, *scope-lex-class.js*, and
+*scope-lex-generator.js*, each of which expects a runtime `ReferenceError`
+for a reference outside the switch that the frontend instead reports as a
+compile-time diagnostic, the same documented boundary Unit 8.5d records for
+a block. The manifest reaches 4,372 cases: 2,568 passes, 1,235 expected
+negatives, and 569 unsupported profile features with no semantic or harness
+failures.
 
 
 Known gaps inside the claim

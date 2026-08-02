@@ -365,6 +365,68 @@ test("rejects a var nested under its block function's own block", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO0001");
 });
 
+// A parameter-environment function (default or destructuring parameters)
+// wraps its own FunctionBody in a synthetic block to give it a scope
+// distinct from the separate parameter scope. That wrapper carries no
+// source block of its own, so its top-level function declarations must
+// keep the FunctionBody's own var-like redeclaration policy: any later
+// declaration of the same name, of any kind, freely replaces an earlier
+// one, exactly like a simple-parameter or rest-only body already admits.
+const parameterEnvironmentBodyForms = [
+  ["default parameters", "function outer(x = 0) {"],
+  ["destructuring parameters", "function outer({ x }) {"],
+  ["rest parameters", "function outer(...x) {"],
+  ["simple parameters", "function outer(x) {"],
+] as const;
+
+for (const [name, header] of parameterEnvironmentBodyForms) {
+  test(`admits duplicate ordinary function names with ${name}`, () => {
+    const result = compileSource(babelFrontend, {
+      source: `${header} function f() {} function f() {} return f(); }`,
+      sourceId: "parameter-environment-duplicate-ordinary.ts",
+    });
+    assert.deepEqual(result.diagnostics, []);
+  });
+
+  test(`admits a mismatched-kind top-level redeclaration with ${name}`, () => {
+    const result = compileSource(babelFrontend, {
+      source: `${header} function f() {} function* f() {} return typeof f; }`,
+      sourceId: "parameter-environment-duplicate-kind.ts",
+    });
+    assert.deepEqual(result.diagnostics, []);
+  });
+}
+
+test("rejects a duplicate block function in a parameterized body", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function outer(x = 0) { { function f() {} function f() {} } }",
+    sourceId: "parameter-environment-block-duplicate.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Duplicate declaration 'f'/u,
+  );
+});
+
+test("rejects a duplicate switch function in a parameterized body", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function outer(x = 0) {\n" +
+      "  switch (x) {\n" +
+      "    case 1: function f() {} break;\n" +
+      "    default: function f() {}\n" +
+      "  }\n" +
+      "}\n",
+    sourceId: "parameter-environment-switch-duplicate.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Duplicate declaration 'f'/u,
+  );
+});
+
 test("keeps block-scoped let clear of later var declarations", () => {
   const result = compileSource(babelFrontend, {
     source: "{ let value = 1; console.log(value); } var value = 2;",

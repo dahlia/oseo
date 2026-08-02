@@ -921,6 +921,91 @@ test("evaluates switch case tests lazily in separate blocks", () => {
   assert.match(printMir(buildMir(hir)), /join switch bb/u);
 });
 
+test("instantiates a switch clause function before any case test runs", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        cases: [
+          {
+            body: [
+              {
+                body: [
+                  {
+                    expression: { kind: "number", range, value: 1 },
+                    kind: "return",
+                    range,
+                  },
+                ],
+                kind: "function",
+                name: "inner",
+                parameters: [],
+                range,
+                returnHints: [],
+              },
+              { kind: "break", range },
+            ],
+            range,
+            test: { kind: "number", range, value: 1 },
+          },
+          {
+            body: [
+              {
+                expression: {
+                  arguments: [
+                    {
+                      arguments: [],
+                      kind: "call",
+                      range,
+                      target: { kind: "name", name: "inner", range },
+                    },
+                  ],
+                  kind: "call",
+                  range,
+                  target: { kind: "console-log", range },
+                },
+                kind: "expression",
+                range,
+              },
+            ],
+            range,
+            test: { kind: "number", range, value: 2 },
+          },
+        ],
+        discriminant: { kind: "number", range, value: 2 },
+        kind: "switch",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "switch-function-order.ts",
+  };
+  const hir = buildHir(syntax).program;
+  assert.ok(hir != null);
+  const script = buildMir(hir).script;
+  // BlockDeclarationInstantiation runs once for the whole CaseBlock,
+  // ahead of CaseBlockEvaluation, so the function is callable through
+  // case 2 even though it is declared in case 1's own clause.
+  const entryBlock = script.blocks[0];
+  assert.ok(entryBlock != null);
+  assert.ok(
+    entryBlock.operations.some(
+      (operation) => operation.kind === "function-create",
+    ),
+  );
+  const testBlockIndex = script.blocks.findIndex((block) =>
+    block.operations.some(
+      (operation) =>
+        operation.kind === "binary" && operation.operator === "===",
+    ),
+  );
+  const initBlockIndex = script.blocks.findIndex((block) =>
+    block.operations.some((operation) => operation.kind === "initialize"),
+  );
+  assert.ok(initBlockIndex >= 0 && testBlockIndex >= 0);
+  assert.ok(initBlockIndex <= testBlockIndex);
+});
+
 test("runs cleanup only for control transfers that leave its region", () => {
   const emptyBlock: SyntaxStatement = { body: [], kind: "block", range };
   const internalTransfers: SyntaxProgram = {

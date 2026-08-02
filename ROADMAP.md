@@ -970,8 +970,21 @@ landed with the M5 intrinsics units. The remaining queue is:
     errors reject only a var that lexically shares the declaring block or a
     block nested inside it, so the frontend's hoisting pass now rejects
     that overlap alone instead of reserving the name across the whole
-    enclosing var scope. Annex B's copied-out alias remains unimplemented,
-    and function declarations in switch clauses stay a later unit's scope.
+    enclosing var scope. Annex B's copied-out alias remains unimplemented.
+    Unit 8.5e admits a function declaration in a switch clause: every
+    clause's function is instantiated once at CaseBlock entry, sharing the
+    scope its `let`, `const`, and class declarations already share, so it is
+    callable through any clause the discriminant reaches regardless of which
+    clause declares it. ECMA-262 exempts a CaseBlock's duplicate function
+    name from its early error only for a host that implements Annex B's
+    Block-Level Function Declarations Web Legacy Compatibility Semantics;
+    since this profile does not, a Block or CaseBlock now rejects every
+    duplicate function name outright, correcting the shared
+    `predeclareBindings` helper an ordinary block also uses; a module's own
+    top level shares that same lexical rule, since ECMA-262 gives it no
+    Script- or FunctionBody-style exception either. A Script or function
+    body's own top-level function declarations keep their separate,
+    unconditional hoistable-redeclaration rule unaffected.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

@@ -2236,16 +2236,12 @@ export function statement(
       const testNode = node(caseNode.test);
       const test = testNode == null ? undefined : expression(context, testNode);
       if (testNode != null && test == null) return undefined;
-      const body: SyntaxStatement[] = [];
+      const body: (SyntaxFunction | SyntaxStatement)[] = [];
       for (const child of nodes(caseNode.consequent)) {
-        if (child.type === "FunctionDeclaration") {
-          return unsupported(
-            context,
-            child,
-            "Function declarations in switch clauses are unsupported.",
-          );
-        }
-        const converted = statement(context, child, functionBody);
+        const converted =
+          child.type === "FunctionDeclaration"
+            ? functionDeclaration(context, child, true)
+            : statement(context, child, functionBody);
         if (converted == null) return undefined;
         body.push(converted);
       }
@@ -3320,6 +3316,7 @@ export function functionDeclaration(
       {
         body: executionBody,
         kind: "block",
+        parameterEnvironmentBody: true,
         range,
       },
     ];

@@ -6111,10 +6111,19 @@ function lowerStatements(
       }
     } else if (statement.kind === "switch") {
       const discriminant = lowerExpression(statement.discriminant, builder);
+      const functionInits = statement.functionInits ?? [];
       resetBlockBindings(
-        statement.cases.flatMap((switchCase) => switchCase.body),
+        [
+          ...functionInits,
+          ...statement.cases.flatMap((switchCase) => switchCase.body),
+        ],
         builder,
       );
+      // BlockDeclarationInstantiation instantiates every CaseBlock
+      // function once, here, before CaseBlockEvaluation tests or enters
+      // any clause, so the binding is callable no matter which clause is
+      // selected or reached through fallthrough.
+      lowerStatements(functionInits, builder);
       const testedCases = statement.cases
         .map((switchCase, index) => ({ index, switchCase }))
         .filter((entry) => entry.switchCase.test != null);

@@ -23,6 +23,33 @@ export async function runNativeScenario2(
   assert.equal(nativeSwitchTdz.exitStatus, 0, nativeSwitchTdz.stderr);
   assert.equal(nativeSwitchTdz.stdout, "case tdz\nset none\n");
 
+  // The switch-function-forward-reference fixture explains why this
+  // check bypasses the Deno reference the same way switch-tdz.js does:
+  // Deno's TypeScript transpile loses the CaseBlock-wide function
+  // instantiation for a forward reference from an earlier clause.
+  const switchFunctionForwardEntry = [
+    root,
+    "tests/fixtures/switch-function-forward-reference.js",
+  ].join("/");
+  const nativeSwitchFunctionForward = await runNativeCli(
+    {
+      args: [switchFunctionForwardEntry],
+      version: "0.1.0",
+    },
+    host,
+  );
+  assert.equal(
+    nativeSwitchFunctionForward.exitStatus,
+    0,
+    nativeSwitchFunctionForward.stderr,
+  );
+  assert.equal(
+    nativeSwitchFunctionForward.stdout,
+    "function,declared-in-case-2,declared-in-case-2\n" +
+      "declared-in-case-2,declared-in-case-2\n" +
+      "default\n",
+  );
+
   // The object-spread-accessor-order fixture explains why this check bypasses
   // both references: V8 enumerates an accessor defined after an object
   // literal spread property last instead of in property-creation order.

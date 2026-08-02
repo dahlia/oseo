@@ -81,16 +81,115 @@ test("rejects continue without an enclosing loop", () => {
   assert.equal(result.diagnostics[0]?.code, "OSEO0001");
 });
 
-test("rejects function declarations in switch clauses", () => {
+test("admits a function declaration in a switch clause", () => {
   const result = compileSource(babelFrontend, {
-    source: "switch (1) { case 1: function inner() {} }",
+    source:
+      "switch (1) {\n" +
+      "  case 1:\n" +
+      "    function inner() { return 1; }\n" +
+      "    console.log(inner());\n" +
+      "    break;\n" +
+      "}\n",
     sourceId: "switch-function.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /Function declarations in switch/u,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  // The function is instantiated once at CaseBlock entry, ahead of the
+  // clause dispatch, rather than inline where it is declared.
+  assert.match(hirText, /switch [^\n]*\n\s+function-init %b(\d+) inner/u);
+});
+
+test("instantiates a switch function no matter which clause runs", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "switch (2) {\n" +
+      "  case 1:\n" +
+      "    function inner() { return 1; }\n" +
+      "    break;\n" +
+      "  case 2:\n" +
+      "    console.log(inner());\n" +
+      "    break;\n" +
+      "}\n",
+    sourceId: "switch-function-other-clause.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("admits generator and async switch clause functions", () => {
+  for (const [keyword, sourceId] of [
+    ["function*", "switch-generator-function.ts"],
+    ["async function", "switch-async-function.ts"],
+    ["async function*", "switch-async-generator-function.ts"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source: `switch (1) { case 1: ${keyword} inner() {} }`,
+      sourceId,
+    });
+    assert.deepEqual(result.diagnostics, [], sourceId);
+  }
+});
+
+// The bootstrap parser already implements CaseBlock's own early errors,
+// including the LexicallyDeclaredNames/VarDeclaredNames overlap check, so
+// a lexical or var conflict surfaces as a parse failure before conversion
+// ever runs. Babel's parser admits a duplicate ordinary FunctionDeclaration
+// itself, because Annex B.3.2 (Block-Level Function Declarations Web
+// Legacy Compatibility Semantics) is a normal browser and Node.js
+// capability Babel assumes by default, but this profile's closed
+// ahead-of-time runtime does not implement it, so HIR construction
+// rejects that duplicate on its own instead.
+const rejectedSwitchFunctionConflicts = [
+  [
+    "a lexical name shared with a switch clause function",
+    "switch (1) { case 1: let f; default: function f() {} }",
+    "OSEO0001",
+  ],
+  [
+    "mismatched function kinds sharing a switch clause name",
+    "switch (1) { case 1: function f() {} default: function* f() {} }",
+    "OSEO0001",
+  ],
+  [
+    "a var name shared with a switch clause function",
+    "switch (1) { case 1: var f; default: function f() {} }",
+    "OSEO0001",
+  ],
+  [
+    "two ordinary switch clause functions sharing a name",
+    "switch (1) { case 1: function f() {} default: function f() {} }",
+    "OSEO1001",
+  ],
+] as const;
+
+for (const [name, source, code] of rejectedSwitchFunctionConflicts) {
+  test(`rejects ${name}`, () => {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "switch-function-conflict.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, code);
+  });
+}
+
+test("admits a var declaration sharing a disjoint switch function name", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function outer() {\n" +
+      "  switch (1) { case 1: function f() { return 1; } }\n" +
+      "  var f;\n" +
+      "  return typeof f;\n" +
+      "}\n",
+    sourceId: "switch-function-var-disjoint.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hirText = printHir(result.hir);
+  const outer = /let %b(\d+) f = undefined/u.exec(hirText)?.[1];
+  const switchFunction = /function-init %b(\d+) f = @f\d+/u.exec(hirText)?.[1];
+  assert.ok(outer != null);
+  assert.ok(switchFunction != null);
+  assert.notEqual(switchFunction, outer);
 });
 
 test("converts classic for statements to owned syntax", () => {

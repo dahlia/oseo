@@ -850,6 +850,13 @@ export type HirStatement =
   | (LocatedSyntax & {
       readonly cases: readonly HirSwitchCase[];
       readonly discriminant: HirExpression;
+      /**
+       * Every clause's function declaration, instantiated once at
+       * CaseBlock entry regardless of which clause runs, which is
+       * ECMA-262's BlockDeclarationInstantiation for a CaseBlock. Absent
+       * when no clause declares a function.
+       */
+      readonly functionInits?: readonly HirStatement[];
       readonly kind: "switch";
     })
   | (LocatedSyntax & {
