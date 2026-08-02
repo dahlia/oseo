@@ -1379,13 +1379,6 @@ export function bindingPattern(
         "Member targets are supported only in assignment patterns.",
       );
     }
-    if (nodeContainsAwait(value)) {
-      return unsupported(
-        context,
-        value,
-        "Await inside a destructuring assignment target is unsupported.",
-      );
-    }
     const name = privateMemberName(value);
     if (name != null) {
       const object = privateReferenceObject(context, value);
@@ -1463,13 +1456,6 @@ export function bindingPattern(
       if (keyNode == null || valueNode == null) {
         return unsupported(context, property);
       }
-      if (property.computed === true && nodeContainsAwait(keyNode)) {
-        return unsupported(
-          context,
-          keyNode,
-          "Await inside an object binding property name is unsupported.",
-        );
-      }
       let key: SyntaxExpression | undefined;
       if (property.computed === true) {
         key = expression(context, keyNode);
@@ -1500,13 +1486,6 @@ export function bindingPattern(
           ? node(valueNode.right)
           : undefined;
       if (left == null) return unsupported(context, property);
-      if (right != null && nodeContainsAwait(right)) {
-        return unsupported(
-          context,
-          right,
-          "Await inside a binding default is unsupported.",
-        );
-      }
       const pattern = bindingPattern(context, left, assignment);
       // A rejected target already named its own reason, so the default
       // is not converted and cannot add an unrelated second diagnostic.
@@ -1559,13 +1538,6 @@ export function bindingPattern(
     const right =
       element.type === "AssignmentPattern" ? node(element.right) : undefined;
     if (left == null) return unsupported(context, element);
-    if (right != null && nodeContainsAwait(right)) {
-      return unsupported(
-        context,
-        right,
-        "Await inside an array binding default is unsupported.",
-      );
-    }
     const pattern = bindingPattern(context, left, assignment);
     // A rejected target already named its own reason, so the default is
     // not converted and cannot add an unrelated second diagnostic.
@@ -2635,21 +2607,6 @@ export function identifierExpression(
   range: SourceRange,
 ): SyntaxExpression {
   return { kind: "identifier", name, range };
-}
-
-export function nodeContainsAwait(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(nodeContainsAwait);
-  const valueNode = node(value);
-  if (valueNode == null) return false;
-  if (valueNode.type === "AwaitExpression") return true;
-  if (
-    valueNode.type === "FunctionDeclaration" ||
-    valueNode.type === "FunctionExpression" ||
-    valueNode.type === "ArrowFunctionExpression"
-  ) {
-    return false;
-  }
-  return Object.values(valueNode).some(nodeContainsAwait);
 }
 
 export function unparenthesizedExpression(

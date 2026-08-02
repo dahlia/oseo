@@ -550,8 +550,9 @@ its deliberate boundary and its evidence:
     another container shape, that subtree remains unhinted without a diagnostic
     while matching siblings continue to map. Root container mismatches and type
     annotations that require resolution remain source-located unsupported
-    boundaries. Assignment member targets, `export var`, and `await` inside a
-    default remain outside this array declaration syntax unit.
+    boundaries. Assignment member targets and `export var` remain outside this
+    array declaration syntax unit; M5a Unit 8.3 later admits `await` inside a
+    default, as recorded below.
  -  Object binding declarations. A standalone one-declarator `const` or `let`
     statement and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -583,9 +584,9 @@ its deliberate boundary and its evidence:
     remains unhinted without a diagnostic while matching siblings continue to
     map. Root container mismatches and type annotations that require resolution
     or otherwise lack an admitted concrete syntactic shape remain source-located
-    unsupported boundaries. Assignment member targets, `export var`, and
-    `await` inside a property name or default remain outside this object
-    declaration syntax unit.
+    unsupported boundaries. Assignment member targets and `export var` remain
+    outside this object declaration syntax unit; M5a Unit 8.3 later admits
+    `await` inside a property name or default, as recorded below.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
     patterns plus top-level defaults and rest. The frontend retains plain
@@ -690,9 +691,10 @@ its deliberate boundary and its evidence:
     defaults, rest, nullish failure, both specialization policies, and forced
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
-    properties, and object rest descriptors. Assignment member targets,
-    pattern type annotations, and `await` inside a
-    property name or default remain outside this syntax unit.
+    properties, and object rest descriptors. Assignment member targets and
+    pattern type annotations remain outside this syntax unit; M5a Unit 8.3
+    later admits `await` inside a property name or default, as recorded
+    below.
  -  Destructuring assignment with identifier and member targets. An assignment
     expression admits recursive array and object patterns whose leaves and rest
     targets name existing bindings or evaluate static or computed member
@@ -710,8 +712,10 @@ its deliberate boundary and its evidence:
     assignment to an immutable local or imported binding keeps its specified
     catchable error. Direct awaited right operands resume before any pattern
     work in asynchronous functions and modules. Await inside a member target
-    is rejected until that nested suspension position has an owned continuation
-    contract. Native differential fixtures cover identifier and member targets.
+    was rejected at this unit until an owned continuation contract existed for
+    that nested suspension position; M5a Unit 8.3 supplies it and admits the
+    position in asynchronous bodies, as recorded below.
+    Native differential fixtures cover identifier and member targets.
     A generated property with seed `0x5eed000c` also covers parenthesized member
     targets, array and object inputs, defaults, rest, nullish failure, result
     identity, both specialization policies, and forced collection. Fourteen
@@ -719,8 +723,9 @@ its deliberate boundary and its evidence:
     member writes, nested patterns, defaults, rest, result identity, nullish and
     immutable target errors, and function-name inference. Synchronous `for-of`
     assignment heads reuse this pattern and target contract. Pattern type
-    annotations and `await` inside a source property name, default, or member
-    target remain outside this syntax unit.
+    annotations remain outside this syntax unit; M5a Unit 8.3 later admits
+    `await` inside a source property name, default, or member target, as
+    recorded below.
  -  Basic object literal expressions. An object literal creates a fresh
     ordinary object and adds each data property, shorthand property, and
     method definition as an own writable, enumerable, configurable data
@@ -1621,12 +1626,10 @@ its deliberate boundary and its evidence:
     An asynchronous generator body reuses the generator suspension record: it
     suspends at `await` as well as at `yield`, so `await` is admitted in
     ordinary expression positions inside such a body rather than only in the
-    M4 continuation positions. The frontend's existing destructuring
-    restriction still applies to an asynchronous generator body: `await`
-    inside a computed member of an assignment target, a computed binding
-    property name, or an array or object binding default is rejected with a
-    source-located diagnostic, because this profile lowers a pattern's
-    subexpressions before the suspension machinery reaches them.
+    M4 continuation positions. M5a Unit 8.3 extends that admission to the
+    pattern subexpressions of such a body: `await` inside a computed member of
+    an assignment target, a computed binding property name, or an array or
+    object binding default suspends the same record, as recorded below.
     `next`, `return`, and `throw` each enqueue one
     AsyncGeneratorRequest and return its promise immediately; the queue's head
     owns the running step, so a call that arrives while the body runs or
@@ -2139,6 +2142,77 @@ The manifest stays at 4,215 cases and moves to 2,482 passes, 1,179 expected
 negatives, and 554 unsupported profile features with no semantic or harness
 failures.
 
+### Pattern-position `await` suspension
+
+M5a Unit 8.3 admits `await` inside the three pattern subexpressions that the
+frontend previously rejected everywhere: the object and computed key of an
+assignment target member, a computed binding property name, and an array or
+object binding default. They are admitted in every body that owns a traced
+suspension frame, which is an ordinary asynchronous function, an asynchronous
+arrow, and an asynchronous generator, and in every pattern that reaches such a
+body: standalone declarations, destructuring assignment, catch parameters,
+classic `for` declaration heads, and `for-of`, `for-await-of`, and assignment
+heads.
+
+The admission adds no new lowering. A pattern already lowers into the enclosing
+body, and every MIR value in that body occupies a root slot of the frame, so
+the acquired iterator, its captured `next` method, its done state, the prepared
+assignment reference, an object binding's coercible input, and the excluded
+keys of a rest property all survive a suspension and are reachable by the
+collector while the frame is suspended. Removing the frontend rejection is what
+lets those positions reach the machinery.
+
+Evaluation order is unchanged by suspension. An assignment target's object and
+computed key evaluate before the iterator step or source read that selects the
+value it stores, and the raw key converts after that selection. A computed
+binding property name evaluates before the `GetV` it names, and after
+`RequireObjectCoercible` for an object pattern. A default evaluates only when
+the selected value is `undefined`, so a supplied value never reaches the
+operand and a rejected operand behind a supplied value never rejects anything.
+An object rest keeps every excluded key computed before the suspensions that
+separate them.
+
+Abrupt completion keeps the ordinary precedence. A rejected operand raises a
+throw completion at the `await` position, so an enclosing `catch` and `finally`
+still run, and an array pattern whose iterator is not yet done closes that
+iterator exactly once before the throw leaves the pattern. An iterator that has
+already reported `done` is not closed again. Assignment and binding cell
+identity is unchanged: a closure captured before the suspension observes the
+write the pattern performs after it.
+
+Module top level is not part of this admission and keeps a source-located
+diagnostic for the same three positions, as recorded below.
+
+The generated property suite uses seed `0x5eed0028` across the four pattern
+positions, asynchronous functions, arrows, and asynchronous generators,
+supplied and missing selections, fulfilled and rejected operands, and truthful
+or false hints. Its independent oracle predicts the printed order and
+completion from the case record alone, and every case runs under both
+specialization policies with forced collection against Node.js, Deno, and
+native execution. Fixed native fixtures cover member-target and source-key
+order, defaults that are and are not taken, nested patterns, rest exclusions,
+assignment cell identity, per-iteration lexical and hoisted `var` loop cells
+captured by closures, `for-of` and `for-await-of` heads, a single close of an
+unfinished iterator, a done iterator that is not closed, a rejected key and a
+rejected target, `finally` precedence, a catch parameter, an asynchronous
+generator that mixes `await` and `yield` in the same positions, and a false
+number hint with a deliberate guard miss that reaches the compiled generic
+fallback.
+
+No reviewed test262 case exercises these positions: an AST scan of all 47,381
+candidate paths finds `await` inside a pattern in seventeen cases, and every
+one of them is either module code or a parse negative for function parameters.
+Three of those parse negatives enter the reviewed subset here, pinning that the
+admission does not reach an asynchronous arrow's or asynchronous generator's
+formal parameters and does not propagate the module Await capability into a
+nested function's parameters. The one module positive enters as inventory
+evidence only: its declared `dynamic-import` feature stops it before
+compilation, so it classifies `unsupported-profile-feature` without reaching
+the module diagnostic recorded below, which package tests prove instead. The
+manifest therefore
+grows to 4,219 cases and stays at 2,482 passes, with 1,182 expected negatives
+and 555 unsupported profile features and no semantic or harness failures.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -2162,7 +2236,8 @@ must never shrink by reclassification alone.
     native evidence, generated suites with seeds `0x5eed0019` and
     `0x5eed001a`, and reviewed test262 cases. The forms that remain outside the
     profile have specific boundaries: BigInt and regular expressions are
-    recorded above, and dynamic import and pattern-position `await` are
+    recorded above, and dynamic import and module top-level pattern-position
+    `await` are
     recorded below. M5a Unit 8.1c admits the object-literal prototype setter,
     Unit 8.1d admits Script and module top-level `this`, and Unit 8.2 admits the
     remaining M5a `super` and `new.target` forms, as recorded above.
@@ -2206,10 +2281,20 @@ must never shrink by reclassification alone.
     Owner: the intrinsics and built-in objects stream; the surface audit in
     [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding
-    property name, or an array or object binding default remains unsupported
-    in ordinary asynchronous and asynchronous generator bodies. Those pattern
-    subexpressions lower before the suspension machinery reaches them.
-    Owner: the functions and executable syntax stream for pattern suspension.
+    property name, or an array or object binding default is admitted by M5a
+    Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as
+    recorded above. The same positions stay rejected with a source-located
+    diagnostic at module top level, where suspension comes from the module
+    continuation transform rather than a traced frame: that transform splits
+    statements around whole `await` expressions and has no way to split the
+    steps of a pattern. No reviewed test262 case exercises the module form on
+    its own; the one upstream case that does,
+    *top-level-await/syntax/catch-parameter.js*, is reviewed and classifies
+    `unsupported-profile-feature` for its declared `dynamic-import` feature
+    before it reaches this diagnostic. Package tests in
+    *packages/parser-babel/tests/bindings.test.ts* and
+    *packages/compiler/tests/modules.test.ts* prove the diagnostic and its
+    location. Owner: the modules and asynchronous execution stream.
  -  `PromiseResolve` does not read the resolved value's `constructor`. The
     specification returns an already-native promise unchanged only after
     `SameValue(value.constructor, %Promise%)` holds, so a value carrying a

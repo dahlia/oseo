@@ -1062,4 +1062,81 @@ async function main() {
 main();
 `,
   },
+  {
+    name: "async-generator-pattern-await",
+    source: `
+async function settle(label, value) {
+  console.log("await", label);
+  return value;
+}
+async function* patterns(input) {
+  const box = {};
+  // A computed source key, a default, and a computed member target each
+  // suspend the asynchronous generator's own traced frame.
+  const { [await settle("key", "value")]: named = await settle(
+    "default",
+    input,
+  ) } = {};
+  yield named;
+  [box[await settle("target", "slot")]] = [named + 1];
+  yield box.slot;
+  // yield suspends in the same positions, so a resumption value can
+  // reach a pattern default and a computed target key.
+  const { sent = yield "ask default" } = {};
+  yield sent;
+  [box[yield "ask key"]] = [sent];
+  return box;
+}
+async function* head(first, second) {
+  const box = {};
+  for await ([box[await settle("head key", "h")]] of first) {
+    yield box.h;
+  }
+  for await (const { each = await settle("head default", 0) } of second) {
+    yield each;
+  }
+}
+async function* pairs() {
+  yield [1];
+  yield [2];
+}
+async function* records() {
+  yield {};
+  yield { each: 5 };
+}
+async function main() {
+  const iterator = patterns(3);
+  console.log("first", (await iterator.next()).value);
+  console.log("second", (await iterator.next()).value);
+  console.log("third", (await iterator.next()).value);
+  console.log("fourth", (await iterator.next("sent")).value);
+  console.log("fifth", (await iterator.next()).value);
+  const done = await iterator.next("k");
+  console.log("done", done.done, done.value.slot, done.value.k);
+  for await (const value of head(pairs(), records())) {
+    console.log("head", value);
+  }
+  // A rejection raised at an await inside a pattern reaches the enclosing
+  // catch of the generator body.
+  const failing = (async function* () {
+    try {
+      const { value = await Promise.reject("generator rejection") } = {};
+      yield value;
+    } catch (error) {
+      yield "caught " + error;
+    }
+  })();
+  console.log("failing", (await failing.next()).value);
+  console.log("finished");
+}
+main();
+`,
+    specialization: {
+      genericCallsDisabled: 2,
+      genericCallsEnabled: 2,
+      hits: 1,
+      misses: 13,
+      overflowMisses: 0,
+    },
+  },
 ];

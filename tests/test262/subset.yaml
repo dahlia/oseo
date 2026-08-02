@@ -993,6 +993,9 @@ tests:
   - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/async-arrow-function/await-as-param-nested-arrow-body-position.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -8002,6 +8005,15 @@ tests:
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/catch-parameter.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-params.js
+    expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
     expectedClassification: pass

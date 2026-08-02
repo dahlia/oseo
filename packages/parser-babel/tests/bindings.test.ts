@@ -624,28 +624,39 @@ test("converts private destructuring assignment targets", () => {
   assert.match(mir, /private-set destructuring private target/u);
 });
 
-test("rejects await inside destructuring assignment targets", () => {
-  const result = compileSource(babelFrontend, {
-    source:
-      "async function assign(target, input) {\n" +
-      "  [(await target).value] = input;\n" +
-      "}\n",
-    sourceId: "await-destructuring-target.ts",
-  });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(result.mir, undefined);
-});
-
-test("rejects await inside parenthesized assignment targets", () => {
-  const result = compileSource(babelFrontend, {
-    source:
-      "async function assign(target, input) {\n" +
-      "  [((await target).value)] = input;\n" +
-      "}\n",
-    sourceId: "await-parenthesized-destructuring-target.ts",
-  });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(result.mir, undefined);
+// The assignment reference is prepared before the iterator step that
+// selects its value, so an `await` in the target's own base suspends
+// the traced frame before the step and resumes holding the reference.
+test("admits await inside destructuring assignment targets", () => {
+  for (const [sourceId, target] of [
+    ["await-destructuring-target.ts", "(await target).value"],
+    ["await-parenthesized-destructuring-target.ts", "((await target).value)"],
+    ["await-computed-destructuring-target.ts", "target[await key]"],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source:
+        "async function assign(target, key, input) {\n" +
+        `  [${target}] = input;\n` +
+        "}\n",
+      sourceId,
+    });
+    assert.deepEqual(result.diagnostics, [], sourceId);
+    assert.ok(result.mir != null, sourceId);
+    const assign = result.mir.functions.find(
+      (candidate) => candidate.name === "assign",
+    );
+    assert.ok(assign != null, sourceId);
+    const suspensions = assign.blocks.filter(
+      (block) => block.terminator.kind === "generator-yield",
+    );
+    assert.equal(suspensions.length, 1, sourceId);
+    const printed = printMir(result.mir);
+    assert.match(printed, /destructuring member target/u);
+    // The suspension precedes the step that selects the stored value.
+    const suspensionIndex = printed.indexOf("generator-await");
+    const stepIndex = printed.indexOf("IteratorStepValue for array binding");
+    assert.ok(suspensionIndex >= 0 && suspensionIndex < stepIndex, sourceId);
+  }
 });
 
 test("supports awaited destructuring assignment in modules", () => {
@@ -675,6 +686,92 @@ test("supports awaited destructuring assignment in modules", () => {
   assert.deepEqual(compiled.diagnostics, []);
   assert.ok(compiled.mir != null);
   assert.match(printMir(compiled.mir), /GetIterator sync for array binding/u);
+});
+
+/* Module top level suspends through the module continuation transform,
+ * which splits statements around whole `await` expressions rather than
+ * around the steps of a pattern. Each pattern position therefore keeps a
+ * source-located rejection there, while an asynchronous function written
+ * in the same module admits every one of them. */
+test("rejects module top-level pattern await at its statement", () => {
+  const rejected: readonly string[] = [
+    "const { value = await 1 } = {};\n",
+    "const [value = await 1] = [];\n",
+    "const { [await 'k']: value } = {};\n",
+    "const target = {};\n[target[await 'k']] = [1];\n",
+    "try { throw {}; } catch ({ value = await 1 }) { value; }\n",
+    "const target = {};\nfor ([target[await 'k']] of [[1]]) target;\n",
+  ];
+  for (const source of rejected) {
+    const sourceId = "file:///app/module-pattern-await.js";
+    const parsed = babelModuleFrontend.parseModule({ source, sourceId });
+    assert.deepEqual(parsed.diagnostics, [], source);
+    assert.ok(parsed.module != null, source);
+    const compiled = compileModuleGraph({
+      entryId: sourceId,
+      kind: "module-graph",
+      modules: [
+        {
+          canonicalId: sourceId,
+          dependencies: [],
+          resolutions: [],
+          sourceHash: "module-pattern-await",
+          syntax: parsed.module,
+        },
+      ],
+    });
+    assert.equal(compiled.mir, undefined, source);
+    const diagnostic = compiled.diagnostics[0];
+    assert.equal(diagnostic?.code, "OSEO1001", source);
+    assert.match(
+      diagnostic?.message ?? "",
+      /await inside a module top-level binding or assignment pattern/iu,
+      source,
+    );
+    assert.equal(diagnostic?.sourceId, sourceId, source);
+    assert.ok((diagnostic?.range.start.line ?? 0) >= 1, source);
+  }
+});
+
+test("admits pattern await inside a module's async function", () => {
+  const sourceId = "file:///app/module-async-pattern-await.js";
+  const parsed = babelModuleFrontend.parseModule({
+    source:
+      "export async function unpack(input, key) {\n" +
+      "  const { [await key]: first = await input } = {};\n" +
+      "  const target = {};\n" +
+      "  [target[await key]] = [first];\n" +
+      "  return target;\n" +
+      "}\n",
+    sourceId,
+  });
+  assert.deepEqual(parsed.diagnostics, []);
+  assert.ok(parsed.module != null);
+  const compiled = compileModuleGraph({
+    entryId: sourceId,
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: sourceId,
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "module-async-pattern-await",
+        syntax: parsed.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  const unpack = compiled.mir.functions.find(
+    (candidate) => candidate.name === "unpack",
+  );
+  assert.equal(unpack?.asyncFunction, true);
+  assert.equal(
+    unpack?.blocks.filter(
+      (block) => block.terminator.kind === "generator-yield",
+    ).length,
+    3,
+  );
 });
 
 test("supports awaited destructuring assignment in async functions", () => {

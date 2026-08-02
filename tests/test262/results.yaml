@@ -9144,6 +9144,29 @@ results:
       expectedFailurePhase: parse
       features:
         - async-functions
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/async-arrow-function/await-as-param-nested-arrow-body-position.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-functions
       flags:
         - generated
       includes: []
@@ -79142,6 +79165,83 @@ results:
       async: false
       features:
         - top-level-await
+        - dynamic-import
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/catch-parameter.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures:
+      - dynamic-import
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/early-does-no\
+        t-propagate-to-fn-declaration-params.js:107:17: error[OSEO0001]:
+        Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-params.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/early-does-no\
+        t-propagate-to-fn-expr-params.js:97:18: error[OSEO0001]: Source
+        could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
       flags:
         - generated
         - module
@@ -133942,11 +134042,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1179
+  expectedNegatives: 1182
   harnessFailures: 0
   passes: 2482
   semanticFailures: 0
-  unsupportedProfileFeatures: 554
+  unsupportedProfileFeatures: 555
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 1
@@ -133955,7 +134055,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: async-functions
-      expectedNegatives: 155
+      expectedNegatives: 156
       harnessFailures: 0
       passes: 317
       semanticFailures: 0
@@ -134039,11 +134139,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: module-linking
-      expectedNegatives: 166
+      expectedNegatives: 168
       harnessFailures: 0
       passes: 27
       semanticFailures: 0
-      unsupportedProfileFeatures: 34
+      unsupportedProfileFeatures: 35
     - dependency: object-literals
       expectedNegatives: 12
       harnessFailures: 0
@@ -134075,11 +134175,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 25
     - dependency: top-level-await
-      expectedNegatives: 3
+      expectedNegatives: 5
       harnessFailures: 0
       passes: 3
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 4
     - dependency: var-bindings
       expectedNegatives: 35
       harnessFailures: 0
@@ -134166,7 +134266,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/expressions
-      expectedNegatives: 475
+      expectedNegatives: 476
       harnessFailures: 0
       passes: 1284
       semanticFailures: 0
@@ -134196,11 +134296,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/module-code
-      expectedNegatives: 165
+      expectedNegatives: 167
       harnessFailures: 0
       passes: 26
       semanticFailures: 0
-      unsupportedProfileFeatures: 34
+      unsupportedProfileFeatures: 35
     - group: language/rest-parameters
       expectedNegatives: 1
       harnessFailures: 0
