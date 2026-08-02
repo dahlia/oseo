@@ -131,6 +131,48 @@ const strictGlobalDeclarationExpectation =
   "property TypeError\n" +
   "3 3 3\n";
 
+/**
+ * A block-level function declaration in sloppy-mode Script and ordinary
+ * function code. Both reference hosts apply Annex B's web legacy
+ * compatibility semantics to this exact shape in sloppy mode, copying the
+ * block's function value out to an outer var-scoped binding of the same
+ * name, so this source is compared with fixed ECMA-262 expectations
+ * instead of a host observation. The strict-mode and module forms of this
+ * construct have no such divergence and are covered by the
+ * block-function-var-coexistence native fixture and the
+ * block-function-var-module fixture, which do compare against Node.js and
+ * Deno.
+ */
+const blockFunctionVarSource = `
+var scriptValue = "script outer";
+let readBlockType;
+{
+  readBlockType = function () { return typeof scriptValue; };
+  function scriptValue() { return "script block"; }
+  console.log("script block", scriptValue());
+}
+console.log("script outer", scriptValue, readBlockType());
+
+function ordinary() {
+  var value = "ordinary outer";
+  let readBlockType;
+  {
+    readBlockType = function () { return typeof value; };
+    function value() { return "ordinary block"; }
+    console.log("ordinary block", value());
+  }
+  return [value, readBlockType()];
+}
+const ordinaryValues = ordinary();
+console.log("ordinary", ordinaryValues[0], ordinaryValues[1]);
+`;
+
+const blockFunctionVarExpectation =
+  "script block script block\n" +
+  "script outer script outer function\n" +
+  "ordinary block ordinary block\n" +
+  "ordinary ordinary outer function\n";
+
 export async function runNativeScenario1(
   context: NativeScenarioContext,
 ): Promise<void> {
@@ -150,6 +192,11 @@ export async function runNativeScenario1(
       "global-declarations-strict.js",
       strictGlobalDeclarationSource,
       strictGlobalDeclarationExpectation,
+    ],
+    [
+      "block-function-var-sloppy.js",
+      blockFunctionVarSource,
+      blockFunctionVarExpectation,
     ],
   ] as const) {
     for (const specialization of ["disabled", "enabled"] as const) {

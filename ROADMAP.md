@@ -964,7 +964,14 @@ landed with the M5 intrinsics units. The remaining queue is:
     module keeps its hoisted outer cell, while the catch clause creates a fresh
     cell and a same-name initializer inside the catch writes only that cell.
     Recursive catch patterns, same-scope lexical errors, and the Annex B
-    block-function boundary remain unchanged.
+    block-function boundary remain unchanged. Unit 8.5d admits a
+    block-level function declaration sharing a name with a var-scoped
+    declaration outside the block that declares it: ECMA-262's Block early
+    errors reject only a var that lexically shares the declaring block or a
+    block nested inside it, so the frontend's hoisting pass now rejects
+    that overlap alone instead of reserving the name across the whole
+    enclosing var scope. Annex B's copied-out alias remains unimplemented,
+    and function declarations in switch clauses stay a later unit's scope.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

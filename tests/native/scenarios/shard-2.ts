@@ -141,6 +141,59 @@ export async function runNativeScenario2(
     }
   }
 
+  // A block-scoped function declaration and an outer var of the same name
+  // stay distinct cells in module code, which is always strict, so no
+  // Annex B extension could apply even on a host that implements it.
+  const blockFunctionVarModule = [
+    root,
+    "tests/fixtures/block-function-var-module.mjs",
+  ].join("/");
+  const blockFunctionVarReferences = [
+    await host.run({
+      args: [blockFunctionVarModule],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", blockFunctionVarModule],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of blockFunctionVarReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeBlockFunctionVar = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            blockFunctionVarModule,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(
+        nativeBlockFunctionVar.exitStatus,
+        0,
+        nativeBlockFunctionVar.stderr,
+      );
+      assert.equal(nativeBlockFunctionVar.stderr, "");
+      for (const reference of blockFunctionVarReferences) {
+        assert.equal(
+          nativeBlockFunctionVar.stdout,
+          reference.stdout,
+          `module block function var ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
   for (const specialization of ["disabled", "enabled"] as const) {
     if (specialization === "enabled") {

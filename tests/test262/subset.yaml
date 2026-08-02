@@ -810,6 +810,30 @@ tests:
   - path: test/language/arguments-object/S10.6_A4.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/block-scope/shadowing/dynamic-lookup-from-closure.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/lookup-from-closure.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-var-declaration-nested-in-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/computed-property-names/class/accessor/getter-duplicates.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -828,6 +852,18 @@ tests:
   - path: test/language/computed-property-names/class/method/constructor-can-be-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/eval-code/direct/block-decl-eval-source-is-strict-onlystrict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/eval-code/direct/block-decl-onlystrict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, error-intrinsics, functions, lexical-bindings]
   - path: test/language/expressions/addition/bigint-arithmetic.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
@@ -7152,6 +7188,12 @@ tests:
   - path: test/language/expressions/yield/star-rhs-unresolvable.js
     expectedClassification: unsupported-profile-feature
     dependencies: [generators, iterator-protocol]
+  - path: test/language/function-code/block-decl-onlystrict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [error-intrinsics, functions, lexical-bindings]
+  - path: test/language/global-code/block-decl-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [error-intrinsics, functions, lexical-bindings]
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
