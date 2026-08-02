@@ -953,6 +953,48 @@ test("rejects await in object-rest assignment member targets", () => {
   );
 });
 
+test("rejects duplicate top-level function declarations in a module", () => {
+  // A module's top-level function declarations are LexicallyDeclaredNames,
+  // unlike a Script's or a FunctionBody's own top level, which treats them
+  // as hoistable, var-like declarations any later declaration of the same
+  // name freely replaces.
+  const canonicalId = "file:///duplicate-function.js";
+  const declaration = (value: number) => ({
+    body: [
+      {
+        expression: { kind: "number" as const, range, value },
+        kind: "return" as const,
+        range,
+      },
+    ],
+    kind: "function" as const,
+    name: "f",
+    parameters: [],
+    range,
+    returnHints: [],
+  });
+  const module = {
+    canonicalId,
+    dependencies: [],
+    resolutions: [],
+    sourceHash: "duplicate-function",
+    syntax: {
+      ...testModule(canonicalId, ""),
+      body: [declaration(1), declaration(2)],
+    },
+  };
+  const result = compileModuleGraph({
+    entryId: canonicalId,
+    kind: "module-graph",
+    modules: [module],
+  });
+  assert.equal(result.mir, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Duplicate declaration 'f'/u,
+  );
+});
+
 test("rejects pattern await nested in expression containers", () => {
   const patternAwait = {
     kind: "destructuring-set" as const,

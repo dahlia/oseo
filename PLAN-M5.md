@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,353
-reviewed cases: 2,568 passes, 1,220 expected negatives, and 565 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,372
+reviewed cases: 2,568 passes, 1,235 expected negatives, and 569 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2171,6 +2171,149 @@ runtime assertion, so the fixed native fixture and module fixture supply
 that evidence directly. The manifest reaches 4,353 cases: 2,568 passes,
 1,220 expected negatives, and 565 unsupported profile features with no
 semantic or harness failures.
+
+M5a Unit 8.5e admits a function declaration in a switch clause, closing the
+one core-language boundary Unit 8.5d left for a later unit. ECMA-262 treats a
+CaseBlock's FunctionDeclarations the same way BlockDeclarationInstantiation
+treats a Block's: every one is instantiated once, in source order, when the
+switch statement is entered, before CaseBlockEvaluation tests or reaches any
+clause. Every clause already shared one lexical scope for `let`, `const`, and
+class declarations; this unit gives that same scope's function declarations
+their own CaseBlock-wide instantiation instead of leaving them for whichever
+clause happens to run. The owned syntax and HIR extend `SyntaxSwitchCase` and
+`HirSwitchCase`'s clause bodies to admit a function declaration the same way a
+block's body already does, and HIR construction now hoists every clause's
+function declarations into a shared `functionInits` list on the switch
+statement itself, built by the same first-pass helper a block's own two-pass
+statement-list resolution already used for its own body, so the two call
+sites share one implementation rather than two copies. Each clause's
+per-statement resolution then skips a function declaration where it appears,
+matching a block's own second pass. MIR lowering resets every clause's direct
+bindings to their temporal dead zone and then lowers the shared
+`functionInits` list once, immediately after the discriminant is evaluated
+and before the lazy, source-ordered case tests begin, so a function is
+already a callable value no matter which clause the discriminant selects or
+reaches through fallthrough, and no matter whether the clause that declares
+it ever runs.
+
+A duplicate name across two clauses of one CaseBlock is the same
+LexicallyDeclaredNames duplicate early error an ordinary Block already
+enforces. ECMA-262 exempts that error, for a repeated name bound only by
+ordinary FunctionDeclarations in non-strict code, solely when the host
+supports Block-Level Function Declarations Web Legacy Compatibility
+Semantics (Annex B.3.2): the exemption is written as part of the
+non-strict-mode duplicate rule itself, conditioned on that Annex B host
+capability, not as an unconditional core rule. This profile's closed
+ahead-of-time runtime does not implement that capability, or the outer
+var-scoped copy-out Annex B.3.2 pairs it with, so a Block or CaseBlock in
+this profile rejects a duplicate function name outright, regardless of a
+matching ordinary kind or the code's strictness. A Script or FunctionBody's
+own top-level function declarations follow a wholly different, unconditional
+rule instead, unaffected by that capability either way: their
+LexicallyDeclaredNames excludes function and var bindings entirely, so they
+are hoistable, var-like declarations that any later declaration of the same
+name freely replaces regardless of its kind or the code's strictness.
+`predeclareBindings` is the one helper both rules share, predeclaring a Block
+or CaseBlock's own scope and a Script or FunctionBody's top-level scope
+alike, and its duplicate-function exemption did not distinguish them: it
+treated any two function declarations sharing a name as exempt everywhere,
+regardless of scope or kind, so a `function f` and a `function* f` inside one
+switch statement were silently accepted with the second replacing the first,
+the same way two top-level `function* f` declarations correctly are. This
+unit gives `predeclareBindings` an explicit lexical-scope flag, true only for
+a Block or CaseBlock's own call: a Block or CaseBlock now rejects every
+duplicate function name, while a Script or FunctionBody top level keeps the
+original unconditional exemption. The codebase's bootstrap Babel parser
+still admits a duplicate ordinary FunctionDeclaration in a Block or CaseBlock
+itself, because Babel assumes the Annex B.3.2 host capability applies by
+default, matching ordinary browsers and Node.js; this profile's own
+`buildHir` now rejects that same source on its own once conversion hands it
+a syntax tree, so this half of the fix is evidenced by a set of tests that
+compile Babel-parsed source through the full pipeline and observe the HIR
+boundary's own diagnostic, alongside direct `buildHir` tests covering the
+kind-mismatch and strict-mode cases Babel does still reject at parse time.
+The corrected Script and FunctionBody exemption remains reachable through
+ordinary compilation and is covered by a differential regression test
+drawing on the existing top-level repeated-function-declaration evidence. A
+module's top level shares neither rule: ECMA-262 gives ModuleItemList no
+exception comparable to a Script's or a FunctionBody's, so a module's
+top-level function declarations are LexicallyDeclaredNames like a Block's,
+and a module is always strict, so no duplicate name is ever admitted
+regardless of kind, matching a Block or CaseBlock exactly. `buildSeededHir`
+now takes an explicit module-body seed flag that `module-compile.ts` sets
+for a module's own top-level `predeclareBindings` call, so a module keeps
+the CaseBlock-style lexical rule while a Script or a FunctionBody keeps the
+unconditional one; this closes a gap Babel also happened to mask, since its
+module parser already rejects a duplicate top-level function name outright,
+so the fix is again evidenced by a direct `compileModuleGraph` test built
+from an owned module body rather than by Babel-parsed source.
+
+The var-scoped hoisting pass's existing `SwitchStatement` case in
+`collectVarStatement` already treated a switch's case bodies as one lexical
+frame that includes function names, in anticipation of this unit; once
+function declarations reach that code path, the existing check already
+implements the correct rule without change: a var inside the same switch
+conflicts with a function any clause declares, while a var outside the
+switch, sharing a switch-clause function's name, sits outside that frame and
+stays admitted as a disjoint coexistence with its own distinct cell, the same
+relationship Unit 8.5d already established for a block.
+
+Fixed Node.js, Deno, and native differential evidence covers a function
+declared in one clause and called through a different clause reached
+directly or through fallthrough, a function declared in an earlier clause
+read back after fallthrough into a later one, fresh per-execution function
+identity captured by closures across loop iterations, a `let` in one clause
+and a differently named function in another clause sharing the CaseBlock's
+temporal dead zone, and generator, asynchronous, and asynchronous generator
+switch-clause functions, none of which carry Annex B's web legacy
+compatibility semantics in any strictness mode. Every case above runs as an
+always-strict module fixture so it needs no Annex B accommodation on either
+reference host. A duplicate function name in one CaseBlock is always
+rejected in this profile, so it has no positive runtime behavior to compare
+against a reference host; that rejection is instead covered directly by the
+frontend and `buildHir` tests recorded above. Deno 2.9.2's TypeScript
+transpile loses the CaseBlock-wide function instantiation for a forward
+reference from an earlier clause to a function a later clause declares, the
+same class of bug *switch-tdz.js* already documents for a case-level `let`,
+so that one construct runs as a direct native fixture bypassing the Deno
+reference instead, following the same pattern. Both specialization policies
+and forced collection cover every fixture, proving a function object and the
+closures that capture it stay reachable across a collection forced at every
+safepoint and that a later switch evaluation's function keeps an identity
+distinct from an earlier one's. A fixed sloppy-mode Script and function-body
+scenario shows the var-coexistence positive without Annex B's copy-out,
+matching *block-function-var-sloppy.js*'s established pattern: the
+switch-clause function and the outer var stay distinct cells, so the outer
+var is unaffected by the switch and a closure created inside the switch
+still resolves the CaseBlock's own binding. The construct's admitted state
+space reduces to the shared CaseBlock scope, hoisting, and closure machinery
+already exercised by other units' generated properties, plus a small,
+enumerable set of clause-selection and declaration-position combinations the
+fixed fixtures above cover directly, so this unit adds no new generated
+property suite.
+
+The reviewed test262 subset promotes every included
+_test/language/statements/switch/syntax/redeclaration/\*-with-function.js_
+and _function-name-redeclaration-attempt-with-\*.js_ case: each is a
+CaseBlock LexicallyDeclaredNames duplicate or a LexicallyDeclaredNames and
+VarDeclaredNames overlap the bootstrap parser already rejects as a native
+parse-time `SyntaxError`, so all fifteen enter as expected negatives,
+including the ordinary function pair test262 reviews only in strict mode,
+where this profile and every host agree regardless of Annex B support. Four
+*scope-lex-async-function.js*, *scope-lex-async-generator.js*,
+*scope-lex-class.js*, and *scope-lex-generator.js* cases, previously
+unreachable while every function-kind declaration in a switch clause was
+rejected outright, assert that the declared name resolves to a runtime
+`ReferenceError` when read outside the switch; this profile instead resolves
+every binding statically and reports the same absence as a compile-time
+diagnostic, the same documented boundary Unit 8.5d records for a block-level
+function, so all four enter as `unsupported-profile-feature` rather than
+closing a semantic gap this unit owns. No test262 case in the reviewed
+candidate set exercises the positive CaseBlock-wide instantiation or the
+disjoint var coexistence with a runtime assertion, so the fixed native
+fixtures and scenario above supply that evidence directly. The manifest
+reaches 4,372 cases: 2,568 passes, 1,235 expected negatives, and 569
+unsupported profile features with no semantic or harness failures.
 
 ### Intrinsics and built-in objects
 

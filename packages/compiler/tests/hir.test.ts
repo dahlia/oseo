@@ -747,6 +747,157 @@ test("shares one binding across duplicate non-strict parameters", () => {
   );
 });
 
+test("hoists a switch clause function into one CaseBlock instantiation", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        cases: [
+          {
+            body: [
+              {
+                body: [
+                  {
+                    expression: { kind: "number", range, value: 1 },
+                    kind: "return",
+                    range,
+                  },
+                ],
+                kind: "function",
+                name: "inner",
+                parameters: [],
+                range,
+                returnHints: [],
+              },
+            ],
+            range,
+            test: { kind: "number", range, value: 1 },
+          },
+        ],
+        discriminant: { kind: "number", range, value: 1 },
+        kind: "switch",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "switch-function-hoist.ts",
+  };
+  const result = buildHir(syntax);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.program != null);
+  const statement = result.program.body[0];
+  assert.equal(statement?.kind, "switch");
+  if (statement?.kind !== "switch") return;
+  // The declaration is instantiated once, shared by the whole CaseBlock,
+  // rather than inline in the one clause where it appears.
+  assert.equal(statement.functionInits?.length, 1);
+  assert.equal(statement.functionInits?.[0]?.kind, "function-init");
+  assert.equal(statement.cases[0]?.body.length, 0);
+});
+
+test("rejects every duplicate function name in a switch clause", () => {
+  // ECMA-262 exempts a duplicate LexicallyDeclaredNames entry from a
+  // CaseBlock's early error only when the host supports Block-Level
+  // Function Declarations Web Legacy Compatibility Semantics (Annex
+  // B.3.2), which this closed ahead-of-time profile does not implement.
+  // A CaseBlock therefore rejects a duplicate function name outright,
+  // regardless of matching kind or strictness, unlike a Script or
+  // FunctionBody's own unconditional top-level exemption.
+  const declaration = (functionKind: "generator" | "ordinary") => ({
+    body: [],
+    functionKind,
+    kind: "function" as const,
+    name: "f",
+    parameters: [],
+    range,
+    returnHints: [],
+  });
+  for (const strict of [false, true]) {
+    for (const kinds of [
+      ["ordinary", "ordinary"],
+      ["ordinary", "generator"],
+    ] as const) {
+      const result = buildHir({
+        body: [
+          {
+            cases: [
+              {
+                body: [declaration(kinds[0])],
+                range,
+                test: { kind: "number", range, value: 1 },
+              },
+              {
+                body: [declaration(kinds[1])],
+                range,
+                test: { kind: "number", range, value: 2 },
+              },
+            ],
+            discriminant: { kind: "number", range, value: 0 },
+            kind: "switch",
+            range,
+          },
+        ],
+        kind: "program",
+        range,
+        sourceId: "switch-function-duplicate.ts",
+        strict,
+      });
+      const label = `${kinds.join("+")} ${strict}`;
+      assert.equal(result.program, undefined, label);
+      assert.equal(result.diagnostics.length, 1, label);
+      assert.equal(result.diagnostics[0]?.code, "OSEO1001", label);
+      assert.match(
+        result.diagnostics[0]?.message ?? "",
+        /Duplicate declaration 'f'/u,
+        label,
+      );
+    }
+  }
+});
+
+test("admits a top-level function redeclaration of any kind", () => {
+  // A Script or FunctionBody's top-level function declaration is a
+  // hoistable, var-like declaration: ECMA-262 admits any later
+  // declaration of the same name, of any kind, and in strict mode too,
+  // unlike a Block or CaseBlock's LexicallyDeclaredNames.
+  const declaration = (
+    functionKind: "generator" | "ordinary",
+    value: number,
+  ) => ({
+    body: [
+      {
+        expression: { kind: "number" as const, range, value },
+        kind: "return" as const,
+        range,
+      },
+    ],
+    functionKind,
+    kind: "function" as const,
+    name: "f",
+    parameters: [],
+    range,
+    returnHints: [],
+  });
+  for (const strict of [false, true]) {
+    for (const kinds of [
+      ["generator", "generator"],
+      ["ordinary", "generator"],
+    ] as const) {
+      const result = buildHir({
+        body: [declaration(kinds[0], 1), declaration(kinds[1], 2)],
+        kind: "program",
+        range,
+        sourceId: "top-level-function-duplicate.ts",
+        strict,
+      });
+      assert.deepEqual(result.diagnostics, [], `${kinds.join("+")} ${strict}`);
+      assert.ok(result.program != null);
+      assert.equal(result.program.functions.length, 1);
+      assert.match(printHir(result.program), /return 2/u);
+    }
+  }
+});
+
 test("uses the last repeated top-level function declaration", () => {
   const declaration = (value: number) => ({
     body: [

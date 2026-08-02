@@ -136549,6 +136549,117 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/scope-lex-async-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/switch/scope-lex-async-function.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/switch/scope-lex-async-functi\
+        on.js:91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/scope-lex-async-generator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/switch/scope-lex-async-generator.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/switch/scope-lex-async-genera\
+        tor.js:91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/scope-lex-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - control-flow
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/switch/scope-lex-class.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/switch/scope-lex-class.js:91:\
+        1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/scope-lex-generator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - functions
+      - generators
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/switch/scope-lex-generator.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/switch/scope-lex-generator.js\
+        :91:1: error[OSEO1001]: Unknown binding 'x'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - let
       flags: []
@@ -136580,6 +136691,397 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-functions
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-iteration
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-iteration
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/const-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-functions
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-async-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-iteration
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-async-generator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-iteration
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-const.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-function.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-generator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - generators
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-let.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-var.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - generators
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/let-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -138722,11 +139224,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1220
+  expectedNegatives: 1235
   harnessFailures: 0
   passes: 2568
   semanticFailures: 0
-  unsupportedProfileFeatures: 565
+  unsupportedProfileFeatures: 569
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 4
@@ -138735,17 +139237,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: async-functions
-      expectedNegatives: 156
+      expectedNegatives: 158
       harnessFailures: 0
       passes: 378
       semanticFailures: 0
-      unsupportedProfileFeatures: 12
+      unsupportedProfileFeatures: 13
     - dependency: async-iteration
-      expectedNegatives: 209
+      expectedNegatives: 211
       harnessFailures: 0
       passes: 1010
       semanticFailures: 0
-      unsupportedProfileFeatures: 237
+      unsupportedProfileFeatures: 238
     - dependency: bigint-primitive
       expectedNegatives: 39
       harnessFailures: 0
@@ -138753,17 +139255,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: classes
-      expectedNegatives: 572
+      expectedNegatives: 574
       harnessFailures: 0
       passes: 621
       semanticFailures: 0
-      unsupportedProfileFeatures: 144
+      unsupportedProfileFeatures: 145
     - dependency: control-flow
-      expectedNegatives: 141
+      expectedNegatives: 156
       harnessFailures: 0
       passes: 433
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 17
     - dependency: default-parameters
       expectedNegatives: 22
       harnessFailures: 0
@@ -138795,17 +139297,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: functions
-      expectedNegatives: 49
+      expectedNegatives: 64
       harnessFailures: 0
       passes: 148
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 23
     - dependency: generators
-      expectedNegatives: 64
+      expectedNegatives: 66
       harnessFailures: 0
       passes: 156
       semanticFailures: 0
-      unsupportedProfileFeatures: 32
+      unsupportedProfileFeatures: 33
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
@@ -138813,11 +139315,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 42
     - dependency: lexical-bindings
-      expectedNegatives: 116
+      expectedNegatives: 131
       harnessFailures: 0
       passes: 334
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 18
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
@@ -138861,7 +139363,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: var-bindings
-      expectedNegatives: 41
+      expectedNegatives: 43
       harnessFailures: 0
       passes: 185
       semanticFailures: 0
@@ -139018,8 +139520,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 528
+      expectedNegatives: 543
       harnessFailures: 0
       passes: 1078
       semanticFailures: 0
-      unsupportedProfileFeatures: 136
+      unsupportedProfileFeatures: 140

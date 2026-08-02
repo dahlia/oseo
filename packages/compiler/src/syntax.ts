@@ -681,9 +681,18 @@ export type SyntaxAssignmentPattern =
 /** How a resolved binding pattern stores each identifier leaf. */
 export type BindingPatternMode = "declare" | "initialize" | "write";
 
-/** One switch clause; a missing test marks the default clause. */
+/**
+ * One switch clause; a missing test marks the default clause.
+ *
+ * A function declaration is admitted in `body` alongside ordinary
+ * statements, matching a block's own body shape. HIR construction hoists
+ * every clause's function declarations into one CaseBlock-wide
+ * instantiation shared by the whole switch, the same way it already
+ * shares one lexical scope for `let`, `const`, and class declarations
+ * across clauses.
+ */
 export interface SyntaxSwitchCase {
-  readonly body: readonly SyntaxStatement[];
+  readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
   readonly range: SourceRange;
   readonly test?: SyntaxExpression;
 }

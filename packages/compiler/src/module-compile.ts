@@ -542,6 +542,7 @@ function collectHirBindings(
       }
       collect(statement.body);
     } else if (statement.kind === "switch") {
+      (statement.functionInits ?? []).forEach(collect);
       for (const switchCase of statement.cases) {
         switchCase.body.forEach(collect);
       }
@@ -1264,7 +1265,7 @@ export function compileModuleGraph(
         sourceId: moduleId,
         strict: true,
       },
-      { bindings, nextBindingId, nextFunctionId },
+      { bindings, moduleBody: true, nextBindingId, nextFunctionId },
     );
     nextBindingId = result.nextBindingId;
     nextFunctionId = result.nextFunctionId;

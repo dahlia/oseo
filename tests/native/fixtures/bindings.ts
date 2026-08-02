@@ -169,6 +169,142 @@ console.log(NaN === NaN, nanCase());
 `,
   },
   {
+    name: "switch-function-declarations",
+    source: `
+// A CaseBlock function is instantiated once for the whole switch, ahead
+// of every case test, so it is callable through a clause reached without
+// ever running the clause that declares it.
+function callFromOtherClause(value) {
+  switch (value) {
+    case 1:
+      function produced() { return "clause one"; }
+      break;
+    case 2:
+      return produced();
+    default:
+      return "default " + typeof produced;
+  }
+  return "fell through";
+}
+console.log(callFromOtherClause(2), callFromOtherClause(3));
+
+// A function declared in an earlier clause stays reachable through
+// fallthrough into a later one, and after the declaring clause has run.
+function fallthroughOrder(value) {
+  const seen = [];
+  switch (value) {
+    case 1:
+      function declaredFirst() { return "declared-in-case-1"; }
+      seen.push(declaredFirst());
+    case 2:
+      seen.push(declaredFirst());
+      break;
+    default:
+      seen.push("default");
+  }
+  return \`\${seen}\`;
+}
+console.log(fallthroughOrder(1), fallthroughOrder(2), fallthroughOrder(3));
+
+// Each switch evaluation creates a fresh CaseBlock environment, so a
+// closure captured from one execution keeps its own function identity
+// distinct from a later execution's.
+function collectClosures(count) {
+  const closures = [];
+  for (let i = 0; i < count; i = i + 1) {
+    switch (1) {
+      case 1:
+        function make() { return i; }
+        closures.push(make);
+        break;
+    }
+  }
+  const values = [];
+  for (let i = 0; i < closures.length; i = i + 1) {
+    values.push(closures[i]());
+  }
+  return values;
+}
+console.log(\`\${collectClosures(3)}\`);
+function distinctIdentities() {
+  const captured = [];
+  for (let i = 0; i < 2; i = i + 1) {
+    switch (1) {
+      case 1:
+        function identity() {}
+        captured.push(identity);
+    }
+  }
+  return captured[0] === captured[1];
+}
+console.log(distinctIdentities());
+
+// A let in one clause and a function of a different name in another
+// clause share the same CaseBlock scope and its temporal dead zone.
+function letAndFunction(value) {
+  switch (value) {
+    case 1:
+      let flag = "case-one";
+      return flag;
+    case 2:
+      function helper() { return "case-two"; }
+      return helper();
+    default:
+      try {
+        return flag;
+      } catch (error) {
+        return error.constructor.name;
+      }
+  }
+}
+console.log(letAndFunction(1), letAndFunction(2), letAndFunction(3));
+
+// Generator, asynchronous, and asynchronous generator declarations are
+// admitted the same way. Unlike a plain FunctionDeclaration, none of
+// them carries Annex B's web legacy compatibility semantics in any
+// strictness mode, so this always-strict module fixture exercises them
+// directly against Node.js and Deno.
+function* callGenerator(value) {
+  switch (value) {
+    case 1:
+      function* produce() { yield "a"; yield "b"; }
+      break;
+    case 2:
+      yield* produce();
+      return;
+  }
+}
+console.log(\`\${[...callGenerator(2)]}\`);
+
+async function callAsync(value) {
+  switch (value) {
+    case 1:
+      async function produce() { return "async-one"; }
+      break;
+    case 2:
+      return await produce();
+  }
+  return "unreached";
+}
+callAsync(2).then((value) => console.log(value));
+
+async function callAsyncGenerator(value) {
+  switch (value) {
+    case 1:
+      async function* produce() { yield "x"; yield "y"; }
+      break;
+    case 2: {
+      const collected = [];
+      for await (const item of produce()) collected.push(item);
+      return \`\${collected}\`;
+    }
+  }
+  return "unreached";
+}
+callAsyncGenerator(2).then((value) => console.log(value));
+`,
+  },
+  {
     name: "for-loops",
     source: `
 for (let i = 0; i < 3; i = i + 1) console.log("let", i);

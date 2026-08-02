@@ -298,6 +298,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "catch-bindings" ||
     fixture.name === "catch-var-coexistence" ||
     fixture.name === "block-function-var-coexistence" ||
+    fixture.name === "switch-function-declarations" ||
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
@@ -407,6 +408,13 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "block-function-var-coexistence") {
             // The block's own function cell and the outer var cell stay
             // independently reachable across closures and suspension.
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "switch-function-declarations") {
+            // A CaseBlock function created on one switch evaluation
+            // stays reachable through a closure captured across forced
+            // collection, and a later evaluation's function object keeps
+            // an identity distinct from an earlier one's.
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "lexical-declaration-list-hints") {

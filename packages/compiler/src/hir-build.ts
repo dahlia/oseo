@@ -1062,10 +1062,30 @@ function mixedDeclarationList(
   );
 }
 
+/**
+ * Predeclares every lexical, function, and pattern-declared name of one
+ * statement list into `scope`.
+ *
+ * `lexicalScope` distinguishes a Block, CaseBlock, or module top level's
+ * own LexicallyDeclaredNames from a Script or FunctionBody's top-level
+ * declarations. ECMA-262 treats a Script or FunctionBody's top-level
+ * function declaration as a hoistable, var-like declaration that any
+ * later declaration of the same name freely replaces regardless of its
+ * kind or the code's strictness, because its LexicallyDeclaredNames
+ * excludes function and var bindings entirely. A Block, CaseBlock, or
+ * module top level's FunctionDeclarations are LexicallyDeclaredNames
+ * instead, and ECMA-262 exempts a duplicate entry there only for a host
+ * that implements Annex B.3.2 (Block-Level Function Declarations Web
+ * Legacy Compatibility Semantics), which this closed ahead-of-time
+ * profile does not, so every duplicate function name there is always an
+ * early error, regardless of a matching ordinary kind or the code's
+ * strictness.
+ */
 function predeclareBindings(
   statements: readonly SyntaxStatementItem[],
   scope: Map<string, Binding>,
   state: ResolveState,
+  lexicalScope: boolean,
 ): void {
   for (const statement of statements) {
     // Every declarator of a lexical declaration list is predeclared in
@@ -1080,7 +1100,7 @@ function predeclareBindings(
       // diagnostic the invalid list deserves would arrive with a cascade
       // of misleading ones. No mutability is invented: the list produces
       // no statement, so nothing reads the recovery bindings.
-      predeclareBindings(statement.declarations, scope, state);
+      predeclareBindings(statement.declarations, scope, state, lexicalScope);
       continue;
     }
     if (
@@ -1131,10 +1151,23 @@ function predeclareBindings(
       continue;
     }
     const previous = scope.get(name);
+    // A Script or FunctionBody's top-level function declaration is
+    // var-like: any later declaration of the same name, of any kind,
+    // freely replaces it, because the LexicallyDeclaredNames of a
+    // ScriptBody or FunctionBody excludes function and var bindings
+    // entirely. A Block or CaseBlock's FunctionDeclarations are
+    // LexicallyDeclaredNames instead, and ECMA-262 exempts a duplicate
+    // entry there only when the host supports Block-Level Function
+    // Declarations Web Legacy Compatibility Semantics (Annex B.3.2),
+    // which this profile's closed ahead-of-time runtime does not
+    // implement, so a Block or CaseBlock never admits a duplicate
+    // function name, regardless of its kind or the code's strictness.
+    const duplicateFunctions =
+      statement.kind === "function" && previous?.functionId != null;
     if (
       previous != null &&
       previous.pendingDeclaration !== true &&
-      (statement.kind !== "function" || previous.functionId == null)
+      !(duplicateFunctions && !lexicalScope)
     ) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -1168,25 +1201,27 @@ function predeclareBindings(
   }
 }
 
-function resolveStatementList(
+/**
+ * Builds the `function-init` HIR statement for every function declaration
+ * directly in `statements` whose binding still owns `scope`, in source
+ * order. A block runs these before any other statement in its body,
+ * which is InstantiateFunctionObject inside its own
+ * BlockDeclarationInstantiation; a switch CaseBlock shares one such list
+ * across every clause instead of giving each clause its own.
+ */
+function buildFunctionInits(
   statements: readonly SyntaxStatementItem[],
-  parentScopes: readonly Map<string, Binding>[],
+  scope: Map<string, Binding>,
+  scopes: readonly Map<string, Binding>[],
   state: ResolveState,
-  functionBody: boolean,
-  existingLocal?: Map<string, Binding>,
-  loopDepth = 0,
-  breakDepth = 0,
 ): readonly HirStatement[] {
-  const local = existingLocal ?? new Map<string, Binding>();
-  if (existingLocal == null) predeclareBindings(statements, local, state);
-  const scopes = [...parentScopes, local];
   const result: HirStatement[] = [];
   for (const statement of statements) {
     if (statement.kind !== "function" || statement.name == null) continue;
     const bindingName = statement.bindingName ?? statement.name;
     const info = state.functionInfo.get(statement);
     if (info == null) continue;
-    if (local.get(bindingName)?.functionId !== info.id) continue;
+    if (scope.get(bindingName)?.functionId !== info.id) continue;
     const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
       bindingId: info.bindingId ?? -1,
@@ -1199,6 +1234,30 @@ function resolveStatementList(
       range: statement.range,
     });
   }
+  return result;
+}
+
+function resolveStatementList(
+  statements: readonly SyntaxStatementItem[],
+  parentScopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  functionBody: boolean,
+  existingLocal?: Map<string, Binding>,
+  loopDepth = 0,
+  breakDepth = 0,
+): readonly HirStatement[] {
+  const local = existingLocal ?? new Map<string, Binding>();
+  // `resolveStatementList` predeclares its own scope only for a genuine
+  // nested Block, whose FunctionDeclarations are LexicallyDeclaredNames;
+  // a caller that already predeclared `existingLocal` owns a Script,
+  // module, or FunctionBody top level instead and already chose that
+  // scope's own policy: var-like for a Script or FunctionBody, lexical
+  // for a module.
+  if (existingLocal == null) predeclareBindings(statements, local, state, true);
+  const scopes = [...parentScopes, local];
+  const result: HirStatement[] = [
+    ...buildFunctionInits(statements, local, scopes, state),
+  ];
   for (const statement of statements) {
     if (statement.kind === "function") continue;
     const resolved = resolveStatementItems(
@@ -1358,7 +1417,7 @@ function resolveFunction(
     parameterScope.set("arguments", argumentsBinding);
   }
   const bodyScope = new Map<string, Binding>();
-  predeclareBindings(functionValue.body, bodyScope, state);
+  predeclareBindings(functionValue.body, bodyScope, state, false);
   // Labels never cross a function boundary.
   const outerLabels = state.labels.splice(0);
   const body = resolveStatementList(
@@ -1705,6 +1764,7 @@ export function declaredHirBindingIds(
       }
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "switch") {
+      result.push(...declaredHirBindingIds(statement.functionInits ?? []));
       for (const switchCase of statement.cases) {
         result.push(...declaredHirBindingIds(switchCase.body));
       }
@@ -2795,8 +2855,19 @@ function resolveStatement(
     const caseStatements = statement.cases.flatMap(
       (switchCase) => switchCase.body,
     );
-    predeclareBindings(caseStatements, caseScope, state);
+    predeclareBindings(caseStatements, caseScope, state, true);
     const caseScopes = [...scopes, caseScope];
+    // Every clause's function declaration is instantiated once, here,
+    // rather than where it appears in its own clause: ECMA-262 runs
+    // BlockDeclarationInstantiation for the whole CaseBlock before
+    // CaseBlockEvaluation selects a clause, so the binding exists and
+    // holds a callable function no matter which clause runs first.
+    const functionInits = buildFunctionInits(
+      caseStatements,
+      caseScope,
+      caseScopes,
+      state,
+    );
     let sawDefault = false;
     const cases: HirSwitchCase[] = [];
     for (const switchCase of statement.cases) {
@@ -2820,6 +2891,7 @@ function resolveStatement(
       if (switchCase.test != null && test == null) return undefined;
       const body: HirStatement[] = [];
       for (const child of switchCase.body) {
+        if (child.kind === "function") continue;
         const resolved = resolveStatementItems(
           child,
           caseScopes,
@@ -2837,7 +2909,12 @@ function resolveStatement(
         ...(test == null ? {} : { test }),
       });
     }
-    return { ...statement, cases, discriminant };
+    return {
+      ...statement,
+      cases,
+      discriminant,
+      ...(functionInits.length === 0 ? {} : { functionInits }),
+    };
   }
   if (statement.kind === "with") {
     const object = resolveExpression(statement.object, scopes, state);
@@ -2933,6 +3010,14 @@ function globalObjectCollisionMessage(entry: SyntaxGlobalObjectName): string {
 
 interface HirSeed {
   readonly bindings?: ReadonlyMap<string, Binding>;
+  /**
+   * True when `program` is one module's body rather than a Script or
+   * FunctionBody. A module's top-level function declarations are
+   * LexicallyDeclaredNames, unlike a Script's or a FunctionBody's, which
+   * treat them as hoistable, var-like declarations that any later
+   * declaration of the same name freely replaces.
+   */
+  readonly moduleBody?: boolean;
   readonly nextBindingId?: number;
   readonly nextFunctionId?: number;
 }
@@ -2960,7 +3045,12 @@ export function buildSeededHir(
     withScopes: new Map(),
   };
   const scriptScope = new Map(seed.bindings);
-  predeclareBindings(program.body, scriptScope, state);
+  predeclareBindings(
+    program.body,
+    scriptScope,
+    state,
+    seed.moduleBody === true,
+  );
   const body = resolveStatementList(
     program.body,
     [],

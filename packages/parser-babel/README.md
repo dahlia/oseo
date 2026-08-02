@@ -80,7 +80,12 @@ declaration may also share its name with a var declared outside that block:
 the var-scoped hoisting pass only rejects a var that lexically shares the
 block declaring the function, since ECMA-262's Block early errors reject only
 that overlap, and it no longer treats the function name as reserved across the
-whole enclosing var scope. Standalone destructuring
+whole enclosing var scope. A switch clause may declare a function the same
+way: the frontend admits a function declaration in a switch case's body
+alongside ordinary statements, and the existing var-scoped hoisting pass
+already treats a switch's case bodies as one lexical frame that includes
+function names, so the same disjoint-coexistence rule applies. Standalone
+destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
 assignment heads reuse that assignment target conversion. A computed member

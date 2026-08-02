@@ -17762,9 +17762,66 @@ tests:
   - path: test/language/statements/switch/S12.11_A3_T3.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
+  - path: test/language/statements/switch/scope-lex-async-function.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/scope-lex-async-generator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-iteration, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/scope-lex-class.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, control-flow, lexical-bindings]
+  - path: test/language/statements/switch/scope-lex-generator.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/scope-lex-open-case.js
     expectedClassification: pass
     dependencies: [control-flow, lexical-bindings, var-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/const-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, generators, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/function-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings, var-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, generators, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/let-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, lexical-bindings, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion]

@@ -173,6 +173,51 @@ const blockFunctionVarExpectation =
   "ordinary block ordinary block\n" +
   "ordinary ordinary outer function\n";
 
+/**
+ * A switch-clause function declaration in sloppy-mode Script and ordinary
+ * function code. Annex B.3.2's web legacy compatibility semantics reach a
+ * CaseClause exactly as they reach a Block, so both reference hosts copy
+ * the CaseBlock function's value out to an outer var-scoped binding of the
+ * same name in sloppy mode; this source is compared with fixed ECMA-262
+ * expectations instead of a host observation. The strict-mode and module
+ * forms of this construct have no such divergence and are covered by the
+ * switch-function-declarations native fixture, which does compare against
+ * Node.js and Deno.
+ */
+const switchFunctionVarSource = `
+var switchValue = "script outer";
+let readSwitchType;
+switch (1) {
+  case 1:
+    readSwitchType = function () { return typeof switchValue; };
+    function switchValue() { return "switch case"; }
+    console.log("switch case", switchValue());
+    break;
+}
+console.log("script outer", switchValue, readSwitchType());
+
+function ordinary() {
+  var value = "ordinary outer";
+  let readType;
+  switch (1) {
+    case 1:
+      readType = function () { return typeof value; };
+      function value() { return "ordinary case"; }
+      console.log("ordinary case", value());
+      break;
+  }
+  return [value, readType()];
+}
+const ordinaryValues = ordinary();
+console.log("ordinary", ordinaryValues[0], ordinaryValues[1]);
+`;
+
+const switchFunctionVarExpectation =
+  "switch case switch case\n" +
+  "script outer script outer function\n" +
+  "ordinary case ordinary case\n" +
+  "ordinary ordinary outer function\n";
+
 export async function runNativeScenario1(
   context: NativeScenarioContext,
 ): Promise<void> {
@@ -197,6 +242,11 @@ export async function runNativeScenario1(
       "block-function-var-sloppy.js",
       blockFunctionVarSource,
       blockFunctionVarExpectation,
+    ],
+    [
+      "switch-function-var-sloppy.js",
+      switchFunctionVarSource,
+      switchFunctionVarExpectation,
     ],
   ] as const) {
     for (const specialization of ["disabled", "enabled"] as const) {

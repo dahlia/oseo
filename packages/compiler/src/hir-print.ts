@@ -551,6 +551,9 @@ function appendHirStatement(
       `${indent}switch ${printHirExpression(statement.discriminant)}` +
         location,
     );
+    for (const functionInit of statement.functionInits ?? []) {
+      appendHirStatement(lines, functionInit, `${indent}  `);
+    }
     for (const switchCase of statement.cases) {
       lines.push(
         switchCase.test == null
