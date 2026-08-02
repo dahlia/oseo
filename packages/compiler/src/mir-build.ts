@@ -4892,14 +4892,22 @@ function lowerTryStatement(
 
   if (catchBlock != null && statement.handler != null) {
     builder.current = catchBlock;
-    for (const binding of hirBindingIdentifiers(statement.handler.pattern)) {
-      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+    const handlerPattern = statement.handler.pattern;
+    if (handlerPattern != null) {
+      for (const binding of hirBindingIdentifiers(handlerPattern)) {
+        resetBinding(binding.bindingId, binding.name, binding.range, builder);
+      }
     }
+    // The caught operation both clears the pending language error
+    // context and consumes the completion slot's thrown value, so the
+    // optional catch binding form still emits it and simply leaves the
+    // value unused.
     const caught = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
       arguments: [],
-      detail: "catch parameter",
+      detail:
+        handlerPattern == null ? "discarded catch value" : "catch parameter",
       id: caught,
       kind: "caught",
       completionSlot: catchBlock.id,
@@ -4909,12 +4917,9 @@ function lowerTryStatement(
     const catchAbrupt = finallyTarget ?? outerAbrupt;
     if (catchAbrupt != null) builder.abruptTargets.push(catchAbrupt);
     if (finallyTarget != null) builder.finalizers.push(finallyTarget);
-    lowerBindingTarget(
-      statement.handler.pattern,
-      caught,
-      "initialize",
-      builder,
-    );
+    if (handlerPattern != null) {
+      lowerBindingTarget(handlerPattern, caught, "initialize", builder);
+    }
     const catchTerminated = lowerStatementBody(statement.handler.body, builder);
     if (finallyBlock != null) builder.finalizers.pop();
     if (catchAbrupt != null) builder.abruptTargets.pop();

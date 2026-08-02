@@ -912,7 +912,12 @@ export type HirStatement =
       readonly handler:
         | {
             readonly body: HirStatement;
-            readonly pattern: HirBindingPattern;
+            /**
+             * Resolved CatchParameter, or `undefined` for the optional
+             * catch binding form, which binds nothing and resolves its
+             * body without a catch-parameter scope.
+             */
+            readonly pattern: HirBindingPattern | undefined;
             readonly range: SourceRange;
           }
         | undefined;

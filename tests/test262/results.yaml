@@ -90927,6 +90927,28 @@ results:
       async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/block/12.1-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
       features:
         - class-static-block
       flags: []
@@ -136340,6 +136362,28 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/S12.14_A16_T6.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -136958,6 +137002,154 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-catch-binding
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/optional-catch-binding-finally.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-catch-binding
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/optional-catch-binding-lexical.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/statements/try/optional-catch-binding-lexical.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/try/optional-catch-binding-le\
+        xical.js:106:5: error[OSEO1001]: Unknown binding 'y'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - optional-catch-binding
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/optional-catch-binding-parens.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-catch-binding
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/optional-catch-binding-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - optional-catch-binding
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/try/optional-catch-binding.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
@@ -138158,18 +138350,18 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1211
+  expectedNegatives: 1214
   harnessFailures: 0
-  passes: 2563
+  passes: 2566
   semanticFailures: 0
-  unsupportedProfileFeatures: 558
+  unsupportedProfileFeatures: 559
   dependencies:
     - dependency: abrupt-completion
-      expectedNegatives: 1
+      expectedNegatives: 4
       harnessFailures: 0
-      passes: 25
+      passes: 28
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: async-functions
       expectedNegatives: 156
       harnessFailures: 0
@@ -138221,9 +138413,9 @@ summary:
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 77
+      passes: 78
       semanticFailures: 0
-      unsupportedProfileFeatures: 26
+      unsupportedProfileFeatures: 27
     - dependency: expression-operators
       expectedNegatives: 41
       harnessFailures: 0
@@ -138233,9 +138425,9 @@ summary:
     - dependency: functions
       expectedNegatives: 43
       harnessFailures: 0
-      passes: 145
+      passes: 146
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 14
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -138253,7 +138445,7 @@ summary:
       harnessFailures: 0
       passes: 332
       semanticFailures: 0
-      unsupportedProfileFeatures: 8
+      unsupportedProfileFeatures: 9
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
@@ -138430,8 +138622,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 525
+      expectedNegatives: 528
       harnessFailures: 0
-      passes: 1075
+      passes: 1078
       semanticFailures: 0
-      unsupportedProfileFeatures: 134
+      unsupportedProfileFeatures: 135

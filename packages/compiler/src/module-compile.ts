@@ -200,7 +200,8 @@ function hirStatementAwaits(
     return (
       recurse(statement.block) ||
       (statement.handler != null &&
-        (hirBindingPatternHasAwait(statement.handler.pattern) ||
+        ((statement.handler.pattern != null &&
+          hirBindingPatternHasAwait(statement.handler.pattern)) ||
           recurse(statement.handler.body))) ||
       (statement.finalizer != null && recurse(statement.finalizer))
     );
@@ -393,7 +394,8 @@ function hirStatementHasPatternAwait(statement: HirStatement): boolean {
     return (
       recurse(statement.block) ||
       (statement.handler != null &&
-        (hirBindingPatternHasAwait(statement.handler.pattern) ||
+        ((statement.handler.pattern != null &&
+          hirBindingPatternHasAwait(statement.handler.pattern)) ||
           recurse(statement.handler.body))) ||
       (statement.finalizer != null && recurse(statement.finalizer))
     );
@@ -490,10 +492,12 @@ function collectHirBindings(
     } else if (statement.kind === "try") {
       collect(statement.block);
       if (statement.handler != null) {
-        for (const binding of hirBindingIdentifiers(
-          statement.handler.pattern,
-        )) {
-          bindings.push({ id: binding.bindingId, name: binding.name });
+        if (statement.handler.pattern != null) {
+          for (const binding of hirBindingIdentifiers(
+            statement.handler.pattern,
+          )) {
+            bindings.push({ id: binding.bindingId, name: binding.name });
+          }
         }
         collect(statement.handler.body);
       }

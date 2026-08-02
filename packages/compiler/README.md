@@ -77,7 +77,9 @@ recovering frontend syntax.
 Catch parameters reuse those patterns after capturing the pending thrown value.
 MIR resets every catch cell before initialization, retains conditional iterator
 cleanup, and sends a pattern failure through the enclosing `finally` or abrupt
-target without entering the catch body.
+target without entering the catch body. A handler without a parameter still
+consumes the pending completion to clear the error context, then discards the
+thrown value and binds nothing.
 Synchronous `for-of` declaration heads reuse the same patterns. MIR resets all
 lexical leaves before iterator acquisition and before each iteration, while
 `var` leaves write hoisted cells. Nested pattern cleanup resumes through the

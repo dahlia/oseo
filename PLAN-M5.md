@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,332
-reviewed cases: 2,563 passes, 1,211 expected negatives, and 558 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,339
+reviewed cases: 2,566 passes, 1,214 expected negatives, and 559 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1990,6 +1990,67 @@ recorded an awaited initializer in a declaration list with more than one
 declarator as a deliberate `var` rejection. Re-measuring every such form in
 an asynchronous function and at module top level found all of them admitted,
 so the profile entry drops the rejection instead of rewording it.
+
+M5a Unit 8.5b admits the optional catch binding. The frontend previously
+rejected every `catch` clause without a parameter, so the ES2019 form
+`catch { ... }` classified as unsupported even though it exercises no new
+runtime behavior. The owned syntax now represents the absent parameter
+explicitly: the handler keeps its `pattern` field and spells absence as
+`undefined`, so a frontend cannot omit the decision silently, and the
+handler's range covers the catch clause when no parameter supplies one. HIR
+construction resolves an absent-parameter handler without creating a
+catch-parameter scope, which leaves the body block the owner of its own
+lexical scope exactly as CatchClauseEvaluation observes, and it recovers two
+malformed shapes an untyped custom frontend can build: a nullish pattern
+normalizes to the absent parameter, and a handler without a body is a
+source-located diagnostic instead of a crash. MIR lowering keeps emitting the
+`caught` operation, because that operation both clears the pending language
+error context and consumes the completion slot's thrown value; the absent
+form simply leaves the value unused, so abrupt completion, `finally`
+precedence, nested handlers, generator suspension inside the clause, and the
+traced asynchronous frame reuse the lowering the parameterized clause already
+proved. Parameterized catch semantics are untouched.
+
+Evidence is one fixed native fixture, a new generated optional-catch domain,
+and package tests written to fail first. The fixture covers body entry
+for a discarded value including a thrown `null`, a skipped handler on
+normal completion, `let`
+shadowing inside the clause, fresh cells per repeated catch entry observed
+through mutating closures, `var` hoisting out of the clause, `return` through
+`finally` and a `finally` override, a rethrow reaching an outer handler after
+the inner `finally`, labeled `continue` and `break` with per-iteration
+`finally` observations, generator yields inside `catch` and `finally`, and an
+awaited recovery value, all under both specialization policies with
+collection forced at every safepoint. The pre-existing `0x5eed000a`
+catch-binding domain, array and object catch bindings with defaults, rest,
+present, missing, and nullish inputs, is unchanged and keeps its reviewed
+ten-case budget. A distinct new domain under seed `0x5eed002a` with its own
+ordinary ten-case budget directly generates absent and destructured catch
+handlers combined with rethrown handler completions, optional finalizers,
+and present, missing, and nullish thrown inputs, so an absent handler runs
+against the thrown `null` a pattern handler rejects while both handler kinds
+order the handler body, the finalizer, and the function completion the same
+way. Package tests pin the owned representation,
+the bare `catch` HIR print, the discarded `caught` MIR shape, the distinct
+shadowing cells, and both malformed-shape recoveries.
+
+A textual scan of the 41,091 included candidate paths finds `catch` without a
+parameter in seven of them: the five
+_statements/try/optional-catch-binding\*.js_ cases, the
+*statements/block/12.1-2.js* negative whose bare `catch {}` sits inside a
+rejected statement sequence, and *statements/try/S12.14\_A16\_T6.js*, which
+names the form only in its description while its tested source rejects
+`catch ()`. All seven enter the reviewed subset. *optional-catch-binding.js*,
+*optional-catch-binding-finally.js*, and *optional-catch-binding-throws.js*
+pass in both strictness modes. *optional-catch-binding-parens.js*,
+*statements/try/S12.14\_A16\_T6.js*, and *statements/block/12.1-2.js* are
+expected parse negatives that keep `catch ()` and a catch-less `try {};`
+rejected. *optional-catch-binding-lexical.js* classifies
+`unsupported-profile-feature` because its final assertion reads the
+unresolved global `y` through `assert.throws(ReferenceError, ...)`, which the
+global binding model gap owns; the catch clauses it contains compile. The
+manifest reaches 4,339 cases: 2,566 passes, 1,214 expected negatives, and 559
+unsupported profile features with no semantic or harness failures.
 
 ### Intrinsics and built-in objects
 
