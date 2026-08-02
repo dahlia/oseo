@@ -437,8 +437,12 @@ The frontend predeclares every lexical name before evaluating the initializer,
 and direct awaited initializers resume by initializing those existing cells.
 `var` pattern names join the existing function-scope hoisting pass as
 `undefined`-initialized cells, then pattern leaves write those cells in source
-order. A declaration list may mix plain and array `var` declarators without
-changing redeclaration or parameter-sharing behavior.
+order. A declaration list of any kind may mix plain and array declarators
+without changing redeclaration or parameter-sharing behavior. A `const` or
+`let` list reaches the compiler as one declaration whose declarators are
+expanded into the statement list that contains it, which keeps ECMAScript's
+one scope for the whole list instead of adding a block that would reset the
+declared cells a second time.
 
 Standalone object binding declarations use the same compiler-owned recursive
 patterns and binding leaves. Lowering checks `RequireObjectCoercible` before it

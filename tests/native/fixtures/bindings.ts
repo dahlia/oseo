@@ -1452,4 +1452,172 @@ try { console.log("try"); } catch (caught) { var inCatch = 1; }
 console.log(typeof inCatch);
 `,
   },
+  {
+    name: "lexical-declaration-lists",
+    source: `
+function mark(label, value) {
+  console.log("eval", label);
+  return value;
+}
+function boom(label) {
+  throw new RangeError(label);
+}
+
+let first = mark("first", 1), second = mark("second", first + 1);
+const third = mark("third", second + 1), fourth = mark("fourth", third + 1);
+let bare, paired = 5;
+console.log("values", first, second, third, fourth, bare, paired);
+
+// Every name of the list is created before the first initializer runs,
+// so a read of a later name is a temporal dead zone error.
+let listTdz = "none";
+try {
+  let early = later, later = 2;
+  console.log("unreachable", early, later);
+} catch (error) {
+  listTdz = error instanceof ReferenceError ? "reference" : error.name;
+}
+let closureTdz = "none";
+try {
+  const readLater = () => laterName;
+  let early = readLater(), laterName = 2;
+  console.log("unreachable", early, laterName);
+} catch (error) {
+  closureTdz = error instanceof ReferenceError ? "reference" : error.name;
+}
+console.log("list-tdz", listTdz, closureTdz);
+
+// An abrupt initializer stops the list, and the names that follow it
+// stay uninitialized in the scope their closures captured.
+let reader;
+let abruptOutcome = "none";
+try {
+  {
+    reader = () => trailing;
+    let leading = mark("leading", 1), thrown = boom("stop"),
+      trailing = mark("trailing", 3);
+    console.log("unreachable", leading, thrown, trailing);
+  }
+} catch (error) {
+  abruptOutcome = error.message;
+}
+console.log("abrupt", abruptOutcome);
+try {
+  reader();
+} catch (error) {
+  console.log("abrupt-tdz", error instanceof ReferenceError);
+}
+
+// Recursive patterns and plain names mix inside one list.
+const [patternFirst, [patternNested] = [7]] = [6],
+  { renamed: patternRenamed, missing: patternDefault = 9 } = { renamed: 8 },
+  patternPlain = 10;
+console.log(
+  "patterns",
+  patternFirst,
+  patternNested,
+  patternRenamed,
+  patternDefault,
+  patternPlain
+);
+
+// Each pattern of the list closes its own unexhausted iterator, in
+// declarator order, and an abrupt default stops the declarators after it.
+let closes = "";
+function source(values, label) {
+  return {
+    [Symbol.iterator]: function () {
+      let index = 0;
+      return {
+        next: function () {
+          if (index >= values.length) return { value: undefined, done: true };
+          const value = values[index];
+          index = index + 1;
+          return { value: value, done: false };
+        },
+        return: function () {
+          closes = closes + label;
+          return {};
+        },
+      };
+    },
+  };
+}
+const [normalFirst] = source([1, 2], "a"), [normalSecond] = source([3, 4], "b");
+console.log("closed", closes, normalFirst, normalSecond);
+
+closes = "";
+let cleanupOutcome = "none";
+try {
+  let [kept, defaulted = boom("default")] = source([11, undefined, 12], "c"),
+    [unreached] = source([13, 14], "d");
+  console.log("unreachable", kept, defaulted, unreached);
+} catch (error) {
+  cleanupOutcome = error.message;
+}
+console.log("cleanup", cleanupOutcome, closes);
+
+// Every iteration gives the whole list fresh cells, so a closure made in
+// one iteration never observes another iteration's value.
+const captured = [];
+for (let index = 0; index < 3; index = index + 1) {
+  let doubled = index * 2, capture = () => doubled;
+  doubled = doubled + 1;
+  captured[index] = capture;
+}
+console.log("loop", captured[0](), captured[1](), captured[2]());
+
+// A switch shares one case-block scope across its clauses, and a static
+// block owns its own.
+switch (1) {
+  case 1: {
+    let inner = 1, sibling = inner + 1;
+    console.log("case", inner, sibling);
+    break;
+  }
+  default:
+    let fallback = 0, spare = fallback;
+    console.log("default", fallback, spare);
+}
+
+class Holder {
+  static value;
+  static {
+    let blockFirst = 3, blockSecond = blockFirst + 1;
+    Holder.value = blockFirst + blockSecond;
+  }
+}
+console.log("static-block", Holder.value);
+`,
+  },
+  {
+    name: "lexical-declaration-list-hints",
+    source: `
+/** @param {number} left @param {number} right @returns {number} */
+function add(left, right) {
+  return left + right;
+}
+let hinted: number = 20, alsoHinted: number = 22;
+console.log("hinted", add(hinted, alsoHinted));
+
+// The same list initializes a binding whose hint is false, so the
+// specialized path guards, misses, and reaches the compiled generic
+// fallback while its truthful sibling keeps hitting.
+let truthful: number = 1,
+  falsified: number = {
+    valueOf: function () {
+      console.log("guard miss fallback");
+      return 2;
+    },
+  };
+console.log("mixed", add(truthful, 1), add(falsified, 1));
+`,
+    specialization: {
+      genericCallsDisabled: 3,
+      genericCallsEnabled: 1,
+      hits: 2,
+      misses: 1,
+      overflowMisses: 0,
+    },
+  },
 ];

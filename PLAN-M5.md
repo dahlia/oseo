@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,220
-reviewed cases: 2,483 passes, 1,182 expected negatives, and 555 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,332
+reviewed cases: 2,563 passes, 1,211 expected negatives, and 558 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1902,6 +1902,94 @@ existing generator throw-resumption and delegation suites keep their seeds
 and domains. The reviewed case enters as a pass, and the manifest grows to
 4,220 cases: 2,483 passes, 1,182 expected negatives, and 555 unsupported
 profile features with no semantic or harness failures.
+
+M5a Unit 8.5a admits the multi-declarator `const` and `let` declaration list.
+The frontend previously rejected every lexical declaration with more than one
+declarator, which made an ordinary line such as `let probe1, probe2;`
+unsupported and blocked reviewed cases that only use the form in a prelude.
+
+The unit adds one owned syntax node and no lowering. A declaration list is
+kept as one `declaration-list` statement whose members are the same
+declarator shapes a one-declarator statement already produced, and HIR
+construction expands those members into the statement list that contains the
+declaration. That expansion is the whole semantic decision. ECMAScript admits
+a lexical declaration only where a StatementList is admitted and gives its
+declarators the scope that contains them, so the existing per-scope
+predeclaration pass already gives the whole list one temporal dead zone, one
+duplicate-name check against its siblings and its enclosing scope, and one
+set of cells. Wrapping the declarators in a block instead, which is what the
+`var` path does for its assignment list, would have created a lexical scope
+the source does not have: MIR resets the lexical cells a block declares on
+entry, so the same names would be reset twice and a closure made between the
+two resets would observe a different cell. The compiler rejects a
+declaration list that reaches a single-statement position with a
+source-located diagnostic, which pins the owned-syntax contract that the
+grammar cannot produce one there.
+
+Two owned-syntax consumers besides HIR construction see the node, and nothing
+after HIR construction does. The module frontend's `exportForDeclaration`
+returns one export entry per bound name, because ExportedNames of an export
+declaration is the BoundNames of the whole declaration, and the module
+compiler's duplicate-declaration diagnostic searches a list's declarators so
+that it names the declarator rather than the whole module. Because the list is
+gone before HIR exists, the module continuation transform, the traced
+asynchronous frame, the specialization passes, and the C backend keep working
+on the same statements they already lowered, so awaited declarators,
+per-iteration loop cells, and both specialization policies follow from the
+existing machinery rather than from new code.
+
+Two invariants the grammar guarantees are kept unrepresentable or checked
+rather than assumed. The declarator field is a tuple of at least two members,
+because a one-declarator declaration stays the declarator statement it has
+always been, and HIR construction rejects a list that mixes `const` and `let`
+declarators with a source-located diagnostic, because one LetOrConst covers a
+whole BindingList and a mixed list would have no mutability to resolve. The
+rejected list still predeclares its declarators, each with the mutability its
+own declarator asks for, so the one diagnostic the list deserves arrives
+without an unknown-binding diagnostic for every later reference to a name it
+was meant to bind.
+
+Evidence is one native fixture for the semantics, one for the hint, one for
+suspension, and one generated suite. The fixtures cover left-to-right
+ordering, a direct and a closure-mediated read of a later name, an abrupt
+declarator that leaves the later names uninitialized in the captured scope,
+mixed pattern and identifier declarators, iterator close order across two
+patterns, an abrupt default that stops the declarators after it, fresh cells
+per loop iteration, switch clauses, class static blocks, awaited declarators
+in an asynchronous function, and a falsified `number` annotation on one
+declarator of a list whose truthful sibling keeps hitting. All of them run
+under both specialization policies with collection forced at every
+safepoint. The generated suite uses seed `0x5eed0029` and an independent
+model over one `const` or `let` list of two to four declarators per case,
+mixing plain, bare, array-pattern, object-pattern, and back-reading
+declarators across five statement-list positions, with normal completion, an
+abrupt declarator, a read of a later name, and truthful or false hints.
+
+An AST scan of the 41,091 included candidate paths finds a multi-declarator
+lexical declaration in 83 of them, two of which were already reviewed and
+classified `unsupported-profile-feature` for exactly this rejection:
+*statements/class/static-init-scope-lex-open.js* and
+*for-await-of/async-gen-decl-dstr-array-elem-init-assignment.js*. Both now
+pass. The reviewed subset grows by 112 cases drawn from
+*language/statementList/*, *statements/let/syntax/*,
+*statements/const/syntax/*, *statements/for/*, the two *fn-name-cover.js*
+cases, and the *for-await-of* destructuring family whose generated preludes
+declare several names in one `let`: 78 pass, 29 are the parse negatives that
+keep a lexical declaration out of a single-statement position and reject a
+`const` declarator without an initializer, and 5 are for-await-of cases whose
+remaining prerequisites are the `arguments` object and `Object` as a value.
+The two *cptn-value.js* cases stay outside the subset because they read the
+completion value through `eval`, which
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps outside the
+profile. The manifest reaches 4,332 cases: 2,563 passes, 1,211 expected
+negatives, and 558 unsupported profile features with no semantic or harness
+failures.
+
+Tracing the unit's own claim also invalidated a documented one. The profile
+recorded an awaited initializer in a declaration list with more than one
+declarator as a deliberate `var` rejection. Re-measuring every such form in
+an asynchronous function and at module top level found all of them admitted,
+so the profile entry drops the rejection instead of rewording it.
 
 ### Intrinsics and built-in objects
 

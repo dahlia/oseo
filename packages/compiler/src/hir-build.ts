@@ -43,6 +43,7 @@ import type {
   SyntaxExpression,
   SyntaxFunction,
   SyntaxGlobalObjectName,
+  SyntaxLexicalDeclarator,
   SyntaxProgram,
   SyntaxStatement,
 } from "./syntax.ts";
@@ -1033,12 +1034,55 @@ function syntaxBindingNames(
   ];
 }
 
+/**
+ * The declaration kind one declarator of a lexical declaration list
+ * binds. A binding pattern names its kind directly, while an identifier
+ * declarator is discriminated by its own statement kind.
+ */
+function declaratorKind(declarator: SyntaxLexicalDeclarator): "const" | "let" {
+  return declarator.kind === "binding-pattern"
+    ? declarator.declarationKind
+    : declarator.kind;
+}
+
+/**
+ * True when a declaration list mixes `const` and `let` declarators. One
+ * LetOrConst covers a whole BindingList, so no source can produce such a
+ * list, and resolving one would have to invent a mutability for it.
+ */
+function mixedDeclarationList(
+  declarations: readonly SyntaxLexicalDeclarator[],
+): boolean {
+  const first = declarations[0];
+  return (
+    first != null &&
+    declarations.some(
+      (declarator) => declaratorKind(declarator) !== declaratorKind(first),
+    )
+  );
+}
+
 function predeclareBindings(
   statements: readonly SyntaxStatementItem[],
   scope: Map<string, Binding>,
   state: ResolveState,
 ): void {
   for (const statement of statements) {
+    // Every declarator of a lexical declaration list is predeclared in
+    // the scope that contains the list, so the whole list shares one
+    // temporal dead zone and duplicate names inside it are still an
+    // early error against their siblings.
+    if (statement.kind === "declaration-list") {
+      // A mixed list is rejected where it is resolved, but its names are
+      // still predeclared here, each with the mutability its own
+      // declarator asks for. Leaving them undeclared would make every
+      // later reference report an unrelated unknown binding, so the one
+      // diagnostic the invalid list deserves would arrive with a cascade
+      // of misleading ones. No mutability is invented: the list produces
+      // no statement, so nothing reads the recovery bindings.
+      predeclareBindings(statement.declarations, scope, state);
+      continue;
+    }
     if (
       statement.kind === "binding-pattern" &&
       statement.mode === "declare" &&
@@ -1157,6 +1201,37 @@ function resolveStatementList(
   }
   for (const statement of statements) {
     if (statement.kind === "function") continue;
+    const resolved = resolveStatementItems(
+      statement,
+      scopes,
+      state,
+      functionBody,
+      loopDepth,
+      breakDepth,
+    );
+    if (resolved != null) result.push(...resolved);
+  }
+  return result;
+}
+
+/**
+ * Resolves one statement of a statement list, expanding a lexical
+ * declaration list into its declarators.
+ *
+ * The declarators join the enclosing list rather than a nested block.
+ * ECMAScript gives them the scope that contains the declaration, and a
+ * block would reset their cells a second time and break the identity a
+ * closure captured between the two resets.
+ */
+function resolveStatementItems(
+  statement: SyntaxStatement,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+  functionBody: boolean,
+  loopDepth: number,
+  breakDepth: number,
+): readonly HirStatement[] | undefined {
+  if (statement.kind !== "declaration-list") {
     const resolved = resolveStatement(
       statement,
       scopes,
@@ -1165,9 +1240,32 @@ function resolveStatementList(
       loopDepth,
       breakDepth,
     );
-    if (resolved != null) result.push(resolved);
+    return resolved == null ? undefined : [resolved];
   }
-  return result;
+  if (mixedDeclarationList(statement.declarations)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        statement,
+        "A lexical declaration list declares one kind of binding.",
+      ),
+    );
+    return undefined;
+  }
+  const resolved: HirStatement[] = [];
+  for (const declarator of statement.declarations) {
+    const item = resolveStatement(
+      declarator,
+      scopes,
+      state,
+      functionBody,
+      loopDepth,
+      breakDepth,
+    );
+    if (item == null) return undefined;
+    resolved.push(item);
+  }
+  return resolved;
 }
 
 /**
@@ -2143,6 +2241,19 @@ function resolveStatement(
   loopDepth = 0,
   breakDepth = 0,
 ): HirStatement | undefined {
+  if (statement.kind === "declaration-list") {
+    // ECMAScript admits a lexical declaration only where a StatementList
+    // is admitted, so a list that reaches a single-statement position
+    // means a frontend produced owned syntax the grammar does not have.
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        statement,
+        "A lexical declaration list requires a statement list.",
+      ),
+    );
+    return undefined;
+  }
   if (statement.kind === "binding-pattern") {
     const initializer = resolveExpression(statement.initializer, scopes, state);
     const pattern = resolveBindingPattern(
@@ -2681,7 +2792,7 @@ function resolveStatement(
       if (switchCase.test != null && test == null) return undefined;
       const body: HirStatement[] = [];
       for (const child of switchCase.body) {
-        const resolved = resolveStatement(
+        const resolved = resolveStatementItems(
           child,
           caseScopes,
           state,
@@ -2690,7 +2801,7 @@ function resolveStatement(
           breakDepth + 1,
         );
         if (resolved == null) return undefined;
-        body.push(resolved);
+        body.push(...resolved);
       }
       cases.push({
         body,

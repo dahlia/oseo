@@ -836,3 +836,214 @@ test("resolves declared functions as primitive-global bindings", () => {
     assert.equal(statement.expression.arguments[0]?.kind, "binding");
   }
 });
+
+test("expands a lexical declaration list into the enclosing list", () => {
+  const declarators = [
+    {
+      hint: undefined,
+      initializer: { kind: "number", range, value: 1 },
+      kind: "let",
+      name: "first",
+      range,
+    },
+    {
+      hint: undefined,
+      initializer: { kind: "number", range, value: 2 },
+      kind: "let",
+      name: "second",
+      range,
+    },
+  ] as const;
+  const syntax: SyntaxProgram = {
+    body: [
+      { declarations: declarators, kind: "declaration-list", range },
+      {
+        expression: {
+          arguments: [
+            { kind: "identifier", name: "first", range },
+            { kind: "identifier", name: "second", range },
+          ],
+          kind: "call",
+          range,
+          target: { kind: "console-log", range },
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "declaration-list.ts",
+  };
+  const result = buildHir(syntax);
+  assert.deepEqual(result.diagnostics, []);
+  // The declarators become siblings of the statement that follows them,
+  // so no block is inserted and no second scope owns their cells.
+  assert.deepEqual(
+    result.program?.body.map((statement) => statement.kind),
+    ["let", "let", "expression"],
+  );
+});
+
+test("rejects a declaration list in a single-statement position", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        alternate: undefined,
+        consequent: {
+          declarations: [
+            {
+              hint: undefined,
+              initializer: { kind: "number", range, value: 1 },
+              kind: "let",
+              name: "first",
+              range,
+            },
+            {
+              hint: undefined,
+              initializer: { kind: "number", range, value: 2 },
+              kind: "let",
+              name: "second",
+              range,
+            },
+          ],
+          kind: "declaration-list",
+          range,
+        },
+        kind: "if",
+        range,
+        test: { kind: "boolean", range, value: true },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "declaration-list-position.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  assert.equal(result.diagnostics.length, 1);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /lexical declaration list requires a statement list/u,
+  );
+});
+
+test("rejects a lexical declaration list that mixes binding kinds", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        declarations: [
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 1 },
+            kind: "let",
+            name: "first",
+            range,
+          },
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 2 },
+            kind: "const",
+            name: "second",
+            range,
+          },
+        ],
+        kind: "declaration-list",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "declaration-list-kinds.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  // One LetOrConst covers a whole BindingList, so a mixed list has no
+  // mutability to resolve and is reported exactly once.
+  assert.equal(result.diagnostics.length, 1);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /declaration list declares one kind of binding/u,
+  );
+});
+
+test("resolves references to a rejected mixed declaration list", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        declarations: [
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 1 },
+            kind: "let",
+            name: "first",
+            range,
+          },
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 2 },
+            kind: "const",
+            name: "second",
+            range,
+          },
+        ],
+        kind: "declaration-list",
+        range,
+      },
+      {
+        expression: {
+          arguments: [
+            { kind: "identifier", name: "first", range },
+            { kind: "identifier", name: "second", range },
+          ],
+          kind: "call",
+          range,
+          target: { kind: "console-log", range },
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: {
+          functionValue: {
+            body: [
+              {
+                expression: {
+                  arguments: [{ kind: "identifier", name: "second", range }],
+                  kind: "call",
+                  range,
+                  target: { kind: "console-log", range },
+                },
+                kind: "expression",
+                range,
+              },
+            ],
+            functionKind: "arrow",
+            kind: "function",
+            name: undefined,
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+          kind: "function",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "declaration-list-kinds-reference.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  // The rejected list still predeclares its declarators, so a later
+  // reference resolves and the invalid list reports one diagnostic
+  // rather than one per name that reads it.
+  assert.equal(result.diagnostics.length, 1);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /declaration list declares one kind of binding/u,
+  );
+});

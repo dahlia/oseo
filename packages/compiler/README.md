@@ -53,6 +53,15 @@ work returns without `IteratorClose`; invocations without spread retain fixed
 positional lowering. Construction allocates its receiver after accumulation. A
 spread before a later top-level await point remains an explicit unsupported
 combination until continuation extraction can retain the list.
+A `const` or `let` declaration list arrives as one owned `declaration-list`
+statement, and HIR construction expands its declarators into the statement
+list that contains the declaration. ECMAScript gives those declarators the
+scope that contains them, so the existing per-scope predeclaration pass gives
+the whole list one temporal dead zone, one duplicate-name check, and one set
+of cells. A block would instead declare a scope the source does not have and
+reset the same cells a second time. A declaration list that reaches a
+single-statement position is a source-located diagnostic, because the grammar
+admits a lexical declaration only where a StatementList is admitted.
 Standalone array binding declarations use compiler-owned recursive
 patterns rather than frontend AST nodes. MIR gives each pattern an explicit
 iterator done state, steps elisions and elements in order, drains rest into a
