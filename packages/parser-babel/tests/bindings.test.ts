@@ -262,16 +262,107 @@ for (const [name, source] of varConflicts) {
   });
 }
 
-test("rejects var sharing a block-level function name", () => {
+test("admits a var declaration sharing a disjoint block function name", () => {
   const result = compileSource(babelFrontend, {
-    source: "function outer() { { function inner() {} } var inner; }",
+    source:
+      "function outer() {\n" +
+      '  var inner = "outer";\n' +
+      "  const readOuter = function () { return inner; };\n" +
+      "  {\n" +
+      '    function inner() { return "block"; }\n' +
+      "  }\n" +
+      "  return [readOuter(), inner];\n" +
+      "}\n",
     sourceId: "var-block-function.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /block-level function name/u,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  const outer = /let %b(\d+) inner = undefined/u.exec(hir)?.[1];
+  const blockFunction = /function-init %b(\d+) inner = @f\d+/u.exec(hir)?.[1];
+  assert.ok(outer != null);
+  assert.ok(blockFunction != null);
+  assert.notEqual(blockFunction, outer);
+});
+
+test("admits a disjoint block generator or async function var name", () => {
+  const cases = [
+    ["function*", "generator-block-function.ts"],
+    ["async function", "async-block-function.ts"],
+    ["async function*", "async-generator-block-function.ts"],
+  ] as const;
+  for (const [keyword, sourceId] of cases) {
+    const result = compileSource(babelFrontend, {
+      source:
+        "function outer() {\n" +
+        "  var inner;\n" +
+        `  { ${keyword} inner() {} }\n` +
+        "  return inner;\n" +
+        "}\n",
+      sourceId,
+    });
+    assert.deepEqual(result.diagnostics, [], sourceId);
+  }
+});
+
+test("admits a block function name sharing a sibling block var name", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "function outer() {\n" +
+      "  { function inner() {} }\n" +
+      "  { var inner; }\n" +
+      "  return inner;\n" +
+      "}\n",
+    sourceId: "var-block-function-sibling.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+});
+
+test("admits a var sharing a block function name in a module", () => {
+  const result = babelModuleFrontend.parseModule({
+    source:
+      'var inner = "outer";\n' +
+      "let readOuter;\n" +
+      "{\n" +
+      "  readOuter = function () { return inner; };\n" +
+      '  function inner() { return "block"; }\n' +
+      "}\n" +
+      "export const retained = [readOuter(), inner];\n",
+    sourceId: "file:///app/var-block-function.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-block-function.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-block-function.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-block-function",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+});
+
+test("rejects a var declaration sharing its own block's function name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function outer() { { var inner; function inner() {} } }",
+    sourceId: "var-block-function-same-scope.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+});
+
+test("rejects a var nested under its block function's own block", () => {
+  const result = compileSource(babelFrontend, {
+    source: "function outer() { { function inner() {} { var inner; } } }",
+    sourceId: "var-block-function-nested.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
 });
 
 test("keeps block-scoped let clear of later var declarations", () => {

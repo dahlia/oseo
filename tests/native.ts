@@ -297,6 +297,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-from-sync-rejection-close" ||
     fixture.name === "catch-bindings" ||
     fixture.name === "catch-var-coexistence" ||
+    fixture.name === "block-function-var-coexistence" ||
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
@@ -401,6 +402,11 @@ for (const fixture of selectedFixtures) {
           if (fixture.name === "catch-var-coexistence") {
             // Catch and outer var cells remain independently reachable
             // across closures, suspension, and cleanup.
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "block-function-var-coexistence") {
+            // The block's own function cell and the outer var cell stay
+            // independently reachable across closures and suspension.
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "lexical-declaration-list-hints") {

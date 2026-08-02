@@ -2740,7 +2740,6 @@ export function collectVarStatement(
   lexicalFrames: readonly ReadonlySet<string>[],
   catchParameters: ReadonlySet<string>,
   collected: Map<string, HoistedVar>,
-  blockFunctions: Set<string>,
 ): boolean {
   if (value.type === "VariableDeclaration" && value.kind === "var") {
     if (value.declare === true) return true;
@@ -2801,19 +2800,9 @@ export function collectVarStatement(
   }
   if (value.type === "BlockStatement") {
     const children = nodes(value.body);
-    for (const name of varScopedFunctionNames(children)) {
-      blockFunctions.add(name);
-    }
     const frames = [...lexicalFrames, gatherLexicalNames(children, true)];
     return children.every((child) =>
-      collectVarStatement(
-        context,
-        child,
-        frames,
-        catchParameters,
-        collected,
-        blockFunctions,
-      ),
+      collectVarStatement(context, child, frames, catchParameters, collected),
     );
   }
   if (value.type === "IfStatement") {
@@ -2828,7 +2817,6 @@ export function collectVarStatement(
           lexicalFrames,
           catchParameters,
           collected,
-          blockFunctions,
         )
       ) {
         return false;
@@ -2851,7 +2839,6 @@ export function collectVarStatement(
         lexicalFrames,
         catchParameters,
         collected,
-        blockFunctions,
       )
     );
   }
@@ -2869,7 +2856,6 @@ export function collectVarStatement(
             lexicalFrames,
             catchParameters,
             collected,
-            blockFunctions,
           )
         ) {
           return false;
@@ -2881,14 +2867,7 @@ export function collectVarStatement(
     const body = node(value.body);
     return (
       body == null ||
-      collectVarStatement(
-        context,
-        body,
-        bodyFrames,
-        catchParameters,
-        collected,
-        blockFunctions,
-      )
+      collectVarStatement(context, body, bodyFrames, catchParameters, collected)
     );
   }
   if (value.type === "SwitchStatement") {
@@ -2897,14 +2876,7 @@ export function collectVarStatement(
     );
     const frames = [...lexicalFrames, gatherLexicalNames(caseBodies, true)];
     return caseBodies.every((child) =>
-      collectVarStatement(
-        context,
-        child,
-        frames,
-        catchParameters,
-        collected,
-        blockFunctions,
-      ),
+      collectVarStatement(context, child, frames, catchParameters, collected),
     );
   }
   if (value.type === "TryStatement") {
@@ -2917,7 +2889,6 @@ export function collectVarStatement(
         lexicalFrames,
         catchParameters,
         collected,
-        blockFunctions,
       )
     ) {
       return false;
@@ -2938,7 +2909,6 @@ export function collectVarStatement(
           lexicalFrames,
           handlerCatch,
           collected,
-          blockFunctions,
         )
       ) {
         return false;
@@ -2953,7 +2923,6 @@ export function collectVarStatement(
         lexicalFrames,
         catchParameters,
         collected,
-        blockFunctions,
       )
     ) {
       return false;
@@ -2973,6 +2942,17 @@ export function collectVarStatement(
  * binding and always take precedence over a supplied copy. A caller may
  * provide an outer parameter copy when a parameter-expression environment
  * requires a distinct body var binding with the parameter's initial value.
+ * A var name that shares its name with a block-level function declaration
+ * outside its own lexical frames is admitted as an ordinary disjoint
+ * coexistence: `collectVarStatement`'s `lexicalFrames` check already
+ * rejects the one case ECMA-262 forbids, a var inside the same block that
+ * declares the function or a block nested inside it, so nothing further is
+ * checked here. The two cells stay distinct because HIR predeclares the
+ * block's function name in the block's own scope, separate from the
+ * hoisted `let` this function returns for the enclosing scope. Annex B
+ * function hoisting, which would copy the block's value out to this outer
+ * cell, is not implemented, so the outer cell keeps its hoisting-supplied
+ * value.
  */
 export function hoistedVarDeclarations(
   context: ConvertContext,
@@ -2981,7 +2961,6 @@ export function hoistedVarDeclarations(
   copiedNames: ReadonlyMap<string, string> = new Map<string, string>(),
 ): SyntaxStatement[] | undefined {
   const collected = new Map<string, HoistedVar>();
-  const blockFunctions = new Set<string>();
   const rootLexical = gatherLexicalNames(values, false);
   const complete = values.every((value) =>
     collectVarStatement(
@@ -2990,22 +2969,11 @@ export function hoistedVarDeclarations(
       [rootLexical],
       new Set<string>(),
       collected,
-      blockFunctions,
     ),
   );
   if (!complete) return undefined;
   const hoisted: SyntaxStatement[] = [];
   for (const [name, info] of collected) {
-    if (blockFunctions.has(name)) {
-      // Annex B function hoisting would make this observable; reject it
-      // instead of silently diverging from web-engine behavior.
-      return unsupported(
-        context,
-        info.declarator,
-        `A var declaration sharing the block-level function name ` +
-          `'${name}' is outside the admitted profile.`,
-      );
-    }
     if (skipNames.has(name)) continue;
     const copiedName = copiedNames.get(name);
     hoisted.push({

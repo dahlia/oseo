@@ -75,7 +75,12 @@ its parameter entirely; the owned handler then records the absent pattern
 explicitly and its range covers the clause. A simple catch parameter may share
 a name with a var-scoped declaration: the var name is still hoisted, while an
 initializer inside the clause resolves to the catch cell. Recursive catch
-patterns keep their redeclaration restriction. Standalone destructuring
+patterns keep their redeclaration restriction. A block-level function
+declaration may also share its name with a var declared outside that block:
+the var-scoped hoisting pass only rejects a var that lexically shares the
+block declaring the function, since ECMA-262's Block early errors reject only
+that overlap, and it no longer treats the function name as reserved across the
+whole enclosing var scope. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
 assignment heads reuse that assignment target conversion. A computed member

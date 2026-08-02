@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,340
-reviewed cases: 2,566 passes, 1,214 expected negatives, and 560 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,353
+reviewed cases: 2,568 passes, 1,220 expected negatives, and 565 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2089,6 +2089,88 @@ manifest reaches 4,340 cases: 2,566 passes, 1,214 expected negatives, and 560
 unsupported profile features with no semantic or harness failures. The suite
 revision, inventory policy, manifest schema, classification vocabulary, and
 every earlier classification remain unchanged.
+
+M5a Unit 8.5d admits a block-level function declaration that shares its name
+with a var-scoped declaration outside the block that declares it. ECMA-262's
+Block early errors reject a name in the block's own LexicallyDeclaredNames
+that also occurs in that same Block's VarDeclaredNames; because
+VarDeclaredNames of a nested block already propagates into every Block that
+contains it, that rule reaches a var declared in the block that declares the
+function or in any block nested inside it before a function boundary, and
+nowhere else. A var declared in a sibling block, in an ancestor block that
+does not itself declare the function, or elsewhere in the same function,
+Script, or module body sits outside that overlap and stays admitted without
+Annex B.
+
+The frontend's var-scoped hoisting pass previously reserved every block-level
+function name across the whole enclosing var scope: a `blockFunctions`
+accumulator collected every function name declared in any block anywhere in
+the body, and any var sharing one of those names was rejected regardless of
+where the var and the function actually sat relative to each other. That
+accumulator is removed. The pass's existing lexical-frame check, which
+already walks the exact chain of enclosing blocks a var declaration sits
+inside and rejects a var that redeclares a lexical or function name from an
+enclosing frame, is now the only check for this collision, and it already
+implements the correct rule: a var only conflicts when it sits inside the
+declaring block or a block nested inside it. No HIR or MIR change is needed:
+`predeclareBindings` already gives a block-level function its own scope-local
+cell, distinct from the hoisted `let` a var declaration becomes, so the two
+cells were already distinct once the frontend admitted the coexistence.
+
+Fixed differential evidence covers a strict function body's own block
+function read through a closure formed inside the block, a sibling block
+sharing an outer var's name, completion precedence through `finally`, a
+generator body, a block-scoped generator declaration, an asynchronous
+function body, and, in a separate module fixture compiled only for the
+native target, a real source module. All function-body cases run under
+both specialization policies with forced collection and the AArch64 Linux
+cross-link; the module fixture is not part of that cross-link loop.
+Sloppy-mode Script and function code exercise the identical construct, but
+Node.js and Deno apply Annex B's web legacy compatibility semantics to it
+in sloppy mode, hoisting the block's function value out to the outer var,
+which this profile does not implement; a fixed native scenario pins the
+ECMA-262 (non-Annex-B) expectation for that case instead of comparing a
+host observation, following the same pattern the Script global-declaration
+order already uses. The rule reduces to an existing block-ancestor
+lexical-frame check plus the generic block-scope, hoisting, and closure
+machinery every other unit's generated properties already exercise, so no
+new generated value or state domain is added.
+
+A scan of test262's `block-scope`, `eval-code`, `function-code`, and
+`global-code` directories finds the reviewed subset's first cases naming a
+block-level function declaration.
+*test/language/block-scope/shadowing/lookup-from-closure.js* and
+*dynamic-lookup-from-closure.js* were already admitted before this unit,
+since a bare block-level function declaration was never rejected, and enter
+the reviewed subset as passes.
+*test/language/global-code/block-decl-strict.js* and
+*test/language/function-code/block-decl-onlystrict.js* assert that a strict
+block function's name resolves to a runtime `ReferenceError` outside its
+block; the frontend instead resolves every binding statically and reports
+the same absence as a compile-time diagnostic, which is a documented
+profile boundary rather than a semantic gap this unit closes, so both enter
+as `unsupported-profile-feature`. Three *test/language/eval-code/direct/*
+cases exercise the identical construct through direct `eval`, which
+[ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps outside the
+profile, and enter with the same classification. Six
+*test/language/block-scope/syntax/redeclaration/* cases test the
+same-block and ancestor-block conflicts the lexical-frame check must keep
+rejecting. Five are named directly:
+*var-name-redeclaration-attempt-with-function.js* and
+*var-redeclaration-attempt-after-function.js* cover a var and function
+sharing one block in both orders,
+*fn-scope-var-name-redeclaration-attempt-with-function.js* nests that
+conflict inside a function, and
+*inner-block-var-name-redeclaration-attempt-with-function.js* and
+*inner-block-var-redeclaration-attempt-after-function.js* nest it inside
+an inner block in both orders. The sixth, whose identifier exceeds this
+document's line length, nests a var two blocks under the function it
+redeclares. All six enter as expected negatives. No test262 case in the
+reviewed candidate set exercises the disjoint positive coexistence with a
+runtime assertion, so the fixed native fixture and module fixture supply
+that evidence directly. The manifest reaches 4,353 cases: 2,568 passes,
+1,220 expected negatives, and 565 unsupported profile features with no
+semantic or harness failures.
 
 ### Intrinsics and built-in objects
 

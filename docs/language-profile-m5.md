@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,340 reviewed cases: 2,566 passes, 1,214
-expected negatives, and 560 unsupported profile features. It records no
+The current manifest contains 4,353 reviewed cases: 2,568 passes, 1,220
+expected negatives, and 565 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -226,12 +226,14 @@ its deliberate boundary and its evidence:
     into hoisted bindings initialized to `undefined` plus in-place
     assignments, so no separate binding kind reaches HIR or the runtime.
     A simple catch parameter may share a name with one of these declarations,
-    as M5a Unit 8.5c records below. Deliberate boundaries, each rejected with a
-    source-located diagnostic: `export var`, ambient `declare` declarations,
-    a recursive catch pattern sharing a var name, and a `var` sharing a
-    block-level function declaration name, because Annex B function hoisting
-    would make the difference observable. This entry previously also recorded
-    an awaited initializer
+    as M5a Unit 8.5c records below, and so may a block-level function
+    declaration whose block does not lexically contain the var declaration,
+    as M5a Unit 8.5d records below. Deliberate boundaries, each rejected with
+    a source-located diagnostic: `export var`, ambient `declare`
+    declarations, a recursive catch pattern sharing a var name, and a `var`
+    that lexically shares the block declaring a same-name function, which
+    stays the one collision ECMA-262's Block early errors forbid. This entry
+    previously also recorded an awaited initializer
     in a `var` list with more than one declarator as a rejection. M5a Unit
     8.5a re-measured every such form in an asynchronous function and at
     module top level and found all of them admitted, so the stale
@@ -2105,7 +2107,12 @@ hoisting is not implemented, so a function declared in a block at Script top
 level has no var-scoped binding and is therefore absent from the global
 object; a reference to that name outside its block is already rejected with a
 source-located diagnostic, but a global-object observation such as
-`"name" in this` reports absence instead of diagnosing it. Property creation
+`"name" in this` reports absence instead of diagnosing it. This holds in
+strict and non-strict Script code alike, since Annex B applies only to
+non-strict code and the profile never applies it: M5a Unit 8.5d admits a var
+declaration that shares a block-level function's name only when the two
+coexist as the ordinary disjoint bindings ECMA-262 already describes without
+Annex B, never as the copied-out alias Annex B would create. Property creation
 order also follows ECMA-262 rather than the reference hosts: both Node.js and
 Deno share V8, which creates global declarations in source order, while
 GlobalDeclarationInstantiation creates every function binding before every
@@ -2375,6 +2382,21 @@ differential fixture provides the same-name positive evidence the upstream
 case does not isolate. The manifest reaches 4,340 cases: 2,566 passes, 1,214
 expected negatives, and 560 unsupported profile features with no semantic or
 harness failures.
+
+M5a Unit 8.5d admits the block-level function and outer var coexistence
+recorded above. The reviewed subset adds thirteen cases naming a
+block-level function declaration: two passes from
+*test/language/block-scope/shadowing/* for a bare block function that was
+already admitted before this unit, six expected negatives from
+*test/language/block-scope/syntax/redeclaration/* for the same-block and
+ancestor-block conflicts the lexical-frame check keeps rejecting, and five
+`unsupported-profile-feature` results, *global-code/block-decl-strict.js*,
+*function-code/block-decl-onlystrict.js*, and three *eval-code/direct/*
+forms, each of which expects a runtime `ReferenceError` for a reference
+outside the declaring block that the frontend instead reports as a
+compile-time diagnostic. The manifest reaches 4,353 cases: 2,568 passes,
+1,220 expected negatives, and 565 unsupported profile features with no
+semantic or harness failures.
 
 
 Known gaps inside the claim

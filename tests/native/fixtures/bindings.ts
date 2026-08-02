@@ -1354,6 +1354,115 @@ asyncBody().then(function (value) {
 `,
   },
   {
+    name: "block-function-var-coexistence",
+    source: `
+(function () {
+  "use strict";
+  var scriptValue = "script outer";
+  let readScriptBlock;
+  {
+    readScriptBlock = function () { return scriptValue(); };
+    function scriptValue() { return "script block"; }
+    console.log("script block", scriptValue());
+  }
+  console.log("script outer", scriptValue, readScriptBlock());
+
+  {
+    function siblingValue() { return "sibling block"; }
+  }
+  var siblingValue;
+  console.log("sibling", typeof siblingValue);
+})();
+
+function ordinary() {
+  "use strict";
+  var value = "ordinary outer";
+  const readOuter = function () { return value; };
+  let readBlock;
+  {
+    readBlock = function () { return value(); };
+    function value() { return "ordinary block"; }
+    console.log("ordinary block", value());
+  }
+  return [readOuter(), readBlock(), value];
+}
+const ordinaryValues = ordinary();
+console.log(
+  "ordinary",
+  ordinaryValues[0],
+  ordinaryValues[1],
+  ordinaryValues[2],
+);
+
+function ordinaryGenerator() {
+  "use strict";
+  var value = "generator-block outer";
+  const readOuter = function () { return value; };
+  let readBlock;
+  {
+    readBlock = function () { return [...value()][0]; };
+    function* value() { yield "generator-block block"; }
+  }
+  return [readOuter(), readBlock()];
+}
+const ordinaryGeneratorValues = ordinaryGenerator();
+console.log(
+  "ordinaryGenerator",
+  ordinaryGeneratorValues[0],
+  ordinaryGeneratorValues[1],
+);
+
+function precedence() {
+  "use strict";
+  var value = "finally outer";
+  let result;
+  {
+    function value() { return "block return"; }
+    try {
+      result = value();
+    } finally {
+      result += " finally";
+    }
+  }
+  return [result, value];
+}
+const precedenceValues = precedence();
+console.log("precedence", precedenceValues[0], precedenceValues[1]);
+
+function* generatorBody() {
+  "use strict";
+  var value = "generator outer";
+  {
+    function value() { return "generator block"; }
+    yield value();
+  }
+  yield typeof value;
+  return value;
+}
+const generator = generatorBody();
+console.log("generator", generator.next().value);
+console.log("generator typeof", generator.next().value);
+console.log("generator return", generator.next().value);
+
+async function asyncBody() {
+  "use strict";
+  var value = "async outer";
+  const readOuter = function () { return value; };
+  let readBlock;
+  {
+    readBlock = function () { return value(); };
+    function value() { return "async block"; }
+    await Promise.resolve();
+    console.log("async block", value());
+  }
+  return [readOuter(), readBlock()];
+}
+asyncBody().then(function (values) {
+  console.log("async outer", values[0], values[1]);
+});
+`,
+  },
+  {
     name: "optional-catch-binding",
     source: `
 let entered = 0;

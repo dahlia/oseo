@@ -7654,6 +7654,221 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/language/block-scope/shadowing/dynamic-lookup-from-closure.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/block-scope/shadowing/lookup-from-closure.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-var-declaration-nested-in-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/language/computed-property-names/class/accessor/getter-duplicates.js
       strictness:
         - non-strict
@@ -7839,6 +8054,86 @@ results:
     observation:
       harnessFailed: false
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
+        t-nostrict.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
+        is-strict-nostrict.js:88:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/block-decl-eval-source-is-strict-onlystrict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
+        t-onlystrict.js strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
+        is-strict-onlystrict.js:89:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/block-decl-onlystrict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/block-decl-onlystrict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/block-decl-onlystrict.j\
+        s:89:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false
@@ -71876,6 +72171,56 @@ results:
         stderr=\"test/language/expressions/yield/star-rhs-unresolvable.\
         js:87:13: error[OSEO1001]: Unknown binding
         'test262unresolvable'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/function-code/block-decl-onlystrict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/function-code/block-decl-onlystrict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/function-code/block-decl-onlystrict.js:9\
+        1:5: error[OSEO1001]: Unknown binding 'f'.\\n\""
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/global-code/block-decl-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/global-code/block-decl-strict.js strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/global-code/block-decl-strict.js:86:3:
+        error[OSEO1001]: Unknown binding 'f'.\\n\""
       unsupportedCapability: profile-syntax
       harnessFailed: false
       passed: false
@@ -138377,11 +138722,11 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1214
+  expectedNegatives: 1220
   harnessFailures: 0
-  passes: 2566
+  passes: 2568
   semanticFailures: 0
-  unsupportedProfileFeatures: 560
+  unsupportedProfileFeatures: 565
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 4
@@ -138436,13 +138781,13 @@ summary:
       harnessFailures: 0
       passes: 0
       semanticFailures: 0
-      unsupportedProfileFeatures: 59
+      unsupportedProfileFeatures: 62
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
       passes: 78
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 32
     - dependency: expression-operators
       expectedNegatives: 41
       harnessFailures: 0
@@ -138450,11 +138795,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: functions
-      expectedNegatives: 43
+      expectedNegatives: 49
       harnessFailures: 0
-      passes: 146
+      passes: 148
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 20
     - dependency: generators
       expectedNegatives: 64
       harnessFailures: 0
@@ -138468,11 +138813,11 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 42
     - dependency: lexical-bindings
-      expectedNegatives: 110
+      expectedNegatives: 116
       harnessFailures: 0
-      passes: 332
+      passes: 334
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 14
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
@@ -138516,9 +138861,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: var-bindings
-      expectedNegatives: 35
+      expectedNegatives: 41
       harnessFailures: 0
-      passes: 183
+      passes: 185
       semanticFailures: 0
       unsupportedProfileFeatures: 2
   groups:
@@ -138594,18 +138939,42 @@ summary:
       passes: 6
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: language/block-scope
+      expectedNegatives: 6
+      harnessFailures: 0
+      passes: 2
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: language/computed-property-names
       expectedNegatives: 0
       harnessFailures: 0
       passes: 6
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: language/eval-code
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 3
     - group: language/expressions
       expectedNegatives: 476
       harnessFailures: 0
       passes: 1284
       semanticFailures: 0
       unsupportedProfileFeatures: 275
+    - group: language/function-code
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
+    - group: language/global-code
+      expectedNegatives: 0
+      harnessFailures: 0
+      passes: 0
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0
