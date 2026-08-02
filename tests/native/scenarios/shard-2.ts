@@ -96,6 +96,51 @@ export async function runNativeScenario2(
     }
   }
 
+  // Module var declarations are hoisted outside the catch environment,
+  // while the same-name initializer still resolves to the catch cell.
+  const catchVarModule = `${root}/tests/fixtures/catch-var-module.mjs`;
+  const catchVarReferences = [
+    await host.run({
+      args: [catchVarModule],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", catchVarModule],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of catchVarReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeCatchVar = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            catchVarModule,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeCatchVar.exitStatus, 0, nativeCatchVar.stderr);
+      assert.equal(nativeCatchVar.stderr, "");
+      for (const reference of catchVarReferences) {
+        assert.equal(
+          nativeCatchVar.stdout,
+          reference.stdout,
+          `module catch var ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const moduleEntry = `${root}/tests/fixtures/modules/entry.js`;
   for (const specialization of ["disabled", "enabled"] as const) {
     if (specialization === "enabled") {

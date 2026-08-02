@@ -17824,6 +17824,16 @@ tests:
   - path: test/language/statements/try/optional-catch-binding.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/try/scope-catch-param-var-none.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        dynamic-source,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/try/static-init-await-binding-invalid.js
     expectedClassification: expected-negative
     dependencies: [abrupt-completion, classes]

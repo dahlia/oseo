@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,339
-reviewed cases: 2,566 passes, 1,214 expected negatives, and 559 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,340
+reviewed cases: 2,566 passes, 1,214 expected negatives, and 560 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -78,6 +78,10 @@ enumerable own-key copying, and string and symbol exclusions. Catch parameter
 destructuring is now implemented: catch clauses admit the same
 recursive array and object patterns, including defaults and rest, with fresh
 catch cells, iterator cleanup, and abrupt propagation through `finally`.
+A simple catch parameter may also share its name with a var-scoped declaration.
+The enclosing function, Script, or module keeps its hoisted cell, while the
+catch clause creates a distinct cell and same-name initializers inside the
+catch write that catch cell.
 Synchronous `for-of` declaration heads now admit those recursive patterns for
 `const`, `let`, and `var`, preserving lexical temporal dead zones, fresh
 per-iteration cells, `var` hoisting, nested cleanup, and outer iterator close
@@ -2051,6 +2055,40 @@ unresolved global `y` through `assert.throws(ReferenceError, ...)`, which the
 global binding model gap owns; the catch clauses it contains compile. The
 manifest reaches 4,339 cases: 2,566 passes, 1,214 expected negatives, and 559
 unsupported profile features with no semantic or harness failures.
+
+M5a Unit 8.5c admits a simple catch parameter that shares its name with a
+var-scoped declaration in the enclosing function, Script, or module. The
+existing hoisting pass creates and initializes the outer var cell normally,
+including when the only declaration appears inside the catch body. The catch
+clause still creates a fresh cell for its parameter. A same-name `var`
+declaration adds no catch-body binding, and its initializer resolves to and
+writes the catch cell. After the clause, the outer cell therefore retains its
+earlier value or the `undefined` supplied by hoisting.
+
+The implementation narrows only the frontend's redeclaration check. A simple
+identifier is omitted from the set of catch names that reject nested
+var-scoped declarations; recursive array and object catch patterns keep the
+existing restriction. Same-scope lexical declarations still fail during
+parsing, and the block-level function restriction remains unchanged. This unit
+does not add optional-catch behavior or Annex B function hoisting.
+
+Fixed differential evidence covers non-strict Script code, strict and
+non-strict ordinary function bodies, a real source module, generator and
+asynchronous function bodies, closure identity, a same-name initializer that
+completes or throws, `return` and generator-close completion through `finally`,
+both specialization policies, forced collection, and the AArch64 Linux
+cross-link. The rule has no useful generated value or state domain beyond the
+fixed name and completion matrix, so this unit adds no property suite.
+
+The reviewed subset adds
+*test/language/statements/try/scope-catch-param-var-none.js* as fixed inventory
+evidence. Its direct `eval` remains outside the admitted profile under ADR
+0016, so the case is honestly unsupported rather than used as the same-name
+positive. The fixed differential fixture supplies that positive evidence. The
+manifest reaches 4,340 cases: 2,566 passes, 1,214 expected negatives, and 560
+unsupported profile features with no semantic or harness failures. The suite
+revision, inventory policy, manifest schema, classification vocabulary, and
+every earlier classification remain unchanged.
 
 ### Intrinsics and built-in objects
 

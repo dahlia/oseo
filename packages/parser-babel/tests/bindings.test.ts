@@ -282,13 +282,55 @@ test("keeps block-scoped let clear of later var declarations", () => {
   assert.deepEqual(result.diagnostics, []);
 });
 
-test("rejects var declarations sharing a catch parameter name", () => {
+test("admits var declarations sharing a simple catch parameter name", () => {
   const result = compileSource(babelFrontend, {
-    source: "try { console.log(1); } catch (caught) { var caught; }",
+    source:
+      'var caught = "outer";\n' +
+      'try { throw "inner"; } catch (caught) {\n' +
+      '  var caught = "catch";\n' +
+      "  console.log(caught);\n" +
+      "}\n" +
+      "console.log(caught);\n",
     sourceId: "var-catch.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /catch parameter/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  const outer = /let %b(\d+) caught = undefined/u.exec(hir)?.[1];
+  const caught = /catch %b(\d+) caught/u.exec(hir)?.[1];
+  assert.ok(outer != null);
+  assert.ok(caught != null);
+  assert.notEqual(caught, outer);
+  assert.match(hir, new RegExp(`%b${caught} caught = "catch"`, "u"));
+});
+
+test("admits a same-name catch var initializer in a module", () => {
+  const result = babelModuleFrontend.parseModule({
+    source:
+      'var caught = "outer";\n' +
+      'try { throw "inner"; } catch (caught) {\n' +
+      '  var caught = "catch";\n' +
+      "}\n" +
+      "export const retained = caught;\n",
+    sourceId: "file:///app/var-catch.js",
+  });
+  assert.ok(result.parsed);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/var-catch.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/var-catch.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "var-catch",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
 });
 
 test("rejects var declarations sharing a catch pattern name", () => {
@@ -297,6 +339,14 @@ test("rejects var declarations sharing a catch pattern name", () => {
       "try { throw { value: 1 }; } " +
       "catch ({ value: caught }) { var caught; }",
     sourceId: "var-catch-pattern.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+});
+
+test("keeps a catch parameter distinct from body lexical declarations", () => {
+  const result = compileSource(babelFrontend, {
+    source: "try { throw 1; } catch (caught) { let caught = 2; }",
+    sourceId: "lexical-catch.ts",
   });
   assert.equal(result.diagnostics[0]?.code, "OSEO0001");
 });

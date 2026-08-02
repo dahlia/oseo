@@ -1230,6 +1230,130 @@ try {
 `,
   },
   {
+    name: "catch-var-coexistence",
+    nonStrictScript: true,
+    source: `
+var scriptValue = "script outer";
+let readScriptCatch;
+try {
+  throw "script caught";
+} catch (scriptValue) {
+  readScriptCatch = function () { return scriptValue; };
+  var scriptValue = "script catch";
+  console.log("script catch", scriptValue);
+}
+console.log("script outer", scriptValue, readScriptCatch());
+
+try {
+  throw "fresh caught";
+} catch (freshValue) {
+  var freshValue;
+  console.log("fresh catch", freshValue);
+}
+console.log("fresh outer", freshValue);
+
+function ordinary() {
+  var value = "ordinary outer";
+  const readOuter = function () { return value; };
+  let readCatch;
+  try {
+    throw "ordinary caught";
+  } catch (value) {
+    readCatch = function () { return value; };
+    var value = "ordinary catch";
+  }
+  return [readOuter(), readCatch(), value];
+}
+const ordinaryValues = ordinary();
+console.log(
+  "ordinary",
+  ordinaryValues[0],
+  ordinaryValues[1],
+  ordinaryValues[2],
+);
+
+function strictBody() {
+  "use strict";
+  var value = "strict outer";
+  let readCatch;
+  try {
+    throw "strict caught";
+  } catch (value) {
+    readCatch = function () { return value; };
+    var value = "strict catch";
+  }
+  return [readCatch(), value];
+}
+const strictValues = strictBody();
+console.log("strict", strictValues[0], strictValues[1]);
+
+function precedence() {
+  var value = "finally outer";
+  try {
+    throw "caught";
+  } catch (value) {
+    var value = "catch return";
+    return value;
+  } finally {
+    return value;
+  }
+}
+console.log("precedence", precedence());
+
+function initializerAbrupt() {
+  var value = "abrupt outer";
+  try {
+    try {
+      throw "abrupt caught";
+    } catch (value) {
+      var value = (function () { throw "initializer"; })();
+    } finally {
+      console.log("abrupt finally", value);
+    }
+  } catch (reason) {
+    console.log("abrupt", reason, value);
+  }
+}
+initializerAbrupt();
+
+function* generatorBody() {
+  var value = "generator outer";
+  try {
+    throw "generator caught";
+  } catch (value) {
+    var value = "generator catch";
+    yield value;
+  } finally {
+    yield value;
+  }
+  return value;
+}
+const generator = generatorBody();
+console.log("generator", generator.next().value);
+console.log("generator finally", generator.return("closed").value);
+console.log("generator return", generator.next().value);
+
+async function asyncBody() {
+  var value = "async outer";
+  const readOuter = function () { return value; };
+  let readCatch;
+  try {
+    throw "async caught";
+  } catch (value) {
+    readCatch = function () { return value; };
+    var value = await Promise.resolve("async catch");
+    console.log("async catch", value, readCatch());
+  } finally {
+    console.log("async finally", value);
+  }
+  return readOuter();
+}
+asyncBody().then(function (value) {
+  console.log("async outer", value);
+});
+`,
+  },
+  {
     name: "optional-catch-binding",
     source: `
 let entered = 0;
