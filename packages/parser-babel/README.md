@@ -63,16 +63,20 @@ Standalone one-declarator `const` and `let` binding declarations and standalone
 `var` declaration lists are converted into compiler-owned recursive patterns.
 A `var` list may mix plain and pattern declarators; every pattern name joins the
 existing function-scope hoisting and redeclaration pass. Array patterns admit
-elisions, defaults without `await`, nesting, and a final identifier or nested
+elisions, defaults, nesting, and a final identifier or nested
 array rest target. Object patterns admit static and computed properties,
 shorthand and renamed targets, defaults, nested object or array patterns, and a
 final identifier rest target. Catch parameters and synchronous `for-of`
 declarations reuse the same recursive patterns. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
-assignment heads reuse that assignment target conversion. Await inside a member
-target, pattern type annotations on assignment, `for-of`, and catch targets,
-and `for-in` and `for-await-of` heads remain explicit boundaries.
+assignment heads reuse that assignment target conversion. A computed member
+target, a computed property name, and a default may each contain `await`; the
+frontend converts them unchanged and the compiler decides whether the enclosing
+body owns a suspension frame for them. `for-await-of` heads reuse the same
+declaration and assignment target conversion. Pattern type annotations on
+assignment, `for-of`, and catch targets, and `for-in` heads remain explicit
+boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
 expression remains an explicit boundary until the compiler can retain its

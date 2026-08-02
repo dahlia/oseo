@@ -833,7 +833,8 @@ direct awaited right operands, both specialization policies, and forced
 collection. Fourteen reviewed standards cases cover identifier and member
 writes, nested patterns, defaults, rest, result identity, nullish and
 immutable-target errors, and function-name inference. Await inside a member
-target remains a separate continuation unit. Synchronous `for-of` assignment
+target became a separate continuation unit, which M5a Unit 8.3 has now
+closed for asynchronous bodies. Synchronous `for-of` assignment
 heads now reuse those recursive patterns and existing targets. Generated and
 fixed native evidence covers defaults, rest, member leaves, nullish and
 immutable failure, and inner-before-outer iterator cleanup. Six reviewed
@@ -917,7 +918,11 @@ landed with the M5 intrinsics units. The remaining queue is:
     retain `super` property context, each `super()` call performs a fresh
     `Construct`, and optional calls through `super` properties are admitted.
     Class bodies without `extends` and object-literal methods still wait for
-    the M5b `Object.prototype` intrinsic.
+    the M5b `Object.prototype` intrinsic. Unit 8.3 admits `await` inside an
+    assignment target's computed member, a computed binding property name, and
+    an array or object binding default in every body that owns a traced
+    suspension frame; module top level keeps that rejection under the modules
+    and asynchronous execution stream.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

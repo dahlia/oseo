@@ -1413,8 +1413,8 @@ missing, and nullish inputs, both native specialization policies, and forced
 collection. Fixed native fixtures retain expression-result identity,
 function-name inference, member-reference order, step failure without close,
 target failure with close, and computed-key suppression for nullish source
-inputs and member bases. Await inside a member target remains unsupported until
-it joins the admitted continuation positions.
+inputs and member bases. Await inside a member target remained unsupported at
+this unit until M5a Unit 8.3 gave it an owned suspension position.
 Fourteen reviewed test262 cases pin identifier and member writes, nested
 patterns, defaults, rest, result identity, nullish and immutable-target errors,
 and function-name inference under both strictness and specialization policies.
@@ -1713,9 +1713,9 @@ request ordering reached through an ordinary asynchronous callback,
 `try`/`finally` completion precedence, and non-promise thenable assimilation.
 The last case uses the unit's narrow `%Array.prototype.push%` dependency, whose
 generic body preserves ordered strict writes, abrupt completion, accessors, and
-array length semantics. Binding-pattern subexpressions retain their explicit
-suspension restrictions, and asynchronous module cycles remain outside this
-unit.
+array length semantics. Binding-pattern subexpressions retained their explicit
+suspension restrictions at this unit until M5a Unit 8.3 removed them, and
+asynchronous module cycles remain outside this unit.
 
 M5a Unit 7.5 moves `for await` iterator steps inside ordinary asynchronous
 functions and asynchronous generators, plus asynchronous generator `yield*`
@@ -1808,6 +1808,66 @@ negatives, and 519 unsupported profile features with no semantic or harness
 failures. Pattern-position await, `PromiseResolve` constructor semantics,
 Async-from-Sync throw and iterator-result gaps, and M5b intrinsics remain
 outside this unit.
+
+M5a Unit 8.3 admits `await` inside the three pattern subexpressions the
+frontend rejected everywhere: the object and computed key of an assignment
+target member, a computed binding property name, and an array or object binding
+default. The admission covers every body that owns a traced suspension frame,
+which is an ordinary asynchronous function, an asynchronous arrow, and an
+asynchronous generator, and every pattern that reaches one: standalone
+declarations, destructuring assignment, catch parameters, classic `for`
+declaration heads, and `for-of`, `for-await-of`, and assignment heads.
+
+The unit adds no lowering. A pattern already lowers into the enclosing body,
+and every MIR value of that body occupies a root slot of its frame, so the
+acquired iterator, its captured `next` method and done state, a prepared
+assignment reference, an object pattern's coercible input, and a rest
+property's excluded keys already survive suspension and stay reachable by the
+collector. What the unit removes is the frontend rejection that kept those
+positions from reaching the machinery, together with the stale claims the
+rejection supported.
+
+Evaluation order and abrupt completion are unchanged by the suspension. A
+target's object and computed key still evaluate before the step or read that
+selects the stored value, and the raw key still converts after that selection.
+A default still evaluates only for `undefined`, so a supplied value never
+reaches a rejected operand. A rejected operand raises its throw completion at
+the `await` position, an unfinished array-pattern iterator closes exactly once
+before that completion leaves the pattern, and a done iterator is not closed
+again.
+
+Module top level keeps a source-located rejection for the same positions,
+because its continuation transform splits statements around whole `await`
+expressions rather than around the steps of a pattern. That residue moves to
+the modules and asynchronous execution stream.
+
+The generated property suite uses seed `0x5eed0028` across four pattern
+positions, three body forms, supplied and missing selections, fulfilled and
+rejected operands, and truthful or false hints, with an independent oracle that
+predicts order and completion from the case record alone, both specialization
+policies, and forced collection. Fixed native fixtures cover member-target and
+source-key order, taken and skipped defaults, nested patterns, rest exclusions,
+assignment cell identity, captured per-iteration lexical and hoisted `var` loop
+cells, loop heads, one close of an unfinished iterator, a done iterator
+that is not closed, rejected keys and targets, `finally` precedence, a catch
+parameter, an asynchronous generator that mixes `await` and `yield` in the same
+positions, and a deliberate guard miss reaching the generic fallback.
+
+An AST scan of all 47,381 candidate paths finds `await` inside a pattern in
+seventeen upstream cases, and every one is module code or a parse negative for
+function parameters, so no reviewed case can promote to pass here. Three of
+those parse negatives enter the reviewed subset as executable boundary
+evidence: they pin that the admission reaches neither an asynchronous arrow's
+nor an asynchronous generator's formal parameters, and that the module Await
+capability does not propagate into a nested function's parameters. The one
+module positive, *top-level-await/syntax/catch-parameter.js*, enters as
+inventory evidence only; its declared `dynamic-import` feature stops it before
+compilation, so it never reaches the module pattern-await diagnostic. The
+compiler tests in *packages/parser-babel/tests/bindings.test.ts* and
+*packages/compiler/tests/modules.test.ts* are what prove that diagnostic and
+its location. The manifest grows to 4,219 cases and stays at 2,482 passes,
+with 1,182 expected negatives and 555 unsupported profile features and no
+semantic or harness failures.
 
 ### Intrinsics and built-in objects
 

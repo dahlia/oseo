@@ -189,7 +189,11 @@ test("separates async generator parameter initialization from its body", () => {
   );
 });
 
-test("admits await in expression positions but not in patterns", () => {
+test("admits await in expression and pattern positions", () => {
+  /* An asynchronous generator body suspends at `await` through the same
+   * traced frame it uses for `yield`, and a pattern's subexpressions
+   * lower into that body, so every pattern position below reaches the
+   * suspension machinery instead of a rejection. */
   const admitted: readonly string[] = [
     "async function* g(p) { const a = (await p) + 1; }",
     "async function* g(p, f) { f(await p, 1); }",
@@ -197,6 +201,11 @@ test("admits await in expression positions but not in patterns", () => {
     "async function* g(p) { const a = { key: await p }; }",
     "async function* g(o, p) { [o.x] = [await p]; }",
     "async function* g(p) { if (await p) console.log(1); }",
+    "async function* g(o, p) { [o[await p]] = [1]; }",
+    "async function* g(p) { const { [await p]: v } = {}; }",
+    "async function* g(p) { const { a = await p } = {}; }",
+    "async function* g(p) { const [a = await p] = []; }",
+    "async function* g(o, p) { ({ [await p]: o[await p] } = {}); }",
   ];
   for (const source of admitted) {
     const result = compileSource(babelFrontend, {
@@ -204,36 +213,11 @@ test("admits await in expression positions but not in patterns", () => {
       sourceId: "async-generator-await-position.js",
     });
     assert.deepEqual(result.diagnostics, [], source);
-  }
-  /* The frontend lowers a pattern's subexpressions before the suspension
-   * machinery reaches them, so these positions stay rejected inside an
-   * asynchronous generator body the way they are elsewhere. */
-  const rejected: readonly (readonly [string, RegExp])[] = [
-    [
-      "async function* g(o, p) { [o[await p]] = [1]; }",
-      /destructuring assignment target/u,
-    ],
-    [
-      "async function* g(p) { const { [await p]: v } = {}; }",
-      /object binding property name/u,
-    ],
-    [
-      "async function* g(p) { const { a = await p } = {}; }",
-      /binding default/u,
-    ],
-    [
-      "async function* g(p) { const [a = await p] = []; }",
-      /array binding default/u,
-    ],
-  ];
-  for (const [source, message] of rejected) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "async-generator-await-position.js",
-    });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+    assert.ok(result.mir != null, source);
+    const generator = result.mir.functions.find(
+      (candidate) => candidate.name === "g",
+    );
+    assert.ok(generator?.asyncGenerator === true, source);
   }
 });
 

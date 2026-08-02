@@ -233,6 +233,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "catchable-type-errors" ||
     fixture.name === "async-continuations" ||
     fixture.name === "async-await-positions" ||
+    fixture.name === "async-pattern-await-positions" ||
+    fixture.name === "async-pattern-await-abrupt" ||
+    fixture.name === "async-generator-pattern-await" ||
     fixture.name === "generic-addition" ||
     fixture.name === "guarded-addition" ||
     fixture.name === "timer-event-loop" ||
@@ -365,6 +368,17 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "delete-strict") {
+            assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "async-pattern-await-positions" ||
+            fixture.name === "async-pattern-await-abrupt" ||
+            fixture.name === "async-generator-pattern-await"
+          ) {
+            // A pattern subexpression that suspends leaves its prepared
+            // reference, iterator, and excluded keys in the resumed
+            // frame's root slots, so every forced collection between the
+            // suspension and the resumption must keep them alive.
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "script-global-bindings") {

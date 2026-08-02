@@ -89,6 +89,13 @@ storage lower after value selection. A nullish member base fails before key
 conversion and resumes through active nested and outer iterator cleanup. The
 expression retains the original right-hand value, nested array cleanup stays
 inside out, and imported and immutable leaves keep their ordinary errors.
+Inside an ordinary asynchronous or asynchronous generator body, a member
+object, a computed property name, and a default may each suspend at `await`,
+because the pattern lowers into the body's traced frame and every value it has
+already prepared lives in that frame's root slots. Module top level keeps a
+source-located rejection for the same positions, because its continuation
+extractor splits statements around whole `await` expressions rather than around
+the steps of a pattern.
 Compound assignment retains one identifier read or one member object,
 property-key expression, converted key, and property read before evaluating its
 right operand. The retained raw key value is converted again on the write path

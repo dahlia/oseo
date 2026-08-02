@@ -1254,6 +1254,13 @@ export function compileModuleGraph(
         evaluationBody.push(statement);
       }
     }
+    /* A module top level suspends through the continuation transform
+     * below, which splits statements around whole `await` expressions
+     * rather than around the steps of a pattern. An ordinary
+     * asynchronous or asynchronous generator body suspends through its
+     * traced frame instead and admits these positions, so this
+     * rejection is located at the module statement that carries the
+     * pattern rather than shared with those bodies. */
     const patternAwait = evaluationBody.find(hirStatementHasPatternAwait);
     if (patternAwait != null) {
       return {
@@ -1261,7 +1268,8 @@ export function compileModuleGraph(
           sourceDiagnostic(
             moduleId,
             patternAwait,
-            "Pattern-position top-level await is outside M5a Unit 7.7.",
+            "Await inside a module top-level binding or assignment " +
+              "pattern is unsupported.",
           ),
         ],
         graph: linked.graph,

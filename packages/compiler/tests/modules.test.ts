@@ -949,7 +949,7 @@ test("rejects await in object-rest assignment member targets", () => {
   assert.equal(result.mir, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+    /await inside a module top-level binding or assignment pattern/iu,
   );
 });
 
@@ -1019,7 +1019,7 @@ test("rejects pattern await nested in expression containers", () => {
     assert.equal(result.mir, undefined);
     assert.match(
       result.diagnostics[0]?.message ?? "",
-      /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+      /await inside a module top-level binding or assignment pattern/iu,
     );
   }
 });
@@ -1079,7 +1079,7 @@ test("rejects await in a top-level catch binding pattern", () => {
   assert.equal(result.mir, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+    /await inside a module top-level binding or assignment pattern/iu,
   );
 });
 
@@ -1131,6 +1131,6 @@ test("rejects await in top-level binding-pattern keys", () => {
   assert.equal(result.mir, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /pattern-position top-level await.*outside M5a Unit 7\.7/iu,
+    /await inside a module top-level binding or assignment pattern/iu,
   );
 });

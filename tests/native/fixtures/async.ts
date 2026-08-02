@@ -369,4 +369,216 @@ setTimeout(task, 100, "late");
 console.log("scheduled");
 `,
   },
+  {
+    name: "async-pattern-await-positions",
+    source: `
+function trace(label, value) {
+  console.log(label);
+  return value;
+}
+function hintedAdd(left: number, right: number) {
+  return left + right;
+}
+async function settle(label, value) {
+  console.log("await", label);
+  return value;
+}
+async function positions(input) {
+  const box = { first: {}, second: {} };
+  // A member target evaluates its object and computed key before the
+  // iterator step that selects the value it stores.
+  [
+    trace("target base", box).first[await settle("target key", "a")],
+    box.second[await settle("second key", "b")],
+  ] = [trace("value one", 1), trace("value two", 2)];
+  console.log("targets", box.first.a, box.second.b);
+
+  // A computed source key suspends before the property read it names.
+  const source = { one: 11, two: 22, three: 33 };
+  const { [await settle("source key", "one")]: named } = source;
+  console.log("named", named);
+
+  // Object and array binding defaults suspend only when the selected
+  // value is undefined.
+  const { present = await settle("unused default", -1), missing = await settle(
+    "object default",
+    input,
+  ) } = { present: 7 };
+  const [kept = await settle("unused element", -1), absent = await settle(
+    "array default",
+    input + 1,
+  )] = [8];
+  console.log("defaults", present, missing, kept, absent);
+
+  // Nested patterns keep their own suspension points.
+  const {
+    outer: { inner = await settle("nested object", 5) } = {},
+    list: [head = await settle("nested array", 6)] = [],
+  } = { list: [] };
+  console.log("nested", inner, head);
+
+  // Rest retains every excluded key computed across a suspension.
+  const {
+    [await settle("excluded one", "one")]: taken,
+    [await settle("excluded two", "two")]: alsoTaken,
+    ...others
+  } = source;
+  console.log("rest", taken, alsoTaken, others.one, others.two, others.three);
+
+  // The binding cell a closure captured before the suspension is the
+  // cell the pattern writes after it.
+  let cell = 0;
+  const read = function () { return cell; };
+  ({ cell = await settle("cell", 9) } = {});
+  console.log("cell", cell, read());
+
+  // A for-of assignment head reuses the same target preparation.
+  for ([box.first[await settle("head key", "h")]] of [[1], [2]]) {
+    console.log("head", box.first.h);
+  }
+  const readers = [];
+  for (const { loop = await settle("head default", 3) } of [{}, { loop: 4 }]) {
+    console.log("head default", loop);
+    readers.push(function () { return loop; });
+  }
+  console.log("head cells", readers[0](), readers[1]());
+  const varReaders = [];
+  const records = [{}, { hoisted: 6 }];
+  for (var { hoisted = await settle("var default", 5) } of records) {
+    varReaders.push(function () { return hoisted; });
+  }
+  console.log("var cells", varReaders[0](), varReaders[1](), hoisted);
+
+  // A deliberate guard miss reaches the compiled generic fallback with a
+  // value the number hint does not describe.
+  const [guarded = await settle("guard operand", {
+    valueOf: function () {
+      console.log("guard miss fallback");
+      return input;
+    },
+  })] = [];
+  return hintedAdd(guarded, 1);
+}
+positions(2).then(function (value) {
+  console.log("positions result", value);
+});
+`,
+    specialization: {
+      genericCallsDisabled: 2,
+      genericCallsEnabled: 2,
+      hits: 3,
+      misses: 13,
+      overflowMisses: 0,
+    },
+  },
+  {
+    name: "async-pattern-await-abrupt",
+    source: `
+function makeIterable(label, values) {
+  let index = 0;
+  let closes = 0;
+  return {
+    closeCount: function () { return closes; },
+    iterable: {
+      [Symbol.iterator]: function () {
+        return {
+          next: function () {
+            const done = index >= values.length;
+            const value = values[index];
+            index += 1;
+            console.log(label, "step", done, value);
+            return { done: done, value: value };
+          },
+          return: function () {
+            closes += 1;
+            console.log(label, "close");
+            return { done: true, value: undefined };
+          },
+        };
+      },
+    },
+  };
+}
+async function unfinished() {
+  // The iterator is not done, so a rejected default closes it once
+  // before the throw completion leaves the pattern.
+  const source = makeIterable("unfinished", [undefined, 2]);
+  try {
+    const [first = await Promise.reject("rejected default")] = source.iterable;
+    console.log("unreachable", first);
+  } catch (error) {
+    console.log("unfinished caught", error, source.closeCount());
+  }
+}
+async function exhausted() {
+  // The iterator already reported done, so the same rejection leaves it
+  // closed by the protocol rather than by IteratorClose.
+  const source = makeIterable("exhausted", []);
+  try {
+    const [first = await Promise.reject("rejected default")] = source.iterable;
+    console.log("unreachable", first);
+  } catch (error) {
+    console.log("exhausted caught", error, source.closeCount());
+  }
+}
+async function keyRejection() {
+  const target = {};
+  try {
+    ({ [await Promise.reject("rejected key")]: target.slot } = { a: 1 });
+    console.log("unreachable");
+  } catch (error) {
+    console.log("key caught", error, target.slot);
+  }
+}
+async function targetRejection() {
+  const source = makeIterable("target", [1, 2]);
+  try {
+    const holder = {};
+    [holder.first, holder[await Promise.reject("rejected target")]] =
+      source.iterable;
+    console.log("unreachable", holder.first);
+  } catch (error) {
+    console.log("target caught", error, source.closeCount());
+  }
+}
+async function finallyPrecedence() {
+  try {
+    try {
+      const { value = await Promise.reject("inner") } = {};
+      console.log("unreachable", value);
+    } finally {
+      console.log("finally before");
+      await Promise.resolve(0);
+      console.log("finally after");
+    }
+  } catch (error) {
+    console.log("precedence", error);
+  }
+}
+async function catchParameter() {
+  try {
+    throw { reason: "thrown" };
+  } catch ({ reason, fallback = await Promise.resolve("filled") }) {
+    console.log("catch", reason, fallback);
+  }
+}
+async function main() {
+  await unfinished();
+  await exhausted();
+  await keyRejection();
+  await targetRejection();
+  await finallyPrecedence();
+  await catchParameter();
+  console.log("finished");
+}
+main();
+`,
+    specialization: {
+      genericCallsDisabled: 5,
+      genericCallsEnabled: 5,
+      hits: 2,
+      misses: 8,
+      overflowMisses: 0,
+    },
+  },
 ];
