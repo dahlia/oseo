@@ -44,6 +44,7 @@ void oseo_context_init(
     context->iterator_self_function = oseo_undefined();
     context->generator_next_function = oseo_undefined();
     context->generator_return_function = oseo_undefined();
+    context->generator_throw_function = oseo_undefined();
     context->generator_prototype = oseo_undefined();
     context->async_generator_next_function = oseo_undefined();
     context->async_generator_return_function = oseo_undefined();
@@ -135,6 +136,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->iterator_self_function = oseo_undefined();
     context->generator_next_function = oseo_undefined();
     context->generator_return_function = oseo_undefined();
+    context->generator_throw_function = oseo_undefined();
     context->generator_prototype = oseo_undefined();
     context->async_generator_next_function = oseo_undefined();
     context->async_generator_return_function = oseo_undefined();

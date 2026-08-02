@@ -207,8 +207,8 @@ typedef struct {
 /*
  * The [[GeneratorState]] values this profile can observe. A suspended
  * generator leaves through a next, a return, or a throw resumption, or
- * stays suspended; a synchronous generator receives no throw resumption,
- * because `%GeneratorPrototype%.throw` is not admitted yet.
+ * stays suspended; `%GeneratorPrototype%.throw` delivers the throw
+ * resumption to a synchronous generator.
  *
  * An asynchronous generator adds `OSEO_GENERATOR_AWAITING`, which is
  * [[AsyncGeneratorState]] `executing` with the body parked on a settled

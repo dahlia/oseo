@@ -537,9 +537,10 @@ merged units from `fa119c7` to `8f2fff6`.
 | 4     | Asynchronous iteration | 2,231           | Units landed |
 
 Units landed is not the same as fully admitted. The profile still records open
-behavior in every one of these families, including generator and asynchronous
-generator method definitions,
-`%GeneratorPrototype%.throw`, and the suspension model a `for await` step uses.
+behavior in these families, including the `PromiseResolve` constructor read
+the poisoned-wrapper cases need, the unmaterialized `%GeneratorFunction%`
+chain, and the *nativeFunctionMatcher.js* include the `async-iteration`-tagged
+`Function.prototype.toString` cases need.
 Each count is the size of the family in the inventory, not a total of admitted
 paths.
 
@@ -922,7 +923,12 @@ landed with the M5 intrinsics units. The remaining queue is:
     assignment target's computed member, a computed binding property name, and
     an array or object binding default in every body that owns a traced
     suspension frame; module top level keeps that rejection under the modules
-    and asynchronous execution stream.
+    and asynchronous execution stream. Unit 8.4 closes the async-from-sync
+    delegated-throw gap: the virtualized `%GeneratorPrototype%.throw` gains
+    its own method-cache identity, the synchronous `yield*` exit reports the
+    ending step's own value, and the reviewed
+    *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case enters as
+    a pass.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

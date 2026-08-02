@@ -175,6 +175,7 @@ struct OseoContext {
     OseoValue iterator_self_function;
     OseoValue generator_next_function;
     OseoValue generator_return_function;
+    OseoValue generator_throw_function;
     OseoValue generator_prototype;
     OseoValue async_generator_next_function;
     OseoValue async_generator_return_function;
@@ -451,9 +452,9 @@ size_t oseo_generator_resume_point(OseoValue generator);
  * continues at the suspension's resume block; a return resumption leaves
  * the body from the suspension point, so generated code branches to the
  * block that runs the enclosing `finally` and iterator-close chain; a
- * throw resumption raises `sent` at the suspension point. Only an
- * asynchronous generator body receives a throw resumption, either from
- * `%AsyncGeneratorPrototype%.throw` or from an awaited rejection.
+ * throw resumption raises `sent` at the suspension point. The prototype
+ * throw methods deliver a throw resumption to either body kind, and an
+ * awaited rejection delivers one to an asynchronous body.
  */
 #define OSEO_GENERATOR_RESUME_NEXT ((size_t)0u)
 #define OSEO_GENERATOR_RESUME_RETURN ((size_t)1u)

@@ -60,6 +60,7 @@ OseoResult oseo_internal_iterator_method(
     OseoValue *cache;
     const uint16_t next_units[] = {'n', 'e', 'x', 't'};
     const uint16_t return_units[] = {'r', 'e', 't', 'u', 'r', 'n'};
+    const uint16_t throw_units[] = {'t', 'h', 'r', 'o', 'w'};
     const uint16_t values_units[] = {'v', 'a', 'l', 'u', 'e', 's'};
     static const uint16_t symbol_iterator_units[] = {
         '[', 'S', 'y', 'm', 'b', 'o', 'l', '.',
@@ -67,8 +68,9 @@ OseoResult oseo_internal_iterator_method(
     };
     const uint16_t *name;
     size_t name_length;
-    /* %GeneratorPrototype%.next and .return each take one declared
-     * parameter; every other virtualized iterator method declares none. */
+    /* %GeneratorPrototype%.next, .return, and .throw each take one
+     * declared parameter; every other virtualized iterator method
+     * declares none. */
     size_t parameter_count = 0u;
     if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
         cache = &context->iterator_next_function;
@@ -83,6 +85,11 @@ OseoResult oseo_internal_iterator_method(
         cache = &context->generator_return_function;
         name = return_units;
         name_length = 6u;
+        parameter_count = 1u;
+    } else if (code_id == OSEO_GENERATOR_THROW_CODE_ID) {
+        cache = &context->generator_throw_function;
+        name = throw_units;
+        name_length = 5u;
         parameter_count = 1u;
     } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
         cache = &context->iterator_values_function;

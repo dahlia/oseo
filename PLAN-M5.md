@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,215
-reviewed cases: 2,482 passes, 1,179 expected negatives, and 554 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,220
+reviewed cases: 2,483 passes, 1,182 expected negatives, and 555 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -1080,10 +1080,10 @@ the resolved value's
 the generator, which three *AsyncFromSyncIteratorPrototype/* poisoned-wrapper
 cases and the three *AsyncGeneratorPrototype/return/* broken-promise cases
 observe. The remaining
-*AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case awaits separate
-review outside Unit 7.6; its former missing `%GeneratorPrototype%.throw`
-attribution is stale. The functions and executable syntax stream owns targeted
-differential evidence for its forwarded throw and subsequent completed state.
+*AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case stayed outside
+Unit 7.6; its former missing `%GeneratorPrototype%.throw` attribution was
+stale, and M5a Unit 8.4 later traced the forwarded throw, repaired the two
+defects the trace exposed, and promoted the case as a pass.
 Eight
 *test/built-ins/Function/prototype/toString/* cases the `async-iteration` tag
 reaches need an *nativeFunctionMatcher.js* include that has no reviewed
@@ -1868,6 +1868,40 @@ compiler tests in *packages/parser-babel/tests/bindings.test.ts* and
 its location. The manifest grows to 4,219 cases and stays at 2,482 passes,
 with 1,182 expected negatives and 555 unsupported profile features and no
 semantic or harness failures.
+
+M5a Unit 8.4 closes the reviewed
+*AsyncFromSyncIteratorPrototype/throw/iterator-result.js* gap with targeted
+differential evidence for a throw forwarded through the async-from-sync
+wrapper to a synchronous generator. Tracing that forwarding found two real
+defects rather than an evidence gap. The runtime's virtualized
+`%GeneratorPrototype%.throw` had no context cache slot of its own, so its
+lookup fell through to the `[Symbol.iterator]` self function's slot and
+whichever method a program resolved first answered both keys afterward. Any
+program that acquired a generator's iterator before delivering a throw
+therefore called the self function instead of resuming the generator, which
+is exactly the shape of the reviewed case, where the delegation's
+GetIterator fallback reads `[Symbol.iterator]` before the wrapper forwards
+the throw. The `m5-39` runtime ABI gives the throw method its own
+permanently rooted cache field. The synchronous `yield*` lowering also
+reported the wrong delegation result when a forwarded throw ended the
+delegation: the shared exit read the `next` step's result slot, so a `throw`
+result carrying `done` reported the last stepped object instead of its own
+`IteratorValue`. The exit now joins through a block parameter each ending
+step supplies, matching the asynchronous delegation's join.
+
+Two fixed fixtures cover the repaired paths against Node.js, Deno, and
+native execution under both specialization policies and forced collection: a
+synchronous fixture that resolves the throw method before the program's
+first `[Symbol.iterator]` read, forwards uncaught and caught throws through
+`yield*`, and completes a delegation through a done `throw` result, and an
+asynchronous fixture that forwards a throw through the wrapper to a
+synchronous generator, observes the rejection reason's identity, and then
+observes the completed state of both iterators. The defect domain is a fixed
+method-identity and join-value fault, so no new property suite is added; the
+existing generator throw-resumption and delegation suites keep their seeds
+and domains. The reviewed case enters as a pass, and the manifest grows to
+4,220 cases: 2,483 passes, 1,182 expected negatives, and 555 unsupported
+profile features with no semantic or harness failures.
 
 ### Intrinsics and built-in objects
 

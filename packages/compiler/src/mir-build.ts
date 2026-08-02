@@ -1879,9 +1879,12 @@ function lowerAsyncYieldDelegation(
  * A result that is not done suspends the same way, so a `return` the
  * inner iterator refuses does not end the outer generator.
  *
- * A throw resumption cannot reach a body in this profile, because
- * `%GeneratorPrototype%.throw` is not admitted, so no branch reads the
- * inner iterator's `throw` method.
+ * A throw resumption steps the inner iterator's `throw` instead. A done
+ * result ends the delegation and completes the delegating expression
+ * normally with that result's value; a result that is not done suspends
+ * the same way a `next` step does. The step operation itself closes an
+ * inner iterator that has no `throw` method and raises the `TypeError`
+ * the specification requires.
  *
  * No branch closes the inner iterator on an abrupt completion: every step
  * of the specified delegation loop propagates its own abrupt completion
@@ -1925,6 +1928,7 @@ function lowerYieldDelegation(
 
   const stepBlock = createMirBlock(builder);
   const stepYieldBlock = createMirBlock(builder);
+  const stepExitBlock = createMirBlock(builder);
   const suspendBlock = createMirBlock(builder);
   const resumeBlock = createMirBlock(builder);
   const returnResumeBlock = createMirBlock(builder);
@@ -1934,9 +1938,12 @@ function lowerYieldDelegation(
   const throwResumeBlock = createMirBlock(builder);
   const throwStepBlock = createMirBlock(builder);
   const throwYieldBlock = createMirBlock(builder);
+  const throwExitBlock = createMirBlock(builder);
   const exitBlock = createMirBlock(builder);
   // A `branch` carries no argument list, so each side of a step reaches
-  // the shared suspension through a jump that passes the yielded value.
+  // the shared suspension through a jump that passes the yielded value,
+  // and each step that can end the delegation reaches the shared exit
+  // through a jump that passes its own step's exhaustion value.
   const received = builder.nextValue;
   builder.nextValue += 1;
   stepBlock.parameters = [received];
@@ -1949,6 +1956,9 @@ function lowerYieldDelegation(
   const yielded = builder.nextValue;
   builder.nextValue += 1;
   suspendBlock.parameters = [yielded];
+  const delegated = builder.nextValue;
+  builder.nextValue += 1;
+  exitBlock.parameters = [delegated];
 
   const start = lowerSyntheticUndefined(range, builder);
   builder.current.terminator = {
@@ -1991,7 +2001,7 @@ function lowerYieldDelegation(
   builder.current.terminator = {
     kind: "branch",
     test: continues,
-    whenFalse: exitBlock.id,
+    whenFalse: stepExitBlock.id,
     whenTrue: stepYieldBlock.id,
   };
 
@@ -1999,6 +2009,13 @@ function lowerYieldDelegation(
   builder.current.terminator = {
     kind: "jump",
     target: suspendBlock.id,
+    values: [stepResult],
+  };
+
+  builder.current = stepExitBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: exitBlock.id,
     values: [stepResult],
   };
 
@@ -2068,7 +2085,7 @@ function lowerYieldDelegation(
   builder.current.terminator = {
     kind: "branch",
     test: throwContinues,
-    whenFalse: exitBlock.id,
+    whenFalse: throwExitBlock.id,
     whenTrue: throwYieldBlock.id,
   };
 
@@ -2076,6 +2093,13 @@ function lowerYieldDelegation(
   builder.current.terminator = {
     kind: "jump",
     target: suspendBlock.id,
+    values: [throwStepResult],
+  };
+
+  builder.current = throwExitBlock;
+  builder.current.terminator = {
+    kind: "jump",
+    target: exitBlock.id,
     values: [throwStepResult],
   };
 
@@ -2130,7 +2154,7 @@ function lowerYieldDelegation(
 
   builder.current = exitBlock;
   appendMirMetadata(builder, "join", `yield* bb${stepBlock.id}`, [], range);
-  return recordRoot(builder, stepResult, range);
+  return recordRoot(builder, delegated, range);
 }
 
 /**
