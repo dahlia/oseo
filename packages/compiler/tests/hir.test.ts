@@ -472,6 +472,133 @@ test("rejects duplicate names in owned catch binding patterns", () => {
   }
 });
 
+test("resolves an owned catch clause without a parameter", () => {
+  const logValue = {
+    arguments: [{ kind: "identifier", name: "value", range }],
+    kind: "call",
+    range,
+    target: { kind: "console-log", range },
+  } as const;
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        hint: undefined,
+        initializer: { kind: "number", range, value: 1 },
+        kind: "let",
+        name: "value",
+        range,
+      },
+      {
+        block: {
+          body: [
+            {
+              expression: { kind: "number", range, value: 2 },
+              kind: "throw",
+              range,
+            },
+          ],
+          kind: "block",
+          range,
+        },
+        finalizer: undefined,
+        handler: {
+          body: {
+            body: [
+              {
+                hint: undefined,
+                initializer: { kind: "number", range, value: 3 },
+                kind: "let",
+                name: "value",
+                range,
+              },
+              { expression: logValue, kind: "expression", range },
+            ],
+            kind: "block",
+            range,
+          },
+          pattern: undefined,
+          range,
+        },
+        kind: "try",
+        range,
+      },
+      { expression: logValue, kind: "expression", range },
+    ],
+    kind: "program",
+    range,
+    sourceId: "optional-catch-binding.ts",
+  };
+  const hirResult = buildHir(syntax);
+  assert.deepEqual(hirResult.diagnostics, []);
+  assert.ok(hirResult.program != null);
+  const hir = printHir(hirResult.program);
+  assert.match(hir, /^\s*catch$/mu);
+  // The catch block keeps its own lexical scope: the shadowing `let`
+  // declares a distinct binding, and the read after the statement
+  // resolves to the outer one.
+  const declared = [...hir.matchAll(/let %b(\d+) value/gu)].map(
+    (entry) => entry[1],
+  );
+  assert.equal(declared.length, 2);
+  assert.notEqual(declared[0], declared[1]);
+  const reads = [...hir.matchAll(/%b(\d+)\(value\)/gu)].map(
+    (entry) => entry[1],
+  );
+  assert.deepEqual(reads, [declared[1], declared[0]]);
+
+  const mir = printMir(buildMir(hirResult.program));
+  assert.match(mir, /caught discarded catch value/u);
+  assert.doesNotMatch(mir, /caught catch parameter/u);
+});
+
+test("treats a nullish owned catch pattern as the absent parameter", () => {
+  const result = buildHir({
+    body: [
+      {
+        block: { body: [], kind: "block", range },
+        finalizer: undefined,
+        handler: {
+          body: { body: [], kind: "block", range },
+          pattern: null,
+          range,
+        },
+        kind: "try",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "null-catch-pattern.ts",
+  } as unknown as SyntaxProgram);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.program != null);
+  assert.match(printHir(result.program), /^\s*catch$/mu);
+});
+
+test("rejects an owned catch handler without a body", () => {
+  const result = buildHir({
+    body: [
+      {
+        block: { body: [], kind: "block", range },
+        finalizer: undefined,
+        handler: { pattern: undefined, range },
+        kind: "try",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "catch-without-body.ts",
+  } as unknown as SyntaxProgram);
+  assert.equal(result.program, undefined);
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /A catch clause requires a block body/u,
+  );
+});
+
 test("rejects assignment members in owned binding patterns", () => {
   const member = {
     key: { kind: "string", range, value: "value" },

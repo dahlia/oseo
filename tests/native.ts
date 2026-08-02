@@ -296,6 +296,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "async-generator-missing-throw-close-suspension" ||
     fixture.name === "async-from-sync-rejection-close" ||
     fixture.name === "catch-bindings" ||
+    fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
     fixture.name === "script-this" ||

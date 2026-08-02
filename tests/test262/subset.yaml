@@ -27,6 +27,7 @@ supportedFeatures:
   - numeric-separator-literal
   - object-rest
   - object-spread
+  - optional-catch-binding
   - optional-chaining
   - rest-parameters
   - Symbol
@@ -9078,6 +9079,9 @@ tests:
   - path: test/language/statements/async-generator/yield-star-throw-notdone-iter-value-throws.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/language/statements/block/12.1-2.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion]
   - path: test/language/statements/break/static-init-without-label.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow]
@@ -17731,6 +17735,9 @@ tests:
   - path: test/language/statements/try/12.14-12.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/try/S12.14_A16_T6.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/S12.14_A18_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
@@ -17801,6 +17808,22 @@ tests:
   - path: test/language/statements/try/dstr/obj-ptrn-rest-val-obj.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, lexical-bindings, object-properties]
+  - path: test/language/statements/try/optional-catch-binding-finally.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion]
+  - path: test/language/statements/try/optional-catch-binding-lexical.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/statements/try/optional-catch-binding-parens.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion]
+  - path: test/language/statements/try/optional-catch-binding-throws.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions]
+  - path: test/language/statements/try/optional-catch-binding.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion]
   - path: test/language/statements/try/static-init-await-binding-invalid.js
     expectedClassification: expected-negative
     dependencies: [abrupt-completion, classes]

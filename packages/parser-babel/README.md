@@ -70,7 +70,9 @@ elisions, defaults, nesting, and a final identifier or nested
 array rest target. Object patterns admit static and computed properties,
 shorthand and renamed targets, defaults, nested object or array patterns, and a
 final identifier rest target. Catch parameters and synchronous `for-of`
-declarations reuse the same recursive patterns. Standalone destructuring
+declarations reuse the same recursive patterns, and a catch clause may omit
+its parameter entirely; the owned handler then records the absent pattern
+explicitly and its range covers the clause. Standalone destructuring
 assignment reuses them when every leaf and rest target is an existing
 identifier or a static or computed member reference. Synchronous `for-of`
 assignment heads reuse that assignment target conversion. A computed member

@@ -955,7 +955,11 @@ landed with the M5 intrinsics units. The remaining queue is:
     a pass. Unit 8.5a admits the multi-declarator `const` and `let`
     declaration list: the compiler expands its declarators into the enclosing
     statement list rather than a block, so the whole list keeps one temporal
-    dead zone, one set of cells, and its existing early errors.
+    dead zone, one set of cells, and its existing early errors. Unit 8.5b
+    admits the optional catch binding: a `catch` clause without a parameter
+    discards the thrown value, creates no catch-parameter environment, and
+    keeps the block's own lexical scope and the parameterized clause's
+    completion precedence.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

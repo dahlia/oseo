@@ -1711,11 +1711,13 @@ export function declaredHirBindingIds(
     } else if (statement.kind === "try") {
       result.push(...declaredHirBindingIds([statement.block]));
       if (statement.handler != null) {
-        result.push(
-          ...hirBindingIdentifiers(statement.handler.pattern).map(
-            (item) => item.bindingId,
-          ),
-        );
+        if (statement.handler.pattern != null) {
+          result.push(
+            ...hirBindingIdentifiers(statement.handler.pattern).map(
+              (item) => item.bindingId,
+            ),
+          );
+        }
         result.push(...declaredHirBindingIds([statement.handler.body]));
       }
       if (statement.finalizer != null) {
@@ -2322,41 +2324,67 @@ function resolveStatement(
     let handler:
       | {
           readonly body: HirStatement;
-          readonly pattern: HirBindingPattern;
+          readonly pattern: HirBindingPattern | undefined;
           readonly range: SourceRange;
         }
       | undefined;
     if (statement.handler != null) {
-      const catchScope = new Map<string, Binding>();
-      for (const name of syntaxBindingNames(statement.handler.pattern)) {
-        if (catchScope.has(name)) {
-          state.diagnostics.push(
-            sourceDiagnostic(
-              state.sourceId,
-              statement.handler.pattern,
-              `Duplicate catch binding '${name}'.`,
-            ),
-          );
-          return undefined;
-        }
-        catchScope.set(name, {
-          id: state.nextBindingId,
-          mutable: true,
-          name,
-        });
-        state.nextBindingId += 1;
+      // A nullish handler body is not constructible from the grammar,
+      // but a frontend that builds owned syntax directly can omit it;
+      // recover with one located diagnostic instead of resolving a
+      // clause that has no block to run.
+      if ((statement.handler.body as SyntaxStatement | undefined) == null) {
+        state.diagnostics.push(
+          sourceDiagnostic(
+            state.sourceId,
+            statement,
+            "A catch clause requires a block body.",
+          ),
+        );
+        return undefined;
       }
-      const pattern = resolveBindingPattern(
-        statement.handler.pattern,
-        [...scopes, catchScope],
-        state,
-        "declare",
-        false,
-      );
-      if (pattern == null) return undefined;
+      const syntaxPattern = statement.handler.pattern;
+      // Optional catch binding discards the thrown value, so no
+      // catch-parameter scope exists and the body block owns its own
+      // lexical scope.
+      const catchScope =
+        syntaxPattern == null ? undefined : new Map<string, Binding>();
+      if (syntaxPattern != null && catchScope != null) {
+        for (const name of syntaxBindingNames(syntaxPattern)) {
+          if (catchScope.has(name)) {
+            state.diagnostics.push(
+              sourceDiagnostic(
+                state.sourceId,
+                syntaxPattern,
+                `Duplicate catch binding '${name}'.`,
+              ),
+            );
+            return undefined;
+          }
+          catchScope.set(name, {
+            id: state.nextBindingId,
+            mutable: true,
+            name,
+          });
+          state.nextBindingId += 1;
+        }
+      }
+      const handlerScopes =
+        catchScope == null ? scopes : [...scopes, catchScope];
+      const pattern =
+        syntaxPattern == null
+          ? undefined
+          : resolveBindingPattern(
+              syntaxPattern,
+              handlerScopes,
+              state,
+              "declare",
+              false,
+            );
+      if (syntaxPattern != null && pattern == null) return undefined;
       const body = resolveStatement(
         statement.handler.body,
-        [...scopes, catchScope],
+        handlerScopes,
         state,
         functionBody,
         loopDepth,

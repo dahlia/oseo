@@ -1230,6 +1230,148 @@ try {
 `,
   },
   {
+    name: "optional-catch-binding",
+    source: `
+let entered = 0;
+try {
+  throw new RangeError("discarded");
+} catch {
+  entered = entered + 1;
+}
+console.log("entered", entered);
+
+try {
+  throw null;
+} catch {
+  console.log("null entered");
+}
+
+try {
+  console.log("normal");
+} catch {
+  console.log("skipped");
+} finally {
+  console.log("normal finally");
+}
+
+let shadow = "outer";
+try {
+  shadow = "written";
+  throw new Error("shadow");
+} catch {
+  let shadow = "catch";
+  console.log("shadow", shadow);
+}
+console.log("after", shadow);
+
+const closures = [];
+for (let index = 0; index < 2; index = index + 1) {
+  try {
+    throw index;
+  } catch {
+    let cell = index * 10;
+    closures[index] = function () {
+      cell = cell + 1;
+      return cell;
+    };
+  }
+}
+console.log("cells", closures[0](), closures[1](), closures[0]());
+
+try {
+  throw 1;
+} catch {
+  var hoisted = "from catch";
+}
+console.log("var", hoisted);
+
+function returned() {
+  try {
+    throw new Error("inner");
+  } catch {
+    return "catch";
+  } finally {
+    console.log("returned finally");
+  }
+}
+console.log("return", returned());
+
+function overridden() {
+  try {
+    throw new Error("inner");
+  } catch {
+    return "catch";
+  } finally {
+    return "finally";
+  }
+}
+console.log("override", overridden());
+
+let outerReached = false;
+try {
+  try {
+    throw new TypeError("first");
+  } catch {
+    throw new RangeError("second");
+  } finally {
+    console.log("inner finally");
+  }
+} catch (error) {
+  outerReached = true;
+  console.log("outer", error instanceof RangeError, error.message);
+}
+console.log("reached", outerReached);
+
+const visits = [];
+let visitCount = 0;
+loop: for (let index = 0; index < 3; index = index + 1) {
+  try {
+    if (index === 0) throw new Error("continue");
+    if (index === 1) throw new Error("break");
+    visits[visitCount] = "body " + index;
+    visitCount = visitCount + 1;
+  } catch {
+    if (index === 0) continue loop;
+    break loop;
+  } finally {
+    visits[visitCount] = "finally " + index;
+    visitCount = visitCount + 1;
+  }
+  visits[visitCount] = "after " + index;
+  visitCount = visitCount + 1;
+}
+console.log("loop", visits[0], visits[1], visitCount);
+
+function* caughtYields() {
+  try {
+    throw new Error("generator");
+  } catch {
+    yield "first";
+    yield "second";
+  } finally {
+    yield "final";
+  }
+}
+const iterator = caughtYields();
+console.log("gen", iterator.next().value, iterator.next().value);
+console.log("gen", iterator.next().value, iterator.next().done);
+
+async function recovered() {
+  try {
+    throw new RangeError("async");
+  } catch {
+    const value = await "recovered";
+    return value;
+  } finally {
+    console.log("async finally");
+  }
+}
+recovered().then(function (value) {
+  console.log("async", value);
+});
+`,
+  },
+  {
     name: "in-and-instanceof",
     source: `
 const box = { present: undefined, value: 1 };

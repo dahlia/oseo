@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,332 reviewed cases: 2,563 passes, 1,211
-expected negatives, and 558 unsupported profile features. It records no
+The current manifest contains 4,339 reviewed cases: 2,566 passes, 1,214
+expected negatives, and 559 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -731,8 +731,40 @@ its deliberate boundary and its evidence:
     function-name inference, nested rest, object nullish failure, trailing
     properties, and object rest descriptors. Assignment member targets and
     pattern type annotations remain outside this syntax unit; M5a Unit 8.3
-    later admits `await` inside a property name or default, as recorded
-    below.
+    later admits `await` inside a property name or default, and M5a Unit
+    8.5b later admits the clause without any parameter, as recorded below.
+ -  Optional catch binding. M5a Unit 8.5b admits a `catch` clause without a
+    CatchParameter. The clause discards the thrown value, creates no
+    catch-parameter environment, and runs its block with the block's own
+    lexical scope, so a shadowing `let` declares a fresh cell per entry and a
+    `var` declaration hoists to the enclosing function or script exactly as a
+    parameterized clause allows. Strictness, closure identity, abrupt
+    completion, `return`, `throw`, `break`, and `continue` through `finally`,
+    and nested `try` statements keep the completion precedence the
+    parameterized form already proved, because MIR still consumes the pending
+    completion to clear the error context and simply leaves the thrown value
+    unused. The owned syntax represents the absent parameter explicitly, a
+    nullish handler pattern from a custom frontend normalizes to that absent
+    form, and a handler without a body is a source-located diagnostic.
+    Parameterized catch clauses are unchanged. A fixed native fixture covers
+    body entry for every thrown value including `null`, a skipped handler on
+    normal completion, shadowing, fresh cells across repeated entries, `var`
+    hoisting, `return` and override precedence through `finally`, labeled
+    `break` and `continue`, a rethrow reaching an outer handler, generator
+    yields inside the clause, and an awaited recovery, under both
+    specialization policies with forced collection. The pre-existing
+    `0x5eed000a` generated domain of array and object catch bindings is
+    unchanged; a distinct `0x5eed002a` generated domain covers absent and
+    destructured catch handlers with rethrown completions, optional
+    finalizers, and present, missing, and nullish thrown inputs. Seven
+    reviewed cases enter:
+    *optional-catch-binding.js*, *optional-catch-binding-finally.js*, and
+    *optional-catch-binding-throws.js* pass in both strictness modes;
+    *optional-catch-binding-parens.js*, *S12.14\_A16\_T6.js*, and
+    *block/12.1-2.js* are expected parse negatives that keep `catch ()` and a
+    catch-less `try {};` rejected; and *optional-catch-binding-lexical.js*
+    stays `unsupported-profile-feature` because its final assertion reads an
+    unresolved global name, which the global binding model gap below owns.
  -  Destructuring assignment with identifier and member targets. An assignment
     expression admits recursive array and object patterns whose leaves and rest
     targets name existing bindings or evaluate static or computed member
@@ -2306,6 +2338,14 @@ seventy-eight promotions from *language/statementList/*,
 the *for-await-of* destructuring family whose generated preludes declare
 several names in one `let`.
 
+M5a Unit 8.5b admits the optional catch binding recorded above. The reviewed
+subset grows by the seven cases a textual scan of the included inventory
+finds using or naming the form: three passes, three expected parse negatives,
+and one unresolved-global read that stays `unsupported-profile-feature` under
+the global binding model gap. The manifest reaches 4,339 cases: 2,566 passes,
+1,214 expected negatives, and 559 unsupported profile features with no
+semantic or harness failures.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -2371,6 +2411,12 @@ must never shrink by reclassification alone.
     environment. Their intended nullish `TypeError` path has fixed native
     evidence, but the complete upstream source remains
     `unsupported-profile-feature` until this global binding model lands.
+    The reviewed
+    *test/language/statements/try/optional-catch-binding-lexical.js* case
+    stays `unsupported-profile-feature` for the same reason: its final
+    assertion reads the unresolved global `y` through
+    `assert.throws(ReferenceError, ...)`, while the optional catch clauses
+    it contains are admitted by M5a Unit 8.5b.
     Owner: the intrinsics and built-in objects stream; the surface audit in
     [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding

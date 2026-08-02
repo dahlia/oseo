@@ -923,7 +923,14 @@ export type SyntaxStatement =
       readonly handler:
         | {
             readonly body: SyntaxStatement;
-            readonly pattern: SyntaxBindingPattern;
+            /**
+             * The CatchParameter binding, or explicitly `undefined` for
+             * the optional catch binding form `catch Block`, which
+             * discards the thrown value and creates no catch-parameter
+             * environment. When the pattern is absent, `range` covers
+             * the catch clause instead of a parameter.
+             */
+            readonly pattern: SyntaxBindingPattern | undefined;
             readonly range: SourceRange;
           }
         | undefined;

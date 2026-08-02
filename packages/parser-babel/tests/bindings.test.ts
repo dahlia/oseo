@@ -858,6 +858,37 @@ test("converts catch binding patterns to owned syntax", () => {
   );
 });
 
+test("converts an optional catch binding to owned syntax", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let handled = false;\n" +
+      'try { throw new RangeError("discarded"); } catch { handled = true; }\n' +
+      "try { console.log(handled); } catch {} finally {\n" +
+      '  console.log("finally", handled);\n' +
+      "}\n",
+    sourceId: "optional-catch-binding.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.syntax != null);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const first = result.syntax.body[1];
+  assert.equal(first?.kind, "try");
+  if (first?.kind !== "try") return;
+  assert.ok(first.handler != null);
+  assert.equal(first.handler?.pattern, undefined);
+  const second = result.syntax.body[2];
+  assert.equal(second?.kind, "try");
+  if (second?.kind !== "try") return;
+  assert.equal(second.handler?.pattern, undefined);
+  assert.ok(second.finalizer != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /^\s*catch$/mu);
+  const mir = printMir(result.mir);
+  assert.match(mir, /caught discarded catch value/u);
+  assert.doesNotMatch(mir, /caught catch parameter/u);
+});
+
 test("rejects ambient declare declarations", () => {
   const result = compileSource(babelFrontend, {
     source: "declare var ambient: number;",

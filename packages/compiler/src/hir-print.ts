@@ -464,7 +464,10 @@ function appendHirStatement(
     appendHirStatement(lines, statement.block, `${indent}  `);
     if (statement.handler != null) {
       lines.push(
-        `${indent}catch ${printHirBindingPattern(statement.handler.pattern)}`,
+        statement.handler.pattern == null
+          ? `${indent}catch`
+          : `${indent}catch ` +
+              printHirBindingPattern(statement.handler.pattern),
       );
       appendHirStatement(lines, statement.handler.body, `${indent}  `);
     }

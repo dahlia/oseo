@@ -2541,27 +2541,30 @@ export function statement(
     let handler:
       | {
           readonly body: SyntaxStatement;
-          readonly pattern: SyntaxBindingPattern;
+          readonly pattern: SyntaxBindingPattern | undefined;
           readonly range: SourceRange;
         }
       | undefined;
     if (handlerNode != null) {
       const parameter = node(handlerNode.param);
       const bodyNode = node(handlerNode.body);
-      if (parameter == null || bodyNode == null) {
+      if (bodyNode == null) {
         return unsupported(
           context,
           handlerNode,
-          "A catch clause requires one binding pattern.",
+          "A catch clause requires a block body.",
         );
       }
-      const pattern = bindingPattern(context, parameter);
+      const pattern =
+        parameter == null ? undefined : bindingPattern(context, parameter);
       const body = statement(context, bodyNode, functionBody);
-      if (pattern == null || body == null) return undefined;
+      if ((parameter != null && pattern == null) || body == null) {
+        return undefined;
+      }
       handler = {
         body,
         pattern,
-        range: sourceRange(context.locations, parameter),
+        range: sourceRange(context.locations, parameter ?? handlerNode),
       };
     }
     const finalizer =
