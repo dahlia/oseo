@@ -1073,12 +1073,14 @@ function predeclareBindings(
     // temporal dead zone and duplicate names inside it are still an
     // early error against their siblings.
     if (statement.kind === "declaration-list") {
-      // A mixed list has no one mutability to predeclare its names with,
-      // so it is left undeclared here and rejected where the list is
-      // resolved, which keeps one diagnostic per invalid list.
-      if (!mixedDeclarationList(statement.declarations)) {
-        predeclareBindings(statement.declarations, scope, state);
-      }
+      // A mixed list is rejected where it is resolved, but its names are
+      // still predeclared here, each with the mutability its own
+      // declarator asks for. Leaving them undeclared would make every
+      // later reference report an unrelated unknown binding, so the one
+      // diagnostic the invalid list deserves would arrive with a cascade
+      // of misleading ones. No mutability is invented: the list produces
+      // no statement, so nothing reads the recovery bindings.
+      predeclareBindings(statement.declarations, scope, state);
       continue;
     }
     if (

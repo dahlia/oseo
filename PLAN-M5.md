@@ -1943,7 +1943,11 @@ rather than assumed. The declarator field is a tuple of at least two members,
 because a one-declarator declaration stays the declarator statement it has
 always been, and HIR construction rejects a list that mixes `const` and `let`
 declarators with a source-located diagnostic, because one LetOrConst covers a
-whole BindingList and a mixed list would have no mutability to resolve.
+whole BindingList and a mixed list would have no mutability to resolve. The
+rejected list still predeclares its declarators, each with the mutability its
+own declarator asks for, so the one diagnostic the list deserves arrives
+without an unknown-binding diagnostic for every later reference to a name it
+was meant to bind.
 
 Evidence is one native fixture for the semantics, one for the hint, one for
 suspension, and one generated suite. The fixtures cover left-to-right

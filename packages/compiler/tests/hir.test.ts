@@ -966,3 +966,84 @@ test("rejects a lexical declaration list that mixes binding kinds", () => {
     /declaration list declares one kind of binding/u,
   );
 });
+
+test("resolves references to a rejected mixed declaration list", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        declarations: [
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 1 },
+            kind: "let",
+            name: "first",
+            range,
+          },
+          {
+            hint: undefined,
+            initializer: { kind: "number", range, value: 2 },
+            kind: "const",
+            name: "second",
+            range,
+          },
+        ],
+        kind: "declaration-list",
+        range,
+      },
+      {
+        expression: {
+          arguments: [
+            { kind: "identifier", name: "first", range },
+            { kind: "identifier", name: "second", range },
+          ],
+          kind: "call",
+          range,
+          target: { kind: "console-log", range },
+        },
+        kind: "expression",
+        range,
+      },
+      {
+        expression: {
+          functionValue: {
+            body: [
+              {
+                expression: {
+                  arguments: [{ kind: "identifier", name: "second", range }],
+                  kind: "call",
+                  range,
+                  target: { kind: "console-log", range },
+                },
+                kind: "expression",
+                range,
+              },
+            ],
+            functionKind: "arrow",
+            kind: "function",
+            name: undefined,
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+          kind: "function",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "declaration-list-kinds-reference.ts",
+  };
+  const result = buildHir(syntax);
+  assert.equal(result.program, undefined);
+  // The rejected list still predeclares its declarators, so a later
+  // reference resolves and the invalid list reports one diagnostic
+  // rather than one per name that reads it.
+  assert.equal(result.diagnostics.length, 1);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /declaration list declares one kind of binding/u,
+  );
+});
