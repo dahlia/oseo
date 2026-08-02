@@ -86,6 +86,12 @@ complete memory accounting, mutable slot tracing, and exact safepoint
 liveness. Moving, generational, incremental, parallel, and concurrent
 collectors remain measured decisions rather than milestone assumptions.
 
+A release and distribution track is recorded in
+[*PLAN-RELEASE.md*](./PLAN-RELEASE.md). It fixes the artifact, channel, and
+toolchain-acquisition contracts for future releases but leaves the first
+release gate undecided. It reserves no milestone and changes no semantics or
+compatibility counts.
+
 
 Working rules
 -------------
@@ -230,6 +236,24 @@ target evidence. A self-contained native REPL additionally depends on M8 so it
 can carry an Oseo compiler without embedding Node.js or Deno. Interactive
 compilation does not change the M5 exclusion of language-level `eval`, the
 `Function` constructor family, or unrestricted dynamic import.
+
+
+Release and distribution track
+------------------------------
+
+Oseo has published no release. [*PLAN-RELEASE.md*](./PLAN-RELEASE.md) defines
+the distribution channels: standalone CLI archives for the supported
+execution environments, the `@oseo/*` packages on npm and JSR, and an
+unscoped npm launcher. It separately defines automatic acquisition of the
+pinned Zig toolchain by the released CLI. Before M8, `deno compile` embeds a
+JavaScript runtime in the archive binary; native executables produced by that
+CLI embed no JavaScript runtime. M8 changes only how the CLI executable is
+produced.
+
+The first release waits for recorded capability prerequisites from the
+measured tracks, and selecting the moment within them remains a maintainer
+judgment based on timing and surrounding conditions. Intermediate releases
+publish exact coverage and known gaps without the conformance label.
 
 
 M0: Architecture and project foundations
