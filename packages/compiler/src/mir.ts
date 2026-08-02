@@ -314,9 +314,11 @@ export type MirTerminator =
        * resumption that delivers a throw completion continues at
        * `throwResume`, which raises the sent value at the suspension point.
        *
-       * Only an asynchronous generator body receives either resumption at
-       * every suspension, so a synchronous body names no `throwResume` and
-       * an `awaited` suspension names no `returnResume`.
+       * Every yield suspension names both blocks: the synchronous and
+       * asynchronous prototype methods deliver either resumption to
+       * their body kind. An `awaited` suspension names no
+       * `returnResume`, because a rejection is the only abrupt
+       * resumption an awaited operand delivers.
        */
       readonly kind: "generator-yield";
       /**

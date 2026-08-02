@@ -1541,11 +1541,11 @@ its deliberate boundary and its evidence:
     and `value`, and both happen before completion precedence applies, so an
     in-flight body error still observes those getters. The reviewed
     *test/built-ins/AsyncFromSyncIteratorPrototype/* cases pin that wrapper
-    directly: thirty pass, four are unsupported, and four stay outside the
-    reviewed subset. Three poisoned-wrapper cases belong to the
-    `PromiseResolve` gap below. The remaining *throw/iterator-result.js* case
-    awaits separate review outside Unit 7.6; its former missing
-    `%GeneratorPrototype%.throw` attribution is stale.
+    directly: thirty-one pass, four are unsupported, and three stay outside
+    the reviewed subset, all of them poisoned-wrapper cases belonging to the
+    `PromiseResolve` gap below. The *throw/iterator-result.js* case entered
+    as a pass once M5a Unit 8.4, recorded below, repaired the throw
+    forwarded through the wrapper to a synchronous generator.
     The head reuses the synchronous
     `for-of` lowering unchanged, so it admits the same `const`, `let`, `var`,
     existing binding, member target, and array or object pattern forms with
@@ -2213,6 +2213,51 @@ manifest therefore
 grows to 4,219 cases and stays at 2,482 passes, with 1,182 expected negatives
 and 555 unsupported profile features and no semantic or harness failures.
 
+### Async-from-sync delegated throw
+
+M5a Unit 8.4 closes the reviewed
+*AsyncFromSyncIteratorPrototype/throw/iterator-result.js* gap. The case
+delivers a throw to an asynchronous generator suspended in `yield*` over a
+wrapped synchronous generator, expects the step promise to reject with the
+forwarded reason after the wrapper calls the synchronous
+`%GeneratorPrototype%.throw`, and then observes the completed iterator.
+Tracing that forwarding against Node.js and Deno found two real defects.
+
+The runtime's virtualized `%GeneratorPrototype%.throw` had no context cache
+slot of its own, so its lookup fell through to the `[Symbol.iterator]` self
+function's slot and whichever method a program resolved first answered both
+keys afterward. Any program that acquired a generator's iterator before
+delivering a throw therefore called the self function instead of resuming the
+generator: the delegating step fulfilled with the generator object where a
+reference host rejects with the forwarded reason. The `m5-39` runtime ABI
+gives the throw method its own permanently rooted cache field, so `next`,
+`return`, `throw`, and `[Symbol.iterator]` now keep four distinct cached
+identities in every resolution order.
+
+The synchronous `yield*` lowering also reported the wrong delegation result
+when a forwarded throw ended the delegation: the shared exit read the `next`
+step's result slot, so a `throw` result carrying `done` reported the last
+stepped object instead of its own `IteratorValue`. The exit now joins through
+a block parameter each ending step supplies, matching the asynchronous
+delegation's join.
+
+Two fixed fixtures cover the repaired paths against Node.js, Deno, and native
+execution under both specialization policies and forced collection. The
+synchronous *generator-delegated-throw* fixture resolves the throw method
+before the program's first `[Symbol.iterator]` read, forwards uncaught and
+caught throws through `yield*` to an inner generator, observes the inner
+`finally`, the rethrown reason's identity, and both completed states, and
+completes a delegation through a hand-written iterator's done `throw` result.
+The asynchronous *async-from-sync-delegated-throw* fixture forwards a throw
+through the wrapper to a synchronous generator in the reviewed case's shape,
+observes the rejection reason's identity and the completed state of both
+iterators, and keeps a caught forwarded throw delegating. The defect domain
+is a fixed method-identity and join-value fault, so no new property suite is
+added; the existing generator throw-resumption and delegation suites keep
+their seeds and domains. The reviewed case enters as a pass, and the manifest
+grows to 4,220 cases: 2,483 passes, 1,182 expected negatives, and 555
+unsupported profile features with no semantic or harness failures.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -2307,13 +2352,6 @@ must never shrink by reclassification alone.
     cases. Closing
     it needs `Promise` as a materialized intrinsic value to compare against.
     Owner: the intrinsics and built-in objects stream.
- -  The reviewed-candidate
-    *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* case stays
-    outside the subset pending targeted differential evidence for a throw
-    forwarded to a wrapped synchronous generator and the generator's
-    subsequent completed state. The behavior is no longer attributed to a
-    missing `%GeneratorPrototype%.throw`. Owner: the functions and executable
-    syntax stream after Unit 7.6.
  -  `%GeneratorFunction%` and `%GeneratorFunction.prototype%` are not
     materialized. Reaching either needs `Object.getPrototypeOf`, and
     creating a generator function from one needs the dynamic-source

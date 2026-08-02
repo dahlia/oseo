@@ -231,9 +231,16 @@ code never calls it.
 also exposes. It writes the cell unless `[[DefineOwnProperty]]` made that
 property non-writable, in which case it fails the way the equivalent property
 assignment fails: with a `TypeError` in strict code and silently outside it.
+
 Object reads, writes, descriptor queries, and definitions resolve such a
 property through its cell, and the fixed-slot property cache excludes
 cell-backed slots so that a cached load never yields the cell itself.
+
+The `m5-39` ABI gives the virtualized `%GeneratorPrototype%.throw` its own
+permanently rooted context cache. The previous layout had no cache field for
+the throw method, so its lookup fell through to the `[Symbol.iterator]` self
+function's slot and whichever method a program resolved first was returned
+for both keys afterward.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

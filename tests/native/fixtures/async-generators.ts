@@ -1139,4 +1139,73 @@ main();
       overflowMisses: 0,
     },
   },
+  {
+    name: "async-from-sync-delegated-throw",
+    source: `
+// A throw delivered to an asynchronous generator suspended in yield*
+// over a wrapped synchronous generator forwards through the wrapper to
+// the inner %GeneratorPrototype%.throw, which the delegation resolves
+// after its GetIterator fallback already read [Symbol.iterator]. The
+// uncaught reason runs the inner finally, rejects the step promise
+// with the forwarded reason itself, and leaves both iterators
+// completed.
+const forwarded = new RangeError("forwarded");
+let innerReference = null;
+function* syncUncaught() {
+  try {
+    yield 42;
+    yield "unreached";
+  } finally {
+    console.log("sync finally");
+  }
+}
+async function* delegatesUncaught() {
+  const source = syncUncaught();
+  innerReference = source;
+  yield* source;
+}
+function* syncCaught() {
+  try {
+    yield "before";
+  } catch (error) {
+    yield "caught:" + (error === forwarded);
+  }
+  yield "after";
+}
+async function* delegatesCaught() {
+  yield* syncCaught();
+  yield "outer";
+}
+async function main() {
+  const iterator = delegatesUncaught();
+  const first = await iterator.next();
+  console.log(first.value, first.done);
+  const settled = await iterator.throw(forwarded).then(
+    function (step) {
+      return "resolved " + step.value;
+    },
+    function (error) {
+      return "rejected " + (error === forwarded);
+    },
+  );
+  console.log(settled);
+  const after = await iterator.next();
+  console.log("async completed", after.value, after.done);
+  const innerAfter = innerReference.next();
+  console.log("sync completed", innerAfter.value, innerAfter.done);
+
+  // A caught forwarded throw keeps the delegation open, so the throw
+  // step fulfills with the caught resumption's yield and later steps
+  // continue through the inner body into the outer one.
+  const caught = delegatesCaught();
+  console.log((await caught.next()).value);
+  console.log((await caught.throw(forwarded)).value);
+  console.log((await caught.next()).value);
+  console.log((await caught.next()).value);
+  console.log((await caught.next()).done);
+  console.log("finished");
+}
+main();
+`,
+  },
 ];

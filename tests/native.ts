@@ -282,7 +282,9 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-static-block-scope" ||
     fixture.name === "class-static-block-super" ||
     fixture.name === "generators" ||
+    fixture.name === "generator-delegated-throw" ||
     fixture.name === "async-generators" ||
+    fixture.name === "async-from-sync-delegated-throw" ||
     fixture.name === "async-generator-prototypes" ||
     fixture.name === "async-generator-resumptions" ||
     fixture.name === "async-generator-delegation" ||

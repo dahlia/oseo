@@ -740,4 +740,98 @@ while (!grownStep.done) {
 console.log(grownText, grownStep.value);
 `,
   },
+  {
+    name: "generator-delegated-throw",
+    source: `
+// The virtualized generator methods keep distinct identities in either
+// resolution order, so a program whose first generator-brand lookup is
+// the throw method still resolves [Symbol.iterator] to the self
+// function afterward, and the delegations below resolve the inner
+// throw method after their GetIterator already read [Symbol.iterator].
+const forwarded = new RangeError("forwarded");
+function* throwsFirst() {
+  try {
+    yield "first";
+  } finally {
+    console.log("first finally");
+  }
+}
+const firstThrower = throwsFirst();
+console.log(firstThrower.next().value);
+try {
+  firstThrower.throw(forwarded);
+} catch (error) {
+  console.log("throw before iteration", error === forwarded);
+}
+for (const value of throwsFirst()) console.log("iterated", value);
+
+// A throw delivered to a generator suspended in yield* forwards to the
+// inner generator's %GeneratorPrototype%.throw. The uncaught reason
+// runs the inner finally, completes both generators, and rethrows from
+// the delegating throw call.
+function* innerUncaught() {
+  try {
+    yield "inner";
+  } finally {
+    console.log("inner finally");
+  }
+}
+function* delegatesUncaught() {
+  yield* innerUncaught();
+}
+const uncaught = delegatesUncaught();
+console.log(uncaught.next().value);
+try {
+  uncaught.throw(forwarded);
+} catch (error) {
+  console.log("uncaught rethrown", error === forwarded);
+}
+const uncaughtAfter = uncaught.next();
+console.log("completed", uncaughtAfter.value, uncaughtAfter.done);
+
+// An inner catch keeps the delegation open, so the delegating throw
+// reports the caught resumption's yield and later steps continue
+// through the inner body into the outer one.
+function* innerCaught() {
+  try {
+    yield "before";
+  } catch (error) {
+    yield "caught:" + (error === forwarded);
+  }
+  yield "after";
+}
+function* delegatesCaught() {
+  yield* innerCaught();
+  yield "outer";
+}
+const caught = delegatesCaught();
+console.log(caught.next().value);
+console.log(caught.throw(forwarded).value);
+console.log(caught.next().value);
+console.log(caught.next().value);
+console.log(caught.next().done);
+
+// A throw result that reports done ends the delegation and completes
+// the delegating expression normally with that result's value.
+const throwCompletes = {};
+throwCompletes[Symbol.iterator] = function () {
+  return {
+    next: function () {
+      return { value: "stepped", done: false };
+    },
+    throw: function (reason) {
+      return { value: "threw:" + reason, done: true };
+    },
+  };
+};
+function* delegatesThrowResult() {
+  const completed = yield* throwCompletes;
+  yield "completed:" + completed;
+}
+const completing = delegatesThrowResult();
+console.log(completing.next().value);
+console.log(completing.throw("requested").value);
+console.log(completing.next().done);
+`,
+  },
 ];

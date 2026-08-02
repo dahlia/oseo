@@ -113,6 +113,9 @@ tests:
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result-unwrap-promise.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/iterator-result.js
+    expectedClassification: pass
+    dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/throw/poisoned-get-throw.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
