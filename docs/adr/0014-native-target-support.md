@@ -63,10 +63,11 @@ Probe evidence
 
 The before-state is recorded in
 [*native-target-baseline.md*](../native-target-baseline.md). The implementation
-uses Zig 0.16.0 and runs these tasks:
+used Zig 0.16.0 and ran the native, native-property, test262, and extended
+property suites. The acceptance run also included the M0 architecture probes,
+which were later retired after direct tests subsumed their contracts.
 
 ~~~~ sh
-mise run test:probes
 mise run test:native
 mise run test:property:native
 mise run test:test262
@@ -74,9 +75,9 @@ mise run test:property:extended
 ~~~~
 
 On an Apple M4 host, the ABI-root, native-boundary, NaN-box, and low-tag probes
-execute as `macos-aarch64` with address and undefined-behavior sanitizers. The
-probes also inspect named `linux-x86_64-gnu`, `macos-aarch64`, and
-`linux-aarch64-musl` assembly. The boundary probe retains the AArch64 Linux
+executed as `macos-aarch64` with address and undefined-behavior sanitizers. The
+probes also inspected named `linux-x86_64-gnu`, `macos-aarch64`, and
+`linux-aarch64-musl` assembly. The boundary probe retained the AArch64 Linux
 compile-link.
 
 The heap and promise fixtures, complete differential fixture corpus, forced
@@ -152,7 +153,7 @@ directory or toolchain process is created.
 
 The native fixture API names its requested operation as `compile` or `execute`.
 The target contains no universal executability flag. Cross-target compilation
-continues to use explicit test and probe paths.
+continues to use explicit test and compile-only paths.
 
 ### Command-line behavior
 

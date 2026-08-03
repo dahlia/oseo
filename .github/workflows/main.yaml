@@ -130,10 +130,6 @@ jobs:
         with:
           install: true
       - if: matrix.shard == 1
-        run: mise run test:probes
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: matrix.shard == 1
         run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard

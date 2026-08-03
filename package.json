@@ -16,8 +16,6 @@
     "@arethetypeswrong/core": "0.18.5",
     "@babel/parser": "8.0.4",
     "@types/node": "24.13.3",
-    "acorn": "8.17.0",
-    "acorn-typescript": "1.4.13",
     "fast-check": "4.9.0",
     "publint": "0.3.21",
     "test262": "github:tc39/test262#f2d1435644797268dca1f7988cad5a4e89ccd8d2",

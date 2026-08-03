@@ -46,15 +46,11 @@ responsibilities leak into M1 packages.
 Probe evidence
 --------------
 
-*experiments/native/generated.c* stands in for backend output.
-*experiments/native/runtime.c* and *experiments/native/oseo\_probe\_runtime.h*
-form a separate runtime input. *experiments/native/run.sh* compiles the runtime,
-archives it, links the generated translation unit, and performs the AArch64
-cross-link. Run:
-
-~~~~ sh
-mise run probe:native-boundary
-~~~~
+The M0 probe used one C translation unit as backend output and separate C and
+header inputs as the runtime. It compiled and archived the runtime, linked the
+generated translation unit, and performed the AArch64 cross-link. The probe was
+retired after the toolchain and native integration suites exercised the same
+boundaries with production inputs. Commit `52ae40e` preserves its source.
 
 
 Observed results

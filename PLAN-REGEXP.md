@@ -468,8 +468,8 @@ specialization variant executes.
 Native evidence runs on Linux AMD64 and macOS AArch64. AArch64 Linux
 compile-links and exposes static matcher artifacts and generated control flow
 for inspection. Changes to pattern lowering, matcher state, Unicode tables, or
-runtime allocation run the ordinary native, probe, property, extended-property,
-and test262 gates required by [*CONTRIBUTING.md*](./CONTRIBUTING.md).
+runtime allocation run the ordinary native, property, extended-property, and
+test262 gates required by [*CONTRIBUTING.md*](./CONTRIBUTING.md).
 
 
 Delivery order
@@ -537,5 +537,5 @@ This plan is complete when:
     ordinary regression fixtures;
  -  the active profile and compatibility manifest contain no regular
     expression gap inside the candidate claim; and
- -  `mise run check`, `mise run test`, the required native, probe, property,
+ -  `mise run check`, `mise run test`, the required native, property,
     extended-property, and test262 tasks pass from a clean checkout.

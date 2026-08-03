@@ -289,11 +289,11 @@ unless they are reviewed fixtures with a documented purpose.
 
 Changes to targets, host adapters, C lowering, the runtime, collector,
 specialization, or native generators run `mise run test:native`,
-`mise run test:probes`, `mise run test:property:native`, and
-`mise run test:test262` in addition to the ordinary gates. They also run
-`mise run test:property:extended` before submission. The native and standards
-tasks execute the matching host target and retain the AArch64 Linux cross-link;
-do not replace a required execution with a blanket skip.
+`mise run test:property:native`, and `mise run test:test262` in addition to the
+ordinary gates. They also run `mise run test:property:extended` before
+submission. The native and standards tasks execute the matching host target
+and retain the AArch64 Linux cross-link; do not replace a required execution
+with a blanket skip.
 
 CI partitions the native and test262 suites with `--shard INDEX/TOTAL`, for
 example `mise run test:native --shard 1/3` or

@@ -3,8 +3,6 @@ packages/*/dist/
 artifacts/
 *.tgz
 
-# Probe outputs are reproducible and are written outside the source tree.
-experiments/.tmp/
 *.o
 *.a
 *.s

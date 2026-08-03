@@ -251,7 +251,7 @@ overrides:
 test("rejects an ambiguous property options declaration", () => {
   const properties: PropertySource[] = [
     {
-      path: "experiments/example.property.test.ts",
+      path: "tests/property/example.property.test.ts",
       text: `
 {
   const suite = { domain: "first", numRuns: 10, seed: 1 };
@@ -274,14 +274,17 @@ test("omits deleted property sources from the current worktree", () => {
   assert.deepEqual(
     selectCurrentPropertyPaths(
       [
-        "experiments/added.property.test.ts",
+        "tests/property/added.property.test.ts",
         "tests/deleted.property.test.ts",
         "tests/retained.property.test.ts",
         "tests/unit.test.ts",
       ].join("\n"),
       "tests/deleted.property.test.ts",
     ),
-    ["experiments/added.property.test.ts", "tests/retained.property.test.ts"],
+    [
+      "tests/property/added.property.test.ts",
+      "tests/retained.property.test.ts",
+    ],
   );
 });
 

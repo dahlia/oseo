@@ -21,14 +21,15 @@ The Ubuntu native job recorded these task durations:
 | Task                       | Duration | Evidence                                 |
 | -------------------------- | -------- | ---------------------------------------- |
 | `mise run test:native`     | 155 s    | Native execution and AArch64 cross-links |
-| `mise run test:probes`     | 2 s      | ABI, parser, boundary, and value probes  |
+| M0 architecture probes     | 2 s      | ABI, parser, boundary, and value probes  |
 | `mise run test:test262`    | 96 s     | Reviewed test262 manifest                |
 | Complete `test-native` job | 264 s    | Setup and all native task steps          |
 
 The native fixture corpus executed `x86_64-linux-gnu` and cross-linked
 `aarch64-linux-musl`. The checked test262 manifest recorded 50 passes, 178
 expected negatives, 150 unsupported profile features, and no semantic or
-harness failures.
+harness failures. The M0 architecture probes were later retired after direct
+package, native, and property tests subsumed their contracts.
 
 [GitHub Actions]: https://github.com/dahlia/oseo/actions/runs/29649255718
 

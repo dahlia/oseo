@@ -41,13 +41,10 @@ shape.
 Probe evidence
 --------------
 
-*experiments/abi-roots/probe.c* executes normal, nested, abrupt, allocating, and
-forced-collection paths. It emits both ABI variants and a non-throwing helper.
-Run:
-
-~~~~ sh
-mise run probe:abi-roots
-~~~~
+The M0 probe executed normal, nested, abrupt, allocating, and forced-collection
+paths. It emitted both ABI variants and a non-throwing helper. The synthetic
+comparison was retired after native and property tests exercised the selected
+ABI with production-generated code. Commit `52ae40e` preserves its source.
 
 
 Observed results

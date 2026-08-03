@@ -37,14 +37,11 @@ Probe evidence
 --------------
 
 [*mise.toml*](../../mise.toml) pins every executable. The shared erasable
-TypeScript fixture is *experiments/host/probe.ts*. The native and cross-target
-fixtures are under *experiments/native/*. Run:
-
-~~~~ sh
-mise install
-mise run probe:host-parser
-mise run probe:native-boundary
-~~~~
+TypeScript fixture compared Node.js and Deno. Separate native fixtures compiled
+and linked generated C against a static runtime archive for the execution and
+portability targets. These M0 sources were retired after the package and native
+integration suites subsumed their contracts. Commit `52ae40e` preserves the
+original probes.
 
 
 Observed results
@@ -89,7 +86,5 @@ target-specific assumptions that are absent from the target description.
 Links
 -----
 
-[*experiments/README.md*](../../experiments/README.md) defines the probe
-commands.
 [*0003-c11-runtime-and-zig-boundary.md*](./0003-c11-runtime-and-zig-boundary.md)
 defines how the native tools are used.

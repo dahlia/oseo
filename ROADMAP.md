@@ -282,7 +282,8 @@ the C11 and Zig responsibility split, an x86-64 NaN-boxed generic value, a
 two-word generic call result, and linked explicit root frames. It also created
 the eight-package npm and JSR workspace, lockstep versioning, dual-host tests,
 package validation, and the native differential fixture harness. The checked-in
-probes remain regression tests through `mise run test:probes`.
+M0 probes were retired after direct package, native, and property tests
+subsumed their contracts.
 
 ### Exit criteria
 

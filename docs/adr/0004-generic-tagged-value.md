@@ -30,12 +30,12 @@ masks.
 Alternatives considered
 -----------------------
 
-*experiments/value/nanbox.c* stores non-NaN doubles directly, canonicalizes NaN,
-and uses quiet-NaN payloads for immediates and heap references.
-*experiments/value/lowtag.c* reserves three low bits, stores small integers
-immediately, and boxes other numbers in aligned heap objects. Deferring the
-layout behind an opaque word remained an option if either probe exposed an
-uncontained target dependency.
+The NaN-box candidate stored non-NaN doubles directly, canonicalized NaN, and
+used quiet-NaN payloads for immediates and heap references. The low-tag
+candidate reserved three low bits, stored small integers immediately, and boxed
+other numbers in aligned heap objects. Deferring the layout behind an opaque
+word remained an option if either probe exposed an uncontained target
+dependency.
 
 
 Probe evidence
@@ -44,11 +44,9 @@ Probe evidence
 Both independent C programs test positive and negative zero, minimum and
 maximum finite doubles, infinities, NaN, integer boundaries, Booleans, `null`,
 `undefined`, and heap references. The task runs correctness checks with
-undefined-behavior sanitization and emits optimized assembly for both targets:
-
-~~~~ sh
-mise run probe:value-layouts
-~~~~
+undefined-behavior sanitization and emits optimized assembly for both targets.
+The comparison programs were retired after runtime tests covered the selected
+NaN-box layout directly. Commit `52ae40e` preserves the original programs.
 
 
 Observed results

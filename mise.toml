@@ -117,26 +117,8 @@ run = "mise fmt"
 [tasks."fmt:oxfmt"]
 run = "oxfmt ."
 
-[tasks."probe:abi-roots"]
-run = "bash experiments/abi-roots/run.sh"
-
-[tasks."probe:host-parser"]
-run = "node experiments/parser/check.ts"
-
-[tasks."probe:native-boundary"]
-run = "bash experiments/native/run.sh"
-
-[tasks."probe:value-layouts"]
-run = "bash experiments/value/run.sh"
-
 [tasks.test]
-depends = [
-  "test:deno",
-  "test:native",
-  "test:node",
-  "test:probes",
-  "test:test262",
-]
+depends = ["test:deno", "test:native", "test:node", "test:test262"]
 
 [tasks."test:deno"]
 description = "Run package source tests under Deno"
@@ -152,15 +134,6 @@ run = "node tests/native.ts"
 description = "Run source, version, and built ESM tests under Node.js"
 depends = ["build"]
 run = "node --test"
-
-[tasks."test:probes"]
-description = "Run host-native and cross-target architecture probes"
-run = '''
-mise run probe:abi-roots
-mise run probe:host-parser
-mise run probe:native-boundary
-mise run probe:value-layouts
-'''
 
 [tasks."test:property:extended"]
 description = "Run property suites at ten times the ordinary case budget"

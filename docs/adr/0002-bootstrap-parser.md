@@ -39,15 +39,12 @@ its cost.
 Probe evidence
 --------------
 
-*experiments/parser/corpus.ts* contains valid M1 candidates, TypeScript and
-JSDoc hints, fatal and recoverable errors, unsupported but parseable syntax,
-Unicode identifiers, ambiguous comments, and CRLF input. The candidate adapters
-convert their result to *experiments/parser/schema.ts* before serialization.
-Run:
-
-~~~~ sh
-mise run probe:host-parser
-~~~~
+The M0 corpus contained valid M1 candidates, TypeScript and JSDoc hints, fatal
+and recoverable errors, unsupported but parseable syntax, Unicode identifiers,
+ambiguous comments, and CRLF input. Each candidate adapter converted its result
+to the same small owned schema before serialization. The comparison sources and
+Acorn-only dependencies were retired after direct Babel adapter tests subsumed
+the selected contract. Commit `52ae40e` preserves the original probe.
 
 
 Observed results

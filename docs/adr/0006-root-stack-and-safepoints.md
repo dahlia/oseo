@@ -38,15 +38,12 @@ handles add allocation and bookkeeping to ordinary generated calls.
 Probe evidence
 --------------
 
-*experiments/abi-roots/probe.c* implements a small non-moving mark-and-sweep
-collector solely to exercise the protocol. Allocation collects before returning
-a new object. The fixture roots live objects across nested calls, frees an
-unrooted object, preserves abrupt values, and checks that every frame is popped.
-Run:
-
-~~~~ sh
-mise run probe:abi-roots
-~~~~
+The M0 probe implemented a small non-moving mark-and-sweep collector solely to
+exercise the protocol. Allocation collected before returning a new object. The
+fixture rooted live objects across nested calls, freed an unrooted object,
+preserved abrupt values, and checked that every frame was popped. The synthetic
+collector was retired after forced-collection native and property tests covered
+the production runtime. Commit `52ae40e` preserves its source.
 
 
 Observed results

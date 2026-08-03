@@ -240,10 +240,11 @@ target.
 Probe and measurement plan
 --------------------------
 
-Checked-in probes live under *experiments/native-io/*. They run through named
-`mise` tasks once those tasks exist and retain source, compiler invocation,
-target, operating-system version, capability results, and observations. A
-benchmark number without those inputs is not architecture evidence.
+Checked-in I/O probes live under *tests/native-io/probes/*. They run through
+named `mise` tasks once those tasks exist and retain source, compiler
+invocation, target, operating-system version, capability results, and
+observations. A benchmark number without those inputs is not architecture
+evidence.
 
 The M5 and M6 native probe corpus covers:
 
