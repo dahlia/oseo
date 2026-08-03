@@ -38,7 +38,8 @@ Command syntax
 --------------
 
 ~~~~ text
-oseo [--module] [--no-specialization] [--target TARGET] SOURCE
+oseo [--module] [--no-specialization] [--target TARGET]
+  [--no-runtime-archive-reuse] SOURCE
 oseo [--dump-mir | --emit-c] [--module] [--no-specialization] SOURCE
 oseo --help
 oseo --version
@@ -48,15 +49,16 @@ oseo --version
 Oseo reads the file from that path; standard input and `-` are not supported.
 Options may appear before or after the source path.
 
-| Option                | Behavior                                     |
-| --------------------- | -------------------------------------------- |
-| `--dump-mir`          | Print Oseo's textual MIR without compiling C |
-| `--emit-c`            | Print the generated C11 translation unit     |
-| `--module`            | Compile the source as an ECMAScript module   |
-| `--no-specialization` | Compile only the generic native path         |
-| `--target TARGET`     | Select an explicit native execution target   |
-| `--help`              | Print help generated from the CLI grammar    |
-| `--version`           | Print the lockstep Oseo package version      |
+| Option                       | Behavior                                     |
+| ---------------------------- | -------------------------------------------- |
+| `--dump-mir`                 | Print Oseo's textual MIR without compiling C |
+| `--emit-c`                   | Print the generated C11 translation unit     |
+| `--module`                   | Compile the source as an ECMAScript module   |
+| `--no-specialization`        | Compile only the generic native path         |
+| `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
+| `--target TARGET`            | Select an explicit native execution target   |
+| `--help`                     | Print help generated from the CLI grammar    |
+| `--version`                  | Print the lockstep Oseo package version      |
 
 `--dump-mir` and `--emit-c` are mutually exclusive. Unknown options,
 duplicate options, a missing source path, and extra positional arguments are
@@ -92,6 +94,18 @@ directory, links a native executable, and runs it. The example prints:
 Oseo forwards the native program's standard output, standard error, and exit
 status. It removes the temporary directory after both successful and failed
 workflows.
+
+Native execution reuses a host-cached C runtime archive when the host and
+toolchain support that optimization. Use `--no-runtime-archive-reuse` to
+rebuild the archive deliberately, such as when investigating a suspected
+stale cache:
+
+~~~~ sh
+oseo --no-runtime-archive-reuse add.ts
+~~~~
+
+The option applies only to native execution. `--dump-mir` and `--emit-c`
+reject it because neither mode starts the native toolchain.
 
 Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
 `macos-aarch64` on macOS AArch64. Both targets use address and

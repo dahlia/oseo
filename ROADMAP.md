@@ -92,6 +92,13 @@ toolchain-acquisition contracts for future releases but leaves the first
 release gate undecided. It reserves no milestone and changes no semantics or
 compatibility counts.
 
+A command-line evolution track is recorded in
+[*PLAN-CLI.md*](./PLAN-CLI.md). It separates compile-and-run behavior from
+retained artifact production, preserves the short source-path invocation as a
+root shortcut, and defines a statically generated Optique command registry for
+every distribution channel. It reserves no milestone and changes no language
+semantics or compatibility counts.
+
 
 Working rules
 -------------
@@ -236,6 +243,23 @@ target evidence. A self-contained native REPL additionally depends on M8 so it
 can carry an Oseo compiler without embedding Node.js or Deno. Interactive
 compilation does not change the M5 exclusion of language-level `eval`, the
 `Function` constructor family, or unrestricted dynamic import.
+
+
+Command-line track
+------------------
+
+Oseo's current command line compiles one source entry and either prints an
+intermediate form or builds and runs a temporary native executable.
+[*PLAN-CLI.md*](./PLAN-CLI.md) records the transition to an explicit `run`
+command, a cross-target `build` command, a compatible root shortcut, and public
+help and completion commands.
+
+This track is planned and its implementation has not started. It changes the
+outer composition and artifact lifecycle without changing accepted JavaScript
+or the compiler's dependency direction. The command registry remains
+statically visible to Node.js, Deno, JSR publication, and the standalone CLI
+pipeline; feature-specific commands enter only after their owning plans supply
+the required semantics.
 
 
 Release and distribution track
