@@ -1305,6 +1305,79 @@ test("threads argumentsMapped from HIR into MIR unchanged", () => {
   const restMir = buildMir(restHir);
   assert.ok(restMir.functions[0]?.argumentsBindingId != null);
   assert.equal(restMir.functions[0]?.argumentsMapped, undefined);
+
+  // A strict function still carries the binding, so MIR keeps the id and
+  // drops the mapped fact the backend uses to pick the exotic object.
+  const strictSyntax: SyntaxProgram = {
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "strictSimple",
+        parameters: [{ hints: [], name: "value", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+        strict: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mir-arguments-strict.ts",
+  };
+  const strictHir = buildHir(strictSyntax).program;
+  assert.ok(strictHir != null);
+  const strictMir = buildMir(strictHir);
+  assert.ok(strictMir.functions[0]?.argumentsBindingId != null);
+  assert.equal(strictMir.functions[0]?.argumentsMapped, undefined);
+
+  // An asynchronous generator owns the binding through the same path a
+  // synchronous function does, and an arrow declares none at all.
+  const asyncGeneratorSyntax: SyntaxProgram = {
+    body: [
+      {
+        body: [],
+        functionKind: "async-generator",
+        kind: "function",
+        name: "owner",
+        parameters: [{ hints: [], name: "value", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mir-arguments-async-generator.ts",
+  };
+  const asyncGeneratorHir = buildHir(asyncGeneratorSyntax).program;
+  assert.ok(asyncGeneratorHir != null);
+  const asyncGeneratorMir = buildMir(asyncGeneratorHir);
+  assert.ok(asyncGeneratorMir.functions[0]?.argumentsBindingId != null);
+  assert.equal(asyncGeneratorMir.functions[0]?.argumentsMapped, true);
+
+  const arrowSyntax: SyntaxProgram = {
+    body: [
+      {
+        body: [],
+        functionKind: "arrow",
+        kind: "function",
+        name: "lexical",
+        parameters: [],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mir-arguments-arrow.ts",
+  };
+  const arrowHir = buildHir(arrowSyntax).program;
+  assert.ok(arrowHir != null);
+  const arrowMir = buildMir(arrowHir);
+  assert.equal(arrowMir.functions[0]?.argumentsBindingId, undefined);
+  assert.equal(arrowMir.functions[0]?.argumentsMapped, undefined);
 });
 
 function additionProgram(

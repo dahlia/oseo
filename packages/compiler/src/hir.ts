@@ -967,8 +967,10 @@ export interface HirParameter extends SyntaxParameter {
 /** One statically resolved HIR function. */
 export interface HirFunction extends LocatedSyntax {
   /**
-   * The implicit non-strict `arguments` binding initialized from the call
-   * arguments before parameter initialization.
+   * The implicit `arguments` binding initialized from the call arguments
+   * before parameter initialization. Every function form except an arrow
+   * declares one, so an arrow's own `arguments` reference resolves to the
+   * nearest enclosing form's binding instead.
    */
   readonly argumentsBindingId?: number;
   /**
@@ -1067,8 +1069,6 @@ export interface Binding {
    * the last one and it still targets that same already-initialized id.
    */
   readonly alreadyInitialized?: true;
-  /** True only for an implicit non-strict `arguments` object binding. */
-  readonly argumentsObject?: true;
   readonly functionId?: number;
   readonly functionNameBinding?: boolean;
   readonly id: number;
@@ -1079,11 +1079,6 @@ export interface Binding {
 }
 
 export interface ResolveState {
-  /**
-   * True while resolving a function form whose implicit `arguments` object
-   * is deliberately unavailable in the current function profile.
-   */
-  argumentsObjectUnavailable: boolean;
   nextBindingId: number;
   readonly diagnostics: Diagnostic[];
   readonly functionInfo: Map<

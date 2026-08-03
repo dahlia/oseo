@@ -168,6 +168,12 @@ struct OseoContext {
      * every non-strict nullish receiver observe one identity.
      */
     OseoValue global_this;
+    /*
+     * The realm's %ThrowTypeError% intrinsic, created on first use and
+     * permanently rooted so every unmapped arguments object's poisoned
+     * `callee` accessor shares one function identity.
+     */
+    OseoValue throw_type_error_function;
     /* Cached virtualized Array and iterator methods, permanently rooted. */
     OseoValue array_push_function;
     OseoValue iterator_values_function;
@@ -844,15 +850,17 @@ OseoResult oseo_template_object(
 OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);
 /*
- * Creates the ordinary, unmapped arguments object for one admitted
- * non-strict function invocation whose parameter list is not simple.
- * Indexed properties snapshot the call arguments, `length` records
- * their count, and `callee` is the running function. A simple
- * parameter list instead calls oseo_mapped_arguments_create.
+ * CreateUnmappedArgumentsObject (10.4.4.6) for one admitted function
+ * invocation that is strict, has a non-simple parameter list, or both.
+ * Indexed properties snapshot the call arguments and `length` records
+ * their count; `callee` is the non-configurable poisoned accessor whose
+ * [[Get]] and [[Set]] are both %ThrowTypeError%, so the object never
+ * exposes the running function. A non-strict function with a simple
+ * parameter list instead calls oseo_mapped_arguments_create, which is
+ * the only shape that keeps `callee` an ordinary data property.
  */
 OseoResult oseo_arguments_create(
     OseoContext *context,
-    OseoValue callee,
     size_t argument_count,
     const OseoValue *arguments
 );

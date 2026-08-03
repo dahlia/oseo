@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,374
-reviewed cases: 2,569 passes, 1,236 expected negatives, and 569 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,722
+reviewed cases: 2,890 passes, 1,292 expected negatives, and 540 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2478,6 +2478,176 @@ as a bare value, which stays outside the profile until the intrinsics and
 built-in objects stream admits standard constructors as values. The
 manifest reaches 4,415 cases: 2,610 passes, 1,236 expected negatives, and
 569 unsupported profile features with no semantic or harness failures.
+
+M5a Unit 8.5h completes the implicit `arguments` binding's availability and
+the unmapped object's own contract. FunctionDeclarationInstantiation creates
+the binding for every function form except an arrow, so `admitsArgumentsObject`
+now excludes only the `arrow` and `async-arrow` kinds and stops consulting
+strictness at all: strict ordinary functions, object and class methods, class
+constructors including the implicit and implicit derived ones, synchronous
+generators, ordinary asynchronous functions, and asynchronous generators each
+receive their own binding through the one path an ordinary non-strict function
+already used. Because every eligible enclosing form now declares the name, the
+helper that stripped an enclosing implicit binding out of a nested function's
+scope chain had nothing left to protect and is removed; an arrow simply
+inherits the enclosing scopes, so its `arguments` reference resolves to the
+nearest owning form's binding id and its MIR reads that captured cell like any
+other closed-over binding. An arrow with no eligible enclosing form leaves the
+name unresolved and keeps the ordinary source-located `Unknown binding`
+diagnostic, the same one a Script or module top-level reference reports. The
+`ResolveState.argumentsObjectUnavailable` flag and the separate
+`delete arguments` diagnostic it drove are removed with it: the name either
+resolves, and the delete answers `false`, or it does not, and the delete is an
+ordinary unresolvable-reference delete answering `true`. Strictness now selects
+only the object's shape, so `argumentsMapped` adds `strict !== true` to the
+`IsSimpleParameterList` test Unit 8.5g introduced and every strict or
+non-simple eligible form takes the unmapped snapshot. Every strict early error
+for `arguments` as an assignment target, binding identifier, or declared name
+stays in the parser and is unchanged, so the newly created strict binding is
+never assignable.
+
+FunctionDeclarationInstantiation's step 18 tests BoundNames of the formals,
+not the parameter list a parameter environment lowers them to, so the
+frontend records that decision as `argumentsFormal` on `SyntaxFunction` and
+HIR gates the implicit binding on it. Without that fact a defaulted or
+destructured formal named `arguments` is lowered to a synthetic parameter
+name and its own binding is created by a parameter initializer instead, which
+left the implicit object created and then shadowed. Step 19's two
+suppressions, a body-level function or lexical declaration named `arguments`
+when the parameter list has no expressions, are deliberately not implemented:
+the declaration that suppresses the object also initializes or shadows the
+same binding before any code can read it, so in a closed profile with no
+`eval` the extra object is unreachable. A class static block's synthetic
+method keeps the object ECMA-262 gives it for the same reason, since its own
+`ContainsArguments` early error and the class body's strictness make the name
+unusable there.
+
+`oseo_arguments_create` becomes CreateUnmappedArgumentsObject (10.4.4.6)
+rather than an approximation of it. Its `callee` parameter is dropped, because
+the specified property is not the running function at all: it is a
+non-configurable, non-enumerable accessor whose `[[Get]]` and `[[Set]]` are
+both `%ThrowTypeError%`, and that holds for every unmapped object, not only a
+strict function's. A new `OSEO_THROW_TYPE_ERROR_CODE_ID` internal function,
+created on first use and cached on the context beside the other permanently
+rooted intrinsics, gives the realm one `%ThrowTypeError%` identity, so both
+accessor slots and every unmapped object compare equal and the shared call
+dispatcher answers a call on it with a `TypeError`. Only
+`oseo_mapped_arguments_create` still defines `callee` as the writable,
+configurable data property naming the running function, which is what
+10.4.4.7 requires.
+
+Both constructors also define `@@iterator` as a writable, non-enumerable,
+configurable data property whose value is the cached
+`%Array.prototype.values%` function an array's own `Symbol.iterator` already
+resolves to, matching 10.4.4.6 step 6 and 10.4.4.7 step 20. This is not
+optional polish for this unit: eighteen reviewed cases already in the
+manifest spread `arguments` with `[...arguments]` and were classified
+`unsupported-profile-feature` only because the name did not resolve. Once it
+does, they compile, so without `@@iterator` they would become semantic
+failures. Serving them needs the array iterator to accept a non-array target,
+so `oseo_internal_array_values` accepts any object and the iterator's `next`
+reads its target's length through a new `LengthOfArrayLike` helper that keeps
+an ordinary array's own element count as its fast path, since that is the
+value its `length` property reports, and otherwise applies
+`ToLength(ToNumber(Get(O, "length")))`: the read observes an inherited or
+accessor `length` and propagates its abrupt completion, and the clamp turns a
+fractional, string, negative, `NaN`, or infinite value into the specified
+integral count. The element read already went through the generic
+`oseo_object_get`, and generalizing the receiver made two ordering
+requirements observable that an array's own non-configurable `length` had
+kept out of reach: `next` now snapshots the iterated target and the cursor
+before the length read, so an accessor `length` that reenters the same
+iterator cannot steal the index this step yields, and it advances the cursor
+before the element `Get`, so an abrupt element accessor leaves the iterator
+on the following index instead of retrying the one it failed to read. Both
+orderings also correct the pre-existing array path, which a defined accessor
+index could already reach. `%ThrowTypeError%` is hardened the way 10.2.4.1
+requires:
+its `length` and `name` are redefined non-writable and non-configurable and
+the function is made non-extensible, so admitted reflection can neither
+reshape it nor replace its prototype. The `prototype` object every internal
+function in this profile still carries stays a separate boundary the
+intrinsics stream owns. The runtime ABI moves from `oseo-runtime-m5-40` to
+`oseo-runtime-m5-41`.
+
+Focused HIR tests assert that each of the six owning kinds carries an
+`argumentsBindingId` and that neither arrow kind does, that an arrow's
+`arguments` expression resolves to its enclosing function's binding id, that a
+strict simple parameter list keeps the binding but drops `argumentsMapped`, and
+that `delete arguments` answers `false` in an asynchronous function and `true`
+in an arrow with no enclosing form; companion MIR tests confirm `buildMir`
+threads the strict, asynchronous-generator, and arrow shapes unchanged. Three
+fixed native differential fixtures cover the unit's three observable halves.
+*unmapped-arguments-forms* exercises a strict ordinary function, sloppy,
+strict, and binding-pattern object methods, a class constructor, an instance
+method, a static method, a generator method, a derived constructor, an
+implicit derived constructor, and strict and binding-pattern generators.
+*unmapped-arguments-callee* covers the poisoned accessor's descriptor shape,
+its shared identity across two functions, its read, write, redefinition, and
+strict and non-strict deletion behavior, the mapped object's contrasting data
+property, unmapped index and `length` descriptors, and snapshot independence
+in both directions with fresh identity per call. *arguments-lexical-capture*
+covers a direct arrow, a nested arrow, a shadowing ordinary function
+expression, an arrow in a strict function, an arrow in an object method, an
+arrow in a class constructor, an asynchronous function reading `arguments`
+across an `await`, an asynchronous function with a default parameter, an
+asynchronous generator, and an async arrow capturing its enclosing ordinary
+function. Two further fixtures cover what the unit's own review surfaced:
+*arguments-declaration-interaction* pins a body-level `var`, `let`, or
+function declaration named `arguments` against both the shared and the
+separate parameter environment, an explicit `arguments` formal, a
+parameter-scope closure that observes the separate body binding, and a class
+static block, and *arguments-iteration-and-poison* pins iteration under a
+fractional, string, negative, `NaN`, grown, shrinking, infinite, inherited,
+and abrupt `length`, the shared `%Array.prototype.values%` identity and its
+descriptor, mapped-index iteration after a parameter write, an abrupt
+element accessor and the index the following step reads on both an
+arguments object and a plain array, a `length` accessor that reenters the
+same iterator, a borrowed `%Array.prototype.values%` invoked as a method on
+an ordinary array-like with own and inherited indices, and
+`%ThrowTypeError%`'s own `length` and `name` descriptors,
+non-extensibility, and rejected prototype replacement. A third generated
+property with seed `0x5eed003b` extends the M5 arguments-object model with one
+owning form of seven, an optional enclosing strict scope, one to three simple
+leading parameters and an optional non-simple trailing formal, zero to five
+supplied arguments, a bounded write index, and optional reads through a nested
+arrow; its independent oracle predicts the mapped-versus-unmapped selection,
+the aliased and snapshot values, the `callee` descriptor shape, and the
+poisoned read, and every case also asserts the arrow-boundary diagnostic's
+exact message and location and that an explicit `arguments` parameter
+suppresses the implicit binding.
+
+The reviewed subset grows by 307 cases and promotes 29 existing entries. The
+201 newly reviewed *test/language/arguments-object/* paths contribute 200
+passes covering `callee` identity, poisoning, and descriptors, `length`,
+indexed writes, deletion, iteration, and one call-site trailing comma in every
+admitted function form, plus one expected negative for assignment to
+`arguments` in strict code; the complete reviewed group then holds 247 passes
+and that one expected negative. A further 51 passes and 55 expected negatives
+across *test/language/expressions/* and *test/language/statements/* cover
+lexical capture from an arrow, parameter-default references, `for-of` over
+both shapes, `var` and function declarations named `arguments`, and the strict
+early errors that keep the name off every assignment target. The 29 promoted
+entries were classified `unsupported-profile-feature` only because
+`arguments` did not resolve: eighteen asynchronous-generator `yield*` cases
+that spread `arguments` in a method's logging iterator, two `yield*` receiver
+cases, two `AsyncFromSyncIteratorPrototype` cases, two tagged-template
+argument-list cases, two class static-initializer cases, and three
+for-await-of destructuring cases.
+Candidates this unit's own audit leaves out stay out for reasons outside it:
+*10.5-1-s.js* and *10.5-7-b-1-s.js* read `eval`, seven cases read `Object` or
+`Array` as a bare value, two need `for-in`, two need the `caller` feature, two
+tagged-template cases need a realm, four arguments-object cases and 44
+`forbidden-ext` and `bind` cases need `Object.prototype.hasOwnProperty` or
+`Function.prototype.bind`, and every remaining candidate is `eval` code. The
+manifest reaches 4,722 cases: 2,890 passes, 1,292 expected negatives, and 540
+unsupported profile features with no semantic or harness failures. Unit
+8.5g recorded *unmapped/via-params-dflt.js*, *unmapped/via-params-dstr.js*,
+and *unmapped/via-params-rest.js* as blocked on harness value reads; this
+unit's audit found the harness compiles cleanly and their only blocker was the
+strict variant's missing binding, so all three now pass, as does
+*mapped/nonconfigurable-descriptors-define-failure.js*, whose nested arrow
+capture that unit recorded as a gap.
 
 ### Intrinsics and built-in objects
 

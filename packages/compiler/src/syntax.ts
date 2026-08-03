@@ -964,6 +964,15 @@ export type SyntaxStatement =
 
 /** A top-level function declaration in owned syntax. */
 export interface SyntaxFunction extends LocatedSyntax {
+  /**
+   * True when BoundNames of the formal parameters contains `arguments`,
+   * which is what FunctionDeclarationInstantiation tests before creating
+   * the implicit object. It is recorded here rather than recovered from
+   * `parameters`, because a defaulted or destructured formal is lowered
+   * to a synthetic parameter name and its own binding is created by a
+   * parameter initializer instead.
+   */
+  readonly argumentsFormal?: true;
   /** Internal declaration binding when it differs from the function name. */
   readonly bindingName?: string;
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
@@ -990,8 +999,9 @@ export interface SyntaxFunction extends LocatedSyntax {
    * ECMA-262's IsSimpleParameterList: every parameter is a single
    * `BindingIdentifier` with no initializer, and no parameter is a rest
    * parameter. A mapped arguments object is admitted only when this is
-   * true, so it is computed once at the frontend boundary rather than
-   * reconstructed later from the parameter list's shape.
+   * true and the function is non-strict, so it is computed once at the
+   * frontend boundary rather than reconstructed later from the parameter
+   * list's shape.
    */
   readonly simpleParameterList?: true;
   readonly strict?: boolean;

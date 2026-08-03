@@ -3267,9 +3267,25 @@ export function functionDeclaration(
           } satisfies BabelNode,
         ]
       : nodes(bodyNode?.body);
+  // FunctionDeclarationInstantiation's step 18 tests BoundNames of the
+  // formals, not the possibly synthetic parameter list a parameter
+  // environment lowers them to, so a defaulted or destructured formal
+  // named `arguments` suppresses the implicit object exactly as a plain
+  // one does. HIR reads the recorded fact rather than the lowered list.
+  const argumentsFormal = parameterNames.includes("arguments");
+  // Step 21 then appends `arguments` to parameterBindings whenever the
+  // implicit object is created, so a body's own `var arguments` never
+  // resets it: without parameter expressions the var name is already
+  // instantiated, and with them the separate body binding is initialized
+  // from the parameter environment's value rather than from `undefined`.
+  const implicitArgumentsBinding =
+    value.type !== "ArrowFunctionExpression" && !argumentsFormal;
   const copiedParameterNames = new Map<string, string>();
   if (parameterExpressions) {
-    for (const parameterName of parameterNames) {
+    for (const parameterName of [
+      ...parameterNames,
+      ...(implicitArgumentsBinding ? ["arguments"] : []),
+    ]) {
       if (!copiedParameterNames.has(parameterName)) {
         copiedParameterNames.set(
           parameterName,
@@ -3283,6 +3299,7 @@ export function functionDeclaration(
     for (const parameterName of parameterNames) {
       skippedHoistedNames.add(parameterName);
     }
+    if (implicitArgumentsBinding) skippedHoistedNames.add("arguments");
   }
   const hoisted = hoistedVarDeclarations(
     context,
@@ -3354,6 +3371,7 @@ export function functionDeclaration(
       : 0;
   return {
     ...location(context, value),
+    ...(argumentsFormal ? { argumentsFormal: true as const } : {}),
     body,
     functionLength,
     functionKind:

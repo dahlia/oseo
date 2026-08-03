@@ -124,23 +124,34 @@ test("preserves non-strict script parameter bindings", () => {
   }
 });
 
-test("binds arguments only in admitted non-strict functions", () => {
+test("binds arguments in every owning function form", () => {
   const admitted = compileSource(babelFrontend, {
     source:
       "function declared() { return arguments; }\n" +
       "const expressed = function () { return arguments.length; };\n" +
-      "const object = { method() { return arguments[0]; } };\n",
+      "const object = { method() { return arguments[0]; } };\n" +
+      'function strict() { "use strict"; return arguments.length; }\n' +
+      "function outer() { return () => arguments.length; }\n" +
+      "async function asynchronous() { return arguments.length; }\n" +
+      "async function* asyncGenerated() { yield arguments.length; }\n" +
+      "function* generated() { yield arguments.length; }\n" +
+      "class Value {\n" +
+      "  constructor() { this.count = arguments.length; }\n" +
+      "  method() { return arguments.length; }\n" +
+      "}\n",
     sourceId: "arguments-object.ts",
   });
   assert.deepEqual(admitted.diagnostics, []);
   assert.ok(admitted.hir != null);
   assert.ok(admitted.mir != null);
 
+  // An arrow declares none of its own, so one with no enclosing owning
+  // form leaves the name unresolved, exactly as a top-level reference does.
   const rejectedSources = [
-    'function strict() { "use strict"; return arguments; }',
-    "function outer() { return () => arguments; }",
-    "async function asynchronous() { return arguments; }",
-    "class Value { method() { return arguments; } }",
+    "const lexical = () => arguments;",
+    "const asynchronousLexical = async () => arguments;",
+    "const nested = () => () => arguments.length;",
+    "arguments;",
   ];
   for (const [index, source] of rejectedSources.entries()) {
     const rejected = compileSource(babelFrontend, {
@@ -152,6 +163,55 @@ test("binds arguments only in admitted non-strict functions", () => {
       rejected.diagnostics[0]?.message ?? "",
       /Unknown binding 'arguments'/u,
     );
+  }
+});
+
+test("suppresses the implicit binding for every arguments formal", () => {
+  // FunctionDeclarationInstantiation tests BoundNames of the formals, so
+  // a defaulted or destructured formal named `arguments` suppresses the
+  // implicit object even though a parameter environment lowers it to a
+  // synthetic parameter name whose own binding a parameter initializer
+  // creates. The deterministic list is the regression guard: the observable
+  // output cannot see the difference, because the parameter's own binding
+  // shadows an implicit one either way.
+  const suppressing = [
+    "arguments",
+    "arguments = 1",
+    "{ arguments }",
+    "[arguments]",
+    "...arguments",
+    "first, arguments = first",
+  ];
+  for (const formals of suppressing) {
+    const result = compileSource(babelFrontend, {
+      source: `function inspect(${formals}) { return arguments; }\n`,
+      sourceId: "arguments-formal.js",
+    });
+    assert.deepEqual(result.diagnostics, [], formals);
+    const inspect = result.hir?.functions.find(
+      (functionValue) => functionValue.name === "inspect",
+    );
+    assert.equal(inspect?.argumentsBindingId, undefined, formals);
+    assert.equal(inspect?.argumentsMapped, undefined, formals);
+    assert.equal(result.syntax?.body[0]?.kind, "function", formals);
+    const declaration = result.syntax?.body[0];
+    if (declaration?.kind === "function") {
+      assert.equal(declaration.argumentsFormal, true, formals);
+    }
+  }
+
+  // A formal that does not bind the name leaves the implicit object in
+  // place, including when its own default makes the list non-simple.
+  for (const formals of ["", "a", "a = 1", "{ a }", "...rest"]) {
+    const result = compileSource(babelFrontend, {
+      source: `function inspect(${formals}) { return arguments; }\n`,
+      sourceId: "ordinary-formal.js",
+    });
+    assert.deepEqual(result.diagnostics, [], formals);
+    const inspect = result.hir?.functions.find(
+      (functionValue) => functionValue.name === "inspect",
+    );
+    assert.ok(inspect?.argumentsBindingId != null, formals);
   }
 });
 
@@ -1040,6 +1100,25 @@ test("resolves top-level delete arguments as an unresolvable reference", () => {
   assert.ok(result.hir != null);
   assert.ok(result.mir != null);
   assert.match(printHir(result.hir), /\n  true/u);
+
+  // An arrow with no enclosing owning form reaches the same unresolvable
+  // reference, while every owning form resolves its own binding and
+  // answers false without reading the cell.
+  const arrow = compileSource(babelFrontend, {
+    source: "const read = () => delete arguments;\n",
+    sourceId: "delete-arrow-arguments.js",
+  });
+  assert.deepEqual(arrow.diagnostics, []);
+  assert.ok(arrow.hir != null);
+  assert.match(printHir(arrow.hir), /\n {2}return true/u);
+
+  const asynchronous = compileSource(babelFrontend, {
+    source: "async function owner() { return delete arguments; }\n",
+    sourceId: "delete-async-arguments.js",
+  });
+  assert.deepEqual(asynchronous.diagnostics, []);
+  assert.ok(asynchronous.hir != null);
+  assert.match(printHir(asynchronous.hir), /\n {2}return false/u);
 });
 
 test("retains closed-world and early-error delete boundaries", () => {
@@ -1063,11 +1142,6 @@ test("retains closed-world and early-error delete boundaries", () => {
       "delete console;",
       "OSEO1001",
       /outside the admitted global-object profile/u,
-    ],
-    [
-      "async function unavailable() { return delete arguments; }",
-      "OSEO1001",
-      /outside the admitted function profile/u,
     ],
     [
       "with ({}) { unavailable = 1; delete unavailable; }",
