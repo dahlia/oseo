@@ -410,6 +410,74 @@ test("rejects delete arguments only in unavailable function profiles", () => {
   assert.equal(result.diagnostics[0]?.range.start.column, 1);
 });
 
+test("admits the mapped arguments object only for a simple list", () => {
+  const mapped = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "simple",
+        parameters: [
+          { hints: [], name: "a", range },
+          { hints: [], name: "b", range },
+        ],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-simple.js",
+  });
+  assert.deepEqual(mapped.diagnostics, []);
+  const mappedFunction = mapped.program?.functions[0];
+  assert.ok(mappedFunction?.argumentsBindingId != null);
+  assert.equal(mappedFunction?.argumentsMapped, true);
+
+  const unmapped = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "rest",
+        parameters: [{ hints: [], name: "a", range, rest: true }],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-rest.js",
+  });
+  assert.deepEqual(unmapped.diagnostics, []);
+  const unmappedFunction = unmapped.program?.functions[0];
+  assert.ok(unmappedFunction?.argumentsBindingId != null);
+  assert.equal(unmappedFunction?.argumentsMapped, undefined);
+
+  const strict = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "strictSimple",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+        strict: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-strict.js",
+  });
+  assert.deepEqual(strict.diagnostics, []);
+  const strictFunction = strict.program?.functions[0];
+  assert.equal(strictFunction?.argumentsBindingId, undefined);
+  assert.equal(strictFunction?.argumentsMapped, undefined);
+});
+
 test("rejects duplicate names in owned catch binding patterns", () => {
   const identifier = {
     hints: [],

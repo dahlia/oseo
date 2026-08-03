@@ -3069,6 +3069,10 @@ export function functionDeclaration(
   });
   const defaultParameters = defaultParameterIndex >= 0;
   const parameterEnvironment = bindingPatternParameters || defaultParameters;
+  // ECMA-262's IsSimpleParameterList: no rest parameter, no binding
+  // pattern, and no initializer. A mapped arguments object needs this
+  // fact, since CreateMappedArgumentsObject admits only simple lists.
+  const simpleParameterList = !parameterEnvironment && restParameterIndex < 0;
   const parameterExpressions = parameterNodes.some(
     rawParameterContainsExpression,
   );
@@ -3371,6 +3375,7 @@ export function functionDeclaration(
     name,
     parameters,
     returnHints,
+    ...(simpleParameterList ? { simpleParameterList: true } : {}),
     strict,
   };
 }

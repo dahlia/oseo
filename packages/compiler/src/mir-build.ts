@@ -6486,6 +6486,7 @@ function buildMirFunction(
   asyncFunction = false,
   argumentsBindingId?: number,
   generatorCallStatementCount = 0,
+  argumentsMapped = false,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -6566,6 +6567,7 @@ function buildMirFunction(
   );
   return {
     ...(argumentsBindingId == null ? {} : { argumentsBindingId }),
+    ...(argumentsMapped ? { argumentsMapped: true as const } : {}),
     blocks: builder.blocks.map((block) => ({
       id: block.id,
       operations: block.operations,
@@ -6654,6 +6656,7 @@ export function buildMir(
           functionValue.functionKind === "async-arrow",
         functionValue.argumentsBindingId,
         functionValue.generatorCallStatementCount,
+        functionValue.argumentsMapped === true,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

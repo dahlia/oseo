@@ -242,6 +242,23 @@ the throw method, so its lookup fell through to the `[Symbol.iterator]` self
 function's slot and whichever method a program resolved first was returned
 for both keys afterward.
 
+The `m5-40` ABI adds `oseo_mapped_arguments_create` and a `mapped_arguments`
+object flag. The generated prologue calls it instead of
+`oseo_arguments_create` whenever a non-strict function's parameter list is
+simple: every supplied index first snapshots its call argument exactly as
+the unmapped constructor does, then a rightmost formal parameter's own
+index is redefined to hold that parameter's environment binding cell as
+its stored value. `cell_backed_property`, already shared by the global
+object and a module namespace, recognizes the flag, so `[[Get]]`,
+`[[Set]]`, and `[[GetOwnProperty]]` alias the index and the parameter with
+no exotic method table of their own. `[[DefineOwnProperty]]`'s
+redefinition path severs that alias, replacing the cell with a plain
+snapshot of the value just written, exactly when the accepted descriptor
+is an explicit non-writable data descriptor or an accessor; the parameter
+itself keeps its own binding cell and stays mutable regardless. A
+duplicate formal name maps only its rightmost occurrence, and an index at
+or beyond the parameter count keeps the unmapped snapshot.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

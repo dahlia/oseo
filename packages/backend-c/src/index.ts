@@ -3307,6 +3307,70 @@ function emitGlobalObject(
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
 }
 
+/**
+ * The mapped arguments exotic object aliases each supplied index that is
+ * the rightmost formal parameter of its name to that parameter's own
+ * binding cell, so a later mutation through either the index or the
+ * parameter observes the other. A duplicate name's earlier occurrence,
+ * having no index of its own left to alias, keeps the ordinary snapshot
+ * value the runtime otherwise gives every unmapped or excess index.
+ */
+function emitMappedArgumentsCreate(
+  state: EmitState,
+  functionValue: MirFunction,
+  environmentSlot: number,
+): void {
+  const parameters = functionValue.parameters;
+  const mapped = parameters
+    .map((parameter, index) => ({ bindingId: parameter.bindingId, index }))
+    .filter(
+      ({ bindingId }, position) =>
+        parameters.findLastIndex((p) => p.bindingId === bindingId) === position,
+    );
+  let indicesExpression = renderC(emittedC.common.nullPointer);
+  let bindingIdsExpression = renderC(emittedC.common.nullPointer);
+  if (mapped.length > 0) {
+    indicesExpression = renderC(
+      emittedC.mappedArguments.indicesName,
+      functionValue.id,
+    );
+    bindingIdsExpression = renderC(
+      emittedC.mappedArguments.bindingIdsName,
+      functionValue.id,
+    );
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstSizeTArrayAssignStatement,
+        indicesExpression,
+        mapped
+          .map(({ index }) => `${index}u`)
+          .join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstSizeTArrayAssignStatement,
+        bindingIdsExpression,
+        mapped
+          .map(({ bindingId }) => `${bindingId}u`)
+          .join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+  }
+  line(
+    state,
+    renderC(
+      emittedC.prologue.resultAssignOseoMappedArgumentsCreate,
+      environmentSlot,
+      indicesExpression,
+      bindingIdsExpression,
+      mapped.length,
+    ),
+  );
+}
+
 function emitPrologue(
   state: EmitState,
   functionValue: MirFunction,
@@ -3380,7 +3444,11 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     line(state, renderC(emittedC.common.rootAssignResultValue, temporarySlot));
-    line(state, renderC(emittedC.prologue.resultAssignOseoArgumentsCreate));
+    if (functionValue.argumentsMapped === true) {
+      emitMappedArgumentsCreate(state, functionValue, environmentSlot);
+    } else {
+      line(state, renderC(emittedC.prologue.resultAssignOseoArgumentsCreate));
+    }
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     line(
       state,

@@ -44,6 +44,11 @@ export const emittedC = {
       ["[] = {"],
       ["};"],
     ],
+    staticConstSizeTArrayAssignStatement: [
+      ["static const size_t "],
+      ["[] = {"],
+      ["};"],
+    ],
     commaSpace: [[", "]],
     rootAssignResultValue: [["roots["], ["] = result.value;"]],
     rootsAssignOseoUndefinedStatement: [["roots["], ["] = oseo_undefined();"]],
@@ -853,6 +858,10 @@ export const emittedC = {
       ["result = oseo_global_object_create(context, "],
     ],
   },
+  mappedArguments: {
+    indicesName: [["mapped_arguments_indices_"], [""]],
+    bindingIdsName: [["mapped_arguments_binding_ids_"], [""]],
+  },
   operation: {
     resultAssignOseoSymbolIntrinsicContext: [
       ["result = oseo_symbol_intrinsic(context);"],
@@ -1008,6 +1017,13 @@ export const emittedC = {
         "result = oseo_arguments_create(context, callee, argument_count, ",
         "arguments);",
       ],
+    ],
+    resultAssignOseoMappedArgumentsCreate: [
+      ["result = oseo_mapped_arguments_create(context, roo", "ts["],
+      ["], callee, argument_count, arguments, "],
+      [", "],
+      [", "],
+      ["u);"],
     ],
     oseoCellSet: [["oseo_cell_set"]],
     oseoCellInitialize: [["oseo_cell_initialize"]],

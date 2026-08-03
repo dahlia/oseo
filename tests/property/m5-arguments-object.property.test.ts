@@ -196,3 +196,225 @@ test(
     );
   },
 );
+
+/**
+ * A non-strict simple parameter list now selects the mapped arguments
+ * exotic object instead of the unmapped snapshot above. This domain
+ * covers two-way parameter aliasing, only-supplied mapping, a
+ * duplicate formal name mapping only its rightmost occurrence, and
+ * every severing transition 10.4.4.2 admits: deletion, an explicit
+ * non-writable redefinition, and conversion to an accessor.
+ */
+type SeverMode = "accessor" | "delete" | "none" | "writable-false";
+
+interface MappedArgumentsCase {
+  readonly duplicateLast: boolean;
+  readonly paramCount: number;
+  readonly replacement1: number;
+  readonly replacement2: number;
+  readonly severMode: SeverMode;
+  readonly suppliedValues: readonly number[];
+  readonly writeIndex: number;
+}
+
+const ACCESSOR_MARKER = 999_999;
+
+const mappedCaseArbitrary: fc.Arbitrary<MappedArgumentsCase> = fc.record({
+  duplicateLast: fc.boolean(),
+  paramCount: fc.integer({ max: 3, min: 1 }),
+  replacement1: fc.integer({ max: 500, min: 100 }),
+  replacement2: fc.integer({ max: 999, min: 501 }),
+  severMode: fc.constantFrom<SeverMode>(
+    "accessor",
+    "delete",
+    "none",
+    "writable-false",
+  ),
+  suppliedValues: fc.array(fc.integer({ max: 20, min: -20 }), {
+    maxLength: 5,
+  }),
+  writeIndex: fc.integer({ max: 4, min: 0 }),
+});
+
+function isShadowedMappedParameter(
+  testCase: MappedArgumentsCase,
+  index: number,
+): boolean {
+  return testCase.duplicateLast && testCase.paramCount >= 2 && index === 0;
+}
+
+function mappedParameterName(
+  testCase: MappedArgumentsCase,
+  index: number,
+): string {
+  return isShadowedMappedParameter(testCase, index) ||
+    (testCase.duplicateLast &&
+      testCase.paramCount >= 2 &&
+      index === testCase.paramCount - 1)
+    ? "p0"
+    : `p${index}`;
+}
+
+function isMappedInitially(
+  testCase: MappedArgumentsCase,
+  index: number,
+): boolean {
+  return (
+    index < testCase.paramCount &&
+    index < testCase.suppliedValues.length &&
+    !isShadowedMappedParameter(testCase, index)
+  );
+}
+
+function initialParameterValue(
+  testCase: MappedArgumentsCase,
+  index: number,
+): number | undefined {
+  const effectiveIndex = isShadowedMappedParameter(testCase, index)
+    ? testCase.paramCount - 1
+    : index;
+  return effectiveIndex < testCase.suppliedValues.length
+    ? testCase.suppliedValues[effectiveIndex]
+    : undefined;
+}
+
+function severStatement(testCase: MappedArgumentsCase): string {
+  switch (testCase.severMode) {
+    case "accessor":
+      return (
+        `Object.defineProperty(arguments, ${testCase.writeIndex}, ` +
+        `{ configurable: true, get() { return ${ACCESSOR_MARKER}; } });`
+      );
+    case "delete":
+      return `delete arguments[${testCase.writeIndex}];`;
+    case "writable-false":
+      return (
+        `Object.defineProperty(arguments, ${testCase.writeIndex}, ` +
+        `{ writable: false });`
+      );
+    case "none":
+      return "";
+  }
+}
+
+function printMappedCase(testCase: MappedArgumentsCase): string {
+  const parameterNames = Array.from(
+    { length: testCase.paramCount },
+    (_value, index) => mappedParameterName(testCase, index),
+  );
+  const writesParameter = testCase.writeIndex < testCase.paramCount;
+  const parameterName = writesParameter
+    ? mappedParameterName(testCase, testCase.writeIndex)
+    : "undefined";
+  return `
+function inspect(${parameterNames.join(", ")}) {
+  arguments[${testCase.writeIndex}] = ${testCase.replacement1};
+  const paramAfterArgWrite = ${parameterName};
+  ${severStatement(testCase)}
+  ${writesParameter ? `${parameterName} = ${testCase.replacement2};` : ""}
+  const argAfterParamWrite = arguments[${testCase.writeIndex}];
+  console.log(
+    paramAfterArgWrite,
+    argAfterParamWrite,
+    arguments.length,
+    arguments.callee === inspect,
+  );
+}
+inspect(${testCase.suppliedValues.join(", ")});
+`;
+}
+
+function mappedExpected(testCase: MappedArgumentsCase): string {
+  const mappedInitially = isMappedInitially(testCase, testCase.writeIndex);
+  const writesParameter = testCase.writeIndex < testCase.paramCount;
+  const paramAfterArgWrite = writesParameter
+    ? mappedInitially
+      ? testCase.replacement1
+      : initialParameterValue(testCase, testCase.writeIndex)
+    : undefined;
+  const argAfterParamWrite = ((): number | undefined => {
+    if (testCase.severMode === "delete") return undefined;
+    if (testCase.severMode === "accessor") return ACCESSOR_MARKER;
+    if (!writesParameter) return testCase.replacement1;
+    if (testCase.severMode === "writable-false") return testCase.replacement1;
+    return mappedInitially ? testCase.replacement2 : testCase.replacement1;
+  })();
+  return (
+    `${printed(paramAfterArgWrite)} ${printed(argAfterParamWrite)} ` +
+    `${testCase.suppliedValues.length} true\n`
+  );
+}
+
+test(
+  "mapped arguments objects alias, shadow duplicates, and sever",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "mapped arguments indices alias, and sever from, their parameters",
+      fc.asyncProperty(mappedCaseArbitrary, async (testCase) => {
+        const source = printMappedCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: mappedExpected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-mapped-arguments.js" },
+            { specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          if (specialization === "enabled") {
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          }
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: zigToolchain,
+              },
+              (native) =>
+                assertMatchingObservations([expectedObservation, native]),
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to three simple parameters, an optional rightmost-name " +
+          "duplicate, zero to five supplied integer arguments, a " +
+          "write/sever index from zero through four, and every sever " +
+          "mode (none, delete, non-writable redefinition, accessor)",
+        numRuns: 15,
+        profile: "M5 mapped arguments object",
+        seed: 0x5eed_002b,
+        sizeLimit:
+          "three parameters, five supplied arguments, and an index " +
+          "from zero through four",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

@@ -40,6 +40,7 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
     promise->ordinary.default_intrinsics = true;
     promise->ordinary.generator_prototype = false;
     promise->ordinary.generator = NULL;
+    promise->ordinary.mapped_arguments = false;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();

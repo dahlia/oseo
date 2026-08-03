@@ -986,6 +986,14 @@ export interface SyntaxFunction extends LocatedSyntax {
   readonly name: string | undefined;
   readonly parameters: readonly SyntaxParameter[];
   readonly returnHints: readonly Hint[];
+  /**
+   * ECMA-262's IsSimpleParameterList: every parameter is a single
+   * `BindingIdentifier` with no initializer, and no parameter is a rest
+   * parameter. A mapped arguments object is admitted only when this is
+   * true, so it is computed once at the frontend boundary rather than
+   * reconstructed later from the parameter list's shape.
+   */
+  readonly simpleParameterList?: true;
   readonly strict?: boolean;
 }
 

@@ -1445,11 +1445,14 @@ function resolveFunction(
   state.labels.push(...outerLabels);
   state.argumentsObjectUnavailable = outerArgumentsObjectUnavailable;
   state.thisBinding = outerThisBinding;
+  const argumentsMapped =
+    argumentsBinding != null && functionValue.simpleParameterList === true;
   const resolved: HirFunction = {
     ...functionValue,
     ...(argumentsBinding == null
       ? {}
       : { argumentsBindingId: argumentsBinding.id }),
+    ...(argumentsMapped ? { argumentsMapped: true } : {}),
     body,
     ...(derivedThisBinding == null
       ? {}

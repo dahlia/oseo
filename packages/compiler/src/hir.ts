@@ -964,6 +964,14 @@ export interface HirFunction extends LocatedSyntax {
    * arguments before parameter initialization.
    */
   readonly argumentsBindingId?: number;
+  /**
+   * True when `argumentsBindingId`'s object is the mapped arguments
+   * exotic object rather than the ordinary unmapped snapshot. ECMA-262
+   * admits the mapped form only for a non-strict function whose
+   * parameter list is simple; a present `argumentsBindingId` with this
+   * absent keeps the existing unmapped object.
+   */
+  readonly argumentsMapped?: true;
   readonly body: readonly HirStatement[];
   /**
    * Present exactly on a derived class constructor. Every `return` leaves
