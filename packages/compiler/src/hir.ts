@@ -1182,7 +1182,7 @@ export interface ResolveState {
   /**
    * Every `typeof` reference this program folded to the unresolvable
    * `"undefined"` answer, directly or as a `with` chain's miss
-   * fallback. The set is checked against `withAssignedFallbackNames`
+   * fallback. The set is checked against `withInitializingFallbackNames`
    * after the whole program resolves, so the rejection does not depend
    * on the source order of the fold and the assignment.
    */
@@ -1191,13 +1191,24 @@ export interface ResolveState {
     readonly name: string;
   }[];
   /**
-   * Names any `with` region of this program uses as an unresolved
-   * assignment target. Such an assignment can initialize its hidden
+   * The effective strictness of the code currently being resolved. A
+   * strict all-miss PutValue throws ReferenceError instead of creating
+   * a sloppy global, so with-fallback write classification depends on
+   * it.
+   */
+  strict: boolean;
+  /**
+   * Names any non-strict `with` region of this program uses as an
+   * unresolved assignment target whose all-miss path reaches PutValue
+   * without a prior read: a simple assignment or a destructuring or
+   * loop assignment target. Such a write can initialize its hidden
    * fallback cell at run time, which ECMA-262 models as creating a real
    * global binding, so a folded `typeof` answer for the same name
-   * anywhere in the program would misreport the materialized value.
+   * anywhere in the program would misreport the materialized value. A
+   * compound or logical assignment and an update expression read first
+   * and throw before any write, so they never enter this set.
    */
-  readonly withAssignedFallbackNames: Set<string>;
+  readonly withInitializingFallbackNames: Set<string>;
   /**
    * Hidden fallback bindings owned by each currently resolved `with`
    * statement, ordered outermost first.

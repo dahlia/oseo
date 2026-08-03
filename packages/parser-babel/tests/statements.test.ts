@@ -937,6 +937,123 @@ test("rejects typeof of an assigned with fallback name", () => {
   }
 });
 
+test("keeps the fold beside read-first with fallback operations", () => {
+  // A compound or logical assignment and an update expression perform
+  // GetValue before their write, so an all-miss chain throws
+  // ReferenceError on the uninitialized fallback cell and can never
+  // initialize it; a caught attempt leaves the name genuinely
+  // unresolvable and the fold stays admitted.
+  for (const source of [
+    "with ({}) {\n" +
+      "  try { missing++; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { --missing; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing += 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ||= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ??= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-read-first.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
+test("rejects typeof of a destructuring or loop with fallback target", () => {
+  // These targets reach PutValue without a prior read, so they can
+  // initialize the hidden cell exactly like a simple assignment.
+  for (const source of [
+    "with ({}) { ({ missing } = {}); console.log(typeof missing); }",
+    "with ({}) { [missing] = [1]; console.log(typeof missing); }",
+    "with ({}) { for (missing of [1]) {} console.log(typeof missing); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-put-target.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /typeof with fallback binding 'missing'/u,
+      source,
+    );
+  }
+});
+
+test("rejects a strict write to a with fallback binding", () => {
+  // A strict all-miss PutValue throws ReferenceError instead of
+  // creating a sloppy global, while the profile's fallback lowering
+  // would initialize the hidden cell, so the strict write itself stays
+  // rejected and never poisons the typeof fold.
+  for (const source of [
+    "with ({}) {\n" +
+      '  const f = () => { "use strict"; missing = 1; };\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; [missing] = [1]; }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; for (missing of [1]) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  class C { f = (missing = 1); }\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-strict-write.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /Assigning with fallback binding 'missing' in strict code/u,
+      source,
+    );
+  }
+});
+
+test("keeps strict read-first with fallback operations admitted", () => {
+  // A strict compound assignment or update reads first and throws the
+  // same catchable ReferenceError the lowering already produces, so it
+  // stays admitted and does not poison the fold.
+  for (const source of [
+    "with ({}) {\n" +
+      '  function f() { "use strict"; try { missing += 1; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; try { missing++; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-strict-read-first.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
 test("keeps typeof beside unrelated with fallback assignments", () => {
   const result = compileSource(babelFrontend, {
     source:

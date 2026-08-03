@@ -2676,9 +2676,22 @@ value itself, so an all-miss chain answers `"undefined"` without an
 uninitialized-cell error and without allocating a hidden cell. The one
 rejected composition is a folded `typeof`, direct or through `with`, of
 a name any `with` region of the same program uses as an unresolved
-assignment target: ECMA-262 models that sloppy assignment as creating a
-real global binding, so the folded answer would misreport the
-materialized value. The fold keeps the source-located hidden-fallback
+assignment target that can actually initialize its hidden cell:
+ECMA-262 models that sloppy assignment as creating a real global
+binding, so the folded answer would misreport the materialized value.
+Only an operation that reaches PutValue on an all-miss chain records
+the name, which is a non-strict simple assignment or a non-strict
+destructuring or loop assignment target. A compound or logical
+assignment and an update expression perform GetValue first, throw
+ReferenceError on the uninitialized cell before any write, and can
+never initialize it, so a caught attempt leaves the name genuinely
+unresolvable and keeps the fold admitted, in strict and non-strict code
+alike. A strict function or class body nested in a `with` region can
+still name a fallback write target, but its all-miss PutValue throws
+ReferenceError instead of creating a global; until that strict throw is
+lowered, the strict fallback write is itself a source-located
+rejection, so it neither runs with the wrong sloppy behavior nor
+poisons the fold. The fold keeps the source-located hidden-fallback
 rejection the Unit 8.1b delete records, and the check runs after the
 whole program resolves, so it holds regardless of where the assignment
 and the fold occur relative to each other, including an assignment only

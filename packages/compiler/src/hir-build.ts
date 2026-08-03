@@ -102,9 +102,13 @@ function resolveName(
 
 /**
  * Allocate the uninitialized fallback behind an unresolved `with` name.
- * An `initializing` use is an assignment-capable reference whose miss
- * path can write the hidden cell; recording it lets the enclosing
- * `with` statement reject a folded `typeof` of the same name instead of
+ * An `initializing` use is one whose all-miss path reaches PutValue
+ * without a prior GetValue, so it can actually write the hidden cell: a
+ * simple assignment or a destructuring or loop assignment target. A
+ * compound or logical assignment and an update expression read first
+ * and throw ReferenceError on the uninitialized cell before any write,
+ * so they never initialize it. Recording the initializing names lets
+ * the program reject a folded `typeof` of the same name instead of
  * misreporting the materialized value as `"undefined"`.
  */
 function withFallbackBinding(
@@ -116,7 +120,7 @@ function withFallbackBinding(
   if (owner == null) {
     throw new Error("A with fallback was requested outside a with statement.");
   }
-  if (initializing) state.withAssignedFallbackNames.add(name);
+  if (initializing) state.withInitializingFallbackNames.add(name);
   const existing = owner.get(name);
   if (existing != null) return existing;
   const binding: Binding = {
@@ -127,6 +131,31 @@ function withFallbackBinding(
   state.nextBindingId += 1;
   owner.set(name, binding);
   return binding;
+}
+
+/**
+ * Reject a strict-code write to a `with` fallback. A strict all-miss
+ * PutValue throws ReferenceError instead of creating a sloppy global,
+ * while this profile's fallback lowering would initialize the hidden
+ * cell, so the write stays outside the admitted global-object profile
+ * until the strict throw is lowered; it consequently never records an
+ * initializing name that could poison the typeof fold.
+ */
+function rejectStrictWithFallbackWrite(
+  name: string,
+  located: LocatedSyntax,
+  state: ResolveState,
+): void {
+  state.diagnostics.push(
+    sourceDiagnostic(
+      state.sourceId,
+      located,
+      `Assigning with fallback binding '${name}' in strict code is ` +
+        "outside the admitted global-object profile; a strict PutValue " +
+        "on an unresolvable reference throws instead of creating a " +
+        "global.",
+    ),
+  );
 }
 
 function bindingExpression(
@@ -497,8 +526,26 @@ function resolveExpression(
       return undefined;
     }
     if (value == null) return undefined;
+    if (
+      resolution.binding == null &&
+      state.strict &&
+      expression.kind === "binding-set"
+    ) {
+      rejectStrictWithFallbackWrite(expression.name, expression, state);
+      return undefined;
+    }
+    // Only a non-strict simple assignment reaches PutValue on an
+    // all-miss chain; a compound or logical assignment performs
+    // GetValue first, which throws ReferenceError on the uninitialized
+    // fallback cell before any write, so it can never initialize the
+    // hidden cell.
     const binding =
-      resolution.binding ?? withFallbackBinding(expression.name, state, true);
+      resolution.binding ??
+      withFallbackBinding(
+        expression.name,
+        state,
+        expression.kind === "binding-set",
+      );
     const inferred =
       expression.kind === "binding-set" ||
       expression.operator === "&&" ||
@@ -561,8 +608,11 @@ function resolveExpression(
       );
       return undefined;
     }
+    // An update expression performs GetValue before its write, so an
+    // all-miss chain throws ReferenceError on the uninitialized
+    // fallback cell and can never initialize it.
     const binding =
-      resolution.binding ?? withFallbackBinding(expression.name, state, true);
+      resolution.binding ?? withFallbackBinding(expression.name, state, false);
     if (resolution.objectBindingIds.length > 0) {
       return {
         ...expression,
@@ -833,7 +883,14 @@ function resolveExpression(
     return resolveOptionalChain(expression, scopes, state);
   }
   if (expression.kind === "class") {
-    return resolveClassExpression(expression, scopes, state);
+    // A ClassDefinition is strict code in its entirety, including the
+    // heritage operand, computed keys, and field initializers resolved
+    // in the enclosing context.
+    const outerStrict = state.strict;
+    state.strict = true;
+    const resolved = resolveClassExpression(expression, scopes, state);
+    state.strict = outerStrict;
+    return resolved;
   }
   if (
     expression.kind === "property-get" ||
@@ -1470,6 +1527,10 @@ function resolveFunction(
   } else if (!lexicalReceiver(functionValue)) {
     state.thisBinding = undefined;
   }
+  // The frontend records each function's effective strictness, so the
+  // body resolves under its own mode and restores the enclosing one.
+  const outerStrict = state.strict;
+  state.strict = functionValue.strict === true;
   const parameterScope = new Map<string, Binding>();
   const parameters: HirParameter[] = [];
   for (const parameter of functionValue.parameters) {
@@ -1527,6 +1588,7 @@ function resolveFunction(
   );
   state.labels.push(...outerLabels);
   state.thisBinding = outerThisBinding;
+  state.strict = outerStrict;
   // CreateMappedArgumentsObject is reachable only from
   // FunctionDeclarationInstantiation's non-strict, simple-parameter-list
   // branch; every other eligible form takes the unmapped snapshot.
@@ -2245,6 +2307,14 @@ function resolveBindingPattern(
             objectBindingIds: [],
           }
         : resolveName(scopes, state, pattern.name);
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      state.strict
+    ) {
+      rejectStrictWithFallbackWrite(pattern.name, pattern, state);
+      return undefined;
+    }
     const binding =
       resolution.binding ??
       (resolution.objectBindingIds.length === 0
@@ -2876,6 +2946,18 @@ function resolveStatement(
       }
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
+      if (
+        resolution.binding == null &&
+        resolution.objectBindingIds.length > 0 &&
+        state.strict
+      ) {
+        rejectStrictWithFallbackWrite(
+          statement.target.name,
+          statement.target,
+          state,
+        );
+        return undefined;
+      }
       const binding =
         resolution.binding ??
         (resolution.objectBindingIds.length === 0
@@ -3139,8 +3221,9 @@ export function buildSeededHir(
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
-    withAssignedFallbackNames: new Set(),
+    strict: program.strict === true,
     withFallbacks: [],
+    withInitializingFallbackNames: new Set(),
     withScopes: new Map(),
   };
   const scriptScope = new Map(seed.bindings);
@@ -3164,7 +3247,7 @@ export function buildSeededHir(
   // after the whole program resolves, so it holds regardless of where
   // the assignment and the fold occur relative to each other.
   for (const reference of state.foldedTypeofReferences) {
-    if (!state.withAssignedFallbackNames.has(reference.name)) continue;
+    if (!state.withInitializingFallbackNames.has(reference.name)) continue;
     diagnostics.push(
       sourceDiagnostic(
         state.sourceId,

@@ -106,7 +106,17 @@ its deliberate boundary and its evidence:
     or position, since ECMA-262 models that sloppy assignment as
     creating a real global binding whose value the folded answer would
     misreport, the same hidden-fallback boundary the Unit 8.1b delete
-    records.
+    records. Only an operation that reaches PutValue on an all-miss
+    chain records the name: a non-strict simple assignment or a
+    non-strict destructuring or loop assignment target. A compound or
+    logical assignment and an update expression read first and throw
+    ReferenceError on the uninitialized cell before any write, so a
+    caught attempt leaves the name genuinely unresolvable and keeps the
+    fold admitted in either mode. A strict fallback write, whose
+    all-miss PutValue ECMA-262 makes throw instead of creating a
+    global, is itself a source-located rejection until that strict
+    throw is lowered, so it neither runs with sloppy semantics nor
+    poisons the fold.
     `typeof` of an unshadowed runtime-owned intrinsic name, such
     as `Object` or `Promise`, stays a source-located rejection: the
     realm binds those names as call targets the profile does not admit

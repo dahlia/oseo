@@ -393,6 +393,12 @@ function withTemporalDeadZone(shadowing) {
   let beforeWith;
 }
 console.log(withTemporalDeadZone(true), withTemporalDeadZone(false));
+with (environment) {
+  try { missingUpdate++; } catch (caught) { console.log(caught.name); }
+  console.log(typeof missingUpdate);
+  try { missingCompound += 1; } catch (caught) { console.log(caught.name); }
+  console.log(typeof missingCompound);
+}
 console.log(typeof undefined, typeof NaN, typeof Infinity);
 `,
   },
