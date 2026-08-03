@@ -446,6 +446,69 @@ console.log(
 `,
   },
   {
+    name: "mapped-arguments-hoisted-function",
+    nonStrictScript: true,
+    source: `
+function sameName(a) {
+  console.log(arguments[0] === a);
+  function a() {}
+  console.log(arguments[0] === a, typeof arguments[0]);
+  a = 5;
+  console.log(arguments[0]);
+}
+sameName(1);
+
+function duplicateFormals(a, a) {
+  console.log(arguments[0] === a, arguments[1] === a);
+  function a() {}
+  console.log(arguments[0] === a, arguments[1] === a);
+  a = 9;
+  console.log(arguments[0], arguments[1]);
+}
+duplicateFormals(1, 2);
+
+function repeatedSameName(a) {
+  console.log(arguments[0] === a);
+  function a() { return "first"; }
+  function a() { return "second"; }
+  console.log(arguments[0] === a, a());
+  a = 5;
+  console.log(arguments[0]);
+}
+repeatedSameName(1);
+
+function argumentsNamedFunction(a) {
+  console.log(typeof arguments);
+  function arguments() { return "shadowed"; }
+  console.log(arguments());
+}
+argumentsNamedFunction(1);
+
+function nestedBlockShadows(a) {
+  console.log(arguments[0] === a);
+  { function a() {} console.log(typeof a); }
+  console.log(arguments[0] === a);
+  a = 7;
+  console.log(arguments[0]);
+}
+nestedBlockShadows(1);
+
+function nonSimpleUnaffected(a = 1) {
+  function a() {}
+  a = 9;
+  console.log(a);
+}
+nonSimpleUnaffected(2);
+
+function varAndFunctionSameName(a) {
+  const before = arguments[0] === a;
+  function a() {}
+  console.log(before, arguments[0] === a);
+}
+varAndFunctionSameName(3);
+`,
+  },
+  {
     name: "constructors",
     source: `
 function Box(value) { this.value = value; }

@@ -1086,6 +1086,7 @@ function predeclareBindings(
   scope: Map<string, Binding>,
   state: ResolveState,
   lexicalScope: boolean,
+  reuseScope?: ReadonlyMap<string, Binding>,
 ): void {
   for (const statement of statements) {
     // Every declarator of a lexical declaration list is predeclared in
@@ -1181,15 +1182,43 @@ function predeclareBindings(
     if (statement.kind === "function") {
       const functionId = state.nextFunctionId;
       state.nextFunctionId += 1;
-      const bindingId = previous?.id ?? state.nextBindingId;
-      if (previous == null) state.nextBindingId += 1;
+      // FunctionDeclarationInstantiation instantiates a FunctionBody's own
+      // top-level function declarations into varEnv, which is the same
+      // environment as the parameters themselves whenever the parameter
+      // list has no parameter expressions: a name already bound by a
+      // parameter (or by the implicit `arguments` binding) is not a fresh
+      // declaration but an ordinary write to that existing binding, the
+      // same reuse `var` already gets by resolving through the whole
+      // scope chain instead of being predeclared here. `reuseScope` is
+      // only ever the enclosing function's own parameter scope, passed by
+      // the sole caller that predeclares a FunctionBody's own top level,
+      // so a genuinely nested block's function declaration never reuses a
+      // parameter's binding: it keeps its own lexically shadowing one.
+      // A same-name earlier declaration in this same body scope reuses
+      // `previous` instead of `reuseScope`, but when that earlier
+      // declaration itself already reused an outer binding, this one
+      // targets the very same already-initialized id: `alreadyInitialized`
+      // carries forward from `previous` so it survives even though
+      // `buildFunctionInits` keeps only the last declaration's statement.
+      const reusedFromOuterScope =
+        previous == null ? reuseScope?.get(name) : undefined;
+      const reused = previous ?? reusedFromOuterScope;
+      const bindingId = reused?.id ?? state.nextBindingId;
+      if (reused == null) state.nextBindingId += 1;
+      const alreadyInitialized =
+        reusedFromOuterScope != null || previous?.alreadyInitialized === true;
       scope.set(name, {
+        ...(alreadyInitialized ? { alreadyInitialized: true } : {}),
         functionId,
         id: bindingId,
         mutable: true,
         name,
       });
-      state.functionInfo.set(statement, { bindingId, id: functionId });
+      state.functionInfo.set(statement, {
+        bindingId,
+        id: functionId,
+        ...(alreadyInitialized ? { alreadyInitialized: true } : {}),
+      });
     } else {
       scope.set(name, {
         id: previous?.id ?? state.nextBindingId,
@@ -1224,6 +1253,7 @@ function buildFunctionInits(
     if (scope.get(bindingName)?.functionId !== info.id) continue;
     const functionValue = resolveFunction(statement, scopes, state, info.id);
     result.push({
+      ...(info.alreadyInitialized === true ? { alreadyInitialized: true } : {}),
       bindingId: info.bindingId ?? -1,
       functionId: info.id,
       functionKind: functionValue.functionKind,
@@ -1424,7 +1454,13 @@ function resolveFunction(
     parameterScope.set("arguments", argumentsBinding);
   }
   const bodyScope = new Map<string, Binding>();
-  predeclareBindings(functionValue.body, bodyScope, state, false);
+  predeclareBindings(
+    functionValue.body,
+    bodyScope,
+    state,
+    false,
+    parameterScope,
+  );
   // Labels never cross a function boundary.
   const outerLabels = state.labels.splice(0);
   const body = resolveStatementList(

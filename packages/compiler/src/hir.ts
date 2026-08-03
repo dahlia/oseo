@@ -892,6 +892,13 @@ export type HirStatement =
       readonly kind: "expression";
     })
   | (LocatedSyntax & {
+      /**
+       * True when `bindingId` names a parameter or the implicit
+       * `arguments` binding that FunctionDeclarationInstantiation already
+       * initialized, so this statement writes through that existing
+       * binding instead of initializing a fresh one.
+       */
+      readonly alreadyInitialized?: true;
       readonly bindingId: number;
       readonly functionId: number;
       readonly functionKind: FunctionKind;
@@ -1050,6 +1057,16 @@ export interface HirResult {
 }
 
 export interface Binding {
+  /**
+   * True once this name's id names a parameter or the implicit
+   * `arguments` binding that FunctionDeclarationInstantiation already
+   * initialized before a same-name top-level function declaration's own
+   * instantiation step. Set the first time such a declaration reuses the
+   * outer binding, and carried forward by every later redeclaration of
+   * the same name in that scope, since `buildFunctionInits` keeps only
+   * the last one and it still targets that same already-initialized id.
+   */
+  readonly alreadyInitialized?: true;
   /** True only for an implicit non-strict `arguments` object binding. */
   readonly argumentsObject?: true;
   readonly functionId?: number;
@@ -1071,7 +1088,18 @@ export interface ResolveState {
   readonly diagnostics: Diagnostic[];
   readonly functionInfo: Map<
     SyntaxFunction,
-    { readonly bindingId?: number; readonly id: number }
+    {
+      /**
+       * True when `bindingId` names a parameter or the implicit
+       * `arguments` binding that FunctionDeclarationInstantiation already
+       * initialized before this declaration's own instantiation step, so
+       * the function-init statement must write through the existing
+       * binding rather than initialize a fresh one.
+       */
+      readonly alreadyInitialized?: true;
+      readonly bindingId?: number;
+      readonly id: number;
+    }
   >;
   readonly hirFunctions: HirFunction[];
   /** Active labels of the function being resolved; loops accept continue. */

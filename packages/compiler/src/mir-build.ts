@@ -5921,6 +5921,21 @@ function lowerStatements(
         },
         builder,
       );
+      // A parameter or the implicit `arguments` binding this declaration
+      // shares a name with is already initialized by the time
+      // FunctionDeclarationInstantiation reaches its own function
+      // declarations, so this instantiation writes through that existing
+      // binding instead of initializing a fresh one.
+      const writesThroughOuterBinding = statement.alreadyInitialized === true;
+      if (writesThroughOuterBinding) {
+        appendMirMetadata(
+          builder,
+          "safepoint",
+          "binding assignment error",
+          [value],
+          statement.range,
+        );
+      }
       const id = builder.nextValue;
       builder.nextValue += 1;
       builder.current.operations.push({
@@ -5928,9 +5943,19 @@ function lowerStatements(
         bindingId: statement.bindingId,
         detail: `%b${statement.bindingId} ${statement.name}`,
         id,
-        kind: "initialize",
+        kind: writesThroughOuterBinding ? "write" : "initialize",
+        ...(writesThroughOuterBinding ? { mutable: true } : {}),
         range: statement.range,
       });
+      if (writesThroughOuterBinding) {
+        appendMirMetadata(
+          builder,
+          "check-status",
+          "normal -> continue, abrupt -> return",
+          [id],
+          statement.range,
+        );
+      }
       recordRoot(builder, id, statement.range);
     } else if (statement.kind === "expression") {
       lowerExpression(statement.expression, builder);
