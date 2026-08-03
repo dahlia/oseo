@@ -2688,10 +2688,19 @@ whether direct or behind `with`: ECMA-262 resolves `Object`, `Promise`,
 `console`, `setTimeout`, and `clearTimeout` to real global values this
 profile admits only as call targets, so answering `"undefined"` would
 misreport them; the rejection reuses the `isRuntimeOwnedIntrinsicName`
-boundary the Unit 8.1b identifier delete records. A shadowing
-declaration keeps the ordinary binding read, and the admitted intrinsic
-values `undefined`, `NaN`, `Infinity`, `Symbol`, and the error
-constructors keep their existing resolutions. No MIR, backend, or
+boundary the Unit 8.1b identifier delete records. The same honesty rule
+covers every other global name ECMA-262 clause 19 requires of the
+ECMAScript 2025 realm ADR 0013 pins, such as `Math`, `JSON`, `Array`,
+`Function`, `eval`, and `globalThis`: a conforming realm always
+resolves them, so an unshadowed `typeof` of one is a source-located
+rejection through the owned `isStandardGlobalName` classification
+rather than a misreported `"undefined"`, and the fold answers
+`"undefined"` only for a name no conforming realm of the pinned
+edition is required to bind. Annex B additions such as `escape` stay
+excluded from the claim and remain ordinary unresolvable names. A
+shadowing declaration keeps the ordinary binding read, and the admitted
+intrinsic values `undefined`, `NaN`, `Infinity`, `Symbol`, and the
+error constructors keep their existing resolutions. No MIR, backend, or
 runtime change is needed and the runtime ABI stays `oseo-runtime-m5-41`.
 
 Focused tests pin each side: compiler tests assert the fold produces the

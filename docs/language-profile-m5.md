@@ -111,7 +111,15 @@ its deliberate boundary and its evidence:
     as `Object` or `Promise`, stays a source-located rejection: the
     realm binds those names as call targets the profile does not admit
     as values, so `"undefined"` would misreport them, the same boundary
-    the Unit 8.1b identifier delete records. HIR and MIR structural
+    the Unit 8.1b identifier delete records. The same rule covers every
+    other global name ECMA-262 clause 19 requires of the pinned
+    ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
+    `globalThis`: an unshadowed `typeof` of one stays a source-located
+    rejection until the profile admits the name as a value, so the fold
+    answers `"undefined"` only for a name no conforming realm of the
+    pinned edition is required to bind; Annex B additions such as
+    `escape` stay excluded from the claim and remain ordinary
+    unresolvable names. HIR and MIR structural
     tests, a fixed native differential fixture, a generated property
     suite with seed `0x5eed002c`, and the reviewed test262
     unresolvable-reference case cover the boundary.
@@ -2624,7 +2632,16 @@ must never shrink by reclassification alone.
     Script top-level `this` and every non-strict nullish receiver one
     realm-wide global this value whose own properties are the Script's
     statically known var-scoped top-level bindings, as recorded above,
-    but that object is not the global object. Admitting the global object
+    but that object is not the global object. Because this realm binds
+    none of the unadmitted clause 19 standard globals, a Script
+    top-level `var` declaration of such a name creates the fresh
+    undefined-initialized property GlobalDeclarationInstantiation
+    prescribes for an absent name, exactly as reviewed passes such as
+    *for-of/dstr/obj-id-init-simple-no-strict.js* rely on; the window
+    before its first assignment, where a conforming realm would still
+    expose the intrinsic value, is part of this gap, and a case that
+    observes it surfaces as a semantic failure at manifest review rather
+    than entering silently. Admitting the global object
     requires the intrinsic graph to expose standard constructors as real
     values first, Annex B block-level function hoisting so that a
     function declared in a block reaches the same binding model, the

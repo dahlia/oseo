@@ -2,6 +2,7 @@ import {
   anonymousDefinition,
   errorIntrinsicName,
   intrinsicGlobalKind,
+  isStandardGlobalName,
 } from "./hir.ts";
 import type {
   Binding,
@@ -404,6 +405,22 @@ function resolveTypeofIdentifier(
         state.sourceId,
         argument,
         `typeof runtime intrinsic binding '${argument.name}' is outside ` +
+          "the admitted global-object profile.",
+      ),
+    );
+    return undefined;
+  }
+  // A clause 19 standard global is never unresolvable in a conforming
+  // realm of the pinned edition, so folding it to "undefined" would
+  // misreport a required global value this profile has simply not
+  // admitted yet. Annex B additions stay excluded from the claim and
+  // remain ordinary unresolvable names.
+  if (isStandardGlobalName(argument.name)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        argument,
+        `typeof standard global binding '${argument.name}' is outside ` +
           "the admitted global-object profile.",
       ),
     );

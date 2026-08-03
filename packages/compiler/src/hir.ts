@@ -212,6 +212,84 @@ export function errorIntrinsicName(
 }
 
 /**
+ * Global names ECMA-262 clause 19 requires of every realm in ECMAScript
+ * 2025, the candidate edition ADR 0013 pins, excluding the Annex B
+ * additions the claim excludes. A conforming realm always resolves
+ * these names, so a `typeof` of one can never take the unresolvable
+ * reference's `"undefined"` answer; a name this profile has not
+ * admitted as a value must be rejected instead of misreported.
+ */
+const standardGlobalNames: ReadonlySet<string> = new Set([
+  "AggregateError",
+  "Array",
+  "ArrayBuffer",
+  "Atomics",
+  "BigInt",
+  "BigInt64Array",
+  "BigUint64Array",
+  "Boolean",
+  "DataView",
+  "Date",
+  "Error",
+  "EvalError",
+  "FinalizationRegistry",
+  "Float16Array",
+  "Float32Array",
+  "Float64Array",
+  "Function",
+  "Infinity",
+  "Int16Array",
+  "Int32Array",
+  "Int8Array",
+  "Iterator",
+  "JSON",
+  "Map",
+  "Math",
+  "NaN",
+  "Number",
+  "Object",
+  "Promise",
+  "Proxy",
+  "RangeError",
+  "ReferenceError",
+  "Reflect",
+  "RegExp",
+  "Set",
+  "SharedArrayBuffer",
+  "String",
+  "Symbol",
+  "SyntaxError",
+  "TypeError",
+  "URIError",
+  "Uint16Array",
+  "Uint32Array",
+  "Uint8Array",
+  "Uint8ClampedArray",
+  "WeakMap",
+  "WeakRef",
+  "WeakSet",
+  "decodeURI",
+  "decodeURIComponent",
+  "encodeURI",
+  "encodeURIComponent",
+  "eval",
+  "globalThis",
+  "isFinite",
+  "isNaN",
+  "parseFloat",
+  "parseInt",
+  "undefined",
+]);
+
+/**
+ * Whether ECMA-262 requires every realm of the pinned edition to bind
+ * `name` as a global, ignoring what this profile has admitted so far.
+ */
+export function isStandardGlobalName(name: string): boolean {
+  return standardGlobalNames.has(name);
+}
+
+/**
  * How ECMA-262's global object already binds one intrinsic global name,
  * which is what decides whether a Script's own top-level declaration of
  * that name creates an ordinary global-object property.

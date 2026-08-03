@@ -810,6 +810,62 @@ test("rejects typeof of an unshadowed runtime intrinsic name", () => {
   );
 });
 
+test("rejects typeof of an unimplemented standard global name", () => {
+  // ECMA-262 clause 19 requires every conforming realm to bind these
+  // names, so the unresolvable fold's "undefined" answer would
+  // misreport them; each stays a source-located rejection until the
+  // profile admits it as a value, inside and outside `with` alike.
+  for (const source of [
+    "console.log(typeof Math);",
+    "console.log(typeof Array);",
+    "console.log(typeof Function);",
+    "console.log(typeof JSON);",
+    "console.log(typeof RegExp);",
+    "console.log(typeof BigInt);",
+    "console.log(typeof eval);",
+    "console.log(typeof globalThis);",
+    "console.log(typeof parseInt);",
+    "with ({}) { console.log(typeof Math); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-standard-global.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /typeof standard global binding '\w+' is outside/u,
+      source,
+    );
+  }
+});
+
+test("resolves typeof of a shadowed standard global to the binding", () => {
+  for (const source of [
+    "let Math = 1; console.log(typeof Math);",
+    "function Array() {}\nconsole.log(typeof Array);",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-shadowed-global.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
+test("keeps the fold for names outside the pinned realm", () => {
+  // Annex B additions are excluded from the claim, so an unshadowed
+  // `escape` is an ordinary unresolvable name in this profile's realm.
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof escape);",
+    sourceId: "typeof-annex-b.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
+});
+
 test("resolves typeof of a shadowed intrinsic name to the binding", () => {
   const result = compileSource(babelFrontend, {
     source: "let Promise = 1;\nconsole.log(typeof Promise);",
