@@ -377,6 +377,13 @@ export interface MirFunction extends LocatedSyntax {
    */
   readonly argumentsBindingId?: number;
   /**
+   * True when `argumentsBindingId`'s object is the mapped arguments
+   * exotic object rather than the ordinary unmapped snapshot, mirroring
+   * `HirFunction.argumentsMapped`. The backend uses it to select which
+   * runtime constructor the prologue calls.
+   */
+  readonly argumentsMapped?: true;
+  /**
    * An ordinary asynchronous body backed by a traced suspension frame.
    * Calling it still returns one capability promise rather than exposing
    * the frame.

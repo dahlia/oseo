@@ -698,25 +698,62 @@ its deliberate boundary and its evidence:
     expressions, object methods, constructors, and synchronous generators.
     HIR and MIR carry one implicit binding identity, and the generated
     function prologue initializes its cell from the generic call ABI before
-    parameter initialization. Each invocation receives a fresh ordinary,
-    unmapped object whose indexed properties snapshot every supplied argument,
-    whose `length` records the supplied count, and whose `callee` is the
-    enclosing function. Indexed properties are writable, enumerable, and
-    configurable; `length` and `callee` are writable and configurable but
-    non-enumerable. A parameter named `arguments` remains an explicit binding
-    and suppresses the implicit one. Strict functions, arrows, class methods,
-    and asynchronous functions do not receive or capture this binding, so an
-    otherwise unresolved reference keeps the ordinary source-located
-    diagnostic. Parameter-index aliasing through a mapped arguments exotic
-    object remains outside this ordinary-object unit. The runtime ABI is
-    `oseo-runtime-m5-29`. A generated property with seed `0x5eed001b` covers
-    zero to six bounded arguments, in-range and absent indexed reads, writes,
-    `length`, `callee`, fresh identity, both specialization policies, and
-    forced collection. Fixed native evidence also covers property
-    descriptors, object methods, and synchronous generators. Six reviewed
-    no-strict test262 cases from *test/language/arguments-object/* cover empty
-    calls despite formal parameters, `callee` identity and descriptors,
-    writes, and deletion.
+    parameter initialization. M5a Unit 8.5g now selects between two shapes
+    by ECMA-262's `IsSimpleParameterList`, computed once at the frontend
+    boundary and carried on `SyntaxFunction` as `simpleParameterList`: no
+    rest parameter, no binding pattern, and no initializer. A simple
+    parameter list receives the mapped arguments exotic object
+    (`CreateMappedArgumentsObject`, 10.4.4.7). Every supplied index that is
+    the rightmost formal parameter of its name stores that parameter's own
+    binding cell as its property's slot value, so the existing
+    `cell_backed_property` gate, already shared by the global object and a
+    module namespace, routes `[[Get]]`, `[[Set]]`, and `[[GetOwnProperty]]`
+    through the cell: a later mutation through either the index or the
+    parameter observes the other. `[[DefineOwnProperty]]`'s redefinition
+    path severs that alias exactly when the accepted descriptor is an
+    explicit non-writable data descriptor or an accessor, replacing the
+    cell reference with a plain snapshot of the value already written,
+    while the parameter itself keeps its own cell and stays an ordinary
+    mutable binding; deleting a mapped index severs it the same way every
+    ordinary delete already does, since the property is simply gone
+    afterward. A duplicate formal name maps only its rightmost occurrence;
+    an earlier duplicate and an index at or beyond the parameter count keep
+    the plain snapshot. Every other admitted non-simple parameter list (a
+    rest parameter, a binding pattern, or a default) keeps the existing
+    ordinary, unmapped object unchanged: indexed properties snapshot every
+    supplied argument, `length` records the supplied count, and `callee` is
+    the enclosing function. Indexed properties are writable, enumerable,
+    and configurable in both shapes; `length` and `callee` are writable and
+    configurable but non-enumerable in both shapes. A parameter named
+    `arguments` remains an explicit binding and suppresses the implicit
+    one. Strict functions, arrows, class methods, and asynchronous
+    functions do not receive or capture this binding, so an otherwise
+    unresolved reference keeps the ordinary source-located diagnostic; an
+    arrow's lexical reference to an enclosing function's `arguments` is the
+    same documented gap and stays outside this unit. A later unit owns
+    extending availability to those forms. The runtime ABI is
+    `oseo-runtime-m5-40`. A generated property with seed `0x5eed001b`
+    covers zero to six bounded arguments, in-range and absent indexed
+    reads, writes, `length`, `callee`, fresh identity, both specialization
+    policies, and forced collection; a second generated property with seed
+    `0x5eed002b` covers one to three simple parameters, an optional
+    rightmost-name duplicate, zero to five supplied arguments, a
+    write/sever index, and every sever mode (none, deletion, an explicit
+    non-writable redefinition, and conversion to an accessor), checked
+    against an independent hand oracle alongside Node.js and Deno
+    references, both specialization policies, and forced collection. Fixed
+    native evidence also covers property descriptors, object methods,
+    synchronous generators, two-way aliasing through both a numeric and a
+    string-keyed index, an excess and an absent parameter, a duplicate
+    formal name, deletion, a non-writable redefinition whose omitted value
+    defaults to the current mapped value, and conversion to an accessor.
+    Six reviewed no-strict test262 cases from *test/language/arguments-object/*
+    cover empty calls despite formal parameters, `callee` identity and
+    descriptors, writes, and deletion; 41 additional reviewed cases from
+    *test/language/arguments-object/mapped/* cover mapped index descriptor
+    shape, non-configurable and non-writable redefinition transitions in
+    every order, severing through `[[DefineOwnProperty]]` and through
+    deletion, and conversion to an accessor.
  -  The non-strict `with` statement. Its object expression evaluates once and
     passes `RequireObjectCoercible` before the body can run. HIR retains each
     intervening object environment for an identifier reference. MIR tests

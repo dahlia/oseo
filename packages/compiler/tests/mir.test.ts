@@ -1262,6 +1262,51 @@ test("copies parameters into a MIR-owned representation", () => {
   });
 });
 
+test("threads argumentsMapped from HIR into MIR unchanged", () => {
+  const mappedSyntax: SyntaxProgram = {
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "simple",
+        parameters: [{ hints: [], name: "value", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mir-arguments-mapped.ts",
+  };
+  const mappedHir = buildHir(mappedSyntax).program;
+  assert.ok(mappedHir != null);
+  const mappedMir = buildMir(mappedHir);
+  assert.ok(mappedMir.functions[0]?.argumentsBindingId != null);
+  assert.equal(mappedMir.functions[0]?.argumentsMapped, true);
+
+  const restSyntax: SyntaxProgram = {
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "rest",
+        parameters: [{ hints: [], name: "value", range, rest: true }],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mir-arguments-unmapped.ts",
+  };
+  const restHir = buildHir(restSyntax).program;
+  assert.ok(restHir != null);
+  const restMir = buildMir(restHir);
+  assert.ok(restMir.functions[0]?.argumentsBindingId != null);
+  assert.equal(restMir.functions[0]?.argumentsMapped, undefined);
+});
+
 function additionProgram(
   leftHints: readonly Hint[],
   rightHints: readonly Hint[],

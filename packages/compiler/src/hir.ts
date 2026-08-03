@@ -892,6 +892,13 @@ export type HirStatement =
       readonly kind: "expression";
     })
   | (LocatedSyntax & {
+      /**
+       * True when `bindingId` names a parameter or the implicit
+       * `arguments` binding that FunctionDeclarationInstantiation already
+       * initialized, so this statement writes through that existing
+       * binding instead of initializing a fresh one.
+       */
+      readonly alreadyInitialized?: true;
       readonly bindingId: number;
       readonly functionId: number;
       readonly functionKind: FunctionKind;
@@ -964,6 +971,14 @@ export interface HirFunction extends LocatedSyntax {
    * arguments before parameter initialization.
    */
   readonly argumentsBindingId?: number;
+  /**
+   * True when `argumentsBindingId`'s object is the mapped arguments
+   * exotic object rather than the ordinary unmapped snapshot. ECMA-262
+   * admits the mapped form only for a non-strict function whose
+   * parameter list is simple; a present `argumentsBindingId` with this
+   * absent keeps the existing unmapped object.
+   */
+  readonly argumentsMapped?: true;
   readonly body: readonly HirStatement[];
   /**
    * Present exactly on a derived class constructor. Every `return` leaves
@@ -1042,6 +1057,16 @@ export interface HirResult {
 }
 
 export interface Binding {
+  /**
+   * True once this name's id names a parameter or the implicit
+   * `arguments` binding that FunctionDeclarationInstantiation already
+   * initialized before a same-name top-level function declaration's own
+   * instantiation step. Set the first time such a declaration reuses the
+   * outer binding, and carried forward by every later redeclaration of
+   * the same name in that scope, since `buildFunctionInits` keeps only
+   * the last one and it still targets that same already-initialized id.
+   */
+  readonly alreadyInitialized?: true;
   /** True only for an implicit non-strict `arguments` object binding. */
   readonly argumentsObject?: true;
   readonly functionId?: number;
@@ -1063,7 +1088,18 @@ export interface ResolveState {
   readonly diagnostics: Diagnostic[];
   readonly functionInfo: Map<
     SyntaxFunction,
-    { readonly bindingId?: number; readonly id: number }
+    {
+      /**
+       * True when `bindingId` names a parameter or the implicit
+       * `arguments` binding that FunctionDeclarationInstantiation already
+       * initialized before this declaration's own instantiation step, so
+       * the function-init statement must write through the existing
+       * binding rather than initialize a fresh one.
+       */
+      readonly alreadyInitialized?: true;
+      readonly bindingId?: number;
+      readonly id: number;
+    }
   >;
   readonly hirFunctions: HirFunction[];
   /** Active labels of the function being resolved; loops accept continue. */

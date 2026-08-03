@@ -989,7 +989,18 @@ landed with the M5 intrinsics units. The remaining queue is:
     it to the same empty block an empty statement already produces, so
     every later stage's existing block handling admits it unmodified, in a
     block, a loop, a switch clause, a function, an async or generator body,
-    and a module top level alike.
+    and a module top level alike. Unit 8.5g replaces the ordinary unmapped
+    arguments object with the mapped arguments exotic object for a
+    non-strict function whose parameter list is simple: each supplied
+    index that is a formal parameter's rightmost occurrence stores that
+    parameter's own binding cell as its property value, so the runtime's
+    existing cell-backed property machinery, already shared by the global
+    object and a module namespace, aliases the index and the parameter
+    until an explicit non-writable redefinition, a conversion to an
+    accessor, or a deletion severs it. Every non-simple parameter list
+    keeps the existing unmapped object, and availability stays limited to
+    the same non-strict forms; extending it to strict functions, arrows,
+    class methods, and asynchronous functions remains a later unit's work.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

@@ -80,17 +80,20 @@ static bool same_property_value(OseoValue left, OseoValue right) {
 /*
  * True when one own property of `object_value` keeps its value in the
  * binding cell `stored` instead of the property slot. A module
- * namespace and the realm's global this value are the two objects whose
- * properties are views of a binding: the namespace exposes an imported
- * binding, and the global object exposes a var-scoped Script binding.
- * Every read of such a property dereferences the cell, and every write
- * that ECMA-262 admits goes through it, so a property and its binding
- * are one storage location rather than two copies.
+ * namespace, the realm's global this value, and a mapped arguments
+ * object are the objects whose properties are views of a binding: the
+ * namespace exposes an imported binding, the global object exposes a
+ * var-scoped Script binding, and a mapped arguments object exposes a
+ * formal parameter. Every read of such a property dereferences the
+ * cell, and every write that ECMA-262 admits goes through it, so a
+ * property and its binding are one storage location rather than two
+ * copies.
  */
 static bool cell_backed_property(OseoValue object_value, OseoValue stored) {
     if (!is_object(object_value) || !is_cell(stored)) return false;
     const OseoOrdinaryObject *object = ordinary_object(object_value);
-    return object->module_namespace || object->global_object;
+    return object->module_namespace || object->global_object ||
+        object->mapped_arguments;
 }
 
 static size_t own_property_index(
@@ -298,6 +301,7 @@ static OseoResult object_create(
     object->default_intrinsics = default_intrinsics;
     object->generator_prototype = false;
     object->generator = NULL;
+    object->mapped_arguments = false;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
 }
@@ -366,6 +370,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->default_intrinsics = true;
     array->generator_prototype = false;
     array->generator = NULL;
+    array->mapped_arguments = false;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }
 
@@ -1262,14 +1267,25 @@ OseoResult oseo_object_define(
         if (cell_backed) {
             /* The binding stays the one storage location the property
              * views, so the accepted redefinition writes through the
-             * cell and records the new [[Writable]] on it. A binding
-             * assignment then fails exactly where a property assignment
-             * would. */
+             * cell. A global or namespace binding also records the new
+             * [[Writable]] on the cell, so a later binding assignment
+             * fails exactly where a property assignment would. */
             OseoValue cell = property->value;
             OseoResult written = oseo_cell_set(context, cell, value);
             if (written.status != OSEO_STATUS_NORMAL) return written;
-            cell_object(cell)->writable = attributes.writable;
             property->attributes = attributes;
+            if (object->mapped_arguments) {
+                /* CreateMappedArgumentsObject's [[DefineOwnProperty]]
+                 * (10.4.4.2) severs the alias exactly when the accepted
+                 * descriptor is an explicit non-writable data
+                 * descriptor: this property stops forwarding to the
+                 * cell and keeps the value just written as its own
+                 * plain snapshot, while the parameter itself keeps its
+                 * own cell and stays an ordinary mutable binding. */
+                if (!attributes.writable) property->value = value;
+            } else {
+                cell_object(cell)->writable = attributes.writable;
+            }
             object->dictionary = true;
             object->shape_id = context->next_shape_id;
             context->next_shape_id += 1u;
@@ -1745,6 +1761,116 @@ OseoResult oseo_arguments_create(
                 frame.slots[0],
                 frame.slots[1],
                 arguments[index],
+                indexed
+            );
+        }
+    }
+    const OseoPropertyAttributes metadata =
+        (OseoPropertyAttributes){true, false, true, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_string(context, "length");
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            oseo_number((double)argument_count),
+            metadata
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_string(context, "callee");
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            metadata
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * CreateMappedArgumentsObject (10.4.4.7), admitted only for a non-strict
+ * function whose parameter list is simple. `mapped_indices` names, in
+ * ascending order, exactly the indices that are the rightmost formal
+ * parameter of their name, and `mapped_binding_ids` gives each of those
+ * indices its parameter's own environment binding id at the same
+ * position; both are empty for a supplied index that is a duplicate
+ * name's non-rightmost occurrence, or at or beyond the parameter count,
+ * since ECMA-262 maps only the rightmost occurrence of a declared
+ * parameter position. Defining a mapped index's property with its
+ * parameter's own binding cell as the stored value, rather than the
+ * plain snapshot value an unmapped arguments object stores, is what
+ * makes cell_backed_property recognize it afterward: every later
+ * [[Get]]/[[Set]]/[[GetOwnProperty]]/[[DefineOwnProperty]]/[[Delete]]
+ * on the index then reaches the parameter through the existing
+ * cell-backed property machinery with no exotic method table of its
+ * own.
+ */
+OseoResult oseo_mapped_arguments_create(
+    OseoContext *context,
+    OseoValue environment,
+    OseoValue callee,
+    size_t argument_count,
+    const OseoValue *arguments,
+    const size_t *mapped_indices,
+    const size_t *mapped_binding_ids,
+    size_t mapped_count
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(context, "OSEO2001", "Arguments are missing.");
+    }
+    if (mapped_count > 0u &&
+        (mapped_indices == NULL || mapped_binding_ids == NULL)) {
+        return failure(context, "OSEO2001", "Mapped parameters are missing.");
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[2] = callee;
+    result = oseo_object_literal_create(context);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[0])->mapped_arguments = true;
+    }
+    const OseoPropertyAttributes indexed =
+        (OseoPropertyAttributes){true, true, true, false};
+    size_t mapped_position = 0u;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        bool is_mapped = mapped_position < mapped_count &&
+            mapped_indices[mapped_position] == index;
+        if (is_mapped) {
+            result = oseo_environment_get(
+                context,
+                environment,
+                mapped_binding_ids[mapped_position]
+            );
+            mapped_position += 1u;
+        } else {
+            result = normal(arguments[index]);
+        }
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_property_key(context, oseo_number((double)index));
+            frame.slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                frame.slots[3],
                 indexed
             );
         }

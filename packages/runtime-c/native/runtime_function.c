@@ -274,6 +274,7 @@ OseoResult oseo_function_create(
     function->ordinary.default_intrinsics = true;
     function->ordinary.generator_prototype = false;
     function->ordinary.generator = NULL;
+    function->ordinary.mapped_arguments = false;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];
     function->lexical_new_target = oseo_undefined();

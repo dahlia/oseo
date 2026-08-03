@@ -303,6 +303,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||
+    fixture.name === "mapped-arguments-object" ||
+    fixture.name === "mapped-arguments-hoisted-function" ||
     fixture.name === "script-this" ||
     fixture.name === "script-this-strict" ||
     fixture.name === "script-this-hints" ||

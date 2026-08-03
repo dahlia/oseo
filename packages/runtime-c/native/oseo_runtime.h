@@ -845,15 +845,36 @@ OseoResult oseo_object_create(OseoContext *context, OseoValue prototype);
 OseoResult oseo_object_literal_create(OseoContext *context);
 /*
  * Creates the ordinary, unmapped arguments object for one admitted
- * non-strict function invocation. Indexed properties snapshot the call
- * arguments, `length` records their count, and `callee` is the running
- * function.
+ * non-strict function invocation whose parameter list is not simple.
+ * Indexed properties snapshot the call arguments, `length` records
+ * their count, and `callee` is the running function. A simple
+ * parameter list instead calls oseo_mapped_arguments_create.
  */
 OseoResult oseo_arguments_create(
     OseoContext *context,
     OseoValue callee,
     size_t argument_count,
     const OseoValue *arguments
+);
+/*
+ * Creates the mapped arguments exotic object (10.4.4.7) for one
+ * admitted non-strict function invocation whose parameter list is
+ * simple. Indexed properties snapshot the call arguments the same way
+ * oseo_arguments_create does; `mapped_indices` then names, in
+ * ascending order, the `mapped_count` indices that alias their
+ * parameter's own binding cell in `environment`, keyed by
+ * `mapped_binding_ids` at the same position. `length` and `callee`
+ * match the unmapped object's own attributes and values.
+ */
+OseoResult oseo_mapped_arguments_create(
+    OseoContext *context,
+    OseoValue environment,
+    OseoValue callee,
+    size_t argument_count,
+    const OseoValue *arguments,
+    const size_t *mapped_indices,
+    const size_t *mapped_binding_ids,
+    size_t mapped_count
 );
 OseoResult oseo_require_object_coercible(
     OseoContext *context,

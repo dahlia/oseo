@@ -410,6 +410,213 @@ test("rejects delete arguments only in unavailable function profiles", () => {
   assert.equal(result.diagnostics[0]?.range.start.column, 1);
 });
 
+test("admits the mapped arguments object only for a simple list", () => {
+  const mapped = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "simple",
+        parameters: [
+          { hints: [], name: "a", range },
+          { hints: [], name: "b", range },
+        ],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-simple.js",
+  });
+  assert.deepEqual(mapped.diagnostics, []);
+  const mappedFunction = mapped.program?.functions[0];
+  assert.ok(mappedFunction?.argumentsBindingId != null);
+  assert.equal(mappedFunction?.argumentsMapped, true);
+
+  const unmapped = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "rest",
+        parameters: [{ hints: [], name: "a", range, rest: true }],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-rest.js",
+  });
+  assert.deepEqual(unmapped.diagnostics, []);
+  const unmappedFunction = unmapped.program?.functions[0];
+  assert.ok(unmappedFunction?.argumentsBindingId != null);
+  assert.equal(unmappedFunction?.argumentsMapped, undefined);
+
+  const strict = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "strictSimple",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+        strict: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "mapped-arguments-strict.js",
+  });
+  assert.deepEqual(strict.diagnostics, []);
+  const strictFunction = strict.program?.functions[0];
+  assert.equal(strictFunction?.argumentsBindingId, undefined);
+  assert.equal(strictFunction?.argumentsMapped, undefined);
+});
+
+test("reuses a parameter's binding for a same-name hoisted function", () => {
+  // FunctionDeclarationInstantiation instantiates a FunctionBody's own
+  // top-level function declarations into the same environment as the
+  // parameters whenever the parameter list has no parameter expressions,
+  // so a function declaration sharing a parameter's name writes through
+  // the parameter's own binding instead of a fresh one; the mapped
+  // arguments object this unit admits depends on that identity.
+  const mapped = buildHir({
+    body: [
+      {
+        body: [
+          {
+            body: [],
+            kind: "function",
+            name: "a",
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+        ],
+        kind: "function",
+        name: "f",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "reuse-parameter-function.js",
+  });
+  assert.deepEqual(mapped.diagnostics, []);
+  const functionValue = mapped.program?.functions.find((f) => f.name === "f");
+  const parameterBindingId = functionValue?.parameters[0]?.bindingId;
+  const init = functionValue?.body[0];
+  assert.equal(init?.kind, "function-init");
+  if (init?.kind !== "function-init") return;
+  assert.equal(init.bindingId, parameterBindingId);
+  assert.equal(init.alreadyInitialized, true);
+
+  // A genuinely nested block's function declaration is a distinct,
+  // lexically shadowing binding: it must not reuse the parameter's cell
+  // even though it shares its name.
+  const shadowed = buildHir({
+    body: [
+      {
+        body: [
+          {
+            body: [
+              {
+                body: [],
+                kind: "function",
+                name: "a",
+                parameters: [],
+                range,
+                returnHints: [],
+              },
+            ],
+            kind: "block",
+            range,
+          },
+        ],
+        kind: "function",
+        name: "g",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "shadowed-parameter-function.js",
+  });
+  assert.deepEqual(shadowed.diagnostics, []);
+  const shadowedFunction = shadowed.program?.functions.find(
+    (f) => f.name === "g",
+  );
+  const shadowedParameterBindingId = shadowedFunction?.parameters[0]?.bindingId;
+  const block = shadowedFunction?.body[0];
+  assert.equal(block?.kind, "block");
+  if (block?.kind !== "block") return;
+  const blockInit = block.body[0];
+  assert.equal(blockInit?.kind, "function-init");
+  if (blockInit?.kind !== "function-init") return;
+  assert.notEqual(blockInit.bindingId, shadowedParameterBindingId);
+  assert.equal(blockInit.alreadyInitialized, undefined);
+
+  // A second same-name declaration at the same body top level replaces
+  // the first as the one `buildFunctionInits` keeps, per the existing
+  // last-repeated-declaration rule; it must still carry
+  // `alreadyInitialized` forward, since it targets the very same
+  // parameter binding the first declaration already reused.
+  const repeated = buildHir({
+    body: [
+      {
+        body: [
+          {
+            body: [],
+            kind: "function",
+            name: "a",
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+          {
+            body: [],
+            kind: "function",
+            name: "a",
+            parameters: [],
+            range,
+            returnHints: [],
+          },
+        ],
+        kind: "function",
+        name: "h",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "repeated-parameter-function.js",
+  });
+  assert.deepEqual(repeated.diagnostics, []);
+  const repeatedFunction = repeated.program?.functions.find(
+    (f) => f.name === "h",
+  );
+  const repeatedParameterBindingId = repeatedFunction?.parameters[0]?.bindingId;
+  const repeatedInit = repeatedFunction?.body[0];
+  assert.equal(repeatedInit?.kind, "function-init");
+  if (repeatedInit?.kind !== "function-init") return;
+  assert.equal(repeatedInit.bindingId, repeatedParameterBindingId);
+  assert.equal(repeatedInit.alreadyInitialized, true);
+});
+
 test("rejects duplicate names in owned catch binding patterns", () => {
   const identifier = {
     hints: [],

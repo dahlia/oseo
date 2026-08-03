@@ -375,6 +375,18 @@ typedef struct {
      */
     bool async_from_sync;
     OseoValue async_sync_iterator;
+    /*
+     * A mapped arguments exotic object (10.4.4). Each own index property
+     * this unit maps stores its parameter's own binding cell as the
+     * property's slot value, so cell_backed_property recognizes it and
+     * routes [[Get]]/[[Set]]/[[GetOwnProperty]] through the cell the
+     * same way it already does for a global or namespace binding.
+     * [[DefineOwnProperty]] additionally severs the alias here: an
+     * explicit non-writable redefinition, or a redefinition into an
+     * accessor, replaces the slot with a plain snapshot so the index and
+     * the parameter stop observing each other.
+     */
+    bool mapped_arguments;
     /* A generator function's `prototype` object, which serves the
      * virtualized %GeneratorPrototype% methods to the generators created
      * from it. Replacing the object drops the brand with it. */

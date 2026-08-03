@@ -350,6 +350,165 @@ console.log(generated.next().value, generated.next().value);
 `,
   },
   {
+    name: "mapped-arguments-object",
+    nonStrictScript: true,
+    source: `
+function aliasing(a, b) {
+  console.log(arguments.length, a, b, arguments[0], arguments[1]);
+  arguments[0] = 100;
+  console.log(a, arguments[0]);
+  a = 200;
+  console.log(arguments[0], a);
+  arguments["1"] = 300;
+  console.log(b, arguments[1]);
+  b = 400;
+  console.log(arguments[1], b);
+  return arguments.callee === aliasing;
+}
+console.log(aliasing(1, 2));
+
+function excess(a) {
+  console.log(arguments.length, a, arguments[0], arguments[1]);
+  arguments[1] = 500;
+  console.log(a, arguments[1]);
+  a = 600;
+  console.log(arguments[1]);
+  return 0;
+}
+console.log(excess(10, 20));
+
+function absent(a, b) {
+  console.log(arguments.length, a, b, arguments[0], arguments[1]);
+  return 0;
+}
+console.log(absent(1));
+
+function duplicate(a, a) {
+  console.log(arguments.length, a, arguments[0], arguments[1]);
+  arguments[0] = 700;
+  console.log(a, arguments[0], arguments[1]);
+  arguments[1] = 800;
+  console.log(a, arguments[0], arguments[1]);
+  a = 900;
+  console.log(arguments[0], arguments[1]);
+  return 0;
+}
+console.log(duplicate(1, 2));
+
+function severDelete(a) {
+  arguments[0] = 111;
+  delete arguments[0];
+  a = 222;
+  console.log(arguments[0], a);
+  return 0;
+}
+console.log(severDelete(10));
+
+function severWritableFalse(a) {
+  arguments[0] = 333;
+  Object.defineProperty(arguments, 0, { writable: false });
+  a = 444;
+  console.log(arguments[0], a);
+  const descriptor = Object.getOwnPropertyDescriptor(arguments, "0");
+  console.log(descriptor.value, descriptor.writable, descriptor.configurable);
+  return 0;
+}
+console.log(severWritableFalse(10));
+
+function severAccessor(a) {
+  arguments[0] = 555;
+  Object.defineProperty(arguments, 0, {
+    configurable: true,
+    get() { return 666; },
+  });
+  a = 777;
+  console.log(arguments[0], a);
+  return 0;
+}
+console.log(severAccessor(10));
+
+function inspectMapped(a, b) {
+  return arguments;
+}
+const mappedFirst = inspectMapped(1, 2);
+const mappedSecond = inspectMapped(1, 2);
+console.log(mappedFirst === mappedSecond);
+const mappedIndexDescriptor = Object.getOwnPropertyDescriptor(
+  mappedFirst,
+  "0",
+);
+console.log(
+  mappedIndexDescriptor.value,
+  mappedIndexDescriptor.writable,
+  mappedIndexDescriptor.enumerable,
+  mappedIndexDescriptor.configurable,
+);
+`,
+  },
+  {
+    name: "mapped-arguments-hoisted-function",
+    nonStrictScript: true,
+    source: `
+function sameName(a) {
+  console.log(arguments[0] === a);
+  function a() {}
+  console.log(arguments[0] === a, typeof arguments[0]);
+  a = 5;
+  console.log(arguments[0]);
+}
+sameName(1);
+
+function duplicateFormals(a, a) {
+  console.log(arguments[0] === a, arguments[1] === a);
+  function a() {}
+  console.log(arguments[0] === a, arguments[1] === a);
+  a = 9;
+  console.log(arguments[0], arguments[1]);
+}
+duplicateFormals(1, 2);
+
+function repeatedSameName(a) {
+  console.log(arguments[0] === a);
+  function a() { return "first"; }
+  function a() { return "second"; }
+  console.log(arguments[0] === a, a());
+  a = 5;
+  console.log(arguments[0]);
+}
+repeatedSameName(1);
+
+function argumentsNamedFunction(a) {
+  console.log(typeof arguments);
+  function arguments() { return "shadowed"; }
+  console.log(arguments());
+}
+argumentsNamedFunction(1);
+
+function nestedBlockShadows(a) {
+  console.log(arguments[0] === a);
+  { function a() {} console.log(typeof a); }
+  console.log(arguments[0] === a);
+  a = 7;
+  console.log(arguments[0]);
+}
+nestedBlockShadows(1);
+
+function nonSimpleUnaffected(a = 1) {
+  function a() {}
+  a = 9;
+  console.log(a);
+}
+nonSimpleUnaffected(2);
+
+function varAndFunctionSameName(a) {
+  const before = arguments[0] === a;
+  function a() {}
+  console.log(before, arguments[0] === a);
+}
+varAndFunctionSameName(3);
+`,
+  },
+  {
     name: "constructors",
     source: `
 function Box(value) { this.value = value; }

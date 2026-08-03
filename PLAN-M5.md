@@ -2387,6 +2387,98 @@ negative test262 already predicts. The manifest reaches 4,374 cases: 2,569
 passes, 1,236 expected negatives, and 569 unsupported profile features with
 no semantic or harness failures.
 
+M5a Unit 8.5g admits the mapped arguments exotic object
+(`CreateMappedArgumentsObject`, 10.4.4.7) for the non-strict function forms
+that already receive the implicit `arguments` binding, when the formal
+parameter list is simple. ECMA-262's `IsSimpleParameterList` excludes a
+rest parameter, a binding pattern, and an initializer; the frontend
+computes it once as `simpleParameterList` on `SyntaxFunction`, and
+`resolveFunction` combines it with the existing `admitsArgumentsObject`
+decision into a new `argumentsMapped` fact that HIR and MIR both carry
+alongside the existing `argumentsBindingId`. FunctionDeclarationInstantiation
+creates every declared parameter's binding cell before it creates
+`arguments`, and the generated prologue already matches that order: it
+creates every local binding's cell, including each parameter's, before
+reaching the `arguments`-binding block. The backend uses that ordering
+directly. For each formal parameter position that is the rightmost
+occurrence of its name, duplicate non-strict parameter names already share
+one binding cell in this profile, so no separate resolution step is needed
+to find it, it emits that position and its binding id into two
+compile-time arrays, and the new `oseo_mapped_arguments_create` runtime
+entry point snapshots every supplied index exactly as the existing
+`oseo_arguments_create` does, then, for each of those positions, replaces
+the snapshot with the parameter's own environment binding cell as the
+property's stored value.
+
+Extending `cell_backed_property`, already shared by the global object and
+a module namespace, with a new `mapped_arguments` object flag gives the
+generic `oseo_object_get`, `oseo_object_set`, and
+`Object.getOwnPropertyDescriptor` paths the two-way alias for free:
+reading or writing a mapped index reaches the parameter's cell, and its
+descriptor reflects the cell's current value. `oseo_object_define`'s
+existing cell-backed redefinition branch gains the one behavior those
+generic paths cannot express: 10.4.4.2 severs the alias exactly when the
+accepted descriptor is an explicit non-writable data descriptor, and
+`oseo_object_define_accessor`'s existing unconditional
+`property->value = undefined` on a redefinition to an accessor already
+severs it as a side effect of code this unit does not change. Severing
+replaces the property's own stored value with a plain snapshot of the
+value just written instead of the cell, so a later `[[Get]]`/`[[Set]]` on
+that index no longer reaches the parameter, while the parameter itself
+keeps its own cell and stays an ordinary mutable binding regardless; the
+runtime never touches a cell's own `writable` field for a mapped index,
+which remains reserved for a global or namespace binding's own
+`[[Writable]]` mirror. Deleting a mapped index needs no special case at
+all: `oseo_object_delete` already just removes the configurable property,
+and a removed property answers every later `[[Get]]` as absent whether or
+not it once aliased a parameter. An index beyond the supplied argument
+count, and a duplicate name's earlier, non-rightmost occurrence, are never
+redefined to a cell, so they keep the plain snapshot every unmapped index
+already receives; the existing unmapped `oseo_arguments_create` path, and
+every non-simple parameter list that still selects it, are unchanged. The
+runtime ABI moves from `oseo-runtime-m5-39` to `oseo-runtime-m5-40`.
+
+A new HIR test asserts `argumentsMapped` is present only for a
+non-strict, simple parameter list, and a companion MIR test confirms
+`buildMir` threads it unchanged; both also confirm a rest parameter and a
+strict function keep the existing unmapped or absent shape. A fixed
+*mapped-arguments-object* native differential fixture covers two-way
+aliasing through both a numeric and a string-keyed index, an index
+beyond the supplied count, an absent parameter, a duplicate formal name
+mapping only its rightmost occurrence, deletion, an explicit
+non-writable redefinition whose omitted value defaults to the current
+mapped value, and a redefinition into an accessor, plus fresh identity
+and a mapped index's own descriptor, across both specialization policies
+and forced collection. A second generated property with seed
+`0x5eed002b` extends the M5 arguments-object model with one to three
+simple parameters, an optional rightmost-name duplicate, zero to five
+supplied arguments, a write/sever index, and every sever mode (none,
+deletion, an explicit non-writable redefinition, and conversion to an
+accessor), checked against an independent hand oracle alongside Node.js
+and Deno references, both specialization policies, and forced
+collection; the existing seed `0x5eed001b` model is unchanged and its
+zero-parameter case now exercises the mapped object's own trivial,
+nothing-to-alias path.
+
+The reviewed test262 subset promotes 41 of the included
+_test/language/arguments-object/mapped/\*_ cases: they cover a mapped
+index's own descriptor shape, non-configurable and non-writable
+redefinition transitions taken in every order, severing through both
+`[[DefineOwnProperty]]` and deletion, and conversion to an accessor. Four
+candidates from this unit's own audit stay `unsupported-profile-feature`
+for reasons outside it:
+*mapped/nonconfigurable-descriptors-define-failure.js* reads `arguments`
+from inside a nested arrow function, which this profile's arrows do not
+lexically capture from their enclosing function, the same gap the
+admitted-features entry above records; and
+*unmapped/via-params-dflt.js*, *unmapped/via-params-dstr.js*, and
+*unmapped/via-params-rest.js* each fail only because the shared
+*assert.js*/*sta.js* harness itself reads `Object`, `String`, or `JSON`
+as a bare value, which stays outside the profile until the intrinsics and
+built-in objects stream admits standard constructors as values. The
+manifest reaches 4,415 cases: 2,610 passes, 1,236 expected negatives, and
+569 unsupported profile features with no semantic or harness failures.
+
 ### Intrinsics and built-in objects
 
 Establish the intrinsic graph, well-known symbols, iterator protocols, error
