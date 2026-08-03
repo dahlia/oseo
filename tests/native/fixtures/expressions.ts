@@ -340,6 +340,63 @@ console.log("10" % "3", true % 2, null % 2, undefined % 2);
 `,
   },
   {
+    name: "typeof-unresolved",
+    nonStrictScript: true,
+    source: `
+console.log(typeof missingTopLevel, typeof (missingParenthesized));
+var declared;
+let initialized = 1;
+console.log(typeof declared, typeof initialized, typeof missingAgain);
+function inFunction() {
+  var local = "text";
+  return typeof local + " " + typeof missingInFunction;
+}
+console.log(inFunction());
+function strictFunction() {
+  "use strict";
+  return typeof missingInStrict;
+}
+console.log(strictFunction());
+const arrow = () => typeof missingInArrow;
+console.log(arrow());
+function temporalDeadZone() {
+  try {
+    return typeof beforeInitialization;
+  } catch (caught) {
+    return caught.name;
+  }
+  let beforeInitialization;
+}
+console.log(temporalDeadZone());
+function shadowedIntrinsic() {
+  let Promise = 1;
+  return typeof Promise;
+}
+console.log(shadowedIntrinsic());
+const environment = {
+  present: 1,
+  valueless: undefined,
+  get supplied() { return function fromGetter() {}; },
+};
+with (environment) {
+  console.log(typeof present, typeof valueless, typeof supplied);
+  console.log(typeof missingInWith);
+  console.log(typeof initialized);
+}
+function withTemporalDeadZone(shadowing) {
+  const inner = shadowing ? { beforeWith: 1 } : {};
+  try {
+    with (inner) { return typeof beforeWith; }
+  } catch (caught) {
+    return caught.name;
+  }
+  let beforeWith;
+}
+console.log(withTemporalDeadZone(true), withTemporalDeadZone(false));
+console.log(typeof undefined, typeof NaN, typeof Infinity);
+`,
+  },
+  {
     name: "generic-addition",
     source: `
 function show(left, right) { console.log(left + right); }

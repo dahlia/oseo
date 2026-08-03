@@ -1190,7 +1190,7 @@ test("keeps do-while bodies ahead of their condition", () => {
   assert.match(printMir(buildMir(hir)), /join do-while bb/u);
 });
 
-test("rejects typeof with an unresolved name during resolution", () => {
+test("folds typeof with an unresolvable name to its undefined string", () => {
   const syntax: SyntaxProgram = {
     body: [
       {
@@ -1209,10 +1209,41 @@ test("rejects typeof with an unresolved name during resolution", () => {
     sourceId: "typeof-unresolved.ts",
   };
   const result = buildHir(syntax);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.program != null);
+  // The fold is the resolved value itself: no binding is read or
+  // created, so the lowered program holds one string constant and no
+  // typeof operation.
+  assert.match(printHir(result.program), /"undefined"/u);
+  const mir = printMir(buildMir(result.program));
+  assert.match(mir, /constant "undefined"/u);
+  assert.doesNotMatch(mir, /unary typeof/u);
+  assert.doesNotMatch(mir, /read/u);
+});
+
+test("rejects typeof of a runtime-owned intrinsic global name", () => {
+  const syntax: SyntaxProgram = {
+    body: [
+      {
+        expression: {
+          argument: { kind: "identifier", name: "console", range },
+          kind: "unary",
+          operator: "typeof",
+          range,
+        },
+        kind: "expression",
+        range,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "typeof-intrinsic.ts",
+  };
+  const result = buildHir(syntax);
   assert.equal(result.program, undefined);
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /typeof with an unresolved name/u,
+    /typeof runtime intrinsic binding 'console'/u,
   );
 });
 

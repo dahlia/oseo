@@ -1036,7 +1036,18 @@ landed with the M5 intrinsics units. The remaining queue is:
     `%ThrowTypeError%` intrinsic. Both shapes also expose `@@iterator` as
     `%Array.prototype.values%`, which now reads a non-array target's
     `length` through `Get`, `ToNumber`, and `ToLength` the way
-    `LengthOfArrayLike` does.
+    `LengthOfArrayLike` does. Unit 8.5i admits direct `typeof` applied
+    to an unresolvable name: the closed profile decides resolvability
+    ahead of time, so the expression folds to the `"undefined"` string
+    without reading or creating a binding, while every other unresolved
+    reference keeps its source-located rejection. Inside `with`, the
+    object environments are consulted first and a genuinely
+    unresolvable miss answers `"undefined"` instead of an
+    uninitialized-cell error, while a resolved lexical fallback keeps
+    its ordinary read and temporal dead zone. An unshadowed
+    runtime-owned intrinsic name such as `Object` or `Promise` stays a
+    source-located rejection because ECMA-262 resolves it to a real
+    global value this profile admits only as a call target.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

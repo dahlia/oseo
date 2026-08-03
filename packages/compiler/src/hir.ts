@@ -1102,6 +1102,25 @@ export interface ResolveState {
   nextFunctionId: number;
   readonly sourceId: string;
   /**
+   * Every `typeof` reference this program folded to the unresolvable
+   * `"undefined"` answer, directly or as a `with` chain's miss
+   * fallback. The set is checked against `withAssignedFallbackNames`
+   * after the whole program resolves, so the rejection does not depend
+   * on the source order of the fold and the assignment.
+   */
+  readonly foldedTypeofReferences: {
+    readonly located: LocatedSyntax;
+    readonly name: string;
+  }[];
+  /**
+   * Names any `with` region of this program uses as an unresolved
+   * assignment target. Such an assignment can initialize its hidden
+   * fallback cell at run time, which ECMA-262 models as creating a real
+   * global binding, so a folded `typeof` answer for the same name
+   * anywhere in the program would misreport the materialized value.
+   */
+  readonly withAssignedFallbackNames: Set<string>;
+  /**
    * Hidden fallback bindings owned by each currently resolved `with`
    * statement, ordered outermost first.
    */

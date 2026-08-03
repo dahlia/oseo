@@ -18,7 +18,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records 4,722
-reviewed cases: 2,890 passes, 1,292 expected negatives, and 540 unsupported
+reviewed cases: 2,891 passes, 1,292 expected negatives, and 539 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2648,6 +2648,86 @@ unit's audit found the harness compiles cleanly and their only blocker was the
 strict variant's missing binding, so all three now pass, as does
 *mapped/nonconfigurable-descriptors-define-failure.js*, whose nested arrow
 capture that unit recorded as a gap.
+
+M5a Unit 8.5i admits direct `typeof` applied to an unresolvable name.
+ECMA-262's typeof evaluation answers `"undefined"` when
+IsUnresolvableReference is true instead of throwing the ReferenceError
+every other read produces, and the closed profile decides resolvability
+ahead of time the same way the Unit 8.1b identifier delete does, so the
+frontend folds the whole expression to that string constant: no binding
+is read or created, the lowered MIR holds one string constant behind the
+existing string-allocation safepoint, and the emitted C never names the
+operand. Every other unresolved reference keeps the ordinary
+source-located rejection, including a member-access base, a sequence
+operand, and an assignment target, so the fold does not weaken the
+closed-world rule anywhere else. A parenthesized name forwards the
+reference the way the specification's grouping operator does and folds
+identically, and Script strictness does not change the answer.
+
+The `with` interaction reuses the ordinary `with-get` reference: every
+active object environment is consulted innermost-first, a hit reads the
+supplied property through the ordinary property read so an accessor and
+its abrupt completion stay observable, and a resolved lexical fallback
+keeps the ordinary binding read including its temporal dead zone error.
+The one change is the genuinely unresolvable fallback: instead of the
+hidden uninitialized cell an ordinary read allocates to preserve its
+ReferenceError, the typeof operand's miss fallback is the `undefined`
+value itself, so an all-miss chain answers `"undefined"` without an
+uninitialized-cell error and without allocating a hidden cell. The one
+rejected composition is a folded `typeof`, direct or through `with`, of
+a name any `with` region of the same program uses as an unresolved
+assignment target: ECMA-262 models that sloppy assignment as creating a
+real global binding, so the folded answer would misreport the
+materialized value. The fold keeps the source-located hidden-fallback
+rejection the Unit 8.1b delete records, and the check runs after the
+whole program resolves, so it holds regardless of where the assignment
+and the fold occur relative to each other, including an assignment only
+a later loop iteration, a nested closure, or another function performs.
+Runtime-owned call-target intrinsic names stay rejected when unshadowed,
+whether direct or behind `with`: ECMA-262 resolves `Object`, `Promise`,
+`console`, `setTimeout`, and `clearTimeout` to real global values this
+profile admits only as call targets, so answering `"undefined"` would
+misreport them; the rejection reuses the `isRuntimeOwnedIntrinsicName`
+boundary the Unit 8.1b identifier delete records. A shadowing
+declaration keeps the ordinary binding read, and the admitted intrinsic
+values `undefined`, `NaN`, `Infinity`, `Symbol`, and the error
+constructors keep their existing resolutions. No MIR, backend, or
+runtime change is needed and the runtime ABI stays `oseo-runtime-m5-41`.
+
+Focused tests pin each side: compiler tests assert the fold produces the
+string constant with no typeof operation or binding read and that an
+unshadowed runtime intrinsic stays rejected, and frontend tests cover
+the strict Script, module, parenthesized, shadowed-intrinsic, and both
+`with` fallback shapes while keeping every non-typeof unresolved
+reference rejected. A fixed *typeof-unresolved* native differential
+fixture covers the direct fold, var-declared and initialized bindings,
+strict and non-strict functions, an arrow, a caught temporal dead zone
+read, a shadowed intrinsic, object-environment hits over a data
+property, an undefined-valued property, and an accessor, an all-miss
+chain, the lexical fallback through `with`, and a caught dead-zone
+fallback, across both specialization policies and forced collection,
+and asserts the emitted C never mentions the folded name. A generated
+property with seed `0x5eed002c` covers direct typeof over unresolvable,
+var-declared, number, string, object, and function bindings and a
+temporal dead zone in both Script modes, plus `with` chains with
+supplied function, number, and undefined values against missing,
+lexical, and dead-zone fallbacks, against an independent oracle
+alongside Node.js and Deno references, both specialization policies,
+and forced collection.
+
+The reviewed test262 subset promotes
+*test/language/expressions/typeof/unresolvable-reference.js* from
+`unsupported-profile-feature` to a pass in both strictness modes. The
+sibling candidates stay outside for reasons this unit does not change:
+*get-value-ref-err.js* reads a member of an unresolvable base, which
+remains rejected, *get-value.js* and the built-in observers need global
+`this` reflection and intrinsics the profile has not admitted, and
+*test/built-ins/Promise/constructor.js* keeps its `typeof Promise`
+rejection under the new runtime-intrinsic diagnostic. The manifest holds
+4,722 cases: 2,891 passes, 1,292 expected negatives, and 539 unsupported
+profile features with no semantic or harness failures. The suite
+revision, inventory policy, manifest schema, and classification
+vocabulary do not change.
 
 ### Intrinsics and built-in objects
 
