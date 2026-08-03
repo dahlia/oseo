@@ -299,6 +299,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "catch-var-coexistence" ||
     fixture.name === "block-function-var-coexistence" ||
     fixture.name === "switch-function-declarations" ||
+    fixture.name === "debugger-statement" ||
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
     fixture.name === "delete-non-strict" ||

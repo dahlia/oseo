@@ -305,6 +305,110 @@ callAsyncGenerator(2).then((value) => console.log(value));
 `,
   },
   {
+    name: "debugger-statement",
+    source: `
+console.log("start");
+debugger;
+console.log("after top-level debugger");
+{
+  console.log("block enter");
+  debugger;
+  console.log("block exit");
+}
+let whileIterations = "";
+let whileIndex = 0;
+while (whileIndex < 3) {
+  debugger;
+  whileIterations = whileIterations + whileIndex;
+  whileIndex = whileIndex + 1;
+}
+console.log(whileIterations);
+let doWhileCount = 0;
+do {
+  debugger;
+  doWhileCount = doWhileCount + 1;
+} while (doWhileCount < 2);
+console.log(doWhileCount);
+let forSum = 0;
+for (let step = 0; step < 3; step = step + 1) {
+  debugger;
+  forSum = forSum + step;
+}
+console.log(forSum);
+function describe(value) {
+  switch (value) {
+    case 1:
+      debugger;
+      return "one";
+    default:
+      debugger;
+      return "other";
+  }
+}
+console.log(describe(1), describe(2));
+if (true) {
+  debugger;
+  console.log("if branch");
+} else {
+  debugger;
+  console.log("else branch");
+}
+outer: for (let index = 0; index < 2; index = index + 1) {
+  debugger;
+  if (index === 1) break outer;
+  console.log("labeled", index);
+}
+function ordinaryFunction() {
+  debugger;
+  console.log("ordinary function ran");
+  return 1;
+}
+console.log(ordinaryFunction());
+async function asynchronousFunction() {
+  console.log("async before await");
+  debugger;
+  const value = await Promise.resolve(1);
+  debugger;
+  console.log("async after await", value);
+  return value;
+}
+asynchronousFunction().then((value) => console.log("async result", value));
+function* generatorFunction() {
+  debugger;
+  console.log("generator before yield");
+  const received = yield 1;
+  debugger;
+  console.log("generator after yield", received);
+}
+const generatorIterator = generatorFunction();
+console.log(generatorIterator.next().value);
+console.log(generatorIterator.next("resumed").done);
+async function* asyncGeneratorFunction() {
+  debugger;
+  console.log("async generator before yield");
+  yield 1;
+  debugger;
+  console.log("async generator after yield");
+}
+async function driveAsyncGenerator() {
+  const iterator = asyncGeneratorFunction();
+  console.log((await iterator.next()).value);
+  console.log((await iterator.next()).done);
+}
+driveAsyncGenerator();
+try {
+  debugger;
+  throw new Error("abrupt");
+} catch (error) {
+  debugger;
+  console.log("caught", error.message);
+} finally {
+  debugger;
+  console.log("finally ran");
+}
+`,
+  },
+  {
     name: "for-loops",
     source: `
 for (let i = 0; i < 3; i = i + 1) console.log("let", i);

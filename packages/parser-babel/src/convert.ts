@@ -2223,7 +2223,11 @@ export function statement(
       ? undefined
       : { ...located, body, kind: "with", object };
   }
-  if (value.type === "EmptyStatement") {
+  if (value.type === "EmptyStatement" || value.type === "DebuggerStatement") {
+    // DebuggerStatement has no owned debugging facility in this profile,
+    // so its Evaluation is the same empty NormalCompletion as an
+    // EmptyStatement's; it reuses the same empty-block representation
+    // rather than gaining its own SyntaxStatement kind.
     return { ...located, body: [], kind: "block" };
   }
   if (value.type === "SwitchStatement") {

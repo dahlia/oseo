@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,372
-reviewed cases: 2,568 passes, 1,235 expected negatives, and 569 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,374
+reviewed cases: 2,569 passes, 1,236 expected negatives, and 569 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2340,6 +2340,52 @@ parameter-environment body still rejecting one, and the same contract
 proven directly at the `buildHir` boundary. The manifest is unchanged,
 because no promoted test262 case exercises a parameter-environment
 function body.
+
+M5a Unit 8.5f admits the ECMAScript `debugger` statement as an executable
+no-op. DebuggerStatement's Evaluation is the same empty NormalCompletion an
+EmptyStatement's already is in this profile, since the closed ahead-of-time
+runtime implements no debugging facility for the statement to invoke; the
+frontend's `statement` conversion function reuses EmptyStatement's own
+established representation for it, converting a `DebuggerStatement` node to
+the same `{ kind: "block", body: [] }` owned syntax rather than gaining its
+own `SyntaxStatement` or `HirStatement` variant. Every later stage this
+profile owns is either exhaustive over statement kinds and already
+dispatches an empty block through its existing block case, or is a
+permissive statement-kind scan that already treats an unrecognized kind as
+inert; both keep working unmodified, so the whole boundary from
+Babel-sourced syntax through HIR construction, MIR lowering, module
+traversal, and the C backend needs no new case anywhere, matching the empty
+statement's own reach. The statement is therefore admitted wherever
+ECMA-262 admits any Statement: nested in a block, a loop body, a switch
+clause, a labeled statement, a function, async function, generator, or
+async generator body, and a module's top level, since every one of those
+positions already converts its body through the same shared `statement`
+function.
+
+Focused parser tests compile a debugger statement in every one of those
+positions and confirm the frontend, HIR, and MIR stages accept it with no
+diagnostics, and a direct HIR assertion confirms it lowers to the identical
+empty-block shape an empty statement already produces. A fixed
+*debugger-statement* native differential fixture interleaves debugger
+statements with observable `console.log` calls across a block, a while and
+do-while loop, a classic for loop, a switch statement's clauses, an
+if/else, a labeled loop, an ordinary function, a try/catch/finally, and a
+suspended async function, generator, and async generator body, proving
+source order, completion behavior, lexical scopes, and suspension and
+resumption stay unaffected across both specialization policies and forced
+collection. A debugger statement has no useful generated domain beyond the
+enumerable set of statement positions the fixed fixture and parser tests
+already cover directly, so this unit adds no new property suite.
+
+The reviewed test262 subset promotes both included
+_test/language/statements/debugger/\*_ cases: *statement.js* exercises the
+positive `while (false) debugger;` form and enters as a pass, while
+*expression.js* exercises `(debugger)` in an expression position, which the
+bootstrap parser already rejects as a native parse-time `SyntaxError` since
+`debugger` remains a statement-only keyword, so it enters as the expected
+negative test262 already predicts. The manifest reaches 4,374 cases: 2,569
+passes, 1,236 expected negatives, and 569 unsupported profile features with
+no semantic or harness failures.
 
 ### Intrinsics and built-in objects
 

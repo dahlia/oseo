@@ -112216,6 +112216,59 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/language/statements/debugger/expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/debugger/statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/language/statements/do-while/S12.6.1_A15.js
       strictness:
         - non-strict
@@ -139224,9 +139277,9 @@ results:
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1235
+  expectedNegatives: 1236
   harnessFailures: 0
-  passes: 2568
+  passes: 2569
   semanticFailures: 0
   unsupportedProfileFeatures: 569
   dependencies:
@@ -139261,9 +139314,9 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 145
     - dependency: control-flow
-      expectedNegatives: 156
+      expectedNegatives: 157
       harnessFailures: 0
-      passes: 433
+      passes: 434
       semanticFailures: 0
       unsupportedProfileFeatures: 17
     - dependency: default-parameters
@@ -139520,8 +139573,8 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/statements
-      expectedNegatives: 543
+      expectedNegatives: 544
       harnessFailures: 0
-      passes: 1078
+      passes: 1079
       semanticFailures: 0
       unsupportedProfileFeatures: 140

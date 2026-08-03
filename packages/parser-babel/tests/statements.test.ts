@@ -60,6 +60,57 @@ test("converts switch statements to owned syntax", () => {
   assert.match(hirText, /default:/u);
 });
 
+test("admits debugger statements in every statement position", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "debugger;\n" +
+      "{ debugger; }\n" +
+      "while (false) debugger;\n" +
+      "do debugger; while (false);\n" +
+      "for (let i = 0; i < 1; i = i + 1) debugger;\n" +
+      "for (const item of [1]) debugger;\n" +
+      "switch (1) {\n" +
+      "  case 1: debugger; break;\n" +
+      "  default: debugger;\n" +
+      "}\n" +
+      "if (true) debugger; else debugger;\n" +
+      "outer: debugger;\n" +
+      "with ({}) debugger;\n" +
+      "try { debugger; } catch { debugger; } finally { debugger; }\n" +
+      "class Sample {\n" +
+      "  static { debugger; }\n" +
+      "}\n" +
+      "function ordinary() { debugger; }\n" +
+      "async function asynchronous() {\n" +
+      "  debugger;\n" +
+      "  await 0;\n" +
+      "  for await (const item of []) debugger;\n" +
+      "  debugger;\n" +
+      "}\n" +
+      "function* generator() { debugger; yield 0; debugger; }\n" +
+      "async function* asyncGenerator() { debugger; yield 0; debugger; }\n",
+    sourceId: "debugger-positions.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+});
+
+test("lowers debugger to the same no-op as an empty statement", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'console.log("before");\ndebugger;\nconsole.log("after");\n',
+    sourceId: "debugger-no-op.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const debuggerStatement = result.hir.body[1];
+  assert.equal(debuggerStatement?.kind, "block");
+  assert.deepEqual(
+    debuggerStatement?.kind === "block" ? debuggerStatement.body : undefined,
+    [],
+  );
+});
+
 test("keeps break valid inside if consequents", () => {
   const result = compileSource(babelFrontend, {
     source:
@@ -346,6 +397,18 @@ function compileOneModule(source: string, sourceId: string) {
     ],
   });
 }
+
+test("admits a debugger statement at a module's top level", () => {
+  const compiled = compileOneModule(
+    'console.log("before");\n' +
+      "debugger;\n" +
+      "for (let i = 0; i < 1; i = i + 1) { debugger; }\n" +
+      'console.log("after");\n',
+    "file:///app/module-debugger.js",
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+});
 
 test("lowers a module top-level for-await head", () => {
   const compiled = compileOneModule(

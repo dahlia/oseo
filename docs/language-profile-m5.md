@@ -42,7 +42,7 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,372 reviewed cases: 2,568 passes, 1,235
+The current manifest contains 4,374 reviewed cases: 2,569 passes, 1,236
 expected negatives, and 569 unsupported profile features. It records no
 semantic or harness failures.
 
@@ -151,7 +151,8 @@ its deliberate boundary and its evidence:
     closure identity, and post-loop `var` values. Seven reviewed test262 cases
     pin array defaults, trailing object patterns, and object rest.
     `for-in` stays rejected with a source-located diagnostic. The empty
-    statement is also admitted as a no-op block.
+    statement is also admitted as a no-op block, and M5a Unit 8.5f admits
+    the `debugger` statement as the same no-op, as recorded below.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
@@ -2424,6 +2425,20 @@ compile-time diagnostic, the same documented boundary Unit 8.5d records for
 a block. The manifest reaches 4,372 cases: 2,568 passes, 1,235 expected
 negatives, and 569 unsupported profile features with no semantic or harness
 failures.
+
+M5a Unit 8.5f admits the `debugger` statement recorded above. The frontend
+converts it to the same `{ kind: "block", body: [] }` owned syntax the
+empty statement already produces, so every later exhaustive or permissive
+statement-kind dispatch in HIR construction, MIR lowering, module
+traversal, and the C backend admits it unmodified, in a block, a loop, a
+switch clause, a labeled statement, a function, an async or generator body,
+and a module top level alike. The reviewed subset adds both included
+_test/language/statements/debugger/\*_ cases: *statement.js* is a pass, and
+*expression.js*, which places `debugger` in an expression position, is an
+expected negative the bootstrap parser already rejects as a native
+parse-time `SyntaxError`. The manifest reaches 4,374 cases: 2,569 passes,
+1,236 expected negatives, and 569 unsupported profile features with no
+semantic or harness failures.
 
 
 Known gaps inside the claim
