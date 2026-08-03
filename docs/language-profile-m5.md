@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,722 reviewed cases: 2,890 passes, 1,292
-expected negatives, and 540 unsupported profile features. It records no
+The current manifest contains 4,722 reviewed cases: 2,891 passes, 1,292
+expected negatives, and 539 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -88,12 +88,51 @@ its deliberate boundary and its evidence:
     the shared generic `ToPrimitive`. Native
     differential fixtures, MIR structural tests, and reviewed test262
     cases cover the three operators.
- -  `typeof` applied to a name that does not resolve to a binding is
-    rejected with a source-located diagnostic instead of evaluating to
-    `"undefined"`. The closed ahead-of-time profile rejects every other
-    unresolved reference, and this deviation is explicit rather than a
-    silent approximation. The affected test262 case remains classified
-    unsupported until an owned decision admits unresolved references.
+ -  `typeof` applied directly to an unresolvable name evaluates to
+    `"undefined"`, as ECMA-262's unresolvable-reference step requires.
+    M5a Unit 8.5i decides resolvability ahead of time the same way the
+    Unit 8.1b identifier delete does, so the result folds to the string
+    constant without reading or creating any binding, and every other
+    unresolved reference keeps its source-located rejection, including a
+    member access, a sequence operand, and an assignment target. Inside
+    `with`, every active object environment is consulted first: a hit
+    inspects the supplied value through the ordinary property read, a
+    resolved lexical fallback performs the ordinary binding read
+    including its temporal dead zone error, and a genuinely unresolvable
+    fallback produces `"undefined"` rather than an uninitialized-cell
+    error. A folded `typeof`, direct or through `with`, of a name any
+    `with` region of the same program uses as an unresolved assignment
+    target stays a source-located rejection regardless of source order
+    or position, since ECMA-262 models that sloppy assignment as
+    creating a real global binding whose value the folded answer would
+    misreport, the same hidden-fallback boundary the Unit 8.1b delete
+    records. Only an operation that reaches PutValue on an all-miss
+    chain records the name: a non-strict simple assignment or a
+    non-strict destructuring or loop assignment target. A compound or
+    logical assignment and an update expression read first and throw
+    ReferenceError on the uninitialized cell before any write, so a
+    caught attempt leaves the name genuinely unresolvable and keeps the
+    fold admitted in either mode. A strict fallback write, whose
+    all-miss PutValue ECMA-262 makes throw instead of creating a
+    global, is itself a source-located rejection until that strict
+    throw is lowered, so it neither runs with sloppy semantics nor
+    poisons the fold.
+    `typeof` of an unshadowed runtime-owned intrinsic name, such
+    as `Object` or `Promise`, stays a source-located rejection: the
+    realm binds those names as call targets the profile does not admit
+    as values, so `"undefined"` would misreport them, the same boundary
+    the Unit 8.1b identifier delete records. The same rule covers every
+    other global name ECMA-262 clause 19 requires of the pinned
+    ECMAScript 2025 realm, such as `Math`, `JSON`, `Array`, `eval`, and
+    `globalThis`: an unshadowed `typeof` of one stays a source-located
+    rejection until the profile admits the name as a value, so the fold
+    answers `"undefined"` only for a name no conforming realm of the
+    pinned edition is required to bind; Annex B additions such as
+    `escape` stay excluded from the claim and remain ordinary
+    unresolvable names. HIR and MIR structural
+    tests, a fixed native differential fixture, a generated property
+    suite with seed `0x5eed002c`, and the reviewed test262
+    unresolvable-reference case cover the boundary.
  -  The `&&` and `||` logical operators and the conditional `?:` operator,
     lowered through explicit MIR branches and a parameterized join block.
     The untaken operand never evaluates, the produced value is the operand
@@ -2603,7 +2642,16 @@ must never shrink by reclassification alone.
     Script top-level `this` and every non-strict nullish receiver one
     realm-wide global this value whose own properties are the Script's
     statically known var-scoped top-level bindings, as recorded above,
-    but that object is not the global object. Admitting the global object
+    but that object is not the global object. Because this realm binds
+    none of the unadmitted clause 19 standard globals, a Script
+    top-level `var` declaration of such a name creates the fresh
+    undefined-initialized property GlobalDeclarationInstantiation
+    prescribes for an absent name, exactly as reviewed passes such as
+    *for-of/dstr/obj-id-init-simple-no-strict.js* rely on; the window
+    before its first assignment, where a conforming realm would still
+    expose the intrinsic value, is part of this gap, and a case that
+    observes it surfaces as a semantic failure at manifest review rather
+    than entering silently. Admitting the global object
     requires the intrinsic graph to expose standard constructors as real
     values first, Annex B block-level function hoisting so that a
     function declared in a block reaches the same binding model, the

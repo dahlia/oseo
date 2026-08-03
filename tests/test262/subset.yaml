@@ -8331,7 +8331,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/unresolvable-reference.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/unary-minus/bigint.js
     expectedClassification: pass

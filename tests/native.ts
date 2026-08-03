@@ -317,6 +317,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "in-and-instanceof" ||
     fixture.name === "optional-chaining" ||
     fixture.name === "typeof-void-remainder" ||
+    fixture.name === "typeof-unresolved" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "tagged-templates" ||
@@ -381,6 +382,14 @@ for (const fixture of selectedFixtures) {
           }
           if (fixture.name === "delete-strict") {
             assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "typeof-unresolved") {
+            // The folded "undefined" result and every with-chain typeof
+            // observation must survive forced collection, and no lowered
+            // path may read or create a binding for an unresolvable
+            // direct operand.
+            assert.ok(native.counters.collections > 0);
+            assert.doesNotMatch(native.emittedC, /missingTopLevel/u);
           }
           if (
             fixture.name === "async-pattern-await-positions" ||

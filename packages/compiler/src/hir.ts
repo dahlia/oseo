@@ -212,6 +212,84 @@ export function errorIntrinsicName(
 }
 
 /**
+ * Global names ECMA-262 clause 19 requires of every realm in ECMAScript
+ * 2025, the candidate edition ADR 0013 pins, excluding the Annex B
+ * additions the claim excludes. A conforming realm always resolves
+ * these names, so a `typeof` of one can never take the unresolvable
+ * reference's `"undefined"` answer; a name this profile has not
+ * admitted as a value must be rejected instead of misreported.
+ */
+const standardGlobalNames: ReadonlySet<string> = new Set([
+  "AggregateError",
+  "Array",
+  "ArrayBuffer",
+  "Atomics",
+  "BigInt",
+  "BigInt64Array",
+  "BigUint64Array",
+  "Boolean",
+  "DataView",
+  "Date",
+  "Error",
+  "EvalError",
+  "FinalizationRegistry",
+  "Float16Array",
+  "Float32Array",
+  "Float64Array",
+  "Function",
+  "Infinity",
+  "Int16Array",
+  "Int32Array",
+  "Int8Array",
+  "Iterator",
+  "JSON",
+  "Map",
+  "Math",
+  "NaN",
+  "Number",
+  "Object",
+  "Promise",
+  "Proxy",
+  "RangeError",
+  "ReferenceError",
+  "Reflect",
+  "RegExp",
+  "Set",
+  "SharedArrayBuffer",
+  "String",
+  "Symbol",
+  "SyntaxError",
+  "TypeError",
+  "URIError",
+  "Uint16Array",
+  "Uint32Array",
+  "Uint8Array",
+  "Uint8ClampedArray",
+  "WeakMap",
+  "WeakRef",
+  "WeakSet",
+  "decodeURI",
+  "decodeURIComponent",
+  "encodeURI",
+  "encodeURIComponent",
+  "eval",
+  "globalThis",
+  "isFinite",
+  "isNaN",
+  "parseFloat",
+  "parseInt",
+  "undefined",
+]);
+
+/**
+ * Whether ECMA-262 requires every realm of the pinned edition to bind
+ * `name` as a global, ignoring what this profile has admitted so far.
+ */
+export function isStandardGlobalName(name: string): boolean {
+  return standardGlobalNames.has(name);
+}
+
+/**
  * How ECMA-262's global object already binds one intrinsic global name,
  * which is what decides whether a Script's own top-level declaration of
  * that name creates an ordinary global-object property.
@@ -1101,6 +1179,36 @@ export interface ResolveState {
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   nextFunctionId: number;
   readonly sourceId: string;
+  /**
+   * Every `typeof` reference this program folded to the unresolvable
+   * `"undefined"` answer, directly or as a `with` chain's miss
+   * fallback. The set is checked against `withInitializingFallbackNames`
+   * after the whole program resolves, so the rejection does not depend
+   * on the source order of the fold and the assignment.
+   */
+  readonly foldedTypeofReferences: {
+    readonly located: LocatedSyntax;
+    readonly name: string;
+  }[];
+  /**
+   * The effective strictness of the code currently being resolved. A
+   * strict all-miss PutValue throws ReferenceError instead of creating
+   * a sloppy global, so with-fallback write classification depends on
+   * it.
+   */
+  strict: boolean;
+  /**
+   * Names any non-strict `with` region of this program uses as an
+   * unresolved assignment target whose all-miss path reaches PutValue
+   * without a prior read: a simple assignment or a destructuring or
+   * loop assignment target. Such a write can initialize its hidden
+   * fallback cell at run time, which ECMA-262 models as creating a real
+   * global binding, so a folded `typeof` answer for the same name
+   * anywhere in the program would misreport the materialized value. A
+   * compound or logical assignment and an update expression read first
+   * and throw before any write, so they never enter this set.
+   */
+  readonly withInitializingFallbackNames: Set<string>;
   /**
    * Hidden fallback bindings owned by each currently resolved `with`
    * statement, ordered outermost first.

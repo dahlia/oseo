@@ -730,15 +730,360 @@ test("suspends top-level await inside logical operands", () => {
   );
 });
 
-test("rejects typeof with an unresolved name explicitly", () => {
+test("admits direct typeof with an unresolvable name", () => {
   const result = compileSource(babelFrontend, {
-    source: "console.log(typeof missing);",
+    source: "console.log(typeof missing);\nconsole.log(typeof (missing));",
     sourceId: "typeof-unresolved.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  // Both the bare and the parenthesized reference fold to the string the
+  // specification's unresolvable-reference step produces, without a
+  // binding read or a hidden cell.
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
+});
+
+test("admits direct typeof with an unresolvable name in a module", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: "console.log(typeof missing);",
+    sourceId: "file:///app/typeof-module.js",
+  });
+  assert.ok(result.parsed);
+  assert.ok(result.module != null);
+  const compiled = compileModuleGraph({
+    entryId: "file:///app/typeof-module.js",
+    kind: "module-graph",
+    modules: [
+      {
+        canonicalId: "file:///app/typeof-module.js",
+        dependencies: [],
+        resolutions: [],
+        sourceHash: "typeof-module",
+        syntax: result.module,
+      },
+    ],
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir != null);
+  assert.match(printMir(compiled.mir), /constant "undefined"/u);
+});
+
+test("admits direct typeof with an unresolvable name in strict code", () => {
+  const result = compileSource(babelFrontend, {
+    source: '"use strict";\nconsole.log(typeof missing);',
+    sourceId: "typeof-unresolved-strict.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
+});
+
+test("keeps every non-typeof unresolved reference rejected", () => {
+  for (const source of [
+    "console.log(missing);",
+    "console.log(typeof missing.property);",
+    "console.log(typeof (0, missing));",
+    "missing = 1;",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "unresolved-read.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /Unknown binding 'missing'/u,
+      source,
+    );
+  }
+});
+
+test("rejects typeof of an unshadowed runtime intrinsic name", () => {
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof Promise);",
+    sourceId: "typeof-intrinsic.ts",
   });
   assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   assert.match(
     result.diagnostics[0]?.message ?? "",
-    /typeof with an unresolved name/u,
+    /typeof runtime intrinsic binding 'Promise'/u,
+  );
+});
+
+test("rejects typeof of an unimplemented standard global name", () => {
+  // ECMA-262 clause 19 requires every conforming realm to bind these
+  // names, so the unresolvable fold's "undefined" answer would
+  // misreport them; each stays a source-located rejection until the
+  // profile admits it as a value, inside and outside `with` alike.
+  for (const source of [
+    "console.log(typeof Math);",
+    "console.log(typeof Array);",
+    "console.log(typeof Function);",
+    "console.log(typeof JSON);",
+    "console.log(typeof RegExp);",
+    "console.log(typeof BigInt);",
+    "console.log(typeof eval);",
+    "console.log(typeof globalThis);",
+    "console.log(typeof parseInt);",
+    "with ({}) { console.log(typeof Math); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-standard-global.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /typeof standard global binding '\w+' is outside/u,
+      source,
+    );
+  }
+});
+
+test("resolves typeof of a shadowed standard global to the binding", () => {
+  for (const source of [
+    "let Math = 1; console.log(typeof Math);",
+    "function Array() {}\nconsole.log(typeof Array);",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-shadowed-global.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
+test("keeps the fold for names outside the pinned realm", () => {
+  // Annex B additions are excluded from the claim, so an unshadowed
+  // `escape` is an ordinary unresolvable name in this profile's realm.
+  const result = compileSource(babelFrontend, {
+    source: "console.log(typeof escape);",
+    sourceId: "typeof-annex-b.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /console\.log\("undefined"\)/u);
+});
+
+test("resolves typeof of a shadowed intrinsic name to the binding", () => {
+  const result = compileSource(babelFrontend, {
+    source: "let Promise = 1;\nconsole.log(typeof Promise);",
+    sourceId: "typeof-shadowed-intrinsic.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /typeof %b\d+\(Promise\)/u);
+});
+
+test("consults object environments before the typeof fallback", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "const environment = { present: 1 };\n" +
+      "with (environment) {\n" +
+      "  console.log(typeof present);\n" +
+      "  console.log(typeof absent);\n" +
+      "}\n",
+    sourceId: "typeof-with.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const printed = printHir(result.hir);
+  // A hit inspects the object environment's value; a genuinely
+  // unresolvable miss falls back to the undefined value rather than a
+  // hidden uninitialized cell, so typeof reports "undefined" instead of
+  // an uninitialized-cell error.
+  assert.match(printed, /typeof with\[%b\d+\] present fallback undefined/u);
+  assert.match(printed, /typeof with\[%b\d+\] absent fallback undefined/u);
+});
+
+test("rejects typeof of an assigned with fallback name", () => {
+  // A hidden fallback cell an unresolved assignment can initialize at
+  // run time would make the folded "undefined" answer misreport the
+  // materialized value, so the combination stays rejected in every
+  // source order and position, including a direct fold outside the
+  // assigning region and an assignment only a later iteration or a
+  // nested closure performs.
+  for (const source of [
+    "with ({}) { missing = 1; console.log(typeof missing); }",
+    "with ({}) { console.log(typeof missing); missing = 1; }",
+    "with ({}) {\n" +
+      "  for (let i = 0; i < 2; i = i + 1) {\n" +
+      "    console.log(typeof missing);\n" +
+      "    missing = 1;\n" +
+      "  }\n" +
+      "}",
+    "with ({}) {\n" +
+      "  const f = () => { missing = 1; };\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) { missing = 1; }\nconsole.log(typeof missing);",
+    "console.log(typeof missing);\nwith ({}) { missing = 1; }",
+    "with ({}) { with ({}) { missing = 1; } console.log(typeof missing); }",
+    "function assign() { with ({}) { missing = 1; } }\n" +
+      "function probe() { return typeof missing; }\n" +
+      "console.log(probe());\nassign();",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-assigned.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /typeof with fallback binding 'missing'/u,
+      source,
+    );
+  }
+});
+
+test("keeps the fold beside read-first with fallback operations", () => {
+  // A compound or logical assignment and an update expression perform
+  // GetValue before their write, so an all-miss chain throws
+  // ReferenceError on the uninitialized fallback cell and can never
+  // initialize it; a caught attempt leaves the name genuinely
+  // unresolvable and the fold stays admitted.
+  for (const source of [
+    "with ({}) {\n" +
+      "  try { missing++; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { --missing; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing += 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ||= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  try { missing ??= 1; } catch (c) {}\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-read-first.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
+test("rejects typeof of a destructuring or loop with fallback target", () => {
+  // These targets reach PutValue without a prior read, so they can
+  // initialize the hidden cell exactly like a simple assignment.
+  for (const source of [
+    "with ({}) { ({ missing } = {}); console.log(typeof missing); }",
+    "with ({}) { [missing] = [1]; console.log(typeof missing); }",
+    "with ({}) { for (missing of [1]) {} console.log(typeof missing); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-put-target.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /typeof with fallback binding 'missing'/u,
+      source,
+    );
+  }
+});
+
+test("rejects a strict write to a with fallback binding", () => {
+  // A strict all-miss PutValue throws ReferenceError instead of
+  // creating a sloppy global, while the profile's fallback lowering
+  // would initialize the hidden cell, so the strict write itself stays
+  // rejected and never poisons the typeof fold.
+  for (const source of [
+    "with ({}) {\n" +
+      '  const f = () => { "use strict"; missing = 1; };\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; [missing] = [1]; }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; for (missing of [1]) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      "  class C { f = (missing = 1); }\n" +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-strict-write.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /Assigning with fallback binding 'missing' in strict code/u,
+      source,
+    );
+  }
+});
+
+test("keeps strict read-first with fallback operations admitted", () => {
+  // A strict compound assignment or update reads first and throws the
+  // same catchable ReferenceError the lowering already produces, so it
+  // stays admitted and does not poison the fold.
+  for (const source of [
+    "with ({}) {\n" +
+      '  function f() { "use strict"; try { missing += 1; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+    "with ({}) {\n" +
+      '  function f() { "use strict"; try { missing++; } catch (c) {} }\n' +
+      "  console.log(typeof missing);\n" +
+      "}",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-strict-read-first.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+  }
+});
+
+test("keeps typeof beside unrelated with fallback assignments", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let known = 1;\n" +
+      "with ({}) {\n" +
+      "  other = 1;\n" +
+      "  known = 2;\n" +
+      "  console.log(typeof missing, typeof known);\n" +
+      "}\n",
+    sourceId: "typeof-with-unrelated.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+});
+
+test("keeps the lexical fallback for typeof through with", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "let shadowable = 1;\n" +
+      "const environment = {};\n" +
+      "with (environment) {\n" +
+      "  console.log(typeof shadowable);\n" +
+      "}\n",
+    sourceId: "typeof-with-lexical.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(
+    printHir(result.hir),
+    /typeof with\[%b\d+\] shadowable fallback %b\d+\(shadowable\)/u,
   );
 });
 

@@ -2,6 +2,7 @@ import {
   anonymousDefinition,
   errorIntrinsicName,
   intrinsicGlobalKind,
+  isStandardGlobalName,
 } from "./hir.ts";
 import type {
   Binding,
@@ -99,12 +100,27 @@ function resolveName(
   return { objectBindingIds };
 }
 
-/** Allocate the uninitialized fallback behind an unresolved `with` name. */
-function withFallbackBinding(name: string, state: ResolveState): Binding {
+/**
+ * Allocate the uninitialized fallback behind an unresolved `with` name.
+ * An `initializing` use is one whose all-miss path reaches PutValue
+ * without a prior GetValue, so it can actually write the hidden cell: a
+ * simple assignment or a destructuring or loop assignment target. A
+ * compound or logical assignment and an update expression read first
+ * and throw ReferenceError on the uninitialized cell before any write,
+ * so they never initialize it. Recording the initializing names lets
+ * the program reject a folded `typeof` of the same name instead of
+ * misreporting the materialized value as `"undefined"`.
+ */
+function withFallbackBinding(
+  name: string,
+  state: ResolveState,
+  initializing: boolean,
+): Binding {
   const owner = state.withFallbacks.at(-1);
   if (owner == null) {
     throw new Error("A with fallback was requested outside a with statement.");
   }
+  if (initializing) state.withInitializingFallbackNames.add(name);
   const existing = owner.get(name);
   if (existing != null) return existing;
   const binding: Binding = {
@@ -115,6 +131,31 @@ function withFallbackBinding(name: string, state: ResolveState): Binding {
   state.nextBindingId += 1;
   owner.set(name, binding);
   return binding;
+}
+
+/**
+ * Reject a strict-code write to a `with` fallback. A strict all-miss
+ * PutValue throws ReferenceError instead of creating a sloppy global,
+ * while this profile's fallback lowering would initialize the hidden
+ * cell, so the write stays outside the admitted global-object profile
+ * until the strict throw is lowered; it consequently never records an
+ * initializing name that could poison the typeof fold.
+ */
+function rejectStrictWithFallbackWrite(
+  name: string,
+  located: LocatedSyntax,
+  state: ResolveState,
+): void {
+  state.diagnostics.push(
+    sourceDiagnostic(
+      state.sourceId,
+      located,
+      `Assigning with fallback binding '${name}' in strict code is ` +
+        "outside the admitted global-object profile; a strict PutValue " +
+        "on an unresolvable reference throws instead of creating a " +
+        "global.",
+    ),
+  );
 }
 
 function bindingExpression(
@@ -152,7 +193,7 @@ function identifierFallback(
   const errorName = errorIntrinsicName(name);
   if (errorName != null) return { errorName, kind: "error-intrinsic", range };
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
-  return bindingExpression(withFallbackBinding(name, state), range);
+  return bindingExpression(withFallbackBinding(name, state, false), range);
 }
 
 /** The source location of one syntax node, without its other fields. */
@@ -357,6 +398,91 @@ function resolveIdentifierDelete(
   };
 }
 
+/**
+ * Resolve a direct `typeof` applied to an identifier. ECMA-262 answers
+ * `"undefined"` for an unresolvable reference instead of throwing, and the
+ * closed-world profile can decide resolvability statically the same way
+ * `resolveIdentifierDelete` does, so a name with no binding, no admitted
+ * intrinsic value, and no enclosing object environment folds to that
+ * string without reading or creating any binding. Every other expression
+ * keeps the ordinary unresolved-name rejection. Runtime-owned call-target
+ * intrinsics stay rejected: ECMA-262 resolves them to real global values
+ * this profile does not admit as values, so `"undefined"` would misreport
+ * them.
+ */
+function resolveTypeofIdentifier(
+  expression: Extract<SyntaxExpression, { readonly kind: "unary" }>,
+  argument: Extract<SyntaxExpression, { readonly kind: "identifier" }>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirExpression | undefined {
+  const resolution = resolveName(scopes, state, argument.name);
+  const resolvesValue =
+    resolution.binding != null ||
+    argument.name === "undefined" ||
+    argument.name === "NaN" ||
+    argument.name === "Infinity" ||
+    argument.name === "Symbol" ||
+    errorIntrinsicName(argument.name) != null;
+  if (resolvesValue) {
+    const resolved = resolveExpression(argument, scopes, state);
+    return resolved == null ? undefined : { ...expression, argument: resolved };
+  }
+  if (isRuntimeOwnedIntrinsicName(argument.name)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        argument,
+        `typeof runtime intrinsic binding '${argument.name}' is outside ` +
+          "the admitted global-object profile.",
+      ),
+    );
+    return undefined;
+  }
+  // A clause 19 standard global is never unresolvable in a conforming
+  // realm of the pinned edition, so folding it to "undefined" would
+  // misreport a required global value this profile has simply not
+  // admitted yet. Annex B additions stay excluded from the claim and
+  // remain ordinary unresolvable names.
+  if (isStandardGlobalName(argument.name)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        argument,
+        `typeof standard global binding '${argument.name}' is outside ` +
+          "the admitted global-object profile.",
+      ),
+    );
+    return undefined;
+  }
+  // Both folded shapes are re-checked against the program's unresolved
+  // `with` assignment targets after resolution completes, because a
+  // hidden fallback cell such an assignment initializes at run time
+  // would make the folded answer misreport the materialized value.
+  state.foldedTypeofReferences.push({
+    located: locatedOf(argument),
+    name: argument.name,
+  });
+  if (resolution.objectBindingIds.length > 0) {
+    // Every active object environment is consulted first; when all of
+    // them miss, the reference is unresolvable, so the fallback is the
+    // `undefined` value `typeof` reports rather than the hidden
+    // uninitialized cell an ordinary read preserves for its
+    // ReferenceError.
+    return {
+      ...expression,
+      argument: {
+        ...locatedOf(argument),
+        fallback: { kind: "undefined", range: argument.range },
+        kind: "with-get",
+        name: argument.name,
+        objectBindingIds: resolution.objectBindingIds,
+      },
+    };
+  }
+  return { kind: "string", range: expression.range, value: "undefined" };
+}
+
 function resolveExpression(
   expression: SyntaxExpression,
   scopes: readonly Map<string, Binding>[],
@@ -400,8 +526,26 @@ function resolveExpression(
       return undefined;
     }
     if (value == null) return undefined;
+    if (
+      resolution.binding == null &&
+      state.strict &&
+      expression.kind === "binding-set"
+    ) {
+      rejectStrictWithFallbackWrite(expression.name, expression, state);
+      return undefined;
+    }
+    // Only a non-strict simple assignment reaches PutValue on an
+    // all-miss chain; a compound or logical assignment performs
+    // GetValue first, which throws ReferenceError on the uninitialized
+    // fallback cell before any write, so it can never initialize the
+    // hidden cell.
     const binding =
-      resolution.binding ?? withFallbackBinding(expression.name, state);
+      resolution.binding ??
+      withFallbackBinding(
+        expression.name,
+        state,
+        expression.kind === "binding-set",
+      );
     const inferred =
       expression.kind === "binding-set" ||
       expression.operator === "&&" ||
@@ -464,8 +608,11 @@ function resolveExpression(
       );
       return undefined;
     }
+    // An update expression performs GetValue before its write, so an
+    // all-miss chain throws ReferenceError on the uninitialized
+    // fallback cell and can never initialize it.
     const binding =
-      resolution.binding ?? withFallbackBinding(expression.name, state);
+      resolution.binding ?? withFallbackBinding(expression.name, state, false);
     if (resolution.objectBindingIds.length > 0) {
       return {
         ...expression,
@@ -643,31 +790,16 @@ function resolveExpression(
     };
   }
   if (expression.kind === "unary") {
-    const typeofResolution =
-      expression.operator === "typeof" &&
-      expression.argument.kind === "identifier"
-        ? resolveName(scopes, state, expression.argument.name)
-        : undefined;
     if (
       expression.operator === "typeof" &&
-      expression.argument.kind === "identifier" &&
-      typeofResolution?.binding == null &&
-      typeofResolution?.objectBindingIds.length === 0 &&
-      expression.argument.name !== "undefined" &&
-      expression.argument.name !== "NaN" &&
-      expression.argument.name !== "Infinity" &&
-      expression.argument.name !== "Symbol" &&
-      errorIntrinsicName(expression.argument.name) == null
+      expression.argument.kind === "identifier"
     ) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          expression,
-          "typeof with an unresolved name is outside the admitted " +
-            'profile; ECMAScript would evaluate it to "undefined".',
-        ),
+      return resolveTypeofIdentifier(
+        expression,
+        expression.argument,
+        scopes,
+        state,
       );
-      return undefined;
     }
     const argument = resolveExpression(expression.argument, scopes, state);
     if (argument == null) return undefined;
@@ -751,7 +883,14 @@ function resolveExpression(
     return resolveOptionalChain(expression, scopes, state);
   }
   if (expression.kind === "class") {
-    return resolveClassExpression(expression, scopes, state);
+    // A ClassDefinition is strict code in its entirety, including the
+    // heritage operand, computed keys, and field initializers resolved
+    // in the enclosing context.
+    const outerStrict = state.strict;
+    state.strict = true;
+    const resolved = resolveClassExpression(expression, scopes, state);
+    state.strict = outerStrict;
+    return resolved;
   }
   if (
     expression.kind === "property-get" ||
@@ -1388,6 +1527,10 @@ function resolveFunction(
   } else if (!lexicalReceiver(functionValue)) {
     state.thisBinding = undefined;
   }
+  // The frontend records each function's effective strictness, so the
+  // body resolves under its own mode and restores the enclosing one.
+  const outerStrict = state.strict;
+  state.strict = functionValue.strict === true;
   const parameterScope = new Map<string, Binding>();
   const parameters: HirParameter[] = [];
   for (const parameter of functionValue.parameters) {
@@ -1445,6 +1588,7 @@ function resolveFunction(
   );
   state.labels.push(...outerLabels);
   state.thisBinding = outerThisBinding;
+  state.strict = outerStrict;
   // CreateMappedArgumentsObject is reachable only from
   // FunctionDeclarationInstantiation's non-strict, simple-parameter-list
   // branch; every other eligible form takes the unmapped snapshot.
@@ -2163,11 +2307,19 @@ function resolveBindingPattern(
             objectBindingIds: [],
           }
         : resolveName(scopes, state, pattern.name);
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      state.strict
+    ) {
+      rejectStrictWithFallbackWrite(pattern.name, pattern, state);
+      return undefined;
+    }
     const binding =
       resolution.binding ??
       (resolution.objectBindingIds.length === 0
         ? undefined
-        : withFallbackBinding(pattern.name, state));
+        : withFallbackBinding(pattern.name, state, true));
     if (binding == null) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -2794,11 +2946,23 @@ function resolveStatement(
       }
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
+      if (
+        resolution.binding == null &&
+        resolution.objectBindingIds.length > 0 &&
+        state.strict
+      ) {
+        rejectStrictWithFallbackWrite(
+          statement.target.name,
+          statement.target,
+          state,
+        );
+        return undefined;
+      }
       const binding =
         resolution.binding ??
         (resolution.objectBindingIds.length === 0
           ? undefined
-          : withFallbackBinding(statement.target.name, state));
+          : withFallbackBinding(statement.target.name, state, true));
       if (binding == null) {
         state.diagnostics.push(
           sourceDiagnostic(
@@ -3050,13 +3214,16 @@ export function buildSeededHir(
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
     diagnostics,
+    foldedTypeofReferences: [],
     functionInfo: new Map(),
     hirFunctions: [],
     labels: [],
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
+    strict: program.strict === true,
     withFallbacks: [],
+    withInitializingFallbackNames: new Set(),
     withScopes: new Map(),
   };
   const scriptScope = new Map(seed.bindings);
@@ -3073,6 +3240,23 @@ export function buildSeededHir(
     false,
     scriptScope,
   );
+  // A hidden fallback cell an unresolved `with` assignment initializes
+  // at run time materializes its name the way ECMA-262's sloppy global
+  // write does, so every `typeof` the program folded to "undefined" for
+  // such a name is rejected rather than misreported. The check runs
+  // after the whole program resolves, so it holds regardless of where
+  // the assignment and the fold occur relative to each other.
+  for (const reference of state.foldedTypeofReferences) {
+    if (!state.withInitializingFallbackNames.has(reference.name)) continue;
+    diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        reference.located,
+        `typeof with fallback binding '${reference.name}' is outside ` +
+          "the admitted global-object profile.",
+      ),
+    );
+  }
   if (diagnostics.length > 0) {
     return {
       diagnostics,
