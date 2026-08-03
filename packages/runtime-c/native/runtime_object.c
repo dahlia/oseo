@@ -1613,6 +1613,76 @@ static OseoResult ascii_string(OseoContext *context, const char *text) {
     return oseo_internal_allocate_string(context, units, length);
 }
 
+/*
+ * %ThrowTypeError% (10.2.4.1). One anonymous, zero-parameter function
+ * per realm, so an unmapped arguments object's `callee` accessor reports
+ * the same [[Get]] and [[Set]] identity every time it is inspected. Its
+ * own body only throws, and the caller's arguments never reach it.
+ *
+ * 10.2.4.1 also hardens the intrinsic: its `length` and `name` are
+ * non-writable and non-configurable, and the function itself is
+ * non-extensible, so admitted reflection can neither reshape it nor
+ * replace its prototype. `oseo_function_create` leaves both properties
+ * configurable, so they are redefined before extensibility is dropped.
+ * The `prototype` object every internal function in this profile still
+ * carries is a separate boundary the intrinsics stream owns.
+ */
+OseoResult oseo_internal_throw_type_error_function(OseoContext *context) {
+    if (tag_of(context->throw_type_error_function) != OSEO_TAG_UNDEFINED) {
+        return normal(context->throw_type_error_function);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_environment_create(context, 0u);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            OSEO_THROW_TYPE_ERROR_CODE_ID,
+            frame.slots[0],
+            NULL,
+            0u,
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[0] = result.value;
+    }
+    const OseoPropertyAttributes frozen =
+        (OseoPropertyAttributes){false, false, false, false};
+    const char *const hardened[] = {"length", "name"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = ascii_string(context, hardened[index]);
+        frame.slots[1] = result.value;
+        OseoValue existing = oseo_undefined();
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
+            existing = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                existing,
+                frozen
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[0])->extensible = false;
+        context->throw_type_error_function = frame.slots[0];
+        result = normal(frame.slots[0]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_array_push_function(OseoContext *context) {
     if (tag_of(context->array_push_function) != OSEO_TAG_UNDEFINED) {
         return normal(context->array_push_function);
@@ -1733,9 +1803,46 @@ OseoResult oseo_internal_array_push(
     return result;
 }
 
+/*
+ * Both arguments object shapes define `@@iterator` as an ordinary
+ * writable, non-enumerable, configurable data property whose value is
+ * the same %Array.prototype.values% function an array's own
+ * `Symbol.iterator` resolves to, so spreading or iterating an arguments
+ * object walks its indices through the same array iterator, which reads
+ * a non-array target's `length` the way LengthOfArrayLike does.
+ */
+static OseoResult arguments_define_iterator(
+    OseoContext *context,
+    OseoValue object
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = object;
+    result = oseo_internal_well_known_symbol(context, OSEO_WELL_KNOWN_ITERATOR);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result =
+            oseo_internal_iterator_method(context, OSEO_ARRAY_VALUES_CODE_ID);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoPropertyAttributes attributes =
+            (OseoPropertyAttributes){true, false, true, false};
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            attributes
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_arguments_create(
     OseoContext *context,
-    OseoValue callee,
     size_t argument_count,
     const OseoValue *arguments
 ) {
@@ -1745,7 +1852,6 @@ OseoResult oseo_arguments_create(
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[2] = callee;
     result = oseo_object_literal_create(context);
     frame.slots[0] = result.value;
     const OseoPropertyAttributes indexed =
@@ -1780,18 +1886,37 @@ OseoResult oseo_arguments_create(
             metadata
         );
     }
+    /*
+     * CreateUnmappedArgumentsObject poisons `callee` unconditionally: it
+     * is a non-configurable accessor whose [[Get]] and [[Set]] are both
+     * %ThrowTypeError%, so the running function never leaks through an
+     * unmapped arguments object, whatever the caller's strictness. Only
+     * the mapped object still exposes the ordinary data property.
+     */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_throw_type_error_function(context);
+        frame.slots[2] = result.value;
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = ascii_string(context, "callee");
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_define(
+        const OseoPropertyAttributes poisoned =
+            (OseoPropertyAttributes){false, false, false, true};
+        result = oseo_object_define_accessor(
             context,
             frame.slots[0],
             frame.slots[1],
             frame.slots[2],
-            metadata
+            frame.slots[2],
+            true,
+            true,
+            poisoned
         );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = arguments_define_iterator(context, frame.slots[0]);
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
     oseo_roots_release(context, &frame);
@@ -1902,6 +2027,9 @@ OseoResult oseo_mapped_arguments_create(
             frame.slots[2],
             metadata
         );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = arguments_define_iterator(context, frame.slots[0]);
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
     oseo_roots_release(context, &frame);

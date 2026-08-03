@@ -40,7 +40,7 @@ supportedFeatures:
   - well-known-symbols
 tests:
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/for-await-iterator-next-rejected-promise-close.js
     expectedClassification: pass
@@ -73,7 +73,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/absent-value-not-passed.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/return/iterator-result-poisoned-done.js
     expectedClassification: pass
@@ -792,15 +792,69 @@ tests:
   - path: test/built-ins/Symbol/uniqueness.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/language/arguments-object/10.5-1gs.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.5-7-b-2-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.5-7-b-3-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.5-7-b-4-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-10-c-ii-1-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-10-c-ii-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-10-c-ii-2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-12-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-c-1-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-c-2-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-14-c-1-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-14-c-4-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-2gs.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-6-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-6-2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-6-3-s.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-6-3.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/10.6-6-4-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-6-4.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.1.6_A1_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/S10.6_A3_T3.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
@@ -810,6 +864,893 @@ tests:
   - path: test/language/arguments-object/S10.6_A4.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.6_A5_T3.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A5_T4.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A6.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A7.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/arguments-caller.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/async-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-named-func-expr-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-named-func-expr-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-named-func-expr-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-named-func-expr-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/async-gen-named-func-expr-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-func-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-func-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-func-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-func-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-func-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-decl-async-private-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-decl-private-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-gen-func-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-func-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-func-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-func-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-func-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        classes,
+        functions,
+        generators,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        classes,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/arguments-object/cls-expr-async-private-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-gen-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, generators, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-static-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-static-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-static-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-static-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [classes, functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/cls-expr-private-meth-static-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/arguments-object/func-decl-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-decl-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-decl-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-decl-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/func-decl-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-expr-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-expr-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-expr-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/func-expr-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/func-expr-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/gen-func-decl-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-decl-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-decl-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-decl-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/gen-func-decl-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-expr-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-expr-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-expr-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-func-expr-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/gen-func-expr-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/gen-meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, generators, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/gen-meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/arguments-object/mapped/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/language/arguments-object/mapped/enumerable-configurable-accessor-descriptor.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -879,6 +1820,9 @@ tests:
   - path: test/language/arguments-object/mapped/nonconfigurable-descriptors-basic.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/mapped/nonconfigurable-descriptors-define-failure.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/mapped/nonconfigurable-descriptors-set-value-by-arguments.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -933,6 +1877,39 @@ tests:
   - path: test/language/arguments-object/mapped/writable-enumerable-configurable-descriptor.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/meth-args-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/meth-args-trailing-comma-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/meth-args-trailing-comma-single-args.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/meth-args-trailing-comma-spread-operator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties]
+  - path: test/language/arguments-object/meth-args-trailing-comma-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/non-strict-arguments-object-is-immutable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/unmapped/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/language/arguments-object/unmapped/via-params-dflt.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
+  - path: test/language/arguments-object/unmapped/via-params-dstr.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions, object-properties]
+  - path: test/language/arguments-object/unmapped/via-params-rest.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, rest-parameters]
+  - path: test/language/arguments-object/unmapped/via-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/block-scope/shadowing/dynamic-lookup-from-closure.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, var-bindings]
@@ -975,6 +1952,12 @@ tests:
   - path: test/language/computed-property-names/class/method/constructor-can-be-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/destructuring/binding/syntax/destructuring-array-parameters-function-arguments-length.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions, object-properties]
+  - path: test/language/destructuring/binding/syntax/destructuring-object-parameters-function-arguments-length.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions, object-properties]
   - path: test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -1038,6 +2021,9 @@ tests:
   - path: test/language/expressions/arrow-function/length-dflt.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, object-properties]
+  - path: test/language/expressions/arrow-function/lexical-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
@@ -1077,6 +2063,18 @@ tests:
   - path: test/language/expressions/arrow-function/static-init-await-reference.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -1150,15 +2148,33 @@ tests:
   - path: test/language/expressions/assignment/dstr/obj-rest-valid-object.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/expressions/assignment/id-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/direct-identifierreference-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/direct-new-memberexpression-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-identifierreference-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-new-memberexpression-arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/async-arrow-function/await-as-param-nested-arrow-body-position.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-arguments-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -1252,6 +2268,12 @@ tests:
   - path: test/language/expressions/async-function/named-rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-returns-async-arrow-returns-arguments-from-parent-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
+  - path: test/language/expressions/async-function/named-returns-async-function-returns-arguments-from-own-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/expressions/async-function/nameless-array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, destructuring-bindings]
@@ -2672,13 +3694,13 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/named-yield-star-async-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-async-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-async-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-expr-abrupt.js
     expectedClassification: pass
@@ -2831,13 +3853,13 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-sync-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-sync-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/named-yield-star-sync-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/object-destructuring-param-strict-body.js
     expectedClassification: expected-negative
@@ -2918,13 +3940,13 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration]
   - path: test/language/expressions/async-generator/yield-star-async-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-async-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-async-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-expr-abrupt.js
     expectedClassification: pass
@@ -3083,13 +4105,13 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-sync-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-sync-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-star-sync-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/expressions/async-generator/yield-thenable-create-resolving-functions-reject.js
     expectedClassification: unsupported-profile-feature
@@ -3376,6 +4398,12 @@ tests:
   - path: test/language/expressions/class/accessor-name-static/literal-string-unicode-escape.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/async-method-static/returns-async-arrow-returns-arguments-from-parent-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, classes, functions, object-properties]
+  - path: test/language/expressions/class/async-method-static/returns-async-function-returns-arguments-from-own-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, classes, functions, object-properties]
   - path: test/language/expressions/class/class-name-ident-await-escaped-module.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
@@ -4804,6 +5832,20 @@ tests:
   - path: test/language/expressions/class/name.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
+  - path: test/language/expressions/class/params-dflt-gen-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [classes, default-parameters, functions, generators, object-properties]
+  - path: test/language/expressions/class/params-dflt-gen-meth-static-ref-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [classes, default-parameters, functions, generators, object-properties]
+  - path: test/language/expressions/class/params-dflt-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions, object-properties]
+  - path: test/language/expressions/class/params-dflt-meth-static-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions, object-properties]
   - path: test/language/expressions/class/private-static-field-multiple-evaluations-of-class-factory.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -4870,6 +5912,39 @@ tests:
   - path: test/language/expressions/comma/S11.14_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/compound-assignment/add-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/and-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/div-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/lshift-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/mod-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/mult-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/or-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/srshift-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/sub-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/urshift-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/compound-assignment/xor-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/conditional/S11.12_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
@@ -5093,12 +6168,21 @@ tests:
   - path: test/language/expressions/exponentiation/int32_min-exponent.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - path: test/language/expressions/function/arguments-with-arguments-fn.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/expressions/function/arguments-with-arguments-lex.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/function/dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [default-parameters, functions]
   - path: test/language/expressions/function/name-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/function/name-arguments-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/function/name-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -5123,6 +6207,9 @@ tests:
   - path: test/language/expressions/function/param-eval-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/expressions/function/params-dflt-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/expressions/function/scope-paramsbody-var-close.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
@@ -5135,6 +6222,12 @@ tests:
   - path: test/language/expressions/function/static-init-await-reference.js
     expectedClassification: pass
     dependencies: [classes, functions]
+  - path: test/language/expressions/generators/arguments-with-arguments-fn.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/expressions/generators/arguments-with-arguments-lex.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
   - path: test/language/expressions/generators/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [generators]
@@ -5216,6 +6309,9 @@ tests:
   - path: test/language/expressions/generators/param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [generators]
+  - path: test/language/expressions/generators/params-dflt-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, generators, object-properties]
   - path: test/language/expressions/generators/params-trailing-comma-multiple.js
     expectedClassification: pass
     dependencies: [generators]
@@ -5505,12 +6601,21 @@ tests:
   - path: test/language/expressions/logical-and/S11.11.1_A2.1_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/logical-assignment/lgcl-and-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/logical-assignment/lgcl-and-assignment-operator-bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/logical-assignment/lgcl-nullish-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/logical-assignment/lgcl-nullish-assignment-operator-bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - path: test/language/expressions/logical-assignment/lgcl-or-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/logical-assignment/lgcl-or-assignment-operator-bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
@@ -6490,12 +7595,21 @@ tests:
   - path: test/language/expressions/object/method-definition/async-meth-params-trailing-comma-single.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-returns-async-arrow-returns-arguments-from-parent-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/expressions/object/method-definition/async-returns-async-arrow.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/async-returns-async-function-returns-arguments-from-own-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/expressions/object/method-definition/async-returns-async-function.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/early-errors-object-method-arguments-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
   - path: test/language/expressions/object/method-definition/fn-name-fn.js
     expectedClassification: pass
     dependencies: [object-literals]
@@ -6562,6 +7676,12 @@ tests:
   - path: test/language/expressions/object/method-definition/name-property-desc.js
     expectedClassification: pass
     dependencies: [object-literals]
+  - path: test/language/expressions/object/method-definition/params-dflt-gen-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, generators, object-properties]
+  - path: test/language/expressions/object/method-definition/params-dflt-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/expressions/object/method-definition/static-init-await-binding-accessor.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
@@ -6745,6 +7865,9 @@ tests:
   - path: test/language/expressions/optional-chaining/update-expression-prefix.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/postfix-decrement/arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/postfix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
@@ -6757,6 +7880,9 @@ tests:
   - path: test/language/expressions/postfix-increment/11.3.1-2-1gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - path: test/language/expressions/postfix-increment/arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/postfix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
@@ -6769,6 +7895,9 @@ tests:
   - path: test/language/expressions/prefix-decrement/11.4.5-2-2gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - path: test/language/expressions/prefix-decrement/arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/prefix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
@@ -6778,6 +7907,9 @@ tests:
   - path: test/language/expressions/prefix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/prefix-increment/arguments.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/prefix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
@@ -7130,7 +8262,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/call-expression-argument-list-evaluation.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/call-expression-context-no-strict.js
     expectedClassification: pass
@@ -7148,7 +8280,7 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/member-expression-argument-list-evaluation.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/member-expression-context.js
     expectedClassification: pass
@@ -7233,6 +8365,9 @@ tests:
   - path: test/language/expressions/void/S11.4.2_A2_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - path: test/language/expressions/yield/arguments-object-attributes.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
   - path: test/language/expressions/yield/star-array.js
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
@@ -7267,7 +8402,7 @@ tests:
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
   - path: test/language/expressions/yield/star-rhs-iter-nrml-next-invoke.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [generators, iterator-protocol]
   - path: test/language/expressions/yield/star-rhs-iter-nrml-res-done-err.js
     expectedClassification: pass
@@ -7306,7 +8441,7 @@ tests:
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
   - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [generators, iterator-protocol]
   - path: test/language/expressions/yield/star-rhs-unresolvable.js
     expectedClassification: unsupported-profile-feature
@@ -8196,6 +9331,9 @@ tests:
   - path: test/language/rest-parameters/expected-argument-count.js
     expectedClassification: pass
     dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/no-alias-arguments.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, rest-parameters]
   - path: test/language/rest-parameters/object-pattern.js
     expectedClassification: pass
     dependencies:
@@ -8311,9 +9449,15 @@ tests:
   - path: test/language/statements/async-function/evaluation-default-that-throws.js
     expectedClassification: pass
     dependencies: [async-functions, default-parameters]
+  - path: test/language/statements/async-function/evaluation-mapped-arguments.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/statements/async-function/evaluation-this-value-global.js
     expectedClassification: pass
     dependencies: [async-functions, functions, promise-settlement]
+  - path: test/language/statements/async-function/evaluation-unmapped-arguments.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/statements/async-function/let-newline-await-in-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -8326,6 +9470,12 @@ tests:
   - path: test/language/statements/async-function/rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/statements/async-function/returns-async-arrow-returns-arguments-from-parent-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
+  - path: test/language/statements/async-function/returns-async-function-returns-arguments-from-own-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-properties]
   - path: test/language/statements/async-function/syntax-declaration-line-terminators-allowed.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions]
@@ -9059,13 +10209,13 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-async-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-async-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-async-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-expr-abrupt.js
     expectedClassification: pass
@@ -9233,13 +10383,13 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-sync-next.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-sync-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-sync-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
   - path: test/language/statements/async-generator/yield-star-throw-notdone-iter-value-throws.js
     expectedClassification: pass
@@ -9382,6 +10532,15 @@ tests:
   - path: test/language/statements/class/accessor-name-static/literal-string-unicode-escape.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/arguments/access.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/statements/class/async-method-static/returns-async-arrow-returns-arguments-from-parent-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, classes, functions, object-properties]
+  - path: test/language/statements/class/async-method-static/returns-async-function-returns-arguments-from-own-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, classes, functions, object-properties]
   - path: test/language/statements/class/class-name-ident-static-escaped.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
@@ -9494,6 +10653,9 @@ tests:
   - path: test/language/statements/class/definition/methods-gen-yield-weak-binding.js
     expectedClassification: expected-negative
     dependencies: [classes, generators]
+  - path: test/language/statements/class/definition/methods-named-eval-arguments.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
   - path: test/language/statements/class/definition/prototype-property.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -10952,6 +12114,20 @@ tests:
   - path: test/language/statements/class/name-binding/basic.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/class/params-dflt-gen-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [classes, default-parameters, functions, generators, object-properties]
+  - path: test/language/statements/class/params-dflt-gen-meth-static-ref-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [classes, default-parameters, functions, generators, object-properties]
+  - path: test/language/statements/class/params-dflt-meth-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions, object-properties]
+  - path: test/language/statements/class/params-dflt-meth-static-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [classes, default-parameters, functions, object-properties]
   - path: test/language/statements/class/scope-name-lex-open-heritage.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
@@ -10986,10 +12162,10 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, classes]
   - path: test/language/statements/class/static-init-arguments-functions.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, functions]
   - path: test/language/statements/class/static-init-arguments-methods.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes, object-literals]
   - path: test/language/statements/class/static-init-await-binding-invalid.js
     expectedClassification: expected-negative
@@ -11480,7 +12656,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-func-decl-dstr-array-elem-init-simple-no-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,
@@ -15823,7 +16999,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-gen-decl-dstr-array-elem-init-simple-no-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,
@@ -15847,7 +17023,7 @@ tests:
         promise-settlement,
       ]
   - path: test/language/statements/for-await-of/async-gen-decl-dstr-array-elem-target-simple-no-strict.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,
@@ -16837,6 +18013,42 @@ tests:
         iterator-protocol,
         promise-settlement,
       ]
+  - path: test/language/statements/for-in/var-arguments-fn-strict-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, object-properties, var-bindings]
+  - path: test/language/statements/for-in/var-arguments-fn-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, object-properties, var-bindings]
+  - path: test/language/statements/for-in/var-arguments-strict-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, object-properties, var-bindings]
+  - path: test/language/statements/for-in/var-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, object-properties, var-bindings]
+  - path: test/language/statements/for-of/arguments-mapped-aliasing.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/arguments-mapped-mutation.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/arguments-mapped.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/arguments-unmapped-aliasing.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/arguments-unmapped-mutation.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/arguments-unmapped.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, functions, iterator-protocol, object-properties]
   - path: test/language/statements/for-of/dstr/array-elem-put-prop-ref.js
     expectedClassification: pass
     dependencies:
@@ -17549,6 +18761,12 @@ tests:
   - path: test/language/statements/function/S13.2_A6_T2.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/statements/function/arguments-with-arguments-fn.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/statements/function/arguments-with-arguments-lex.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/dflt-params-ref-prior.js
     expectedClassification: pass
     dependencies:
@@ -17575,6 +18793,9 @@ tests:
   - path: test/language/statements/function/name-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/statements/function/name-arguments-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/name-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -17590,12 +18811,21 @@ tests:
   - path: test/language/statements/function/param-arguments-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
+  - path: test/language/statements/function/param-arguments-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
+  - path: test/language/statements/function/param-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/param-duplicated-non-strict.js
     expectedClassification: pass
     dependencies: [functions]
   - path: test/language/statements/function/param-duplicated-strict-1.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/language/statements/function/params-dflt-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/statements/function/scope-paramsbody-var-close.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
@@ -17608,6 +18838,12 @@ tests:
   - path: test/language/statements/function/static-init-await-binding-valid.js
     expectedClassification: pass
     dependencies: [classes, functions]
+  - path: test/language/statements/generators/arguments-with-arguments-fn.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
+  - path: test/language/statements/generators/arguments-with-arguments-lex.js
+    expectedClassification: pass
+    dependencies: [functions, generators, object-properties]
   - path: test/language/statements/generators/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [generators]
@@ -17641,6 +18877,9 @@ tests:
   - path: test/language/statements/generators/param-dflt-yield.js
     expectedClassification: expected-negative
     dependencies: [generators]
+  - path: test/language/statements/generators/params-dflt-ref-arguments.js
+    expectedClassification: pass
+    dependencies: [default-parameters, functions, generators, object-properties]
   - path: test/language/statements/generators/params-trailing-comma-multiple.js
     expectedClassification: pass
     dependencies: [generators]
@@ -17972,6 +19211,9 @@ tests:
   - path: test/language/statements/try/S12.14_A18_T2.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
+  - path: test/language/statements/try/catch-parameter-boundnames-restriction-arguments-negative-early.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, functions, object-properties]
   - path: test/language/statements/try/dstr/ary-name-iter-val.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
@@ -18077,6 +19319,66 @@ tests:
   - path: test/language/statements/variable/S12.2_A8_T4.js
     expectedClassification: expected-negative
     dependencies: [var-bindings]
+  - path: test/language/statements/variable/arguments-fn-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-final-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-final.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-first-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-first.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-middle-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-middle.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-list-repeated.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-single-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-fn-strict-single.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-final-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-final.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-first-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-first.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-middle-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-middle.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-list-repeated.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-single-init.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/variable/arguments-strict-single.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/variable/dstr/ary-name-iter-val.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -18153,6 +19455,9 @@ tests:
   - path: test/language/statements/variable/dstr/obj-ptrn-rest-val-obj.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/statements/variable/id-arguments-strict.js
+    expectedClassification: expected-negative
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/variable/static-init-await-binding-invalid.js
     expectedClassification: expected-negative
     dependencies: [classes, var-bindings]

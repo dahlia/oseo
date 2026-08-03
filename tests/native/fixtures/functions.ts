@@ -509,6 +509,512 @@ varAndFunctionSameName(3);
 `,
   },
   {
+    name: "unmapped-arguments-forms",
+    nonStrictScript: true,
+    source: `
+function strictOrdinary(a, b) {
+  "use strict";
+  arguments[0] = 100;
+  a = 200;
+  console.log(arguments.length, a, b, arguments[0], arguments[1], arguments[2]);
+  return arguments.length;
+}
+console.log(strictOrdinary(1, 2), strictOrdinary(1, 2, 3), strictOrdinary());
+
+const holder = {
+  sloppyMethod(a) {
+    arguments[0] = 10;
+    return a === 10;
+  },
+  strictMethod(a) {
+    "use strict";
+    arguments[0] = 10;
+    return a;
+  },
+  patternMethod([a], b) {
+    arguments[0] = 10;
+    return a + ":" + b + ":" + arguments.length;
+  },
+};
+console.log(
+  holder.sloppyMethod(1),
+  holder.strictMethod(1),
+  holder.patternMethod([1], 2),
+);
+
+class Base {
+  constructor(a) {
+    this.seen = arguments.length + ":" + arguments[0] + ":" + arguments[1];
+  }
+  method(a) {
+    arguments[0] = 5;
+    return a + ":" + arguments[0];
+  }
+  static staticMethod() {
+    return arguments.length;
+  }
+  *generatorMethod(a) {
+    yield arguments.length;
+    yield arguments[1];
+  }
+}
+class Derived extends Base {
+  constructor(a) {
+    super(a);
+    this.own = arguments.length + ":" + arguments[0];
+  }
+}
+console.log(new Base(7, 8).seen, new Base().seen);
+console.log(new Derived(9, 10).own, new Derived(9, 10).seen);
+console.log(new Base().method(3), Base.staticMethod(1, 2, 3));
+const generated = new Base().generatorMethod("g", "h");
+console.log(
+  generated.next().value,
+  generated.next().value,
+  generated.next().done,
+);
+
+class ImplicitDerived extends Base {}
+console.log(new ImplicitDerived(11, 12).seen);
+
+function* strictGenerator(a) {
+  "use strict";
+  arguments[0] = 20;
+  yield a;
+  yield arguments[0];
+}
+const strictGenerated = strictGenerator(1);
+console.log(strictGenerated.next().value, strictGenerated.next().value);
+
+function* patternGenerator([a], b) {
+  yield arguments.length;
+  arguments[0] = 30;
+  yield a;
+}
+const patternGenerated = patternGenerator([1], 2);
+console.log(patternGenerated.next().value, patternGenerated.next().value);
+`,
+  },
+  {
+    name: "unmapped-arguments-callee",
+    nonStrictScript: true,
+    source: `
+function poison(a, b) {
+  "use strict";
+  const descriptor = Object.getOwnPropertyDescriptor(arguments, "callee");
+  console.log(
+    typeof descriptor.get,
+    typeof descriptor.set,
+    descriptor.get === descriptor.set,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+  console.log(
+    "value" in descriptor,
+    "writable" in descriptor,
+    "get" in descriptor,
+    "set" in descriptor,
+  );
+  try { arguments.callee; console.log("read missed"); }
+  catch (error) { console.log("read", error instanceof TypeError); }
+  try { descriptor.set.call(arguments, 1); console.log("set missed"); }
+  catch (error) { console.log("set", error instanceof TypeError); }
+  try {
+    Object.defineProperty(arguments, "callee", { value: 1 });
+    console.log("define missed");
+  } catch (error) { console.log("define", error instanceof TypeError); }
+  try { delete arguments.callee; console.log("delete missed"); }
+  catch (error) { console.log("delete", error instanceof TypeError); }
+  return descriptor.get;
+}
+const first = poison(1, 2);
+function poisonDefault(a = 1) {
+  return Object.getOwnPropertyDescriptor(arguments, "callee").get;
+}
+console.log(first === poisonDefault(), first === poisonDefault(3));
+
+function sloppyDelete(a = 1) {
+  return delete arguments.callee;
+}
+console.log(sloppyDelete());
+
+function mappedCallee(a) {
+  const descriptor = Object.getOwnPropertyDescriptor(arguments, "callee");
+  return descriptor.value === mappedCallee &&
+    descriptor.writable && !descriptor.enumerable && descriptor.configurable;
+}
+console.log(mappedCallee(1));
+
+function unmappedDescriptors(a, b = 2) {
+  const indexed = Object.getOwnPropertyDescriptor(arguments, "0");
+  const length = Object.getOwnPropertyDescriptor(arguments, "length");
+  console.log(
+    indexed.value, indexed.writable, indexed.enumerable, indexed.configurable,
+  );
+  console.log(
+    length.value, length.writable, length.enumerable, length.configurable,
+  );
+  console.log(Object.getOwnPropertyDescriptor(arguments, "2") === undefined);
+}
+unmappedDescriptors(7, 8);
+
+function snapshotIndependence(a, b) {
+  "use strict";
+  const captured = arguments;
+  a = 1;
+  console.log(captured[0], captured.length);
+  captured[0] = 2;
+  console.log(a, captured[0]);
+  delete captured[1];
+  console.log(b, captured[1], captured.length);
+  return captured;
+}
+const firstSnapshot = snapshotIndependence(10, 20);
+const secondSnapshot = snapshotIndependence(10, 20);
+console.log(
+  firstSnapshot === secondSnapshot,
+  firstSnapshot[0],
+  secondSnapshot[0],
+);
+`,
+  },
+  {
+    name: "arguments-lexical-capture",
+    nonStrictScript: true,
+    source: `
+function lexicalHost(a, b) {
+  const direct = () => arguments.length + ":" + arguments[0];
+  const nested = () => (() => arguments[1])();
+  const shadowing = function (c) { return () => arguments[0]; };
+  arguments[0] = 50;
+  return direct() + " " + nested() + " " + shadowing(9)();
+}
+console.log(lexicalHost(1, 2));
+
+function strictLexicalHost(a) {
+  "use strict";
+  const direct = () => { arguments[0] = 60; return a + ":" + arguments[0]; };
+  return direct();
+}
+console.log(strictLexicalHost(1));
+
+const methodHost = {
+  method(a) {
+    return (() => arguments[0] + ":" + arguments.length)();
+  },
+};
+console.log(methodHost.method(3, 4));
+
+class ArrowClass {
+  constructor(a) {
+    this.value = (() => arguments.length + ":" + arguments[1])();
+  }
+}
+console.log(new ArrowClass(5, 6).value);
+
+async function asyncOrdinary(a, b) {
+  const before = arguments.length;
+  await null;
+  arguments[0] = 70;
+  return before + ":" + a + ":" + arguments[0] + ":" + arguments[1];
+}
+
+async function asyncDefault(a = 1) {
+  await null;
+  return arguments.length + ":" + a + ":" + (arguments[0] === undefined);
+}
+
+async function* asyncGenerator(a) {
+  yield arguments.length;
+  await null;
+  arguments[0] = 80;
+  yield a + ":" + arguments[0];
+}
+
+function asyncArrowHost(a) {
+  const arrow = async () => { await null; return arguments[0]; };
+  return arrow();
+}
+
+async function main() {
+  console.log(await asyncOrdinary(1, 2));
+  console.log(await asyncDefault());
+  const iterator = asyncGenerator(1);
+  console.log((await iterator.next()).value);
+  console.log((await iterator.next()).value);
+  console.log(await asyncArrowHost(90));
+}
+main();
+`,
+  },
+  {
+    name: "arguments-declaration-interaction",
+    nonStrictScript: true,
+    source: `
+function bodyFunctionNamed() {
+  console.log(typeof arguments);
+  function arguments() { return "shadowed"; }
+  console.log(arguments());
+}
+bodyFunctionNamed(1, 2);
+
+function bodyLexicalNamed() {
+  let arguments = 5;
+  console.log(arguments);
+}
+bodyLexicalNamed(1, 2);
+
+function bodyLexicalTdz() {
+  try { console.log(arguments); }
+  catch (error) { console.log("tdz", error instanceof ReferenceError); }
+  let arguments = 5;
+}
+bodyLexicalTdz(1, 2);
+
+function bodyVarNamed() {
+  var arguments;
+  console.log(typeof arguments, arguments.length);
+}
+bodyVarNamed(1, 2);
+
+function bodyVarInitialized() {
+  var arguments = 5;
+  console.log(arguments);
+}
+bodyVarInitialized(1, 2);
+
+function bodyVarWithDefault(a = 1) {
+  var arguments;
+  console.log(typeof arguments, arguments.length, a);
+}
+bodyVarWithDefault(7, 8);
+
+function bodyVarWithRest(...rest) {
+  var arguments;
+  console.log(typeof arguments, arguments.length, rest.length);
+}
+bodyVarWithRest(9, 10);
+
+function explicitParameter(arguments) {
+  var arguments;
+  console.log(arguments);
+}
+explicitParameter(3);
+
+function defaultedFormal(arguments = 1) { return arguments; }
+console.log(defaultedFormal(), defaultedFormal(7));
+
+function objectFormal({ arguments }) { return arguments; }
+console.log(objectFormal({ arguments: 4 }));
+
+function arrayFormal([arguments]) { return arguments; }
+console.log(arrayFormal([3]));
+
+function restFormal(...arguments) { return arguments.length; }
+console.log(restFormal(5, 6));
+
+function dependentFormal(first, arguments = first) { return arguments; }
+console.log(dependentFormal(9));
+
+function parameterClosure(a = () => arguments) {
+  var arguments;
+  arguments = 1;
+  console.log(typeof a(), arguments);
+}
+parameterClosure();
+
+function restBodyFunctionNamed(...rest) {
+  console.log(typeof arguments, rest.length);
+  function arguments() { return "rest shadowed"; }
+  console.log(arguments());
+}
+restBodyFunctionNamed(1, 2);
+
+class StaticBlockHost {
+  static observed = 0;
+  static { StaticBlockHost.observed = 1; }
+}
+console.log(StaticBlockHost.observed);
+`,
+  },
+  {
+    name: "arguments-iteration-and-poison",
+    nonStrictScript: true,
+    source: `
+function fractional(a, b = 1) {
+  arguments.length = 1.5;
+  let count = 0;
+  for (const value of arguments) count = count + 1;
+  return count;
+}
+console.log(fractional(1, 2, 3));
+
+function stringLength(a, b = 1) {
+  arguments.length = "2";
+  return [...arguments].length;
+}
+console.log(stringLength(1, 2, 3));
+
+function negativeLength(a, b = 1) {
+  arguments.length = -1;
+  return [...arguments].length;
+}
+console.log(negativeLength(1, 2, 3));
+
+function nanLength(a) {
+  arguments.length = NaN;
+  return [...arguments].length;
+}
+console.log(nanLength(1, 2));
+
+function grownLength(a) {
+  arguments.length = 4;
+  const out = [...arguments];
+  return out.length + ":" + out[3];
+}
+console.log(grownLength(1, 2));
+
+function infiniteLength(a, b = 1) {
+  arguments.length = Infinity;
+  for (const value of arguments) { console.log("first", value); break; }
+}
+infiniteLength(7, 8);
+
+function inheritedLength(a, b = 1) {
+  delete arguments.length;
+  Object.setPrototypeOf(arguments, { length: 2 });
+  console.log([...arguments].length);
+}
+inheritedLength(9, 10, 11);
+
+function accessorLength(a, b = 1) {
+  Object.defineProperty(arguments, "length", {
+    configurable: true,
+    get() { throw new TypeError("length"); },
+  });
+  try { [...arguments]; console.log("no throw"); }
+  catch (error) { console.log("abrupt", error instanceof TypeError); }
+}
+accessorLength(12, 13);
+
+function shrinkingLength(a) {
+  let steps = 0;
+  for (const value of arguments) {
+    steps = steps + 1;
+    arguments.length = 1;
+  }
+  console.log(steps);
+}
+shrinkingLength(1, 2, 3);
+
+function abruptElement(a, b = 1) {
+  const iterator = arguments[Symbol.iterator]();
+  Object.defineProperty(arguments, 0, {
+    configurable: true,
+    get() { throw new TypeError("element"); },
+  });
+  try { iterator.next(); console.log("no throw"); }
+  catch (error) { console.log("throw", error instanceof TypeError); }
+  Object.defineProperty(arguments, 0, { configurable: true, value: 42 });
+  const next = iterator.next();
+  console.log("after", next.done, next.value);
+}
+abruptElement(1, 2, 3);
+
+function reentrantLength(a, b = 1) {
+  const iterator = arguments[Symbol.iterator]();
+  let depth = 0;
+  Object.defineProperty(arguments, "length", {
+    configurable: true,
+    get() {
+      depth = depth + 1;
+      if (depth === 1) {
+        const inner = iterator.next();
+        console.log("inner", inner.done, inner.value);
+      }
+      return 3;
+    },
+  });
+  const outer = iterator.next();
+  console.log("outer", outer.done, outer.value);
+}
+reentrantLength(10, 20, 30);
+
+function arrayAbruptElement() {
+  const values = [1, 2, 3];
+  const iterator = values[Symbol.iterator]();
+  Object.defineProperty(values, 0, {
+    configurable: true,
+    get() { throw new TypeError("element"); },
+  });
+  try { iterator.next(); console.log("no throw"); }
+  catch (error) { console.log("array throw", error instanceof TypeError); }
+  Object.defineProperty(values, 0, { configurable: true, value: 9 });
+  const next = iterator.next();
+  console.log("array after", next.done, next.value);
+}
+arrayAbruptElement();
+
+function borrowedIteration() {
+  const borrowed = { 0: 42, 1: 43, length: 2, values: [][Symbol.iterator] };
+  const iterator = borrowed.values();
+  const out = [];
+  for (let step = iterator.next(); !step.done; step = iterator.next()) {
+    out.push(step.value);
+  }
+  console.log(out.length, out[0], out[1]);
+  const empty = { values: [][Symbol.iterator], length: 0 };
+  console.log([...empty.values()].length);
+  const inherited = Object.create({ length: 1, 0: "proto" });
+  inherited.values = [][Symbol.iterator];
+  console.log([...inherited.values()][0]);
+}
+borrowedIteration();
+
+function poisonShape(a, b = 1) {
+  const getter = Object.getOwnPropertyDescriptor(arguments, "callee").get;
+  const nameDescriptor = Object.getOwnPropertyDescriptor(getter, "name");
+  const lengthDescriptor = Object.getOwnPropertyDescriptor(getter, "length");
+  console.log(
+    nameDescriptor.value === "",
+    nameDescriptor.writable,
+    nameDescriptor.enumerable,
+    nameDescriptor.configurable,
+  );
+  console.log(
+    lengthDescriptor.value,
+    lengthDescriptor.writable,
+    lengthDescriptor.enumerable,
+    lengthDescriptor.configurable,
+  );
+  try {
+    Object.defineProperty(getter, "x", { value: 1 });
+    console.log("extended");
+  } catch (error) { console.log("extend", error instanceof TypeError); }
+  try { Object.setPrototypeOf(getter, null); console.log("reproto"); }
+  catch (error) { console.log("reproto", error instanceof TypeError); }
+}
+poisonShape(1);
+
+function iteratorIdentity(a, b = 1) {
+  const unmapped = Object.getOwnPropertyDescriptor(arguments, Symbol.iterator);
+  console.log(
+    unmapped.value === [][Symbol.iterator],
+    unmapped.writable,
+    unmapped.enumerable,
+    unmapped.configurable,
+  );
+}
+iteratorIdentity(1);
+
+function mappedIteration(a, b) {
+  a = 20;
+  console.log([...arguments][0], [...arguments].length);
+}
+mappedIteration(1, 2);
+`,
+  },
+  {
     name: "constructors",
     source: `
 function Box(value) { this.value = value; }

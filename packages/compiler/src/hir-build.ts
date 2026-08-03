@@ -327,19 +327,6 @@ function resolveIdentifierDelete(
       ),
     );
     return undefined;
-  } else if (
-    argument.name === "arguments" &&
-    state.argumentsObjectUnavailable
-  ) {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        argument,
-        "Deleting an unavailable 'arguments' binding is outside the " +
-          "admitted function profile.",
-      ),
-    );
-    return undefined;
   } else {
     fallbackResult = true;
   }
@@ -1376,36 +1363,15 @@ function lexicalReceiver(functionValue: SyntaxFunction): boolean {
 }
 
 /**
- * True when this unit admits an implicit `arguments` object for the
- * function. Strict, arrow, class, and asynchronous functions deliberately
- * leave the name unresolved.
+ * True when ECMA-262 gives the function form its own `arguments` binding.
+ * FunctionDeclarationInstantiation creates one for every function except
+ * an arrow, whose `arguments` reference resolves lexically in the
+ * enclosing function instead. Strictness selects the object's shape, not
+ * whether the binding exists.
  */
 function admitsArgumentsObject(functionValue: SyntaxFunction): boolean {
   const kind = functionValue.functionKind ?? "ordinary";
-  return (
-    functionValue.strict !== true &&
-    kind !== "arrow" &&
-    kind !== "async" &&
-    kind !== "async-arrow" &&
-    kind !== "async-generator" &&
-    kind !== "class"
-  );
-}
-
-/**
- * Prevents an ineligible nested function from capturing an enclosing
- * function's implicit `arguments` binding. Explicit bindings with that name
- * remain ordinary lexical references.
- */
-function withoutArgumentsObjectBindings(
-  scopes: readonly Map<string, Binding>[],
-): readonly Map<string, Binding>[] {
-  return scopes.map((scope) => {
-    if (scope.get("arguments")?.argumentsObject !== true) return scope;
-    const filtered = new Map(scope);
-    filtered.delete("arguments");
-    return filtered;
-  });
+  return kind !== "arrow" && kind !== "async-arrow";
 }
 
 function resolveFunction(
@@ -1417,8 +1383,6 @@ function resolveFunction(
   derivedThisBinding?: HirClassThisBinding,
 ): HirFunction {
   const outerThisBinding = state.thisBinding;
-  const outerArgumentsObjectUnavailable = state.argumentsObjectUnavailable;
-  state.argumentsObjectUnavailable = !admitsArgumentsObject(functionValue);
   if (derivedThisBinding != null) {
     state.thisBinding = derivedThisBinding;
   } else if (!lexicalReceiver(functionValue)) {
@@ -1442,10 +1406,10 @@ function resolveFunction(
   let argumentsBinding: Binding | undefined;
   if (
     admitsArgumentsObject(functionValue) &&
+    functionValue.argumentsFormal !== true &&
     !parameterScope.has("arguments")
   ) {
     argumentsBinding = {
-      argumentsObject: true,
       id: state.nextBindingId,
       mutable: true,
       name: "arguments",
@@ -1466,9 +1430,10 @@ function resolveFunction(
   const body = resolveStatementList(
     functionValue.body,
     [
-      ...(admitsArgumentsObject(functionValue)
-        ? outerScopes
-        : withoutArgumentsObjectBindings(outerScopes)),
+      // An arrow declares no `arguments` of its own, so the enclosing
+      // function's binding stays visible through `outerScopes` and its
+      // reference resolves lexically.
+      ...outerScopes,
       ...(selfBinding == null
         ? []
         : [new Map([[selfBinding.name, selfBinding]])]),
@@ -1479,10 +1444,14 @@ function resolveFunction(
     bodyScope,
   );
   state.labels.push(...outerLabels);
-  state.argumentsObjectUnavailable = outerArgumentsObjectUnavailable;
   state.thisBinding = outerThisBinding;
+  // CreateMappedArgumentsObject is reachable only from
+  // FunctionDeclarationInstantiation's non-strict, simple-parameter-list
+  // branch; every other eligible form takes the unmapped snapshot.
   const argumentsMapped =
-    argumentsBinding != null && functionValue.simpleParameterList === true;
+    argumentsBinding != null &&
+    functionValue.strict !== true &&
+    functionValue.simpleParameterList === true;
   const resolved: HirFunction = {
     ...functionValue,
     ...(argumentsBinding == null
@@ -3080,7 +3049,6 @@ export function buildSeededHir(
 ): SeededHirResult {
   const diagnostics: Diagnostic[] = [];
   const state: ResolveState = {
-    argumentsObjectUnavailable: false,
     diagnostics,
     functionInfo: new Map(),
     hirFunctions: [],

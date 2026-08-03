@@ -1014,7 +1014,7 @@ export const emittedC = {
     ],
     resultAssignOseoArgumentsCreate: [
       [
-        "result = oseo_arguments_create(context, callee, argument_count, ",
+        "result = oseo_arguments_create(context, argument_count, ",
         "arguments);",
       ],
     ],

@@ -1,5 +1,6 @@
 #include "runtime_internal.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -126,15 +127,59 @@ OseoResult oseo_internal_iterator_method(
     return result;
 }
 
+/* ToLength's clamp: 2^53 - 1. */
+#define OSEO_MAX_SAFE_LENGTH 9007199254740991.0
+
+/*
+ * LengthOfArrayLike for the array iterator's target: ToLength(Get(O,
+ * "length")). An ordinary array answers from its own element count,
+ * which is the same value its `length` property reports. Every other
+ * object goes through the generic `Get`, so an inherited or accessor
+ * `length` is observed and an abrupt completion propagates, and then
+ * through ToNumber and ToLength, so a fractional, string, negative,
+ * `NaN`, or infinite value produces the specified integral count rather
+ * than being read literally.
+ */
+static OseoResult array_like_length(
+    OseoContext *context,
+    OseoValue target,
+    double *length
+) {
+    *length = 0.0;
+    if (is_array(target)) {
+        *length = (double)ordinary_object(target)->array_length;
+        return normal(oseo_undefined());
+    }
+    OseoValue slots[1] = {target};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "length");
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], result.value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_number(context, result.value);
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (!is_number(result.value)) return normal(oseo_undefined());
+    double value = number_value(result.value);
+    /* NaN, negative zero, and every negative value clamp to zero. */
+    if (!(value > 0.0)) return normal(oseo_undefined());
+    value = floor(value);
+    *length = value > OSEO_MAX_SAFE_LENGTH ? OSEO_MAX_SAFE_LENGTH : value;
+    return normal(oseo_undefined());
+}
+
 OseoResult oseo_internal_array_values(
     OseoContext *context,
     OseoValue array
 ) {
-    if (!is_array(array)) {
+    if (!is_object(array)) {
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "Array iteration requires an array receiver."
+            "Array iteration requires an object receiver."
         );
     }
     OseoValue slots[1] = {array};
@@ -205,28 +250,40 @@ OseoResult oseo_internal_array_iterator_next(
             "Array iterator next requires an array iterator receiver."
         );
     }
+    /*
+     * The iterated target and the cursor are both snapshotted before
+     * LengthOfArrayLike, because its `Get` can run an accessor that
+     * reenters this same iterator: the reentrant step must not decide
+     * which index this step yields. The cursor then advances before the
+     * element `Get`, so an abrupt element accessor leaves the iterator on
+     * the following index rather than retrying the one it failed to read.
+     */
     OseoOrdinaryObject *state = ordinary_object(iterator);
-    if (!is_array(state->iterator_array)) {
+    if (!is_object(state->iterator_array)) {
         return oseo_internal_iterator_result(context, oseo_undefined(), true);
     }
-    uint32_t length = ordinary_object(state->iterator_array)->array_length;
-    if (state->iterator_index >= length) {
-        state->iterator_array = oseo_undefined();
-        return oseo_internal_iterator_result(context, oseo_undefined(), true);
-    }
-    OseoValue slots[2] = {iterator, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
+    OseoValue slots[3] = {iterator, oseo_undefined(), state->iterator_array};
+    const size_t index = state->iterator_index;
+    OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    OseoResult result =
-        oseo_property_key(context, oseo_number((double)state->iterator_index));
+    double length = 0.0;
+    OseoResult result = array_like_length(context, slots[2], &length);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    if ((double)index >= length) {
+        ordinary_object(slots[0])->iterator_array = oseo_undefined();
+        oseo_roots_pop(context, &frame);
+        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+    }
+    ordinary_object(slots[0])->iterator_index = index + 1u;
+    result = oseo_property_key(context, oseo_number((double)index));
     if (result.status == OSEO_STATUS_NORMAL) {
-        state = ordinary_object(slots[0]);
-        result = oseo_object_get(context, state->iterator_array, result.value);
+        result = oseo_object_get(context, slots[2], result.value);
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        state = ordinary_object(slots[0]);
-        state->iterator_index += 1u;
         result = oseo_internal_iterator_result(context, slots[1], false);
     }
     oseo_roots_pop(context, &frame);

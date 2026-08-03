@@ -259,6 +259,35 @@ itself keeps its own binding cell and stays mutable regardless. A
 duplicate formal name maps only its rightmost occurrence, and an index at
 or beyond the parameter count keeps the unmapped snapshot.
 
+The `m5-41` ABI drops `oseo_arguments_create`'s `callee` parameter and adds
+the realm's `%ThrowTypeError%` intrinsic behind a new context cache. Every
+function form except an arrow now owns an implicit `arguments` binding, so
+the unmapped constructor also serves strict functions, methods, class
+constructors, asynchronous functions, and asynchronous generators.
+CreateUnmappedArgumentsObject defines `callee` as a non-configurable,
+non-enumerable accessor whose `[[Get]]` and `[[Set]]` are both the single
+cached `%ThrowTypeError%` function, so reading or writing it throws a
+`TypeError` and the running function is never reachable through the
+object. The intrinsic is created on first use, permanently rooted, and
+shared by every unmapped arguments object in the realm, so both accessor
+slots and every object's pair compare equal, and 10.2.4.1's hardening is
+applied: its `length` and `name` are non-writable and non-configurable and
+the function itself is non-extensible. Only
+`oseo_mapped_arguments_create` still defines `callee` as a writable,
+configurable data property naming the running function.
+
+The same ABI gives both arguments object shapes an `@@iterator` data
+property holding the cached `%Array.prototype.values%` function, which
+makes that function and the array iterator's `next` generic over object
+array-likes. `next` now takes its bound as
+`ToLength(ToNumber(Get(O, "length")))`, keeping an ordinary array's own
+element count as an equivalent fast path, and it snapshots the iterated
+target and cursor before that read and advances the cursor before the
+element `Get`. The ordering matters because a non-array target's `length`
+and elements can be accessors: a reentrant step must not steal the index
+this step yields, and an abrupt element accessor must leave the iterator on
+the following index rather than retrying the one it failed to read.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

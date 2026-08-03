@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,374 reviewed cases: 2,569 passes, 1,236
-expected negatives, and 569 unsupported profile features. It records no
+The current manifest contains 4,722 reviewed cases: 2,890 passes, 1,292
+expected negatives, and 540 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -192,8 +192,9 @@ its deliberate boundary and its evidence:
     specialization policies and forced collection. Fourteen of the 25
     reviewed cases under *test/language/expressions/tagged-template/* pass
     once M5a Unit 8.1d moves the top-level `this` case from unsupported to
-    pass; the eleven cases that remain unsupported retain independent
-    dynamic-source, realm, `arguments`, tail-call optimization, and `Array`
+    pass, and two more once M5a Unit 8.5h resolves the `arguments` their
+    argument lists read; the nine cases that remain unsupported retain
+    independent dynamic-source, realm, tail-call optimization, and `Array`
     intrinsic prerequisites. The two remaining directory cases stay
     outside the reviewed subset pending their separate review. Unit 7.4 admits
     only the narrow `%Array.prototype.push%` dependency exercised by its
@@ -303,8 +304,9 @@ its deliberate boundary and its evidence:
     optional-chain operands. A resolved declarative identifier returns `false`
     without reading its cell, including while that cell is uninitialized; an
     unresolvable name returns `true`, including top-level `arguments` in a
-    non-strict Script with no global binding. An admitted ordinary function's
-    implicit `arguments` object is a resolved binding and returns `false`. A
+    non-strict Script with no global binding, and inside an arrow function
+    with no enclosing function form. Every other function form's implicit
+    `arguments` object is a resolved binding and returns `false`. A
     `with` environment deletes the first object binding it selects before using
     that static fallback. Strict identifier deletion remains an early error. A
     non-reference operand is evaluated for its effects and abrupt completion
@@ -369,7 +371,9 @@ its deliberate boundary and its evidence:
     forced collection, including suppression of key conversion for a nullish
     base. Four reviewed test262 cases cover the four forms, two expected parse
     negatives retain strict `arguments` early errors, and the newly admitted
-    classic `for` update promotes an exponentiation case to pass. BigInt update
+    classic `for` update promotes an exponentiation case to pass. M5a Unit
+    8.5h adds four further expected negatives covering `arguments` as a
+    prefix and postfix update target in strict code. BigInt update
     semantics remain outside the admitted value profile.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
     `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
@@ -520,9 +524,20 @@ its deliberate boundary and its evidence:
     specification reaches by boxing, is unsupported; the promise combinators,
     `for-of`, array spread, call spread, constructor spread, and array binding
     declarations accept only
-    object iterables. The array iterator methods are array-specific rather than
-    the generic `%Array.prototype.values%`; and array and string
-    iterator prototype identity remain outside the admitted syntax.
+    object iterables. M5a Unit 8.5h makes `%Array.prototype.values%` and the
+    array iterator's `next` generic over object array-likes, because both
+    arguments object shapes now expose the same function through
+    `@@iterator`: `next` takes its bound length as
+    `ToLength(ToNumber(Get(O, "length")))` and each element through an
+    ordinary `Get`, so an inherited or accessor property is observed and its
+    abrupt completion propagates, while an ordinary array keeps its own
+    element count as an equivalent fast path. Any object array-like is a
+    reachable receiver, not only an array or an arguments object: admitted
+    syntax can store `[][Symbol.iterator]` as an ordinary property and
+    invoke it as a method, which preserves the receiver without
+    `Function.prototype.call`. A primitive receiver, which the
+    specification reaches by boxing, stays unsupported. Array and
+    string iterator prototype identity remain outside the admitted syntax.
  -  Call and constructor argument spread. A call or construction containing
     spread evaluates its target first, then accumulates ordinary arguments and
     spread iterator values from left to right in a rooted private argument
@@ -572,9 +587,9 @@ its deliberate boundary and its evidence:
     per case in five statement-list positions. Seventy-eight reviewed test262
     cases pass, twenty nine record the parse negatives that keep a lexical
     declaration out of a single-statement position and a `const` declarator
-    without an initializer, and five record for-await-of destructuring cases
-    whose remaining prerequisites are the `arguments` object and `Object` as a
-    value.
+    without an initializer, and five record for-await-of destructuring cases;
+    M5a Unit 8.5h promotes three of those five to pass, leaving two whose
+    remaining prerequisite is `Object` as a value.
  -  Array binding declarations. A `const` or `let` declarator
     and each declarator in a standalone `var` statement admit empty
     patterns, elisions, defaults, nested array patterns, and a final identifier
@@ -694,15 +709,27 @@ its deliberate boundary and its evidence:
     completion, top-level fallback and suffix selection, prior references,
     function length, the parameter and body environment split, asynchronous
     default selection, and promise rejection.
- -  The non-strict `arguments` object for ordinary functions, function
-    expressions, object methods, constructors, and synchronous generators.
+ -  The implicit `arguments` object. M5a Unit 8.5h gives it to every
+    ECMA-262 function form that owns one: ordinary functions and function
+    expressions, object and class methods, class constructors including the
+    implicit and implicit derived ones, synchronous generators, asynchronous
+    functions, and asynchronous generators, in strict and non-strict code
+    alike. Only an arrow and an async arrow declare none of their own; their
+    `arguments` reference resolves lexically to the nearest enclosing owning
+    form's binding, and one with no such enclosing form keeps the ordinary
+    source-located unresolved-binding diagnostic, which is also what a
+    Script or module top-level reference reports.
     HIR and MIR carry one implicit binding identity, and the generated
     function prologue initializes its cell from the generic call ABI before
-    parameter initialization. M5a Unit 8.5g now selects between two shapes
+    parameter initialization, so a suspended generator, asynchronous
+    function, or asynchronous generator observes the object its call
+    created rather than one built at resumption. M5a Unit 8.5g selects
+    between two shapes
     by ECMA-262's `IsSimpleParameterList`, computed once at the frontend
     boundary and carried on `SyntaxFunction` as `simpleParameterList`: no
-    rest parameter, no binding pattern, and no initializer. A simple
-    parameter list receives the mapped arguments exotic object
+    rest parameter, no binding pattern, and no initializer. A non-strict
+    function with a simple parameter list receives the mapped arguments
+    exotic object
     (`CreateMappedArgumentsObject`, 10.4.4.7). Every supplied index that is
     the rightmost formal parameter of its name stores that parameter's own
     binding cell as its property's slot value, so the existing
@@ -718,21 +745,46 @@ its deliberate boundary and its evidence:
     ordinary delete already does, since the property is simply gone
     afterward. A duplicate formal name maps only its rightmost occurrence;
     an earlier duplicate and an index at or beyond the parameter count keep
-    the plain snapshot. Every other admitted non-simple parameter list (a
-    rest parameter, a binding pattern, or a default) keeps the existing
-    ordinary, unmapped object unchanged: indexed properties snapshot every
-    supplied argument, `length` records the supplied count, and `callee` is
-    the enclosing function. Indexed properties are writable, enumerable,
-    and configurable in both shapes; `length` and `callee` are writable and
-    configurable but non-enumerable in both shapes. A parameter named
-    `arguments` remains an explicit binding and suppresses the implicit
-    one. Strict functions, arrows, class methods, and asynchronous
-    functions do not receive or capture this binding, so an otherwise
-    unresolved reference keeps the ordinary source-located diagnostic; an
-    arrow's lexical reference to an enclosing function's `arguments` is the
-    same documented gap and stays outside this unit. A later unit owns
-    extending availability to those forms. The runtime ABI is
-    `oseo-runtime-m5-40`. A generated property with seed `0x5eed001b`
+    the plain snapshot. Every strict function, and every non-strict one
+    whose parameter list is non-simple (a rest parameter, a binding
+    pattern, or a default), instead receives
+    `CreateUnmappedArgumentsObject` (10.4.4.6): indexed properties snapshot
+    every supplied argument, and no index ever aliases a parameter, so a
+    write through either side is invisible to the other. `length` records
+    the supplied count and is writable, configurable, and non-enumerable in
+    both shapes, and indexed properties are writable, enumerable, and
+    configurable in both. The two shapes differ in `callee`: the mapped
+    object keeps the writable, configurable, non-enumerable data property
+    naming the running function, while the unmapped object defines the
+    non-configurable, non-enumerable poisoned accessor whose `[[Get]]` and
+    `[[Set]]` are both the realm's single `%ThrowTypeError%` intrinsic, so
+    reading or writing it throws a `TypeError`, redefining it throws, and
+    a non-strict `delete` of it answers `false`. Both accessor slots and
+    every unmapped object in the realm observe one `%ThrowTypeError%`
+    identity. Both shapes also define `@@iterator` as a writable,
+    non-enumerable, configurable data property whose value is the same
+    `%Array.prototype.values%` function an array's own `Symbol.iterator`
+    resolves to, so spreading or iterating an arguments object walks its
+    indices; the shared array iterator reads a non-array target's `length`
+    as `ToLength(ToNumber(Get(O, "length")))`, so an inherited or accessor
+    `length` is observed, its abrupt completion propagates, and a
+    fractional, string, negative, `NaN`, or infinite value produces the
+    specified integral count. `%ThrowTypeError%` itself is non-extensible
+    with a non-writable, non-configurable `length` and `name`; the
+    `prototype` object every internal function in this profile carries
+    remains a documented boundary the intrinsics stream owns. A formal
+    parameter named `arguments` remains an explicit binding and suppresses
+    the implicit one, in every spelling BoundNames admits: a plain formal, a
+    defaulted one, an array or object binding pattern element, and a rest
+    parameter, including the ones a parameter environment lowers to a
+    synthetic parameter name. A body-level `var arguments` reuses that same
+    binding rather than resetting it, while a body-level `let`, `const`, or
+    function declaration of the name shadows or overwrites it the way
+    FunctionDeclarationInstantiation's own ordering does. Every strict early
+    error for `arguments` as an assignment target, binding identifier, or
+    declared name is unchanged. The runtime
+    ABI is `oseo-runtime-m5-41`. A generated property with seed
+    `0x5eed001b`
     covers zero to six bounded arguments, in-range and absent indexed
     reads, writes, `length`, `callee`, fresh identity, both specialization
     policies, and forced collection; a second generated property with seed
@@ -741,19 +793,44 @@ its deliberate boundary and its evidence:
     write/sever index, and every sever mode (none, deletion, an explicit
     non-writable redefinition, and conversion to an accessor), checked
     against an independent hand oracle alongside Node.js and Deno
-    references, both specialization policies, and forced collection. Fixed
+    references, both specialization policies, and forced collection; a
+    third generated property with seed `0x5eed003b` covers one owning form
+    of seven, an optional enclosing strict scope, one to three simple
+    leading parameters with an optional non-simple trailing formal, zero to
+    five supplied arguments, a bounded write index, and optional reads
+    through a nested arrow, checking mapped-versus-unmapped selection, the
+    `callee` descriptor shape, snapshot independence, the arrow boundary
+    diagnostic, and the explicit-parameter suppression against the same
+    references and policies. Fixed
     native evidence also covers property descriptors, object methods,
     synchronous generators, two-way aliasing through both a numeric and a
     string-keyed index, an excess and an absent parameter, a duplicate
     formal name, deletion, a non-writable redefinition whose omitted value
-    defaults to the current mapped value, and conversion to an accessor.
-    Six reviewed no-strict test262 cases from *test/language/arguments-object/*
-    cover empty calls despite formal parameters, `callee` identity and
-    descriptors, writes, and deletion; 41 additional reviewed cases from
-    *test/language/arguments-object/mapped/* cover mapped index descriptor
-    shape, non-configurable and non-writable redefinition transitions in
-    every order, severing through `[[DefineOwnProperty]]` and through
-    deletion, and conversion to an accessor.
+    defaults to the current mapped value, conversion to an accessor, every
+    owning form's own object, arrow and async-arrow lexical capture from an
+    ordinary function, an object method, and a class constructor, the
+    poisoned `callee`'s read, write, redefinition, deletion, descriptor
+    shape, and non-extensibility, a body `var`, `let`, or function
+    declaration named `arguments` in both the shared and the separate
+    parameter environment, and iteration under a fractional, string,
+    negative, `NaN`, grown, shrinking, infinite, inherited, and abrupt
+    `length`, an abrupt element accessor and the index the following step
+    reads, a `length` accessor that reenters the same iterator, and a
+    borrowed `%Array.prototype.values%` invoked as a method on an ordinary
+    array-like with own and inherited indices.
+    248 reviewed test262 cases from *test/language/arguments-object/*,
+    247 of them passes and one an expected negative,
+    cover empty calls despite formal parameters, `callee` identity,
+    descriptors, and poisoning, writes, deletion, iteration, mapped index
+    descriptor shape, non-configurable and non-writable redefinition
+    transitions in every order, severing through `[[DefineOwnProperty]]`
+    and through deletion, conversion to an accessor, and one call-site
+    trailing comma in every admitted function form. 106 further reviewed
+    cases across *test/language/expressions/* and
+    *test/language/statements/* cover lexical capture from an arrow,
+    parameter-default references, `for-of` over both shapes, `var` and
+    function declarations named `arguments`, and the strict early errors
+    that keep the name off every assignment target.
  -  The non-strict `with` statement. Its object expression evaluates once and
     passes `RequireObjectCoercible` before the body can run. HIR retains each
     intervening object environment for an identifier reference. MIR tests
@@ -2027,11 +2104,12 @@ Deleting `Symbol` or a named error intrinsic as an identifier remains invalid
 until the global-object model can remove the property and change subsequent
 name resolution consistently. At non-strict Script top level,
 `delete arguments` is an unresolvable-reference delete and returns `true` when
-no global binding exists. An admitted ordinary function instead resolves its
-implicit `arguments` object and returns `false`. Deleting `arguments` remains a
-source-located invalid boundary only inside a function form whose implicit
-object is deliberately unavailable, including an asynchronous function under
-the current profile. Strict identifier deletion remains an early error.
+no global binding exists, and M5a Unit 8.5h gives an arrow function with no
+enclosing function form the same answer through the same unresolvable path.
+Every other function form instead resolves its own implicit `arguments`
+object and returns `false`, so the unit retired the separate source-located
+diagnostic that reported a deliberately unavailable implicit object. Strict
+identifier deletion remains an early error.
 Deleting a hidden `with` fallback that a prior unresolved assignment allocated
 is likewise invalid until the global-object model can remove that cell
 consistently.

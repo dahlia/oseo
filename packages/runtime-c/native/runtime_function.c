@@ -1347,6 +1347,15 @@ OseoResult oseo_call_function(
         );
     } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
         result = oseo_internal_error_to_string(context, receiver);
+    } else if (code_id == OSEO_THROW_TYPE_ERROR_CODE_ID) {
+        /* %ThrowTypeError%. Only an unmapped arguments object's `callee`
+         * accessor reaches it, and both its [[Get]] and its [[Set]]
+         * throw regardless of receiver or argument. */
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "'callee' is not available on an unmapped arguments object."
+        );
     } else if (code_id == OSEO_ARRAY_PUSH_CODE_ID) {
         result = oseo_internal_array_push(
             context,

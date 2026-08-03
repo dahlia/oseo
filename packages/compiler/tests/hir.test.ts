@@ -340,7 +340,7 @@ test("resolves delete identifiers without reading their bindings", () => {
   );
 });
 
-test("rejects delete arguments only in unavailable function profiles", () => {
+test("resolves delete arguments through every owning function form", () => {
   const ordinary = buildHir({
     body: [
       {
@@ -376,7 +376,10 @@ test("rejects delete arguments only in unavailable function profiles", () => {
     }
   }
 
-  const result = buildHir({
+  // An asynchronous function owns its own `arguments` binding now, so
+  // deleting the resolved name answers `false` exactly as an ordinary
+  // function's does instead of reporting an unavailable profile.
+  const asynchronous = buildHir({
     body: [
       {
         body: [
@@ -392,7 +395,7 @@ test("rejects delete arguments only in unavailable function profiles", () => {
         ],
         functionKind: "async",
         kind: "function",
-        name: "unavailable",
+        name: "available",
         parameters: [],
         range,
         returnHints: [],
@@ -400,14 +403,56 @@ test("rejects delete arguments only in unavailable function profiles", () => {
     ],
     kind: "program",
     range,
-    sourceId: "delete-arguments-function.js",
+    sourceId: "delete-arguments-async.js",
   });
-  assert.equal(result.program, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /Deleting an unavailable 'arguments' binding/u,
-  );
-  assert.equal(result.diagnostics[0]?.range.start.column, 1);
+  assert.deepEqual(asynchronous.diagnostics, []);
+  const asynchronousReturn = asynchronous.program?.functions[0]?.body[0];
+  assert.equal(asynchronousReturn?.kind, "return");
+  if (asynchronousReturn?.kind === "return") {
+    assert.equal(asynchronousReturn.expression?.kind, "boolean");
+    if (asynchronousReturn.expression?.kind === "boolean") {
+      assert.equal(asynchronousReturn.expression.value, false);
+    }
+  }
+
+  // An arrow declares none of its own, so `delete arguments` inside one
+  // with no enclosing function is an unresolvable-reference delete and
+  // answers `true`, exactly as a Script's own top level does.
+  const arrow = buildHir({
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              argument: { kind: "identifier", name: "arguments", range },
+              kind: "delete",
+              range,
+            },
+            kind: "return",
+            range,
+          },
+        ],
+        functionKind: "arrow",
+        kind: "function",
+        name: "unresolved",
+        parameters: [],
+        range,
+        returnHints: [],
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "delete-arguments-arrow.js",
+  });
+  assert.deepEqual(arrow.diagnostics, []);
+  const arrowReturn = arrow.program?.functions[0]?.body[0];
+  assert.equal(arrowReturn?.kind, "return");
+  if (arrowReturn?.kind === "return") {
+    assert.equal(arrowReturn.expression?.kind, "boolean");
+    if (arrowReturn.expression?.kind === "boolean") {
+      assert.equal(arrowReturn.expression.value, true);
+    }
+  }
 });
 
 test("admits the mapped arguments object only for a simple list", () => {
@@ -474,8 +519,136 @@ test("admits the mapped arguments object only for a simple list", () => {
   });
   assert.deepEqual(strict.diagnostics, []);
   const strictFunction = strict.program?.functions[0];
-  assert.equal(strictFunction?.argumentsBindingId, undefined);
+  // A strict function owns the binding but never the mapped shape, so it
+  // takes the unmapped snapshot even with a simple parameter list.
+  assert.ok(strictFunction?.argumentsBindingId != null);
   assert.equal(strictFunction?.argumentsMapped, undefined);
+});
+
+test("gives every function form except an arrow its own arguments", () => {
+  const owning = [
+    "async",
+    "async-generator",
+    "class",
+    "generator",
+    "method",
+    "ordinary",
+  ] as const;
+  for (const functionKind of owning) {
+    const result = buildHir({
+      body: [
+        {
+          body: [],
+          functionKind,
+          kind: "function",
+          name: "owner",
+          parameters: [],
+          range,
+          returnHints: [],
+          simpleParameterList: true,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `arguments-owner-${functionKind}.js`,
+    });
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(
+      result.program?.functions[0]?.argumentsBindingId != null,
+      `${functionKind} owns an arguments binding`,
+    );
+  }
+  for (const functionKind of ["arrow", "async-arrow"] as const) {
+    const result = buildHir({
+      body: [
+        {
+          body: [],
+          functionKind,
+          kind: "function",
+          name: "lexical",
+          parameters: [],
+          range,
+          returnHints: [],
+          simpleParameterList: true,
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: `arguments-arrow-${functionKind}.js`,
+    });
+    assert.deepEqual(result.diagnostics, []);
+    assert.equal(
+      result.program?.functions[0]?.argumentsBindingId,
+      undefined,
+      `${functionKind} declares no arguments binding`,
+    );
+    assert.equal(result.program?.functions[0]?.argumentsMapped, undefined);
+  }
+});
+
+test("resolves an arrow's arguments to the enclosing function binding", () => {
+  const result = buildHir({
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              functionValue: {
+                body: [
+                  {
+                    expression: {
+                      kind: "identifier",
+                      name: "arguments",
+                      range,
+                    },
+                    kind: "return",
+                    range,
+                  },
+                ],
+                functionKind: "arrow",
+                kind: "function",
+                name: undefined,
+                parameters: [],
+                range,
+                returnHints: [],
+                simpleParameterList: true,
+              },
+              kind: "function",
+              range,
+            },
+            kind: "return",
+            range,
+          },
+        ],
+        kind: "function",
+        name: "outer",
+        parameters: [],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "arrow-captures-arguments.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  const outer = result.program?.functions.find(
+    (functionValue) => functionValue.name === "outer",
+  );
+  const arrow = result.program?.functions.find(
+    (functionValue) => functionValue.functionKind === "arrow",
+  );
+  assert.ok(outer?.argumentsBindingId != null);
+  assert.equal(arrow?.argumentsBindingId, undefined);
+  const arrowReturn = arrow?.body[0];
+  assert.equal(arrowReturn?.kind, "return");
+  if (arrowReturn?.kind === "return") {
+    assert.equal(arrowReturn.expression?.kind, "binding");
+    if (arrowReturn.expression?.kind === "binding") {
+      assert.equal(arrowReturn.expression.bindingId, outer?.argumentsBindingId);
+    }
+  }
 });
 
 test("reuses a parameter's binding for a same-name hoisted function", () => {

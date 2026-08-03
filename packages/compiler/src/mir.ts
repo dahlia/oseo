@@ -372,8 +372,8 @@ export interface MirSpecialization {
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
   /**
-   * The implicit non-strict `arguments` binding initialized by the backend
-   * from the generic call ABI.
+   * The implicit `arguments` binding initialized by the backend from the
+   * generic call ABI, present for every function form except an arrow.
    */
   readonly argumentsBindingId?: number;
   /**

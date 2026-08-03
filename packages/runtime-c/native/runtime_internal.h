@@ -90,6 +90,12 @@
     (SIZE_MAX - 26u - OSEO_ERROR_KIND_COUNT)
 #define OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID \
     (SIZE_MAX - 27u - OSEO_ERROR_KIND_COUNT)
+/* %ThrowTypeError%. CreateUnmappedArgumentsObject installs it as both
+ * the [[Get]] and the [[Set]] of the arguments object's non-configurable
+ * `callee`, so every read or write of that property throws a TypeError
+ * instead of exposing the running function. */
+#define OSEO_THROW_TYPE_ERROR_CODE_ID \
+    (SIZE_MAX - 28u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
@@ -924,6 +930,12 @@ OseoResult oseo_internal_async_from_sync_rejected(
     OseoValue callee,
     OseoValue reason
 );
+/*
+ * The realm's single %ThrowTypeError% intrinsic, created on first use
+ * and cached afterwards so every unmapped arguments object's `callee`
+ * accessor observes one function identity, as 10.2.4.1 requires.
+ */
+OseoResult oseo_internal_throw_type_error_function(OseoContext *context);
 /* The cached virtualized %Array.prototype%.push function and its generic
  * body. The body deliberately uses ordinary Get and Set so borrowed calls
  * preserve accessors, abrupt completion, and array length semantics. */

@@ -998,9 +998,20 @@ landed with the M5 intrinsics units. The remaining queue is:
     object and a module namespace, aliases the index and the parameter
     until an explicit non-writable redefinition, a conversion to an
     accessor, or a deletion severs it. Every non-simple parameter list
-    keeps the existing unmapped object, and availability stays limited to
-    the same non-strict forms; extending it to strict functions, arrows,
-    class methods, and asynchronous functions remains a later unit's work.
+    keeps the existing unmapped object. Unit 8.5h then completes
+    availability: every ECMA-262 function form that owns an `arguments`
+    binding receives one, including strict functions, object and class
+    methods, class constructors, asynchronous functions, and asynchronous
+    generators, while an arrow declares none of its own and resolves the
+    name lexically in its enclosing form, keeping the ordinary
+    source-located unresolved diagnostic when there is none. Strictness
+    now selects the shape rather than availability, so every strict or
+    non-simple form takes `CreateUnmappedArgumentsObject`, whose `callee`
+    is the non-configurable poisoned accessor backed by the realm's single
+    `%ThrowTypeError%` intrinsic. Both shapes also expose `@@iterator` as
+    `%Array.prototype.values%`, which now reads a non-array target's
+    `length` through `Get`, `ToNumber`, and `ToLength` the way
+    `LengthOfArrayLike` does.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows
