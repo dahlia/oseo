@@ -984,7 +984,12 @@ landed with the M5 intrinsics units. The remaining queue is:
     top level shares that same lexical rule, since ECMA-262 gives it no
     Script- or FunctionBody-style exception either. A Script or function
     body's own top-level function declarations keep their separate,
-    unconditional hoistable-redeclaration rule unaffected.
+    unconditional hoistable-redeclaration rule unaffected. Unit 8.5f admits
+    the `debugger` statement as an executable no-op: the frontend converts
+    it to the same empty block an empty statement already produces, so
+    every later stage's existing block handling admits it unmodified, in a
+    block, a loop, a switch clause, a function, an async or generator body,
+    and a module top level alike.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

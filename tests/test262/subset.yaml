@@ -11229,6 +11229,12 @@ tests:
   - path: test/language/statements/continue/static-init-without-label.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow]
+  - path: test/language/statements/debugger/expression.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow]
+  - path: test/language/statements/debugger/statement.js
+    expectedClassification: pass
+    dependencies: [control-flow]
   - path: test/language/statements/do-while/S12.6.1_A15.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
