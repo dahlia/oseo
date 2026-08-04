@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,733
-reviewed cases: 2,897 passes, 1,292 expected negatives, and 544 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,857
+reviewed cases: 2,932 passes, 1,355 expected negatives, and 570 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2901,7 +2901,7 @@ change follow, and specialization has no effect: neither store has a
 guard, a cache, or a generic fallback to choose between, so both
 policies lower and emit the same operation. The prepared reference is
 the shape M5a Unit 8.5l reuses for a for-in head, which this unit does
-not admit; the for-in statement stays unsupported as a whole.
+not admit.
 
 Every existing `super` boundary is unchanged. A class body without
 `extends` and an object literal method keep the source-located rejection
@@ -2982,6 +2982,197 @@ profile features with no semantic or harness failures. The suite
 revision, inventory policy, manifest schema, and classification
 vocabulary do not change, and the 41,091-path applicable-test inventory
 is unchanged.
+
+M5a Unit 8.5l admits the `for-in` statement with its base enumeration
+semantics and simple heads. ECMA-262 gives the enumerate head a shape the
+iterate head does not have, and this unit follows it rather than reusing
+the for-of lowering. ForIn/OfHeadEvaluation returns a break completion
+when the subject is `undefined` or `null`, so the whole statement is
+skipped without an error and without a ToObject conversion; every other
+value converts, and EnumerateObjectProperties supplies an iterator that
+is never closed. ForIn/OfBodyEvaluation therefore performs no
+IteratorClose for an enumerate head: an abrupt head reference, an abrupt
+PutValue, and a `break`, `continue`, `return`, or `throw` in the body all
+leave the loop through the enclosing transfer alone.
+
+The enumeration itself is unspecified in mechanics and order and
+specified in rules, so a conforming implementation must choose when it
+obtains each level's own keys, and the choice is observable. This unit
+makes the choice both reference hosts make: the whole prototype chain is
+collected once, when the enumeration is acquired. Collection walks the
+chain outward and takes each level's own string keys in
+OrdinaryOwnPropertyKeys order, ascending array indices first and then the
+remaining string keys in creation order. Symbol keys are dropped. A name
+already recorded at a nearer level is skipped whether or not that nearer
+property was enumerable, which is the specified shadow rule, so a
+non-enumerable own property suppresses the same name on every prototype
+behind it and no name is ever collected twice. A surviving name is
+collected only if its own property was enumerable when its level was
+read. Each step then reports the next collected name while the receiver
+still has a property of that name anywhere on its chain, which is what
+makes a property deleted before it is processed ignored, as the rules
+require. A property added during the enumeration, a prototype replaced
+during it, and a collected property made non-enumerable during it are all
+invisible to it, and both reference hosts agree on each of those
+observations. No step runs user code: this realm has no proxy and no
+exotic object whose own-key, descriptor, or prototype access is
+observable, so the enumeration cannot be reentered and reports no abrupt
+completion of its own.
+
+The alternative reading, the informative generator ECMA-262 prints beside
+the rules, obtains a prototype's own keys only when the walk reaches it.
+Both readings satisfy every stated rule, and an earlier revision of this
+unit implemented the lazy one; the generated property suite found the
+divergence within three cases, on a non-enumerable prototype shadow
+deleted before its level would have been entered, where Node.js and Deno
+agree with the eager reading. The eager reading is therefore what this
+profile records, and the fixed fixture pins all five observations that
+distinguish the two.
+
+ToObject is modeled rather than materialized, because this profile has no
+primitive wrapper objects yet. A string subject reports one enumerable
+own index property per code unit and a non-enumerable `length`, which is
+exactly what a String exotic object owns, and %String.prototype% is not an
+object this realm creates. Every other primitive wrapper owns no property
+at all, so enumerating one is enumerating its prototype: `Symbol` is the
+only such intrinsic this profile admits as a value, so a symbol subject
+enumerates %Symbol.prototype% directly and a number, boolean, or BigInt
+subject reports nothing. An Array's `length` and a function's `prototype`
+are own non-enumerable properties this runtime keeps outside its property
+vector; both enter collection as shadows so that a prototype of the same
+name stays suppressed.
+
+Owned syntax adds a `for-in` statement carrying a subject and a target
+rather than extending the for-of node, because the skipped nullish
+subject and the absent close are the statement's shape rather than a
+flag. The target reuses the resolved for-of target, minus the two pattern
+kinds, which are excluded structurally: an object pattern head belongs to
+M5a Unit 8.5m, no other pattern form is admitted before it, and an array
+pattern head or a `for (const { a } in o)` head is a source-located
+rejection instead of a representable target with no lowering. The simple
+heads this unit admits are a `var`, `let`, or `const` identifier
+declaration and an assignment target the profile can already represent: an
+identifier, including one resolved through `with`, an ordinary or
+computed property, a private member, and a `super` property. A head
+initializer, which is Annex B's legacy VarDeclaration form, stays
+rejected, as does a multi-declarator head.
+
+HIR creates the head's lexical environment before resolving the subject,
+so `for (let k in { [k]: 1 })` reports the temporal dead zone rather than
+an outer binding, and resolves an assignment or `var` target in the
+surrounding scopes, which is where ForIn/OfBodyEvaluation evaluates it
+once per iteration. A non-strict identifier target behind `with` records
+its name as an initializing fallback write exactly as the for-of head
+does, so the Unit 8.5i `typeof` fold stays rejected for that name, and a
+strict fallback write keeps that unit's source-located rejection. MIR
+lowers the subject, one `enumerate-get`, and a branch that skips the whole
+statement when the subject was nullish, then a step block holding one
+`enumerate-next` and its branch. It pushes no finalizer and no abrupt
+target, which is what makes the absent close structural. Both
+specialization policies lower and emit the same two operations: neither
+has a guard, a cache, or a generic fallback to choose between. The
+per-iteration store reuses ForIn/OfBodyEvaluation's shared target
+lowering, so a `super` head keeps its receiver argument and its deferred
+ToPropertyKey, and a lexical head still receives a fresh cell each
+iteration.
+
+A step's reachability check is HasProperty, so it must agree with what a
+read of the same name would find. This runtime serves several intrinsic
+methods, including an array's `push` and `Symbol.iterator`, a promise's
+`then`, `catch`, and `finally`, and `%GeneratorPrototype%`'s resumption
+methods, from a virtualized table rather than from a materialized
+prototype object, and the `in` operator carried a second, drifted copy of
+that table: it was missing an array's `push` and a generator prototype's
+`throw`, so `"push" in []` answered `false` where a read answers a
+function. The table now lives once, beside the read it mirrors, and both
+HasProperty and the enumeration step consult it, which fixes the `in`
+operator's two missing names as well. The unit's own generated property
+found the enumeration half of this defect; the `in` half is a
+pre-existing divergence the shared helper removes.
+
+This unit advances the runtime ABI to `oseo-runtime-m5-43`. It adds
+`oseo_enumerate_get`, which reports exhaustion instead of an iterator for
+a nullish subject, and `oseo_enumerate_next`, which reports the next key
+or exhaustion. Both keep the `value` and `done` contract the iterator
+step already uses, so the backend branches on a scalar while the record
+and the key stay in root slots that survive forced collection and a
+suspension taken in the body. The enumeration record is a new traced heap
+kind holding the collected key list and the receiver each step consults;
+it is never reachable from ECMAScript code, so it has no prototype, no
+`next` property, and no close.
+
+Focused frontend tests assert that every admitted head converts to owned
+syntax, that a private and two `super` head targets lower to the private
+write and the ordinary `super` property set with its receiver argument,
+that the lowered program holds exactly one acquisition and one step and
+no iterator operation at all, that a lexical head resets its cell once
+before the subject and once per iteration while a `var` head resets none,
+that a `super` head's receiver read, key expression, GetSuperBase,
+ToPropertyKey, and store all follow the step, that a label binds to the
+statement's own transfers, and that every head this unit does not admit
+keeps its source-located rejection, including the `typeof` fold a
+non-strict `with` fallback target poisons. Two fixed native differential
+fixtures cover the unit's two halves. *for-in* covers the five head forms,
+a computed and an ordinary member target, a `super` and a private target,
+nullish and non-object subjects, a string subject, a sparse array with an
+extra string key, per-iteration closure identity, labeled `break` and
+`continue`, a `return` through `finally`, a `throw`, the head temporal
+dead zone, and an empty subject. *for-in-enumeration* covers canonical
+order, symbol exclusion, a three-level prototype chain, a non-enumerable
+shadow, a non-enumerable own property, the five observations that
+distinguish eager from lazy collection, an own key whose deletion
+uncovers an inherited virtualized intrinsic, deletion during enumeration
+including a deleted own key that suppresses its prototype twin, addition
+during enumeration, accessor keys, a function, a class and its heritage,
+an instance, a bare and an extended `Symbol.prototype`, a well-known
+symbol, a number, a boolean, and a BigInt subject, two independent
+records over one object, and a suspension inside a generator and an
+asynchronous function body. Both run under both
+specialization policies with forced collection, and both assert that the
+emitted C acquires and steps the enumeration and never closes an
+iterator. A generated property with seed `0x5eed002f` draws a one- to
+three-level prototype chain of enumerable and non-enumerable index and
+string keys against object, string, number, symbol, `null`, and
+`undefined` subjects, through all five head forms, with a key added to or
+deleted from the own or the parent level after the first reported key, and
+checks the reported sequence against an independent transcription of the
+specified rules alongside Node.js and Deno references, both specialization
+policies, and forced collection.
+
+The reviewed subset grows by 124 cases and promotes two existing entries.
+The 124 newly reviewed paths contribute 33 passes, 63 expected negatives,
+and 28 unsupported profile features. The passes cover the enumeration
+order rules, the `let`, `const`, and `var` block-scope heads, the
+`head-lhs-member`, `head-decl-expr`, and `head-expr-expr` head forms, the
+lexical head's fresh binding per iteration, its temporal dead zone, and
+the top-level-await subject positions; the reviewed feature list now
+records `for-in-order` as supported, which is what lets the three
+`order-*` cases execute. The expected negatives keep every head early
+error: a duplicate or `let`-named lexical head name, a lexical head bound
+name reused in the body, a labelled function statement body, a
+non-assignment-target and a covered non-assignment-target head, an
+invalid assignment pattern head, a declaration in the head that is not a
+binding, and the strict `arguments` and `eval` head targets. The 28
+unsupported entries record prerequisites this unit does not change:
+eight completion-value cases and six scope cases need `eval`, six
+`S12.6.4_*` cases need `eval` or an undeclared global, four cases need
+`let` as an identifier, one needs a pattern head that M5a Unit 8.5m owns,
+one needs `Object.create` descriptor maps, one needs a resizable
+ArrayBuffer, and one needs a regular expression literal. Seven further
+`test/language/statements/for-in/` cases stay outside the subset because
+they reach `Object.prototype.hasOwnProperty` or `String.prototype.indexOf`
+at run time rather than at compile time, so their only blocker is a
+built-in family, not the statement. The two promoted entries were
+classified `unsupported-profile-feature` only because the statement did
+not compile: *optional-chaining/iteration-statement-for-in.js* and
+*class/elements/privatefieldset-typeerror-7.js*, which writes a private
+member from a for-in head. The manifest reaches 4,857 cases: 2,932
+passes, 1,355 expected negatives, and 570 unsupported profile features
+with no semantic or harness failures. The reviewed dependency vocabulary
+gains `property-enumeration`, which names the EnumerateObjectProperties
+dependency the new cases share. The suite revision, inventory policy,
+manifest schema, and classification vocabulary are otherwise unchanged,
+and the 41,091-path applicable-test inventory is unchanged.
 
 ### Intrinsics and built-in objects
 

@@ -242,6 +242,17 @@ function hirStatementAwaits(
       recurse(statement.body)
     );
   }
+  if (statement.kind === "for-in") {
+    return (
+      hirExpressionHasAwait(statement.subject) ||
+      (statement.target.kind === "property" &&
+        (hirExpressionHasAwait(statement.target.object) ||
+          hirExpressionHasAwait(statement.target.key))) ||
+      (statement.target.kind === "private" &&
+        hirExpressionHasAwait(statement.target.object)) ||
+      recurse(statement.body)
+    );
+  }
   return (
     (statement.kind === "while" || statement.kind === "do-while") &&
     (hirExpressionHasAwait(statement.test) || recurse(statement.body))
@@ -441,6 +452,17 @@ function hirStatementHasPatternAwait(statement: HirStatement): boolean {
       recurse(statement.body)
     );
   }
+  if (statement.kind === "for-in") {
+    return (
+      (statement.target.kind === "property" &&
+        (hirExpressionHasPatternAwait(statement.target.object) ||
+          hirExpressionHasPatternAwait(statement.target.key))) ||
+      (statement.target.kind === "private" &&
+        hirExpressionHasPatternAwait(statement.target.object)) ||
+      hirExpressionHasPatternAwait(statement.subject) ||
+      recurse(statement.body)
+    );
+  }
   if (statement.kind === "while" || statement.kind === "do-while") {
     return (
       hirExpressionHasPatternAwait(statement.test) || recurse(statement.body)
@@ -539,6 +561,17 @@ function collectHirBindings(
         for (const binding of hirBindingIdentifiers(statement.target.pattern)) {
           bindings.push({ id: binding.bindingId, name: binding.name });
         }
+      }
+      collect(statement.body);
+    } else if (statement.kind === "for-in") {
+      if (
+        statement.target.kind === "declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        bindings.push({
+          id: statement.target.bindingId,
+          name: statement.target.name,
+        });
       }
       collect(statement.body);
     } else if (statement.kind === "switch") {

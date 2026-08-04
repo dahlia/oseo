@@ -1426,4 +1426,321 @@ const grown = grow(24);
 console.log(Object.keys(grown).length, grown.key0, grown.key23);
 `,
   },
+  {
+    name: "for-in",
+    source: `
+function record(label, value) { console.log(label, value); }
+
+let text = "";
+for (const key in { a: 1, b: 2 }) { text = text + key; }
+record("const-head", text);
+
+text = "";
+for (let key in { c: 3, d: 4 }) { text = text + key; }
+record("let-head", text);
+
+var reused;
+for (reused in { e: 5, f: 6 }) {}
+record("assignment-head", reused);
+
+var declared;
+for (var declared in { g: 7 }) {}
+record("var-head", declared);
+
+const holder = {};
+let computedCount = 0;
+function nextKey() {
+  computedCount = computedCount + 1;
+  return "slot" + computedCount;
+}
+for (holder[nextKey()] in { h: 8, i: 9 }) {}
+record("computed-target", computedCount + ":" + holder.slot1 + holder.slot2);
+for (holder.direct in { j: 10 }) {}
+record("member-target", holder.direct);
+
+class Base {}
+class Derived extends Base {
+  #slot = "";
+  read() { return this.#slot; }
+  run(source) {
+    for (super.stored in source) {}
+    for (this.#slot in source) {}
+    return this.stored;
+  }
+}
+const derived = new Derived();
+record("super-target", derived.run({ k: 11 }));
+record("private-target", derived.read());
+
+let skipped = 0;
+for (const key in null) { skipped = skipped + 1; }
+for (const key in undefined) { skipped = skipped + 1; }
+for (const key in 42) { skipped = skipped + 1; }
+for (const key in true) { skipped = skipped + 1; }
+for (const key in Symbol("s")) { skipped = skipped + 1; }
+record("nullish-and-primitive", skipped);
+
+text = "";
+for (const key in "abc") { text = text + key; }
+record("string-subject", text);
+
+text = "";
+const sparse = [10, 20, 30];
+delete sparse[1];
+sparse.tag = "extra";
+for (const key in sparse) { text = text + key + ","; }
+record("array-subject", text);
+
+const readers = [];
+let readerCount = 0;
+for (let key in { m: 1, n: 2 }) {
+  readers[readerCount] = function () { return key; };
+  readerCount = readerCount + 1;
+}
+record("per-iteration-cells", readers[0]() + readers[1]());
+
+text = "";
+outer: for (const outerKey in { p: 1, q: 2 }) {
+  for (const innerKey in { x: 1, y: 2 }) {
+    if (innerKey === "y") continue outer;
+    if (outerKey === "q") break outer;
+    text = text + outerKey + innerKey + " ";
+  }
+}
+record("labeled-transfers", text);
+
+function earlyReturn(source) {
+  try {
+    for (const key in source) { return "returned:" + key; }
+  } finally {
+    console.log("finally-ran");
+  }
+  return "none";
+}
+record("abrupt-return", earlyReturn({ r: 1, s: 2 }));
+
+try {
+  for (const key in { t: 1 }) { throw new TypeError("thrown:" + key); }
+} catch (error) {
+  record("abrupt-throw", error.message);
+}
+
+try {
+  for (const key in { [key]: 1 }) {}
+} catch (error) {
+  record("head-dead-zone", error instanceof ReferenceError);
+}
+
+let empty = 0;
+for (const key in {}) { empty = empty + 1; }
+record("empty-subject", empty);
+`,
+  },
+  {
+    name: "for-in-enumeration",
+    source: `
+function keysOf(source) {
+  let text = "";
+  for (const key in source) { text = text + key + " "; }
+  return text;
+}
+
+const ordered = {};
+ordered.zeta = 1;
+ordered[2] = 1;
+ordered.alpha = 1;
+ordered[0] = 1;
+ordered[10] = 1;
+console.log("canonical-order", keysOf(ordered));
+
+const marker = Symbol("hidden");
+const symbolic = { plain: 1 };
+symbolic[marker] = 2;
+console.log("symbol-excluded", keysOf(symbolic));
+
+const grandparent = { deep: 1, shared: "grandparent" };
+const parent = Object.create(grandparent);
+parent.middle = 1;
+parent.shared = "parent";
+const child = Object.create(parent);
+child.own = 1;
+console.log("prototype-chain", keysOf(child));
+
+const shadowSource = { visible: 1, masked: 2 };
+const shadowed = Object.create(shadowSource);
+Object.defineProperty(shadowed, "masked", {
+  configurable: true,
+  enumerable: false,
+  value: 3,
+  writable: true,
+});
+console.log("non-enumerable-shadow", keysOf(shadowed));
+
+const nonEnumerableOwn = {};
+Object.defineProperty(nonEnumerableOwn, "quiet", {
+  configurable: true,
+  enumerable: false,
+  value: 1,
+  writable: true,
+});
+nonEnumerableOwn.loud = 2;
+console.log("non-enumerable-own", keysOf(nonEnumerableOwn));
+
+function afterFirstKey(source, mutate) {
+  let text = "";
+  let first = true;
+  for (const key in source) {
+    text = text + key + " ";
+    if (first) { first = false; mutate(); }
+  }
+  return text;
+}
+
+const shadowGrand = { delta: 1 };
+const shadowParent = Object.create(shadowGrand);
+Object.defineProperty(shadowParent, "delta", {
+  configurable: true,
+  enumerable: false,
+  value: 2,
+  writable: true,
+});
+const shadowChild = Object.create(shadowParent);
+shadowChild["0"] = 1;
+console.log(
+  "shadow-deleted-late",
+  afterFirstKey(shadowChild, function () { delete shadowParent.delta; }),
+);
+
+const lateParent = {};
+const lateChild = Object.create(lateParent);
+lateChild.a = 1;
+console.log(
+  "prototype-key-added",
+  afterFirstKey(lateChild, function () { lateParent.z = 1; }),
+);
+
+const twinParent = { k: "prototype" };
+const twinChild = Object.create(twinParent);
+twinChild.a = 1;
+twinChild.k = "own";
+console.log(
+  "own-twin-deleted",
+  afterFirstKey(twinChild, function () { delete twinChild.k; }),
+);
+
+const hiddenParent = { z: 1 };
+const hiddenChild = Object.create(hiddenParent);
+hiddenChild.a = 1;
+console.log(
+  "prototype-key-hidden",
+  afterFirstKey(hiddenChild, function () {
+    Object.defineProperty(hiddenParent, "z", { enumerable: false });
+  }),
+);
+
+const replaced = Object.create({ first: 1 });
+replaced.a = 1;
+console.log(
+  "prototype-replaced",
+  afterFirstKey(replaced, function () {
+    Object.setPrototypeOf(replaced, { second: 1 });
+  }),
+);
+
+const virtualTwin = [1];
+virtualTwin.push = 5;
+console.log(
+  "virtual-intrinsic-uncovered",
+  afterFirstKey(virtualTwin, function () { delete virtualTwin.push; }),
+);
+
+const deleted = { a: 1, b: 2, c: 3 };
+let deletedText = "";
+for (const key in deleted) {
+  deletedText = deletedText + key;
+  delete deleted.b;
+  delete deleted.c;
+}
+console.log("deleted-during", deletedText);
+
+const deletedShadow = Object.create({ moved: "prototype" });
+deletedShadow.moved = "own";
+deletedShadow.first = 1;
+let deletedShadowText = "";
+for (const key in deletedShadow) {
+  deletedShadowText = deletedShadowText + key + "=" + deletedShadow[key] + " ";
+  delete deletedShadow.moved;
+}
+console.log("deleted-shadow", deletedShadowText);
+
+const grown = { seed: 1 };
+let grownCount = 0;
+let grownText = "";
+for (const key in grown) {
+  grownText = grownText + key + " ";
+  grownCount = grownCount + 1;
+  if (grownCount < 4) { grown["added" + grownCount] = 1; }
+}
+console.log("added-during", grownText);
+
+const accessors = {
+  get computed() { return 1; },
+  set computed(value) {},
+};
+console.log("accessor-keys", keysOf(accessors));
+
+function ordinary() {}
+ordinary.attached = 1;
+console.log("function-subject", keysOf(ordinary));
+
+class Ancestor {}
+Ancestor.inherited = 1;
+class Descendant extends Ancestor {}
+Descendant.declared = 2;
+console.log("class-subject", keysOf(Descendant));
+console.log("instance-subject", keysOf(new Descendant()));
+
+const nested = { a: 1, b: 2 };
+let nestedText = "";
+for (const outerKey in nested) {
+  for (const innerKey in nested) {
+    nestedText = nestedText + outerKey + innerKey + " ";
+  }
+}
+console.log("independent-records", nestedText);
+
+function* stepper(source) { for (const key in source) { yield key; } }
+const iterator = stepper({ u: 1, v: 2 });
+console.log(
+  "generator-suspension",
+  iterator.next().value,
+  iterator.next().value,
+  iterator.next().done,
+);
+
+async function awaited(source) {
+  let text = "";
+  for (const key in source) { await Promise.resolve(); text = text + key; }
+  console.log("async-suspension", text);
+}
+awaited({ w: 1, x: 2 });
+
+const frozenOrder = Object.create(null);
+frozenOrder.only = 1;
+console.log("null-prototype", keysOf(frozenOrder));
+
+const bareSymbol = Symbol("mark");
+console.log("symbol-clean", keysOf(bareSymbol));
+Symbol.prototype.borrowed = 1;
+Object.defineProperty(Symbol.prototype, "quiet", {
+  configurable: true,
+  enumerable: false,
+  value: 2,
+  writable: true,
+});
+console.log("symbol-prototype", keysOf(bareSymbol));
+console.log("well-known-symbol", keysOf(Symbol.iterator));
+console.log("other-primitives", keysOf(1) + keysOf(true) + keysOf(2n));
+`,
+  },
 ];

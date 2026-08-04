@@ -20,6 +20,7 @@ supportedFeatures:
   - destructuring-assignment
   - destructuring-binding
   - exponentiation
+  - for-in-order
   - for-of
   - generators
   - let
@@ -1917,6 +1918,30 @@ tests:
   - path: test/language/block-scope/shadowing/lookup-from-closure.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/for-in/acquire-properties-from-array.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/acquire-properties-from-object.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/disallow-initialization-assignment.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/disallow-multiple-lexical-bindings-with-and-without-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/disallow-multiple-lexical-bindings-with-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/disallow-multiple-lexical-bindings-without-and-with-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/disallow-multiple-lexical-bindings.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/for-in/mixed-values-in-iteration.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
   - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
@@ -7819,8 +7844,8 @@ tests:
     expectedClassification: pass
     dependencies: [async-iteration, control-flow, expression-operators]
   - path: test/language/expressions/optional-chaining/iteration-statement-for-in.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, expression-operators]
+    expectedClassification: pass
+    dependencies: [control-flow, expression-operators, property-enumeration]
   - path: test/language/expressions/optional-chaining/iteration-statement-for-of-type-error.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, iterator-protocol]
@@ -9344,6 +9369,42 @@ tests:
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-params.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-regexp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
@@ -10644,19 +10705,23 @@ tests:
   - path: test/language/statements/class/definition/methods-async-super-call-body.js
     expectedClassification: pass
     dependencies:
-      - async-functions
-      - classes
-      - functions
-      - object-properties
-      - promise-settlement
+      [
+        async-functions,
+        classes,
+        functions,
+        object-properties,
+        promise-settlement,
+      ]
   - path: test/language/statements/class/definition/methods-async-super-call-param.js
     expectedClassification: pass
     dependencies:
-      - async-functions
-      - classes
-      - functions
-      - object-properties
-      - promise-settlement
+      [
+        async-functions,
+        classes,
+        functions,
+        object-properties,
+        promise-settlement,
+      ]
   - path: test/language/statements/class/definition/methods-gen-return.js
     expectedClassification: pass
     dependencies: [classes, generators]
@@ -11276,8 +11341,8 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-7.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [classes, object-properties]
+    expectedClassification: pass
+    dependencies: [classes, object-properties, property-enumeration]
   - path: test/language/statements/class/elements/privatefieldset-typeerror-8.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -18038,18 +18103,361 @@ tests:
         iterator-protocol,
         promise-settlement,
       ]
+  - path: test/language/statements/for-in/12.6.4-2.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A14_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A15.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A3.1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A4.1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/S12.6.4_A4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/cptn-decl-abrupt-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-decl-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-decl-skip-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-decl-zero-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-expr-abrupt-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-expr-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-expr-skip-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/cptn-expr-zero-itr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, property-enumeration]
+  - path: test/language/statements/for-in/decl-async-fun.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, control-flow, functions, property-enumeration]
+  - path: test/language/statements/for-in/decl-async-gen.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, control-flow, generators, property-enumeration]
+  - path: test/language/statements/for-in/decl-cls.js
+    expectedClassification: expected-negative
+    dependencies: [classes, control-flow, property-enumeration]
+  - path: test/language/statements/for-in/decl-const.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/decl-fun.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, property-enumeration]
+  - path: test/language/statements/for-in/decl-gen.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, generators, property-enumeration]
+  - path: test/language/statements/for-in/decl-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-init-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-nested-array-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-nested-array-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-nested-memberexpr-optchain-prop-ref-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-nested-obj-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-nested-obj-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-put-obj-literal-optchain-prop-ref-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-target-simple-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-elem-target-yield-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-before-element.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-before-elision.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-before-rest.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-elision-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-nested-array-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-nested-array-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-nested-obj-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-nested-obj-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/array-rest-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-id-identifier-yield-expr.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-id-identifier-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-id-init-simple-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-id-init-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-id-simple-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-elem-init-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-elem-target-memberexpr-optchain-prop-ref-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-elem-target-obj-literal-optchain-prop-ref-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-elem-target-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-nested-array-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-nested-array-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-nested-obj-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-prop-nested-obj-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, destructuring-bindings, generators, property-enumeration]
+  - path: test/language/statements/for-in/dstr/obj-rest-not-last-element-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-const-bound-names-dup.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-const-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-const-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-const-bound-names-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-const-fresh-binding-per-iteration.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-decl-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-expr-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-let-bound-names-dup.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-let-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-let-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-let-bound-names-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-let-destructuring.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        lexical-bindings,
+        property-enumeration,
+      ]
+  - path: test/language/statements/for-in/head-let-fresh-binding-per-iteration.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-cover-non-asnmt-trgt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-cover.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-invalid-asnmt-ptrn-ary.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-invalid-asnmt-ptrn-obj.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, destructuring-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-let.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-member.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-lhs-non-asnmt-trgt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/head-var-bound-names-dup.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/head-var-bound-names-in-stmt.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/head-var-bound-names-let.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/head-var-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/identifier-let-allowed-as-lefthandside-expression-not-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/labelled-fn-stmt-const.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, functions, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/labelled-fn-stmt-let.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, functions, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/labelled-fn-stmt-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, property-enumeration]
+  - path: test/language/statements/for-in/labelled-fn-stmt-var.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/let-array-with-newline.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/let-block-with-newline.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/let-identifier-with-newline.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/order-after-define-property.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/order-enumerable-shadowed.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/order-property-added.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/order-property-on-prototype.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/order-simple-object.js
+    expectedClassification: pass
+    dependencies: [control-flow, property-enumeration]
+  - path: test/language/statements/for-in/resizable-buffer.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, object-properties, property-enumeration]
+  - path: test/language/statements/for-in/scope-body-lex-boundary.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, dynamic-source, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/scope-body-lex-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/scope-body-lex-open.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/scope-body-var-none.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/scope-head-lex-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/scope-head-lex-open.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, dynamic-source, lexical-bindings, property-enumeration]
+  - path: test/language/statements/for-in/scope-head-var-none.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, property-enumeration, var-bindings]
   - path: test/language/statements/for-in/var-arguments-fn-strict-init.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, object-properties, var-bindings]
+    dependencies: [control-flow, property-enumeration, var-bindings]
   - path: test/language/statements/for-in/var-arguments-fn-strict.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, object-properties, var-bindings]
+    dependencies: [control-flow, property-enumeration, var-bindings]
   - path: test/language/statements/for-in/var-arguments-strict-init.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, object-properties, var-bindings]
+    dependencies: [control-flow, property-enumeration, var-bindings]
   - path: test/language/statements/for-in/var-arguments-strict.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, object-properties, var-bindings]
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/var-eval-strict-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, property-enumeration, var-bindings]
+  - path: test/language/statements/for-in/var-eval-strict.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, property-enumeration, var-bindings]
   - path: test/language/statements/for-of/arguments-mapped-aliasing.js
     expectedClassification: pass
     dependencies:

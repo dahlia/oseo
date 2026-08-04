@@ -1070,8 +1070,33 @@ landed with the M5 intrinsics units. The remaining queue is:
     read before the key expression, so a target before `super()` reports
     its uninitialized `this`; `ToPropertyKey` runs only after the value;
     and an abrupt reference closes the iterator the pattern or the loop
-    opened. A for-in head stays unsupported with the rest of that
-    statement.
+    opened. Unit 8.5l admits the `for-in` statement with its base
+    enumeration semantics and simple heads. A nullish subject makes
+    ForIn/OfHeadEvaluation report a break completion, so the whole
+    statement is skipped without an error, and an enumerate iterator is
+    never closed, so an abrupt head reference or body leaves the loop
+    through the enclosing transfer alone. ECMA-262 leaves the enumeration's
+    mechanics and order unspecified and states rules instead, so the
+    point at which each level's own keys are obtained is an observable
+    choice; this unit makes the choice both reference hosts make and
+    collects the whole prototype chain once, when the enumeration is
+    acquired. Collection takes each level's own string keys in ascending
+    index then creation order, drops symbol keys, skips a name already
+    recorded at a nearer level whether or not that property was
+    enumerable, and keeps a surviving name only if its own property was
+    enumerable then. Each step reports the next collected name while the
+    receiver still has a property of that name, so a property deleted
+    before it is processed is ignored while one added during the
+    enumeration stays invisible to it. ToObject is modeled rather than
+    materialized: a string subject reports its code unit indices and a
+    non-enumerable `length`, a symbol subject enumerates
+    %Symbol.prototype%, and every other primitive reports nothing. The admitted
+    heads are a `var`, `let`, or `const` identifier declaration and the
+    assignment targets the profile can already represent, including a
+    `super` property and a private member; a pattern head is a
+    source-located rejection that Unit 8.5m owns. The runtime ABI moves
+    to `oseo-runtime-m5-43` for the two owned enumeration entry
+    points.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

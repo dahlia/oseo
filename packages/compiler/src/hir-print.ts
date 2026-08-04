@@ -546,6 +546,23 @@ function appendHirStatement(
         `(${target} of ${printHirExpression(statement.iterable)})${location}`,
     );
     appendHirStatement(lines, statement.body, `${indent}  `);
+  } else if (statement.kind === "for-in") {
+    const target =
+      statement.target.kind === "declaration"
+        ? `${statement.target.declarationKind} ` +
+          `%b${statement.target.bindingId} ${statement.target.name}`
+        : statement.target.kind === "binding"
+          ? `%b${statement.target.bindingId} ${statement.target.name}`
+          : statement.target.kind === "private"
+            ? `${printHirExpression(statement.target.object)}.` +
+              printHirPrivateName(statement.target.privateName)
+            : `${printHirExpression(statement.target.object)}[` +
+              `${printHirExpression(statement.target.key)}]`;
+    lines.push(
+      `${indent}for (${target} in ` +
+        `${printHirExpression(statement.subject)})${location}`,
+    );
+    appendHirStatement(lines, statement.body, `${indent}  `);
   } else if (statement.kind === "switch") {
     lines.push(
       `${indent}switch ${printHirExpression(statement.discriminant)}` +

@@ -506,6 +506,7 @@ const methods = cleansUp();
 console.log(typeof methods.return, methods.return.length, methods.return.name);
 console.log(methods.return === cleansUp().return);
 console.log("next" in methods, "return" in methods, "missing" in methods);
+console.log("throw" in methods, typeof methods.throw);
 `,
   },
   {

@@ -1013,6 +1013,31 @@ OseoResult oseo_object_builtin_set_prototype_of(
     size_t argument_count,
     const OseoValue *arguments
 );
+/*
+ * EnumerateObjectProperties (14.7.5.9), the only consumer of which is a
+ * for-in head. It is not the iterator protocol: acquisition reads no
+ * `Symbol.iterator` and no `next` method, no step runs user code, and
+ * the record is never closed, so an abrupt head target or body leaves
+ * the loop without a cleanup call.
+ *
+ * `oseo_enumerate_get` reports `done` for a nullish subject and leaves
+ * `record` undefined, which is the break completion
+ * ForIn/OfHeadEvaluation returns before ToObject runs.
+ * `oseo_enumerate_next` reports `done` once every own and inherited
+ * enumerable string key has been reported at most once.
+ */
+OseoResult oseo_enumerate_get(
+    OseoContext *context,
+    OseoValue subject,
+    OseoValue *record,
+    bool *done
+);
+OseoResult oseo_enumerate_next(
+    OseoContext *context,
+    OseoValue record,
+    OseoValue *key,
+    bool *done
+);
 OseoResult oseo_iterator_get(
     OseoContext *context,
     OseoValue iterable,

@@ -19,6 +19,7 @@ import type {
   HirClassThisBinding,
   HirExpression,
   HirForDeclaration,
+  HirForInTarget,
   HirForOfTarget,
   HirFunction,
   HirGlobalObjectBinding,
@@ -42,6 +43,7 @@ import type {
   SyntaxCallArgument,
   SyntaxClassField,
   SyntaxExpression,
+  SyntaxForInTarget,
   SyntaxFunction,
   SyntaxGlobalObjectName,
   SyntaxLexicalDeclarator,
@@ -1922,6 +1924,14 @@ export function declaredHirBindingIds(
         );
       }
       result.push(...declaredHirBindingIds([statement.body]));
+    } else if (statement.kind === "for-in") {
+      if (
+        statement.target.kind === "declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        result.push(statement.target.bindingId);
+      }
+      result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "switch") {
       result.push(...declaredHirBindingIds(statement.functionInits ?? []));
       for (const switchCase of statement.cases) {
@@ -2462,6 +2472,90 @@ function resolveBindingPattern(
   };
 }
 
+/**
+ * Resolve a for-in head target against the scopes outside the head's own
+ * lexical environment.
+ *
+ * ForIn/OfBodyEvaluation evaluates an assignment or `var` head reference
+ * once per iteration in the surrounding environment, so only a `let` or
+ * `const` head sees the fresh binding `declaredBinding` names. The
+ * subject expression is resolved by the caller, because the head
+ * environment exists while it runs and this reference does not.
+ */
+function resolveForInTarget(
+  target: SyntaxForInTarget,
+  scopes: readonly Map<string, Binding>[],
+  declaredBinding: Binding | undefined,
+  state: ResolveState,
+): HirForInTarget | undefined {
+  if (target.kind === "declaration") {
+    const binding = declaredBinding ?? findBinding(scopes, target.name);
+    if (binding == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          target,
+          `Unknown binding '${target.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    return { ...target, bindingId: binding.id, mutable: binding.mutable };
+  }
+  if (target.kind === "binding") {
+    const resolution = resolveName(scopes, state, target.name);
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      state.strict
+    ) {
+      rejectStrictWithFallbackWrite(target.name, target, state);
+      return undefined;
+    }
+    const binding =
+      resolution.binding ??
+      (resolution.objectBindingIds.length === 0
+        ? undefined
+        : withFallbackBinding(target.name, state, true));
+    if (binding == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          target,
+          `Unknown binding '${target.name}'.`,
+        ),
+      );
+      return undefined;
+    }
+    return {
+      ...target,
+      bindingId: binding.id,
+      ...(binding.functionNameBinding === true
+        ? { functionNameBinding: true as const }
+        : {}),
+      ...(binding.importedBinding === true
+        ? { importedBinding: true as const }
+        : {}),
+      mutable: binding.mutable,
+      ...(resolution.objectBindingIds.length === 0
+        ? {}
+        : { withObjectBindingIds: resolution.objectBindingIds }),
+    };
+  }
+  if (target.kind === "property") {
+    const object = resolveExpression(target.object, scopes, state);
+    const key = resolveExpression(target.key, scopes, state);
+    return object == null || key == null
+      ? undefined
+      : { ...target, key, object };
+  }
+  const object = resolveExpression(target.object, scopes, state);
+  const privateName = resolvePrivateName(target.name, target, scopes, state);
+  return object == null || privateName == null
+    ? undefined
+    : { ...locatedOf(target), kind: "private", object, privateName };
+}
+
 function resolveStatement(
   statement: SyntaxStatement,
   scopes: readonly Map<string, Binding>[],
@@ -2735,6 +2829,7 @@ function resolveStatement(
       terminal.kind === "while" ||
       terminal.kind === "do-while" ||
       terminal.kind === "for" ||
+      terminal.kind === "for-in" ||
       terminal.kind === "for-of";
     state.labels.push({ loop, name: statement.label });
     const body = resolveStatement(
@@ -2857,6 +2952,46 @@ function resolveStatement(
       ...(test == null ? {} : { test }),
       ...(update == null ? {} : { update }),
     };
+  }
+  if (statement.kind === "for-in") {
+    // ForIn/OfHeadEvaluation creates the head's lexical environment
+    // before the subject expression runs, so a same-name read in the
+    // subject observes the temporal dead zone rather than an outer
+    // binding.
+    let forScopes = scopes;
+    let declaredBinding: Binding | undefined;
+    if (
+      statement.target.kind === "declaration" &&
+      statement.target.declarationKind !== "var"
+    ) {
+      declaredBinding = {
+        id: state.nextBindingId,
+        mutable: statement.target.declarationKind === "let",
+        name: statement.target.name,
+      };
+      state.nextBindingId += 1;
+      forScopes = [
+        ...scopes,
+        new Map([[statement.target.name, declaredBinding]]),
+      ];
+    }
+    const subject = resolveExpression(statement.subject, forScopes, state);
+    const target = resolveForInTarget(
+      statement.target,
+      scopes,
+      declaredBinding,
+      state,
+    );
+    const body = resolveStatement(
+      statement.body,
+      forScopes,
+      state,
+      functionBody,
+      loopDepth + 1,
+      breakDepth + 1,
+    );
+    if (subject == null || target == null || body == null) return undefined;
+    return { ...statement, body, subject, target };
   }
   if (statement.kind === "for-of") {
     let forScopes = scopes;

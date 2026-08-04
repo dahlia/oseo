@@ -213,6 +213,18 @@ for (const fixture of selectedFixtures) {
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
   }
 
+  if (fixture.name === "for-in" || fixture.name === "for-in-enumeration") {
+    // Both policies lower the enumerate head to the same two owned
+    // operations, and neither emits an iterator close: an enumerate
+    // iterator is never closed, so no head or body completion routes
+    // through one.
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /enumerate-get EnumerateObjectProperties/u);
+      assert.match(text, /enumerate-next enumeration step/u);
+      assert.doesNotMatch(text, /iterator-close/u);
+    }
+  }
+
   if (fixture.name === "script-this") {
     // Script top level and a non-strict function share one lowering,
     // while the strict function in the same Script reads its receiver.
@@ -314,6 +326,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
+    fixture.name === "for-in" ||
+    fixture.name === "for-in-enumeration" ||
     fixture.name === "for-await-of-frame-suspension" ||
     fixture.name === "for-await-of-close-suspension" ||
     fixture.name === "in-and-instanceof" ||
@@ -391,6 +405,26 @@ for (const fixture of selectedFixtures) {
             // every evaluated reference survives forced collection
             // between the reference and the value it stores.
             assert.match(native.emittedC, /oseo_super_set\(context, roots\[/u);
+            assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "for-in" ||
+            fixture.name === "for-in-enumeration"
+          ) {
+            // An enumerate head is not the iterator protocol: it acquires
+            // and steps its own record and is never closed, so no
+            // iterator entry point may appear, and every record, key
+            // snapshot, and processed key must survive forced collection
+            // between two steps and across a suspension.
+            assert.match(
+              native.emittedC,
+              /oseo_enumerate_get\(context, roots\[/u,
+            );
+            assert.match(
+              native.emittedC,
+              /oseo_enumerate_next\(context, roots\[/u,
+            );
+            assert.doesNotMatch(native.emittedC, /oseo_iterator_close/u);
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "typeof-unresolved") {

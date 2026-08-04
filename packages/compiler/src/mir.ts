@@ -158,6 +158,8 @@ export interface MirOperation {
     | "count-guard-hit"
     | "count-guard-miss"
     | "count-overflow-miss"
+    | "enumerate-get"
+    | "enumerate-next"
     | "function-create"
     | "global-this"
     | "guard-object"
@@ -262,6 +264,20 @@ export interface MirOperation {
    * reports the final value as the delegating expression's result.
    */
   readonly iteratorValueResult?: number;
+  /**
+   * The slot receiving the for-in enumeration record `enumerate-get`
+   * creates. The operation's own result is the boolean the head branches
+   * on, because ForIn/OfHeadEvaluation reports a break completion for a
+   * nullish subject instead of an iterator, so the record slot stays
+   * `undefined` in that case and the loop never steps.
+   */
+  readonly enumerateRecordResult?: number;
+  /**
+   * The slot receiving the enumerated property key string. Like
+   * `iteratorValueResult` it is left `undefined` once the enumeration
+   * reports exhaustion.
+   */
+  readonly enumerateKeyResult?: number;
   readonly operator?: BinaryOperator | UnaryOperator;
   readonly range: SourceRange;
   /**

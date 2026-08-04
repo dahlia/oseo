@@ -133,6 +133,7 @@ typedef enum {
     OSEO_HEAP_PRIVATE_NAME = 14,
     OSEO_HEAP_ASYNC_GENERATOR_REQUEST = 15,
     OSEO_HEAP_BIGINT = 16,
+    OSEO_HEAP_ENUMERATION = 17,
 } OseoHeapKind;
 
 struct OseoHeapObject {
@@ -198,6 +199,27 @@ typedef struct {
     size_t length;
     size_t capacity;
 } OseoArgumentList;
+
+/*
+ * One EnumerateObjectProperties (14.7.5.9) record. It is never reachable
+ * from ECMAScript code, so it has no prototype, no `next` property, and
+ * no close: a for-in head steps it directly.
+ *
+ * `keys` is the ordered enumerable string key list collected once, when
+ * the enumeration was acquired, across the whole prototype chain with
+ * every nearer own key suppressing the same name behind it. `receiver`
+ * is the value that chain was collected from, kept so each step can
+ * check that the key it is about to report is still reachable, which is
+ * what makes a property deleted before it is processed ignored. A string
+ * receiver stands for the String exotic object ToObject would create,
+ * whose own index properties the string itself describes.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoValue receiver;
+    OseoValue keys;
+    size_t index;
+} OseoEnumeration;
 
 typedef struct {
     OseoPropertyAttributes attributes;
@@ -703,6 +725,13 @@ static inline bool is_object(OseoValue value) {
     return kind == OSEO_HEAP_OBJECT || kind == OSEO_HEAP_ARRAY ||
         kind == OSEO_HEAP_FUNCTION || kind == OSEO_HEAP_PROMISE;
 }
+static inline bool is_enumeration(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_ENUMERATION;
+}
+static inline OseoEnumeration *enumeration_object(OseoValue value) {
+    return (OseoEnumeration *)heap_object(value);
+}
 static inline bool is_array(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_ARRAY;
@@ -855,6 +884,35 @@ OseoResult oseo_internal_promise_method_function(
     const char *name
 );
 bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
+/*
+ * The virtualized intrinsic methods this runtime serves without
+ * materializing the prototype objects that own them. One classification
+ * feeds both the property read and every existence check, so the two can
+ * never disagree about whether such a name exists.
+ */
+typedef enum {
+    OSEO_VIRTUAL_NONE = 0,
+    OSEO_VIRTUAL_PROMISE_THEN = 1,
+    OSEO_VIRTUAL_PROMISE_CATCH = 2,
+    OSEO_VIRTUAL_PROMISE_FINALLY = 3,
+    OSEO_VIRTUAL_ARRAY_ITERATOR_NEXT = 4,
+    OSEO_VIRTUAL_ITERATOR_SELF = 5,
+    OSEO_VIRTUAL_GENERATOR_NEXT = 6,
+    OSEO_VIRTUAL_GENERATOR_RETURN = 7,
+    OSEO_VIRTUAL_GENERATOR_THROW = 8,
+    OSEO_VIRTUAL_ARRAY_PUSH = 9,
+    OSEO_VIRTUAL_ARRAY_VALUES = 10,
+} OseoVirtualProperty;
+OseoVirtualProperty oseo_internal_classify_virtual_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+);
+bool oseo_internal_virtual_property(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_to_primitive(
     OseoContext *context,

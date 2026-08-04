@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,733 reviewed cases: 2,897 passes, 1,292
-expected negatives, and 544 unsupported profile features. It records no
+The current manifest contains 4,857 reviewed cases: 2,932 passes, 1,355
+expected negatives, and 570 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -189,9 +189,82 @@ its deliberate boundary and its evidence:
     fixtures retain temporal dead zones, conditional iterator close, lexical
     closure identity, and post-loop `var` values. Seven reviewed test262 cases
     pin array defaults, trailing object patterns, and object rest.
-    `for-in` stays rejected with a source-located diagnostic. The empty
+    The empty
     statement is also admitted as a no-op block, and M5a Unit 8.5f admits
-    the `debugger` statement as the same no-op, as recorded below.
+    the `debugger` statement as the same no-op, as recorded below. M5a
+    Unit 8.5l admits the `for-in` statement, recorded below.
+ -  The `for-in` statement with base enumeration semantics and simple
+    heads, admitted by M5a Unit 8.5l. ForIn/OfHeadEvaluation reports a
+    break completion for an `undefined` or `null` subject, so the whole
+    statement is skipped without an error and without a ToObject
+    conversion, and an enumerate iterator is never closed: an abrupt head
+    reference, an abrupt store, and a `break`, `continue`, `return`, or
+    `throw` in the body leave the loop through the enclosing transfer
+    alone. ECMA-262 leaves the enumeration's mechanics and order
+    unspecified and states rules instead, so the point at which each
+    level's own keys are obtained is an observable choice; this profile
+    makes the choice both reference hosts make and collects the whole
+    prototype chain once, when the enumeration is acquired. Collection
+    walks the chain outward and takes each level's own string keys in
+    OrdinaryOwnPropertyKeys order of ascending array indices then
+    creation order; symbol keys are dropped; a name already recorded at
+    a nearer level is skipped whether or not that nearer property was
+    enumerable, which is the specified shadow rule, so a non-enumerable
+    own property suppresses the same name on every prototype behind it
+    and no name is collected twice; and a surviving name is collected
+    only if its own property was enumerable when its level was read.
+    Each step then reports the next collected name while the receiver
+    still has a property of that name anywhere on its chain, including
+    one this runtime serves from its virtualized intrinsic table rather
+    than from a materialized prototype object, which is what makes a
+    property deleted before it is processed ignored, while
+    a property added during the enumeration, a prototype replaced during
+    it, and a collected property made non-enumerable during it are all
+    invisible to it. The alternative reading, the informative generator
+    ECMA-262 prints beside the rules, obtains a prototype's own keys
+    only when the walk reaches it; both readings satisfy every stated
+    rule, and the fixed fixture pins the five observations that
+    distinguish them against Node.js and Deno. No step runs user code,
+    because this realm has no proxy and no exotic object whose own-key,
+    descriptor, or prototype access is observable, so the enumeration
+    cannot be reentered and reports no abrupt completion of its own.
+    ToObject is modeled rather than materialized while primitive
+    wrappers remain outside the profile: a string subject reports one
+    enumerable own index property per code unit and a non-enumerable
+    `length`, and %String.prototype% is not an object this realm
+    creates; every other primitive wrapper owns no property at all, so
+    enumerating one is enumerating its prototype, which makes a symbol
+    subject enumerate %Symbol.prototype% and a number, boolean, or
+    BigInt subject report nothing. An Array's `length` and a function's
+    `prototype` enter collection as non-enumerable own shadows. The
+    admitted heads are a
+    `var`, `let`, or `const` identifier declaration, whose lexical form
+    creates its environment before the subject runs and a fresh cell per
+    iteration, and an assignment target the profile already represents:
+    an identifier, including one resolved through `with`, an ordinary or
+    computed property, a private member, and a `super` property, whose
+    receiver read, key expression, and deferred `ToPropertyKey` all
+    follow the step that produced the key. Deliberate boundaries, each
+    rejected with a source-located diagnostic: an object or array pattern
+    head, in declaration and assignment form alike, which M5a Unit 8.5m
+    owns; Annex B's head initializer; a multi-declarator head; and a
+    strict `with` fallback write, which keeps the M5a Unit 8.5i
+    rejection, while a non-strict one records its name so that unit's
+    `typeof` fold stays rejected for it. The statement lowers to one
+    owned acquisition and one owned step with no iterator operation and
+    no finalizer, identically under both specialization policies, and
+    advances the runtime ABI to `oseo-runtime-m5-43` with
+    `oseo_enumerate_get` and `oseo_enumerate_next` over a new traced
+    enumeration record. Fixed *for-in* and *for-in-enumeration* native
+    differential fixtures cover the head forms, subjects, transfers, and
+    every enumeration rule above, including a suspension inside a
+    generator and an asynchronous function body, and a generated property
+    with seed `0x5eed002f` compares a generated prototype chain, subject,
+    head form, and mid-enumeration mutation against an independent
+    transcription of the specified rules. One hundred twenty-four newly
+    reviewed test262 cases contribute 33 passes, 63 expected negatives,
+    and 28 unsupported prerequisites, and two existing entries are
+    promoted to passes.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
@@ -200,7 +273,11 @@ its deliberate boundary and its evidence:
     through the shared property-key conversion and walks the prototype
     chain with the same visibility as generic property reads, and
     `instanceof` implements `OrdinaryHasInstance` without well-known
-    symbols, which the profile does not admit yet. Non-object `in` right
+    symbols, which the profile does not admit yet. `in` consults the same
+    virtualized intrinsic table a property read does, so it reports an
+    array's `push` and a generator prototype's `throw`; M5a Unit 8.5l
+    moved that table beside the read and corrected those two names, which
+    the `in` operator's own copy had been missing. Non-object `in` right
     operands, non-callable `instanceof` right operands, and non-object
     `prototype` values throw catchable `TypeError` instances.
  -  Untagged template literals, normalized by the frontend into string
@@ -331,12 +408,13 @@ its deliberate boundary and its evidence:
     `0x5eed0019` covers the same forms across both specialization policies and
     forced collection. Sixteen reviewed test262 cases pass and twelve
     expected negatives retain the tagged-template, assignment-target, update,
-    and invalid `super()` grammar errors. Nine unsupported cases record
-    independent prerequisites including dynamic source, `for-in`, restricted
-    asynchronous `await` positions, `String`, `Reflect`,
-    regular expressions. Optional calls through `super` properties are
-    admitted by M5a Unit 8.2 as recorded below.
-    The remaining directory case stays outside the reviewed subset because its
+    and invalid `super()` grammar errors. Five unsupported cases record
+    independent prerequisites including dynamic source, restricted
+    asynchronous `await` positions, `String`, `Reflect`, and
+    regular expressions; the group holds twenty passes since M5a Unit
+    8.5l promoted its `for-in` iteration-statement case. Optional calls through
+    `super` properties are admitted by M5a Unit 8.2 as recorded below. The
+    remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
     not materialized yet.
  -  The `delete` operator for identifier, non-reference, ordinary member, and
@@ -441,8 +519,8 @@ its deliberate boundary and its evidence:
     recorded below, a private member in a target position stays an early
     error, `super?.x` and a declaration pattern such as
     `for (const [super.x] of it)` stay parse errors the bootstrap parser
-    reports, and a for-in head stays unsupported with the rest of that
-    statement. A fixed *class-super-targets* native differential fixture
+    reports. M5a Unit 8.5l admits the same target in a for-in head,
+    recorded below. A fixed *class-super-targets* native differential fixture
     covers every target position, dot, computed, symbol, and parenthesized
     references, an arrow, a getter, a setter, a static method, a static
     block, a field initializer, a generator, an asynchronous method, an
@@ -1639,8 +1717,9 @@ its deliberate boundary and its evidence:
     later admits the `delete` operand position, recorded above, which carries
     no receiver anywhere because ECMA-262 rejects the evaluated reference
     before any lookup starts, and M5a Unit 8.5k admits the destructuring
-    assignment and for-of head target positions, recorded below. A for-in
-    head remains outside the profile with the rest of that statement.
+    assignment and for-of head target positions, recorded below. M5a Unit
+    8.5l adds the for-in head target position, which stores the
+    enumerated key through the same reference.
     Native differential
     fixtures cover a read, a method call, and a detached method value through
     a two-level and a three-level chain, an override reached from the parent

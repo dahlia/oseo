@@ -1605,32 +1605,10 @@ OseoResult oseo_has_property(
             &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
+        if (oseo_internal_virtual_property(context, current, property)) {
+            return normal(oseo_boolean(true));
+        }
         OseoOrdinaryObject *object = ordinary_object(current);
-        if (is_promise(current) && object->default_intrinsics &&
-            (oseo_internal_string_is_ascii(property, "then") ||
-             oseo_internal_string_is_ascii(property, "catch") ||
-             oseo_internal_string_is_ascii(property, "finally"))) {
-            return normal(oseo_boolean(true));
-        }
-        if (object->array_iterator && object->default_intrinsics &&
-            (oseo_internal_string_is_ascii(property, "next") ||
-             oseo_internal_iterator_key_matches(context, property))) {
-            return normal(oseo_boolean(true));
-        }
-        if (object->generator_prototype &&
-            (oseo_internal_string_is_ascii(property, "next") ||
-             oseo_internal_string_is_ascii(property, "return") ||
-             (object->default_intrinsics &&
-              oseo_internal_iterator_key_matches(context, property)))) {
-            return normal(oseo_boolean(true));
-        }
-        /* The asynchronous generator intrinsics need no case of their own:
-         * every method they carry is an ordinary own property, so the
-         * own-descriptor check above already reported it. */
-        if (is_array(current) && object->default_intrinsics &&
-            oseo_internal_iterator_key_matches(context, property)) {
-            return normal(oseo_boolean(true));
-        }
         current = object->prototype;
     }
     return normal(oseo_boolean(false));

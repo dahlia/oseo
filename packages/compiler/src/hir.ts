@@ -182,6 +182,19 @@ export type HirForOfTarget =
     };
 
 /**
+ * One resolved for-in head target with explicit binding identity.
+ *
+ * The enumerate head stores through the same references an iterate head
+ * does, so it shares that resolved shape. The two pattern kinds stay
+ * excluded structurally, matching the owned syntax the frontend admits.
+ */
+export type HirForInTarget = Exclude<
+  HirForOfTarget,
+  | { readonly kind: "assignment-pattern" }
+  | { readonly kind: "pattern-declaration" }
+>;
+
+/**
  * The named error constructors the profile admits as intrinsic values.
  * An unshadowed reference to one of these names resolves to the
  * runtime-owned constructor instead of an unknown-binding diagnostic.
@@ -866,7 +879,7 @@ export type HirExpression =
        * the `object` of a property get, delete, set, update, or step
        * expression, of a `method` call target, of an
        * `assignment-member` destructuring leaf, or of a `property`
-       * for-of head target. Lowering starts the
+       * for-of or for-in head target. Lowering starts the
        * lookup at the running function's home object prototype and keeps
        * `receiver` as the value a getter, setter, or method call
        * receives as `this`, which is the resolved `this` of the
@@ -925,6 +938,17 @@ export type HirStatement =
       readonly kind: "for";
       readonly test?: HirExpression;
       readonly update?: HirExpression;
+    })
+  | (LocatedSyntax & {
+      /**
+       * The enumerate head. A nullish subject skips the whole statement
+       * and no completion ever closes the enumeration, so it lowers
+       * separately from the iterate head it shares targets with.
+       */
+      readonly body: HirStatement;
+      readonly kind: "for-in";
+      readonly subject: HirExpression;
+      readonly target: HirForInTarget;
     })
   | (LocatedSyntax & {
       /** `for await`, which awaits each asynchronous iteration step. */

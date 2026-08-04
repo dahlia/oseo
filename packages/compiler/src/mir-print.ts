@@ -96,7 +96,11 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
             ? `%${operation.id}, %${operation.iteratorNextMethodResult}`
             : operation.iteratorValueResult != null
               ? `%${operation.id}, %${operation.iteratorValueResult}`
-              : `%${operation.id}`;
+              : operation.enumerateRecordResult != null
+                ? `%${operation.id}, %${operation.enumerateRecordResult}`
+                : operation.enumerateKeyResult != null
+                  ? `%${operation.id}, %${operation.enumerateKeyResult}`
+                  : `%${operation.id}`;
       const hintTextValue =
         operation.hint == null
           ? ""

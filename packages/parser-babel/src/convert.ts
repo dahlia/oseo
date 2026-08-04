@@ -16,6 +16,7 @@ import type {
   SyntaxClassStaticBlock,
   SyntaxExpression,
   SyntaxForDeclaration,
+  SyntaxForInTarget,
   SyntaxForOfTarget,
   SyntaxFunction,
   SyntaxGlobalObjectName,
@@ -2269,7 +2270,120 @@ export function statement(
     return { ...located, cases, discriminant, kind: "switch" };
   }
   if (value.type === "ForInStatement") {
-    return unsupported(context, value, "for-in statements are unsupported.");
+    const left = node(value.left);
+    const subjectNode = node(value.right);
+    const bodyNode = node(value.body);
+    if (left == null || subjectNode == null || bodyNode == null) {
+      return unsupported(context, value);
+    }
+    let target: SyntaxForInTarget | undefined;
+    if (left.type === "VariableDeclaration") {
+      if (left.declare === true) {
+        return unsupported(
+          context,
+          left,
+          "Ambient declarations are erased by TypeScript and unsupported.",
+        );
+      }
+      if (left.kind !== "const" && left.kind !== "let" && left.kind !== "var") {
+        return unsupported(
+          context,
+          left,
+          "A for-in declaration uses const, let, or var.",
+        );
+      }
+      const declarations = nodes(left.declarations);
+      const declaration = declarations[0];
+      const identifier = declaration == null ? undefined : node(declaration.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (
+        declarations.length !== 1 ||
+        declaration == null ||
+        identifier == null ||
+        declaration.init != null
+      ) {
+        // A head initializer is Annex B's legacy VarDeclaration form,
+        // which this profile does not implement.
+        return unsupported(
+          context,
+          left,
+          "A for-in declaration needs one uninitialized binding.",
+        );
+      }
+      if (rejectedThisBindingName(context, identifier, name)) return undefined;
+      if (name == null) {
+        return unsupported(
+          context,
+          identifier,
+          "A for-in declaration pattern head is unsupported.",
+        );
+      }
+      target = {
+        declarationKind: left.kind,
+        hint: typeHint(context, identifier.typeAnnotation),
+        kind: "declaration",
+        name,
+        range: location(context, declaration).range,
+      };
+    } else {
+      const assignmentTarget = unparenthesizedExpression(left) ?? left;
+      const name = identifierName(assignmentTarget);
+      if (name != null) {
+        target = {
+          kind: "binding",
+          name,
+          range: location(context, left).range,
+        };
+      } else if (
+        assignmentTarget.type === "ArrayPattern" ||
+        assignmentTarget.type === "ObjectPattern"
+      ) {
+        return unsupported(
+          context,
+          assignmentTarget,
+          "A for-in assignment pattern head is unsupported.",
+        );
+      } else {
+        const targetPrivateName = privateMemberName(assignmentTarget);
+        if (targetPrivateName != null) {
+          const object = privateReferenceObject(context, assignmentTarget);
+          if (object != null) {
+            target = {
+              kind: "private",
+              name: targetPrivateName,
+              object,
+              range: location(context, left).range,
+            };
+          }
+        } else {
+          // ForIn/OfBodyEvaluation evaluates the head's reference once
+          // per iteration and stores the enumerated key through it with
+          // PutValue, so a `super` operand carries its receiver the same
+          // way an ordinary `super` assignment does.
+          const member = memberParts(context, assignmentTarget, true);
+          if (member != null) {
+            target = {
+              key: member.key,
+              kind: "property",
+              object: member.object,
+              range: location(context, left).range,
+            };
+          }
+        }
+      }
+    }
+    if (target == null) {
+      return unsupported(
+        context,
+        left,
+        "A for-in head needs an assignment target.",
+      );
+    }
+    const subject = expression(context, subjectNode);
+    const body = statement(context, bodyNode, functionBody);
+    return subject == null || body == null
+      ? undefined
+      : { ...located, body, kind: "for-in", subject, target };
   }
   if (value.type === "ForOfStatement") {
     // `for await` is a parse error outside an async function or a module
@@ -2857,7 +2971,11 @@ export function collectVarStatement(
       )
     );
   }
-  if (value.type === "ForStatement" || value.type === "ForOfStatement") {
+  if (
+    value.type === "ForStatement" ||
+    value.type === "ForOfStatement" ||
+    value.type === "ForInStatement"
+  ) {
     const initNode = node(
       value.type === "ForStatement" ? value.init : value.left,
     );
