@@ -864,12 +864,17 @@ export type HirExpression =
       /**
        * The `super` operand of a property reference. It stands only as
        * the `object` of a property get, delete, set, update, or step
-       * expression or of a `method` call target. Lowering starts the
+       * expression, of a `method` call target, of an
+       * `assignment-member` destructuring leaf, or of a `property`
+       * for-of head target. Lowering starts the
        * lookup at the running function's home object prototype and keeps
        * `receiver` as the value a getter, setter, or method call
        * receives as `this`, which is the resolved `this` of the
        * enclosing class element and therefore the derived constructor's
-       * binding where one exists. A delete operand reads `receiver` for
+       * binding where one exists. A target position lowers that pair
+       * once per stored value and holds it until the value exists,
+       * because PutValue runs after the iterator step or property read
+       * that produces it. A delete operand reads `receiver` for
        * its temporal dead zone alone: ECMA-262 rejects the evaluated
        * `super` reference before any lookup starts, so no home object
        * prototype is read and no receiver is carried further.
