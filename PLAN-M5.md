@@ -26,11 +26,14 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. Unit 8.5n audited the current implementation, every
-source-located rejection named by the admitted profile, the applicable
-test262 inventory and results, and the complete known-gap list. No remaining
-gap is owned by the core expressions and bindings stream or the functions and
-executable syntax stream. The remaining gaps keep their M5b intrinsic and
+M5a remains open. Unit 8.5n audited the current implementation,
+source-located rejections, the admitted profile, the applicable test262
+inventory and results, and the known-gap list. It discovered that optional
+private access has parser, HIR, and MIR structural coverage but lacks native
+and differential evidence for its nullish short circuit, valid-brand access,
+and invalid-brand `TypeError` under both specialization policies and forced
+collection. A separate evidence unit in the core expressions and bindings
+stream owns that M5a follow-up. The remaining gaps keep their M5b intrinsic and
 global-object, module and asynchronous execution, standards harness, host, or
 accepted dynamic-source owners. The audit changes no semantics, compatibility
 classification, revision pin, generated domain, property seed, or case budget.
@@ -42,7 +45,8 @@ diagnostics and the `dynamic-source` manifest tag.
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
 track without reopening the M5 decision. Realms, agents, and shared memory
 remain classified through missing harness capabilities.
-The M5a portion of delivery item 5 is complete. The admitted syntax now
+The M5a portion of delivery item 5 remains open only for the optional private
+access evidence named above. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
@@ -744,8 +748,11 @@ through the same name. A private reference may use another object as its base
 and applies the same private-name lookup and brand check. At this checkpoint,
 `#name in object`, optional `?.#name` access, and a private reference used as a
 destructuring or `for-of` assignment target stayed rejected with source-located
-diagnostics; later units admit all three. `delete this.#name` remains an early
-error. Fixed
+diagnostics. Later units admit the brand check and private assignment target.
+The frontend now carries optional private access through HIR and MIR, but its
+native and differential evidence under both specialization policies and forced
+collection remains an M5a follow-up. `delete this.#name` remains an early error.
+Fixed
 native fixtures cover private fields, methods, accessors, brand checks,
 updates, the values private state can hold, and a hinted method that
 specializes while private elements surround it on every guard path. The
@@ -833,6 +840,18 @@ private accessor cases enter as passes. The reviewed subset gains the
 `class-static-methods-private` feature tag. The manifest moves to 1,883 passes,
 1,120 expected negatives, and 963 unsupported profile features with no
 semantic or harness failures.
+
+Subsequent evidence admits the private forms this checkpoint still rejected.
+`#name in object` has a fixed native differential fixture and a generated
+property with seed `0x5eed001d` that compares an independent brand model with
+Node.js, Deno, and native execution under both specialization policies and
+forced collection on the enabled path. Nineteen reviewed test262 cases cover
+its runtime behavior and early errors. Focused frontend tests pin private
+destructuring and for-of assignment targets through the existing private-set
+operation, and five reviewed test262 cases execute them under both
+specialization policies. M5a Units 8.5l and 8.5m later exercise the same
+private-target path in direct and object-pattern for-in heads under native
+differential execution, both specialization policies, and forced collection.
 
 Class static initialization blocks are now admitted, the tenth unit of the
 functions and executable syntax stream. A `static { ... }` element declares
@@ -1474,8 +1493,9 @@ property references, observable read and write key conversions, identifier
 function-name inference, and immutable failure. Forty-two reviewed test262
 `for-of` binding cases now pass because their `+=` loop bodies use the same
 lowering. An ordinary asynchronous function now retains the reference and
-already-read target value across suspension; module top level keeps its
-separate continuation restriction.
+already-read target value across suspension. Module top level uses its private
+traced frame for the same position; only the pattern-position module await gap
+recorded below remains.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
@@ -3331,14 +3351,20 @@ suite revision, inventory policy, manifest schema, reviewed feature list,
 dependency vocabulary, and classification vocabulary are unchanged, and
 the 41,091-path applicable-test inventory is unchanged.
 
-M5a Unit 8.5n is the final authoritative stale-profile-claims and gap audit.
+M5a Unit 8.5n is the authoritative stale-profile-claims and gap audit.
 It compares the admitted prose with the frontend and compiler diagnostics,
 the implemented lowering and runtime paths, the applicable-test inventory,
 and the reviewed results. Claims that `??`, logical assignment, BigInt
-update, private static elements, private brand checks, optional private
-access, private assignment targets, asynchronous generators,
-`export default class`, or traced module await positions remain rejected were
-stale and are corrected in the profile.
+update, private static elements, private brand checks, private assignment
+targets, asynchronous generators, `export default class`, or traced module
+await positions remain rejected were stale and are corrected in the profile.
+
+The audit also found one M5a evidence gap. Optional private access such as
+`obj?.#name` reaches parser-owned syntax, HIR, and MIR, but has no native or
+differential execution covering a nullish short circuit, valid-brand access,
+and invalid-brand `TypeError` under both specialization policies and forced
+collection. A separate evidence unit owned by the core expressions and
+bindings stream must close that gap before M5a completes.
 
 The executable rejections that remain have owners outside the two M5a
 streams. An array pattern reached from a `for-in` key needs the M5b string
@@ -3347,14 +3373,16 @@ literal method needs the M5b `Object.prototype`. A statically unresolved
 ordinary read or strict unresolved write needs the M5b global binding model
 to distinguish absent names from the realm's standard and mutable global
 properties; this includes the reviewed block- and switch-scope cases that
-expect a runtime `ReferenceError`. `import.meta`, `export var`, and module
-top-level pattern-position `await` remain with the modules and asynchronous
-execution stream. TypeScript-only syntax is outside the ECMA-262 claim, and
-dynamic source remains owned by ADR 0016. None is an unowned M5a semantic gap.
+expect a runtime `ReferenceError`. `import.meta`, `export var`, namespace
+re-exports such as `export * as ns from "./module.js"`, and module top-level
+pattern-position `await` remain with the modules and asynchronous execution
+stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
+source remains owned by ADR 0016.
 
-The audit therefore closes the M5a checkpoint without changing the reviewed
-manifest's 4,857 cases, 2,932 passes, 1,355 expected negatives, 570 unsupported
-profile features, zero semantic failures, or zero harness failures. The
+The audit therefore keeps the M5a checkpoint open for the separate optional
+private access evidence unit without changing the reviewed manifest's 4,857
+cases, 2,932 passes, 1,355 expected negatives, 570 unsupported profile
+features, zero semantic failures, or zero harness failures. The
 41,091-path inventory, suite and edition revision pins, property seeds and
 budgets, and compatibility overrides are unchanged.
 
