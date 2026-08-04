@@ -13,15 +13,12 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
-M5a remains open. Unit 8.5n audited the implementation, source-located
-rejections, admitted profile, applicable-test inventory and results, and the
-known-gap list. It discovered that optional private field and accessor reads
-and optional private method calls have structural coverage but lack native and
-differential semantic evidence. The evidence must cover nullish short circuit,
-valid-brand access, invalid-brand `TypeError`, and method receiver preservation
-under both specialization policies and forced collection. A separate unit in
-the core expressions and bindings stream owns that follow-up. M5b and M5c also
-remain open.
+M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
+found for optional private field and accessor reads and optional private method
+calls. Native differential fixtures and a generated property cover nullish
+short circuit, valid-brand access, invalid-brand `TypeError`, and method
+receiver preservation under both specialization policies and forced
+collection. M5b and M5c remain open.
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
@@ -631,17 +628,16 @@ admits the M5a Unit 8.1a primitive checkpoint only after exact generic
 semantics and the selected all-heap representation have collector and target
 evidence. The M5b intrinsic and prototype remain outside that checkpoint.
 
-M5a remains open because Unit 8.5n found one entry in the known-gaps list of
-[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) that the core
-expressions and bindings stream still owns. Optional private field and accessor
-reads and optional private method calls, including `object?.#method()`, need
-native and differential evidence for nullish short circuit, valid-brand access,
-invalid-brand `TypeError`, and method receiver preservation under both
-specialization policies and forced collection. The profile is the test, not a
-work queue. Genuine
-remaining rejections, including namespace re-exports, keep their M5b intrinsic
-and global-object, module and asynchronous execution, standards harness, host,
-or accepted dynamic-source owners.
+M5a is complete because Unit 8.5o supplies the last execution evidence that
+the Unit 8.5n audit assigned to the core expressions and bindings stream.
+Optional private field and accessor reads and optional private method calls,
+including `object?.#method()`, now have native and differential evidence for
+nullish short circuit, valid-brand access, invalid-brand `TypeError`, and
+method receiver preservation under both specialization policies and forced
+collection. The profile is the test, not a work queue. Genuine remaining
+rejections, including namespace re-exports, keep their M5b intrinsic and
+global-object, module and asynchronous execution, standards harness, host, or
+accepted dynamic-source owners.
 
 M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
@@ -1151,6 +1147,21 @@ landed with the M5 intrinsics units. The remaining queue is:
     changes none of the 4,857 reviewed cases, their 2,932 passes, 1,355 expected
     negatives, and 570 unsupported profile features, the 41,091-path inventory,
     revision pins, property seeds and budgets, or compatibility overrides.
+    Unit 8.5o supplies that optional private execution evidence and closes
+    M5a. The fixed native fixtures cover valid-brand field and accessor reads,
+    invalid-brand `TypeError`, nullish short circuit, optional private method
+    receiver preservation and argument suppression, both specialization
+    policies, truthful and false hints, and forced collection. A generated
+    property with seed `0x5eed003c` adds one domain, one seed, and twelve
+    ordinary cases with an independent Node.js oracle over field, accessor,
+    and method operations and valid, invalid, `null`, and `undefined`
+    receivers. Four test262 cases are reviewed: two optional-private grammar
+    cases pass, while two cases that require the `Object` intrinsic remain
+    unsupported under their M5b owner. The manifest reaches 4,861 reviewed
+    cases: 2,934 passes, 1,355 expected negatives, and 572 unsupported profile
+    features. No prior result moves, and the inventory, suite revision,
+    manifest schema and vocabulary, zero-override policy, and runtime ABI
+    `oseo-runtime-m5-43` are unchanged.
 3.  Add built-in families and close module and asynchronous boundaries in
     dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).

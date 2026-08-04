@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,857
-reviewed cases: 2,932 passes, 1,355 expected negatives, and 570 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,861
+reviewed cases: 2,934 passes, 1,355 expected negatives, and 572 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,19 +26,16 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a remains open. Unit 8.5n audited the current implementation,
-source-located rejections, the admitted profile, the applicable test262
-inventory and results, and the known-gap list. It discovered that optional
-private field and accessor reads and optional private method calls have parser,
-HIR, and MIR structural coverage but lack native and differential evidence.
-That evidence must cover nullish short circuit, valid-brand access,
-invalid-brand `TypeError`, and method receiver preservation under both
-specialization policies and forced collection. A separate evidence unit in the
-core expressions and bindings stream owns that M5a follow-up. The remaining
-gaps keep their M5b intrinsic and
+M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
+found for optional private field and accessor reads and optional private method
+calls. Fixed native fixtures and a generated differential property now cover
+nullish short circuit, valid-brand access, invalid-brand `TypeError`, and
+method receiver preservation under both specialization policies and forced
+collection. The remaining gaps keep their M5b intrinsic and
 global-object, module and asynchronous execution, standards harness, host, or
 accepted dynamic-source owners. The audit changes no semantics, compatibility
-classification, revision pin, generated domain, property seed, or case budget.
+classification, revision pin, generated domain, property seed, or case budget;
+Unit 8.5o adds one generated domain, one seed, and twelve ordinary cases.
 
 Delivery item 8 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
@@ -47,8 +44,8 @@ diagnostics and the `dynamic-source` manifest tag.
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
 track without reopening the M5 decision. Realms, agents, and shared memory
 remain classified through missing harness capabilities.
-The M5a portion of delivery item 5 remains open only for the optional private
-read and call evidence named above. The admitted syntax now
+The M5a portion of delivery item 5 is complete after the optional private read
+and call evidence named above. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
@@ -751,11 +748,11 @@ and applies the same private-name lookup and brand check. At this checkpoint,
 `#name in object`, optional `?.#name` access, and a private reference used as a
 destructuring or `for-of` assignment target stayed rejected with source-located
 diagnostics. Later units admit the brand check and private assignment target.
-The frontend now carries optional private reads and method calls through HIR
-and MIR, but native and differential evidence for their nullish short circuit,
-valid-brand access, invalid-brand `TypeError`, and method receiver preservation
-under both specialization policies and forced collection remains an M5a
-follow-up. `delete this.#name` remains an early error.
+The frontend carries optional private reads and method calls through HIR and
+MIR. M5a Unit 8.5o adds native and differential execution for their nullish
+short circuit, valid-brand access, invalid-brand `TypeError`, and method
+receiver preservation under both specialization policies and forced
+collection. `delete this.#name` remains an early error.
 Fixed
 native fixtures cover private fields, methods, accessors, brand checks,
 updates, the values private state can hold, and a hinted method that
@@ -3367,12 +3364,11 @@ await positions remain rejected were stale and are corrected in the profile.
 
 The audit also found one M5a evidence gap. Optional private field and accessor
 reads such as `object?.#field` and `object?.#accessor`, and optional private
-method calls such as `object?.#method()`, reach parser-owned syntax, HIR, and
-MIR, but have no native or differential execution covering nullish short
+method calls such as `object?.#method()`, reached parser-owned syntax, HIR, and
+MIR, but had no native or differential execution covering nullish short
 circuit, valid-brand access, invalid-brand `TypeError`, and method receiver
-preservation under both specialization policies and forced collection. A
-separate evidence unit owned by the core expressions and bindings stream must
-close that gap before M5a completes.
+preservation under both specialization policies and forced collection. Unit
+8.5o closes that gap.
 
 The executable rejections that remain have owners outside the two M5a
 streams. An array pattern reached from a `for-in` key needs the M5b string
@@ -3387,13 +3383,48 @@ pattern-position `await` remain with the modules and asynchronous execution
 stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
 source remains owned by ADR 0016.
 
-The audit therefore keeps the M5a checkpoint open for the separate optional
-private read and call evidence unit without changing the reviewed manifest's
-4,857
-cases, 2,932 passes, 1,355 expected negatives, 570 unsupported profile
-features, zero semantic failures, or zero harness failures. The
-41,091-path inventory, suite and edition revision pins, property seeds and
-budgets, and compatibility overrides are unchanged.
+At Unit 8.5n, the audit therefore kept the M5a checkpoint open for the
+separate optional private read and call evidence unit without changing the
+reviewed manifest's 4,857 cases, 2,932 passes, 1,355 expected negatives, 570
+unsupported profile features, zero semantic failures, or zero harness
+failures. The 41,091-path inventory, suite and edition revision pins, property
+seeds and budgets, and compatibility overrides were unchanged.
+
+M5a Unit 8.5o admits optional private field and accessor reads and optional
+private method calls through execution evidence. The optional guard runs
+before the private read, so `null` and `undefined` produce `undefined` without
+a brand check, getter call, method lookup, or argument evaluation. A live
+receiver reaches the existing private get, which performs the brand check and
+invokes an accessor getter where applicable. An optional private method call
+retains the live receiver as `this`. No parser, HIR, MIR, runtime, or ABI
+contract changes; the runtime ABI remains `oseo-runtime-m5-43`.
+
+The fixed *class-optional-private-reads* and
+*class-optional-private-methods* native differential fixtures cover valid-brand
+field and accessor reads, invalid-brand `TypeError`, method receiver
+preservation, nullish short circuit and argument suppression, truthful and
+false numeric hints, both specialization policies, and forced collection. The
+method fixture's enabled policy also proves both specialization guard hits and
+misses. The generated property uses seed `0x5eed003c` for twelve ordinary
+cases over field, accessor, and method operations; valid, invalid, `null`, and
+`undefined` receivers; bounded private values; and number or string method
+arguments. Its independent oracle predicts the result or `TypeError` and the
+exact receiver, getter, method, and argument evaluation log before comparison
+with Node.js, Deno, and native execution under both specialization policies.
+
+Four applicable test262 cases are reviewed at revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The expression and statement
+forms of *grammar-private-field-optional-chaining.js* pass. The corresponding
+*private-field-after-optional-chain.js* cases remain
+`unsupported-profile-feature` because they construct the receiver with
+`new Object()`, an M5b intrinsic boundary. No prior result moves. The manifest
+therefore reaches 4,861 cases: 2,934 passes, 1,355 expected negatives, and 572
+unsupported profile features, with no semantic or harness failures. The
+41,091-path inventory, suite revision, manifest schema and vocabulary, and
+zero-override policy are unchanged. The property inventory increases by one
+domain, one seed, and twelve ordinary cases. This evidence closes M5a; the
+remaining gaps keep their M5b, module and asynchronous execution, standards
+harness, host, or accepted dynamic-source owners.
 
 ### Intrinsics and built-in objects
 
