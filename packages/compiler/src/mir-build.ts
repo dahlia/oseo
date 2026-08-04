@@ -5397,6 +5397,15 @@ function lowerForInStatement(
       statement.target.range,
       builder,
     );
+  } else if (
+    statement.target.kind === "pattern-declaration" &&
+    statement.target.declarationKind !== "var"
+  ) {
+    for (const binding of hirBindingIdentifiers(statement.target.pattern)) {
+      // Every lexical pattern binding is created before the subject runs,
+      // so a same-name read in the subject observes the TDZ.
+      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+    }
   }
   const subject = lowerExpression(statement.subject, builder);
   appendMirMetadata(

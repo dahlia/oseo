@@ -185,14 +185,28 @@ export type HirForOfTarget =
  * One resolved for-in head target with explicit binding identity.
  *
  * The enumerate head stores through the same references an iterate head
- * does, so it shares that resolved shape. The two pattern kinds stay
- * excluded structurally, matching the owned syntax the frontend admits.
+ * does, so it shares that resolved shape. Both pattern kinds stay
+ * narrowed to an object pattern head, matching the owned syntax the
+ * frontend admits; the head's own array pattern form belongs to a later
+ * unit and never reaches HIR.
  */
-export type HirForInTarget = Exclude<
-  HirForOfTarget,
-  | { readonly kind: "assignment-pattern" }
-  | { readonly kind: "pattern-declaration" }
->;
+export type HirForInTarget =
+  | Exclude<
+      HirForOfTarget,
+      | { readonly kind: "assignment-pattern" }
+      | { readonly kind: "pattern-declaration" }
+    >
+  | {
+      readonly declarationKind: "const" | "let" | "var";
+      readonly kind: "pattern-declaration";
+      readonly pattern: HirObjectBindingPattern;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly kind: "assignment-pattern";
+      readonly pattern: HirObjectBindingPattern;
+      readonly range: SourceRange;
+    };
 
 /**
  * The named error constructors the profile admits as intrinsic values.

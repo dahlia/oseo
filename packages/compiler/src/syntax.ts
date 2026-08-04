@@ -773,17 +773,41 @@ export type SyntaxForOfTarget =
  *
  * ForIn/OfBodyEvaluation gives an enumerate head the same target shapes
  * an iterate head has, so the two heads share one representation rather
- * than describing the store twice. The two pattern kinds are excluded
- * structurally: an object pattern head belongs to the unit that admits
- * it, and no other pattern form is admitted before then, so a pattern
- * head is a source-located rejection instead of a representable target
- * with no lowering.
+ * than describing the store twice. Both pattern kinds are narrowed to an
+ * ObjectBindingPattern or ObjectAssignmentPattern head: the head's own
+ * array pattern form belongs to a later unit, so it stays a
+ * source-located rejection instead of a representable target with no
+ * lowering. The narrowing covers the head's own form only. An array
+ * pattern nested below it stays representable, because it is the object
+ * pattern's ordinary recursive shape and lowers like any other leaf. It
+ * is rejected for a separate reason, which is that the enumerated key is
+ * always a String and this realm creates no string iterator, and HIR
+ * construction reports that rejection for every frontend rather than
+ * relying on the bootstrap frontend's own check.
  */
-export type SyntaxForInTarget = Exclude<
-  SyntaxForOfTarget,
-  | { readonly kind: "assignment-pattern" }
-  | { readonly kind: "pattern-declaration" }
->;
+export type SyntaxForInTarget =
+  | Exclude<
+      SyntaxForOfTarget,
+      | { readonly kind: "assignment-pattern" }
+      | { readonly kind: "pattern-declaration" }
+    >
+  | {
+      readonly declarationKind: "const" | "let" | "var";
+      readonly kind: "pattern-declaration";
+      readonly pattern: SyntaxObjectBindingPattern<
+        SyntaxBindingPattern,
+        SyntaxBindingTarget
+      >;
+      readonly range: SourceRange;
+    }
+  | {
+      readonly kind: "assignment-pattern";
+      readonly pattern: SyntaxObjectBindingPattern<
+        SyntaxAssignmentPattern,
+        SyntaxAssignmentTarget
+      >;
+      readonly range: SourceRange;
+    };
 
 /** Runtime call and construction identity retained for every function. */
 export type FunctionKind =

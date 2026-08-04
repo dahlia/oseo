@@ -3156,7 +3156,8 @@ binding, and the strict `arguments` and `eval` head targets. The 28
 unsupported entries record prerequisites this unit does not change:
 eight completion-value cases and six scope cases need `eval`, six
 `S12.6.4_*` cases need `eval` or an undeclared global, four cases need
-`let` as an identifier, one needs a pattern head that M5a Unit 8.5m owns,
+`let` as an identifier, one needs an array pattern head, which stays
+outside the object pattern head M5a Unit 8.5m admits,
 one needs `Object.create` descriptor maps, one needs a resizable
 ArrayBuffer, and one needs a regular expression literal. Seven further
 `test/language/statements/for-in/` cases stay outside the subset because
@@ -3173,6 +3174,147 @@ gains `property-enumeration`, which names the EnumerateObjectProperties
 dependency the new cases share. The suite revision, inventory policy,
 manifest schema, and classification vocabulary are otherwise unchanged,
 and the 41,091-path applicable-test inventory is unchanged.
+
+M5a Unit 8.5m admits the object pattern `for-in` head. It changes nothing
+about the enumeration M5a Unit 8.5l established: the acquisition, the
+step, the skipped nullish subject, and the absent close are the same two
+owned operations, and the unit adds one representable head target rather
+than a second enumeration. ForIn/OfBodyEvaluation already gives an
+enumerate head the same per-iteration store an iterate head has, so an
+`ObjectBindingPattern` declaration head and an `ObjectAssignmentPattern`
+assignment head reuse the recursive destructuring the profile owns for
+standalone declarations, for-of heads, and destructuring assignments.
+
+The order the unit pins follows from where the pattern sits. A `let` or
+`const` head creates its own lexical environment before the subject
+expression runs, so every bound name of the pattern is in its temporal
+dead zone while the subject is evaluated, and ForIn/OfBodyEvaluation
+creates a fresh environment holding all of them again on each iteration,
+which is what makes a closure created in one iteration observe that
+iteration's cells. A `var` head and an assignment head resolve in the
+surrounding environment instead and write the same cells every iteration.
+The step produces the value first, so the whole pattern runs after it:
+RequireObjectCoercible applies to the enumerated String key, never to the
+subject; each AssignmentProperty or BindingProperty then evaluates its
+property name, then its target reference where it has one, then `GetV`,
+then a default only when `GetV` answered `undefined`, then the store. A
+final rest property snapshots the key's own enumerable string keys and
+excludes every property name evaluated before it. An abrupt completion
+anywhere in the pattern, including a poisoned computed name, a `GetV`
+that throws, a nullish nested pattern input, and a failed store, leaves
+the loop through the enclosing transfer, because an enumerate head has no
+iterator to close; the enumeration record is simply dropped. A label
+binds to the statement's own transfers unchanged, an identifier leaf
+resolved through `with` reaches PutValue on the object environment
+exactly as a direct head target does, and a strict fallback write keeps
+the M5a Unit 8.5i rejection while a non-strict one records its name so
+that unit's `typeof` fold stays rejected for it. A pattern subexpression
+may `await` wherever the M5a Unit 8.3 positions may, which is a body that
+owns a traced suspension frame; a module top level keeps that unit's
+rejection, now located at the for-in statement that carries the head.
+
+Because ToObject of the key is modeled rather than materialized, the
+values a head pattern can read are exactly a String exotic object's: one
+enumerable own index property per code unit and a non-enumerable
+`length`. That is enough for the whole object pattern family. It is not
+enough for an array pattern, and that is why this unit keeps every array
+pattern position rejected rather than admitting the head form the shared
+lowering would otherwise accept. This realm creates no string iterator,
+so an array pattern reached from a for-in head could only report a
+`TypeError` where ECMA-262 destructures the key's code units; a
+source-located rejection is the honest answer until the string iterator
+exists. The rejection covers the head's own array pattern form, which a
+later unit owns anyway, and an array pattern nested below an admitted
+object head, which the same evidence excludes. Owned syntax can still
+represent the nested form, because it is the object pattern's ordinary
+recursive leaf, so HIR construction repeats the rejection for every
+frontend instead of leaving it to the bootstrap frontend alone. A
+reserved word used as a binding name anywhere in the head stays the
+early error it already is, reported before either boundary. The other retained
+boundaries are unchanged and unrelated to patterns: Annex B's head
+initializer, a multi-declarator head, and a head target the profile
+cannot represent all keep their existing source-located diagnostics, and
+the reserved-word, duplicate-name, and invalid-target early errors stay
+where the bootstrap parser and the profile's early-error checks already
+report them.
+
+Owned syntax narrows the two for-of pattern target kinds to an object
+pattern instead of adding a head of its own, so an array pattern head is
+unrepresentable rather than representable with no lowering, and every
+leaf below the head keeps the recursive shape the pattern already has.
+HIR resolves a lexical pattern head's names into the head environment
+before the subject and an assignment or `var` head's leaves in the
+surrounding scopes, rejecting a duplicate lexical name in the head
+because owned syntax does not assume a particular frontend reported it.
+MIR resets each lexical leaf once before the subject and once per
+iteration, then reuses `lowerForHeadTarget`, which already routes both
+pattern kinds into the shared binding-pattern lowering; no MIR operation,
+no runtime entry point, and no ABI change follow, so the runtime ABI
+stays `oseo-runtime-m5-43`. Specialization has no effect: the head has no
+guard, no cache, and no generic fallback to choose between, so both
+policies lower and emit the same operations.
+
+Frontend tests assert that a `const`, `let`, `var`, and assignment object
+pattern head all convert to owned syntax, including a computed name, a
+default, a rest property, a nested object pattern, and ordinary member,
+private, and `super` leaves, and that the lowered program holds exactly
+one acquisition, one step, and no iterator operation at all under both
+specialization policies. Separate structural tests assert that the
+enumeration step precedes RequireObjectCoercible of the key, that a
+property name precedes its target reference and that `GetV` follows it,
+that a `super` leaf reads its receiver before GetSuperBase and converts
+its own key only after the value exists, that each lexical leaf resets
+twice while a `var` head resets none, that the head's temporal dead zone
+reaches the subject, and that every array pattern position and every
+`with` fallback boundary keeps its source-located rejection, and that a
+reserved-word binding name in the head reports its early error first.
+Compiler-core tests build a nested array pattern head directly in owned
+syntax, bypassing the frontend, and pin the HIR rejection for the
+lexical, `var`, and assignment forms. A module
+test pins that an `await` inside the head pattern keeps the M5a Unit 8.3
+module top-level rejection at the statement that carries it. A fixed
+*for-in-object-patterns* native differential fixture covers the four head
+forms, computed names and their evaluation order, defaults applied only
+to `undefined`, a rest property and the keys it excludes, a nested object
+pattern, member, computed member, private, and `super` leaves, nullish
+and non-object subjects, a string subject, an abrupt nested pattern, an
+abrupt computed name, per-iteration closure identity, labeled `break` and
+`continue`, a `return` through `finally`, a `with`-resolved leaf, the
+head temporal dead zone, a read-only strict target, and a suspension
+inside a generator and an asynchronous function body, under both
+specialization policies with forced collection, and asserts that the
+emitted C acquires and steps the enumeration and never closes an
+iterator. Node.js strips types from a *.ts* reference file and its
+TypeScript parser rejects a destructuring for-in head that ECMA-262
+admits, so the fixture hands both reference hosts the same source as a
+global Script. A generated property with seed `0x5eed0030` draws one to
+three properties with static and computed present, absent, and index
+names, optional defaults, identifier, member, and nested pattern leaves,
+and an optional rest property, through all four head forms and over
+object, empty object, string, number, `null`, and `undefined` subjects,
+and checks the evaluated-name log, every stored value, the rest object,
+and the abrupt completion against an independent transcription of
+ForIn/OfBodyEvaluation's destructuring alongside Node.js and Deno
+references, both specialization policies, and forced collection.
+
+The applicable-test inventory holds no case that destructures a for-in
+key with an object pattern and executes. Every applicable case is an
+early error: the fourteen `test/language/statements/for-in/dstr/obj-*`
+cases and *head-lhs-invalid-asnmt-ptrn-obj.js* are already reviewed as
+expected negatives, and they stay negatives, which is what proves this
+unit admits the head without weakening the early errors around it. Seven
+reviewed cases record the array pattern head boundary instead of a
+pattern head boundary in general; their classification does not move, and
+only the rejection text the manifest quotes changes.
+*head-let-destructuring.js*, *head-var-bound-names-dup.js*, and the five
+`scope-*` cases all use a `let [` or `var [` head, so they stay
+`unsupported-profile-feature` at the array pattern head boundary. The
+manifest therefore
+holds 4,857 cases: 2,932 passes, 1,355 expected negatives, and 570
+unsupported profile features with no semantic or harness failures. The
+suite revision, inventory policy, manifest schema, reviewed feature list,
+dependency vocabulary, and classification vocabulary are unchanged, and
+the 41,091-path applicable-test inventory is unchanged.
 
 ### Intrinsics and built-in objects
 

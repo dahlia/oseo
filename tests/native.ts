@@ -213,11 +213,17 @@ for (const fixture of selectedFixtures) {
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
   }
 
-  if (fixture.name === "for-in" || fixture.name === "for-in-enumeration") {
+  if (
+    fixture.name === "for-in" ||
+    fixture.name === "for-in-enumeration" ||
+    fixture.name === "for-in-object-patterns"
+  ) {
     // Both policies lower the enumerate head to the same two owned
     // operations, and neither emits an iterator close: an enumerate
     // iterator is never closed, so no head or body completion routes
-    // through one.
+    // through one. An object pattern head adds no iterator either, so
+    // its abrupt property read, default, and rest leave the loop through
+    // the enclosing transfer alone.
     for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
       assert.match(text, /enumerate-get EnumerateObjectProperties/u);
       assert.match(text, /enumerate-next enumeration step/u);
@@ -328,6 +334,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "for-of" ||
     fixture.name === "for-in" ||
     fixture.name === "for-in-enumeration" ||
+    fixture.name === "for-in-object-patterns" ||
     fixture.name === "for-await-of-frame-suspension" ||
     fixture.name === "for-await-of-close-suspension" ||
     fixture.name === "in-and-instanceof" ||
@@ -409,7 +416,8 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "for-in" ||
-            fixture.name === "for-in-enumeration"
+            fixture.name === "for-in-enumeration" ||
+            fixture.name === "for-in-object-patterns"
           ) {
             // An enumerate head is not the iterator protocol: it acquires
             // and steps its own record and is never closed, so no

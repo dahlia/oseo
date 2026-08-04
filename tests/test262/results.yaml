@@ -144038,7 +144038,7 @@ results:
       detail: 'test/language/statements/for-in/head-let-destructuring.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/head-let-destructuring.js:95:10:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144280,7 +144280,7 @@ results:
       detail: 'test/language/statements/for-in/head-var-bound-names-dup.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/head-var-bound-names-dup.js:81:10:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144828,7 +144828,7 @@ results:
       detail: 'test/language/statements/for-in/scope-body-lex-close.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/scope-body-lex-close.js:101:9:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144856,7 +144856,7 @@ results:
       detail: 'test/language/statements/for-in/scope-body-lex-open.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/scope-body-lex-open.js:108:9:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144884,7 +144884,7 @@ results:
       detail: 'test/language/statements/for-in/scope-body-var-none.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/scope-body-var-none.js:106:9:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144912,7 +144912,7 @@ results:
       detail: 'test/language/statements/for-in/scope-head-lex-close.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/scope-head-lex-close.js:105:9:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false
@@ -144974,7 +144974,7 @@ results:
       detail: 'test/language/statements/for-in/scope-head-var-none.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/statements/for-in/scope-head-var-none.js:104:9:
-        error[OSEO1001]: A for-in declaration pattern head is
+        error[OSEO1001]: A for-in array pattern target is
         unsupported.\n"'
       unsupportedCapability: profile-syntax
       harnessFailed: false

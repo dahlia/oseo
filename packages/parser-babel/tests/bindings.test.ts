@@ -904,6 +904,8 @@ test("rejects module top-level pattern await at its statement", () => {
     "const target = {};\n[target[await 'k']] = [1];\n",
     "try { throw {}; } catch ({ value = await 1 }) { value; }\n",
     "const target = {};\nfor ([target[await 'k']] of [[1]]) target;\n",
+    "for (const { [await 'k']: value } in {}) value;\n",
+    "let value;\nfor ({ [await 'k']: value } in {}) value;\n",
   ];
   for (const source of rejected) {
     const sourceId = "file:///app/module-pattern-await.js";

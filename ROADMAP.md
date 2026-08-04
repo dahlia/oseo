@@ -1096,7 +1096,30 @@ landed with the M5 intrinsics units. The remaining queue is:
     `super` property and a private member; a pattern head is a
     source-located rejection that Unit 8.5m owns. The runtime ABI moves
     to `oseo-runtime-m5-43` for the two owned enumeration entry
-    points.
+    points. Unit 8.5m then admits the object pattern head, in both its
+    `ObjectBindingPattern` declaration and `ObjectAssignmentPattern`
+    assignment forms, without changing that enumeration: the acquisition,
+    the step, the skipped nullish subject, and the absent close are the
+    same two owned operations, and the head reuses the recursive
+    destructuring the profile already owns for standalone declarations,
+    for-of heads, and destructuring assignments. A lexical head creates
+    every bound name before the subject runs and again on each iteration,
+    so the subject observes the temporal dead zone and a closure observes
+    its own iteration's cells, while a `var` or assignment head resolves
+    in the surrounding environment. The whole pattern runs after the step
+    that produced the key, so RequireObjectCoercible applies to the
+    enumerated String key; each property evaluates its name, then its
+    target reference, then `GetV`, then a default only for `undefined`,
+    then the store; and a rest property excludes every name evaluated
+    before it. Any abrupt completion leaves the loop through the
+    enclosing transfer, because an enumerate head has no iterator to
+    close. Every array pattern position stays a source-located rejection,
+    both the head's own form and one nested below an admitted object
+    head: the key is always a String and this realm creates no string
+    iterator, so an array pattern could only report a `TypeError` where
+    ECMA-262 destructures the key's code units. Annex B's head
+    initializer and a multi-declarator head keep their existing
+    rejections, and the runtime ABI is unchanged.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows
