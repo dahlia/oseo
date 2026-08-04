@@ -4,7 +4,7 @@ import { isDeepStrictEqual } from "node:util";
 import {
   summarizeTest262,
   test262Group,
-} from "../packages/testkit/src/index.ts";
+} from "../packages/testkit/src/test262-summary.ts";
 import type {
   Test262Classification,
   Test262Result,

@@ -2,7 +2,10 @@
   "name": "@oseo/testkit",
   "version": "0.1.0",
   "license": "GPL-3.0-only",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./test262-summary": "./src/test262-summary.ts"
+  },
   "publish": {
     "exclude": ["dist/", "tests/"]
   }

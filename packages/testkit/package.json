@@ -26,6 +26,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./test262-summary": {
+      "types": "./dist/test262-summary.d.ts",
+      "import": "./dist/test262-summary.js"
     }
   },
   "dependencies": {

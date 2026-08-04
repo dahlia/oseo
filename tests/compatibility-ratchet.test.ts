@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
-import { summarizeTest262 } from "../packages/testkit/src/index.ts";
+import { summarizeTest262 } from "../packages/testkit/src/test262-summary.ts";
 import type {
   Test262Classification,
   Test262Result,
@@ -20,6 +23,8 @@ import type {
   ResultManifestSource,
 } from "../tools/compatibility-ratchet.ts";
 import { serializeTest262Manifest } from "../tools/test262-manifest.ts";
+
+const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 
 function subset(paths: readonly string[]): string {
   return JSON.stringify({
@@ -126,6 +131,30 @@ function snapshot(
     properties,
   );
 }
+
+test("loads the ratchet without compiler build artifacts", () => {
+  const source = `
+import { registerHooks } from "node:module";
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    const result = nextResolve(specifier, context);
+    if (result.url.includes("/packages/compiler/dist/")) {
+      throw new Error("ratchet loaded a compiler build artifact");
+    }
+    return result;
+  },
+});
+
+await import("./tools/compatibility-ratchet.ts");
+`;
+  const result = spawnSync(
+    process.execPath,
+    ["--input-type=module", "--eval", source],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
+  assert.equal(result.status, 0, result.stderr);
+});
 
 test("accepts unchanged and monotonically growing compatibility", () => {
   const baseline = snapshot();
