@@ -1055,6 +1055,103 @@ test("rejects assignment members in owned for-of declarations", () => {
   );
 });
 
+test("rejects nested array patterns in owned for-in heads", () => {
+  // Owned syntax narrows a for-in head to an object pattern, but a
+  // nested array pattern stays representable as an ordinary recursive
+  // leaf. The enumerated key is always a String and this realm creates
+  // no string iterator, so HIR repeats the frontend's rejection for any
+  // frontend rather than lowering an iterator acquisition that could
+  // only throw.
+  const nested = {
+    elements: [
+      {
+        pattern: { hints: [], kind: "binding-identifier", name: "x", range },
+        range,
+      },
+    ],
+    kind: "array-binding-pattern",
+    range,
+  };
+  const heads = [
+    { declarationKind: "const", kind: "pattern-declaration", range },
+    { declarationKind: "var", kind: "pattern-declaration", range },
+    { kind: "assignment-pattern", range },
+  ] as const;
+  for (const head of heads) {
+    const result = buildHir({
+      body: [
+        {
+          hint: undefined,
+          initializer: { kind: "undefined", range },
+          kind: "let",
+          name: "x",
+          range,
+        },
+        {
+          body: { body: [], kind: "block", range },
+          kind: "for-in",
+          range,
+          subject: { kind: "object", properties: [], range },
+          target: {
+            ...head,
+            pattern: {
+              kind: "object-binding-pattern",
+              properties: [
+                {
+                  key: { kind: "string", range, value: "0" },
+                  pattern: nested,
+                  range,
+                },
+              ],
+              range,
+            },
+          },
+        },
+      ],
+      kind: "program",
+      range,
+      sourceId: "invalid-for-in-array-pattern.ts",
+    } as unknown as SyntaxProgram);
+    assert.equal(result.program, undefined, head.kind);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /for-in array pattern target is unsupported/u,
+      head.kind,
+    );
+  }
+});
+
+test("rejects a non-object owned for-in head pattern", () => {
+  const result = buildHir({
+    body: [
+      {
+        body: { body: [], kind: "block", range },
+        kind: "for-in",
+        range,
+        subject: { kind: "object", properties: [], range },
+        target: {
+          declarationKind: "let",
+          kind: "pattern-declaration",
+          pattern: {
+            elements: [],
+            kind: "array-binding-pattern",
+            range,
+          },
+          range,
+        },
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "invalid-for-in-head-pattern.ts",
+  } as unknown as SyntaxProgram);
+  assert.equal(result.program, undefined);
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /for-in head pattern must be an object pattern/u,
+  );
+});
+
 test("retains lexical reads for runtime temporal-dead-zone checks", () => {
   const syntax: SyntaxProgram = {
     body: [

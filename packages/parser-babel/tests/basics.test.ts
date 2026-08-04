@@ -2258,11 +2258,12 @@ test("keeps every super target composition this unit does not admit", () => {
       "class A { static m(it) { for (super.x of it) {} } }",
       /only valid in the body of a class element whose class has an/u,
     ],
-    // The enumerate head admits the same `super` target, but a pattern
-    // head belongs to the unit that admits object patterns.
+    // M5a Unit 8.5m admits the same `super` target inside an enumerate
+    // head's object pattern; an array pattern position keeps its own
+    // boundary there.
     [
-      "class A {}\nclass B extends A { m(o) { for ({ p: super.x } in o) {} } }",
-      /for-in assignment pattern head is unsupported/u,
+      "class A {}\nclass B extends A { m(o) { for ([super.x] in o) {} } }",
+      /for-in array pattern target is unsupported/u,
     ],
   ];
   for (const [source, message] of cases) {

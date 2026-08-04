@@ -1743,4 +1743,209 @@ console.log("well-known-symbol", keysOf(Symbol.iterator));
 console.log("other-primitives", keysOf(1) + keysOf(true) + keysOf(2n));
 `,
   },
+  {
+    // Node.js strips types from a *.ts reference file, and its TypeScript
+    // parser rejects a destructuring for-in head that ECMA-262 admits, so
+    // this fixture hands both hosts the same source as a global Script
+    // instead of writing the head into a typed reference file.
+    globalScriptReference: true,
+    name: "for-in-object-patterns",
+    source: `
+function record(label, value) { console.log(label, value); }
+
+const subject = { ab: 1, cd: 2 };
+
+let text = "";
+for (const { length: size, 0: head } in subject) {
+  text = text + head + size + " ";
+}
+record("const-head", text);
+
+text = "";
+for (let { 1: tail } in subject) { text = text + tail; }
+record("let-head", text);
+
+text = "";
+for (var { length: varSize } in subject) { text = text + varSize; }
+record("var-head", varSize + ":" + text);
+
+let assignedHead = "";
+let assignedSize = 0;
+text = "";
+for ({ 0: assignedHead, length: assignedSize } in subject) {
+  text = text + assignedHead + assignedSize + " ";
+}
+record("assignment-head", text + assignedHead + assignedSize);
+
+let order = "";
+function key(name) { order = order + name + ","; return name; }
+for (const { [key("0")]: first, [key("length")]: len } in { ef: 1 }) {
+  order = order + "body:" + first + len;
+}
+record("computed-key-order", order);
+
+text = "";
+for (
+  const { missing: fallback = "D", length: present = "unused" } in { gh: 1 }
+) {
+  text = text + fallback + present;
+}
+record("defaults", text);
+
+for (const { 0: skipped, ...rest } in { ij: 1 }) {
+  record(
+    "rest",
+    skipped + " " + Object.keys(rest).length + " " + Object.keys(rest)[0] +
+      " " + rest[1] + " " + rest.length,
+  );
+}
+
+for (const { 0: { length: nestedLength } } in { kl: 1 }) {
+  record("nested", nestedLength);
+}
+
+const holder = {};
+let slotCount = 0;
+function nextSlot() { slotCount = slotCount + 1; return "slot" + slotCount; }
+for ({ 0: holder.direct, length: holder[nextSlot()] } in { mn: 1, op: 2 }) {}
+record(
+  "member-targets",
+  holder.direct + " " + holder.slot1 + holder.slot2 + " " + slotCount,
+);
+
+class Base {}
+class Derived extends Base {
+  #slot = "";
+  read() { return this.#slot; }
+  run(source) {
+    for ({ 0: super.stored, length: this.#slot } in source) {}
+    return this.stored;
+  }
+}
+const derived = new Derived();
+record("super-target", derived.run({ qr: 1 }));
+record("private-target", derived.read());
+
+let skipped2 = 0;
+for (const { length: ignored } in null) { skipped2 = skipped2 + 1; }
+for (const { length: ignored } in undefined) { skipped2 = skipped2 + 1; }
+for (const { length: ignored } in 7) { skipped2 = skipped2 + 1; }
+for (const { length: ignored } in true) { skipped2 = skipped2 + 1; }
+record("skipped", skipped2);
+
+text = "";
+for (const { length: stringSize } in "ab") { text = text + stringSize; }
+record("string-subject", text);
+
+try {
+  for (const { missing: { length: unreachable } } in { st: 1 }) {
+    record("unreachable", 1);
+  }
+} catch (error) { record("abrupt-nested", error instanceof TypeError); }
+
+let steps = 0;
+function poison() { throw new RangeError("poisoned key"); }
+try {
+  for (
+    const { [(steps = steps + 1, steps === 2 ? poison() : "length")]: n }
+    in { uv: 1, wx: 2 }
+  ) {}
+} catch (error) {
+  record("abrupt-key", error instanceof RangeError ? steps : "no");
+}
+
+const readers = [];
+let count = 0;
+for (let { length: captured } in { yz: 1, abc: 2 }) {
+  readers[count] = function () { return captured; };
+  count = count + 1;
+}
+record("per-iteration-cells", readers[0]() + "," + readers[1]());
+
+text = "";
+outer: for (const { length: outerLength } in { a: 1, bb: 2 }) {
+  for (const { length: innerLength } in { c: 1, dd: 2 }) {
+    if (innerLength === 2) continue outer;
+    text = text + outerLength + innerLength + " ";
+  }
+  text = text + "|";
+}
+record("labeled-continue", text);
+
+text = "";
+stop: for (const { length: outerLength } in { a: 1, bb: 2 }) {
+  for (const { 0: innerHead } in { c: 1, dd: 2 }) {
+    if (innerHead === "d") break stop;
+    text = text + outerLength + innerHead + " ";
+  }
+}
+record("labeled-break", text);
+
+function earlyReturn(source) {
+  try {
+    for (const { length: size } in source) { return "returned:" + size; }
+  } finally { console.log("finally-ran"); }
+  return "none";
+}
+record("abrupt-return", earlyReturn({ efg: 1 }));
+
+var withProbe = "outer";
+with ({ withProbe: "inner" }) {
+  for ({ length: withProbe } in { gh: 1 }) {}
+  record("with-target", withProbe);
+}
+record("with-outer", withProbe);
+
+try {
+  for (const { length: dead } in { [dead]: 1 }) {}
+} catch (error) { record("head-dead-zone", error instanceof ReferenceError); }
+
+function strictTarget() {
+  "use strict";
+  const frozen = {};
+  Object.defineProperty(frozen, "fixed", {
+    value: 0,
+    writable: false,
+    enumerable: true,
+    configurable: false,
+  });
+  try {
+    for ({ length: frozen.fixed } in { ij: 1 }) {}
+    return "no throw";
+  } catch (error) { return "threw:" + (error instanceof TypeError); }
+}
+record("strict-readonly-target", strictTarget());
+
+function* generate(source) {
+  for (const { length: size, 0: head } in source) { yield head + size; }
+}
+const iterator = generate({ klm: 1, n: 2 });
+record(
+  "generator",
+  iterator.next().value + "," + iterator.next().value + "," +
+    iterator.next().done,
+);
+
+async function collect(source) {
+  let joined = "";
+  for (const { length: size } in source) { joined = joined + await size; }
+  return joined;
+}
+
+async function awaitedHead(source) {
+  let joined = "";
+  for (const { [await "length"]: size = await "D" } in source) {
+    joined = joined + size;
+  }
+  const box = {};
+  for ({ [await "0"]: box[await "slot"] } in source) {}
+  return joined + ":" + box.slot;
+}
+
+collect({ n: 1, opq: 2 }).then(function (value) { record("async", value); });
+awaitedHead({ ab: 1, cde: 2 }).then(function (value) {
+  record("awaited-head", value);
+});
+`,
+  },
 ];

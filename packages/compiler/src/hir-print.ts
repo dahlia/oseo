@@ -551,13 +551,18 @@ function appendHirStatement(
       statement.target.kind === "declaration"
         ? `${statement.target.declarationKind} ` +
           `%b${statement.target.bindingId} ${statement.target.name}`
-        : statement.target.kind === "binding"
-          ? `%b${statement.target.bindingId} ${statement.target.name}`
-          : statement.target.kind === "private"
-            ? `${printHirExpression(statement.target.object)}.` +
-              printHirPrivateName(statement.target.privateName)
-            : `${printHirExpression(statement.target.object)}[` +
-              `${printHirExpression(statement.target.key)}]`;
+        : statement.target.kind === "pattern-declaration"
+          ? `${statement.target.declarationKind} ` +
+            printHirBindingPattern(statement.target.pattern)
+          : statement.target.kind === "assignment-pattern"
+            ? printHirBindingPattern(statement.target.pattern)
+            : statement.target.kind === "binding"
+              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              : statement.target.kind === "private"
+                ? `${printHirExpression(statement.target.object)}.` +
+                  printHirPrivateName(statement.target.privateName)
+                : `${printHirExpression(statement.target.object)}[` +
+                  `${printHirExpression(statement.target.key)}]`;
     lines.push(
       `${indent}for (${target} in ` +
         `${printHirExpression(statement.subject)})${location}`,

@@ -17,12 +17,14 @@ import type {
   HirClassField,
   HirClassNameBinding,
   HirClassThisBinding,
+  HirArrayBindingPattern,
   HirExpression,
   HirForDeclaration,
   HirForInTarget,
   HirForOfTarget,
   HirFunction,
   HirGlobalObjectBinding,
+  HirObjectBindingPattern,
   HirObjectBindingProperty,
   HirObjectProperty,
   HirOptionalChainLink,
@@ -1930,6 +1932,15 @@ export function declaredHirBindingIds(
         statement.target.declarationKind !== "var"
       ) {
         result.push(statement.target.bindingId);
+      } else if (
+        statement.target.kind === "pattern-declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        result.push(
+          ...hirBindingIdentifiers(statement.target.pattern).map(
+            (item) => item.bindingId,
+          ),
+        );
       }
       result.push(...declaredHirBindingIds([statement.body]));
     } else if (statement.kind === "switch") {
@@ -2473,21 +2484,111 @@ function resolveBindingPattern(
 }
 
 /**
+ * The first array pattern anywhere inside a resolved for-in head pattern.
+ *
+ * An object pattern's rest target is a leaf, so only a property's own
+ * pattern can nest another pattern.
+ */
+function forInArrayPattern(
+  pattern: HirBindingPattern,
+): HirArrayBindingPattern | undefined {
+  if (pattern.kind === "array-binding-pattern") return pattern;
+  if (pattern.kind !== "object-binding-pattern") return undefined;
+  for (const property of pattern.properties) {
+    const found = forInArrayPattern(property.pattern);
+    if (found != null) return found;
+  }
+  return undefined;
+}
+
+/**
+ * Narrow a resolved for-in head pattern to the array-free object pattern
+ * the head admits.
+ *
+ * Owned syntax keeps the head's own array pattern form unrepresentable,
+ * but a nested one stays representable because it is an ordinary
+ * recursive leaf of the object pattern. ForIn/OfBodyEvaluation always
+ * supplies a String key and this realm creates no string iterator, so an
+ * array pattern reached from a for-in head could only report a
+ * `TypeError` where ECMA-262 destructures the key's code units. The
+ * bootstrap frontend rejects both forms while converting; this boundary
+ * repeats the rejection for any frontend, so no admitted head lowers to a
+ * divergence.
+ */
+function forInHeadPattern(
+  pattern: HirBindingPattern | undefined,
+  located: LocatedSyntax,
+  state: ResolveState,
+): { readonly pattern: HirObjectBindingPattern } | undefined {
+  if (pattern == null) return undefined;
+  if (pattern.kind !== "object-binding-pattern") {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        located,
+        "A for-in head pattern must be an object pattern.",
+      ),
+    );
+    return undefined;
+  }
+  const nested = forInArrayPattern(pattern);
+  if (nested != null) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        nested,
+        "A for-in array pattern target is unsupported.",
+      ),
+    );
+    return undefined;
+  }
+  return { pattern };
+}
+
+/**
  * Resolve a for-in head target against the scopes outside the head's own
  * lexical environment.
  *
  * ForIn/OfBodyEvaluation evaluates an assignment or `var` head reference
  * once per iteration in the surrounding environment, so only a `let` or
- * `const` head sees the fresh binding `declaredBinding` names. The
- * subject expression is resolved by the caller, because the head
- * environment exists while it runs and this reference does not.
+ * `const` head sees the fresh binding `declaredBinding` names or the
+ * `headScopes` a lexical pattern head declares. The subject expression is
+ * resolved by the caller, because the head environment exists while it
+ * runs and these references do not.
  */
 function resolveForInTarget(
   target: SyntaxForInTarget,
   scopes: readonly Map<string, Binding>[],
+  headScopes: readonly Map<string, Binding>[],
   declaredBinding: Binding | undefined,
   state: ResolveState,
 ): HirForInTarget | undefined {
+  if (target.kind === "pattern-declaration") {
+    // A lexical pattern head initializes the cells its own head
+    // environment declares; a `var` pattern head writes the hoisted cells
+    // of the surrounding environment instead.
+    const lexical = target.declarationKind !== "var";
+    const pattern = resolveBindingPattern(
+      target.pattern,
+      lexical ? headScopes : scopes,
+      state,
+      lexical ? "declare" : "write",
+      false,
+    );
+    const narrowed = forInHeadPattern(pattern, target.pattern, state);
+    return narrowed == null ? undefined : { ...target, ...narrowed };
+  }
+  if (target.kind === "assignment-pattern") {
+    const pattern = resolveBindingPattern(
+      target.pattern,
+      scopes,
+      state,
+      "write",
+      true,
+    );
+    const narrowed = forInHeadPattern(pattern, target.pattern, state);
+    return narrowed == null ? undefined : { ...target, ...narrowed };
+  }
   if (target.kind === "declaration") {
     const binding = declaredBinding ?? findBinding(scopes, target.name);
     if (binding == null) {
@@ -2974,11 +3075,36 @@ function resolveStatement(
         ...scopes,
         new Map([[statement.target.name, declaredBinding]]),
       ];
+    } else if (
+      statement.target.kind === "pattern-declaration" &&
+      statement.target.declarationKind !== "var"
+    ) {
+      const patternScope = new Map<string, Binding>();
+      for (const name of syntaxBindingNames(statement.target.pattern)) {
+        if (patternScope.has(name)) {
+          state.diagnostics.push(
+            sourceDiagnostic(
+              state.sourceId,
+              statement.target.pattern,
+              `Duplicate for-in binding '${name}'.`,
+            ),
+          );
+          return undefined;
+        }
+        patternScope.set(name, {
+          id: state.nextBindingId,
+          mutable: statement.target.declarationKind === "let",
+          name,
+        });
+        state.nextBindingId += 1;
+      }
+      forScopes = [...scopes, patternScope];
     }
     const subject = resolveExpression(statement.subject, forScopes, state);
     const target = resolveForInTarget(
       statement.target,
       scopes,
+      forScopes,
       declaredBinding,
       state,
     );

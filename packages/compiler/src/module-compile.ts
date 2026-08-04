@@ -245,6 +245,9 @@ function hirStatementAwaits(
   if (statement.kind === "for-in") {
     return (
       hirExpressionHasAwait(statement.subject) ||
+      ((statement.target.kind === "pattern-declaration" ||
+        statement.target.kind === "assignment-pattern") &&
+        hirBindingPatternHasAwait(statement.target.pattern)) ||
       (statement.target.kind === "property" &&
         (hirExpressionHasAwait(statement.target.object) ||
           hirExpressionHasAwait(statement.target.key))) ||
@@ -454,6 +457,9 @@ function hirStatementHasPatternAwait(statement: HirStatement): boolean {
   }
   if (statement.kind === "for-in") {
     return (
+      ((statement.target.kind === "pattern-declaration" ||
+        statement.target.kind === "assignment-pattern") &&
+        hirBindingPatternHasAwait(statement.target.pattern)) ||
       (statement.target.kind === "property" &&
         (hirExpressionHasPatternAwait(statement.target.object) ||
           hirExpressionHasPatternAwait(statement.target.key))) ||
@@ -572,6 +578,13 @@ function collectHirBindings(
           id: statement.target.bindingId,
           name: statement.target.name,
         });
+      } else if (
+        statement.target.kind === "pattern-declaration" &&
+        statement.target.declarationKind !== "var"
+      ) {
+        for (const binding of hirBindingIdentifiers(statement.target.pattern)) {
+          bindings.push({ id: binding.bindingId, name: binding.name });
+        }
       }
       collect(statement.body);
     } else if (statement.kind === "switch") {

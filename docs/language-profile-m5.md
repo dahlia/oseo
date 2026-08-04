@@ -244,10 +244,11 @@ its deliberate boundary and its evidence:
     an identifier, including one resolved through `with`, an ordinary or
     computed property, a private member, and a `super` property, whose
     receiver read, key expression, and deferred `ToPropertyKey` all
-    follow the step that produced the key. Deliberate boundaries, each
-    rejected with a source-located diagnostic: an object or array pattern
-    head, in declaration and assignment form alike, which M5a Unit 8.5m
-    owns; Annex B's head initializer; a multi-declarator head; and a
+    follow the step that produced the key. M5a Unit 8.5m adds the object
+    pattern head, recorded below. Deliberate boundaries, each
+    rejected with a source-located diagnostic: an array pattern head, in
+    declaration and assignment form alike; Annex B's head initializer; a
+    multi-declarator head; and a
     strict `with` fallback write, which keeps the M5a Unit 8.5i
     rejection, while a non-strict one records its name so that unit's
     `typeof` fold stays rejected for it. The statement lowers to one
@@ -265,6 +266,67 @@ its deliberate boundary and its evidence:
     reviewed test262 cases contribute 33 passes, 63 expected negatives,
     and 28 unsupported prerequisites, and two existing entries are
     promoted to passes.
+ -  The object pattern `for-in` head, admitted by M5a Unit 8.5m in both
+    its `ObjectBindingPattern` declaration and `ObjectAssignmentPattern`
+    assignment forms. The enumeration is unchanged: the same acquisition,
+    the same step, the same skipped nullish subject, and the same absent
+    close, with the head reusing the recursive destructuring the profile
+    owns for standalone declarations, for-of heads, and destructuring
+    assignments rather than adding a second pattern implementation. A
+    `let` or `const` head creates every bound name of the pattern before
+    the subject expression runs, so the subject observes their temporal
+    dead zone, and creates them again on each iteration, so a closure
+    made in one iteration keeps that iteration's cells; a `var` head and
+    an assignment head resolve in the surrounding environment and write
+    the same cells every iteration. The pattern runs after the step that
+    produced the key, so `RequireObjectCoercible` applies to the
+    enumerated String key rather than to the subject. Each property then
+    evaluates its name, then its target reference where it has one, then
+    `GetV`, then a default only when `GetV` answered `undefined`, then
+    the store; a final rest property snapshots the key's own enumerable
+    string keys and excludes every name evaluated before it. Because
+    `ToObject` of the key stays modeled, the readable values are exactly
+    a String exotic object's: one enumerable own index property per code
+    unit and a non-enumerable `length`. Leaves admit everything the
+    profile's object patterns already admit, including nested object
+    patterns, computed names, defaults, rest, and ordinary, computed,
+    private, and `super` targets, whose receiver read precedes the key
+    expression and whose `ToPropertyKey` follows the value. Any abrupt
+    completion in the head, including a poisoned computed name, an
+    abrupt `GetV`, a nullish nested pattern input, and a failed store,
+    leaves the loop through the enclosing transfer, because an enumerate
+    head has no iterator to close. Labels, `with`-resolved leaves, and
+    the strict and non-strict fallback-write boundaries behave exactly as
+    they do for a direct head target, and a pattern subexpression may
+    `await` wherever the M5a Unit 8.3 pattern positions may, which is a
+    body that owns a traced suspension frame; a module top level keeps
+    that unit's rejection for the same position. Deliberate boundary,
+    rejected with
+    a source-located diagnostic: every array pattern position, both the
+    head's own form and one nested below an admitted object head. The key
+    is always a String and this realm creates no string iterator, so an
+    array pattern reached from a for-in head could only report a
+    `TypeError` where ECMA-262 destructures the key's code units. Owned
+    syntax can still represent the nested form as an ordinary recursive
+    leaf, so HIR construction repeats that rejection for every frontend.
+    A reserved word used as a binding name in the head stays the early
+    error it already is and is reported first. Nothing
+    else about the statement changes: the lowering adds no MIR operation,
+    no runtime entry point, and no ABI change, and both specialization
+    policies emit the same operations. A fixed *for-in-object-patterns*
+    native differential fixture covers the four head forms, computed name
+    order, defaults, rest exclusions, nested patterns, member, private,
+    and `super` leaves, nullish, primitive, and string subjects, abrupt
+    names and nested inputs, per-iteration closure identity, labeled
+    transfers, a `return` through `finally`, a `with`-resolved leaf, the
+    head temporal dead zone, a read-only strict target, and suspensions
+    in a generator and an asynchronous function, and a generated property
+    with seed `0x5eed0030` compares generated head shapes against an
+    independent transcription of ForIn/OfBodyEvaluation's destructuring.
+    The applicable-test inventory holds no executing case for this head;
+    its fifteen applicable cases are early errors that stay expected
+    negatives, and the seven cases that record the array pattern head
+    boundary keep their `unsupported-profile-feature` classification.
  -  The `do-while` statement, lowered body-first with the same loop, join,
     `break`, and `continue` structure as `while`. `continue` re-enters the
     loop through the condition, and a body that always completes abruptly
@@ -519,38 +581,36 @@ its deliberate boundary and its evidence:
     recorded below, a private member in a target position stays an early
     error, `super?.x` and a declaration pattern such as
     `for (const [super.x] of it)` stay parse errors the bootstrap parser
-    reports. M5a Unit 8.5l admits the same target in a for-in head,
-    recorded below. A fixed *class-super-targets* native differential fixture
-    covers every target position, dot, computed, symbol, and parenthesized
-    references, an arrow, a getter, a setter, a static method, a static
-    block, a field initializer, a generator, an asynchronous method, an
-    asynchronous generator, a derived constructor before `super()`, a
-    parent setter, an own property the store defines, a read-only parent
-    property, a null home object prototype, a property name evaluated
-    before the target reference whose `GetV` follows it, a target
-    reference that runs
-    before the iterator step and a key conversion that runs after it, and
-    every `IteratorClose` and `AsyncIteratorClose` the specified order
-    performs, from an abrupt direct head, an abrupt head pattern, and an
-    abrupt leaf, over tracked synchronous and asynchronous iterables,
-    across both specialization policies and forced collection. A
-    generated property with seed `0x5eed002e` draws one of ten element
-    forms and one of ten target positions against static, pure computed,
-    side-effecting, abrupt, and poisoned keys and a parent setter, parent
-    data property, or absent property, and checks the key-evaluation log,
-    the stored value, and the receiver and parent property state against
-    an independent oracle alongside Node.js and Deno references. The
-    evaluation order the log cannot observe is pinned by the frontend
-    structural tests and the fixed fixture instead.
-    The applicable-test inventory holds no case that writes a `super`
-    property from a destructuring pattern or a loop head, so the subset
-    newly reviews the six applicable cases that pin the two families
-    this unit joins. Four pass: the `super` assignment reference whose
-    deferred `ToPropertyKey` every added position shares, and the for-of
-    head target, its destructuring form, and the `IteratorClose` an
-    abrupt target performs. Two record the extends-free class body
-    boundary this unit does not change. The reviewed feature list adds
-    `destructuring-assignment`, which no other reviewed case declares.
+    reports. M5a Unit 8.5l admits the same target in a for-in head and
+    M5a Unit 8.5m inside that head's object pattern, both recorded below. A
+    fixed *class-super-targets* native differential fixture covers every target
+    position, dot, computed, symbol, and parenthesized references, an arrow, a
+    getter, a setter, a static method, a static block, a field initializer, a
+    generator, an asynchronous method, an asynchronous generator, a derived
+    constructor before `super()`, a parent setter, an own property the store
+    defines, a read-only parent property, a null home object prototype, a
+    property name evaluated before the target reference whose `GetV` follows
+    it, a target reference that runs before the iterator step and a key
+    conversion that runs after it, and every `IteratorClose` and
+    `AsyncIteratorClose` the specified order performs, from an abrupt direct
+    head, an abrupt head pattern, and an abrupt leaf, over tracked synchronous
+    and asynchronous iterables, across both specialization policies and forced
+    collection. A generated property with seed `0x5eed002e` draws one of ten
+    element forms and one of ten target positions against static, pure
+    computed, side-effecting, abrupt, and poisoned keys and a parent setter,
+    parent data property, or absent property, and checks the key-evaluation
+    log, the stored value, and the receiver and parent property state against
+    an independent oracle alongside Node.js and Deno references. The evaluation
+    order the log cannot observe is pinned by the frontend structural tests and
+    the fixed fixture instead. The applicable-test inventory holds no case that
+    writes a `super` property from a destructuring pattern or a loop head, so
+    the subset newly reviews the six applicable cases that pin the two families
+    this unit joins. Four pass: the `super` assignment reference whose deferred
+    `ToPropertyKey` every added position shares, and the for-of head target,
+    its destructuring form, and the `IteratorClose` an abrupt target performs.
+    Two record the extends-free class body boundary this unit does not change.
+    The reviewed feature list adds `destructuring-assignment`, which no other
+    reviewed case declares.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the
@@ -1719,7 +1779,8 @@ its deliberate boundary and its evidence:
     before any lookup starts, and M5a Unit 8.5k admits the destructuring
     assignment and for-of head target positions, recorded below. M5a Unit
     8.5l adds the for-in head target position, which stores the
-    enumerated key through the same reference.
+    enumerated key through the same reference, and M5a Unit 8.5m adds the
+    leaf positions of that head's object pattern.
     Native differential
     fixtures cover a read, a method call, and a detached method value through
     a two-level and a three-level chain, an override reached from the parent
@@ -2607,8 +2668,8 @@ object binding default. They are admitted in every body that owns a traced
 suspension frame, which is an ordinary asynchronous function, an asynchronous
 arrow, and an asynchronous generator, and in every pattern that reaches such a
 body: standalone declarations, destructuring assignment, catch parameters,
-classic `for` declaration heads, and `for-of`, `for-await-of`, and assignment
-heads.
+classic `for` declaration heads, and `for-of`, `for-await-of`, `for-in`, and
+assignment heads.
 
 The admission adds no new lowering. A pattern already lowers into the enclosing
 body, and every MIR value in that body occupies a root slot of the frame, so

@@ -214,6 +214,42 @@ function privateName(value: BabelNode): string | undefined {
   return name == null ? undefined : `#${name}`;
 }
 
+/** The one rejection every array pattern position in a for-in head takes. */
+const forInArrayPatternMessage =
+  "A for-in array pattern target is unsupported.";
+
+/**
+ * The first array pattern anywhere inside a for-in head, if it has one.
+ *
+ * ForIn/OfBodyEvaluation always supplies a String key, and this realm
+ * creates no string iterator, so an array pattern reached from a for-in
+ * head could only report a `TypeError` where ECMA-262 destructures the
+ * key's code units. The head's own array pattern form belongs to a later
+ * unit; a pattern nested below an admitted object head is rejected at the
+ * same boundary rather than silently answering differently from the
+ * specification.
+ */
+function forInArrayPattern(value: BabelNode): BabelNode | undefined {
+  if (value.type === "ArrayPattern") return value;
+  if (value.type === "AssignmentPattern" || value.type === "RestElement") {
+    const inner = node(
+      value.type === "RestElement" ? value.argument : value.left,
+    );
+    return inner == null ? undefined : forInArrayPattern(inner);
+  }
+  if (value.type === "ParenthesizedExpression") {
+    const inner = node(value.expression);
+    return inner == null ? undefined : forInArrayPattern(inner);
+  }
+  if (value.type !== "ObjectPattern") return undefined;
+  for (const property of nodes(value.properties)) {
+    const inner = node(property.value ?? property.argument);
+    const found = inner == null ? undefined : forInArrayPattern(inner);
+    if (found != null) return found;
+  }
+  return undefined;
+}
+
 /**
  * The private name a member expression references, absent when the
  * expression names an ordinary property. A private reference is never
@@ -2312,19 +2348,49 @@ export function statement(
       }
       if (rejectedThisBindingName(context, identifier, name)) return undefined;
       if (name == null) {
-        return unsupported(
-          context,
-          identifier,
-          "A for-in declaration pattern head is unsupported.",
-        );
+        // An ObjectBindingPattern head reuses the declaration pattern the
+        // profile already owns; every array pattern position stays a
+        // source-located rejection, as does any other shape a declarator
+        // identifier position can hold. A reserved word used as a binding
+        // name is an early error rather than a profile boundary, so the
+        // whole head is checked for one first, exactly as the iterate
+        // head's pattern conversion does.
+        if (rejectedThisBindingPattern(context, identifier)) return undefined;
+        const arrayPattern = forInArrayPattern(identifier);
+        if (arrayPattern != null) {
+          return unsupported(context, arrayPattern, forInArrayPatternMessage);
+        }
+        if (identifier.type !== "ObjectPattern") {
+          return unsupported(
+            context,
+            identifier,
+            "A for-in declaration pattern head is unsupported.",
+          );
+        }
+        const pattern = bindingPattern(context, identifier);
+        if (pattern == null) return undefined;
+        if (pattern.kind !== "object-binding-pattern") {
+          return unsupported(
+            context,
+            identifier,
+            "A for-in declaration pattern head is unsupported.",
+          );
+        }
+        target = {
+          declarationKind: left.kind,
+          kind: "pattern-declaration",
+          pattern,
+          range: location(context, declaration).range,
+        };
+      } else {
+        target = {
+          declarationKind: left.kind,
+          hint: typeHint(context, identifier.typeAnnotation),
+          kind: "declaration",
+          name,
+          range: location(context, declaration).range,
+        };
       }
-      target = {
-        declarationKind: left.kind,
-        hint: typeHint(context, identifier.typeAnnotation),
-        kind: "declaration",
-        name,
-        range: location(context, declaration).range,
-      };
     } else {
       const assignmentTarget = unparenthesizedExpression(left) ?? left;
       const name = identifierName(assignmentTarget);
@@ -2338,11 +2404,27 @@ export function statement(
         assignmentTarget.type === "ArrayPattern" ||
         assignmentTarget.type === "ObjectPattern"
       ) {
-        return unsupported(
-          context,
-          assignmentTarget,
-          "A for-in assignment pattern head is unsupported.",
-        );
+        // An ObjectAssignmentPattern head reuses the destructuring
+        // assignment pattern the profile already owns; every array
+        // pattern position stays a source-located rejection.
+        const arrayPattern = forInArrayPattern(assignmentTarget);
+        if (arrayPattern != null) {
+          return unsupported(context, arrayPattern, forInArrayPatternMessage);
+        }
+        const pattern = bindingPattern(context, assignmentTarget, true);
+        if (pattern == null) return undefined;
+        if (pattern.kind !== "object-binding-pattern") {
+          return unsupported(
+            context,
+            assignmentTarget,
+            "A for-in assignment pattern head is unsupported.",
+          );
+        }
+        target = {
+          kind: "assignment-pattern",
+          pattern,
+          range: location(context, left).range,
+        };
       } else {
         const targetPrivateName = privateMemberName(assignmentTarget);
         if (targetPrivateName != null) {
