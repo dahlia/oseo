@@ -1328,13 +1328,12 @@ export function compileModuleGraph(
         evaluationBody.push(statement);
       }
     }
-    /* A module top level suspends through the continuation transform
-     * below, which splits statements around whole `await` expressions
-     * rather than around the steps of a pattern. An ordinary
-     * asynchronous or asynchronous generator body suspends through its
-     * traced frame instead and admits these positions, so this
-     * rejection is located at the module statement that carries the
-     * pattern rather than shared with those bodies. */
+    /* A directly asynchronous module evaluates through the private traced
+     * frame constructed below. Graph compilation still owns these HIR
+     * statements before it constructs that frame, so this rejection is
+     * located at the module statement that carries the pattern. Ordinary
+     * asynchronous and asynchronous generator bodies already own their
+     * traced frames and admit these positions. */
     const patternAwait = evaluationBody.find(hirStatementHasPatternAwait);
     if (patternAwait != null) {
       return {
