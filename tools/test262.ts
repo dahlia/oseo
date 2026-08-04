@@ -67,6 +67,7 @@ import {
 import type {
   ReviewedTest262Manifest,
   SerializedTest262Manifest,
+  SerializedTest262Partition,
 } from "./test262-manifest.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1425,25 +1426,34 @@ function serializedManifestsEqual(
   );
 }
 
+/** Read indexed manifest partitions with at most one read in flight. */
+export async function readSerializedManifestPartitions(
+  indexText: string,
+  readPartition: (path: string) => Promise<string>,
+): Promise<readonly SerializedTest262Partition[]> {
+  const partitionPaths = reviewedManifestPartitionPaths(indexText);
+  const partitions: SerializedTest262Partition[] = [];
+  for (const path of partitionPaths) {
+    const segments = path.slice("results/".length).split("/");
+    const key = segments.pop()?.replace(/\.yaml$/u, "") ?? "";
+    partitions.push({
+      group: segments.join("/"),
+      key,
+      path,
+      text: normalizeReviewedManifestText(await readPartition(path)),
+    });
+  }
+  return partitions;
+}
+
 async function readSerializedManifest(): Promise<SerializedTest262Manifest> {
   const indexText = normalizeReviewedManifestText(
     await readFile(resultPath, "utf8"),
   );
-  const partitionPaths = reviewedManifestPartitionPaths(indexText);
   validateReviewedManifestFileSet(indexText, await existingPartitionPaths());
-  const partitions = await Promise.all(
-    partitionPaths.map(async (path) => {
-      const segments = path.slice("results/".length).split("/");
-      const key = segments.pop()?.replace(/\.yaml$/u, "") ?? "";
-      return {
-        group: segments.join("/"),
-        key,
-        path,
-        text: normalizeReviewedManifestText(
-          await readFile(join(dirname(resultPath), path), "utf8"),
-        ),
-      };
-    }),
+  const partitions = await readSerializedManifestPartitions(
+    indexText,
+    async (path) => await readFile(join(dirname(resultPath), path), "utf8"),
   );
   return { indexText, partitions };
 }

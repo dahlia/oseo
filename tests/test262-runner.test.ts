@@ -14,13 +14,13 @@ import {
   executeTest262Case,
   parseReviewedSubset,
   parseTest262Case,
+  readSerializedManifestPartitions,
   selectManifestShard,
   validateReviewedResults,
 } from "../tools/test262.ts";
 import {
   normalizeReviewedManifestText,
   parseReviewedManifest,
-  reviewedManifestPartitionPaths,
   serializeTargetParity,
   serializeTest262Manifest,
   test262ManifestDigest,
@@ -933,21 +933,26 @@ test("round-trips and shards the checked-in reviewed manifest", async () => {
     "utf8",
   );
   const canonicalIndex = normalizeReviewedManifestText(indexText);
+  let activeReads = 0;
+  let peakReads = 0;
+  const partitions = await readSerializedManifestPartitions(
+    canonicalIndex,
+    async (path) => {
+      activeReads += 1;
+      peakReads = Math.max(peakReads, activeReads);
+      try {
+        return await readFile(
+          new URL(`test262/${path}`, import.meta.url),
+          "utf8",
+        );
+      } finally {
+        activeReads -= 1;
+      }
+    },
+  );
+  assert.equal(peakReads, 1);
   const partitionTexts = new Map(
-    await Promise.all(
-      reviewedManifestPartitionPaths(canonicalIndex).map(
-        async (path) =>
-          [
-            path,
-            normalizeReviewedManifestText(
-              await readFile(
-                new URL(`test262/${path}`, import.meta.url),
-                "utf8",
-              ),
-            ),
-          ] as const,
-      ),
-    ),
+    partitions.map(({ path, text }) => [path, text]),
   );
   const reparsed = parseReviewedManifest(canonicalIndex, (path) => {
     const text = partitionTexts.get(path);
@@ -955,14 +960,7 @@ test("round-trips and shards the checked-in reviewed manifest", async () => {
     return text;
   });
   assert.equal(serializeTest262Manifest(reparsed).indexText, canonicalIndex);
-  assert.deepEqual(
-    serializeTest262Manifest(reparsed).partitions,
-    [...partitionTexts].map(([path, text]) => {
-      const segments = path.slice("results/".length).split("/");
-      const key = segments.pop()?.replace(/\.yaml$/u, "") ?? "";
-      return { group: segments.join("/"), key, path, text };
-    }),
-  );
+  assert.deepEqual(serializeTest262Manifest(reparsed).partitions, partitions);
 
   const shards = [1, 2, 3].map((index) =>
     selectManifestShard(reparsed, { index, total: 3 }),
