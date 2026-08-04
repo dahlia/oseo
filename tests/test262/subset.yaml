@@ -6036,6 +6036,21 @@ tests:
   - path: test/language/expressions/delete/non-reference-return-true.js
     expectedClassification: pass
     dependencies: [expression-operators, object-literals, var-bindings]
+  - path: test/language/expressions/delete/super-property-method.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, expression-operators]
+  - path: test/language/expressions/delete/super-property-null-base.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators, object-properties]
+  - path: test/language/expressions/delete/super-property-topropertykey.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators, object-literals]
+  - path: test/language/expressions/delete/super-property-uninitialized-this.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, expression-operators]
+  - path: test/language/expressions/delete/super-property.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, error-intrinsics, expression-operators]
   - path: test/language/expressions/delete/white-space-line-terminator-between-delete-unaryexpression-allowed.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]

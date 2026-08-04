@@ -761,7 +761,11 @@ export function expression(
             };
       }
       if (argumentNode.type === "MemberExpression") {
-        const member = memberParts(context, argumentNode);
+        // A `super` operand is admitted here even though the deletion
+        // can only throw: ECMA-262 evaluates the whole SuperProperty
+        // reference, including the receiver read and the key
+        // expression, before the delete evaluation rejects it.
+        const member = memberParts(context, argumentNode, true);
         return member == null
           ? undefined
           : { ...located, ...member, kind: "property-delete" };

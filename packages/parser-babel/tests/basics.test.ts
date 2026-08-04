@@ -1149,9 +1149,9 @@ test("retains closed-world and early-error delete boundaries", () => {
       /Deleting with fallback binding/u,
     ],
     [
-      "class A extends Object { m() { delete super.x; } }",
+      "const o = { m() { delete super.x; } };",
       "OSEO1001",
-      /Property access through super is unsupported here/u,
+      /only valid in the body of a class element whose class has an/u,
     ],
   ];
   for (const [source, code, message] of cases) {
@@ -1844,12 +1844,16 @@ test("rejects super outside its lexical class context", () => {
       /only valid in the body of a class element whose class has an/u,
     ],
     [
-      "class A {}\nclass B extends A { m() { return delete super.m; } }",
+      "class A {}\nclass B extends A { m() { [super.m] = [1]; } }",
       /Property access through super is unsupported here/u,
     ],
     [
-      "class A {}\nclass B extends A { m() { [super.m] = [1]; } }",
-      /Property access through super is unsupported here/u,
+      "class A { m() { delete super.m; } }",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "const o = { m() { delete super[key()]; } };",
+      /only valid in the body of a class element whose class has an/u,
     ],
   ];
   for (const [source, message] of cases) {
@@ -1860,6 +1864,92 @@ test("rejects super outside its lexical class context", () => {
     assert.equal(result.mir, undefined, source);
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(result.diagnostics[0]?.message ?? "", message, source);
+  }
+});
+
+test("admits a super property reference as a delete operand", () => {
+  const cases: readonly string[] = [
+    "class A {}\nclass B extends A { m() { return delete super.m; } }",
+    "class A {}\nclass B extends A { m(k) { return delete super[k()]; } }",
+    "class A {}\nclass B extends A { m() { return delete ((super.m)); } }",
+    "class A {}\nclass B extends A { m() { const f = () => delete super.m;" +
+      " return f(); } }",
+    "class A {}\nclass B extends A { static m() { return delete super.m; } }",
+    "class A {}\nclass B extends A { constructor() { delete super.m; } }",
+    "class A {}\nclass B extends A { async m() { return delete super.m; } }",
+    "class A {}\nclass B extends A { *m() { yield delete super.m; } }",
+    "class A {}\nclass B extends A { async *m() { yield delete super.m; } }",
+    "class A {}\nclass B extends A { static { delete super.m; } }",
+    "class A {}\nclass B extends A { get g() { return delete super.m; } }",
+    "class A {}\nclass B extends A { set s(v) { delete super.m; } }",
+    "class A {}\nclass B extends A { static get g() { return delete super.m;" +
+      " } }",
+    "class A {}\nclass B extends A { f = delete super.m; }",
+    "class A {}\nclass B extends A { static f = delete super.m; }",
+    "class A {}\nclass B extends A { #p() { return delete super.m; } }",
+    "class A {}\nclass B extends A { [Symbol.iterator]() { return delete" +
+      " super.m; } }",
+  ];
+  for (const source of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-delete.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const text = printMir(result.mir);
+    assert.match(text, /super-property-delete/u, source);
+    // The reference is rejected before any lookup, so no home object
+    // prototype is read and no property deletion is attempted.
+    assert.doesNotMatch(text, /super-base/u, source);
+    assert.doesNotMatch(text, /= property-delete/u, source);
+    assert.doesNotMatch(text, /delete-object-coercible/u, source);
+  }
+});
+
+test("evaluates a deleted super reference before rejecting it", () => {
+  // ECMA-262 evaluates SuperProperty whole before the delete evaluation
+  // rejects it: the receiver is read first, so a derived constructor
+  // observes the `this` temporal dead zone before the key expression
+  // runs, and ToPropertyKey is never reached for the produced value.
+  const source =
+    "class A {}\n" +
+    "class B extends A {\n" +
+    "  constructor(k) {\n" +
+    "    delete super[k()];\n" +
+    "    super();\n" +
+    "  }\n" +
+    "}\n";
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "super-delete-order.ts" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const derived = result.mir.functions.find((item) => item.name === "B");
+    assert.ok(derived != null);
+    const operations = derived.blocks.flatMap((block) => block.operations);
+    const receiverIndex = operations.findIndex(
+      (operation) => operation.kind === "read" && operation.detail === "this",
+    );
+    const keyIndex = operations.findIndex(
+      (operation) => operation.kind === "call",
+    );
+    const rejectIndex = operations.findIndex(
+      (operation) => operation.kind === "super-property-delete",
+    );
+    assert.ok(receiverIndex >= 0, "receiver read");
+    assert.ok(keyIndex > receiverIndex, "key after receiver");
+    assert.ok(rejectIndex > keyIndex, "rejection after key");
+    // The produced key value is deliberately left unconverted.
+    assert.ok(
+      !operations
+        .slice(0, rejectIndex)
+        .some((operation) => operation.kind === "property-key"),
+      "no ToPropertyKey before the rejection",
+    );
   }
 });
 

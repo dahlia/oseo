@@ -809,6 +809,11 @@ export const emittedC = {
       ["] = oseo_super_base(callee);"],
     ],
   },
+  superPropertyDelete: {
+    resultAssignOseoSuperPropertyDeleteContext: [
+      ["result = oseo_super_property_delete(context);"],
+    ],
+  },
   superConstructor: {
     resultAssignOseoSuperConstructorContext: [
       ["result = oseo_super_constructor(context, callee)", ";"],

@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,722 reviewed cases: 2,891 passes, 1,292
-expected negatives, and 539 unsupported profile features. It records no
+The current manifest contains 4,727 reviewed cases: 2,893 passes, 1,292
+expected negatives, and 542 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -356,9 +356,8 @@ its deliberate boundary and its evidence:
     property attributes, strict `TypeError` behavior, and result booleans. A
     computed ordinary member evaluates its key expression before rejecting a
     nullish base but does not convert that key. Private-name deletion remains
-    an early error, and deleting a `super` property stays source-located
-    invalid until that reference can throw the required runtime
-    `ReferenceError`. Deleting a runtime-owned intrinsic identifier also stays
+    an early error. Deleting a `super` property is admitted separately below.
+    Deleting a runtime-owned intrinsic identifier also stays
     invalid until the global-object model can make the deletion affect later
     name resolution. Fixed Node.js, Deno, and native fixtures cover both Script
     modes, effects, abrupt completion, live and nullish paths, a false hint, a
@@ -367,6 +366,40 @@ its deliberate boundary and its evidence:
     and 16 cases across the same domain; the extended gate uses seed
     `0x5eed0003` and runs 160. Twenty-six applicable reviewed test262 cases pass
     and two strict identifier cases are expected parse negatives.
+ -  `delete super.property` and `delete super[expression]`, admitted by
+    M5a Unit 8.5j wherever a `super` property reference itself is admitted.
+    ECMA-262 evaluates the operand before rejecting it, so the whole
+    reference runs and then raises a `ReferenceError`. The receiver is read
+    first, so a reference inside a derived constructor before `super()`
+    reports the uninitialized `this` binding and never evaluates the key
+    expression. The key expression then runs for its value and its abrupt
+    completion, so a key that throws reports its own error. `ToPropertyKey`
+    is never reached, so a key object is never asked for a string. No lookup
+    starts, so the home object's `[[Prototype]]` is never read and nothing is
+    deleted, whether or not the parent owns the named property. The lowered
+    program holds one rejection operation with no `super-base`,
+    `delete-object-coercible`, or key-conversion operation, and both
+    specialization policies emit it unchanged. Deliberate boundaries: a class
+    body without `extends` and an object literal method keep the
+    source-located `super` rejection recorded below, a destructuring
+    assignment target and a `for` head keep theirs, private-member deletion
+    stays an early error, and an optional chain whose base is a `super`
+    property still deletes its final ordinary reference. Both reference hosts
+    evaluate the key before the receiver in a derived constructor, which
+    test262 rejects; frontend structural tests and the reviewed subset pin
+    the specified order, while the fixed *class-super-delete* native
+    differential fixture and the generated property with seed `0x5eed002d`
+    keep the derived-constructor case to keys with no observable evaluation
+    so their Node.js and Deno comparisons stay exact. The fixture and the
+    property cover every element form carrying a home object, static, pure
+    computed, side-effecting, abrupt, and poisoned keys, an awaited and a
+    yielded key whose traced suspension the evaluated receiver survives,
+    present and absent parent properties, both specialization policies, and
+    forced collection.
+    This unit advances the runtime ABI to `oseo-runtime-m5-42` with
+    `oseo_super_property_delete`. Five reviewed test262 cases are added: two
+    pass and three record the `Object` heritage, extends-free class body, and
+    object literal `super` boundaries this unit does not change.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the
@@ -821,8 +854,8 @@ its deliberate boundary and its evidence:
     function declaration of the name shadows or overwrites it the way
     FunctionDeclarationInstantiation's own ordering does. Every strict early
     error for `arguments` as an assignment target, binding identifier, or
-    declared name is unchanged. The runtime
-    ABI is `oseo-runtime-m5-41`. A generated property with seed
+    declared name is unchanged. That unit left the runtime
+    ABI at `oseo-runtime-m5-41`. A generated property with seed
     `0x5eed001b`
     covers zero to six bounded arguments, in-range and absent indexed
     reads, writes, `length`, `callee`, fresh identity, both specialization
@@ -1529,9 +1562,11 @@ its deliberate boundary and its evidence:
     `super` property reference is rejected with a source-located diagnostic in
     a class body without `extends` and in an object literal method, because
     this runtime has no `Object.prototype` object for such a lookup to reach,
-    and as the operand of `delete`, a destructuring assignment target, or a
-    `for` head, which name a target this lowering does not carry a receiver
-    through. Native differential
+    and as a destructuring assignment target or a `for` head, which name a
+    target this lowering does not carry a receiver through. M5a Unit 8.5j
+    later admits the `delete` operand position, recorded above, which carries
+    no receiver anywhere because ECMA-262 rejects the evaluated reference
+    before any lookup starts. Native differential
     fixtures cover a read, a method call, and a detached method value through
     a two-level and a three-level chain, an override reached from the parent
     through the derived receiver, an accessor read and its receiver, a write
@@ -2135,10 +2170,12 @@ negatives. The manifest moves from 4,174 to 4,202 cases, from 2,448 to 2,474
 passes, and from 1,167 to 1,169 expected negatives; its 559 unsupported profile
 features do not move, and it records no semantic or harness failures.
 
-Private-name deletion remains an early error. `delete super.property` remains
-a source-located invalid boundary instead of being lowered as an ordinary
-property delete; admitting it requires the runtime `ReferenceError` and the
-specified receiver, key-expression, and `ToPropertyKey` suppression order.
+Private-name deletion remains an early error. `delete super.property` was a
+source-located invalid boundary for this unit rather than being lowered as an
+ordinary property delete, because admitting it requires the runtime
+`ReferenceError` and the specified receiver, key-expression, and
+`ToPropertyKey` suppression order. M5a Unit 8.5j supplies all four and closes
+that boundary.
 Deleting `Symbol` or a named error intrinsic as an identifier remains invalid
 until the global-object model can remove the property and change subsequent
 name resolution consistently. At non-strict Script top level,
