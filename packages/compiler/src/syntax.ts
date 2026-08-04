@@ -573,14 +573,14 @@ export type SyntaxExpression =
        * the `object` of a property get, delete, set, update, or step
        * expression, of a `property` call target, of an
        * `assignment-member` destructuring leaf, or of a `property`
-       * for-of head target: the reference reads or writes through the
-       * running function's home object while keeping `this` as its
-       * receiver, so an operand that escaped those positions would have
-       * no receiver to carry. The two target positions hold the
-       * evaluated reference until PutValue stores through it, which is
-       * why they carry the operand rather than an already-read object;
-       * a later unit that admits a for-in head reuses the same target
-       * shape without changing this one. The delete position carries no
+       * for-of or for-in head target: the reference reads or writes
+       * through the running function's home object while keeping `this`
+       * as its receiver, so an operand that escaped those positions
+       * would have no receiver to carry. The two target positions hold
+       * the evaluated reference until PutValue stores through it, which
+       * is why they carry the operand rather than an already-read
+       * object; the for-in head reuses the same target shape. The delete
+       * position carries no
        * receiver anywhere, because ECMA-262 rejects a `super` reference
        * after evaluating it; the operand is still admitted so that
        * receiver read and key evaluation happen.
@@ -768,6 +768,23 @@ export type SyntaxForOfTarget =
       readonly range: SourceRange;
     };
 
+/**
+ * One source-level assignment or declaration target in a for-in head.
+ *
+ * ForIn/OfBodyEvaluation gives an enumerate head the same target shapes
+ * an iterate head has, so the two heads share one representation rather
+ * than describing the store twice. The two pattern kinds are excluded
+ * structurally: an object pattern head belongs to the unit that admits
+ * it, and no other pattern form is admitted before then, so a pattern
+ * head is a source-located rejection instead of a representable target
+ * with no lowering.
+ */
+export type SyntaxForInTarget = Exclude<
+  SyntaxForOfTarget,
+  | { readonly kind: "assignment-pattern" }
+  | { readonly kind: "pattern-declaration" }
+>;
+
 /** Runtime call and construction identity retained for every function. */
 export type FunctionKind =
   | "arrow"
@@ -883,6 +900,19 @@ export type SyntaxStatement =
       readonly kind: "for";
       readonly test?: SyntaxExpression;
       readonly update?: SyntaxExpression;
+    })
+  | (LocatedSyntax & {
+      /**
+       * `for (... in ...)`, whose head enumerates the subject's own and
+       * inherited enumerable string keys. It is a separate statement
+       * from the iterate head because ForIn/OfHeadEvaluation skips the
+       * whole loop for a nullish subject and ForIn/OfBodyEvaluation
+       * never closes an enumerate iterator.
+       */
+      readonly body: SyntaxStatement;
+      readonly kind: "for-in";
+      readonly subject: SyntaxExpression;
+      readonly target: SyntaxForInTarget;
     })
   | (LocatedSyntax & {
       /**

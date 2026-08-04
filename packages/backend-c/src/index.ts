@@ -814,6 +814,55 @@ function iteratorDoneRead(state: EmitState, doneState: number): string {
     : renderC(emittedC.common.iteratorDone, doneState);
 }
 
+/**
+ * Emit one for-in enumeration operation.
+ *
+ * `EnumerateObjectProperties` is not the iterator protocol: neither
+ * entry point runs user code, reads a `next` method, or is ever closed,
+ * so both report exhaustion through a local flag and leave the produced
+ * record or key in a root slot that survives collection and suspension.
+ */
+function emitEnumerateOperation(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  const get = operation.kind === "enumerate-get";
+  const slot = get
+    ? operation.enumerateRecordResult
+    : operation.enumerateKeyResult;
+  if (slot == null) {
+    throw new Error(`MIR ${operation.kind} %${operation.id} has no result.`);
+  }
+  state.scalarKinds.set(operation.id, "boolean");
+  line(
+    state,
+    renderC(
+      emittedC.enumerateOperation.boolEnumerateDoneAssignTrueStatement,
+      operation.id,
+    ),
+  );
+  line(
+    state,
+    renderC(
+      get
+        ? emittedC.enumerateOperation.resultAssignOseoEnumerateGetContext
+        : emittedC.enumerateOperation.resultAssignOseoEnumerateNextContext,
+      operationArgument(operation, 0),
+      slot,
+      operation.id,
+    ),
+  );
+  line(
+    state,
+    renderC(
+      emittedC.enumerateOperation.boolFastAssignEnumerateDoneStatement,
+      operation.id,
+      operation.id,
+    ),
+  );
+  line(state, renderC(emittedC.common.voidFastStatement, operation.id));
+}
+
 function emitIteratorOperation(
   state: EmitState,
   operation: MirOperation,
@@ -2695,6 +2744,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
   } else if (operation.kind === "box-smi") {
     emitBoxSmi(state, operation);
   } else if (
+    operation.kind === "enumerate-get" ||
+    operation.kind === "enumerate-next"
+  ) {
+    emitEnumerateOperation(state, operation);
+  } else if (
     operation.kind === "iterator-await-result" ||
     operation.kind === "iterator-await-start" ||
     operation.kind === "iterator-get" ||
@@ -3039,6 +3093,12 @@ function maximumValueId(blocks: readonly MirBlock[]): number {
       }
       if (operation.iteratorValueOnlyResult != null) {
         maximum = Math.max(maximum, operation.iteratorValueOnlyResult);
+      }
+      if (operation.enumerateRecordResult != null) {
+        maximum = Math.max(maximum, operation.enumerateRecordResult);
+      }
+      if (operation.enumerateKeyResult != null) {
+        maximum = Math.max(maximum, operation.enumerateKeyResult);
       }
       for (const argument of operation.arguments) {
         maximum = Math.max(maximum, argument);

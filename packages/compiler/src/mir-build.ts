@@ -5022,11 +5022,25 @@ function lowerTryStatement(
   return false;
 }
 
-function lowerForOfTarget(
+/**
+ * Lower one for-of or for-in head target and store `value` through it.
+ *
+ * ForIn/OfBodyEvaluation gives both heads the same per-iteration
+ * reference evaluation and PutValue, so the store is shared. `head`
+ * names the statement in printed evidence and selects what an abrupt
+ * store transfers to: an iterate head closes its iterator, while an
+ * enumerate head has none to close.
+ */
+function lowerForHeadTarget(
   target: HirForOfTarget,
   value: number,
   builder: MirBuilder,
+  head: "for-in" | "for-of" = "for-of",
 ): void {
+  const abruptNote =
+    head === "for-of"
+      ? "normal -> continue, abrupt -> close iterator"
+      : "normal -> continue, abrupt -> transfer";
   if (target.kind === "assignment-pattern") {
     lowerBindingTarget(target.pattern, value, "write", builder);
     return;
@@ -5080,7 +5094,7 @@ function lowerForOfTarget(
     appendMirMetadata(
       builder,
       "safepoint",
-      "for-of binding assignment error",
+      `${head} binding assignment error`,
       [value],
       target.range,
     );
@@ -5101,13 +5115,7 @@ function lowerForOfTarget(
       mutable: target.mutable,
       range: target.range,
     });
-    appendMirMetadata(
-      builder,
-      "check-status",
-      "normal -> continue, abrupt -> close iterator",
-      [id],
-      target.range,
-    );
+    appendMirMetadata(builder, "check-status", abruptNote, [id], target.range);
     recordRoot(builder, id, target.range);
     return;
   }
@@ -5124,7 +5132,7 @@ function lowerForOfTarget(
       value,
       target.range,
       builder,
-      "for-of private target",
+      `${head} private target`,
     );
     return;
   }
@@ -5145,7 +5153,7 @@ function lowerForOfTarget(
   appendMirMetadata(
     builder,
     "safepoint",
-    "for-of property storage growth",
+    `${head} property storage growth`,
     [object, key, value],
     target.range,
   );
@@ -5156,20 +5164,14 @@ function lowerForOfTarget(
       superReceiver == null
         ? [object, key, value]
         : [object, key, value, superReceiver],
-    detail: "for-of property target",
+    detail: `${head} property target`,
     id,
     kind: "property-set",
     range: target.range,
     ...strictCodeFlag(builder),
     ...(superReceiver == null ? {} : { superReference: true as const }),
   });
-  appendMirMetadata(
-    builder,
-    "check-status",
-    "normal -> continue, abrupt -> close iterator",
-    [id],
-    target.range,
-  );
+  appendMirMetadata(builder, "check-status", abruptNote, [id], target.range);
   recordRoot(builder, id, target.range);
 }
 
@@ -5314,7 +5316,7 @@ function lowerForOfStatement(
     });
   }
   builder.current = bodyBlock;
-  lowerForOfTarget(statement.target, value, builder);
+  lowerForHeadTarget(statement.target, value, builder);
   const terminated = lowerStatementBody(statement.body, builder);
   builder.labels.length -= claimed.length;
   builder.loops.pop();
@@ -5374,6 +5376,128 @@ function lowerForOfStatement(
     builder,
     "join",
     `for${awaited ? "-await" : ""}-of bb${stepBlock.id}`,
+    [],
+    statement.range,
+  );
+}
+
+function lowerForInStatement(
+  statement: HirStatement & { readonly kind: "for-in" },
+  builder: MirBuilder,
+): void {
+  if (
+    statement.target.kind === "declaration" &&
+    statement.target.declarationKind !== "var"
+  ) {
+    // ForIn/OfHeadEvaluation creates the lexical environment before
+    // evaluating the subject, so a same-name read observes the TDZ.
+    resetBinding(
+      statement.target.bindingId,
+      statement.target.name,
+      statement.target.range,
+      builder,
+    );
+  }
+  const subject = lowerExpression(statement.subject, builder);
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "enumerate object properties",
+    [subject],
+    statement.subject.range,
+  );
+  const enumerating = builder.nextValue;
+  builder.nextValue += 1;
+  const enumeration = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [subject],
+    detail: "EnumerateObjectProperties",
+    enumerateRecordResult: enumeration,
+    id: enumerating,
+    kind: "enumerate-get",
+    range: statement.subject.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> transfer",
+    [enumerating],
+    statement.subject.range,
+  );
+  recordRoot(builder, enumeration, statement.subject.range);
+
+  const stepBlock = createMirBlock(builder);
+  const bodyBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  // A nullish subject makes ForIn/OfHeadEvaluation report a break
+  // completion, which skips the whole statement without an error.
+  builder.current.terminator = {
+    kind: "branch",
+    test: enumerating,
+    whenFalse: exitBlock.id,
+    whenTrue: stepBlock.id,
+  };
+
+  builder.current = stepBlock;
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "step enumeration",
+    [enumeration],
+    statement.range,
+  );
+  const hasKey = builder.nextValue;
+  builder.nextValue += 1;
+  const key = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [enumeration],
+    detail: "enumeration step",
+    enumerateKeyResult: key,
+    id: hasKey,
+    kind: "enumerate-next",
+    range: statement.range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> branch, abrupt -> transfer",
+    [hasKey],
+    statement.range,
+  );
+  recordRoot(builder, key, statement.range);
+  builder.current.terminator = {
+    kind: "branch",
+    test: hasKey,
+    whenFalse: exitBlock.id,
+    whenTrue: bodyBlock.id,
+  };
+
+  // An enumerate head has no iterator to close, so no finalizer or
+  // abrupt target is pushed: a break, continue, return, or throw leaves
+  // the loop through the enclosing transfer unchanged.
+  const exitTarget = controlTarget(builder, exitBlock.id);
+  const continueTarget = controlTarget(builder, stepBlock.id);
+  builder.loops.push({ breakTarget: exitTarget, continueTarget });
+  const claimed = builder.pendingLabels.splice(0);
+  for (const name of claimed) {
+    builder.labels.push({ breakTarget: exitTarget, continueTarget, name });
+  }
+  builder.current = bodyBlock;
+  lowerForHeadTarget(statement.target, key, builder, "for-in");
+  const terminated = lowerStatementBody(statement.body, builder);
+  builder.labels.length -= claimed.length;
+  builder.loops.pop();
+  if (!terminated) {
+    builder.current.terminator = { kind: "jump", target: stepBlock.id };
+  }
+
+  builder.current = exitBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `for-in bb${stepBlock.id}`,
     [],
     statement.range,
   );
@@ -6192,6 +6316,7 @@ function lowerStatements(
         inner.kind === "while" ||
         inner.kind === "do-while" ||
         inner.kind === "for" ||
+        inner.kind === "for-in" ||
         inner.kind === "for-of"
       ) {
         // The loop lowering claims these names and binds them to its
@@ -6314,6 +6439,8 @@ function lowerStatements(
       );
     } else if (statement.kind === "for-of") {
       lowerForOfStatement(statement, builder);
+    } else if (statement.kind === "for-in") {
+      lowerForInStatement(statement, builder);
     } else if (statement.kind === "for") {
       const declarations = statement.declarations ?? [];
       // CreatePerIterationEnvironment: each iteration reads the current

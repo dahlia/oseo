@@ -370,6 +370,29 @@ export const emittedC = {
       [");"],
     ],
   },
+  enumerateOperation: {
+    boolEnumerateDoneAssignTrueStatement: [
+      ["bool enumerate_done_"],
+      [" = true;"],
+    ],
+    resultAssignOseoEnumerateGetContext: [
+      ["result = oseo_enumerate_get(context, roots["],
+      ["], &roots["],
+      ["], &enumerate_done_"],
+      [");"],
+    ],
+    resultAssignOseoEnumerateNextContext: [
+      ["result = oseo_enumerate_next(context, roots["],
+      ["], &roots["],
+      ["], &enumerate_done_"],
+      [");"],
+    ],
+    boolFastAssignEnumerateDoneStatement: [
+      ["bool fast_"],
+      [" = !enumerate_done_"],
+      [";"],
+    ],
+  },
   iteratorOperation: {
     asyncPrefix: [["async_"]],
     resultAssignOseoIteratorGetContext: [

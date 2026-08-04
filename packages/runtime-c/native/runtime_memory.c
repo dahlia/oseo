@@ -45,6 +45,13 @@ static void trace_object(
         for (size_t index = 0u; index < list->length; index += 1u) {
             mark_value(list->values[index], worklist);
         }
+    } else if (object->kind == OSEO_HEAP_ENUMERATION) {
+        /* The collected key list and the receiver each step consults
+         * are reachable only through the record a for-in head roots, so
+         * a suspended body keeps both alive. */
+        OseoEnumeration *enumeration = (OseoEnumeration *)object;
+        mark_value(enumeration->receiver, worklist);
+        mark_value(enumeration->keys, worklist);
     } else if (object->kind == OSEO_HEAP_OBJECT ||
                object->kind == OSEO_HEAP_ARRAY ||
                object->kind == OSEO_HEAP_FUNCTION ||

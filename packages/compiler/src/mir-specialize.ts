@@ -28,6 +28,12 @@ function maximumMirValue(functionValue: MirFunction): number {
       if (operation.iteratorCloseResultMode != null) {
         maximum = Math.max(maximum, operation.iteratorCloseResultMode);
       }
+      if (operation.enumerateRecordResult != null) {
+        maximum = Math.max(maximum, operation.enumerateRecordResult);
+      }
+      if (operation.enumerateKeyResult != null) {
+        maximum = Math.max(maximum, operation.enumerateKeyResult);
+      }
     }
   }
   return maximum;

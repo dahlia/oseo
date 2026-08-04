@@ -1857,6 +1857,16 @@ console.log("own" in child);
 console.log(0 in [10, 20], 1 in [10, 20], 2 in [10, 20]);
 console.log("length" in [1], 1 in [1, , 3], 1 in { "1": true });
 console.log("prototype" in function named() {});
+// A virtualized intrinsic method exists for HasProperty exactly where it
+// exists for a read, so the two never disagree about the same name.
+const virtualized = [1];
+console.log("push" in virtualized, typeof virtualized.push);
+virtualized.push = 5;
+console.log("push" in virtualized, virtualized.push);
+delete virtualized.push;
+console.log("push" in virtualized, typeof virtualized.push);
+const settled = Promise.resolve(1);
+console.log("then" in settled, "catch" in settled, "missing" in settled);
 try {
   console.log("x" in "text");
 } catch (caught) {

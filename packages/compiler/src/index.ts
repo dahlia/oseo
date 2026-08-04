@@ -59,6 +59,8 @@ export type { SyntaxForDeclaration } from "./syntax.ts";
 export type { HirForDeclaration } from "./hir.ts";
 export type { SyntaxForOfTarget } from "./syntax.ts";
 export type { HirForOfTarget } from "./hir.ts";
+export type { SyntaxForInTarget } from "./syntax.ts";
+export type { HirForInTarget } from "./hir.ts";
 export type { FunctionKind } from "./syntax.ts";
 export type { SyntaxLexicalDeclarator } from "./syntax.ts";
 export type { SyntaxStatement } from "./syntax.ts";

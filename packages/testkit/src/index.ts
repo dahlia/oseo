@@ -95,6 +95,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "object-literals",
   "object-properties",
   "promise-settlement",
+  "property-enumeration",
   "rest-parameters",
   "symbols",
   "timers",

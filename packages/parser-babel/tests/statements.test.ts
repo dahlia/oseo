@@ -275,7 +275,9 @@ test("converts classic for binding patterns to owned syntax", () => {
 });
 
 const unsupportedForForms = [
-  ["for-in", "for (const key in {}) console.log(key);"],
+  ["for-in declaration pattern", "for (const { key } in {}) break;"],
+  ["for-in assignment pattern", "let key; for ([key] in {}) break;"],
+  ["for-in head initializer", "for (var key = 1 in {}) break;"],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;
 
