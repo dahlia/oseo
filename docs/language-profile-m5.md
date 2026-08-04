@@ -15,15 +15,12 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a remains open. Unit 8.5n audited the implementation, source-located
-rejections, admitted prose, applicable-test inventory and results, and this
-document's known-gap list. It discovered that optional private field and
-accessor reads and optional private method calls have structural coverage but
-lack native and differential semantic evidence for nullish short circuit,
-valid-brand access, invalid-brand `TypeError`, and method receiver preservation
-under both specialization policies and forced collection. The core expressions
-and bindings stream owns that follow-up. M5 also remains active through its M5b
-and M5c checkpoints.
+M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
+found for optional private field and accessor reads and optional private method
+calls. Native differential fixtures and a generated property cover nullish
+short circuit, valid-brand access, invalid-brand `TypeError`, and method
+receiver preservation under both specialization policies and forced
+collection. M5 remains active through its M5b and M5c checkpoints.
 
 
 Claim boundary
@@ -52,8 +49,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,857 reviewed cases: 2,932 passes, 1,355
-expected negatives, and 570 unsupported profile features. It records no
+The current manifest contains 4,861 reviewed cases: 2,934 passes, 1,355
+expected negatives, and 572 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -1945,11 +1942,16 @@ its deliberate boundary and its evidence:
     The `in` entry and the destructuring and iterator entries above record the
     evidence that admits `#name in object` and private assignment targets.
     Optional private field and accessor reads and optional private method calls,
-    including `object?.#method()`, are structurally represented through HIR and
-    MIR. They remain outside the admitted profile until native and differential
-    evidence covers nullish short circuit, valid-brand access, invalid-brand
-    `TypeError`, and method receiver preservation under both specialization
-    policies and forced collection.
+    including `object?.#method()`, are admitted by Unit 8.5o. The optional
+    guard short-circuits `null` and `undefined` before the private get or any
+    method argument evaluation. A live receiver performs the ordinary private
+    brand check and accessor getter call, and a private method call preserves
+    that receiver as `this`. Fixed native differential fixtures cover valid
+    and invalid brands, nullish short circuit, receiver preservation, truthful
+    and false hints, both specialization policies, and forced collection. A
+    generated property with seed `0x5eed003c` adds twelve ordinary cases with
+    an independent oracle over field, accessor, and method operations and
+    valid, invalid, `null`, and `undefined` receivers.
     `delete this.#name` remains the early error it is. Native differential
     fixtures cover private fields and their absence from every key observation,
     private methods including installation order, non- writability,
@@ -2886,6 +2888,17 @@ parse-time `SyntaxError`. The manifest reaches 4,374 cases: 2,569 passes,
 1,236 expected negatives, and 569 unsupported profile features with no
 semantic or harness failures.
 
+M5a Unit 8.5o admits optional private field and accessor reads and optional
+private method calls as recorded above. The reviewed subset adds the expression
+and statement forms of *grammar-private-field-optional-chaining.js* as passes.
+The two *private-field-after-optional-chain.js* forms remain
+`unsupported-profile-feature` because they construct their receiver with the
+M5b-owned `Object` intrinsic. No prior result moves. The manifest reaches 4,861
+cases: 2,934 passes, 1,355 expected negatives, and 572 unsupported profile
+features with no semantic or harness failures. The 41,091-path inventory,
+suite revision, manifest schema and vocabulary, zero-override policy, and
+runtime ABI `oseo-runtime-m5-43` are unchanged.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -2895,8 +2908,8 @@ must never shrink by reclassification alone.
 
 M5a Unit 8.5n removed stale rejection claims for behavior the implementation
 already admits and assigned every genuine remaining rejection an explicit
-owner. The audit also found one M5a evidence gap, so the checkpoint remains
-open. It changes no semantic or compatibility classification.
+owner. Unit 8.5o closes the sole M5a evidence gap from that audit, so M5a is
+complete. The remaining gaps retain their existing owners.
 
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
     assignment, and update are admitted by M5a Unit 8.1a as recorded above.
@@ -2909,14 +2922,6 @@ open. It changes no semantic or compatibility classification.
  -  Regular expression syntax, objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Optional private field and accessor reads such as `object?.#field` and
-    `object?.#accessor`, and optional private method calls such as
-    `object?.#method()`, have parser, HIR, and MIR structural coverage, but no
-    native or differential execution proves nullish short circuit, valid-brand
-    access, invalid-brand `TypeError`, or method receiver preservation under
-    both specialization policies and forced collection. Owner: the core
-    expressions and bindings stream. Unit 8.5n discovered this follow-up; a
-    separate M5a evidence unit must close it.
  -  `import.meta`, `export var`, and namespace re-exports such as
     `export * as ns from "./module.js"` remain rejected with source-located
     diagnostics. Reviewed test262 cases carrying

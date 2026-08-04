@@ -4616,6 +4616,9 @@ tests:
   - path: test/language/expressions/class/elements/fields-string-name-static-propname-prototype.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/grammar-private-field-optional-chaining.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/expressions/class/elements/init-err-evaluation.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -4796,6 +4799,9 @@ tests:
   - path: test/language/expressions/class/elements/private-field-access-on-inner-function.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/expressions/class/elements/private-field-after-optional-chain.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/expressions/class/elements/private-field-as-arrow-function.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -10923,6 +10929,9 @@ tests:
   - path: test/language/statements/class/elements/get-access-of-missing-shadowed-private-getter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/grammar-private-field-optional-chaining.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/statements/class/elements/init-err-evaluation.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -11106,6 +11115,9 @@ tests:
   - path: test/language/statements/class/elements/private-field-access-on-inner-function.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/statements/class/elements/private-field-after-optional-chain.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, expression-operators, object-properties]
   - path: test/language/statements/class/elements/private-field-as-arrow-function.js
     expectedClassification: pass
     dependencies: [classes, object-properties]

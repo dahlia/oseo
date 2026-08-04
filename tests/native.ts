@@ -214,6 +214,20 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "class-optional-private-reads" ||
+    fixture.name === "class-optional-private-methods"
+  ) {
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /private-get private-get/u);
+    }
+  }
+
+  if (fixture.name === "class-optional-private-methods") {
+    assert.match(printMir(enabledMir), /guard-smi/u);
+    assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
+  }
+
+  if (
     fixture.name === "for-in" ||
     fixture.name === "for-in-enumeration" ||
     fixture.name === "for-in-object-patterns"
@@ -294,6 +308,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-private-accessors" ||
     fixture.name === "class-private-brand-checks" ||
     fixture.name === "class-cross-private-access" ||
+    fixture.name === "class-optional-private-reads" ||
+    fixture.name === "class-optional-private-methods" ||
     fixture.name === "class-static-private-methods" ||
     fixture.name === "class-private-updates" ||
     fixture.name === "class-static-fields" ||
@@ -413,6 +429,26 @@ for (const fixture of selectedFixtures) {
             // between the reference and the value it stores.
             assert.match(native.emittedC, /oseo_super_set\(context, roots\[/u);
             assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "class-optional-private-reads" ||
+            fixture.name === "class-optional-private-methods"
+          ) {
+            // The optional guard precedes PrivateGet, while a live private
+            // method call retains its branded object as the receiver across
+            // the lookup safepoint and the following call safepoint.
+            assert.match(
+              native.emittedC,
+              /oseo_private_get\(context, roots\[/u,
+            );
+            assert.ok(native.counters.collections > 0);
+          }
+          if (
+            fixture.name === "class-optional-private-methods" &&
+            mode === "enabled"
+          ) {
+            assert.ok(native.counters.guardHits > 0);
+            assert.ok(native.counters.guardMisses > 0);
           }
           if (
             fixture.name === "for-in" ||

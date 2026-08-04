@@ -3226,6 +3226,111 @@ console.log(hinted.apply(other, "a", "b"));
 `,
   },
   {
+    name: "class-optional-private-reads",
+    source: `
+let optionalPrivateReadOrder = "";
+function optionalPrivateReadBase(label, value) {
+  optionalPrivateReadOrder = optionalPrivateReadOrder + label + " ";
+  return value;
+}
+class OptionalPrivateReads {
+  #field;
+  constructor(value) {
+    this.#field = value;
+  }
+  get #accessor() {
+    optionalPrivateReadOrder = optionalPrivateReadOrder + "get ";
+    return this.#field;
+  }
+  static field(value) {
+    return optionalPrivateReadBase("field", value)?.#field;
+  }
+  static accessor(value) {
+    return optionalPrivateReadBase("accessor", value)?.#accessor;
+  }
+}
+const optionalPrivateReads = new OptionalPrivateReads({ value: 7 });
+console.log(
+  OptionalPrivateReads.field(optionalPrivateReads).value,
+  OptionalPrivateReads.accessor(optionalPrivateReads).value,
+  optionalPrivateReadOrder,
+);
+optionalPrivateReadOrder = "";
+console.log(
+  OptionalPrivateReads.field(null),
+  OptionalPrivateReads.accessor(undefined),
+  optionalPrivateReadOrder,
+);
+for (const read of [
+  OptionalPrivateReads.field,
+  OptionalPrivateReads.accessor,
+]) {
+  optionalPrivateReadOrder = "";
+  try {
+    read({});
+  } catch (error) {
+    console.log(
+      "invalid private read",
+      error instanceof TypeError,
+      optionalPrivateReadOrder,
+    );
+  }
+}
+`,
+  },
+  {
+    name: "class-optional-private-methods",
+    source: `
+let optionalPrivateCallOrder = "";
+function optionalPrivateCallBase(value) {
+  optionalPrivateCallOrder = optionalPrivateCallOrder + "base ";
+  return value;
+}
+function optionalPrivateCallArgument(value) {
+  optionalPrivateCallOrder = optionalPrivateCallOrder + "argument ";
+  return value;
+}
+function optionalPrivateHintedAdd(left: number, right: number) {
+  return left + right;
+}
+class OptionalPrivateMethods {
+  #value;
+  constructor(value) {
+    this.#value = value;
+  }
+  #add(value) {
+    optionalPrivateCallOrder = optionalPrivateCallOrder + "call ";
+    return optionalPrivateHintedAdd(this.#value, value);
+  }
+  static call(receiver, value) {
+    return optionalPrivateCallBase(receiver)?.#add(
+      optionalPrivateCallArgument(value),
+    );
+  }
+}
+const optionalPrivateMethods = new OptionalPrivateMethods(4);
+console.log(OptionalPrivateMethods.call(optionalPrivateMethods, 3));
+console.log(OptionalPrivateMethods.call(optionalPrivateMethods, "x"));
+console.log(optionalPrivateCallOrder);
+optionalPrivateCallOrder = "";
+console.log(
+  OptionalPrivateMethods.call(null, 1),
+  OptionalPrivateMethods.call(undefined, 2),
+  optionalPrivateCallOrder,
+);
+optionalPrivateCallOrder = "";
+try {
+  OptionalPrivateMethods.call({}, 5);
+} catch (error) {
+  console.log(
+    "invalid private call",
+    error instanceof TypeError,
+    optionalPrivateCallOrder,
+  );
+}
+`,
+  },
+  {
     name: "class-static-private-methods",
     source: `
 // Static private methods and accessors are installed directly on the
