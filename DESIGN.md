@@ -898,18 +898,21 @@ and native observations in a deterministic manifest. M5 freezes the
 measurement boundary and manifest schema in
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md): one counted row per
 upstream path with executed variants, execution mode, dependency tags, and
-module-graph evidence recorded inside it, and exactly five classifications
-with expected-negative covering matched parse, resolution, and runtime
-negatives. Applicable Script cases run in every requested strictness mode
+module-graph evidence recorded inside it. A partitioned index and record files
+carry exactly six classifications, with expected-negative covering matched
+parse, resolution, and runtime negatives and infrastructure failures kept
+apart from harness defects. Applicable Script cases run in every requested
+strictness mode
 with specialization disabled and enabled; module and asynchronous cases run
 under the deterministic native scheduler through the explicit CLI module
 goal. The gate rejects semantic failures, harness failures, or changes from
 the reviewed classification instead of counting unsupported cases as
 passes, and summaries keep raw, path-group, and dependency-tag totals.
 ADR 0015 keeps `linux-x86_64-gnu` as the canonical manifest target, while ADR
-0014 adds a digest-pinned parity record. Each supported execution host reruns
-the complete reviewed subset and normalizes only the target ID before comparing
-the manifest, so target evidence cannot duplicate compatibility counts.
+0014 adds a digest-pinned parity record over the index and every ordered
+partition. Each supported execution host reruns the complete reviewed subset
+and normalizes only the target ID before comparing the manifest, so target
+evidence cannot duplicate compatibility counts.
 
 The compiler must print stable source locations for unsupported syntax and
 failed compilation. IR and C dumps should retain enough source information to

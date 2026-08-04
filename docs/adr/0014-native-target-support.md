@@ -180,18 +180,19 @@ owned failure and requires a new representation decision before support.
 
 ### Standards evidence
 
-Keep *tests/test262/results.yaml* as the canonical compatibility manifest with
-one row per upstream path and `linux-x86_64-gnu` as its canonical target ID.
+Keep *tests/test262/results.yaml* as the canonical compatibility manifest index
+with one row per upstream path in its ordered partitions and
+`linux-x86_64-gnu` as its canonical target ID.
 Keep *tests/test262/target-parity.yaml* as the separate target-parity
-record. It pins the canonical manifest digest, suite revision, and supported
-execution targets.
+record. It pins the digest of the index and every ordered partition, suite
+revision, and supported execution targets.
 
 Each primary host executes the same reviewed subset, strictness modes,
 specialization policies, harness includes, module graphs, scheduler mode, and
-observations. The runner normalizes only the target ID before comparing
-the complete generated manifest with the canonical bytes. Any other difference
-fails the gate. This preserves one compatibility count while proving target
-agreement.
+observations. The runner normalizes only the target ID before comparing the
+complete generated manifest file set with the canonical bytes. Any other
+difference fails the gate. This preserves one compatibility count while
+proving target agreement.
 
 
 Consequences

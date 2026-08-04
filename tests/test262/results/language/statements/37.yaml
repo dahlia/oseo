@@ -1,0 +1,111 @@
+group: language/statements
+key: "37"
+results:
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class-fields-public
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/fields-anonymous-function-length.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - class
+        - class-methods-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/private-methods/prod-private-generator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: "test/language/statements/class/elements/private-methods/prod-p\
+        rivate-generator.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/private-method\
+        s/prod-private-generator.js:147:24: error[OSEO1001]: Unknown
+        binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/S12.6.1_A15.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-in/S12.6.4_A4.1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - property-enumeration
+    observation:
+      detail: "test/language/statements/for-in/S12.6.4_A4.1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/for-in/S12.6.4_A4.1.js:84:15:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

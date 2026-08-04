@@ -6,20 +6,26 @@ import test from "node:test";
 import { runInNewContext } from "node:vm";
 
 import type { CliResult } from "../packages/cli/src/index.ts";
+import { summarizeTest262 } from "../packages/testkit/src/index.ts";
 import type { Test262Case } from "../packages/testkit/src/index.ts";
 import {
   assembleTest262Source,
   createReviewedManifest,
   executeTest262Case,
-  normalizeReviewedManifestText,
-  parseReviewedManifest,
   parseReviewedSubset,
   parseTest262Case,
+  readSerializedManifestPartitions,
   selectManifestShard,
-  serializeTest262Manifest,
-  serializeTargetParity,
   validateReviewedResults,
 } from "../tools/test262.ts";
+import {
+  normalizeReviewedManifestText,
+  parseReviewedManifest,
+  serializeTargetParity,
+  serializeTest262Manifest,
+  test262ManifestDigest,
+  validateReviewedManifestFileSet,
+} from "../tools/test262-manifest.ts";
 import type {
   ReviewedTest262Entry,
   ReviewedTest262Subset,
@@ -190,7 +196,7 @@ function passingTest262Result(path: string): Test262Result {
     },
     classification: "pass",
     dependencies: ["functions"],
-    observation: { harnessFailed: false, passed: true },
+    observation: { passed: true },
     unsupportedFeatures: [],
   };
 }
@@ -363,6 +369,34 @@ for (const deterministicFailure of [
     }
   });
 }
+
+test("separates infrastructure failures from harness defects", async () => {
+  const infrastructureSource = "/*---\nflags: [noStrict]\n---*/\n";
+  const infrastructure = await executeTest262Case(
+    infrastructureSource,
+    parseTest262Case(infrastructureSource, "test/failure.js", revision),
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/failure.js:1:1: error[OSEO3001]: " +
+        "The native executable could not be started.\n",
+    ),
+  );
+  assert.equal(infrastructure.classification, "infrastructure-failure");
+  assert.equal(infrastructure.observation.failureKind, "infrastructure");
+
+  const harnessSource =
+    "/*---\nflags: [noStrict]\nincludes: [missing.js]\n---*/\n";
+  const harness = await executeTest262Case(
+    harnessSource,
+    parseTest262Case(harnessSource, "test/failure.js", revision),
+    new Set<string>(),
+    harnesses,
+    { execute: () => Promise.resolve(successfulResult()) },
+  );
+  assert.equal(harness.classification, "harness-failure");
+  assert.equal(harness.observation.failureKind, "harness");
+});
 
 test("stops assigning reviewed work after a worker failure", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oseo-test262-abort-"));
@@ -777,72 +811,240 @@ test("serializes reviewed manifests without volatile metadata", () => {
       expectedNegatives: 0,
       groups: [],
       harnessFailures: 0,
+      infrastructureFailures: 0,
       passes: 0,
       semanticFailures: 0,
       unsupportedProfileFeatures: 0,
     },
   });
-  assert.doesNotMatch(serialized, /timestamp|generatedAt/u);
-  assert.ok(serialized.endsWith("\n"));
+  assert.doesNotMatch(serialized.indexText, /timestamp|generatedAt/u);
+  assert.ok(serialized.indexText.endsWith("\n"));
+  assert.deepEqual(serialized.partitions, []);
   const parity = serializeTargetParity(serialized, revision);
   assert.match(parity, /canonicalDigest: >-/u);
   assert.ok(parity.split("\n").every((line) => line.length <= 80));
 });
 
+test("partitions reviewed records by deterministic group and hash", () => {
+  const results = [
+    passingTest262Result("test/built-ins/Object/a.js"),
+    passingTest262Result("test/language/expressions/a.js"),
+    passingTest262Result("test/language/expressions/b.js"),
+  ];
+  const manifest = {
+    results,
+    suiteRevision: revision,
+    summary: summarizeTest262(results),
+  };
+  const serialized = serializeTest262Manifest(manifest);
+  assert.deepEqual(
+    serialized.partitions.map(({ group, key, path }) => ({
+      group,
+      key,
+      path,
+    })),
+    [
+      {
+        group: "built-ins/Object",
+        key: "de",
+        path: "results/built-ins/Object/de.yaml",
+      },
+      {
+        group: "language/expressions",
+        key: "1c",
+        path: "results/language/expressions/1c.yaml",
+      },
+      {
+        group: "language/expressions",
+        key: "a7",
+        path: "results/language/expressions/a7.yaml",
+      },
+    ],
+  );
+  const texts = new Map(
+    serialized.partitions.map((partition) => [partition.path, partition.text]),
+  );
+  assert.deepEqual(
+    parseReviewedManifest(
+      serialized.indexText,
+      (path) => texts.get(path) ?? assert.fail(`missing ${path}`),
+    ),
+    manifest,
+  );
+
+  assert.throws(
+    () =>
+      serializeTest262Manifest({
+        ...manifest,
+        results: [results[0]!, results[0]!],
+      }),
+    /result paths must be unique/u,
+  );
+});
+
+test("target parity covers every record partition", () => {
+  const firstResult = passingTest262Result(
+    "test/language/expressions/example.js",
+  );
+  const secondResult: Test262Result = {
+    ...firstResult,
+    observation: { detail: "partition changed", passed: true },
+  };
+  const first = serializeTest262Manifest({
+    results: [firstResult],
+    suiteRevision: revision,
+    summary: summarizeTest262([firstResult]),
+  });
+  const second = serializeTest262Manifest({
+    results: [secondResult],
+    suiteRevision: revision,
+    summary: summarizeTest262([secondResult]),
+  });
+  assert.equal(first.indexText, second.indexText);
+  assert.notEqual(test262ManifestDigest(first), test262ManifestDigest(second));
+});
+
+test("requires the manifest index to name every partition file", () => {
+  const result = passingTest262Result("test/language/expressions/example.js");
+  const serialized = serializeTest262Manifest({
+    results: [result],
+    suiteRevision: revision,
+    summary: summarizeTest262([result]),
+  });
+  const paths = serialized.partitions.map(({ path }) => path);
+  validateReviewedManifestFileSet(serialized.indexText, paths);
+  assert.throws(
+    () =>
+      validateReviewedManifestFileSet(serialized.indexText, [
+        ...paths,
+        "results/language/expressions/ff.yaml",
+      ]),
+    /unexpected=.*ff\.yaml/u,
+  );
+  assert.throws(
+    () => validateReviewedManifestFileSet(serialized.indexText, []),
+    /missing=.*\.yaml/u,
+  );
+});
+
 test("round-trips and shards the checked-in reviewed manifest", async () => {
-  const text = await readFile(
+  const indexText = await readFile(
     new URL("test262/results.yaml", import.meta.url),
     "utf8",
   );
-  const canonicalText = normalizeReviewedManifestText(text);
-  const manifest = parseReviewedManifest(canonicalText);
-  assert.equal(serializeTest262Manifest(manifest), canonicalText);
-  assert.equal(
-    serializeTest262Manifest(
-      parseReviewedManifest(
-        normalizeReviewedManifestText(canonicalText.replaceAll("\n", "\r\n")),
-      ),
-    ),
-    canonicalText,
+  const canonicalIndex = normalizeReviewedManifestText(indexText);
+  let activeReads = 0;
+  let peakReads = 0;
+  const partitions = await readSerializedManifestPartitions(
+    canonicalIndex,
+    async (path) => {
+      activeReads += 1;
+      peakReads = Math.max(peakReads, activeReads);
+      try {
+        return await readFile(
+          new URL(`test262/${path}`, import.meta.url),
+          "utf8",
+        );
+      } finally {
+        activeReads -= 1;
+      }
+    },
   );
+  assert.equal(peakReads, 1);
+  const partitionTexts = new Map(
+    partitions.map(({ path, text }) => [path, text]),
+  );
+  const reparsed = parseReviewedManifest(canonicalIndex, (path) => {
+    const text = partitionTexts.get(path);
+    if (text == null) throw new Error(`partition ${path} was not loaded`);
+    return text;
+  });
+  assert.equal(serializeTest262Manifest(reparsed).indexText, canonicalIndex);
+  assert.deepEqual(serializeTest262Manifest(reparsed).partitions, partitions);
 
   const shards = [1, 2, 3].map((index) =>
-    selectManifestShard(manifest, { index, total: 3 }),
+    selectManifestShard(reparsed, { index, total: 3 }),
   );
   assert.deepEqual(
     shards
       .flatMap((shard) => shard.results)
       .map((result) => result.case.path)
       .toSorted(),
-    manifest.results.map((result) => result.case.path).toSorted(),
+    reparsed.results.map((result) => result.case.path).toSorted(),
   );
   assert.equal(
     shards.reduce((total, shard) => total + shard.summary.passes, 0),
-    manifest.summary.passes,
+    reparsed.summary.passes,
   );
 });
 
 test("rejects malformed reviewed manifest entries", () => {
   assert.throws(
     () =>
-      parseReviewedManifest(`results:
+      parseReviewedManifest(
+        `partitions:
+  - group: language/expressions
+    key: 0a
+    path: results/language/expressions/0a.yaml
+suiteRevision: ${revision}
+summary: {}
+`,
+        () => `group: language/expressions
+key: 0a
+results:
   - case: {}
     classification: pass
     dependencies: []
 suiteRevision: ${revision}
-`),
+`,
+      ),
     /test262 result 0 path must be a non-empty string/u,
   );
   assert.throws(
     () =>
-      parseReviewedManifest(`results:
-  - case:
-      path: test/example.js
-    classification: pass
+      parseReviewedManifest(
+        `partitions:
+  - group: language/expressions
+    key: 0a
+    path: results/language/expressions/0a.yaml
 suiteRevision: ${revision}
 summary: {}
-`),
+`,
+        () => `group: language/expressions
+key: 0a
+results:
+  - case:
+      path: test/language/expressions/example.js
+    classification: pass
+suiteRevision: ${revision}
+`,
+      ),
     /test262 result 0 dependencies must be an array/u,
+  );
+  assert.throws(
+    () =>
+      parseReviewedManifest(
+        `partitions:
+  - group: language/expressions
+    key: 0a
+    path: results/language/expressions/0a.yaml
+suiteRevision: ${revision}
+summary: {}
+`,
+        () => `group: language/expressions
+key: 0a
+results:
+  - case:
+      path: test/language/expressions/example.js
+    classification: pass
+    dependencies: []
+    observation:
+      failureKind: infrastructure
+      passed: false
+suiteRevision: ${revision}
+`,
+      ),
+    /failure kind does not match/u,
   );
 });
 

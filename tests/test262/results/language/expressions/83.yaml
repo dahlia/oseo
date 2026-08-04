@@ -1,0 +1,289 @@
+group: language/expressions
+key: "83"
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Symbol.toPrimitive
+        - computed-property-names
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/bitwise-and/bigint-toprimitive.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - bigint-primitive
+      - error-intrinsics
+      - expression-operators
+      - object-properties
+      - symbols
+    observation:
+      detail: "test/language/expressions/bitwise-and/bigint-toprimitive.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/bitwise-and/bigint-toprimiti\
+        ve.js:231:12: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/call/spread-err-mult-err-itr-step.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/accessor-name-inst/literal-numeric-binary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-public
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/class/constructor-this-tdz-during-initializers.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-public
+        - computed-property-names
+        - Symbol.toPrimitive
+        - Symbol
+        - class
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/class/elements/computed-name-toprimitive-symbol.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: "test/language/expressions/class/elements/computed-name-toprimi\
+        tive-symbol.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/computed-name\
+        -toprimitive-symbol.js:200:4: error[OSEO1001]: Unknown binding
+        'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/invalid-names/method-outter-member-expression-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/ident-name-method-def-default-escaped-ext.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - rest-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/method/object-destructuring-param-strict-body.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - destructuring-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/does-not-equals/bigint-and-number.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - bigint-primitive
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/does-not-equals/bigint-and-number.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/does-not-equals/bigint-and-n\
+        umber.js:95:24: error[OSEO1001]: Unknown binding 'Number'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - exponentiation
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/exponentiation/exp-operator-syntax-error-bitnot-unary-expression-base.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -5,12 +5,14 @@ Status
 ------
 
 Implementation status: in progress. The runtime archive reuse, concurrent
-reviewed execution, and compatibility ratchet checkpoints are complete, while
-the later checkpoints remain planned. This plan defines the cost contract for
-the reviewed evidence gates and the checkpoints that keep that cost usable as
-the reviewed corpus grows. It does not change any language semantic, any
-classification vocabulary by itself, or the amount of evidence a semantic
-unit must supply.
+reviewed execution, compatibility ratchet, infrastructure failure
+classification, and manifest record partitioning checkpoints are complete.
+The seed allocation registry and per-family evidence lanes remain planned.
+This plan defines the cost contract for the reviewed evidence gates and the
+checkpoints that keep that cost usable as the reviewed corpus grows. It does
+not change any language semantic or the amount of evidence a semantic unit
+must supply. Its one classification change is the named non-semantic
+infrastructure checkpoint required by ADR 0013.
 
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
@@ -316,10 +318,17 @@ Owner: [*PLAN-PT.md*](./PLAN-PT.md).
 
 ### Infrastructure failure classification
 
-The concurrency checkpoint retries an infrastructure failure but still
-reports it through the harness classification. This checkpoint separates the
-two, so a resource failure and a harness defect stop reaching the gate through
-one vocabulary.
+Checkpoint status: complete.
+
+The concurrency checkpoint retried a named infrastructure failure but still
+reported an exhausted retry or another infrastructure failure through the
+harness classification. The result observation now carries an optional
+`failureKind` whose exact values are `harness` and `infrastructure`.
+Harness-source assembly, missing harness inputs, and adapter graph defects use
+the first value. Host execution exceptions, native process failures, toolchain
+failures, and temporary-resource failures use the second. The derived
+classifications are `harness-failure` and `infrastructure-failure`, and the
+reviewed gate rejects both separately.
 
 ADR 0013 records that renaming a classification is a breaking manifest change
 that lands together with the schema expansion. This checkpoint therefore lands
@@ -327,12 +336,22 @@ as one reviewed change that extends the manifest schema, updates the
 classification vocabulary, regenerates the canonical manifest, and amends
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md).
 
+Focused regressions distinguish an executor exception from a harness assembly
+defect and reject a manifest record whose `failureKind` and classification do
+not match. The regenerated 4,861-case manifest contains zero harness,
+infrastructure, or semantic failures. The shared measurement with record
+partitioning is recorded below and in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
+
 ### Manifest record partitioning
 
-At the baseline the manifest holds 681 records in 19,676 lines, and
-*target-parity.yaml* pins one digest over one canonical file. At the corpus
-size the claim requires, one checked-in file holds a number of records that no
-reviewer can inspect and that every concurrent unit conflicts on.
+Checkpoint status: complete.
+
+At the throughput baseline the manifest held 681 records in 19,676 lines. By
+this checkpoint the same file held 4,861 records in 155,346 lines, and
+*target-parity.yaml* pinned one digest over that canonical file. At the corpus
+size the claim requires, one checked-in file held a number of records that no
+reviewer could inspect and that every concurrent unit conflicted on.
 
 The M5a inventory does not create that file. ADR 0020 stores 47,381 candidate
 paths in a separate 47,390-line tab-separated index, of which 41,091 form the
@@ -343,10 +362,45 @@ The isolated exact-regeneration check takes 4.93 s with a 1.15
 processor-time-to-wall ratio, as recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
-Records are partitioned by a deterministic key, the summary and digest are
-derived from the ordered partitions, and shard reconstruction continues to
-select from the reviewed order. This is a record-format change and extends
-ADR 0013 in the same reviewed change.
+*results.yaml* is now a 3,851-line index over 1,161 nonempty partitions. A
+record's group remains the first two upstream path segments, and its bucket is
+the first byte of the path's SHA-256 digest. The resulting path is
+*results/<group>/<key>.yaml*. The largest partition has 16 records and 528
+lines. This bounded key keeps a large path group from becoming another
+single-file bottleneck.
+
+The index carries the suite revision and the summary derived from every
+partition. Readers validate the exact indexed file set, sorted unique index,
+partition ownership, sorted unique record paths, revision, classification and
+failure-kind pairing, and exact derived summary. They reconstruct the global
+upstream path order before deterministic shard selection. Regeneration writes
+every partition and removes stale ones. The compatibility ratchet reads the
+partition set from the worktree and from a Git baseline; its legacy baseline
+reader permits this one-time schema migration without weakening current
+validation.
+
+*target-parity.yaml* continues to name *results.yaml* as the manifest entry
+point. Its digest now covers the index followed by every ordered partition,
+with each UTF-8 path and body length-framed before hashing. A focused
+regression changes only a partition body and proves the digest changes.
+
+The final exact regeneration retained revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`, all 4,861 records, and exactly
+2,934 passes. It recorded 1,355 expected negatives, 572 unsupported profile
+features, and no semantic, harness, or infrastructure failures. The ratchet
+compared the partitioned worktree against the single-file baseline without a
+count, path, seed, domain, or case-budget change.
+
+| Task                                   | Wall     | User       | System     | CPU / wall |
+| -------------------------------------- | -------- | ---------- | ---------- | ---------- |
+| `mise run test262:update`              | 500.10 s | 2,947.07 s | 1,049.63 s | 7.99       |
+| `mise run check:compatibility-ratchet` | 2.90 s   | 3.69 s     | 0.45 s     | 1.43       |
+
+This checkpoint has no timing target. Complete host facts and the manifest
+shape measurements are recorded in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). This
+record-format change extends ADR 0013 in the same reviewed change as the
+classification vocabulary.
 
 ### Per-family evidence lanes
 

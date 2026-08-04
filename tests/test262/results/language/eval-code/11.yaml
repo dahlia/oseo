@@ -1,0 +1,30 @@
+group: language/eval-code
+key: "11"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
+        t-nostrict.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
+        is-strict-nostrict.js:88:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

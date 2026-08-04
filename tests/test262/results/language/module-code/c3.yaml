@@ -1,0 +1,27 @@
+group: language/module-code
+key: c3
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: resolution
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-named-err-not-found-as.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/instn-named-err-not-found-as.js:103:\
+        10: error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

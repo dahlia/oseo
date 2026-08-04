@@ -79,9 +79,10 @@ re-reviews every affected classification in the same change.
     capability named until the runtime and harness can observe them. They
     are never counted as passes and never silently dropped. The named
     capability distinguishes a missing language feature from a missing
-    harness observation; the `harness-failure` classification stays
-    reserved for faults during an attempted execution, because the reviewed
-    gate rejects any manifest containing one. Every unsupported result
+    harness observation. `harness-failure` records a defect in the test
+    adapter or its harness, while `infrastructure-failure` records a host,
+    process, toolchain, or temporary-storage failure. The reviewed gate rejects
+    any manifest containing either. Every unsupported result
     inside the claim boundary, including one caused only by a missing
     observation capability, blocks the conformance label until it is
     resolved.
@@ -94,19 +95,44 @@ re-reviews every affected classification in the same change.
 ### Compatibility manifest schema
 
 The checked-in manifest under *tests/test262/* is the source of truth for M5
-progress. This section freezes the accepted schema; the runner and manifest
-migration land in the M5 measurement changes that follow this record, and
-until they land the checked-in files keep the M3-era shape.
+progress. This section freezes the accepted schema. The record-partitioning
+and infrastructure-classification amendment below replaces the earlier
+single-file result layout and `harnessFailed` observation field.
 
 The reviewed subset (*subset.yaml*) pins the suite revision, the supported
 feature list, and one entry per sorted unique path holding the expected
 classification and reviewed semantic dependency tags. One upstream path is
 one manifest row; strictness and specialization variants are recorded
-inside the row and never multiply the counted total. The result manifest
-(*results.yaml*) is shaped as:
+inside the row and never multiply the counted total.
+
+The result index (*results.yaml*) lists each nonempty path-group bucket in
+sorted partition-path order, pins the suite revision, and carries the derived
+summary:
 
 ~~~~ yaml
+partitions:
+  - group: language/module-code
+    key: a3
+    path: results/language/module-code/a3.yaml
 suiteRevision: <revision>
+summary:
+  passes: 0
+  expectedNegatives: 0
+  semanticFailures: 0
+  unsupportedProfileFeatures: 0
+  harnessFailures: 0
+  infrastructureFailures: 0
+  groups: []
+  dependencies: []
+~~~~
+
+Each partition repeats its group, key, and revision around an ordered
+`results` array. A record retains the earlier per-case contract, with
+`failureKind` replacing the boolean `harnessFailed` field:
+
+~~~~ yaml
+group: language/module-code
+key: a3
 results:
   - case:
       path: test/language/module-code/example.js
@@ -135,42 +161,35 @@ results:
       passed: false
       failedPhase: resolution   # actual phase when a failure occurred
       errorType: SyntaxError    # observed type when observable
-      harnessFailed: false
+      failureKind: infrastructure   # optional harness | infrastructure
       unsupportedCapability: <name>   # optional named capability
       detail: <text>                  # optional human-readable evidence
     classification: expected-negative
     unsupportedFeatures: []
-summary:
-  passes: 0
-  expectedNegatives: 0
-  semanticFailures: 0
-  unsupportedProfileFeatures: 0
-  harnessFailures: 0
-  groups:
-    - group: language/module-code
-      passes: 0
-      expectedNegatives: 0
-      semanticFailures: 0
-      unsupportedProfileFeatures: 0
-      harnessFailures: 0
-  dependencies:
-    - dependency: top-level-await
-      passes: 0
-      expectedNegatives: 0
-      semanticFailures: 0
-      unsupportedProfileFeatures: 0
-      harnessFailures: 0
+suiteRevision: <revision>
 ~~~~
 
-`classification` has exactly five values: `pass`, `semantic-failure`,
-`expected-negative`, `unsupported-profile-feature`, and `harness-failure`.
+The deterministic partition group is the same path group used by the summary:
+the first two directory segments under *test/*. Within that group, the key is
+the first byte of the SHA-256 digest of the upstream path, written as two
+lowercase hexadecimal digits. A partition path is exactly
+*results/<group>/<key>.yaml*. This bounded hash bucket avoids recreating one
+large file for a high-volume group while keeping nearby review changes within
+the owning group. The index order, each partition's record order, group, key,
+path, revision, and derived summary are validated when read. Regeneration also
+removes a partition that no longer has a reviewed path.
+
+`classification` has exactly six values: `pass`, `semantic-failure`,
+`expected-negative`, `unsupported-profile-feature`, `harness-failure`, and
+`infrastructure-failure`.
 `expected-negative` generalizes the earlier `expected-parse-failure`
 classification so parse, resolution, and runtime negatives share one
-reviewed category with the actual phase recorded. Optional fields are
-omitted rather than recorded as null, and every field above is otherwise
-required. Extending this schema, including its dependency-tag vocabulary,
-is a reviewed change to this record; removing a field requires a
-superseding record.
+reviewed category with the actual phase recorded. `failureKind` is present
+only for a harness or infrastructure failure and must match its classification.
+Other optional fields are omitted rather than recorded as null, and every
+field above is otherwise required. Extending this schema, including its
+dependency-tag vocabulary, is a reviewed change to this record; removing a
+field requires a superseding record.
 
 One observation per row is deliberate: the runner rejects any difference
 between executed variants as a semantic failure whose recorded detail names
@@ -183,8 +202,9 @@ the entry records its upstream test path, so the checked-in manifest never
 contains host-specific canonical URLs. The entry's `sourceHash` hashes the
 executed input, which includes the assembled harness.
 
-Unsupported and harness results never increase the pass count. Summaries
-keep raw totals, dependency-indexed group totals derived deterministically
+Unsupported, harness, and infrastructure results never increase the pass
+count. Summaries keep raw totals, dependency-indexed group totals derived
+deterministically
 from the upstream path (a group is the first two directory segments under
 *test/*), and totals per reviewed dependency tag. Path groups are a
 navigation view; the `mode` and `async` fields index module and
@@ -196,6 +216,12 @@ vocabulary is `abrupt-completion`, `async-functions`, `functions`,
 `lexical-bindings`, `module-linking`, `object-properties`,
 `promise-settlement`, `timers`, and `top-level-await`; any other value is
 a validation error until a reviewed change to this record admits it.
+
+*target-parity.yaml* retains *results.yaml* as the named canonical manifest,
+but its digest covers the index followed by every partition in index order.
+Each UTF-8 path and file body is length-framed before hashing, so no file
+boundary or concatenation ambiguity can preserve a stale digest. The index is
+therefore the entry point, while parity covers the complete record set.
 
 The M5 core expression work extends the vocabulary with four reviewed
 tags: `expression-operators` for scalar operator cases such as `typeof`,
@@ -256,9 +282,9 @@ group's status against it. Coverage reports become comparable across M5
 checkpoints because the boundary definition, counting rule, and record
 format are fixed; the reviewed subset still grows checkpoint by checkpoint,
 and [ADR 0020](./0020-m5-applicable-test-inventory.md) maps the pinned corpus
-to a separate complete applicable-test inventory. Renaming the result
-classification is a breaking manifest change and lands together with the
-schema expansion so the manifest never mixes vocabularies.
+to a separate complete applicable-test inventory. The partitioned schema and
+the `infrastructure-failure` classification landed as one breaking manifest
+change, so no checked-in manifest mixes the old and new vocabularies.
 
 
 Failure modes and replacement triggers

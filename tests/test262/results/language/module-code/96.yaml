@@ -1,0 +1,41 @@
+group: language/module-code
+key: "96"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-star-equality.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-equality.js
+            - test/language/module-code/instn-star-equality-other_FIXTURE.js
+          id: test/language/module-code/instn-star-equality.js
+          sourceHash: fnv1a64:7603a7601dd53c56
+        - dependencies:
+            - test/language/module-code/instn-star-equality.js
+          id: test/language/module-code/instn-star-equality-other_FIXTURE.js
+          sourceHash: fnv1a64:4be5550c656ee09a
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

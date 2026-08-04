@@ -6,7 +6,8 @@
     "artifacts/**",
     "mise.toml",
     "packages/*/dist/**",
-    "tests/test262/results.yaml"
+    "tests/test262/results.yaml",
+    "tests/test262/results/**"
   ],
   "printWidth": 80
 }

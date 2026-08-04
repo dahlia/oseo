@@ -1,0 +1,27 @@
+group: language/literals
+key: 6c
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - BigInt
+        - numeric-separator-literal
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/literals/bigint/numeric-separators/numeric-separator-literal-dd-nsl-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - bigint-primitive
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

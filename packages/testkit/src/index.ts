@@ -56,9 +56,13 @@ export interface FixtureObservation extends ProcessObservation {}
 export type Test262Classification =
   | "expected-negative"
   | "harness-failure"
+  | "infrastructure-failure"
   | "pass"
   | "semantic-failure"
   | "unsupported-profile-feature";
+
+/** Non-semantic failure source recorded before result classification. */
+export type Test262FailureKind = "harness" | "infrastructure";
 
 /** Strictness variants requested by test262 frontmatter. */
 export type Test262Strictness = "non-strict" | "strict";
@@ -152,8 +156,8 @@ export interface Test262Execution {
 export interface Test262Observation {
   readonly detail?: string;
   readonly errorType?: string;
+  readonly failureKind?: Test262FailureKind;
   readonly failedPhase?: Test262FailurePhase;
-  readonly harnessFailed: boolean;
   readonly passed: boolean;
   readonly unsupportedCapability?: string;
 }
@@ -172,6 +176,7 @@ export interface Test262Result {
 export interface Test262Counts {
   readonly expectedNegatives: number;
   readonly harnessFailures: number;
+  readonly infrastructureFailures: number;
   readonly passes: number;
   readonly semanticFailures: number;
   readonly unsupportedProfileFeatures: number;
@@ -355,8 +360,10 @@ export function classifyTest262(
     observation.failedPhase === testCase.expectedFailurePhase &&
     errorTypeMatches;
   let classification: Test262Classification;
-  if (observation.harnessFailed) {
+  if (observation.failureKind === "harness") {
     classification = "harness-failure";
+  } else if (observation.failureKind === "infrastructure") {
+    classification = "infrastructure-failure";
   } else if (
     unsupportedFeatures.length > 0 ||
     observation.unsupportedCapability != null
@@ -382,6 +389,7 @@ export function classifyTest262(
 interface MutableTest262Counts {
   expectedNegatives: number;
   harnessFailures: number;
+  infrastructureFailures: number;
   passes: number;
   semanticFailures: number;
   unsupportedProfileFeatures: number;
@@ -391,6 +399,7 @@ function emptyCounts(): MutableTest262Counts {
   return {
     expectedNegatives: 0,
     harnessFailures: 0,
+    infrastructureFailures: 0,
     passes: 0,
     semanticFailures: 0,
     unsupportedProfileFeatures: 0,
@@ -405,6 +414,8 @@ function countClassification(
     counts.expectedNegatives += 1;
   } else if (classification === "harness-failure") {
     counts.harnessFailures += 1;
+  } else if (classification === "infrastructure-failure") {
+    counts.infrastructureFailures += 1;
   } else if (classification === "pass") {
     counts.passes += 1;
   } else if (classification === "semantic-failure") {
