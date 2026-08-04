@@ -29,11 +29,13 @@ separate from the result manifest.
 M5a remains open. Unit 8.5n audited the current implementation,
 source-located rejections, the admitted profile, the applicable test262
 inventory and results, and the known-gap list. It discovered that optional
-private access has parser, HIR, and MIR structural coverage but lacks native
-and differential evidence for its nullish short circuit, valid-brand access,
-and invalid-brand `TypeError` under both specialization policies and forced
-collection. A separate evidence unit in the core expressions and bindings
-stream owns that M5a follow-up. The remaining gaps keep their M5b intrinsic and
+private field and accessor reads and optional private method calls have parser,
+HIR, and MIR structural coverage but lack native and differential evidence.
+That evidence must cover nullish short circuit, valid-brand access,
+invalid-brand `TypeError`, and method receiver preservation under both
+specialization policies and forced collection. A separate evidence unit in the
+core expressions and bindings stream owns that M5a follow-up. The remaining
+gaps keep their M5b intrinsic and
 global-object, module and asynchronous execution, standards harness, host, or
 accepted dynamic-source owners. The audit changes no semantics, compatibility
 classification, revision pin, generated domain, property seed, or case budget.
@@ -46,7 +48,7 @@ diagnostics and the `dynamic-source` manifest tag.
 track without reopening the M5 decision. Realms, agents, and shared memory
 remain classified through missing harness capabilities.
 The M5a portion of delivery item 5 remains open only for the optional private
-access evidence named above. The admitted syntax now
+read and call evidence named above. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
@@ -749,9 +751,11 @@ and applies the same private-name lookup and brand check. At this checkpoint,
 `#name in object`, optional `?.#name` access, and a private reference used as a
 destructuring or `for-of` assignment target stayed rejected with source-located
 diagnostics. Later units admit the brand check and private assignment target.
-The frontend now carries optional private access through HIR and MIR, but its
-native and differential evidence under both specialization policies and forced
-collection remains an M5a follow-up. `delete this.#name` remains an early error.
+The frontend now carries optional private reads and method calls through HIR
+and MIR, but native and differential evidence for their nullish short circuit,
+valid-brand access, invalid-brand `TypeError`, and method receiver preservation
+under both specialization policies and forced collection remains an M5a
+follow-up. `delete this.#name` remains an early error.
 Fixed
 native fixtures cover private fields, methods, accessors, brand checks,
 updates, the values private state can hold, and a hinted method that
@@ -1878,7 +1882,9 @@ Module top level keeps a source-located rejection for the same positions. Its
 private traced frame can suspend an ordinary expression or control-flow
 position, but module graph compilation rejects these pattern positions before
 constructing that frame. That residue stays with the modules and asynchronous
-execution stream.
+execution stream. The module-owned follow-up must also replace the adjacent
+stale compiler comment, which attributes this rejection to the continuation
+transform, with this traced-frame rationale.
 
 The generated property suite uses seed `0x5eed0028` across four pattern
 positions, three body forms, supplied and missing selections, fulfilled and
@@ -3359,12 +3365,14 @@ update, private static elements, private brand checks, private assignment
 targets, asynchronous generators, `export default class`, or traced module
 await positions remain rejected were stale and are corrected in the profile.
 
-The audit also found one M5a evidence gap. Optional private access such as
-`obj?.#name` reaches parser-owned syntax, HIR, and MIR, but has no native or
-differential execution covering a nullish short circuit, valid-brand access,
-and invalid-brand `TypeError` under both specialization policies and forced
-collection. A separate evidence unit owned by the core expressions and
-bindings stream must close that gap before M5a completes.
+The audit also found one M5a evidence gap. Optional private field and accessor
+reads such as `object?.#field` and `object?.#accessor`, and optional private
+method calls such as `object?.#method()`, reach parser-owned syntax, HIR, and
+MIR, but have no native or differential execution covering nullish short
+circuit, valid-brand access, invalid-brand `TypeError`, and method receiver
+preservation under both specialization policies and forced collection. A
+separate evidence unit owned by the core expressions and bindings stream must
+close that gap before M5a completes.
 
 The executable rejections that remain have owners outside the two M5a
 streams. An array pattern reached from a `for-in` key needs the M5b string
@@ -3380,7 +3388,8 @@ stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
 source remains owned by ADR 0016.
 
 The audit therefore keeps the M5a checkpoint open for the separate optional
-private access evidence unit without changing the reviewed manifest's 4,857
+private read and call evidence unit without changing the reviewed manifest's
+4,857
 cases, 2,932 passes, 1,355 expected negatives, 570 unsupported profile
 features, zero semantic failures, or zero harness failures. The
 41,091-path inventory, suite and edition revision pins, property seeds and

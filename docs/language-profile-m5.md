@@ -17,11 +17,13 @@ A group's status describes tested current behavior, never intended behavior.
 
 M5a remains open. Unit 8.5n audited the implementation, source-located
 rejections, admitted prose, applicable-test inventory and results, and this
-document's known-gap list. It discovered that optional private access has
-structural coverage but lacks the native and differential semantic evidence
-under both specialization policies and forced collection required for
-admission. The core expressions and bindings stream owns that follow-up. M5
-also remains active through its M5b and M5c checkpoints.
+document's known-gap list. It discovered that optional private field and
+accessor reads and optional private method calls have structural coverage but
+lack native and differential semantic evidence for nullish short circuit,
+valid-brand access, invalid-brand `TypeError`, and method receiver preservation
+under both specialization policies and forced collection. The core expressions
+and bindings stream owns that follow-up. M5 also remains active through its M5b
+and M5c checkpoints.
 
 
 Claim boundary
@@ -1942,10 +1944,12 @@ its deliberate boundary and its evidence:
     private-name lookup and brand check that a `this.#name` reference performs.
     The `in` entry and the destructuring and iterator entries above record the
     evidence that admits `#name in object` and private assignment targets.
-    Optional `?.#name` access is structurally represented through HIR and MIR,
-    but remains outside the admitted profile until the native and differential
-    evidence under both specialization policies and forced collection recorded
-    below exists.
+    Optional private field and accessor reads and optional private method calls,
+    including `object?.#method()`, are structurally represented through HIR and
+    MIR. They remain outside the admitted profile until native and differential
+    evidence covers nullish short circuit, valid-brand access, invalid-brand
+    `TypeError`, and method receiver preservation under both specialization
+    policies and forced collection.
     `delete this.#name` remains the early error it is. Native differential
     fixtures cover private fields and their absence from every key observation,
     private methods including installation order, non- writability,
@@ -2905,10 +2909,12 @@ open. It changes no semantic or compatibility classification.
  -  Regular expression syntax, objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  Optional private access such as `obj?.#name` has parser, HIR, and MIR
-    structural coverage, but no native or differential execution proves its
-    nullish short circuit, valid-brand access, and invalid-brand `TypeError`
-    under both specialization policies and forced collection. Owner: the core
+ -  Optional private field and accessor reads such as `object?.#field` and
+    `object?.#accessor`, and optional private method calls such as
+    `object?.#method()`, have parser, HIR, and MIR structural coverage, but no
+    native or differential execution proves nullish short circuit, valid-brand
+    access, invalid-brand `TypeError`, or method receiver preservation under
+    both specialization policies and forced collection. Owner: the core
     expressions and bindings stream. Unit 8.5n discovered this follow-up; a
     separate M5a evidence unit must close it.
  -  `import.meta`, `export var`, and namespace re-exports such as
