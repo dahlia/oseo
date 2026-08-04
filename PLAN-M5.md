@@ -26,6 +26,20 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
+M5a remains open. Unit 8.5n audited the current implementation,
+source-located rejections, the admitted profile, the applicable test262
+inventory and results, and the known-gap list. It discovered that optional
+private field and accessor reads and optional private method calls have parser,
+HIR, and MIR structural coverage but lack native and differential evidence.
+That evidence must cover nullish short circuit, valid-brand access,
+invalid-brand `TypeError`, and method receiver preservation under both
+specialization policies and forced collection. A separate evidence unit in the
+core expressions and bindings stream owns that M5a follow-up. The remaining
+gaps keep their M5b intrinsic and
+global-object, module and asynchronous execution, standards harness, host, or
+accepted dynamic-source owners. The audit changes no semantics, compatibility
+classification, revision pin, generated domain, property seed, or case budget.
+
 Delivery item 8 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the
 `Function` constructor, and dynamic import explicitly unsupported with owned
@@ -33,7 +47,8 @@ diagnostics and the `dynamic-source` manifest tag.
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
 track without reopening the M5 decision. Realms, agents, and shared memory
 remain classified through missing harness capabilities.
-Delivery item 5 is substantially in progress. The admitted syntax now
+The M5a portion of delivery item 5 remains open only for the optional private
+read and call evidence named above. The admitted syntax now
 covers every scalar operator family (`typeof`, `void`, `%`, `**`,
 bitwise and shift operators, unary `+` and `~`, `&&`, `||`, `??`, the
 conditional and comma operators, loose equality, `in`, and
@@ -300,11 +315,12 @@ operations and a `resultObject` flag on `generator-yield`, and the generator
 record records whether the pending suspension already yielded a complete
 iterator result object.
 
-`%GeneratorPrototype%.throw`, asynchronous generators, and generator
-method definitions remain rejected with source-located diagnostics. No throw
-resumption can reach a body while `%GeneratorPrototype%.throw` is
-unimplemented, so the `throw` branch of `yield*` is unreachable and
-unimplemented. `%GeneratorFunction%` and `%GeneratorFunction.prototype%` stay
+At this checkpoint, `%GeneratorPrototype%.throw`, asynchronous generators, and
+generator method definitions remained rejected with source-located
+diagnostics; later units admit all three. No throw resumption could reach a
+body while `%GeneratorPrototype%.throw` was unimplemented, so the `throw`
+branch of `yield*` was then unreachable and unimplemented.
+`%GeneratorFunction%` and `%GeneratorFunction.prototype%` stay
 unmaterialized: every specified route to them starts at
 `Object.getPrototypeOf(function* () {})`, which this profile does not admit,
 creating a generator function from one needs the dynamic-source boundary of
@@ -414,11 +430,13 @@ computed method definitions, `constructor` and `prototype` property
 descriptors, method default, trailing-comma, and rest parameter forms,
 class-scope name lexical open and close observations, and the strict-mode and
 duplicate- binding early errors. Ten deliberately unsupported cases record the
-unit's boundaries. Static initialization blocks and `export default class`
-remain rejected with source-located diagnostics.
-Asynchronous class methods are admitted, because they share the object literal
-method path exactly; generator and asynchronous generator methods stay rejected
-with the same diagnostic object literals already use. The manifest moves to 812
+unit's boundaries. At this checkpoint, static initialization blocks and
+`export default class` remained rejected with source-located diagnostics;
+later units admit both named and anonymous default class exports and static
+blocks. Asynchronous class methods are admitted, because they share the object
+literal method path exactly; generator and asynchronous generator methods were
+then still rejected with the same diagnostic object literals already used and
+are admitted by later units. The manifest moves to 812
 passes, 363 expected negatives, and 150 unsupported profile features with no
 semantic or harness failures.
 
@@ -478,9 +496,10 @@ symbol keys, and writable, non-enumerable, configurable placement, so
 `Object.keys` on the constructor stays empty. Because it defines an own
 property of the constructor, a static element replaces the `name` or `length`
 the class installed, and a computed `"prototype"` key throws a `TypeError`
-against the non-writable, non-configurable `prototype` property. Static
-initialization blocks and private static methods and accessors stay rejected
-with the class element diagnostic they already had. Fixed native fixtures
+against the non-writable, non-configurable `prototype` property. At this
+checkpoint, static initialization blocks and private static methods and
+accessors stayed rejected with the class element diagnostic they already had;
+later units admit all three. Fixed native fixtures
 cover a static method, a static getter and setter pair, `this` inside a static
 method called through the class and through a detached reference, the static
 method descriptor and its attributes, static `name` and `length` for methods
@@ -728,11 +747,16 @@ inside it. A derived constructor installs its private elements where
 temporal dead zone `ReferenceError` rather than a brand `TypeError`.
 Compound assignment and the update operators read and write the element once
 through the same name. A private reference may use another object as its base
-and applies the same private-name lookup and brand check. Deliberate
-boundaries: `#name in object`, optional `?.#name` access, and a private
-reference used as a destructuring or `for-of` assignment target stay rejected
-with source-located diagnostics, and `delete this.#name` is reported as an
-early error. Fixed
+and applies the same private-name lookup and brand check. At this checkpoint,
+`#name in object`, optional `?.#name` access, and a private reference used as a
+destructuring or `for-of` assignment target stayed rejected with source-located
+diagnostics. Later units admit the brand check and private assignment target.
+The frontend now carries optional private reads and method calls through HIR
+and MIR, but native and differential evidence for their nullish short circuit,
+valid-brand access, invalid-brand `TypeError`, and method receiver preservation
+under both specialization policies and forced collection remains an M5a
+follow-up. `delete this.#name` remains an early error.
+Fixed
 native fixtures cover private fields, methods, accessors, brand checks,
 updates, the values private state can hold, and a hinted method that
 specializes while private elements surround it on every guard path. The
@@ -820,6 +844,18 @@ private accessor cases enter as passes. The reviewed subset gains the
 `class-static-methods-private` feature tag. The manifest moves to 1,883 passes,
 1,120 expected negatives, and 963 unsupported profile features with no
 semantic or harness failures.
+
+Subsequent evidence admits the private forms this checkpoint still rejected.
+`#name in object` has a fixed native differential fixture and a generated
+property with seed `0x5eed001d` that compares an independent brand model with
+Node.js, Deno, and native execution under both specialization policies and
+forced collection on the enabled path. Nineteen reviewed test262 cases cover
+its runtime behavior and early errors. Focused frontend tests pin private
+destructuring and for-of assignment targets through the existing private-set
+operation, and five reviewed test262 cases execute them under both
+specialization policies. M5a Units 8.5l and 8.5m later exercise the same
+private-target path in direct and object-pattern for-in heads under native
+differential execution, both specialization policies, and forced collection.
 
 Class static initialization blocks are now admitted, the tenth unit of the
 functions and executable syntax stream. A `static { ... }` element declares
@@ -922,8 +958,9 @@ methods, nested and `finally`-wrapped loops, and every catchable `TypeError`
 the protocol defines. A generated property with seed `0x5eed0011` draws
 asynchronous and synchronous iterator kinds, head forms, transfer positions,
 and close modes under both specialization policies and forced collection.
-Asynchronous generators stay rejected, so the asynchronous generator cases
-the `async-iteration` tag reaches stay outside the reviewed subset.
+At this checkpoint asynchronous generators stayed rejected, so the
+asynchronous generator cases the `async-iteration` tag reached stayed outside
+the reviewed subset. A later unit admits asynchronous generators.
 Two hundred eighty-one reviewed test262 cases newly pass, ninety new expected
 negatives record the head's early errors, and eight new unsupported cases
 record that asynchronous generator boundary. The reviewed subset gains the
@@ -1460,8 +1497,9 @@ property references, observable read and write key conversions, identifier
 function-name inference, and immutable failure. Forty-two reviewed test262
 `for-of` binding cases now pass because their `+=` loop bodies use the same
 lowering. An ordinary asynchronous function now retains the reference and
-already-read target value across suspension; module top level keeps its
-separate continuation restriction.
+already-read target value across suspension. Module top level uses its private
+traced frame for the same position; only the pattern-position module await gap
+recorded below remains.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
@@ -1840,10 +1878,13 @@ the `await` position, an unfinished array-pattern iterator closes exactly once
 before that completion leaves the pattern, and a done iterator is not closed
 again.
 
-Module top level keeps a source-located rejection for the same positions,
-because its continuation transform splits statements around whole `await`
-expressions rather than around the steps of a pattern. That residue moves to
-the modules and asynchronous execution stream.
+Module top level keeps a source-located rejection for the same positions. Its
+private traced frame can suspend an ordinary expression or control-flow
+position, but module graph compilation rejects these pattern positions before
+constructing that frame. That residue stays with the modules and asynchronous
+execution stream. The module-owned follow-up must also replace the adjacent
+stale compiler comment, which attributes this rejection to the continuation
+transform, with this traced-frame rationale.
 
 The generated property suite uses seed `0x5eed0028` across four pattern
 positions, three body forms, supplied and missing selections, fulfilled and
@@ -1936,9 +1977,9 @@ returns one export entry per bound name, because ExportedNames of an export
 declaration is the BoundNames of the whole declaration, and the module
 compiler's duplicate-declaration diagnostic searches a list's declarators so
 that it names the declarator rather than the whole module. Because the list is
-gone before HIR exists, the module continuation transform, the traced
-asynchronous frame, the specialization passes, and the C backend keep working
-on the same statements they already lowered, so awaited declarators,
+gone before HIR exists, module evaluator construction, the traced asynchronous
+frame, the specialization passes, and the C backend keep working on the same
+statements they already lowered, so awaited declarators,
 per-iteration loop cells, and both specialization policies follow from the
 existing machinery rather than from new code.
 
@@ -3315,6 +3356,44 @@ unsupported profile features with no semantic or harness failures. The
 suite revision, inventory policy, manifest schema, reviewed feature list,
 dependency vocabulary, and classification vocabulary are unchanged, and
 the 41,091-path applicable-test inventory is unchanged.
+
+M5a Unit 8.5n is the authoritative stale-profile-claims and gap audit.
+It compares the admitted prose with the frontend and compiler diagnostics,
+the implemented lowering and runtime paths, the applicable-test inventory,
+and the reviewed results. Claims that `??`, logical assignment, BigInt
+update, private static elements, private brand checks, private assignment
+targets, asynchronous generators, `export default class`, or traced module
+await positions remain rejected were stale and are corrected in the profile.
+
+The audit also found one M5a evidence gap. Optional private field and accessor
+reads such as `object?.#field` and `object?.#accessor`, and optional private
+method calls such as `object?.#method()`, reach parser-owned syntax, HIR, and
+MIR, but have no native or differential execution covering nullish short
+circuit, valid-brand access, invalid-brand `TypeError`, and method receiver
+preservation under both specialization policies and forced collection. A
+separate evidence unit owned by the core expressions and bindings stream must
+close that gap before M5a completes.
+
+The executable rejections that remain have owners outside the two M5a
+streams. An array pattern reached from a `for-in` key needs the M5b string
+iterator. A `super` property reference in an extends-free class or object
+literal method needs the M5b `Object.prototype`. A statically unresolved
+ordinary read or strict unresolved write needs the M5b global binding model
+to distinguish absent names from the realm's standard and mutable global
+properties; this includes the reviewed block- and switch-scope cases that
+expect a runtime `ReferenceError`. `import.meta`, `export var`, namespace
+re-exports such as `export * as ns from "./module.js"`, and module top-level
+pattern-position `await` remain with the modules and asynchronous execution
+stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
+source remains owned by ADR 0016.
+
+The audit therefore keeps the M5a checkpoint open for the separate optional
+private read and call evidence unit without changing the reviewed manifest's
+4,857
+cases, 2,932 passes, 1,355 expected negatives, 570 unsupported profile
+features, zero semantic failures, or zero harness failures. The
+41,091-path inventory, suite and edition revision pins, property seeds and
+budgets, and compatibility overrides are unchanged.
 
 ### Intrinsics and built-in objects
 

@@ -15,6 +15,16 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
+M5a remains open. Unit 8.5n audited the implementation, source-located
+rejections, admitted prose, applicable-test inventory and results, and this
+document's known-gap list. It discovered that optional private field and
+accessor reads and optional private method calls have structural coverage but
+lack native and differential semantic evidence for nullish short circuit,
+valid-brand access, invalid-brand `TypeError`, and method receiver preservation
+under both specialization policies and forced collection. The core expressions
+and bindings stream owns that follow-up. M5 also remains active through its M5b
+and M5c checkpoints.
+
 
 Claim boundary
 --------------
@@ -138,11 +148,12 @@ its deliberate boundary and its evidence:
     The untaken operand never evaluates, the produced value is the operand
     value rather than a coerced boolean, and evaluation order and abrupt
     completion follow the lowered control flow. `??` and the logical
-    assignment operators remain rejected. Ordinary asynchronous functions
+    assignment operators are admitted by their later entries below. Ordinary
+    asynchronous functions
     retain the selected path in their traced suspension frame, so `await`
     is admitted in logical and conditional operands there. Module top level
-    keeps its separate source-located rejection for this conditionally
-    evaluated suspension.
+    uses its private traced frame for the same conditionally evaluated
+    suspension.
  -  Labeled statements with labeled `break` and `continue`. Labels on
     loops bind to the loop's break and continue targets, labels on any
     other statement are break-only, chained labels share one target, and
@@ -342,6 +353,15 @@ its deliberate boundary and its evidence:
     the `in` operator's own copy had been missing. Non-object `in` right
     operands, non-callable `instanceof` right operands, and non-object
     `prototype` values throw catchable `TypeError` instances.
+    The private `#name in object` form resolves the name lexically and checks
+    for its field, method, or accessor without reading or invoking the element.
+    A fixed *class-private-in* native differential fixture and a generated
+    property with seed `0x5eed001d` cover per-evaluation identity, instance and
+    static placement, every private element kind, unbranded objects,
+    non-object `TypeError`, evaluation order, both specialization policies,
+    and forced collection on the enabled path against Node.js and Deno.
+    Nineteen reviewed test262 cases cover its runtime behavior and early
+    errors.
  -  Untagged template literals, normalized by the frontend into string
     concatenation. Substitutions evaluate left to right interleaved with
     the cooked template pieces, and every substitution converts through
@@ -395,9 +415,10 @@ its deliberate boundary and its evidence:
     cleanup keep their ordinary precedence. The call returns one capability
     promise, every suspension leaves the native stack, and resumption uses the
     centralized promise reaction construction and dispatch paths required by
-    [ADR 0022](./adr/0022-async-context-boundary.md). Binding-pattern
-    subexpressions keep their existing explicit restrictions, and top-level
-    module await keeps its separate continuation model. Fixed native evidence
+    [ADR 0022](./adr/0022-async-context-boundary.md). M5a Unit 8.3 admits the
+    binding-pattern subexpressions recorded below. Top-level module await uses
+    its own private traced frame, with the pattern-position boundary recorded
+    below. Fixed native evidence
     covers evaluation order, nested and loop positions, abrupt completion,
     awaited cleanup, heap locals across suspension, both specialization
     policies, false hints, a deliberate guard miss, and forced collection. A
@@ -431,10 +452,11 @@ its deliberate boundary and its evidence:
     in a `var` list with more than one declarator as a rejection. M5a Unit
     8.5a re-measured every such form in an asynchronous function and at
     module top level and found all of them admitted, so the stale
-    rejection is removed rather than reworded. Top-level Script
-    `var` creates a script binding rather than a global-object property;
-    the difference is unobservable while `globalThis` remains outside
-    the profile, and the `globalThis` gap entry owns the revisit.
+    rejection is removed rather than reworded. A top-level Script `var`
+    binding is also a cell-backed own property of the realm's global this
+    value, as M5a Unit 8.1d records below. `globalThis` and the complete global
+    object remain outside the profile, and that gap entry owns the remaining
+    Global Environment Record behavior.
  -  The `==` and `!=` loose equality operators, implementing
     `IsLooselyEqual` for the admitted values: nullish pairs are equal, a
     nullish operand compared with anything else is unequal without
@@ -578,8 +600,8 @@ its deliberate boundary and its evidence:
     entry point, and no ABI change, and both specialization policies emit
     the same store. Deliberate boundaries: a class body without `extends`
     and an object literal method keep the source-located `super` rejection
-    recorded below, a private member in a target position stays an early
-    error, `super?.x` and a declaration pattern such as
+    recorded below, a private name on `super` stays an early error,
+    `super?.x` and a declaration pattern such as
     `for (const [super.x] of it)` stay parse errors the bootstrap parser
     reports. M5a Unit 8.5l admits the same target in a for-in head and
     M5a Unit 8.5m inside that head's object pattern, both recorded below. A
@@ -638,8 +660,9 @@ its deliberate boundary and its evidence:
     cover all 15 operators, both target forms, short-circuiting, reference and
     conversion counts, both specialization policies, and forced collection.
     An ordinary asynchronous function retains the reference and current value
-    in its traced frame when the right operand awaits. Top-level module await
-    keeps its separate continuation restriction.
+    in its traced frame when the right operand awaits. Module top level uses
+    its private traced frame for the same position; only the pattern-position
+    module await gap recorded below remains.
  -  Prefix and postfix `++` and `--` for identifiers and static or computed
     member references. Each form reads once, coerces through the admitted
     Number path, adds or subtracts one, and performs a checked write. Prefix
@@ -656,8 +679,8 @@ its deliberate boundary and its evidence:
     negatives retain strict `arguments` early errors, and the newly admitted
     classic `for` update promotes an exponentiation case to pass. M5a Unit
     8.5h adds four further expected negatives covering `arguments` as a
-    prefix and postfix update target in strict code. BigInt update
-    semantics remain outside the admitted value profile.
+    prefix and postfix update target in strict code. M5a Unit 8.1a extends the
+    same update path to exact BigInt values.
  -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
     `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
     runtime-owned constructor values. An unshadowed reference to one of
@@ -764,9 +787,10 @@ its deliberate boundary and its evidence:
     and call and constructor argument spread consume object iterables through
     this protocol. A `for-of` head admits one `const`, `let`, or `var`
     identifier, array, or object declaration, an existing binding, a static or
-    computed member target, or an array or object assignment pattern whose
-    leaves are existing targets. Transparent parentheses around existing
-    identifier and member targets are normalized before classification.
+    computed ordinary member or private member target, or an array or object
+    assignment pattern whose leaves are existing targets. Transparent
+    parentheses around existing identifier and ordinary member targets are
+    normalized before classification.
     Declaration patterns reuse every binding pattern form admitted for
     standalone declarations. Pattern type annotations remain outside this
     syntax unit. Lexical names create their TDZ before the iterable expression
@@ -804,7 +828,8 @@ its deliberate boundary and its evidence:
     specialization policies and forced collection, MIR structural tests, and
     five reviewed test262 cases cover accumulation. Deliberate
     boundaries: string and other primitive iteration, which the
-    specification reaches by boxing, is unsupported; the promise combinators,
+    specification reaches by boxing, is unsupported and remains M5b work; the
+    promise combinators,
     `for-of`, array spread, call spread, constructor spread, and array binding
     declarations accept only
     object iterables. M5a Unit 8.5h makes `%Array.prototype.values%` and the
@@ -904,9 +929,8 @@ its deliberate boundary and its evidence:
     another container shape, that subtree remains unhinted without a diagnostic
     while matching siblings continue to map. Root container mismatches and type
     annotations that require resolution remain source-located unsupported
-    boundaries. Assignment member targets and `export var` remain outside this
-    array declaration syntax unit; M5a Unit 8.3 later admits `await` inside a
-    default, as recorded below.
+    boundaries. `export var` remains a module-syntax boundary; M5a Unit 8.3
+    later admits `await` inside a default, as recorded below.
  -  Object binding declarations. A `const` or `let` declarator
     and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -938,9 +962,9 @@ its deliberate boundary and its evidence:
     remains unhinted without a diagnostic while matching siblings continue to
     map. Root container mismatches and type annotations that require resolution
     or otherwise lack an admitted concrete syntactic shape remain source-located
-    unsupported boundaries. Assignment member targets and `export var` remain
-    outside this object declaration syntax unit; M5a Unit 8.3 later admits
-    `await` inside a property name or default, as recorded below.
+    unsupported boundaries. `export var` remains a module-syntax boundary;
+    M5a Unit 8.3 later admits `await` inside a property name or default, as
+    recorded below.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
     declarations, constructors, and arrows accept recursive array and object
     patterns plus top-level defaults and rest. The frontend retains plain
@@ -1144,9 +1168,9 @@ its deliberate boundary and its evidence:
     defaults, rest, nullish failure, both specialization policies, and forced
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
-    properties, and object rest descriptors. Assignment member targets and
-    pattern type annotations remain outside this syntax unit; M5a Unit 8.3
-    later admits `await` inside a property name or default, and M5a Unit
+    properties, and object rest descriptors. TypeScript pattern annotations
+    remain outside the ECMA-262 claim; M5a Unit 8.3 later admits `await`
+    inside a property name or default, and M5a Unit
     8.5b later admits the clause without any parameter, as recorded below.
  -  Optional catch binding. M5a Unit 8.5b admits a `catch` clause without a
     CatchParameter. The clause discards the thrown value, creates no
@@ -1198,15 +1222,19 @@ its deliberate boundary and its evidence:
     specialization policies, forced collection, and the AArch64 Linux
     cross-link. The deterministic name rule has no useful generated domain, so
     no property suite is added.
- -  Destructuring assignment with identifier and member targets. An assignment
-    expression admits recursive array and object patterns whose leaves and rest
-    targets name existing bindings or evaluate static or computed member
-    references. Transparent parentheses around identifier and member targets
-    are normalized before classification. The expression evaluates the right
-    operand once before pattern work and produces that original value. A member
-    leaf evaluates its object and computed-key expression before the
-    corresponding iterator step, source property read, or default, then
-    converts the key and stores after selecting the value. Array patterns
+ -  Destructuring assignment with identifier, ordinary member, and private
+    member targets. An assignment expression admits recursive array and object
+    patterns whose leaves and rest targets name existing bindings, evaluate
+    static or computed ordinary member references, or select a lexically
+    resolved private name on an evaluated object. Transparent parentheses
+    around identifier and ordinary member targets are normalized before
+    classification. The expression evaluates the right operand once before
+    pattern work and produces that original value. An ordinary member leaf
+    evaluates its object and computed-key expression before the corresponding
+    iterator step, source property read, or default, then converts the key and
+    stores after selecting the value. A private member leaf preserves the same
+    ordering and stores through the existing brand-checked private-set
+    operation. Array patterns
     retain iterator acquisition, captured `next`, defaults, nested patterns,
     rest, conditional close, and throw precedence. Object patterns retain the
     coercibility check before computed source keys, ordered `ToPropertyKey` and
@@ -1223,12 +1251,17 @@ its deliberate boundary and its evidence:
     targets, array and object inputs, defaults, rest, nullish failure, result
     identity, both specialization policies, and forced collection. Fourteen
     reviewed test262 cases add strict and non-strict evidence for identifier and
-    member writes, nested patterns, defaults, rest, result identity, nullish and
-    immutable target errors, and function-name inference. Synchronous `for-of`
-    assignment heads reuse this pattern and target contract. Pattern type
-    annotations remain outside this syntax unit; M5a Unit 8.3 later admits
-    `await` inside a source property name, default, or member target, as
-    recorded below.
+    ordinary member writes, nested patterns, defaults, rest, result identity,
+    nullish and immutable target errors, and function-name inference. Focused
+    frontend tests pin private destructuring and for-of targets through the
+    shared private-set lowering, and five reviewed test262 cases execute those
+    private targets under both specialization policies. M5a Units 8.5l and
+    8.5m later cover the same target path in direct and object-pattern for-in
+    heads under native differential execution, both specialization policies,
+    and forced collection. Synchronous `for-of` assignment heads reuse this
+    pattern and target contract. TypeScript pattern annotations remain outside
+    the ECMA-262 claim; M5a Unit 8.3 later admits `await` inside a source
+    property name, default, or ordinary member target, as recorded below.
  -  Basic object literal expressions. An object literal creates a fresh
     ordinary object and adds each data property, shorthand property, and
     method definition as an own writable, enumerable, configurable data
@@ -1448,9 +1481,11 @@ its deliberate boundary and its evidence:
     `return` error paths, the `done` and `value` read order, the delegating
     expression's result, and a return completion forwarded to an iterator with
     no `return` method, with one new expected negative and four honestly
-    unsupported cases that need `arguments`, the `Boolean` intrinsic, or an
-    unresolvable reference. The fourteen `star-rhs-iter-thrw-*` and
-    `star-throw-is-null` cases have not yet entered the reviewed subset, and
+    unsupported cases that at that checkpoint needed `arguments`, the
+    `Boolean` intrinsic, or an unresolvable reference. `arguments` has since
+    landed; the intrinsic and global-name dependencies retain their M5b owner.
+    The fourteen `star-rhs-iter-thrw-*` and `star-throw-is-null` cases have not
+    yet entered the reviewed subset and remain M5c inventory work, and
     `star-string` stays out until strings are iterable. The twenty-three
     reviewed
     *test/built-ins/GeneratorFunction/* cases are recorded as unsupported with
@@ -1499,8 +1534,8 @@ its deliberate boundary and its evidence:
     function expression, so `const Foo = class {}` reports a `name` of
     `Foo` while `const Foo = class Bar {}` reports `Bar`, including when
     the storage key is a computed object literal key that only reaches the
-    closure at run time. Deliberate boundary: `export default class` is
-    rejected with a source-located diagnostic.
+    closure at run time. Both named and anonymous `export default class`
+    declarations are admitted.
     Asynchronous class methods are admitted, because they reach the same
     lowering object literal async methods already use. Generator and
     asynchronous generator methods are admitted through the same prototype,
@@ -1608,9 +1643,9 @@ its deliberate boundary and its evidence:
     `"prototype"` key throws a `TypeError` against the non-writable,
     non-configurable `prototype` property. A literal `constructor` key is
     admitted on a static element and leaves `prototype.constructor`
-    untouched, unlike the prototype element the grammar rejects. Deliberate
-    boundary: private static methods and accessors are rejected with the
-    class element diagnostic. Native
+    untouched, unlike the prototype element the grammar rejects. Private
+    static methods and accessors are admitted by the later private-element
+    unit. Native
     differential fixtures retain a static method, a static getter and setter
     pair, static `this` through the class and through a detached reference,
     the static method and accessor descriptors and their attributes, static
@@ -1907,25 +1942,30 @@ its deliberate boundary and its evidence:
     element once and write it once through the same private name. A private
     reference may use another object as its base and performs the same
     private-name lookup and brand check that a `this.#name` reference performs.
-    Deliberate boundaries: `#name in object`, optional `?.#name` access, and a
-    private reference used as a destructuring or `for-of` assignment target
-    are rejected with source-located diagnostics, and `delete this.#name` is
-    reported as the early error it is. Native
-    differential fixtures cover private fields and their absence from every key
-    observation, private methods including installation order, non-
-    writability, non-constructibility, and the home object, private accessors,
-    brand checks across per-evaluation identity, plain objects, uninitialized
-    receivers, the prototype receiver, and a base that lacks a derived name,
-    the pre-`super()` temporal dead zone, compound assignment and update
-    operators, private state holding every admitted value, and a hinted method
-    that specializes while private fields, a private method, and a private
-    accessor surround it, with every guard path leaving those elements intact.
-    Eighty-four reviewed test262 cases newly pass and three hundred sixty-six
-    new expected negatives record the private name early errors, which are
-    dominated by the undeclared-private-name references every class element
-    form reports. Seventy new unsupported cases record this unit's boundaries.
-    The reviewed manifest moves to 1,161 passes, 826 expected negatives, and
-    297 unsupported profile features with no semantic or harness failures.
+    The `in` entry and the destructuring and iterator entries above record the
+    evidence that admits `#name in object` and private assignment targets.
+    Optional private field and accessor reads and optional private method calls,
+    including `object?.#method()`, are structurally represented through HIR and
+    MIR. They remain outside the admitted profile until native and differential
+    evidence covers nullish short circuit, valid-brand access, invalid-brand
+    `TypeError`, and method receiver preservation under both specialization
+    policies and forced collection.
+    `delete this.#name` remains the early error it is. Native differential
+    fixtures cover private fields and their absence from every key observation,
+    private methods including installation order, non- writability,
+    non-constructibility, and the home object, private accessors, brand checks
+    across per-evaluation identity, plain objects, uninitialized receivers, the
+    prototype receiver, and a base that lacks a derived name, the pre-`super()`
+    temporal dead zone, compound assignment and update operators, private state
+    holding every admitted value, and a hinted method that specializes while
+    private fields, a private method, and a private accessor surround it, with
+    every guard path leaving those elements intact. Eighty-four reviewed
+    test262 cases newly pass and three hundred sixty-six new expected negatives
+    record the private name early errors, which are dominated by the
+    undeclared-private-name references every class element form reports.
+    Seventy new unsupported cases record this unit's boundaries. The reviewed
+    manifest moves to 1,161 passes, 826 expected negatives, and 297 unsupported
+    profile features with no semantic or harness failures.
  -  Static class fields, public and private. A `static field = expression`
     and a `static #field = expression` element carry the same placement flag
     a static method already carries through the owned syntax tree and HIR,
@@ -2087,9 +2127,9 @@ its deliberate boundary and its evidence:
     boundary this unit keeps. The reviewed subset gains the `async-iteration`
     and `Symbol.asyncIterator` feature tags, and the manifest moves to 1,511
     passes, 988 expected negatives, and 381 unsupported profile features with
-    no semantic or harness failures. Deliberate boundaries: asynchronous
-    generators stay rejected, so the asynchronous generator cases the
-    `async-iteration` tag reaches stay outside the reviewed subset, and a
+    no semantic or harness failures. At this checkpoint asynchronous
+    generators stayed rejected; the asynchronous generator entry below admits
+    them. A
     `for await` head over a string still fails, because primitive iteration
     is unsupported. Inside an ordinary asynchronous function or asynchronous
     generator, each iterator step now starts a promise-producing runtime
@@ -2853,6 +2893,11 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
+M5a Unit 8.5n removed stale rejection claims for behavior the implementation
+already admits and assigned every genuine remaining rejection an explicit
+owner. The audit also found one M5a evidence gap, so the checkpoint remains
+open. It changes no semantic or compatibility classification.
+
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
     assignment, and update are admitted by M5a Unit 8.1a as recorded above.
     The callable `BigInt` intrinsic, `BigInt.prototype`, wrappers, constructor
@@ -2864,18 +2909,24 @@ must never shrink by reclassification alone.
  -  Regular expression syntax, objects, matching, and ahead-of-time literal
     compilation are outside the admitted profile and owned by
     [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
- -  There is no longer one undifferentiated remaining expression grammar gap.
-    The optional chaining and tagged template entries above name their fixed
-    native evidence, generated suites with seeds `0x5eed0019` and
-    `0x5eed001a`, and reviewed test262 cases. The forms that remain outside the
-    profile have specific boundaries: BigInt and regular expressions are
-    recorded above, and dynamic import and module top-level pattern-position
-    `await` are
-    recorded below. M5a Unit 8.1c admits the object-literal prototype setter,
-    Unit 8.1d admits Script and module top-level `this`, and Unit 8.2 admits the
-    remaining M5a `super` and `new.target` forms, as recorded above.
- -  `import.meta` remains rejected with a source-located diagnostic. Owner:
-    the modules and asynchronous execution stream.
+ -  Optional private field and accessor reads such as `object?.#field` and
+    `object?.#accessor`, and optional private method calls such as
+    `object?.#method()`, have parser, HIR, and MIR structural coverage, but no
+    native or differential execution proves nullish short circuit, valid-brand
+    access, invalid-brand `TypeError`, or method receiver preservation under
+    both specialization policies and forced collection. Owner: the core
+    expressions and bindings stream. Unit 8.5n discovered this follow-up; a
+    separate M5a evidence unit must close it.
+ -  `import.meta`, `export var`, and namespace re-exports such as
+    `export * as ns from "./module.js"` remain rejected with source-located
+    diagnostics. Reviewed test262 cases carrying
+    `export-star-as-namespace-from-module` classify
+    `unsupported-profile-feature`. Owner: the modules and asynchronous
+    execution stream.
+ -  Array destructuring of a `for-in` key remains rejected. Every enumerated
+    key is a string, and the realm does not yet expose the string iterator the
+    array pattern must consume. Owner: the intrinsics and built-in objects
+    stream.
  -  A `super` property reference in a class body without `extends` and in an
     object literal method stays rejected until the intrinsic graph provides
     the `Object.prototype` object such a lookup reaches. Owner: the intrinsics
@@ -2926,16 +2977,26 @@ must never shrink by reclassification alone.
     assertion reads the unresolved global `y` through
     `assert.throws(ReferenceError, ...)`, while the optional catch clauses
     it contains are admitted by M5a Unit 8.5b.
+    Strict writes to an unresolved name also stop at the source-located
+    boundary recorded above instead of producing the runtime
+    `ReferenceError` that a complete global environment would produce. The
+    reviewed *function-code/block-decl-onlystrict.js* and
+    *global-code/block-decl-strict.js* cases and four of the reviewed
+    _statements/switch/scope-lex-\*.js_ cases expose the same boundary. Their
+    block or switch binding is correctly absent outside its lexical scope, but
+    the remaining read receives the compile-stage `Unknown binding`
+    diagnostic instead of the runtime `ReferenceError` a complete global name
+    resolution path produces.
     Owner: the intrinsics and built-in objects stream; the surface audit in
     [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding
     property name, or an array or object binding default is admitted by M5a
     Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as
     recorded above. The same positions stay rejected with a source-located
-    diagnostic at module top level, where suspension comes from the module
-    continuation transform rather than a traced frame: that transform splits
-    statements around whole `await` expressions and has no way to split the
-    steps of a pattern. No reviewed test262 case exercises the module form on
+    diagnostic at module top level. Its private traced frame can suspend an
+    ordinary expression, but module construction still rejects a pattern that
+    contains `await` before that frame is built. No reviewed test262 case
+    exercises the module form on
     its own; the one upstream case that does,
     *top-level-await/syntax/catch-parameter.js*, is reviewed and classifies
     `unsupported-profile-feature` for its declared `dynamic-import` feature

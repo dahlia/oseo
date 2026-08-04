@@ -13,6 +13,16 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
+M5a remains open. Unit 8.5n audited the implementation, source-located
+rejections, admitted profile, applicable-test inventory and results, and the
+known-gap list. It discovered that optional private field and accessor reads
+and optional private method calls have structural coverage but lack native and
+differential semantic evidence. The evidence must cover nullish short circuit,
+valid-brand access, invalid-brand `TypeError`, and method receiver preservation
+under both specialization policies and forced collection. A separate unit in
+the core expressions and bindings stream owns that follow-up. M5b and M5c also
+remain open.
+
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
 and macOS on AArch64 execute the same native semantic corpus, while AArch64
@@ -621,10 +631,17 @@ admits the M5a Unit 8.1a primitive checkpoint only after exact generic
 semantics and the selected all-heap representation have collector and target
 evidence. The M5b intrinsic and prototype remain outside that checkpoint.
 
-M5a is complete when no entry in the known-gaps list of
-[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) names the core
-expressions and bindings stream or the functions and executable syntax stream
-as its owner. The profile is the test, not a work queue.
+M5a remains open because Unit 8.5n found one entry in the known-gaps list of
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) that the core
+expressions and bindings stream still owns. Optional private field and accessor
+reads and optional private method calls, including `object?.#method()`, need
+native and differential evidence for nullish short circuit, valid-brand access,
+invalid-brand `TypeError`, and method receiver preservation under both
+specialization policies and forced collection. The profile is the test, not a
+work queue. Genuine
+remaining rejections, including namespace re-exports, keep their M5b intrinsic
+and global-object, module and asynchronous execution, standards harness, host,
+or accepted dynamic-source owners.
 
 M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that
@@ -1120,7 +1137,22 @@ landed with the M5 intrinsics units. The remaining queue is:
     ECMA-262 destructures the key's code units. Annex B's head
     initializer and a multi-declarator head keep their existing
     rejections, and the runtime ABI is unchanged.
-3.  Add built-in families and broader executable syntax in dependency order.
+    Unit 8.5n performs the stale-profile-claims and gap audit. It confirms that
+    most apparent remaining M5a rejections are either stale prose for
+    implemented behavior or genuine boundaries owned by M5b, modules and
+    asynchronous execution, the standards harness, the host profile, or ADR
+    0016. It also discovers that optional private field and accessor reads and
+    optional private method calls such as `object?.#method()` have only parser,
+    HIR, and MIR structural coverage. A separate evidence unit in the core
+    expressions and bindings stream must provide native and differential
+    evidence for nullish short circuit, valid-brand access, invalid-brand
+    `TypeError`, and method receiver preservation under both specialization
+    policies and forced collection before the checkpoint closes. The audit
+    changes none of the 4,857 reviewed cases, their 2,932 passes, 1,355 expected
+    negatives, and 570 unsupported profile features, the 41,091-path inventory,
+    revision pins, property seeds and budgets, or compatibility overrides.
+3.  Add built-in families and close module and asynchronous boundaries in
+    dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows
     [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), including the generic matcher before
