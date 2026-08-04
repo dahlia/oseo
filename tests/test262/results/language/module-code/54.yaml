@@ -1,0 +1,27 @@
+group: language/module-code
+key: "54"
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/early-dup-export-id-as.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/early-dup-export-id-as.js:88:10:
+        error[OSEO0001]: Duplicate export 'z'."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -1,0 +1,78 @@
+group: language/module-code
+key: fd
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-iee-bndng-fun.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/instn-iee-bndng-fun_FIXTURE.js:10:3:
+        error[OSEO1001]: Unknown binding 'A'."
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-named-bndng-fun.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-fun.js
+          id: test/language/module-code/instn-named-bndng-fun.js
+          sourceHash: fnv1a64:4ef8a2236c33ab5e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+        - dynamic-import
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/catch-parameter.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - dynamic-import
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

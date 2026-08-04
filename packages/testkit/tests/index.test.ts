@@ -655,57 +655,74 @@ test("classifies test262 results without inflating passes", () => {
   } as const;
   const unsupported = classifyTest262(
     base,
-    { harnessFailed: false, passed: true },
+    { passed: true },
     new Set<string>(),
     { dependencies: ["object-properties"] },
   );
   const harness = classifyTest262(
     { ...base, features: [] },
-    { detail: "include missing", harnessFailed: true, passed: false },
+    { detail: "include missing", failureKind: "harness", passed: false },
+    new Set<string>(),
+    { dependencies: ["object-properties"] },
+  );
+  const infrastructure = classifyTest262(
+    { ...base, features: [] },
+    {
+      detail: "native process resources exhausted",
+      failureKind: "infrastructure",
+      passed: false,
+    },
     new Set<string>(),
     { dependencies: ["object-properties"] },
   );
   const expectedNegative = classifyTest262(
     { ...base, expectedFailurePhase: "parse", features: [] },
-    { failedPhase: "parse", harnessFailed: false, passed: false },
+    { failedPhase: "parse", passed: false },
     new Set<string>(),
     { dependencies: ["functions"] },
   );
-  assert.deepEqual(summarizeTest262([unsupported, harness, expectedNegative]), {
-    dependencies: [
-      {
-        dependency: "functions",
-        expectedNegatives: 1,
-        harnessFailures: 0,
-        passes: 0,
-        semanticFailures: 0,
-        unsupportedProfileFeatures: 0,
-      },
-      {
-        dependency: "object-properties",
-        expectedNegatives: 0,
-        harnessFailures: 1,
-        passes: 0,
-        semanticFailures: 0,
-        unsupportedProfileFeatures: 1,
-      },
-    ],
-    expectedNegatives: 1,
-    groups: [
-      {
-        expectedNegatives: 1,
-        group: "language/expressions",
-        harnessFailures: 1,
-        passes: 0,
-        semanticFailures: 0,
-        unsupportedProfileFeatures: 1,
-      },
-    ],
-    harnessFailures: 1,
-    passes: 0,
-    semanticFailures: 0,
-    unsupportedProfileFeatures: 1,
-  });
+  assert.deepEqual(
+    summarizeTest262([unsupported, harness, infrastructure, expectedNegative]),
+    {
+      dependencies: [
+        {
+          dependency: "functions",
+          expectedNegatives: 1,
+          harnessFailures: 0,
+          infrastructureFailures: 0,
+          passes: 0,
+          semanticFailures: 0,
+          unsupportedProfileFeatures: 0,
+        },
+        {
+          dependency: "object-properties",
+          expectedNegatives: 0,
+          harnessFailures: 1,
+          infrastructureFailures: 1,
+          passes: 0,
+          semanticFailures: 0,
+          unsupportedProfileFeatures: 1,
+        },
+      ],
+      expectedNegatives: 1,
+      groups: [
+        {
+          expectedNegatives: 1,
+          group: "language/expressions",
+          harnessFailures: 1,
+          infrastructureFailures: 1,
+          passes: 0,
+          semanticFailures: 0,
+          unsupportedProfileFeatures: 1,
+        },
+      ],
+      harnessFailures: 1,
+      infrastructureFailures: 1,
+      passes: 0,
+      semanticFailures: 0,
+      unsupportedProfileFeatures: 1,
+    },
+  );
 });
 
 test("derives dependency-indexed path groups from upstream paths", () => {
@@ -733,7 +750,7 @@ test("requires the declared phase for negative test262 cases", () => {
       strictness: ["non-strict"],
       suiteRevision: "test-revision",
     },
-    { failedPhase: "parse", harnessFailed: false, passed: false },
+    { failedPhase: "parse", passed: false },
     new Set<string>(),
   );
   assert.equal(result.classification, "semantic-failure");
@@ -755,7 +772,6 @@ test("classifies unavailable observation capabilities as unsupported", () => {
     },
     {
       detail: "The runtime error type is not observable.",
-      harnessFailed: false,
       passed: false,
       unsupportedCapability: "runtime-error-types",
     },
@@ -785,7 +801,6 @@ test("classifies early errors and resolution failures", () => {
     {
       errorType: "SyntaxError",
       failedPhase: "parse",
-      harnessFailed: false,
       passed: false,
     },
     new Set<string>(),
@@ -800,7 +815,6 @@ test("classifies early errors and resolution failures", () => {
     {
       errorType: "SyntaxError",
       failedPhase: "resolution",
-      harnessFailed: false,
       passed: false,
     },
     new Set<string>(),
@@ -827,7 +841,6 @@ test("requires the declared error type for negative test262 cases", () => {
     {
       errorType: "RangeError",
       failedPhase: "runtime",
-      harnessFailed: false,
       passed: false,
     },
     new Set<string>(),
@@ -837,7 +850,6 @@ test("requires the declared error type for negative test262 cases", () => {
     {
       errorType: "TypeError",
       failedPhase: "runtime",
-      harnessFailed: false,
       passed: false,
     },
     new Set<string>(),

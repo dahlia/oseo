@@ -1,0 +1,59 @@
+group: language/module-code
+key: "95"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-anon-semi.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-dflt-cls-anon-semi.js
+          sourceHash: fnv1a64:159c5d33089ac8ad
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-export-try-finally.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-export-try-finall\
+        y.js:84:3: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

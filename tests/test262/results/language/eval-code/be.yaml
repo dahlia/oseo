@@ -1,0 +1,29 @@
+group: language/eval-code
+key: be
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/block-decl-onlystrict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/block-decl-onlystrict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/block-decl-onlystrict.j\
+        s:89:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

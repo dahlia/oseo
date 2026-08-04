@@ -1,0 +1,78 @@
+group: language/module-code
+key: "16"
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-import-class-expr-meth-gen.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
+        -meth-gen.js:84:22: error[OSEO0001]: Source could not be
+        parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-import-object-getter.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-import-object-get\
+        ter.js:83:14: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/early-does-no\
+        t-propagate-to-fn-declaration-params.js:107:17: error[OSEO0001]:
+        Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

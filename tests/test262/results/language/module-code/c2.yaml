@@ -1,0 +1,83 @@
+group: language/module-code
+key: c2
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-named-bndng-dflt-cls.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-cls.js
+          id: test/language/module-code/instn-named-bndng-dflt-cls.js
+          sourceHash: fnv1a64:b116c9e17d434082
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-export-object-setter.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-export-object-set\
+        ter.js:83:15: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-import-for-in-lhs.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-import-for-in-lhs\
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

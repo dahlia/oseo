@@ -10,6 +10,7 @@ import {
 import type {
   CompatibilitySnapshot,
   PropertySource,
+  ResultManifestSource,
 } from "../tools/compatibility-ratchet.ts";
 
 function subset(paths: readonly string[]): string {
@@ -18,13 +19,20 @@ function subset(paths: readonly string[]): string {
   });
 }
 
-function results(entries: readonly (readonly [string, string])[]): string {
-  return JSON.stringify({
-    results: entries.map(([path, classification]) => ({
-      case: { path },
-      classification,
-    })),
-  });
+function results(
+  entries: readonly (readonly [string, string])[],
+): ResultManifestSource {
+  return {
+    indexText: JSON.stringify({
+      results: entries.map(([path, classification]) => ({
+        case: { path },
+        classification,
+      })),
+    }),
+    readPartition(path): string {
+      throw new Error(`unexpected partition ${path}`);
+    },
+  };
 }
 
 function propertySource(

@@ -286,6 +286,50 @@ regeneration while using bounded reads or a separate CI comparison rather than
 weakening the inventory validation.
 
 
+Manifest partitioning and failure classification checkpoint
+-----------------------------------------------------------
+
+The combined checkpoint ran on the following host. The memory, swap, and load
+facts were recorded immediately before the exact manifest regeneration. The
+temporary-storage capacity was recorded on the same host after the task.
+
+| Fact                      | Checkpoint sample                       |
+| ------------------------- | --------------------------------------- |
+| Operating system          | Linux 7.1.5-201.fc44.x86\_64            |
+| Processor                 | AMD Ryzen 7 7700X, 8 cores, 16 threads  |
+| Memory available at start | 43 GiB                                  |
+| Swap at start             | 7.1 GiB used, 925 MiB free              |
+| Temporary storage         | Btrfs root volume, 930 GiB, 86 GiB free |
+| Load average at start     | 1.36/0.76/0.84                          |
+| Oseo target               | `linux-x86_64-gnu`                      |
+| Sanitizers                | address, undefined                      |
+| Zig                       | 0.16.0                                  |
+| Node.js                   | 24.18.0                                 |
+| Deno                      | 2.9.2                                   |
+
+The exact regeneration used the eight-worker reviewed pool and no retry. The
+ratchet measurement used the final partition format and compared it with the
+single-file manifest at commit `7ddd2c6`.
+
+| Task                                   | Wall     | User       | System     | CPU / wall |
+| -------------------------------------- | -------- | ---------- | ---------- | ---------- |
+| `mise run test262:update`              | 500.10 s | 2,947.07 s | 1,049.63 s | 7.99       |
+| `mise run check:compatibility-ratchet` | 2.90 s   | 3.69 s     | 0.45 s     | 1.43       |
+
+The regenerated manifest retained the pinned revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2` and all 4,861 reviewed paths. It
+records exactly 2,934 passes, 1,355 expected negatives, 572 unsupported
+profile features, and no semantic, harness, or infrastructure failures. The
+ratchet also retained 57 generated domains, 50 distinct seeds, and an
+aggregate ordinary case budget of 2,686. This checkpoint has no timing target.
+
+Before partitioning, *results.yaml* contained 4,861 records in 155,346 lines.
+After partitioning, the 3,851-line index names 1,161 nonempty files containing
+154,813 lines in total. The largest partition contains 16 records and 528
+lines. *target-parity.yaml* remains a seven-line entry-point record, while its
+digest covers that index and every ordered partition.
+
+
 Load sensitivity
 ----------------
 
@@ -324,11 +368,12 @@ expected passes were reported as harness failures. That observation identifies
 memory and swap exhaustion for the excluded sample. It does not establish that
 the earlier baseline failures had the same cause.
 
-`OSEO3001` still maps a resource failure and a harness defect to one
-classification. Bounded concurrency therefore uses the measured reused
-footprint, records its aggregate bound, and runs without unrelated heavy load.
-It must also narrow the diagnostic before retrying only a named retryable
-resource failure.
+At the throughput baseline, `OSEO3001` mapped a resource failure and a harness
+defect to one classification. Bounded concurrency therefore used the measured
+reused footprint, recorded its aggregate bound, and ran without unrelated
+heavy load. The combined checkpoint above now separates exhausted
+infrastructure failures from harness defects after narrowing the diagnostic
+that permits one retry.
 
 
 Reproduction

@@ -19,7 +19,7 @@ the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records 4,861
 reviewed cases: 2,934 passes, 1,355 expected negatives, and 572 unsupported
-profile features with no semantic or harness failures.
+profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
 and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
@@ -1209,16 +1209,19 @@ policy, and observation. Module and asynchronous cases additionally record
 their graph and scheduler mode.
 
 Results remain classified as pass, semantic failure, expected negative,
-unsupported profile feature, or harness failure. Unsupported and harness
-results never increase the pass count. A newly supported feature moves tests
-from unsupported only after every applicable variant executes. A changed
-upstream revision is a reviewed manifest change, not an automatic percentage
-update.
+unsupported profile feature, harness failure, or infrastructure failure.
+Harness failures identify defects in the adapter or harness. Infrastructure
+failures identify host, process, toolchain, or temporary-storage failures.
+Unsupported, harness, and infrastructure results never increase the pass
+count. A newly supported feature moves tests from unsupported only after every
+applicable variant executes. A changed upstream revision is a reviewed
+manifest change, not an automatic percentage update.
 
-The reviewed subset and the result manifest describe the same set of paths.
-Adding an entry to one without regenerating the other is not a state the
-repository holds, even briefly, because the gate then fails while every count
-still looks healthy.
+The reviewed subset and the partitioned result manifest describe the same set
+of paths. *results.yaml* indexes the sorted path-group partitions and carries
+their derived summary. Adding an entry to one side without regenerating the
+other is not a state the repository holds, even briefly, because the gate then
+fails while every count still looks healthy.
 
 Measured compatibility moves in one direction. An upstream path recorded as a
 pass does not move to another classification, the reviewed subset does not lose

@@ -1,0 +1,74 @@
+group: language/module-code
+key: 0e
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-import-if-else.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-import-if-else.js\
+        :83:20: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - export-star-as-namespace-from-module
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-semi-name-space-export.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - export-star-as-namespace-from-module
+  - case:
+      async: true
+      features:
+        - top-level-await
+      flags:
+        - module
+        - async
+      includes:
+        - compareArray.js
+      mode: module
+      path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/pending-async-dep-fr\
+        om-cycle_setup_FIXTURE.js:4:1: error[OSEO1001]: Unknown binding
+        'globalThis'."
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

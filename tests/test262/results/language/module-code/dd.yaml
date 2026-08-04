@@ -1,0 +1,38 @@
+group: language/module-code
+key: dd
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-cls-name-meth.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-export-dflt-cls-name-meth.js
+          id: test/language/module-code/eval-export-dflt-cls-name-meth.js
+          sourceHash: fnv1a64:56a5c5f49615c3e0
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

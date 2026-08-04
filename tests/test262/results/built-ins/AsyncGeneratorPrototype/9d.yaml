@@ -1,0 +1,28 @@
+group: built-ins/AsyncGeneratorPrototype
+key: 9d
+results:
+  - case:
+      async: false
+      features:
+        - async-iteration
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/AsyncGeneratorPrototype/return/return-promise.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+    observation:
+      detail: "test/built-ins/AsyncGeneratorPrototype/return/return-promise.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/AsyncGeneratorPrototype/return/return-p\
+        romise.js:96:26: error[OSEO1001]: Unknown binding
+        'Promise'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

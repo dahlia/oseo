@@ -1,0 +1,67 @@
+group: language/module-code
+key: "39"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-star-props-dflt-keep-local.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
+            - test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-keep-local.js
+          sourceHash: fnv1a64:393da841b28c21e4
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-keep-local-named_FIXTURE.js
+          sourceHash: fnv1a64:08410762af497b31
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-keep-local-prod_FIXTURE.js
+          sourceHash: fnv1a64:5baa408a1d7b1a0c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-export-for-let.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-export-for-let.js\
+        :84:3: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

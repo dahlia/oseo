@@ -42,16 +42,17 @@ work under the same plan.
 The checked-in compatibility manifest under *tests/test262/* is the source
 of truth for progress against this boundary. *subset.yaml* pins the suite
 revision, supported features, and expected classifications; *results.yaml*
-records the reviewed observations. The checked-in manifest implements the
-schema frozen by ADR 0013: five classifications with `expected-negative`
-covering matched negatives in every phase, execution evidence with the
-executed variants and target, reviewed dependency tags, and summaries with
-raw, path-group, and dependency totals. Unsupported and harness results
-never increase the pass count.
+indexes the reviewed observation partitions. The checked-in manifest
+implements the schema frozen by ADR 0013: six classifications with
+`expected-negative` covering matched negatives in every phase and
+`infrastructure-failure` separated from harness defects, execution evidence
+with the executed variants and target, reviewed dependency tags, and summaries
+with raw, path-group, and dependency totals. Unsupported, harness, and
+infrastructure results never increase the pass count.
 
 The current manifest contains 4,861 reviewed cases: 2,934 passes, 1,355
 expected negatives, and 572 unsupported profile features. It records no
-semantic or harness failures.
+semantic, harness, or infrastructure failures.
 
 
 Capability groups
@@ -3072,8 +3073,9 @@ Measurement workflow
 --------------------
 
 `mise run test:test262` executes the reviewed subset and rejects any drift
-from the expected classifications. `mise run test262:update` regenerates
-*results.yaml* after a reviewed change. Applicable Script cases execute in
+from the expected classifications. `mise run test262:update` regenerates the
+*results.yaml* index and its record partitions after a reviewed change.
+Applicable Script cases execute in
 every requested strictness mode, and every executed case compares
 specialization-disabled and specialization-enabled native observations with
 collection forced at every safepoint.
@@ -3086,10 +3088,11 @@ checked-in manifest. Manifest regeneration remains an unsharded operation.
 
 Linux AMD64 and macOS AArch64 execute that same reviewed subset. The canonical
 manifest keeps one counted result per upstream path, while
-*target-parity.yaml* pins its digest and supported execution targets. A
-host-specific run normalizes only the target spelling before comparing the
-complete manifest, so any semantic, harness, graph, scheduler, strictness, or
-specialization disagreement fails without duplicating compatibility totals.
+*target-parity.yaml* pins the complete file-set digest and supported execution
+targets. A host-specific run normalizes only the target spelling before
+comparing the complete manifest, so any semantic, harness, infrastructure,
+graph, scheduler, strictness, or specialization disagreement fails without
+duplicating compatibility totals.
 
 Module and asynchronous cases execute under the deterministic native
 scheduler. Module entries compile through the explicit CLI module goal with

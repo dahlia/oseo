@@ -1,0 +1,157 @@
+group: language/expressions
+key: 1a
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - rest-parameters
+        - async-functions
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/async-function/nameless-object-destructuring-param-strict-body.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - destructuring-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-prop-ary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - destructuring-bindings
+    observation:
+      detail: "test/language/expressions/async-generator/dstr/named-dflt-obj-\
+        ptrn-prop-ary.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/async-generator/dstr/named-d\
+        flt-obj-ptrn-prop-ary.js:120:5: error[OSEO1001]: Unknown binding
+        'w'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/syntax/early-errors/delete/method-delete-twice-covered-err-delete-call-expression-privatename.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/less-than/bigint-and-number-extremes.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - bigint-primitive
+      - expression-operators
+    observation:
+      detail: "test/language/expressions/less-than/bigint-and-number-extremes\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/less-than/bigint-and-number-\
+        extremes.js:90:23: error[OSEO1001]: Unknown binding
+        'Number'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/tagged-template/call-expression-context-no-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/yield/star-in-rltn-expr.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - generators
+      - iterator-protocol
+    observation:
+      detail: "test/language/expressions/yield/star-in-rltn-expr.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/yield/star-in-rltn-expr.js:8\
+        7:1: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

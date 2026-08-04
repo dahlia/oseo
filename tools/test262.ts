@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
-import { readFile, writeFile } from "node:fs/promises";
-import { createHash } from "node:crypto";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -49,13 +48,26 @@ import type {
   Test262ModuleGraphNode,
   Test262Result,
   Test262Strictness,
-  Test262Summary,
   Test262Variant,
 } from "../packages/testkit/src/index.ts";
-import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
+import { parse as parseYaml } from "yaml";
 
 import { parseTestShardArguments, selectTestShard } from "./shard.ts";
 import type { TestShard } from "./shard.ts";
+import {
+  canonicalTest262Target,
+  normalizeReviewedManifestText,
+  parseReviewedManifest,
+  reviewedManifestPartitionPaths,
+  serializeTargetParity,
+  serializeTest262Manifest,
+  validateReviewedManifestFileSet,
+  validateTargetParity,
+} from "./test262-manifest.ts";
+import type {
+  ReviewedTest262Manifest,
+  SerializedTest262Manifest,
+} from "./test262-manifest.ts";
 
 const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const subsetPath = join(repositoryRoot, "tests/test262/subset.yaml");
@@ -82,12 +94,13 @@ const compareArrayHarnessPath = join(
 const classifications = new Set<Test262Classification>([
   "expected-negative",
   "harness-failure",
+  "infrastructure-failure",
   "pass",
   "semantic-failure",
   "unsupported-profile-feature",
 ]);
 
-const canonicalTarget = "linux-x86_64-gnu";
+const canonicalTarget = canonicalTest262Target;
 const runnerHost = createNodeHost();
 const executionTarget = targetForExecutionHost(
   runnerHost.executionHost ?? {
@@ -99,7 +112,6 @@ const runtimeArchiveReuse =
   process.env.OSEO_RUNTIME_ARCHIVE_REUSE === "disabled"
     ? "disabled"
     : "enabled";
-const parityTargets = [canonicalTarget, "macos-aarch64"] as const;
 const measuredExecutionPoolLimit = 8;
 const reviewedExecutionPoolLimit = Math.min(
   measuredExecutionPoolLimit,
@@ -133,13 +145,6 @@ export interface ReviewedTest262Subset {
   readonly suiteRevision: string;
   readonly supportedFeatures: readonly string[];
   readonly tests: readonly ReviewedTest262Entry[];
-}
-
-/** Deterministic checked-in observation of the reviewed subset. */
-export interface ReviewedTest262Manifest {
-  readonly results: readonly Test262Result[];
-  readonly suiteRevision: string;
-  readonly summary: Test262Summary;
 }
 
 /** Host-varying facts reported outside the canonical manifest. */
@@ -470,7 +475,6 @@ function unsupportedResult(
     testCase,
     {
       detail: "Not executed: the frontmatter needs an unsupported feature.",
-      harnessFailed: false,
       passed: false,
     },
     supportedFeatures,
@@ -498,7 +502,6 @@ function parseNegativeResult(
             diagnostic == null
               ? `${strictnessMode} parsing unexpectedly succeeded.`
               : `${strictnessMode} produced ${diagnostic.code}.`,
-          harnessFailed: false,
           passed: diagnostic == null,
         },
         supportedFeatures,
@@ -511,7 +514,6 @@ function parseNegativeResult(
     {
       errorType: "SyntaxError",
       failedPhase: "parse",
-      harnessFailed: false,
       passed: false,
     },
     supportedFeatures,
@@ -704,7 +706,7 @@ async function moduleNegativeResult(
       testCase,
       {
         detail: errorMessage(error),
-        harnessFailed: true,
+        failureKind: "harness",
         passed: false,
       },
       supportedFeatures,
@@ -723,7 +725,6 @@ async function moduleNegativeResult(
       testCase,
       {
         detail: "Module linking unexpectedly succeeded.",
-        harnessFailed: false,
         passed: false,
       },
       supportedFeatures,
@@ -736,7 +737,6 @@ async function moduleNegativeResult(
       testCase,
       {
         detail: diagnosticDetail(diagnostic),
-        harnessFailed: false,
         passed: false,
         unsupportedCapability,
       },
@@ -751,7 +751,6 @@ async function moduleNegativeResult(
       detail: diagnosticDetail(diagnostic),
       errorType: "SyntaxError",
       ...(failedPhase == null ? {} : { failedPhase }),
-      harnessFailed: false,
       passed: false,
     },
     supportedFeatures,
@@ -793,7 +792,7 @@ async function executedResult(
         testCase,
         {
           detail: "Module execution needs the upstream source path.",
-          harnessFailed: true,
+          failureKind: "harness",
           passed: false,
         },
         supportedFeatures,
@@ -814,7 +813,7 @@ async function executedResult(
         testCase,
         {
           detail: errorMessage(error),
-          harnessFailed: true,
+          failureKind: "harness",
           passed: false,
         },
         supportedFeatures,
@@ -842,7 +841,6 @@ async function executedResult(
           ...(unsupportedCapability == null && failedPhase != null
             ? { failedPhase }
             : {}),
-          harnessFailed: false,
           passed: false,
         },
         supportedFeatures,
@@ -870,7 +868,7 @@ async function executedResult(
         testCase,
         {
           detail: errorMessage(error),
-          harnessFailed: true,
+          failureKind: "harness",
           passed: false,
         },
         supportedFeatures,
@@ -896,7 +894,7 @@ async function executedResult(
           testCase,
           {
             detail: errorMessage(error),
-            harnessFailed: true,
+            failureKind: "infrastructure",
             passed: false,
           },
           supportedFeatures,
@@ -928,7 +926,7 @@ async function executedResult(
           // runtime negative; every variant must still agree before the
           // thrown error type is compared. A compile-stage, resource, or
           // infrastructure diagnostic instead falls through to the
-          // phase-mismatch and harness handling below.
+          // phase-mismatch and infrastructure handling below.
           continue;
         }
         // A compile-stage rejection ran no native variant, so the result
@@ -948,7 +946,9 @@ async function executedResult(
               : parseRejected
                 ? { failedPhase: "parse" as const }
                 : { failedPhase: "runtime" as const }),
-            harnessFailed: !compileStage && infrastructureFailure(observation),
+            ...(!compileStage && infrastructureFailure(observation)
+              ? { failureKind: "infrastructure" as const }
+              : {}),
             passed: false,
           },
           supportedFeatures,
@@ -961,7 +961,6 @@ async function executedResult(
             detail:
               `${testCase.path} ${strictnessMode} ${specialization} ` +
               "completed without the expected runtime error.",
-            harnessFailed: false,
             passed: false,
           },
           supportedFeatures,
@@ -998,7 +997,6 @@ async function executedResult(
           `and ${diverging.variant.strictness} ` +
           `${diverging.variant.specialization}.`,
         failedPhase: "runtime",
-        harnessFailed: false,
         passed: false,
       },
       supportedFeatures,
@@ -1019,7 +1017,6 @@ async function executedResult(
           `${asyncCompletionMarker}: ` +
           `stdout=${JSON.stringify(baseline.observation.stdout)}`,
         failedPhase: "runtime",
-        harnessFailed: false,
         passed: false,
       },
       supportedFeatures,
@@ -1038,7 +1035,6 @@ async function executedResult(
           detail:
             "The thrown value carries no observable error identity: " +
             `stderr=${JSON.stringify(baseline?.observation.stderr ?? "")}`,
-          harnessFailed: false,
           passed: false,
           unsupportedCapability: "runtime-error-observation",
         },
@@ -1051,7 +1047,6 @@ async function executedResult(
       {
         errorType,
         failedPhase: "runtime",
-        harnessFailed: false,
         passed: false,
       },
       supportedFeatures,
@@ -1060,7 +1055,7 @@ async function executedResult(
   }
   return classifyTest262(
     testCase,
-    { harnessFailed: false, passed: true },
+    { passed: true },
     supportedFeatures,
     evidence(),
   );
@@ -1095,7 +1090,7 @@ export async function executeTest262Case(
         parsed.case,
         {
           detail: "Module execution needs the upstream source path.",
-          harnessFailed: true,
+          failureKind: "harness",
           passed: false,
         },
         supportedFeatures,
@@ -1147,16 +1142,6 @@ export async function executeTest262Case(
   );
 }
 
-/** Serialize a reviewed result without timestamps or host-specific metadata. */
-export function serializeTest262Manifest(
-  manifest: ReviewedTest262Manifest,
-): string {
-  // The serializer counts a folded line's width without its indentation, so
-  // the limit stays below the repository's 80-column rule by the deepest
-  // indentation a detail string receives.
-  return stringifyYaml(manifest, { lineWidth: 72 });
-}
-
 export function validateReviewedResults(
   subset: ReviewedTest262Subset,
   results: readonly Test262Result[],
@@ -1186,10 +1171,15 @@ export function validateReviewedResults(
     }
   }
   const summary = summarizeTest262(results);
-  if (summary.semanticFailures !== 0 || summary.harnessFailures !== 0) {
+  if (
+    summary.semanticFailures !== 0 ||
+    summary.harnessFailures !== 0 ||
+    summary.infrastructureFailures !== 0
+  ) {
     failures.push(
       `Reviewed failures: semantic=${summary.semanticFailures} ` +
-        `harness=${summary.harnessFailures}.`,
+        `harness=${summary.harnessFailures} ` +
+        `infrastructure=${summary.infrastructureFailures}.`,
     );
   }
   if (failures.length > 0) throw new Error(failures.join("\n"));
@@ -1399,35 +1389,6 @@ function canonicalizeManifestTarget(
   };
 }
 
-/** Parse the checked-in result fields required for shard reconstruction. */
-export function parseReviewedManifest(text: string): ReviewedTest262Manifest {
-  const root = record(parseYaml(text) as unknown, "test262 results");
-  const rawResults = root.results;
-  if (!Array.isArray(rawResults)) {
-    throw new Error("test262 results must contain a results array.");
-  }
-  const results = rawResults.map((value, index) => {
-    const item = record(value, `test262 result ${index}`);
-    const testCase = record(item.case, `test262 result ${index} case`);
-    stringValue(testCase.path, `test262 result ${index} path`);
-    classification(item.classification);
-    if (!Array.isArray(item.dependencies)) {
-      throw new Error(`test262 result ${index} dependencies must be an array.`);
-    }
-    stringArray(item.dependencies, `test262 result ${index} dependencies`);
-    return item as unknown as Test262Result;
-  });
-  const summary = record(root.summary, "test262 results summary");
-  return {
-    results,
-    suiteRevision: stringValue(
-      root.suiteRevision,
-      "test262 results suiteRevision",
-    ),
-    summary: summary as unknown as Test262Summary,
-  };
-}
-
 /** Select and re-summarize one deterministic result-manifest shard. */
 export function selectManifestShard(
   manifest: ReviewedTest262Manifest,
@@ -1444,54 +1405,87 @@ export function selectManifestShard(
   };
 }
 
-function manifestDigest(serialized: string): string {
-  return `sha256:${createHash("sha256").update(serialized).digest("hex")}`;
-}
-
-/** Normalize reviewed manifest checkout text to canonical LF line endings. */
-export function normalizeReviewedManifestText(text: string): string {
-  return text.replaceAll("\r\n", "\n");
-}
-
-/** Serialize the canonical manifest digest and supported execution targets. */
-export function serializeTargetParity(
-  serializedManifest: string,
-  suiteRevision: string,
-): string {
-  const canonicalDigest = new Scalar(manifestDigest(serializedManifest));
-  canonicalDigest.type = Scalar.BLOCK_FOLDED;
-  return stringifyYaml(
-    {
-      canonicalDigest,
-      canonicalManifest: "results.yaml",
-      suiteRevision,
-      targets: parityTargets,
-    },
-    { lineWidth: 72 },
+function serializedManifestsEqual(
+  left: SerializedTest262Manifest,
+  right: SerializedTest262Manifest,
+): boolean {
+  return (
+    left.indexText === right.indexText &&
+    left.partitions.length === right.partitions.length &&
+    left.partitions.every((partition, index) => {
+      const other = right.partitions[index];
+      return (
+        other != null &&
+        partition.group === other.group &&
+        partition.key === other.key &&
+        partition.path === other.path &&
+        partition.text === other.text
+      );
+    })
   );
 }
 
-function validateTargetParity(
-  text: string,
-  serializedManifest: string,
-  suiteRevision: string,
-): void {
-  const root = record(parseYaml(text) as unknown, "test262 target parity");
-  if (root.canonicalManifest !== "results.yaml") {
-    throw new Error("test262 target parity must name results.yaml.");
+async function readSerializedManifest(): Promise<SerializedTest262Manifest> {
+  const indexText = normalizeReviewedManifestText(
+    await readFile(resultPath, "utf8"),
+  );
+  const partitionPaths = reviewedManifestPartitionPaths(indexText);
+  validateReviewedManifestFileSet(indexText, await existingPartitionPaths());
+  const partitions = await Promise.all(
+    partitionPaths.map(async (path) => {
+      const segments = path.slice("results/".length).split("/");
+      const key = segments.pop()?.replace(/\.yaml$/u, "") ?? "";
+      return {
+        group: segments.join("/"),
+        key,
+        path,
+        text: normalizeReviewedManifestText(
+          await readFile(join(dirname(resultPath), path), "utf8"),
+        ),
+      };
+    }),
+  );
+  return { indexText, partitions };
+}
+
+async function existingPartitionPaths(): Promise<readonly string[]> {
+  try {
+    return (
+      await readdir(join(dirname(resultPath), "results"), {
+        recursive: true,
+      })
+    )
+      .filter((path) => path.endsWith(".yaml"))
+      .map((path) => `results/${path.replaceAll("\\", "/")}`);
+  } catch (error) {
+    if (
+      error != null &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      return [];
+    }
+    throw error;
   }
-  if (root.canonicalDigest !== manifestDigest(serializedManifest)) {
-    throw new Error("test262 target parity canonical digest changed.");
+}
+
+async function writeSerializedManifest(
+  manifest: SerializedTest262Manifest,
+): Promise<void> {
+  const resultDirectory = dirname(resultPath);
+  const expected = new Set(manifest.partitions.map(({ path }) => path));
+  for (const existing of await existingPartitionPaths()) {
+    if (!expected.has(existing)) {
+      await rm(join(resultDirectory, existing));
+    }
   }
-  if (root.suiteRevision !== suiteRevision) {
-    throw new Error("test262 target parity suite revision changed.");
+  for (const partition of manifest.partitions) {
+    const path = join(resultDirectory, partition.path);
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, partition.text);
   }
-  const targets = stringArray(root.targets, "test262 target parity targets");
-  if (executionTarget == null || !targets.includes(executionTarget)) {
-    throw new Error(
-      `test262 target parity does not admit ${executionTarget ?? "unknown"}.`,
-    );
-  }
+  await writeFile(resultPath, manifest.indexText);
 }
 
 async function main(): Promise<void> {
@@ -1525,25 +1519,31 @@ async function main(): Promise<void> {
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(canonicalManifest);
   if (cliArguments.update) {
-    await writeFile(resultPath, serialized);
+    await writeSerializedManifest(serialized);
     await writeFile(
       parityPath,
       serializeTargetParity(serialized, manifest.suiteRevision),
     );
   } else {
-    const expected = normalizeReviewedManifestText(
-      await readFile(resultPath, "utf8"),
+    const expected = await readSerializedManifest();
+    const partitionTexts = new Map(
+      expected.partitions.map(({ path, text }) => [path, text]),
+    );
+    const expectedManifest = parseReviewedManifest(
+      expected.indexText,
+      (path) => {
+        const text = partitionTexts.get(path);
+        if (text == null) throw new Error(`Missing test262 partition ${path}.`);
+        return text;
+      },
     );
     const expectedResult =
       cliArguments.shard == null
         ? expected
         : serializeTest262Manifest(
-            selectManifestShard(
-              parseReviewedManifest(expected),
-              cliArguments.shard,
-            ),
+            selectManifestShard(expectedManifest, cliArguments.shard),
           );
-    if (expectedResult !== serialized) {
+    if (!serializedManifestsEqual(expectedResult, serialized)) {
       throw new Error(
         "Reviewed test262 results changed; run mise run test262:update.",
       );
@@ -1552,6 +1552,7 @@ async function main(): Promise<void> {
       await readFile(parityPath, "utf8"),
       expected,
       manifest.suiteRevision,
+      executionTarget,
     );
   }
   console.log(

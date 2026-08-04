@@ -30,6 +30,7 @@ function exemptLine(path: string, line: string): boolean {
   if (
     path === "tests/test262/subset.yaml" ||
     path === "tests/test262/results.yaml" ||
+    path.startsWith("tests/test262/results/") ||
     path === "tests/compatibility-ratchet-overrides.yaml"
   ) {
     const token = line.match(/\btest\/[^\s"']+/u);

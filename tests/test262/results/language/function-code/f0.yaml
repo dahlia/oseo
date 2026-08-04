@@ -1,0 +1,28 @@
+group: language/function-code
+key: f0
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/function-code/block-decl-onlystrict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/function-code/block-decl-onlystrict.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/function-code/block-decl-onlystrict.js:9\
+        1:5: error[OSEO1001]: Unknown binding 'f'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

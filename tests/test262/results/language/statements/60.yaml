@@ -1,0 +1,200 @@
+group: language/statements
+key: "60"
+results:
+  - case:
+      async: false
+      features:
+        - async-iteration
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-unresolvable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-iteration
+      - destructuring-bindings
+    observation:
+      detail: "test/language/statements/async-generator/dstr/dflt-ary-ptrn-el\
+        em-id-init-unresolvable.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/statements/async-generator/dstr/dflt-ary\
+        -ptrn-elem-id-init-unresolvable.js:106:25: error[OSEO1001]:
+        Unknown binding 'unresolvableReference'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-static-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-definitions-rs-static-privatename-identifier-alt-by-classname.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - object-properties
+    observation:
+      detail: "test/language/statements/class/elements/multiple-definitions-r\
+        s-static-privatename-identifier-alt-by-classname.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/class/elements/multiple-defin\
+        itions-rs-static-privatename-identifier-alt-by-classname.js:219\
+        :4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/subclass/derived-class-return-override-catch-super.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - abrupt-completion
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/const/syntax/with-initializer-if-expression-statement-else-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/const/syntax/with-initializer-while-expression-statement.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/async-func-dstr-let-async-ary-ptrn-rest-not-final-ary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - iterator-protocol
+      - lexical-bindings
+      - promise-settlement
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-hole.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - iterator-protocol
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

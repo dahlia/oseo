@@ -1,0 +1,26 @@
+group: language/module-code
+key: "01"
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - arbitrary-module-namespace-names
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/export-expname-import-unpaired-surrogate.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - arbitrary-module-namespace-names
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

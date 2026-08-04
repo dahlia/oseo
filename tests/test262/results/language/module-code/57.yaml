@@ -1,0 +1,50 @@
+group: language/module-code
+key: "57"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-star-props-circular.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/instn-star-props-circular-a_FIXTURE.\
+        js:5:8: error[OSEO1001]: This export is unsupported."
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/early-errors-await-not-simple-assignment-target.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/early-errors-await-n\
+        ot-simple-assignment-target.js:86:1: error[OSEO0001]: Source
+        could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

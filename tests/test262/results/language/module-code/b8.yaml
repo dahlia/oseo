@@ -1,0 +1,84 @@
+group: language/module-code
+key: b8
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: resolution
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-iee-err-circular-as.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/instn-iee-err-circular-as.js:99:10:
+        error[OSEO2001]: Module has no export 'x'."
+      errorType: SyntaxError
+      failedPhase: resolution
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/parse-err-decl-pos-export-for-of-let.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/parse-err-decl-pos-export-for-of-let\
+        .js:84:3: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
+          sourceHash: fnv1a64:febb40a19109cf64
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

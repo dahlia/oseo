@@ -1,0 +1,48 @@
+group: language/module-code
+key: 7c
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-star-iee-single-cycle-same-name.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-iee-single-cycle-same-name-a_FIXTURE.js
+          id: test/language/module-code/instn-star-iee-single-cycle-same-name.js
+          sourceHash: fnv1a64:c4e98e846bdd1b70
+        - dependencies:
+            - test/language/module-code/instn-star-iee-single-cycle-same-name-b_FIXTURE.js
+            - test/language/module-code/instn-star-iee-single-cycle-same-name-c_FIXTURE.js
+          id: test/language/module-code/instn-star-iee-single-cycle-same-name-a_FIXTURE.js
+          sourceHash: fnv1a64:968c80094e25ef33
+        - dependencies:
+            - test/language/module-code/instn-star-iee-single-cycle-same-name-a_FIXTURE.js
+          id: test/language/module-code/instn-star-iee-single-cycle-same-name-b_FIXTURE.js
+          sourceHash: fnv1a64:e348d934400df829
+        - dependencies: []
+          id: test/language/module-code/instn-star-iee-single-cycle-same-name-c_FIXTURE.js
+          sourceHash: fnv1a64:4510fa9b47e69033
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
