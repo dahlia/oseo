@@ -201,6 +201,7 @@ export interface MirOperation {
     | "root-store"
     | "super-base"
     | "super-constructor"
+    | "super-property-delete"
     | "safepoint"
     | "this-bind"
     | "unbox-smi"

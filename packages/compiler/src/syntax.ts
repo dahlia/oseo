@@ -570,11 +570,14 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       /**
        * The `super` operand of a property reference. It stands only as
-       * the `object` of a property get, set, update, or step expression
-       * or of a `property` call target: the reference reads or writes
-       * through the running function's home object while keeping `this`
-       * as its receiver, so an operand that escaped those positions
-       * would have no receiver to carry.
+       * the `object` of a property get, delete, set, update, or step
+       * expression or of a `property` call target: the reference reads
+       * or writes through the running function's home object while
+       * keeping `this` as its receiver, so an operand that escaped
+       * those positions would have no receiver to carry. The delete
+       * position carries no receiver anywhere, because ECMA-262 rejects
+       * a `super` reference after evaluating it; the operand is still
+       * admitted so that receiver read and key evaluation happen.
        */
       readonly kind: "super-base";
     })

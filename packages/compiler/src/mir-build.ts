@@ -776,6 +776,44 @@ function lowerPropertyDelete(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * Rejects one evaluated `super` property reference used as a `delete`
+ * operand. ECMA-262 evaluates the reference first, so the receiver read
+ * and the key expression have already run and the key was deliberately
+ * left unconverted; the reference's own category is what fails, and it
+ * always fails, so the operation takes no argument and never completes
+ * normally.
+ */
+function lowerSuperPropertyDelete(
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "super property deletion error",
+    [],
+    range,
+  );
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [],
+    detail: "delete of a super property reference",
+    id,
+    kind: "super-property-delete",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "always abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
 function lowerPropertyWrite(
   object: number,
   key: number,
@@ -4048,12 +4086,19 @@ function lowerExpression(
     expression.kind === "property-get" ||
     expression.kind === "property-delete"
   ) {
-    const operand =
-      expression.kind === "property-get"
-        ? superOperand(expression.object)
-        : undefined;
+    const operand = superOperand(expression.object);
     const superReceiver =
       operand == null ? undefined : lowerSuperReceiver(operand, builder);
+    if (expression.kind === "property-delete" && operand != null) {
+      // The reference is evaluated whole before the delete evaluation
+      // rejects it: the receiver read above observes the `this`
+      // temporal dead zone, the key expression runs for its value and
+      // its abrupt completion, and ToPropertyKey is never reached. The
+      // home object's prototype is read by an internal method that
+      // cannot be observed, so no lookup object is materialized.
+      lowerExpression(expression.key, builder);
+      return lowerSuperPropertyDelete(expression.range, builder);
+    }
     if (
       expression.kind === "property-get" &&
       expression.key.kind === "string" &&

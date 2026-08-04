@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,722
-reviewed cases: 2,891 passes, 1,292 expected negatives, and 539 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,727
+reviewed cases: 2,893 passes, 1,292 expected negatives, and 542 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2750,6 +2750,108 @@ rejection under the new runtime-intrinsic diagnostic. The manifest holds
 profile features with no semantic or harness failures. The suite
 revision, inventory policy, manifest schema, and classification
 vocabulary do not change.
+
+M5a Unit 8.5j admits `delete super.property` and
+`delete super[expression]`. ECMA-262's delete evaluation evaluates its
+operand first and rejects the result only afterward, when
+IsSuperReference is true, so the whole SuperProperty reference runs
+before the `ReferenceError` it raises. That order is observable in
+three places and this unit pins all three. GetThisBinding supplies the
+receiver first, so a reference inside a derived constructor before
+`super()` reports the uninitialized `this` binding and the key
+expression never runs at all. The key expression then runs for its
+value and its abrupt completion, so a key that throws reports its own
+error rather than the deletion's. ToPropertyKey is never reached, so a
+key object is never asked for a string. Nothing is ever deleted:
+GetSuperBase reads the home object's `[[Prototype]]` through an
+internal method that runs no user code, no lookup starts at it, and the
+parent property and the receiver are unchanged whether or not the named
+property exists.
+
+Owned syntax admits the existing `super-base` operand in the delete
+member position, which is the smallest representation that carries the
+receiver read the specified order needs. HIR resolves that operand to
+the enclosing element's `this` exactly as a `super` read does, so the
+derived constructor's temporal dead zone is the binding read the
+profile already lowers rather than a second mechanism. MIR lowers the
+receiver, then the key expression, and then one `super-property-delete`
+operation that takes no argument and never completes normally. It emits
+no `super-base`, no `delete-object-coercible`, and no `property-key`
+operation, which is what makes the absent lookup and the unconverted
+key structural rather than incidental. Specialization has no effect:
+the rejection has no guard, no cache, and no generic fallback to
+choose between, so both policies lower and emit the same operation.
+
+This unit advances the runtime ABI to `oseo-runtime-m5-42`. It adds
+`oseo_super_property_delete`, which raises the ReferenceError and
+reports no normal completion, the same shape
+`oseo_write_immutable_binding` already uses for an operation whose only
+outcome is its own error.
+
+Every existing `super` boundary is unchanged. A class body without
+`extends` and an object literal method keep the source-located
+rejection the `super` property unit records, because this runtime still
+has no `Object.prototype` object for such a home object to reach, so
+admitting the delete operand does not widen where `super` may be
+written. A destructuring assignment target and a `for` head keep their
+own rejections, deleting a private member stays an early error, and
+`super?.x` and `super.#x` stay parse errors the bootstrap parser
+reports. An optional chain whose base is a `super` property keeps
+deleting its final ordinary reference, since that reference is not a
+`super` reference.
+
+Both reference hosts deviate from the specified order here. V8 and
+JavaScriptCore evaluate the key expression before reading the receiver
+in a derived constructor, so they run a key expression ECMA-262 never
+reaches and report the deletion's own error instead of the
+uninitialized-`this` error; test262 rejects that order. The evidence is
+therefore split: the frontend structural tests and the reviewed test262
+subset pin the specified order, while the fixed native differential
+fixture and the generated property suite keep the derived-constructor
+case to keys with no observable evaluation so their Node.js and Deno
+comparisons stay exact.
+
+Frontend tests assert that the operand is admitted in each element form
+carrying a home object, covering an instance, static, symbol-keyed, and
+private method, a constructor, an arrow, an asynchronous method, a
+generator, an asynchronous generator, a getter, a setter, a static
+getter, an instance and a static field, a static block, a computed key,
+and a parenthesized operand, and that each lowers to the rejection with
+no `super-base`, `property-delete`, or `delete-object-coercible`
+operation. A separate structural test asserts the receiver read,
+the key call, and the rejection in that order under both specialization
+policies with no key conversion before it. A fixed *class-super-delete*
+native differential fixture covers the dot and computed forms, a
+parenthesized operand, an arrow, a getter, a static method reaching the
+constructor chain, a derived constructor before and after `super()`, a
+field initializer, a static block, a generator, an asynchronous method,
+a side-effecting key, an abrupt key, a poisoned key object that is
+never converted, a present and an absent parent property, the surviving
+parent property and prototype value, an optional chain through a
+`super` property that still deletes its final ordinary reference, and
+an awaited and a yielded key whose traced suspension the evaluated
+receiver survives, across both specialization policies and forced
+collection. A generated
+property with seed `0x5eed002d` draws one of ten element forms against
+static, pure computed, side-effecting, abrupt, and poisoned keys naming
+a present or absent property, and checks the key-evaluation log, the
+reported error, and the surviving parent property against an
+independent oracle alongside Node.js and Deno references, both
+specialization policies, and forced collection.
+
+The reviewed test262 subset newly reviews the five directly applicable
+*test/language/expressions/delete/* super cases.
+*super-property-method.js* and *super-property-uninitialized-this.js*
+pass, the second because the receiver is read before the key
+expression. Three record boundaries this unit does not change:
+*super-property.js* needs `Object` as a heritage value,
+*super-property-null-base.js* needs `super` in a class body without
+`extends`, and *super-property-topropertykey.js* needs `super` in an
+object literal method. The manifest reaches 4,727 cases: 2,893 passes,
+1,292 expected negatives, and 542 unsupported profile features with no
+semantic or harness failures. The suite revision, inventory policy,
+manifest schema, and classification vocabulary do not change, and the
+41,091-path applicable-test inventory is unchanged.
 
 ### Intrinsics and built-in objects
 

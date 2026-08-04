@@ -1047,7 +1047,18 @@ landed with the M5 intrinsics units. The remaining queue is:
     its ordinary read and temporal dead zone. An unshadowed
     runtime-owned intrinsic name such as `Object` or `Promise` stays a
     source-located rejection because ECMA-262 resolves it to a real
-    global value this profile admits only as a call target.
+    global value this profile admits only as a call target. Unit 8.5j
+    admits `delete super.property` and `delete super[expression]`,
+    which ECMA-262 rejects with a `ReferenceError` only after the whole
+    reference has been evaluated. The receiver is read first, so a
+    derived constructor reports its uninitialized `this` before the key
+    expression runs; the key expression then runs for its value and its
+    abrupt completion; and `ToPropertyKey` is never reached, so a
+    poisoned key object is never converted. No lookup starts, so no home
+    object prototype is read and no property is removed. Both reference
+    hosts evaluate the key before the receiver in a derived constructor,
+    which test262 rejects; the reviewed subset and the frontend
+    structural tests pin the specified order instead.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

@@ -2261,6 +2261,27 @@ function emitSuperBase(state: EmitState, operation: MirOperation): void {
 }
 
 /**
+ * Rejects an evaluated `super` property reference used as a `delete`
+ * operand. The receiver and the key have already been evaluated, so the
+ * only remaining step is the ReferenceError the delete evaluation
+ * raises for a super reference.
+ */
+function emitSuperPropertyDelete(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  line(
+    state,
+    renderC(
+      emittedC.superPropertyDelete.resultAssignOseoSuperPropertyDeleteContext,
+    ),
+  );
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+}
+
+/**
  * Reads the running constructor's own [[Prototype]], which is the
  * constructor `super()` invokes.
  */
@@ -2493,6 +2514,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     emitHomeObjectBind(state, operation);
   } else if (operation.kind === "super-base") {
     emitSuperBase(state, operation);
+  } else if (operation.kind === "super-property-delete") {
+    emitSuperPropertyDelete(state, operation);
   } else if (operation.kind === "super-constructor") {
     emitSuperConstructor(state, operation);
   } else if (operation.kind === "this-bind") {

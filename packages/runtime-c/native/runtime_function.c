@@ -1252,6 +1252,14 @@ OseoValue oseo_super_base(OseoValue callee) {
     return ordinary_object(home)->prototype;
 }
 
+OseoResult oseo_super_property_delete(OseoContext *context) {
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_REFERENCE,
+        "Cannot delete a super property reference."
+    );
+}
+
 OseoResult oseo_super_constructor(OseoContext *context, OseoValue callee) {
     OseoValue context_function = callee;
     if (function_has_lexical_this(callee)) {

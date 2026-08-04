@@ -790,6 +790,13 @@ OseoResult oseo_super_set(
     bool strict
 );
 /*
+ * The `delete` evaluation's rejection of a `super` property reference.
+ * The receiver and the key expression have already been evaluated and
+ * the key was deliberately not converted, so this only raises the
+ * ReferenceError that step and reports no normal completion.
+ */
+OseoResult oseo_super_property_delete(OseoContext *context);
+/*
  * GetSuperConstructor: the running constructor's own [[Prototype]].
  * Throws a TypeError when that is not a constructor, which is how
  * `class C extends null {}` rejects `super()`.

@@ -1680,6 +1680,219 @@ console.log(new Late().put(), order);
 `,
   },
   {
+    name: "class-super-delete",
+    source: `
+// The delete evaluation rejects an evaluated super reference with a
+// ReferenceError, so the reference is evaluated whole first and nothing
+// is ever removed. The error message is engine-owned, so only its
+// constructor is observed.
+let order = "";
+function key(name) {
+  order = order + "key:" + name + " ";
+  return name;
+}
+class Base {
+  constructor() {
+    order = order + "base ";
+  }
+  greet() {
+    return "base-greet";
+  }
+}
+Base.prototype.data = "base-data";
+class Derived extends Base {
+  constructor(mode) {
+    if (mode === "early") {
+      // The receiver is read before the key, so the uninitialized
+      // 'this' binding is what a reference before super() reports.
+      try {
+        delete super.data;
+      } catch (error) {
+        order = order + "early:" + error.constructor.name + " ";
+      }
+      try {
+        delete super[0];
+      } catch (error) {
+        order = order + "early-computed:" + error.constructor.name + " ";
+      }
+    }
+    super();
+    if (mode === "late") {
+      try {
+        delete super.data;
+      } catch (error) {
+        order = order + "late:" + error.constructor.name + " ";
+      }
+    }
+  }
+  dot() {
+    try {
+      return delete super.data;
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  computed(name) {
+    try {
+      return delete super[key(name)];
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  parenthesized() {
+    try {
+      return delete ((super.data));
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  fromArrow() {
+    const reach = () => {
+      try {
+        return delete super.data;
+      } catch (error) {
+        return error.constructor.name;
+      }
+    };
+    return reach();
+  }
+  get reader() {
+    try {
+      return delete super.data;
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  static onConstructor() {
+    try {
+      return delete super.create;
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  abruptKey() {
+    try {
+      return delete super[
+        (function () {
+          order = order + "abrupt ";
+          throw new TypeError("key failed");
+        })()
+      ];
+    } catch (error) {
+      return error.constructor.name + ":" + error.message;
+    }
+  }
+  unconverted() {
+    const marker = {
+      toString() {
+        order = order + "toString ";
+        return "data";
+      },
+    };
+    try {
+      return delete super[marker];
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+}
+Base.create = "base-create";
+new Derived("early");
+new Derived("late");
+console.log(order);
+const derived = new Derived();
+console.log(derived.dot(), derived.parenthesized(), derived.fromArrow());
+console.log(derived.reader, Derived.onConstructor());
+order = "";
+console.log(derived.computed("data"), derived.computed("missing"), order);
+// The key expression runs for its value and its abrupt completion, but
+// ToPropertyKey is never reached, so a poisoned key object is never
+// asked for a string.
+order = "";
+console.log(derived.abruptKey(), derived.unconverted(), order);
+// Nothing was deleted anywhere along the chain.
+console.log("data" in Base.prototype, "create" in Base);
+console.log(Base.prototype.data, derived.greet());
+// The same rejection reaches every element form that carries a home
+// object.
+class Elements extends Base {
+  field = (() => {
+    try {
+      return delete super.data;
+    } catch (error) {
+      return error.constructor.name;
+    }
+  })();
+  static probe = "unset";
+  static {
+    try {
+      delete super.create;
+    } catch (error) {
+      Elements.probe = error.constructor.name;
+    }
+  }
+  *steps() {
+    try {
+      yield delete super.data;
+    } catch (error) {
+      yield error.constructor.name;
+    }
+  }
+  async later() {
+    try {
+      return delete super.data;
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+}
+const elements = new Elements();
+console.log(elements.field, Elements.probe, elements.steps().next().value);
+elements.later().then((value) => {
+  console.log("async", value);
+});
+// An optional chain whose base is a super property deletes the final
+// ordinary reference instead, and a nullish guard returns true without
+// touching anything.
+Base.prototype.holder = { removable: 1 };
+class Chained extends Base {
+  live() {
+    return delete super.holder?.removable;
+  }
+  guarded() {
+    return delete super.absent?.removable;
+  }
+}
+const chained = new Chained();
+console.log(chained.live(), "removable" in Base.prototype.holder);
+console.log(chained.guarded());
+// The key expression may suspend, so the evaluated receiver survives a
+// traced suspension before the rejection runs.
+class Suspended extends Base {
+  async later() {
+    try {
+      return delete super[await Promise.resolve("data")];
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  *stepped() {
+    try {
+      yield delete super[yield "ask"];
+    } catch (error) {
+      yield error.constructor.name;
+    }
+  }
+}
+const suspended = new Suspended();
+const steps = suspended.stepped();
+console.log(steps.next().value, steps.next("data").value);
+suspended.later().then((value) => {
+  console.log("suspended", value);
+});
+`,
+  },
+  {
     name: "class-super-static",
     source: `
 // A static element's home object is the constructor itself, so its
