@@ -1844,8 +1844,12 @@ test("rejects super outside its lexical class context", () => {
       /only valid in the body of a class element whose class has an/u,
     ],
     [
-      "class A {}\nclass B extends A { m() { [super.m] = [1]; } }",
-      /Property access through super is unsupported here/u,
+      "class A { m() { [super.m] = [1]; } }",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "const o = { m(it) { for (super.m of it) {} } };",
+      /only valid in the body of a class element whose class has an/u,
     ],
     [
       "class A { m() { delete super.m; } }",
@@ -1950,6 +1954,340 @@ test("evaluates a deleted super reference before rejecting it", () => {
         .some((operation) => operation.kind === "property-key"),
       "no ToPropertyKey before the rejection",
     );
+  }
+});
+
+test("admits a super property as a destructuring assignment target", () => {
+  // Every pattern position the grammar admits a DestructuringAssignment
+  // Target in, in every class element form that carries a home object.
+  const cases: readonly string[] = [
+    "class A {}\nclass B extends A { m() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { m(k) { [super[k()]] = [1]; } }",
+    "class A {}\nclass B extends A { m() { [(super.x)] = [1]; } }",
+    "class A {}\nclass B extends A { m() { ({ p: super.x } = { p: 1 }); } }",
+    "class A {}\nclass B extends A { m(k) { ({ [k()]: super.x } = {}); } }",
+    "class A {}\nclass B extends A { m() { [[super.x]] = [[1]]; } }",
+    "class A {}\nclass B extends A { m() { ({ p: { q: super.x } } = " +
+      "{ p: { q: 1 } }); } }",
+    "class A {}\nclass B extends A { m() { [super.x = 1] = []; } }",
+    "class A {}\nclass B extends A { m() { ({ p: super.x = 1 } = {}); } }",
+    "class A {}\nclass B extends A { m() { [...super.x] = [1]; } }",
+    "class A {}\nclass B extends A { m() { ({ ...super.x } = { r: 1 }); } }",
+    "class A {}\nclass B extends A { m() { const f = () => { [super.x] = " +
+      "[1]; }; f(); } }",
+    "class A {}\nclass B extends A { static m() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { constructor() { super(); [super.x] = " +
+      "[1]; } }",
+    "class A {}\nclass B extends A { async m() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { *m() { [super.x] = [yield 1]; } }",
+    "class A {}\nclass B extends A { async *m() { [super.x] = [await 1]; } }",
+    "class A {}\nclass B extends A { static { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { get g() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { set s(v) { [super.x] = [v]; } }",
+    "class A {}\nclass B extends A { static get g() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { f = (() => { [super.x] = [1]; })(); }",
+    "class A {}\nclass B extends A { static f = (() => { [super.x] = " +
+      "[1]; })(); }",
+    "class A {}\nclass B extends A { #p() { [super.x] = [1]; } }",
+    "class A {}\nclass B extends A { [Symbol.iterator]() { [super.x] = " +
+      "[1]; } }",
+  ];
+  for (const source of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-target.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const text = printMir(result.mir);
+    // The store reuses the ordinary `super` property set: a lookup that
+    // starts at the home object's prototype and a fourth receiver
+    // argument the assignment stores through.
+    assert.match(text, /super-base home object prototype/u, source);
+    assert.match(
+      text,
+      /property-set destructuring member target %\d+, %\d+, %\d+, %\d+/u,
+      source,
+    );
+    // The super base is not an evaluated object expression, so PutValue
+    // reports its own TypeError instead of RequireObjectCoercible.
+    assert.doesNotMatch(
+      text,
+      /RequireObjectCoercible for assignment target/u,
+      source,
+    );
+  }
+});
+
+test("admits a super property as a for-of head assignment target", () => {
+  const cases: readonly string[] = [
+    "class A {}\nclass B extends A { m(it) { for (super.x of it) {} } }",
+    "class A {}\nclass B extends A { m(it, k) { for (super[k()] of it) {} } }",
+    "class A {}\nclass B extends A { m(it) { for ((super.x) of it) {} } }",
+    "class A {}\nclass B extends A { static m(it) { for (super.x of it) {} } }",
+    "class A {}\nclass B extends A { constructor(it) { super(); for " +
+      "(super.x of it) {} } }",
+    "class A {}\nclass B extends A { m(it) { const f = () => { for " +
+      "(super.x of it) {} }; f(); } }",
+    "class A {}\nclass B extends A { async m(it) { for await (super.x of it)" +
+      " {} } }",
+    "class A {}\nclass B extends A { async *m(it) { for await (super.x of it)" +
+      " {} } }",
+    "class A {}\nclass B extends A { *m(it) { for (super.x of it) { yield 1;" +
+      " } } }",
+    "class A {}\nclass B extends A { static { for (super.x of []) {} } }",
+    "class A {}\nclass B extends A { get g() { for (super.x of []) {} } }",
+  ];
+  for (const source of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-head.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const text = printMir(result.mir);
+    assert.match(text, /super-base home object prototype/u, source);
+    assert.match(
+      text,
+      /property-set for-of property target %\d+, %\d+, %\d+, %\d+/u,
+      source,
+    );
+  }
+});
+
+test("admits a super property inside a for-of head pattern", () => {
+  const source =
+    "class A {}\nclass B extends A { m(it) { for ([super.x] of it) {} } }";
+  const result = compileSource(babelFrontend, {
+    source,
+    sourceId: "super-head-pattern.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const text = printMir(result.mir);
+  assert.match(
+    text,
+    /property-set destructuring member target %\d+, %\d+, %\d+, %\d+/u,
+  );
+});
+
+test("orders a super destructuring target's reference before its value", () => {
+  // AssignmentElement evaluates its DestructuringAssignmentTarget before
+  // the iterator step that supplies the value, and PutValue converts the
+  // key only after that value exists. Inside the reference, ECMA-262
+  // reads the receiver first and GetSuperBase last.
+  const source =
+    "class A {}\n" +
+    "class B extends A {\n" +
+    "  m(k, it) {\n" +
+    "    [super[k()]] = it;\n" +
+    "  }\n" +
+    "}\n";
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "super-target-order.ts" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const method = result.mir.functions.find((item) =>
+      item.blocks.some((block) =>
+        block.operations.some(
+          (operation) => operation.detail === "destructuring member target",
+        ),
+      ),
+    );
+    assert.ok(method != null);
+    const operations = method.blocks.flatMap((block) => block.operations);
+    const indexOf = (predicate: (kind: string, detail: string) => boolean) =>
+      operations.findIndex((operation) =>
+        predicate(operation.kind, operation.detail ?? ""),
+      );
+    const receiverIndex = indexOf((kind) => kind === "receiver");
+    const keyIndex = indexOf((kind) => kind === "call");
+    const baseIndex = indexOf((kind) => kind === "super-base");
+    const stepIndex = indexOf(
+      (kind, detail) =>
+        kind === "iterator-next" && detail.includes("array binding"),
+    );
+    const convertIndex = indexOf((kind) => kind === "property-key");
+    const storeIndex = indexOf(
+      (kind, detail) =>
+        kind === "property-set" && detail === "destructuring member target",
+    );
+    assert.ok(receiverIndex >= 0, "receiver read");
+    assert.ok(keyIndex > receiverIndex, "key expression after receiver");
+    assert.ok(baseIndex > keyIndex, "GetSuperBase after the key expression");
+    assert.ok(stepIndex > baseIndex, "iterator step after the reference");
+    assert.ok(convertIndex > stepIndex, "ToPropertyKey after the value");
+    assert.ok(storeIndex > convertIndex, "store last");
+    const store = operations[storeIndex];
+    assert.equal(store?.superReference, true);
+    assert.equal(store?.arguments.length, 4);
+  }
+});
+
+test("orders a super object-pattern target between its name and GetV", () => {
+  // AssignmentProperty evaluates its PropertyName, then the
+  // DestructuringAssignmentTarget, then GetV; PutValue converts the
+  // target's own key only after that value exists.
+  const source =
+    "class A {}\n" +
+    "class B extends A {\n" +
+    "  m(k, source) {\n" +
+    "    ({ p: super[k()] } = source);\n" +
+    "  }\n" +
+    "}\n";
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "super-property-order.ts" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const method = result.mir.functions.find((item) =>
+      item.blocks.some((block) =>
+        block.operations.some(
+          (operation) => operation.detail === "destructuring member target",
+        ),
+      ),
+    );
+    assert.ok(method != null);
+    const operations = method.blocks.flatMap((block) => block.operations);
+    const indexOf = (predicate: (kind: string, detail: string) => boolean) =>
+      operations.findIndex((operation) =>
+        predicate(operation.kind, operation.detail ?? ""),
+      );
+    const nameIndex = indexOf((kind) => kind === "property-key");
+    const receiverIndex = indexOf((kind) => kind === "receiver");
+    const keyIndex = indexOf((kind) => kind === "call");
+    const baseIndex = indexOf((kind) => kind === "super-base");
+    const readIndex = indexOf(
+      (kind, detail) =>
+        kind === "property-get" && detail === "GetV for object binding",
+    );
+    const storeIndex = indexOf(
+      (kind, detail) =>
+        kind === "property-set" && detail === "destructuring member target",
+    );
+    // The source property name is converted before the target runs, and
+    // the target's own key is converted only after GetV.
+    const convertIndex = operations.findIndex(
+      (operation, index) =>
+        index > readIndex && operation.kind === "property-key",
+    );
+    assert.ok(nameIndex >= 0, "property name");
+    assert.ok(receiverIndex > nameIndex, "receiver read after the name");
+    assert.ok(keyIndex > receiverIndex, "key expression after receiver");
+    assert.ok(baseIndex > keyIndex, "GetSuperBase after the key expression");
+    assert.ok(readIndex > baseIndex, "GetV after the target reference");
+    assert.ok(convertIndex > readIndex, "ToPropertyKey after the value");
+    assert.ok(storeIndex > convertIndex, "store last");
+    const store = operations[storeIndex];
+    assert.equal(store?.superReference, true);
+    assert.equal(store?.arguments.length, 4);
+  }
+});
+
+test("orders a super for-of head's reference after each iterator step", () => {
+  // ForIn/OfBodyEvaluation obtains the next value first and evaluates the
+  // head reference once per iteration, so the receiver read and the key
+  // expression follow the step and precede the store.
+  const source =
+    "class A {}\n" +
+    "class B extends A {\n" +
+    "  m(k, it) {\n" +
+    "    for (super[k()] of it) {}\n" +
+    "  }\n" +
+    "}\n";
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "super-head-order.ts" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const method = result.mir.functions.find((item) =>
+      item.blocks.some((block) =>
+        block.operations.some(
+          (operation) => operation.detail === "for-of property target",
+        ),
+      ),
+    );
+    assert.ok(method != null);
+    const operations = method.blocks.flatMap((block) => block.operations);
+    const kinds = operations.map((operation) => operation.kind);
+    const stepIndex = kinds.indexOf("iterator-next");
+    const receiverIndex = kinds.indexOf("receiver");
+    const keyIndex = kinds.indexOf("call");
+    const baseIndex = kinds.indexOf("super-base");
+    const convertIndex = kinds.indexOf("property-key");
+    const storeIndex = operations.findIndex(
+      (operation) =>
+        operation.kind === "property-set" &&
+        operation.detail === "for-of property target",
+    );
+    assert.ok(stepIndex >= 0, "iterator step");
+    assert.ok(receiverIndex > stepIndex, "receiver read after the step");
+    assert.ok(keyIndex > receiverIndex, "key expression after receiver");
+    assert.ok(baseIndex > keyIndex, "GetSuperBase after the key expression");
+    assert.ok(convertIndex > baseIndex, "ToPropertyKey after the reference");
+    assert.ok(storeIndex > convertIndex, "store last");
+    const store = operations[storeIndex];
+    assert.equal(store?.superReference, true);
+    assert.equal(store?.arguments.length, 4);
+  }
+});
+
+test("keeps every super target composition this unit does not admit", () => {
+  const cases: readonly (readonly [string, RegExp])[] = [
+    // A class body without `extends` and an object literal method have no
+    // home object prototype this runtime can reach.
+    [
+      "class A { m() { ({ p: super.x } = {}); } }",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "const o = { m() { [...super.x] = [1]; } };",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    [
+      "class A { static m(it) { for (super.x of it) {} } }",
+      /only valid in the body of a class element whose class has an/u,
+    ],
+    // A for-in head is a separate unit; the statement stays unsupported.
+    [
+      "class A {}\nclass B extends A { m(o) { for (super.x in o) {} } }",
+      /for-in statements are unsupported/u,
+    ],
+  ];
+  for (const [source, message] of cases) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-target-boundary.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+  }
+  // A private member in a target position stays an early error, and an
+  // optional `super` reference stays a parse error.
+  const earlyErrors: readonly string[] = [
+    "class A {}\nclass B extends A { m() { [super.#x] = [1]; } }",
+    "class A {}\nclass B extends A { m(it) { for (super?.x of it) {} } }",
+    "class A {}\nclass B extends A { m(it) { for (const [super.x] of it)" +
+      " {} } }",
+  ];
+  for (const source of earlyErrors) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "super-target-early.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
   }
 });
 

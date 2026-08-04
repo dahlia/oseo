@@ -18214,6 +18214,93 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/assignment/target-super-computed-reference-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - error-intrinsics
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/assignment/target-super-computed-reference-null.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/assignment/target-super-computed-reference-null.js:96:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/assignment/target-super-computed-reference.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - error-intrinsics
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/assignment/target-super-identifier-reference-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - error-intrinsics
+      - object-properties
+    observation:
+      detail: 'test/language/expressions/assignment/target-super-identifier-reference-null.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/assignment/target-super-identifier-reference-null.js:96:5:
+        error[OSEO1001]: Property access through super is only valid in
+        the body of a class element whose class has an extends
+        clause.\n"'
+      unsupportedCapability: profile-syntax
+      harnessFailed: false
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -141765,6 +141852,80 @@ results:
   - case:
       async: false
       features:
+        - destructuring-assignment
+        - for-of
+        - Symbol.iterator
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/body-dstr-assign-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - iterator-protocol
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-assignment
+        - for-of
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/body-dstr-assign.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - iterator-protocol
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - destructuring-binding
       flags:
         - generated
@@ -144106,6 +144267,40 @@ results:
       failedPhase: parse
       harnessFailed: false
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/head-lhs-member.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - iterator-protocol
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      harnessFailed: false
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -151249,9 +151444,9 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
   expectedNegatives: 1292
   harnessFailures: 0
-  passes: 2893
+  passes: 2897
   semanticFailures: 0
-  unsupportedProfileFeatures: 542
+  unsupportedProfileFeatures: 544
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -151280,13 +151475,13 @@ summary:
     - dependency: classes
       expectedNegatives: 574
       harnessFailures: 0
-      passes: 769
+      passes: 770
       semanticFailures: 0
-      unsupportedProfileFeatures: 146
+      unsupportedProfileFeatures: 148
     - dependency: control-flow
       expectedNegatives: 161
       harnessFailures: 0
-      passes: 443
+      passes: 446
       semanticFailures: 0
       unsupportedProfileFeatures: 14
     - dependency: default-parameters
@@ -151298,7 +151493,7 @@ summary:
     - dependency: destructuring-bindings
       expectedNegatives: 131
       harnessFailures: 0
-      passes: 972
+      passes: 974
       semanticFailures: 0
       unsupportedProfileFeatures: 138
     - dependency: dynamic-source
@@ -151310,13 +151505,13 @@ summary:
     - dependency: error-intrinsics
       expectedNegatives: 4
       harnessFailures: 0
-      passes: 80
+      passes: 82
       semanticFailures: 0
-      unsupportedProfileFeatures: 33
+      unsupportedProfileFeatures: 35
     - dependency: expression-operators
       expectedNegatives: 64
       harnessFailures: 0
-      passes: 220
+      passes: 221
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: functions
@@ -151334,7 +151529,7 @@ summary:
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
-      passes: 786
+      passes: 789
       semanticFailures: 0
       unsupportedProfileFeatures: 17
     - dependency: lexical-bindings
@@ -151358,9 +151553,9 @@ summary:
     - dependency: object-properties
       expectedNegatives: 546
       harnessFailures: 0
-      passes: 1001
+      passes: 1003
       semanticFailures: 0
-      unsupportedProfileFeatures: 127
+      unsupportedProfileFeatures: 129
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -151388,7 +151583,7 @@ summary:
     - dependency: var-bindings
       expectedNegatives: 66
       harnessFailures: 0
-      passes: 187
+      passes: 189
       semanticFailures: 0
       unsupportedProfileFeatures: 2
   groups:
@@ -151491,9 +151686,9 @@ summary:
     - group: language/expressions
       expectedNegatives: 504
       harnessFailures: 0
-      passes: 1325
+      passes: 1326
       semanticFailures: 0
-      unsupportedProfileFeatures: 261
+      unsupportedProfileFeatures: 263
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
@@ -151551,6 +151746,6 @@ summary:
     - group: language/statements
       expectedNegatives: 571
       harnessFailures: 0
-      passes: 1116
+      passes: 1119
       semanticFailures: 0
       unsupportedProfileFeatures: 129

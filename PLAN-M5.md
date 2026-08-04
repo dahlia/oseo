@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,727
-reviewed cases: 2,893 passes, 1,292 expected negatives, and 542 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,733
+reviewed cases: 2,897 passes, 1,292 expected negatives, and 544 unsupported
 profile features with no semantic or harness failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -2852,6 +2852,136 @@ object literal method. The manifest reaches 4,727 cases: 2,893 passes,
 semantic or harness failures. The suite revision, inventory policy,
 manifest schema, and classification vocabulary do not change, and the
 41,091-path applicable-test inventory is unchanged.
+
+M5a Unit 8.5k admits `super.property` and `super[expression]` as an
+assignment target in a destructuring assignment pattern and in the
+for-of and for-await-of heads the profile already admits. Both positions
+share one shape ECMA-262 gives them: the target reference is evaluated
+and then held until PutValue stores through it. That is exactly the
+receiver-carrying pair an ordinary `super` assignment already lowers, so
+the unit admits the existing `super-base` operand in the two target
+positions rather than adding a target representation of its own.
+
+The specified order is observable in five places and this unit pins all
+five. An `AssignmentElement` evaluates its DestructuringAssignmentTarget
+before the iterator step that supplies the value, and an
+`AssignmentProperty` evaluates its property name first, then the target,
+then the value; ForIn/OfBodyEvaluation evaluates a head target once per
+iteration, after the step that produced the value. Inside the reference,
+GetThisBinding supplies the receiver first, so a target before `super()`
+in a derived constructor reports the uninitialized `this` binding and
+its key expression never runs at all, and MakeSuperPropertyReference
+reads the home object's `[[Prototype]]` only after that key expression.
+ToPropertyKey belongs to PutValue, so a key object is asked for a string
+only after the stored value exists. PutValue hands the super base to
+ToObject itself, so a null home object prototype reports the `TypeError`
+the store raises rather than a separate RequireObjectCoercible on a base
+no expression produced. An abrupt reference is an abrupt destructuring
+or loop step, so ArrayAssignmentPattern closes an unfinished iterator
+and ForIn/OfBodyEvaluation closes the loop's iterator, through
+AsyncIteratorClose under `for await`.
+
+The store keeps `Set` with a distinct receiver, unchanged from the
+ordinary `super` assignment: a setter found on the base chain runs
+against the enclosing element's `this`, and a target that reaches no
+setter defines an own writable, enumerable, configurable property of
+that receiver while the parent object is unchanged. A read-only parent
+property reports a `TypeError`, because a class body is strict.
+
+Owned syntax needs no new node: the `assignment-member` leaf and the
+`property` for-of head target already carry a `SyntaxExpression` object,
+and the frontend now admits the `super-base` operand there. HIR resolves
+that operand to the enclosing element's `this` exactly as a `super` read
+does, so the derived constructor's temporal dead zone is the binding
+read the profile already lowers. MIR extends the prepared assignment
+reference it already holds across the value's evaluation with that
+receiver, then emits one ordinary `property-set` marked as a `super`
+reference. No new MIR operation, no new runtime entry point, and no ABI
+change follow, and specialization has no effect: neither store has a
+guard, a cache, or a generic fallback to choose between, so both
+policies lower and emit the same operation. The prepared reference is
+the shape M5a Unit 8.5l reuses for a for-in head, which this unit does
+not admit; the for-in statement stays unsupported as a whole.
+
+Every existing `super` boundary is unchanged. A class body without
+`extends` and an object literal method keep the source-located rejection
+the `super` property unit records, because this runtime still has no
+`Object.prototype` object for such a home object to reach. A private
+member in a target position stays an early error, and `super?.x` and a
+declaration pattern such as `for (const [super.x] of it)` stay parse
+errors the bootstrap parser reports. Both reference hosts agree with
+ECMA-262 on every order this unit pins, including the receiver read that
+precedes a key expression before `super()`, so the fixed native
+differential fixture and the generated property compare against Node.js
+and Deno without an excluded case.
+
+Frontend tests assert that the target is admitted in each pattern
+position the grammar reaches, covering an array element, an object
+property, a computed object key, a nested array and object pattern, an
+element and a property default, an array rest element, an object rest
+property, and a parenthesized target, in an instance, static, and
+symbol-keyed method, a private method, a constructor, an arrow, an
+asynchronous method, a generator, an asynchronous generator, a getter, a
+setter, a static getter, an instance and a static field, and a static
+block, and that each lowers to the ordinary `super` property set with
+its receiver argument and no RequireObjectCoercible. Separate structural
+tests assert the receiver read, the key expression, the home object
+prototype read, the iterator step, the key conversion, and the store in
+that order for an array pattern leaf, the property name before the
+target reference and `GetV` after it for an object pattern property, and
+the iterator step before the receiver read for a head, under both
+specialization policies. A fixed
+*class-super-targets* native differential fixture covers every target
+position, dot, computed, symbol, and parenthesized references, an arrow,
+a getter, a setter, a static method, a static block, a field
+initializer, a generator, an asynchronous method, an asynchronous
+generator, a derived constructor before `super()`, a parent setter, an
+own property the store defines and its attributes, a read-only parent
+property, and a null home object prototype. Over a tagged source getter
+and tracked synchronous and
+asynchronous iterables it also pins the property name, the target
+reference, and the `GetV` that follows it, the target reference that
+runs before the iterator step, the key conversion that runs after it,
+and
+every `IteratorClose` and `AsyncIteratorClose` the specified order
+performs, from an abrupt direct head, an abrupt head pattern whose own
+iterator closes before the loop's, an abrupt leaf, and a target before
+`super()`, together with an awaited and a yielded value whose traced
+suspension the evaluated reference survives, across both specialization
+policies and forced collection. A generated property with
+seed `0x5eed002e` draws one of ten element forms and one of ten target
+positions against static, pure computed, side-effecting, abrupt, and
+poisoned keys naming a parent setter, a parent data property, or an
+absent property, and checks the key-evaluation log, the stored value,
+and the receiver and parent property state against an independent oracle
+alongside Node.js and Deno references, both specialization policies, and
+forced collection. The generated log deliberately observes what a single
+printed line can carry; the evaluation order and the iterator-close
+routing it cannot observe are pinned by the frontend structural tests
+and the fixed fixture.
+
+The applicable-test inventory holds no case that writes a `super`
+property from a destructuring pattern or a loop head; the only source
+that does is *test/staging/sm/class/superPropDestructuring.js*, which
+sits outside the reviewed candidate roots. The subset therefore newly
+reviews the six applicable cases that pin the two families this unit
+joins. *target-super-computed-reference.js* passes and is the case that
+pins the deferred ToPropertyKey a `super` target shares with every
+position this unit adds. *head-lhs-member.js*, *body-dstr-assign.js*,
+and *body-dstr-assign-error.js* pass and pin the for-of head target, its
+destructuring form, and the IteratorClose an abrupt target performs.
+*target-super-computed-reference-null.js* and
+*target-super-identifier-reference-null.js* record a boundary this unit
+does not change: both write `super` inside a class body without
+`extends`. The two *body-dstr-assign* cases declare the
+`destructuring-assignment` feature, which the reviewed feature list now
+records as supported; no other reviewed case declares it, so no existing
+classification moves. The manifest reaches 4,733
+cases: 2,897 passes, 1,292 expected negatives, and 544 unsupported
+profile features with no semantic or harness failures. The suite
+revision, inventory policy, manifest schema, and classification
+vocabulary do not change, and the 41,091-path applicable-test inventory
+is unchanged.
 
 ### Intrinsics and built-in objects
 

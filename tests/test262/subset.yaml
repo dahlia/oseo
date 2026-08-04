@@ -17,6 +17,7 @@ supportedFeatures:
   - computed-property-names
   - const
   - default-parameters
+  - destructuring-assignment
   - destructuring-binding
   - exponentiation
   - for-of
@@ -2151,6 +2152,15 @@ tests:
   - path: test/language/expressions/assignment/id-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignment/target-super-computed-reference-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, error-intrinsics, object-properties]
+  - path: test/language/expressions/assignment/target-super-computed-reference.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, expression-operators]
+  - path: test/language/expressions/assignment/target-super-identifier-reference-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, error-intrinsics, object-properties]
   - path: test/language/expressions/assignmenttargettype/direct-identifierreference-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
@@ -18064,6 +18074,20 @@ tests:
     expectedClassification: pass
     dependencies:
       [control-flow, functions, iterator-protocol, object-properties]
+  - path: test/language/statements/for-of/body-dstr-assign-error.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        error-intrinsics,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/statements/for-of/body-dstr-assign.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, destructuring-bindings, iterator-protocol, var-bindings]
   - path: test/language/statements/for-of/dstr/array-elem-put-prop-ref.js
     expectedClassification: pass
     dependencies:
@@ -18679,6 +18703,10 @@ tests:
   - path: test/language/statements/for-of/head-lhs-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-lhs-member.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, iterator-protocol, object-properties, var-bindings]
   - path: test/language/statements/for-of/head-var-init.js
     expectedClassification: expected-negative
     dependencies: [control-flow, var-bindings]

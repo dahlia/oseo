@@ -414,7 +414,11 @@ function superBase(
  * admits a `super` operand, which every caller that can carry the
  * reference's `this` receiver through to lowering passes; the remaining
  * callers reject it, because their targets read or write the object they
- * evaluate rather than a separate receiver.
+ * evaluate rather than a separate receiver. A destructuring assignment
+ * leaf and a for-of head assignment target pass it too: both hold the
+ * evaluated reference until PutValue stores through it, which is exactly
+ * the receiver-carrying shape an ordinary `super` assignment already
+ * lowers.
  */
 export function memberParts(
   context: ConvertContext,
@@ -1396,7 +1400,10 @@ export function bindingPattern(
             object,
           };
     }
-    const member = memberParts(context, value);
+    // A destructuring assignment leaf evaluates its reference before the
+    // iterator step or property read that supplies the value, so a
+    // `super` operand keeps the receiver its PutValue needs.
+    const member = memberParts(context, value, true);
     return member == null
       ? undefined
       : { ...location(context, value), ...member, kind: "assignment-member" };
@@ -2361,7 +2368,11 @@ export function statement(
             };
           }
         } else {
-          const member = memberParts(context, assignmentTarget);
+          // ForIn/OfBodyEvaluation evaluates the head's reference once
+          // per iteration and stores through it with PutValue, so a
+          // `super` operand carries its receiver the same way an
+          // ordinary `super` assignment does.
+          const member = memberParts(context, assignmentTarget, true);
           if (member != null) {
             target = {
               key: member.key,

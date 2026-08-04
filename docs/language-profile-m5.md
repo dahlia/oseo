@@ -42,8 +42,8 @@ executed variants and target, reviewed dependency tags, and summaries with
 raw, path-group, and dependency totals. Unsupported and harness results
 never increase the pass count.
 
-The current manifest contains 4,727 reviewed cases: 2,893 passes, 1,292
-expected negatives, and 542 unsupported profile features. It records no
+The current manifest contains 4,733 reviewed cases: 2,897 passes, 1,292
+expected negatives, and 544 unsupported profile features. It records no
 semantic or harness failures.
 
 
@@ -400,6 +400,79 @@ its deliberate boundary and its evidence:
     `oseo_super_property_delete`. Five reviewed test262 cases are added: two
     pass and three record the `Object` heritage, extends-free class body, and
     object literal `super` boundaries this unit does not change.
+ -  `super.property` and `super[expression]` as an assignment target,
+    admitted by M5a Unit 8.5k wherever a `super` property reference itself
+    is admitted. The target positions are every destructuring assignment
+    leaf the grammar reaches, which is an array element, an object
+    property, a nested array or object pattern, an element or property
+    default, an array rest element, and an object rest property, together
+    with a for-of and a for-await-of head, both as the head's own target
+    and inside a head assignment pattern. Each position evaluates the
+    reference and holds it until PutValue stores through it, so the
+    admitted representation is the same receiver-carrying pair an ordinary
+    `super` assignment already lowers rather than an already-read object.
+    Timing follows ECMA-262 exactly. An `AssignmentElement` evaluates its
+    target before the iterator step that supplies the value, and an
+    `AssignmentProperty` evaluates its property name, then the target, then
+    the value; a for-of head evaluates its target once per iteration, after
+    the step that produced the value. Inside the reference the receiver is
+    read first, so a target before `super()` in a derived constructor
+    reports the uninitialized `this` binding and never runs its key
+    expression, and the home object's `[[Prototype]]` is read after the key
+    expression. `ToPropertyKey` belongs to PutValue, so a key object is
+    converted only after the stored value exists. The store is `Set` with a
+    distinct receiver: a setter found on the base chain runs against the
+    enclosing element's `this`, and a target that reaches no setter defines
+    an own writable, enumerable, configurable property of that receiver
+    while the parent object is unchanged. A read-only parent property
+    reports a `TypeError`, because a class body is strict, and a home
+    object whose `[[Prototype]]` is null reports the `TypeError` the store
+    itself raises rather than a separate `RequireObjectCoercible`. An
+    abrupt reference is an abrupt destructuring or loop step, so an
+    unfinished array pattern iterator is closed and a for-of head closes
+    the loop's iterator, through `AsyncIteratorClose` under `for await`;
+    an abrupt target inside a head pattern closes the pattern's iterator
+    and then the loop's.
+    Both stores lower to the ordinary `super` property set operation with
+    its receiver argument, so the profile adds no operation, no runtime
+    entry point, and no ABI change, and both specialization policies emit
+    the same store. Deliberate boundaries: a class body without `extends`
+    and an object literal method keep the source-located `super` rejection
+    recorded below, a private member in a target position stays an early
+    error, `super?.x` and a declaration pattern such as
+    `for (const [super.x] of it)` stay parse errors the bootstrap parser
+    reports, and a for-in head stays unsupported with the rest of that
+    statement. A fixed *class-super-targets* native differential fixture
+    covers every target position, dot, computed, symbol, and parenthesized
+    references, an arrow, a getter, a setter, a static method, a static
+    block, a field initializer, a generator, an asynchronous method, an
+    asynchronous generator, a derived constructor before `super()`, a
+    parent setter, an own property the store defines, a read-only parent
+    property, a null home object prototype, a property name evaluated
+    before the target reference whose `GetV` follows it, a target
+    reference that runs
+    before the iterator step and a key conversion that runs after it, and
+    every `IteratorClose` and `AsyncIteratorClose` the specified order
+    performs, from an abrupt direct head, an abrupt head pattern, and an
+    abrupt leaf, over tracked synchronous and asynchronous iterables,
+    across both specialization policies and forced collection. A
+    generated property with seed `0x5eed002e` draws one of ten element
+    forms and one of ten target positions against static, pure computed,
+    side-effecting, abrupt, and poisoned keys and a parent setter, parent
+    data property, or absent property, and checks the key-evaluation log,
+    the stored value, and the receiver and parent property state against
+    an independent oracle alongside Node.js and Deno references. The
+    evaluation order the log cannot observe is pinned by the frontend
+    structural tests and the fixed fixture instead.
+    The applicable-test inventory holds no case that writes a `super`
+    property from a destructuring pattern or a loop head, so the subset
+    newly reviews the six applicable cases that pin the two families
+    this unit joins. Four pass: the `super` assignment reference whose
+    deferred `ToPropertyKey` every added position shares, and the for-of
+    head target, its destructuring form, and the `IteratorClose` an
+    abrupt target performs. Two record the extends-free class body
+    boundary this unit does not change. The reviewed feature list adds
+    `destructuring-assignment`, which no other reviewed case declares.
  -  The `**` exponentiation operator, the `&`, `|`, `^`, `<<`, `>>`, and
     `>>>` bitwise and shift operators, and the `+` and `~` unary
     operators. All apply the shared primitive numeric coercion; the
@@ -1561,12 +1634,14 @@ its deliberate boundary and its evidence:
     present method with the same derived receiver. Deliberate boundaries: a
     `super` property reference is rejected with a source-located diagnostic in
     a class body without `extends` and in an object literal method, because
-    this runtime has no `Object.prototype` object for such a lookup to reach,
-    and as a destructuring assignment target or a `for` head, which name a
-    target this lowering does not carry a receiver through. M5a Unit 8.5j
+    this runtime has no `Object.prototype` object for such a lookup to reach.
+    M5a Unit 8.5j
     later admits the `delete` operand position, recorded above, which carries
     no receiver anywhere because ECMA-262 rejects the evaluated reference
-    before any lookup starts. Native differential
+    before any lookup starts, and M5a Unit 8.5k admits the destructuring
+    assignment and for-of head target positions, recorded below. A for-in
+    head remains outside the profile with the rest of that statement.
+    Native differential
     fixtures cover a read, a method call, and a detached method value through
     a two-level and a three-level chain, an override reached from the parent
     through the derived receiver, an accessor read and its receiver, a write

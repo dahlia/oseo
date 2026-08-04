@@ -1058,7 +1058,20 @@ landed with the M5 intrinsics units. The remaining queue is:
     object prototype is read and no property is removed. Both reference
     hosts evaluate the key before the receiver in a derived constructor,
     which test262 rejects; the reviewed subset and the frontend
-    structural tests pin the specified order instead.
+    structural tests pin the specified order instead. Unit 8.5k admits
+    `super.property` and `super[expression]` as an assignment target in
+    a destructuring assignment pattern and in the for-of and
+    for-await-of heads the profile already admits. Both positions
+    evaluate the reference and hold it until PutValue stores through it,
+    which is the receiver-carrying pair an ordinary `super` assignment
+    already lowers, so the store reuses that operation and the runtime
+    ABI is unchanged. The reference runs before the iterator step that
+    supplies the value and once per iteration in a head; the receiver is
+    read before the key expression, so a target before `super()` reports
+    its uninitialized `this`; `ToPropertyKey` runs only after the value;
+    and an abrupt reference closes the iterator the pattern or the loop
+    opened. A for-in head stays unsupported with the rest of that
+    statement.
 3.  Add built-in families and broader executable syntax in dependency order.
     The BigInt intrinsic continues under [*PLAN-BIGINT.md*](./PLAN-BIGINT.md).
     The regular expression family follows

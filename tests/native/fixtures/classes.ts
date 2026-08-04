@@ -1893,6 +1893,360 @@ suspended.later().then((value) => {
 `,
   },
   {
+    name: "class-super-targets",
+    source: `
+// A destructuring assignment leaf and a for-of head both hold an
+// evaluated reference until PutValue stores through it, so a super
+// target reaches a parent setter with the derived receiver and
+// otherwise creates an own property of that receiver.
+let order = "";
+let earlyOrder = "";
+function tag(text) {
+  order = order + text + " ";
+}
+function key(name) {
+  tag("key:" + name);
+  return name;
+}
+function boom() {
+  tag("throw");
+  throw new TypeError("key failed");
+}
+function name() {
+  tag("name");
+  return "p";
+}
+// A source whose read is observable, so GetV can be placed in the order.
+const tagged = {
+  get p() {
+    tag("get:p");
+    return 39;
+  },
+};
+// A tracked iterable reports each step and every IteratorClose the
+// specification performs.
+function tracked(values) {
+  return {
+    [Symbol.iterator]() {
+      let index = 0;
+      return {
+        next() {
+          tag("next");
+          return index < values.length
+            ? { done: false, value: values[index++] }
+            : { done: true, value: undefined };
+        },
+        return() {
+          tag("close");
+          return { done: true, value: undefined };
+        },
+      };
+    },
+  };
+}
+// The asynchronous counterpart, whose close is AsyncIteratorClose.
+function asyncTracked(values) {
+  return {
+    [Symbol.asyncIterator]() {
+      let index = 0;
+      return {
+        next() {
+          tag("anext");
+          return Promise.resolve(
+            index < values.length
+              ? { done: false, value: values[index++] }
+              : { done: true, value: undefined },
+          );
+        },
+        return() {
+          tag("aclose");
+          return Promise.resolve({ done: true, value: undefined });
+        },
+      };
+    },
+  };
+}
+class Base {}
+Object.defineProperty(Base.prototype, "sink", {
+  configurable: true,
+  set(value) {
+    tag("set:" + value);
+  },
+});
+Object.defineProperty(Base, "staticSink", {
+  configurable: true,
+  set(value) {
+    tag("static-set:" + value);
+  },
+});
+Object.defineProperty(Base.prototype, "fixed", {
+  value: "F",
+  writable: false,
+});
+Base.prototype.plain = "base-plain";
+const marker = Symbol("marker");
+Object.defineProperty(Base.prototype, marker, {
+  configurable: true,
+  set(value) {
+    tag("symbol:" + value);
+  },
+});
+class Derived extends Base {
+  constructor(mode) {
+    if (mode === "early") {
+      // The receiver is read before the key expression, so a target
+      // before super() reports the uninitialized 'this' binding and the
+      // iterator the pattern already opened is still closed.
+      order = "";
+      try {
+        [super[key("sink")]] = tracked([1]);
+      } catch (error) {
+        tag("pattern:" + error.constructor.name);
+      }
+      try {
+        for (super[key("sink")] of tracked([1])) {}
+      } catch (error) {
+        tag("head:" + error.constructor.name);
+      }
+      try {
+        [...super[key("sink")]] = tracked([1]);
+      } catch (error) {
+        tag("rest:" + error.constructor.name);
+      }
+      earlyOrder = order;
+    }
+    super();
+  }
+  // Every pattern position the grammar admits a target in.
+  shapes() {
+    order = "";
+    [super.sink] = [1];
+    [super[key("sink")]] = [2];
+    [(super.sink)] = [3];
+    ({ p: super.sink } = { p: 4 });
+    ({ [key("sink")]: super.sink } = { sink: 5 });
+    [[super.sink]] = [[6]];
+    ({ p: { q: super.sink } } = { p: { q: 7 } });
+    [super.sink = 8] = [];
+    ({ p: super.sink = 9 } = {});
+    [...super.sink] = [10];
+    ({ ...super.sink } = { r: 11 });
+    [super[marker]] = [12];
+    return order;
+  }
+  // A for-of head evaluates its reference once per iteration, after the
+  // step that produced the value.
+  heads() {
+    order = "";
+    for (super.sink of tracked([1, 2])) {}
+    for (super[key("sink")] of [3]) {}
+    for ([super.sink] of [[4]]) {}
+    for ({ p: super.sink } of [{ p: 5 }]) {}
+    return order;
+  }
+  // AssignmentProperty evaluates its property name, then the target
+  // reference, then GetV, so a tagged source getter runs after the
+  // target's own key expression.
+  properties() {
+    order = "";
+    ({ p: super[key("sink")] } = tagged);
+    ({ [name()]: super[key("sink")] } = tagged);
+    ({ ...super[key("sink")] } = tagged);
+    return order;
+  }
+  // A target that reaches no setter defines an own property of the
+  // receiver and leaves the parent untouched.
+  receiver() {
+    [super.made] = [13];
+    for (super.grown of [14]) {}
+    const own = Object.getOwnPropertyDescriptor(this, "made");
+    const parent = Object.getOwnPropertyDescriptor(Base.prototype, "made");
+    return (
+      this.made +
+      "," +
+      this.grown +
+      "," +
+      (own.writable && own.enumerable && own.configurable) +
+      "," +
+      (parent === undefined)
+    );
+  }
+  // A read-only parent property rejects the store, because a class body
+  // is strict code.
+  readOnly() {
+    try {
+      [super.fixed] = [15];
+      return "assigned";
+    } catch (error) {
+      return error.constructor.name + ":" + (super.fixed === "F");
+    }
+  }
+  // The reference runs before the iterator step, and PutValue converts
+  // the key only after the value exists.
+  timing() {
+    order = "";
+    [super[key("sink")]] = tracked([16]);
+    const deferred = {
+      toString() {
+        tag("toString");
+        return "sink";
+      },
+    };
+    [super[deferred]] = tracked([17]);
+    return order;
+  }
+  // An abrupt reference is an abrupt destructuring or loop step, so the
+  // iterator opened before it is closed.
+  abrupt() {
+    order = "";
+    try {
+      [super[boom()]] = tracked([18]);
+    } catch (error) {
+      tag("pattern:" + error.constructor.name);
+    }
+    try {
+      for (super[boom()] of tracked([19])) {}
+    } catch (error) {
+      tag("head:" + error.constructor.name);
+    }
+    // A head pattern opens its own iterator, so an abrupt target closes
+    // the pattern's iterator and then the loop's.
+    try {
+      for ([super[boom()]] of tracked([tracked([19])])) {}
+    } catch (error) {
+      tag("nested:" + error.constructor.name);
+    }
+    return order;
+  }
+  fromArrow() {
+    order = "";
+    const reach = () => {
+      [super.sink] = [20];
+      for (super.sink of [21]) {}
+    };
+    reach();
+    return order;
+  }
+  get reader() {
+    order = "";
+    [super.sink] = [22];
+    return order;
+  }
+  set writer(value) {
+    [super.sink] = [value];
+  }
+  static onConstructor() {
+    order = "";
+    [super.staticSink] = [24];
+    for (super.staticSink of [25]) {}
+    return order;
+  }
+  static probe = "unset";
+  static {
+    order = "";
+    [super.staticSink] = [26];
+    Derived.probe = order;
+  }
+  field = (() => {
+    order = "";
+    [super.sink] = [27];
+    return order;
+  })();
+  // The evaluated reference survives a traced suspension between the
+  // receiver read and the store.
+  *stepped() {
+    order = "";
+    [super[yield "ask"] = 28] = [];
+    yield order;
+  }
+  async awaited() {
+    order = "";
+    [super.sink = await Promise.resolve(29)] = [];
+    for await (super[await Promise.resolve("sink")] of [30]) {}
+    return order;
+  }
+  // An awaited head runs the same target evaluation and closes its
+  // iterator through AsyncIteratorClose.
+  async streams() {
+    order = "";
+    for await (super[key("sink")] of asyncTracked([34, 35])) {}
+    for await ([super.sink] of asyncTracked([[36]])) {}
+    try {
+      for await (super[boom()] of asyncTracked([37])) {}
+    } catch (error) {
+      tag("head:" + error.constructor.name);
+    }
+    try {
+      for await ([super[boom()]] of asyncTracked([[38]])) {}
+    } catch (error) {
+      tag("pattern:" + error.constructor.name);
+    }
+    return order;
+  }
+  async *streamed() {
+    order = "";
+    for await (super.sink of [31]) {}
+    yield order;
+  }
+}
+new Derived("early");
+console.log(earlyOrder);
+const derived = new Derived();
+console.log(derived.shapes());
+console.log(derived.heads());
+console.log(derived.properties());
+console.log(derived.receiver());
+console.log(derived.readOnly());
+console.log(derived.timing());
+console.log(derived.abrupt());
+console.log(derived.fromArrow());
+console.log(derived.reader);
+derived.writer = 23;
+console.log(order);
+console.log(Derived.onConstructor());
+console.log(Derived.probe, derived.field);
+const steps = derived.stepped();
+console.log(steps.next().value, steps.next("sink").value);
+// Nothing was written to the parent anywhere along the chain.
+console.log(
+  Object.getOwnPropertyDescriptor(Base.prototype, "sink").set !== undefined,
+  Base.prototype.plain,
+  Base.prototype.fixed,
+);
+// A home object whose prototype is null has no object to store into.
+class Orphan extends Base {
+  write() {
+    try {
+      [super.any] = [32];
+      return "assigned";
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+  head() {
+    try {
+      for (super.any of [33]) {}
+      return "assigned";
+    } catch (error) {
+      return error.constructor.name;
+    }
+  }
+}
+Object.setPrototypeOf(Orphan.prototype, null);
+const orphan = new Orphan();
+console.log(orphan.write(), orphan.head());
+derived.awaited().then((value) => {
+  console.log("awaited", value);
+  return derived.streams();
+}).then((value) => {
+  console.log("streams", value);
+  return derived.streamed().next();
+}).then((result) => {
+  console.log("streamed", result.value);
+});
+`,
+  },
+  {
     name: "class-super-static",
     source: `
 // A static element's home object is the constructor itself, so its

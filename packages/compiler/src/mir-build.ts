@@ -5128,8 +5128,20 @@ function lowerForOfTarget(
     );
     return;
   }
-  const object = lowerExpression(target.object, builder);
-  const key = lowerPropertyKey(target.key, builder);
+  // ForIn/OfBodyEvaluation evaluates the head reference once per
+  // iteration, after the iterator produced this value and before
+  // PutValue stores it, so a `super` head reads its receiver and its key
+  // here and an abrupt one closes the iterator like any other step.
+  const operand = superOperand(target.object);
+  const superReceiver =
+    operand == null ? undefined : lowerSuperReceiver(operand, builder);
+  const { keyInput, object } = lowerReferenceObject(
+    target.object,
+    target.key,
+    operand,
+    builder,
+  );
+  const key = convertPropertyKey(keyInput, target.key.range, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -5140,12 +5152,16 @@ function lowerForOfTarget(
   const id = builder.nextValue;
   builder.nextValue += 1;
   builder.current.operations.push({
-    arguments: [object, key, value],
+    arguments:
+      superReceiver == null
+        ? [object, key, value]
+        : [object, key, value, superReceiver],
     detail: "for-of property target",
     id,
     kind: "property-set",
     range: target.range,
     ...strictCodeFlag(builder),
+    ...(superReceiver == null ? {} : { superReference: true as const }),
   });
   appendMirMetadata(
     builder,
@@ -5474,11 +5490,15 @@ function lowerBindingTarget(
       throw new Error("Assignment member target was not prepared.");
     }
     const prepared = reference;
-    const object = lowerObjectCoercible(
-      prepared.object,
-      pattern.object.range,
-      builder,
-    );
+    const superReceiver = prepared.superReceiver;
+    // A `super` reference starts at the home object's prototype, which
+    // PutValue hands to ToObject itself, so a nullish one reports the
+    // TypeError the store raises instead of a separate
+    // RequireObjectCoercible.
+    const object =
+      superReceiver == null
+        ? lowerObjectCoercible(prepared.object, pattern.object.range, builder)
+        : prepared.object;
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
     appendMirMetadata(
       builder,
@@ -5490,12 +5510,16 @@ function lowerBindingTarget(
     const id = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
-      arguments: [object, key, value],
+      arguments:
+        superReceiver == null
+          ? [object, key, value]
+          : [object, key, value, superReceiver],
       detail: "destructuring member target",
       id,
       kind: "property-set",
       range: pattern.range,
       ...strictCodeFlag(builder),
+      ...(superReceiver == null ? {} : { superReference: true as const }),
     });
     appendMirMetadata(
       builder,
@@ -5581,11 +5605,19 @@ function lowerBindingTarget(
   recordRoot(builder, id, pattern.range);
 }
 
+/**
+ * One destructuring assignment leaf's evaluated reference, held from the
+ * point the pattern evaluates it until PutValue stores through it.
+ * `superReceiver` is present exactly when the leaf named a `super`
+ * property: the lookup then starts at the home object's prototype while
+ * the stored value reaches the enclosing element's `this`.
+ */
 type LoweredAssignmentReference =
   | {
       readonly key: number;
       readonly kind: "property";
       readonly object: number;
+      readonly superReceiver?: number;
     }
   | {
       readonly kind: "private";
@@ -5600,9 +5632,21 @@ function lowerAssignmentReference(
 ): LoweredAssignmentReference | undefined {
   if (mode !== "write") return undefined;
   if (pattern.kind === "assignment-member") {
-    const object = lowerExpression(pattern.object, builder);
-    const key = lowerExpression(pattern.key, builder);
-    return { key, kind: "property", object };
+    const operand = superOperand(pattern.object);
+    const superReceiver =
+      operand == null ? undefined : lowerSuperReceiver(operand, builder);
+    const { keyInput, object } = lowerReferenceObject(
+      pattern.object,
+      pattern.key,
+      operand,
+      builder,
+    );
+    return {
+      key: keyInput,
+      kind: "property",
+      object,
+      ...(superReceiver == null ? {} : { superReceiver }),
+    };
   }
   if (pattern.kind === "assignment-private") {
     const object = lowerExpression(pattern.object, builder);

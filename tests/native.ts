@@ -258,6 +258,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-super-assignment" ||
     fixture.name === "class-super-computed" ||
     fixture.name === "class-super-delete" ||
+    fixture.name === "class-super-targets" ||
     fixture.name === "class-super-static" ||
     fixture.name === "class-super-fresh-construct" ||
     fixture.name === "class-heritage-values" ||
@@ -382,6 +383,14 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "delete-strict") {
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "class-super-targets") {
+            // A destructuring leaf and a for-of head reuse the ordinary
+            // `super` property set rather than a second store path, and
+            // every evaluated reference survives forced collection
+            // between the reference and the value it stores.
+            assert.match(native.emittedC, /oseo_super_set\(context, roots\[/u);
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "typeof-unresolved") {
