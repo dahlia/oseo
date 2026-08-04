@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,10 @@ import { fileURLToPath } from "node:url";
 import { parse as parseJavaScript } from "@babel/parser";
 import { parse as parseYaml } from "yaml";
 
-import { parseReviewedManifest } from "./test262-manifest.ts";
+import {
+  parseReviewedManifest,
+  validateReviewedManifestFileSet,
+} from "./test262-manifest.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
@@ -40,6 +43,7 @@ export interface PropertySource {
 /** Partitioned result-manifest input for one compatibility snapshot. */
 export interface ResultManifestSource {
   readonly indexText: string;
+  readonly partitionPaths: readonly string[];
   readPartition(path: string): string;
 }
 
@@ -166,12 +170,21 @@ function parseSubset(text: string): ReadonlySet<string> {
 
 function parseResults(
   source: ResultManifestSource,
+  allowLegacyGitBaseline: boolean,
 ): ReadonlyMap<string, Classification> {
   const legacy = record(
     parseYaml(source.indexText) as unknown,
     "result manifest",
   );
   if (Array.isArray(legacy.results)) {
+    if (!allowLegacyGitBaseline) {
+      throw new Error(
+        "legacy result manifests are allowed only for Git baselines.",
+      );
+    }
+    if (source.partitionPaths.length > 0) {
+      throw new Error("a legacy Git baseline cannot contain partitions.");
+    }
     const results = new Map<string, Classification>();
     for (const [index, value] of legacy.results.entries()) {
       const result = record(value, `result ${index}`);
@@ -187,6 +200,7 @@ function parseResults(
     }
     return results;
   }
+  validateReviewedManifestFileSet(source.indexText, source.partitionPaths);
   const manifest = parseReviewedManifest(
     source.indexText,
     source.readPartition,
@@ -470,18 +484,46 @@ function parseGeneratedDomains(
   return mutable;
 }
 
-export function createCompatibilitySnapshot(
+function createCompatibilitySnapshotFromSource(
   subsetText: string,
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
+  allowLegacyGitBaseline: boolean,
 ): CompatibilitySnapshot {
-  const classifications = parseResults(resultManifest);
+  const classifications = parseResults(resultManifest, allowLegacyGitBaseline);
   return {
     classifications,
     domains: parseGeneratedDomains(propertySources),
     resultPaths: new Set(classifications.keys()),
     subsetPaths: parseSubset(subsetText),
   };
+}
+
+export function createCompatibilitySnapshot(
+  subsetText: string,
+  resultManifest: ResultManifestSource,
+  propertySources: readonly PropertySource[],
+): CompatibilitySnapshot {
+  return createCompatibilitySnapshotFromSource(
+    subsetText,
+    resultManifest,
+    propertySources,
+    false,
+  );
+}
+
+/** Create a compatibility snapshot from a result manifest stored in Git. */
+export function createGitCompatibilitySnapshot(
+  subsetText: string,
+  resultManifest: ResultManifestSource,
+  propertySources: readonly PropertySource[],
+): CompatibilitySnapshot {
+  return createCompatibilitySnapshotFromSource(
+    subsetText,
+    resultManifest,
+    propertySources,
+    true,
+  );
 }
 
 function counts(snapshot: CompatibilitySnapshot): RatchetCounts {
@@ -847,14 +889,37 @@ function baselinePropertySources(revision: string): readonly PropertySource[] {
   return paths.map((path) => ({ path, text: gitText(revision, path) }));
 }
 
+/** Select every result partition present in one Git tree listing. */
+export function selectGitResultPartitionPaths(
+  listedText: string,
+): readonly string[] {
+  const prefix = "tests/test262/";
+  return listedText
+    .split("\n")
+    .filter(
+      (path) => path.startsWith(`${prefix}results/`) && path.endsWith(".yaml"),
+    )
+    .map((path) => path.slice(prefix.length));
+}
+
 export function compatibilitySnapshotAtRevision(
   revision: string,
 ): CompatibilitySnapshot {
   const commit = resolveCommit(revision);
-  return createCompatibilitySnapshot(
+  return createGitCompatibilitySnapshot(
     gitText(commit, subsetPath),
     {
       indexText: gitText(commit, resultsPath),
+      partitionPaths: selectGitResultPartitionPaths(
+        git([
+          "ls-tree",
+          "-r",
+          "--name-only",
+          commit,
+          "--",
+          "tests/test262/results",
+        ]),
+      ),
       readPartition(path): string {
         return gitText(commit, `tests/test262/${path}`);
       },
@@ -881,6 +946,27 @@ function currentPropertySources(): readonly PropertySource[] {
     path,
     text: readFileSync(join(repositoryRoot, path), "utf8"),
   }));
+}
+
+function currentResultPartitionPaths(): readonly string[] {
+  try {
+    return readdirSync(join(repositoryRoot, "tests/test262/results"), {
+      encoding: "utf8",
+      recursive: true,
+    })
+      .filter((path) => path.endsWith(".yaml"))
+      .map((path) => `results/${path.replaceAll("\\", "/")}`);
+  } catch (error) {
+    if (
+      error != null &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 function formatCounts(label: string, value: RatchetCounts): string {
@@ -922,6 +1008,7 @@ async function main(): Promise<void> {
     readFileSync(join(repositoryRoot, subsetPath), "utf8"),
     {
       indexText: readFileSync(join(repositoryRoot, resultsPath), "utf8"),
+      partitionPaths: currentResultPartitionPaths(),
       readPartition(path): string {
         return readFileSync(
           join(repositoryRoot, "tests/test262", path),

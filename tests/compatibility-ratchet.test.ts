@@ -1,17 +1,25 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { summarizeTest262 } from "../packages/testkit/src/index.ts";
+import type {
+  Test262Classification,
+  Test262Result,
+} from "../packages/testkit/src/index.ts";
 import {
   compareCompatibility,
   createCompatibilitySnapshot,
+  createGitCompatibilitySnapshot,
   selectBaselineIntent,
   selectCurrentPropertyPaths,
+  selectGitResultPartitionPaths,
 } from "../tools/compatibility-ratchet.ts";
 import type {
   CompatibilitySnapshot,
   PropertySource,
   ResultManifestSource,
 } from "../tools/compatibility-ratchet.ts";
+import { serializeTest262Manifest } from "../tools/test262-manifest.ts";
 
 function subset(paths: readonly string[]): string {
   return JSON.stringify({
@@ -19,7 +27,7 @@ function subset(paths: readonly string[]): string {
   });
 }
 
-function results(
+function legacyResults(
   entries: readonly (readonly [string, string])[],
 ): ResultManifestSource {
   return {
@@ -29,8 +37,56 @@ function results(
         classification,
       })),
     }),
+    partitionPaths: [],
     readPartition(path): string {
       throw new Error(`unexpected partition ${path}`);
+    },
+  };
+}
+
+function results(
+  entries: readonly (readonly [string, string])[],
+): ResultManifestSource {
+  const suiteRevision = "0123456789abcdef0123456789abcdef01234567";
+  const manifestResults: readonly Test262Result[] = entries.map(
+    ([path, resultClassification]) => {
+      const classification = resultClassification as Test262Classification;
+      return {
+        case: {
+          async: false,
+          features: [],
+          flags: [],
+          includes: [],
+          mode: "script",
+          path,
+          strictness: ["non-strict"],
+          suiteRevision,
+        },
+        classification,
+        dependencies: [],
+        observation: {
+          passed:
+            classification === "pass" || classification === "expected-negative",
+        },
+        unsupportedFeatures: [],
+      };
+    },
+  );
+  const serialized = serializeTest262Manifest({
+    results: manifestResults,
+    suiteRevision,
+    summary: summarizeTest262(manifestResults),
+  });
+  const partitions = new Map(
+    serialized.partitions.map(({ path, text }) => [path, text]),
+  );
+  return {
+    indexText: serialized.indexText,
+    partitionPaths: [...partitions.keys()],
+    readPartition(path): string {
+      const text = partitions.get(path);
+      if (text == null) throw new Error(`unexpected partition ${path}`);
+      return text;
     },
   };
 }
@@ -54,10 +110,13 @@ assertAsyncProperty("example", property, suite);
 }
 
 function snapshot(
-  subsetPaths: readonly string[] = ["test/a.js", "test/b.js"],
+  subsetPaths: readonly string[] = [
+    "test/language/statements/a.js",
+    "test/language/statements/b.js",
+  ],
   resultEntries: readonly (readonly [string, string])[] = [
-    ["test/a.js", "pass"],
-    ["test/b.js", "expected-negative"],
+    ["test/language/statements/a.js", "pass"],
+    ["test/language/statements/b.js", "expected-negative"],
   ],
   properties: readonly PropertySource[] = [propertySource("values", 101, 10)],
 ): CompatibilitySnapshot {
@@ -71,11 +130,15 @@ function snapshot(
 test("accepts unchanged and monotonically growing compatibility", () => {
   const baseline = snapshot();
   const current = snapshot(
-    ["test/a.js", "test/b.js", "test/c.js"],
     [
-      ["test/a.js", "pass"],
-      ["test/b.js", "expected-negative"],
-      ["test/c.js", "pass"],
+      "test/language/statements/a.js",
+      "test/language/statements/b.js",
+      "test/language/statements/c.js",
+    ],
+    [
+      ["test/language/statements/a.js", "pass"],
+      ["test/language/statements/b.js", "expected-negative"],
+      ["test/language/statements/c.js", "pass"],
     ],
     [propertySource("values", 101, 12)],
   );
@@ -94,12 +157,106 @@ test("accepts unchanged and monotonically growing compatibility", () => {
   assert.equal(report.current.propertyCaseBudget, 12);
 });
 
+test("rejects a legacy result manifest in the current snapshot", () => {
+  assert.throws(
+    () =>
+      createCompatibilitySnapshot(
+        subset(["test/language/statements/a.js"]),
+        legacyResults([["test/language/statements/a.js", "pass"]]),
+        [],
+      ),
+    /legacy result manifests are allowed only for Git baselines/u,
+  );
+});
+
+test("accepts a legacy result manifest only for a Git snapshot", () => {
+  const gitSnapshot = createGitCompatibilitySnapshot(
+    subset(["test/language/statements/a.js"]),
+    legacyResults([["test/language/statements/a.js", "pass"]]),
+    [],
+  );
+  assert.equal(
+    gitSnapshot.classifications.get("test/language/statements/a.js"),
+    "pass",
+  );
+});
+
+test("rejects partitions alongside a legacy Git result manifest", () => {
+  const source = legacyResults([["test/language/statements/a.js", "pass"]]);
+  assert.throws(
+    () =>
+      createGitCompatibilitySnapshot(
+        subset(["test/language/statements/a.js"]),
+        {
+          ...source,
+          partitionPaths: ["results/language/statements/00.yaml"],
+        },
+        [],
+      ),
+    /a legacy Git baseline cannot contain partitions/u,
+  );
+});
+
+test("rejects an unindexed result partition", () => {
+  const source = results([["test/language/statements/a.js", "pass"]]);
+  assert.throws(
+    () =>
+      createCompatibilitySnapshot(
+        subset(["test/language/statements/a.js"]),
+        {
+          ...source,
+          partitionPaths: [
+            ...source.partitionPaths,
+            "results/stale/group/00.yaml",
+          ],
+        },
+        [],
+      ),
+    /unexpected=results\/stale\/group\/00\.yaml/u,
+  );
+});
+
+test("rejects a Git snapshot missing an indexed result partition", () => {
+  const source = results([["test/language/statements/a.js", "pass"]]);
+  assert.throws(
+    () =>
+      createCompatibilitySnapshot(
+        subset(["test/language/statements/a.js"]),
+        {
+          ...source,
+          partitionPaths: selectGitResultPartitionPaths(
+            "tests/test262/results.yaml",
+          ),
+        },
+        [],
+      ),
+    /test262 result partition file set changed: missing=/u,
+  );
+});
+
+test("enumerates every Git result partition path", () => {
+  assert.deepEqual(
+    selectGitResultPartitionPaths(
+      [
+        "tests/test262/results.yaml",
+        "tests/test262/results/language/statements/01.yaml",
+        "tests/test262/results/language/statements/stale.yaml",
+        "tests/test262/results/language/statements/readme.txt",
+      ].join("\n"),
+    ),
+    [
+      "results/language/statements/01.yaml",
+      "results/language/statements/stale.yaml",
+    ],
+  );
+});
+
 test("rejects pass count loss and path reclassification separately", () => {
   const report = compareCompatibility(
     snapshot(),
     snapshot(undefined, [
-      ["test/a.js", "unsupported-profile-feature"],
-      ["test/b.js", "expected-negative"],
+      ["test/language/statements/a.js", "unsupported-profile-feature"],
+      ["test/language/statements/b.js", "expected-negative"],
     ]),
   );
   assert.deepEqual(
@@ -111,36 +268,45 @@ test("rejects pass count loss and path reclassification separately", () => {
 test("rejects a reviewed subset path removal", () => {
   const report = compareCompatibility(
     snapshot(),
-    snapshot(["test/a.js"], [["test/a.js", "pass"]]),
+    snapshot(
+      ["test/language/statements/a.js"],
+      [["test/language/statements/a.js", "pass"]],
+    ),
   );
   assert.deepEqual(
     report.unoverriddenViolations.map((violation) => violation.invariant),
     ["subset-path"],
   );
-  assert.equal(report.unoverriddenViolations[0]?.scope, "test/b.js");
+  assert.equal(
+    report.unoverriddenViolations[0]?.scope,
+    "test/language/statements/b.js",
+  );
 });
 
 test("rejects a subset and result path-set mismatch", () => {
   const report = compareCompatibility(
     snapshot(),
-    snapshot(undefined, [["test/a.js", "pass"]]),
+    snapshot(undefined, [["test/language/statements/a.js", "pass"]]),
   );
   assert.deepEqual(
     report.unoverriddenViolations.map((violation) => violation.invariant),
     ["manifest-path-set"],
   );
-  assert.equal(report.unoverriddenViolations[0]?.scope, "test/b.js");
+  assert.equal(
+    report.unoverriddenViolations[0]?.scope,
+    "test/language/statements/b.js",
+  );
 });
 
 test("rejects a result path missing from the reviewed subset", () => {
   const report = compareCompatibility(
     snapshot(),
     snapshot(
-      ["test/a.js", "test/b.js"],
+      ["test/language/statements/a.js", "test/language/statements/b.js"],
       [
-        ["test/a.js", "pass"],
-        ["test/b.js", "expected-negative"],
-        ["test/c.js", "unsupported-profile-feature"],
+        ["test/language/statements/a.js", "pass"],
+        ["test/language/statements/b.js", "expected-negative"],
+        ["test/language/statements/c.js", "unsupported-profile-feature"],
       ],
     ),
   );
@@ -148,7 +314,7 @@ test("rejects a result path missing from the reviewed subset", () => {
     {
       from: "present",
       invariant: "manifest-path-set",
-      scope: "test/c.js",
+      scope: "test/language/statements/c.js",
       to: "missing-from-subset",
     },
   ]);
@@ -187,8 +353,8 @@ test("rejects a generated domain case-budget reduction", () => {
 test("an override permits only its exact named transition", () => {
   const baseline = snapshot();
   const current = snapshot(undefined, [
-    ["test/a.js", "unsupported-profile-feature"],
-    ["test/b.js", "expected-negative"],
+    ["test/language/statements/a.js", "unsupported-profile-feature"],
+    ["test/language/statements/b.js", "expected-negative"],
   ]);
   const classificationOnly = compareCompatibility(
     baseline,
@@ -196,7 +362,7 @@ test("an override permits only its exact named transition", () => {
     `
 overrides:
   - invariant: pass-classification
-    path: test/a.js
+    path: test/language/statements/a.js
     transition:
       from: pass
       to: unsupported-profile-feature
@@ -216,7 +382,7 @@ overrides:
     `
 overrides:
   - invariant: pass-classification
-    path: test/a.js
+    path: test/language/statements/a.js
     transition:
       from: pass
       to: unsupported-profile-feature
