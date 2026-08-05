@@ -250,3 +250,27 @@ test("extracts validated family IDs from old and current trees", () => {
     /must not be empty/u,
   );
 });
+
+test("rejects unindexed entries in complete evidence trees", () => {
+  const sources = new Map(
+    [indexSource(), recordSource()].map((source) => [source.path, source.text]),
+  );
+  const paths = [...references, ...sources.keys()];
+  const readSource = (path: string): string => {
+    const text = sources.get(path);
+    if (text == null) throw new Error(`unexpected evidence source ${path}`);
+    return text;
+  };
+  for (const path of [
+    `${evidenceIndexDirectory}/notes.txt`,
+    `${evidenceIndexDirectory}/nested/extra.yaml`,
+    `${evidenceRecordDirectory}/notes.txt`,
+    `${evidenceRecordDirectory}/nested/extra.yaml`,
+  ]) {
+    assert.throws(
+      () =>
+        validateRequiredEvidenceInventoryFromTree([...paths, path], readSource),
+      /is an unindexed file/u,
+    );
+  }
+});

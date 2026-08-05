@@ -23,8 +23,9 @@ evidence:
     references:
       - tests/property/m5-lexical-super.property.test.ts
   guard-fallback:
-    status: covered
-    references:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
       - tests/property/m5-lexical-super.property.test.ts
   specialization:
     status: covered

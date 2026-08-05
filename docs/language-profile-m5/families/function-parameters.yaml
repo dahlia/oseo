@@ -23,8 +23,9 @@ evidence:
     references:
       - tests/property/m5-parameter-binding.property.test.ts
   guard-fallback:
-    status: covered
-    references:
+    status: omitted
+    reason: "Parameter-pattern binding has no specialized path or guard."
+    replacements:
       - tests/property/m5-parameter-binding.property.test.ts
   specialization:
     status: covered

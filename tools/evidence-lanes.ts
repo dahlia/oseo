@@ -253,12 +253,18 @@ function validateEvidenceTree(
   readSource: EvidenceSourceReader,
   required: boolean,
 ): ValidatedEvidenceTree {
-  const evidenceSources = (directory: string): readonly EvidenceSource[] =>
-    listedPaths
-      .filter(
-        (path) => path.startsWith(`${directory}/`) && path.endsWith(".yaml"),
-      )
-      .map((path) => ({ path, text: readSource(path) }));
+  const evidenceSources = (directory: string): readonly EvidenceSource[] => {
+    const prefix = `${directory}/`;
+    return listedPaths
+      .filter((path) => path.startsWith(prefix))
+      .map((path) => {
+        const name = path.slice(prefix.length);
+        if (name.includes("/") || !name.endsWith(".yaml")) {
+          throw new Error(`${path} is an unindexed file.`);
+        }
+        return { path, text: readSource(path) };
+      });
+  };
   const indexSources = evidenceSources(evidenceIndexDirectory);
   const recordSources = evidenceSources(evidenceRecordDirectory);
   if (indexSources.length === 0 && recordSources.length === 0 && !required) {

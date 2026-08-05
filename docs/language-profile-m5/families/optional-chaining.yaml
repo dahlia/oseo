@@ -23,8 +23,9 @@ evidence:
     references:
       - tests/property/m5-optional-chaining.property.test.ts
   guard-fallback:
-    status: covered
-    references:
+    status: omitted
+    reason: "The family has no deliberate family-specific guard-miss evidence."
+    replacements:
       - tests/property/m5-optional-chaining.property.test.ts
   specialization:
     status: covered

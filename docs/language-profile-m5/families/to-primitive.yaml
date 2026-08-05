@@ -25,8 +25,9 @@ evidence:
     replacements:
       - tests/native/fixtures/objects.ts
   guard-fallback:
-    status: covered
-    references:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
       - tests/native/fixtures/objects.ts
   specialization:
     status: covered
