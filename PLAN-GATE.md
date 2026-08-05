@@ -453,8 +453,8 @@ repair evidence for asynchronous generators, not a new language family. The
 frozen M3 and M4 profiles remain normative for inherited behavior, so M5 does
 not invent duplicate owners for them.
 
-All 488 class judgments were reviewed. There are 428 covered assessments and
-60 deliberate omissions. A covered class names existing evidence. An omission
+All 488 class judgments were reviewed. There are 427 covered assessments and
+61 deliberate omissions. A covered class names existing evidence. An omission
 states why the class does not isolate a useful additional contract and names
 the fixed, generated, differential, structural, or standards evidence that
 replaces it. No record remains `unassessed`.
