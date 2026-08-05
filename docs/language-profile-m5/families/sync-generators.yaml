@@ -1,0 +1,42 @@
+version: 1
+id: sync-generators
+title: "Synchronous generators"
+scope:
+  - "Generator suspension, resumption, delegation, and throw repair."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/generators.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/generators.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-generator.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-generator.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-generator.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/generators.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/generators.test.ts

@@ -1,0 +1,3 @@
+version: 1
+id: block-function-var-coexistence
+record: docs/language-profile-m5/families/block-function-var-coexistence.yaml

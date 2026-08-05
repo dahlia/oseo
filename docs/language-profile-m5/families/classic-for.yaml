@@ -1,0 +1,42 @@
+version: 1
+id: classic-for
+title: "Classic for statements"
+scope:
+  - "Classic for heads and per-iteration lexical environments."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-for-binding.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-for-binding.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-for-binding.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

@@ -1,0 +1,45 @@
+version: 1
+id: sync-arrows
+title: "Synchronous arrow functions"
+scope:
+  - "Synchronous arrows with lexical receivers and no construction."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: omitted
+    reason: "Reachability is inherited from the frozen function contract."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  generated:
+    status: omitted
+    reason: "Fixed fixtures enumerate lexical receivers and no construction."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts

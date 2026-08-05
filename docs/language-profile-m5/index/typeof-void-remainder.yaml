@@ -1,0 +1,3 @@
+version: 1
+id: typeof-void-remainder
+record: docs/language-profile-m5/families/typeof-void-remainder.yaml

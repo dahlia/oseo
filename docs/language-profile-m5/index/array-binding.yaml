@@ -1,0 +1,3 @@
+version: 1
+id: array-binding
+record: docs/language-profile-m5/families/array-binding.yaml

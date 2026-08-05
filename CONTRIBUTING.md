@@ -229,6 +229,13 @@ crosses a boundary. Depending on the work, this may include:
     contract;
  -  applicable ECMA-262, test262, or WinterTC conformance tests.
 
+Every admitted M5 semantic family has one normative record indexed by
+*docs/language-profile-m5/index/*. The record assesses the fixed vocabulary in
+the M5 profile. A covered class names existing evidence. An omitted class gives
+a reason and names existing replacement evidence for the same contract. New
+families may not use `unassessed`, and `mise run check:evidence-lanes` rejects
+an incomplete or stale record set.
+
 Tests shared by Node.js and Deno must import `test` from `node:test` and
 `assert` from `node:assert/strict` directly. Register tests in files that both
 hosts execute unchanged. Do not add host-specific registration wrappers or

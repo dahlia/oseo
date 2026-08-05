@@ -1,0 +1,3 @@
+version: 1
+id: symbols
+record: docs/language-profile-m5/families/symbols.yaml

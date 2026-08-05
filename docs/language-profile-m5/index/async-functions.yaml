@@ -1,0 +1,3 @@
+version: 1
+id: async-functions
+record: docs/language-profile-m5/families/async-functions.yaml

@@ -1,0 +1,3 @@
+version: 1
+id: lexical-declaration-lists
+record: docs/language-profile-m5/families/lexical-declaration-lists.yaml

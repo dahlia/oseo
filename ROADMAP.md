@@ -13,12 +13,9 @@ executes module and asynchronous cases, and a dependency-indexed baseline
 manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
-M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
-found for optional private field and accessor reads and optional private method
-calls. Native differential fixtures and a generated property cover nullish
-short circuit, valid-brand access, invalid-brand `TypeError`, and method
-receiver preservation under both specialization policies and forced
-collection. M5b and M5c remain open.
+M5a is complete. The normative
+[*M5 language profile*](./docs/language-profile-m5.md) records all 61 admitted
+families and their evidence assessments. M5b and M5c remain open.
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
@@ -845,6 +842,16 @@ dependency-indexed baseline is published.
 source challenge features through explicit unsupported classifications, while
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
 track.
+
+The normative [*M5 language profile*](./docs/language-profile-m5.md), rather
+than this queue, records current admitted behavior and per-family evidence.
+The next M5 work adds M5b built-ins in dependency order, then closes or
+authorizes every M5c inventory result under ADR 0019.
+
+
+M5 implementation history
+-------------------------
+
 The core expression and control-flow stream now covers the scalar
 operator families, `var`, synchronous arrows, template literals, and the
 `do-while`, `for`, `for-of`, `switch`, and labeled statements, and the

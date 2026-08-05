@@ -1,0 +1,42 @@
+version: 1
+id: async-iteration
+title: "Asynchronous iteration"
+scope:
+  - "Async iterator operations, async-from-sync, and for-await-of."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/async-iteration.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/async-iteration.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-for-await-of.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-for-await-of.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-for-await-of.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/async-iteration.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

@@ -1,0 +1,42 @@
+version: 1
+id: class-instance-fields
+title: "Public instance fields"
+scope:
+  - "Public instance fields, initialization, and inheritance."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/classes.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/classes.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-class.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-class.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-class.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/classes.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts

@@ -144,11 +144,13 @@ function snapshot(
     ["test/language/statements/b.js", "expected-negative"],
   ],
   properties: readonly PropertySource[] = [propertySource("values", 101, 10)],
+  families: readonly string[] = [],
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshot(
     subset(subsetPaths),
     results(resultEntries),
     properties,
+    families,
   );
 }
 
@@ -195,6 +197,7 @@ test("accepts unchanged and monotonically growing compatibility", () => {
   assert.deepEqual(report.unoverriddenViolations, []);
   assert.deepEqual(report.staleOverrides, []);
   assert.deepEqual(report.baseline, {
+    admittedFamilies: 0,
     distinctPropertySeeds: 1,
     pass: 1,
     propertyCaseBudget: 10,
@@ -204,6 +207,38 @@ test("accepts unchanged and monotonically growing compatibility", () => {
   });
   assert.equal(report.current.pass, 2);
   assert.equal(report.current.propertyCaseBudget, 12);
+});
+
+test("rejects removal of an admitted family without an override path", () => {
+  const report = compareCompatibility(
+    snapshot(undefined, undefined, undefined, ["retained", "removed"]),
+    snapshot(undefined, undefined, undefined, ["retained"]),
+  );
+  assert.deepEqual(report.unoverriddenViolations, [
+    {
+      from: "present",
+      invariant: "admitted-family",
+      scope: "removed",
+      to: "absent",
+    },
+  ]);
+  assert.throws(
+    () =>
+      compareCompatibility(
+        snapshot(undefined, undefined, undefined, ["removed"]),
+        snapshot(),
+        `
+overrides:
+  - invariant: admitted-family
+    path: removed
+    transition:
+      from: present
+      to: absent
+    reason: A family removal must not be overridden.
+`,
+      ),
+    /invalid invariant/u,
+  );
 });
 
 test("rejects a legacy result manifest in the current snapshot", () => {

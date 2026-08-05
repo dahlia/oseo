@@ -1,0 +1,3 @@
+version: 1
+id: error-intrinsics
+record: docs/language-profile-m5/families/error-intrinsics.yaml

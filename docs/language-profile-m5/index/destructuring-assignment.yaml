@@ -1,0 +1,3 @@
+version: 1
+id: destructuring-assignment
+record: docs/language-profile-m5/families/destructuring-assignment.yaml

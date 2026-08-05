@@ -1,0 +1,3 @@
+version: 1
+id: async-generator-intrinsics
+record: docs/language-profile-m5/families/async-generator-intrinsics.yaml

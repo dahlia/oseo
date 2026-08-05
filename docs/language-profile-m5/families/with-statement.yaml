@@ -1,0 +1,45 @@
+version: 1
+id: with-statement
+title: "With statements"
+scope:
+  - "Non-strict with object environments and dynamic name lookup."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: omitted
+    reason: "Reachability is inherited from ordinary references."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  generated:
+    status: omitted
+    reason: "Fixed fixtures enumerate hits, misses, and abrupt lookup."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

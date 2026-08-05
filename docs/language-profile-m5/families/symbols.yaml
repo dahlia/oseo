@@ -1,0 +1,45 @@
+version: 1
+id: symbols
+title: "Symbol values and intrinsic"
+scope:
+  - "Symbol primitives, the Symbol intrinsic, and well-known symbols."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: omitted
+    reason: "The fixed identity and key surface owns no suspended state."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  generated:
+    status: omitted
+    reason: "Fixed and standards cases enumerate identities and keys."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

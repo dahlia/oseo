@@ -1,0 +1,3 @@
+version: 1
+id: pattern-position-await
+record: docs/language-profile-m5/families/pattern-position-await.yaml

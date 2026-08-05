@@ -1,0 +1,44 @@
+version: 1
+id: typeof-void-remainder
+title: "Unary type, void, and remainder"
+scope:
+  - "The typeof, void, and Number remainder operators."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  generated:
+    status: omitted
+    reason: "Fixed and standards cases enumerate types and IEEE edge values."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/expressions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

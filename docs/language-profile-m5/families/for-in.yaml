@@ -1,0 +1,43 @@
+version: 1
+id: for-in
+title: "For-in statements"
+scope:
+  - "For-in enumeration with simple declaration and assignment heads."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-for-in.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-for-in.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/for-in.test.ts

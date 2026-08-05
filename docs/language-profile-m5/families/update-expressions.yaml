@@ -1,0 +1,42 @@
+version: 1
+id: update-expressions
+title: "Update expressions"
+scope:
+  - "Prefix and postfix increment and decrement on references."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-update-expression.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-update-expression.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-update-expression.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts

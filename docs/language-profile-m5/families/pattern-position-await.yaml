@@ -1,0 +1,43 @@
+version: 1
+id: pattern-position-await
+title: "Pattern-position await"
+scope:
+  - "Await in pattern targets, keys, and defaults in traced frames."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/async.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/async.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-pattern-await.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-pattern-await.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-pattern-await.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/async.ts
+  standards:
+    status: omitted
+    reason: "No applicable positive standards case isolates these positions."
+    replacements:
+      - tests/property/m5-pattern-await.property.test.ts
+      - tests/native/fixtures/async.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/async-generators.test.ts

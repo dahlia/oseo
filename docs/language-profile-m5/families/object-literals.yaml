@@ -1,0 +1,42 @@
+version: 1
+id: object-literals
+title: "Object literals"
+scope:
+  - "Data, method, accessor, computed, and spread definitions."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts

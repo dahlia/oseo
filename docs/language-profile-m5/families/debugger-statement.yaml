@@ -1,0 +1,44 @@
+version: 1
+id: debugger-statement
+title: "Debugger statements"
+scope:
+  - "Debugger statements as admitted no-op statements."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  generated:
+    status: omitted
+    reason: "The no-op statement has no runtime value or state domain."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

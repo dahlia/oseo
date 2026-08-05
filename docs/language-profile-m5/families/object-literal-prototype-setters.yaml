@@ -1,0 +1,43 @@
+version: 1
+id: object-literal-prototype-setters
+title: "Object literal prototype setters"
+scope:
+  - "The noncomputed colon-form __proto__ prototype setter."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-object-literal.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: omitted
+    reason: "Positive upstream cases also require omitted Object reflection."
+    replacements:
+      - tests/property/m5-object-literal.property.test.ts
+      - tests/native/fixtures/objects.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
