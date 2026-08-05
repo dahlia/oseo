@@ -99,7 +99,7 @@ results:
         e.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/after-same-li\
         ne-static-async-method-rs-static-privatename-identifier-alt-by-\
-        classname.js:228:4: error[OSEO1001]: Unknown binding
+        classname.js:232:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -129,7 +129,7 @@ results:
         tatic-privatename-identifier-alt-by-classname.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/same-line-met\
-        hod-rs-static-privatename-identifier-alt-by-classname.js:216:4:
+        hod-rs-static-privatename-identifier-alt-by-classname.js:220:4:
         error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

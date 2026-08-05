@@ -1,4 +1,43 @@
 partitions:
+  - group: built-ins/AggregateError
+    key: "09"
+    path: results/built-ins/AggregateError/09.yaml
+  - group: built-ins/AggregateError
+    key: "17"
+    path: results/built-ins/AggregateError/17.yaml
+  - group: built-ins/AggregateError
+    key: 1d
+    path: results/built-ins/AggregateError/1d.yaml
+  - group: built-ins/AggregateError
+    key: "62"
+    path: results/built-ins/AggregateError/62.yaml
+  - group: built-ins/AggregateError
+    key: 7f
+    path: results/built-ins/AggregateError/7f.yaml
+  - group: built-ins/AggregateError
+    key: "85"
+    path: results/built-ins/AggregateError/85.yaml
+  - group: built-ins/AggregateError
+    key: ae
+    path: results/built-ins/AggregateError/ae.yaml
+  - group: built-ins/AggregateError
+    key: b8
+    path: results/built-ins/AggregateError/b8.yaml
+  - group: built-ins/AggregateError
+    key: ca
+    path: results/built-ins/AggregateError/ca.yaml
+  - group: built-ins/AggregateError
+    key: cb
+    path: results/built-ins/AggregateError/cb.yaml
+  - group: built-ins/AggregateError
+    key: d5
+    path: results/built-ins/AggregateError/d5.yaml
+  - group: built-ins/AggregateError
+    key: dc
+    path: results/built-ins/AggregateError/dc.yaml
+  - group: built-ins/AggregateError
+    key: e9
+    path: results/built-ins/AggregateError/e9.yaml
   - group: built-ins/AsyncFromSyncIteratorPrototype
     key: "02"
     path: results/built-ins/AsyncFromSyncIteratorPrototype/02.yaml
@@ -324,6 +363,9 @@ partitions:
     key: "45"
     path: results/built-ins/Error/45.yaml
   - group: built-ins/Error
+    key: 4f
+    path: results/built-ins/Error/4f.yaml
+  - group: built-ins/Error
     key: a0
     path: results/built-ins/Error/a0.yaml
   - group: built-ins/Error
@@ -530,6 +572,9 @@ partitions:
   - group: built-ins/NativeErrors
     key: c7
     path: results/built-ins/NativeErrors/c7.yaml
+  - group: built-ins/NativeErrors
+    key: cf
+    path: results/built-ins/NativeErrors/cf.yaml
   - group: built-ins/NativeErrors
     key: d6
     path: results/built-ins/NativeErrors/d6.yaml
@@ -3487,7 +3532,7 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 2934
+  passes: 2949
   semanticFailures: 0
   unsupportedProfileFeatures: 572
   dependencies:
@@ -3558,7 +3603,7 @@ summary:
       expectedNegatives: 4
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 82
+      passes: 97
       semanticFailures: 0
       unsupportedProfileFeatures: 35
     - dependency: expression-operators
@@ -3660,6 +3705,13 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 5
   groups:
+    - group: built-ins/AggregateError
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 13
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -3692,7 +3744,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15
+      passes: 16
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/GeneratorFunction
@@ -3713,7 +3765,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 24
+      passes: 25
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/Object

@@ -40,7 +40,7 @@
  * Error constructor code IDs occupy one contiguous block indexed by
  * OseoErrorKind: SIZE_MAX - 10u - kind.
  */
-#define OSEO_ERROR_KIND_COUNT ((size_t)7u)
+#define OSEO_ERROR_KIND_COUNT ((size_t)8u)
 #define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID (SIZE_MAX - 10u)
 #define OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID \
     (SIZE_MAX - 9u - OSEO_ERROR_KIND_COUNT)

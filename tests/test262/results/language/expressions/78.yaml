@@ -196,7 +196,7 @@ results:
       detail: "test/language/expressions/class/elements/computed-name-toprimi\
         tive.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/computed-name\
-        -toprimitive.js:197:4: error[OSEO1001]: Unknown binding
+        -toprimitive.js:201:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

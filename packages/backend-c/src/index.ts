@@ -1999,6 +1999,7 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
 
 function emitErrorIntrinsic(state: EmitState, operation: MirOperation): void {
   const errorKinds = {
+    AggregateError: renderC(emittedC.errorIntrinsic.oseoErrorAggregate),
     Error: renderC(emittedC.errorIntrinsic.oseoErrorError),
     EvalError: renderC(emittedC.errorIntrinsic.oseoErrorEval),
     RangeError: renderC(emittedC.errorIntrinsic.oseoErrorRange),

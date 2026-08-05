@@ -21,7 +21,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorPrototype/throw/length.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorPrototype/throw/length.js\
-        :151:31: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        :155:31: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

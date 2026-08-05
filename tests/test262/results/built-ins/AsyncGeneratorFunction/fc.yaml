@@ -46,7 +46,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorFunction/instance-prototype.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorFunction/instance-prototy\
-        pe.js:147:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        pe.js:151:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

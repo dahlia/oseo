@@ -88,7 +88,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/after-same-li\
         ne-static-method-rs-static-privatename-identifier-by-classname.\
-        js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        js:219:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -118,7 +118,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/multiple-defi\
         nitions-rs-static-privatename-identifier-initializer-alt-by-cla\
-        ssname.js:213:4: error[OSEO1001]: Unknown binding
+        ssname.js:217:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -1,5 +1,6 @@
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 supportedFeatures:
+  - AggregateError
   - BigInt
   - arrow-function
   - async-functions
@@ -19,6 +20,7 @@ supportedFeatures:
   - default-parameters
   - destructuring-assignment
   - destructuring-binding
+  - error-cause
   - exponentiation
   - for-in-order
   - for-of
@@ -41,6 +43,45 @@ supportedFeatures:
   - top-level-await
   - well-known-symbols
 tests:
+  - path: test/built-ins/AggregateError/cause-property.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/errors-iterabletolist-failures.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/errors-iterabletolist.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/message-method-prop-cast.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/message-method-prop.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/message-tostring-abrupt-symbol.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/message-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/prototype/message.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/AggregateError/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
@@ -362,6 +403,9 @@ tests:
   - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncIterator/return-val.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/built-ins/Error/cause_property.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
   - path: test/built-ins/Error/name.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
@@ -624,6 +668,9 @@ tests:
     expectedClassification: pass
     dependencies: [error-intrinsics]
   - path: test/built-ins/NativeErrors/URIError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/NativeErrors/cause_property_native_error.js
     expectedClassification: pass
     dependencies: [error-intrinsics]
   - path: test/built-ins/Object/create/15.2.3.5-1-2.js

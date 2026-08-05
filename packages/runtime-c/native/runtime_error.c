@@ -18,6 +18,7 @@ static const char *const error_names[OSEO_ERROR_KIND_COUNT] = {
     "SyntaxError",
     "TypeError",
     "URIError",
+    "AggregateError",
 };
 
 static OseoResult ascii_runtime_string(
@@ -168,7 +169,7 @@ static OseoResult error_intrinsic_pair(
             frame.slots[2],
             name_units,
             name_length,
-            1u,
+            kind == OSEO_ERROR_AGGREGATE ? 2u : 1u,
             OSEO_FUNCTION_ORDINARY,
             oseo_undefined(),
             oseo_undefined(),
@@ -257,6 +258,38 @@ OseoResult oseo_internal_throw_error(
     return result;
 }
 
+/* InstallErrorCause after message conversion and before aggregate iteration. */
+static OseoResult install_error_cause(
+    OseoContext *context,
+    OseoValue object,
+    OseoValue options
+) {
+    if (!is_object(options)) return normal(object);
+    const OseoPropertyAttributes hidden = {true, false, true, false};
+    OseoValue slots[3] = {object, options, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_runtime_string(context, "cause");
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_has_property(context, slots[2], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && oseo_to_boolean(result.value)) {
+        result = oseo_object_get(context, slots[1], slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_ascii_property(
+                context,
+                slots[0],
+                "cause",
+                result.value,
+                hidden
+            );
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
     OseoValue callee,
@@ -269,10 +302,20 @@ OseoResult oseo_internal_error_construct(
         (OseoErrorKind)(OSEO_ERROR_CONSTRUCT_LAST_CODE_ID - code_id);
     const OseoPropertyAttributes hidden = {true, false, true, false};
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    frame.slots[0] = argument_count > 0u ? arguments[0] : oseo_undefined();
-    frame.slots[1] = argument_count > 1u ? arguments[1] : oseo_undefined();
+    bool aggregate = kind == OSEO_ERROR_AGGREGATE;
+    frame.slots[0] = aggregate && argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    size_t message_index = aggregate ? 1u : 0u;
+    size_t options_index = aggregate ? 2u : 1u;
+    frame.slots[1] = argument_count > message_index
+        ? arguments[message_index]
+        : oseo_undefined();
+    frame.slots[2] = argument_count > options_index
+        ? arguments[options_index]
+        : oseo_undefined();
     /* OrdinaryCreateFromConstructor takes the prototype from the new
      * target, so `class E extends Error {}` gives its instances
      * `E.prototype`. A plain call supplies no new target, and `new Error`
@@ -288,55 +331,72 @@ OseoResult oseo_internal_error_construct(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, result.value);
-        frame.slots[2] = result.value;
+        frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[2])->default_intrinsics = true;
-        ordinary_object(frame.slots[2])->error_data = true;
+        ordinary_object(frame.slots[3])->default_intrinsics = true;
+        ordinary_object(frame.slots[3])->error_data = true;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
-        tag_of(frame.slots[0]) != OSEO_TAG_UNDEFINED) {
-        result = oseo_internal_value_string(context, frame.slots[0]);
+        tag_of(frame.slots[1]) != OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_value_string(context, frame.slots[1]);
         if (result.status == OSEO_STATUS_NORMAL) {
             result = define_ascii_property(
                 context,
-                frame.slots[2],
+                frame.slots[3],
                 "message",
                 result.value,
                 hidden
             );
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL && is_object(frame.slots[1])) {
-        result = ascii_runtime_string(context, "cause");
-        frame.slots[3] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_has_property(
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = install_error_cause(
+            context,
+            frame.slots[3],
+            frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && aggregate) {
+        result = oseo_array_create(context, 0u);
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && aggregate) {
+        result = oseo_iterator_get(
+            context,
+            frame.slots[0],
+            &frame.slots[6]
+        );
+        frame.slots[5] = result.value;
+    }
+    bool done = false;
+    while (result.status == OSEO_STATUS_NORMAL && aggregate && !done) {
+        result = oseo_iterator_next(
+            context,
+            frame.slots[5],
+            frame.slots[6],
+            &frame.slots[7],
+            &done
+        );
+        if (result.status == OSEO_STATUS_NORMAL && !done) {
+            result = oseo_array_append(
                 context,
-                frame.slots[3],
-                frame.slots[1]
+                frame.slots[4],
+                frame.slots[7]
             );
-        }
-        if (result.status == OSEO_STATUS_NORMAL &&
-            oseo_to_boolean(result.value)) {
-            result = oseo_object_get(
-                context,
-                frame.slots[1],
-                frame.slots[3]
-            );
-            if (result.status == OSEO_STATUS_NORMAL) {
-                result = define_ascii_property(
-                    context,
-                    frame.slots[2],
-                    "cause",
-                    result.value,
-                    hidden
-                );
-            }
         }
     }
+    if (result.status == OSEO_STATUS_NORMAL && aggregate) {
+        result = define_ascii_property(
+            context,
+            frame.slots[3],
+            "errors",
+            frame.slots[4],
+            hidden
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result.value = frame.slots[2];
+        result.value = frame.slots[3];
     }
     oseo_roots_release(context, &frame);
     return result;

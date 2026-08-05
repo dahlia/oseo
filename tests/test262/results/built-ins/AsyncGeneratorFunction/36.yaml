@@ -21,7 +21,7 @@ results:
     observation:
       detail: "test/built-ins/AsyncGeneratorFunction/length.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/AsyncGeneratorFunction/length.js:136:30:
+        stderr=\"test/built-ins/AsyncGeneratorFunction/length.js:140:30:
         error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

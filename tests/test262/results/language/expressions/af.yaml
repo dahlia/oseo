@@ -120,7 +120,7 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/new-no-sc-lin\
         e-method-rs-static-privatename-identifier-alt-by-classname.js:2\
-        17:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        21:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

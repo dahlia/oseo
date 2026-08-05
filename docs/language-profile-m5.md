@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 61
+M5a is complete. The normative family records described below inventory 62
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,7 +47,7 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 4,861 reviewed cases: 2,934 passes, 1,355
+The current manifest contains 4,876 reviewed cases: 2,949 passes, 1,355
 expected negatives, and 572 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
@@ -711,16 +711,18 @@ current evidence assessment. Those live only in the indexed records above.
     8.5h adds four further expected negatives covering `arguments` as a
     prefix and postfix update target in strict code. M5a Unit 8.1a extends the
     same update path to exact BigInt values.
- -  The named error intrinsics `Error`, `EvalError`, `RangeError`,
-    `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError` as real
-    runtime-owned constructor values. An unshadowed reference to one of
-    these names resolves to the lazily created intrinsic; a lexical,
-    `var`, parameter, or imported binding shadows it as ECMAScript
-    requires. Each constructor is callable and constructible, installs
-    the hidden own `message` property from a present message argument,
-    honors the ES2022 `cause` option, and exposes `name`, `message`, and
-    `constructor` on its prototype, with one shared
-    `Error.prototype.toString`. Runtime semantic errors, TDZ reads and
+ -  The named error intrinsics `Error`, `AggregateError`, `EvalError`,
+    `RangeError`, `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError`
+    as real runtime-owned constructor values. An unshadowed reference to one
+    of these names resolves to the lazily created intrinsic; a lexical,
+    `var`, parameter, or imported binding shadows it as ECMAScript requires.
+    Each constructor is callable and constructible, installs the hidden own
+    `message` property from a present message argument, honors the ES2022
+    `cause` option, and exposes `name`, `message`, and `constructor` on its
+    prototype, with one shared `Error.prototype.toString`. `AggregateError`
+    consumes its first argument with `IterableToList`, preserves iteration
+    order in a fresh own `errors` array, and installs `message` and `cause`
+    before acquiring that iterator. Runtime semantic errors, TDZ reads and
     writes, immutable-binding assignment, nullish property access,
     calling non-functions, invalid array lengths, and the other
     catchable language errors are now instances of the applicable
@@ -737,7 +739,14 @@ current evidence assessment. Those live only in the indexed records above.
     against the expected type, replacing the former blanket
     `runtime-error-types` capability gap with the narrower
     `runtime-error-observation` classification for thrown values without
-    error identity.
+    error identity. A directly generated property with seed `0x60002f00`
+    covers arrays and custom iterables, message and cause variants, ordering,
+    both specialization policies, and forced collection against independent
+    Node.js and Deno observations. Fixed native differential evidence covers
+    every error constructor, iterable failures, descriptor shape, and the
+    deliberate absence of a specialized guard path. Fifteen reviewed test262
+    cases under the AggregateError, Error, and NativeErrors inventory roots
+    pin the standards surface.
  -  Generic `ToPrimitive` for object operands, implementing
     `OrdinaryToPrimitive` without well-known symbols: user-reachable
     `valueOf` and `toString` run in hint order with the receiver, an
@@ -2931,6 +2940,16 @@ cases: 2,934 passes, 1,355 expected negatives, and 572 unsupported profile
 features with no semantic or harness failures. The 41,091-path inventory,
 suite revision, manifest schema and vocabulary, zero-override policy, and
 runtime ABI `oseo-runtime-m5-43` are unchanged.
+
+M5b node `error-aggregate-and-options` adds `AggregateError`, its iterable
+`errors` list, and the `cause` option shared by every error constructor. The
+reviewed subset adds fifteen passing cases under only its three inventory
+roots. The manifest reaches 4,876 cases: 2,949 passes, 1,355 expected negatives,
+and 572 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. The public
+error-kind and context layouts move the runtime ABI to
+`oseo-runtime-m5-44`.
 
 
 Known gaps inside the claim

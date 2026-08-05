@@ -21,7 +21,7 @@ results:
     observation:
       detail: "test/built-ins/GeneratorFunction/instance-name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/GeneratorFunction/instance-name.js:144:\
+        stderr=\"test/built-ins/GeneratorFunction/instance-name.js:148:\
         25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

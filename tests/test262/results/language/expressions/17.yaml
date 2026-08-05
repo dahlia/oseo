@@ -213,8 +213,8 @@ results:
         rs-static-privatename-identifier-alt-by-classname.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/multiple-defi\
-        nitions-rs-static-privatename-identifier-alt-by-classname.js:21\
-        9:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        nitions-rs-static-privatename-identifier-alt-by-classname.js:22\
+        3:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

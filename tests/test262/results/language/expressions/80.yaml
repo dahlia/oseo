@@ -117,7 +117,7 @@ results:
         -rs-static-privatename-identifier-by-classname.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/new-no-sc-lin\
-        e-method-rs-static-privatename-identifier-by-classname.js:217:4:
+        e-method-rs-static-privatename-identifier-by-classname.js:221:4:
         error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

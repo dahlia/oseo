@@ -151,7 +151,7 @@ results:
         sname.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/multiple-stack\
         ed-definitions-rs-static-privatename-identifier-initializer-alt\
-        -by-classname.js:211:4: error[OSEO1001]: Unknown binding
+        -by-classname.js:215:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -23,7 +23,7 @@ results:
       detail: "test/built-ins/AsyncIteratorPrototype/Symbol.asyncIterator/pro\
         p-desc.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncIteratorPrototype/Symbol.asyncIter\
-        ator/prop-desc.js:141:52: error[OSEO1001]: Unknown binding
+        ator/prop-desc.js:145:52: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

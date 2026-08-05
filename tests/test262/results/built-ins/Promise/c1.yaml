@@ -18,7 +18,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/built-ins/Promise/name.js non-strict disabled failed (1):
-        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:146:16:
+        stdout=\"\" stderr=\"test/built-ins/Promise/name.js:150:16:
         error[OSEO1001]: Unknown binding 'Promise'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

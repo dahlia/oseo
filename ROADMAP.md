@@ -14,7 +14,7 @@ manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
 M5a is complete. The normative
-[*M5 language profile*](./docs/language-profile-m5.md) records all 61 admitted
+[*M5 language profile*](./docs/language-profile-m5.md) records all 62 admitted
 families and their evidence assessments. M5b and M5c remain open.
 
 The macOS AArch64 native execution work accepted by
@@ -963,7 +963,9 @@ Six reviewed standards cases pin the environment split. The
 intrinsics
 stream has landed the
 named error family as runtime-owned constructor values with typed catchable
-runtime errors;
+runtime errors. M5b node `error-aggregate-and-options` adds the runtime-owned
+`AggregateError`, its iterable-to-list `errors` property, and `cause` handling
+to every error constructor;
 [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is

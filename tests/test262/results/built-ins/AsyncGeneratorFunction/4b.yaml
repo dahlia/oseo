@@ -22,7 +22,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorFunction/instance-length.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorFunction/instance-length.\
-        js:152:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        js:156:30: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

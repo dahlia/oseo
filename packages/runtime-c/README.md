@@ -288,6 +288,14 @@ and elements can be accessors: a reentrant step must not steal the index
 this step yields, and an abrupt element accessor must leave the iterator on
 the following index rather than retrying the one it failed to read.
 
+The `m5-44` ABI adds `AggregateError` as the eighth public error kind and
+expands the context's error constructor and prototype caches accordingly.
+Its constructor consumes the first argument through the shared iterator
+protocol into a fresh `errors` array. It also shares the optional `cause`
+installation path with `Error` and every NativeError constructor. These public
+enum and context layout changes shift the generated error code identifiers and
+require the ABI bump.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

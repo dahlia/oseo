@@ -51,7 +51,7 @@ results:
         assname.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/after-same-li\
         ne-static-method-rs-static-privatename-identifier-initializer-a\
-        lt-by-classname.js:209:4: error[OSEO1001]: Unknown binding
+        lt-by-classname.js:213:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

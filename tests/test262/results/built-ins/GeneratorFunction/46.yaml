@@ -22,7 +22,7 @@ results:
       detail: "test/built-ins/GeneratorFunction/prototype/constructor.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/GeneratorFunction/prototype/constructor\
-        .js:141:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        .js:145:25: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -1,0 +1,48 @@
+version: 1
+id: aggregate-error-and-options
+title: "AggregateError and error options"
+scope:
+  - >-
+    AggregateError iterable errors and cause options for all error
+    constructors.
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-aggregate-error.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/m5-aggregate-error.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-aggregate-error.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family adds no specialized path or family-specific guard."
+    replacements:
+      - tests/property/m5-aggregate-error.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-aggregate-error.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

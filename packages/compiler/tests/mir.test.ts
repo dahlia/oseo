@@ -367,6 +367,7 @@ test("marks relational operators as allocation safepoints", () => {
 
 test("resolves unshadowed error names to intrinsic references", () => {
   const errorNames = [
+    "AggregateError",
     "Error",
     "EvalError",
     "RangeError",

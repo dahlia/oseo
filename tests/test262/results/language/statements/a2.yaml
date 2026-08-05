@@ -66,7 +66,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/after-same-lin\
         e-static-method-rs-static-privatename-identifier-alt-by-classna\
-        me.js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        me.js:219:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

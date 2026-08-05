@@ -23,7 +23,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorFunction/prototype/Symbol.toStrin\
         gTag.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorFunction/prototype/Symbol\
-        .toStringTag.js:142:39: error[OSEO1001]: Unknown binding
+        .toStringTag.js:146:39: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

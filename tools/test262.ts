@@ -91,6 +91,10 @@ const compareArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/compareArray.js",
 );
+const nativeErrorsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/nativeErrors.js",
+);
 
 const classifications = new Set<Test262Classification>([
   "expected-negative",
@@ -1215,6 +1219,7 @@ async function readHarnesses(): Promise<Test262Harnesses> {
     includes: new Map([
       ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
       ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
+      ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
       ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
     ]),
   };

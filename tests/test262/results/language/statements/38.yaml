@@ -133,7 +133,7 @@ results:
       detail: "test/language/statements/class/elements/computed-name-toprimit\
         ive-symbol.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/computed-name-\
-        toprimitive-symbol.js:200:4: error[OSEO1001]: Unknown binding
+        toprimitive-symbol.js:204:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

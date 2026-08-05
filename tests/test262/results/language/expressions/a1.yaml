@@ -164,7 +164,7 @@ results:
         -by-classname.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/after-same-li\
         ne-static-async-method-rs-static-privatename-identifier-initial\
-        izer-alt-by-classname.js:222:4: error[OSEO1001]: Unknown binding
+        izer-alt-by-classname.js:226:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -98,7 +98,7 @@ results:
       detail: "test/language/statements/class/elements/field-declaration.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/field-declarat\
-        ion.js:191:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        ion.js:195:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

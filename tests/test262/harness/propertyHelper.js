@@ -2,6 +2,10 @@
 
 function verifyProperty(object, name, descriptor) {
   const actual = Object.getOwnPropertyDescriptor(object, name);
+  if (descriptor === undefined) {
+    assert.sameValue(actual, undefined);
+    return true;
+  }
   assert(actual !== undefined, "The property must be an own property.");
   const hasValue = "value" in descriptor;
   if (hasValue) {

@@ -26,7 +26,7 @@ results:
       detail: "test/language/statements/class/elements/redeclaration.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/redeclaration.\
-        js:178:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        js:182:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

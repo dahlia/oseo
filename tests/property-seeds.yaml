@@ -12,6 +12,10 @@ families:
     owner: tests/property/m4-async.property.test.ts
     start: 0x60000200
     end: 0x600002ff
+  - family: m5-aggregate-error
+    owner: tests/property/m5-aggregate-error.property.test.ts
+    start: 0x60002f00
+    end: 0x60002fff
   - family: m5-arguments-object
     owner: tests/property/m5-arguments-object.property.test.ts
     start: 0x60000300

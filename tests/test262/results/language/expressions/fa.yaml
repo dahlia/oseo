@@ -165,7 +165,7 @@ results:
         ssname.js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/multiple-stac\
         ked-definitions-rs-static-privatename-identifier-initializer-al\
-        t-by-classname.js:211:4: error[OSEO1001]: Unknown binding
+        t-by-classname.js:215:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

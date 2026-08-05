@@ -111,7 +111,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/multiple-stack\
         ed-definitions-rs-static-privatename-identifier-alt-by-classnam\
-        e.js:217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        e.js:221:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

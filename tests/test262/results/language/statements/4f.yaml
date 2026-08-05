@@ -179,7 +179,7 @@ results:
         js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/after-same-lin\
         e-method-rs-static-privatename-identifier-initializer-alt-by-cl\
-        assname.js:209:4: error[OSEO1001]: Unknown binding
+        assname.js:213:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

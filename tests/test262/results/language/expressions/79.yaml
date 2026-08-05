@@ -238,7 +238,7 @@ results:
       detail: "test/language/expressions/tagged-template/template-object.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/tagged-template/template-obj\
-        ect.js:143:8: error[OSEO1001]: Unknown binding 'Array'.\\n\""
+        ect.js:147:8: error[OSEO1001]: Unknown binding 'Array'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

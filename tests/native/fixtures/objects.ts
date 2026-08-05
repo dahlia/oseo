@@ -290,6 +290,114 @@ console.log(renamed.toString(), renamed.name, renamed instanceof Error);
 `,
   },
   {
+    name: "aggregate-error-and-options",
+    source: `
+const constructors = [
+  Error,
+  EvalError,
+  RangeError,
+  ReferenceError,
+  SyntaxError,
+  TypeError,
+  URIError,
+];
+for (const Constructor of constructors) {
+  const cause = { name: Constructor.name };
+  const error = new Constructor("message", { cause });
+  const descriptor = Object.getOwnPropertyDescriptor(error, "cause");
+  console.log(
+    Constructor.name,
+    error.cause === cause,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+}
+
+let order = "";
+const errors = {
+  [Symbol.iterator]: function () {
+    order = order + "iterator ";
+    let index = 0;
+    return {
+      next: function () {
+        order = order + "next ";
+        const value = index === 0 ? "first" : { second: true };
+        const done = index > 1;
+        index = index + 1;
+        return {
+          done,
+          get value() {
+            order = order + "value ";
+            return value;
+          },
+        };
+      },
+    };
+  },
+};
+const message = {
+  toString: function () {
+    order = order + "message ";
+    return "many";
+  },
+};
+const cause = { detail: "root" };
+const aggregate = new AggregateError(errors, message, {
+  get cause() {
+    order = order + "cause ";
+    return cause;
+  },
+});
+console.log(
+  aggregate instanceof AggregateError,
+  aggregate instanceof Error,
+  aggregate.name,
+  aggregate.message,
+  aggregate.cause === cause,
+);
+console.log(
+  aggregate.errors.length,
+  aggregate.errors[0],
+  aggregate.errors[1].second,
+);
+console.log(order);
+const errorsDescriptor = Object.getOwnPropertyDescriptor(aggregate, "errors");
+console.log(
+  errorsDescriptor.writable,
+  errorsDescriptor.enumerable,
+  errorsDescriptor.configurable,
+);
+console.log(AggregateError.length, AggregateError.name);
+console.log(AggregateError.prototype.name);
+console.log(AggregateError.prototype.message === "");
+console.log(AggregateError.prototype instanceof Error);
+console.log(AggregateError.prototype.constructor === AggregateError);
+console.log(AggregateError([], "called") instanceof AggregateError);
+const empty = new AggregateError([]);
+console.log(empty.errors.length, "message" in empty, "cause" in empty);
+
+try {
+  new AggregateError([], {
+    toString: function () { throw new RangeError("message"); },
+  });
+} catch (error) {
+  console.log("message abrupt", error instanceof RangeError);
+}
+try {
+  new AggregateError({
+    [Symbol.iterator]: function () {
+      return {
+        next: function () { throw new SyntaxError("next"); },
+      };
+    },
+  });
+} catch (error) {
+  console.log("iterator abrupt", error instanceof SyntaxError);
+}
+`,
+  },
+  {
     name: "iterators",
     source: `
 const nums = [11, 22, 33];
