@@ -330,7 +330,7 @@ test(
           "operands, delegation kinds, guards, and resumption positions",
         numRuns: 10,
         profile: "M5 asynchronous generators and AsyncGeneratorRequest queues",
-        seed: 0x5eed_0018,
+        seed: 0x6000_0700,
         sizeLimit: large
           ? "6 values and 8 resumption positions"
           : "4 values and 6 resumption positions",

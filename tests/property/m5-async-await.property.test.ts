@@ -323,7 +323,7 @@ test(
           "fulfilled and rejected operands, and truthful or false hints",
         numRuns: 12,
         profile: "M5a ordinary async await positions",
-        seed: 0x5eed_001d,
+        seed: 0x6000_0600,
         sizeLimit: large
           ? "12 generated position cases at the extended run scale"
           : "12 generated position cases",

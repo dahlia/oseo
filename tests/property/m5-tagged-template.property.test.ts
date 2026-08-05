@@ -257,7 +257,7 @@ test(
           "templates over bounded integer substitutions",
         numRuns: 12,
         profile: "M5 tagged templates",
-        seed: 0x5eed_001a,
+        seed: 0x6000_2b00,
         sizeLimit: "one tagged expression with zero to two nested calls",
         timeLimitMilliseconds: 180_000,
       },

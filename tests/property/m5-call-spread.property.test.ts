@@ -336,7 +336,7 @@ test(
           "consumers with custom iterables, captured next, and abrupt steps",
         numRuns: 10,
         profile: "M5 call and constructor spread argument accumulation",
-        seed: 0x5eed_0006,
+        seed: 0x6000_0900,
         sizeLimit: large
           ? "9 values in each spread"
           : "5 values in each spread",

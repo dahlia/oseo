@@ -636,7 +636,7 @@ test(
           "whose guarded addition misses",
         numRuns: 32,
         profile: "M5 top-level this",
-        seed: 0x5eed_0026,
+        seed: 0x6000_2c0c,
         sizeLimit: "one this position per generated source",
         timeLimitMilliseconds: 300_000,
       },

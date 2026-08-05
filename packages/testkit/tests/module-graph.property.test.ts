@@ -110,7 +110,7 @@ test("generated module graphs retain deterministic SCC order", () => {
       domain: "closed reachable module graphs with arbitrary cycles",
       numRuns: 1_000,
       profile: "M4 static module linking",
-      seed: 0x5eed_0002,
+      seed: 0x6000_0000,
       sizeLimit: `${maximumModules} modules`,
       timeLimitMilliseconds: 10_000,
     },

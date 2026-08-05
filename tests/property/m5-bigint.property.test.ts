@@ -460,7 +460,7 @@ test(
           "update, mixed numeric error, false number hint, and bigint hint",
         numRuns: 10,
         profile: "M5a BigInt primitive",
-        seed: 0x5eed_0022,
+        seed: 0x6000_0800,
         sizeLimit:
           "one operation over magnitudes at most 10000, shift counts at " +
           "most 6, and exponents at most 6",

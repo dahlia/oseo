@@ -16,8 +16,12 @@ const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
 const resultsPath = "tests/test262/results.yaml";
 const overridesPath = "tests/compatibility-ratchet-overrides.yaml";
+const propertySeedRegistryPath = "tests/property-seeds.yaml";
 const absent = "absent";
 const present = "present";
+const maximumFastCheckSeed = 0x7fff_ffff;
+const minimumFastCheckSeed = -0x8000_0000;
+const propertySeedBlockSize = 0x100;
 
 type Classification =
   | "expected-negative"
@@ -38,6 +42,13 @@ export type RatchetInvariant =
 export interface PropertySource {
   readonly path: string;
   readonly text: string;
+}
+
+/** Aggregate reviewed allocations validated against the seed registry. */
+export interface PropertySeedRegistrySummary {
+  readonly allocations: number;
+  readonly families: number;
+  readonly seeds: number;
 }
 
 /** Partitioned result-manifest input for one compatibility snapshot. */
@@ -262,6 +273,20 @@ function numericLiteral(expression: AstNode, context: string): number {
   return parsed;
 }
 
+function fastCheckSeed(value: unknown, context: string): number {
+  if (
+    typeof value !== "number" ||
+    !Number.isSafeInteger(value) ||
+    value < minimumFastCheckSeed ||
+    value > maximumFastCheckSeed
+  ) {
+    throw new Error(
+      `${context} must be a signed 32-bit integer accepted by fast-check.`,
+    );
+  }
+  return value;
+}
+
 function staticString(expression: AstNode, context: string): string {
   const value = unwrapExpression(expression);
   if (value.type === "StringLiteral" && typeof value.value === "string") {
@@ -372,13 +397,18 @@ function requiredOption(
   return value;
 }
 
-function parseGeneratedDomains(
+interface PropertyAllocation {
+  readonly domain: string;
+  readonly path: string;
+  readonly property: string;
+  readonly seed: number;
+  readonly numRuns: number;
+}
+
+function parsePropertyAllocations(
   sources: readonly PropertySource[],
-): ReadonlyMap<string, GeneratedDomain> {
-  const mutable = new Map<
-    string,
-    { caseBudget: number; seeds: Set<number>; sources: Set<string> }
-  >();
+): readonly PropertyAllocation[] {
+  const allocations: PropertyAllocation[] = [];
   for (const source of sources) {
     const sourceFile = parseJavaScript(source.text, {
       plugins: ["typescript"],
@@ -461,18 +491,14 @@ function parseGeneratedDomains(
           if (numRuns < 1) {
             throw new Error(`${context} numRuns must be positive.`);
           }
-          const aggregate = mutable.get(domain) ?? {
-            caseBudget: 0,
-            seeds: new Set<number>(),
-            sources: new Set<string>(),
-          };
-          aggregate.caseBudget += numRuns;
-          if (!Number.isSafeInteger(aggregate.caseBudget)) {
-            throw new Error(`${context} produces an unsafe case budget.`);
-          }
-          aggregate.seeds.add(seed);
-          aggregate.sources.add(source.path);
-          mutable.set(domain, aggregate);
+          fastCheckSeed(seed, `${context} seed`);
+          allocations.push({
+            domain,
+            numRuns,
+            path: source.path,
+            property,
+            seed,
+          });
         }
       }
       for (const [key, child] of Object.entries(rawNode)) {
@@ -481,7 +507,190 @@ function parseGeneratedDomains(
     };
     visit(sourceFile);
   }
+  return allocations;
+}
+
+function parseGeneratedDomains(
+  sources: readonly PropertySource[],
+): ReadonlyMap<string, GeneratedDomain> {
+  const mutable = new Map<
+    string,
+    { caseBudget: number; seeds: Set<number>; sources: Set<string> }
+  >();
+  for (const allocation of parsePropertyAllocations(sources)) {
+    const aggregate = mutable.get(allocation.domain) ?? {
+      caseBudget: 0,
+      seeds: new Set<number>(),
+      sources: new Set<string>(),
+    };
+    aggregate.caseBudget += allocation.numRuns;
+    if (!Number.isSafeInteger(aggregate.caseBudget)) {
+      throw new Error(
+        `${allocation.path} property ${JSON.stringify(allocation.property)} ` +
+          "produces an unsafe case budget.",
+      );
+    }
+    aggregate.seeds.add(allocation.seed);
+    aggregate.sources.add(allocation.path);
+    mutable.set(allocation.domain, aggregate);
+  }
   return mutable;
+}
+
+interface PropertySeedFamily {
+  readonly end: number;
+  readonly family: string;
+  readonly owner: string;
+  readonly start: number;
+}
+
+function registryInteger(value: unknown, context: string): number {
+  if (typeof value !== "number" || !Number.isSafeInteger(value)) {
+    throw new Error(`${context} must be a safe integer.`);
+  }
+  return value;
+}
+
+function registryOwner(value: unknown, context: string): string {
+  const owner = stringValue(value, context);
+  if (
+    owner.startsWith("/") ||
+    owner.includes("\\") ||
+    owner.split("/").includes("..") ||
+    !owner.endsWith(".property.test.ts")
+  ) {
+    throw new Error(
+      `${context} must be a repository-relative property test path.`,
+    );
+  }
+  return owner;
+}
+
+function parsePropertySeedRegistry(
+  text: string,
+): readonly PropertySeedFamily[] {
+  const root = record(parseYaml(text) as unknown, "property seed registry");
+  requireKeys(root, new Set(["families", "version"]), "property seed registry");
+  if (root.version !== 1) {
+    throw new Error("property seed registry version must be 1.");
+  }
+  if (!Array.isArray(root.families)) {
+    throw new Error("property seed registry families must be an array.");
+  }
+  const names = new Set<string>();
+  const owners = new Set<string>();
+  const families = root.families.map((value, index) => {
+    const context = `property seed family ${index}`;
+    const entry = record(value, context);
+    requireKeys(entry, new Set(["end", "family", "owner", "start"]), context);
+    const family = stringValue(entry.family, `${context} family`);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(family)) {
+      throw new Error(`${context} family must be a lowercase kebab-case ID.`);
+    }
+    if (names.has(family)) {
+      throw new Error(`property seed registry repeats family ${family}.`);
+    }
+    names.add(family);
+    const owner = registryOwner(entry.owner, `${context} owner`);
+    if (owners.has(owner)) {
+      throw new Error(`property seed registry repeats owner ${owner}.`);
+    }
+    owners.add(owner);
+    const start = fastCheckSeed(
+      registryInteger(entry.start, `${context} start`),
+      `${context} start`,
+    );
+    const end = fastCheckSeed(
+      registryInteger(entry.end, `${context} end`),
+      `${context} end`,
+    );
+    if (
+      start < 0 ||
+      start % propertySeedBlockSize !== 0 ||
+      end !== start + propertySeedBlockSize - 1
+    ) {
+      throw new Error(
+        `${context} must reserve one aligned ${propertySeedBlockSize}-seed ` +
+          "block.",
+      );
+    }
+    return { end, family, owner, start };
+  });
+  const ordered = families.toSorted((left, right) => left.start - right.start);
+  for (let index = 1; index < ordered.length; index += 1) {
+    const previous = ordered[index - 1];
+    const current = ordered[index];
+    if (previous != null && current != null && current.start <= previous.end) {
+      throw new Error(
+        `property seed blocks overlap for ${previous.family} and ` +
+          `${current.family}.`,
+      );
+    }
+  }
+  return families;
+}
+
+/** Validate reviewed property seeds against their checked-in family blocks. */
+export function validatePropertySeedRegistry(
+  registryText: string,
+  sources: readonly PropertySource[],
+): PropertySeedRegistrySummary {
+  const families = parsePropertySeedRegistry(registryText);
+  const allocations = parsePropertyAllocations(sources);
+  const byOwner = new Map(families.map((family) => [family.owner, family]));
+  const usedOwners = new Set<string>();
+  for (const source of sources) {
+    if (!byOwner.has(source.path)) {
+      throw new Error(`property family is unregistered for ${source.path}.`);
+    }
+  }
+  const seedOwners = new Map<
+    number,
+    { readonly domain: string; readonly family: string }
+  >();
+  for (const allocation of allocations) {
+    const family = byOwner.get(allocation.path);
+    if (family == null) {
+      throw new Error(
+        `property family is unregistered for ${allocation.path}.`,
+      );
+    }
+    usedOwners.add(family.owner);
+    if (allocation.seed < family.start || allocation.seed > family.end) {
+      throw new Error(
+        `${allocation.path} property ${JSON.stringify(allocation.property)} ` +
+          `uses seed ${allocation.seed} outside family ${family.family} ` +
+          `block ${family.start}..${family.end}.`,
+      );
+    }
+    const prior = seedOwners.get(allocation.seed);
+    if (
+      prior != null &&
+      (prior.family !== family.family || prior.domain !== allocation.domain)
+    ) {
+      throw new Error(
+        `property seed ${allocation.seed} is allocated to both ` +
+          `${prior.family} domain ${JSON.stringify(prior.domain)} and ` +
+          `${family.family} domain ${JSON.stringify(allocation.domain)}.`,
+      );
+    }
+    seedOwners.set(allocation.seed, {
+      domain: allocation.domain,
+      family: family.family,
+    });
+  }
+  for (const family of families) {
+    if (!usedOwners.has(family.owner)) {
+      throw new Error(
+        `property seed family ${family.family} has no reviewed property call.`,
+      );
+    }
+  }
+  return {
+    allocations: allocations.length,
+    families: families.length,
+    seeds: seedOwners.size,
+  };
 }
 
 function createCompatibilitySnapshotFromSource(
@@ -1004,6 +1213,11 @@ async function main(): Promise<void> {
     throw new Error("compatibility baseline selection produced no commit.");
   }
   const baseline = compatibilitySnapshotAtRevision(baselineRevision);
+  const propertySources = currentPropertySources();
+  const registry = validatePropertySeedRegistry(
+    readFileSync(join(repositoryRoot, propertySeedRegistryPath), "utf8"),
+    propertySources,
+  );
   const current = createCompatibilitySnapshot(
     readFileSync(join(repositoryRoot, subsetPath), "utf8"),
     {
@@ -1016,7 +1230,7 @@ async function main(): Promise<void> {
         );
       },
     },
-    currentPropertySources(),
+    propertySources,
   );
   const report = compareCompatibility(
     baseline,
@@ -1027,6 +1241,10 @@ async function main(): Promise<void> {
   console.log(`compatibility-ratchet baseline=${baselineRevision}`);
   console.log(formatCounts("before", report.baseline));
   console.log(formatCounts("after ", report.current));
+  console.log(
+    `seed-registry families=${registry.families} ` +
+      `allocations=${registry.allocations} seeds=${registry.seeds}`,
+  );
   const failures = [
     ...report.unoverriddenViolations.map(
       (violation) => `unapproved ${formatViolation(violation)}`,

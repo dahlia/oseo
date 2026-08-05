@@ -159,7 +159,7 @@ test(
           "heap-valued static field imported through the default export",
         numRuns: 5,
         profile: "M5 export default class declarations",
-        seed: 0x5eed_001e,
+        seed: 0x6000_1100,
         sizeLimit:
           "one definition module, one importing entry module, and bounded " +
           "integer values",

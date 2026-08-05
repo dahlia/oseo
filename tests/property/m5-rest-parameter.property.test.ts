@@ -167,7 +167,7 @@ test(
           "arguments",
         numRuns: 10,
         profile: "M5 rest parameters",
-        seed: 0x5eed_0013,
+        seed: 0x6000_2900,
         sizeLimit: "four parameters and six bounded integer arguments",
         timeLimitMilliseconds: 180_000,
       },

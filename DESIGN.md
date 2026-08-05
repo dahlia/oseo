@@ -867,6 +867,9 @@ the admitted profile. A failure report records enough metadata to replay the
 same case directly. Interrupted or incomplete runs are failures, not shortened
 passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
 models and replay contract into grammar-based differential generation.
+Each property source owns one non-overlapping, aligned seed block in the
+checked-in registry. The compatibility ratchet validates every ordinary seed
+against that ownership before comparing monotonic seed sets and case budgets.
 
 The M4 native schedule property prints promise commands, repeated async
 suspensions, timer deadlines, cancellations, and task-created microtasks from

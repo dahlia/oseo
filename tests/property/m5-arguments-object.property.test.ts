@@ -189,7 +189,7 @@ test(
           "and a bounded replacement value",
         numRuns: 10,
         profile: "M5 arguments object",
-        seed: 0x5eed_001b,
+        seed: 0x6000_0300,
         sizeLimit: "six arguments and an index from zero through seven",
         timeLimitMilliseconds: 180_000,
       },
@@ -409,7 +409,7 @@ test(
           "mode (none, delete, non-writable redefinition, accessor)",
         numRuns: 15,
         profile: "M5 mapped arguments object",
-        seed: 0x5eed_002b,
+        seed: 0x6000_0301,
         sizeLimit:
           "three parameters, five supplied arguments, and an index " +
           "from zero through four",
@@ -745,7 +745,7 @@ test(
           "through a nested arrow function",
         numRuns: 12,
         profile: "M5 unmapped arguments object",
-        seed: 0x5eed_003b,
+        seed: 0x6000_0302,
         sizeLimit:
           "three leading parameters, five supplied arguments, and an " +
           "index from zero through four",

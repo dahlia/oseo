@@ -127,7 +127,7 @@ test(
           "resumed with g.throw(val), comparing Node.js, Deno, and native",
         numRuns: 15,
         profile: "M5 generator throw resumptions",
-        seed: 0x5eed_0017,
+        seed: 0x6000_1b00,
         sizeLimit: "single yield with catching or uncaught throw",
         timeLimitMilliseconds: 180_000,
       },

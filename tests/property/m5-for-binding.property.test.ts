@@ -256,7 +256,7 @@ test(
           "absent, truthful, or false TypeScript hints",
         numRuns: 10,
         profile: "M5 classic for binding patterns",
-        seed: 0x5eed_0010,
+        seed: 0x6000_1300,
         sizeLimit: "two iterations with bounded integers",
         timeLimitMilliseconds: 180_000,
       },

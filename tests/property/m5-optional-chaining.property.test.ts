@@ -303,7 +303,7 @@ test(
           "argument effects",
         numRuns: 12,
         profile: "M5 optional chaining",
-        seed: 0x5eed_0019,
+        seed: 0x6000_2400,
         sizeLimit: "one optional chain with bounded values and effects",
         timeLimitMilliseconds: 180_000,
       },

@@ -479,7 +479,7 @@ specialization-disabled native execution, and specialization-enabled execution
 with collection forced at every safepoint. The separate binding property below
 owns declaration-pattern heads.
 
-The ordinary suite uses seed `0x5eed0004`, ten successful cases, at most five
+The ordinary suite uses seed `0x60001800`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
 values and runs ten times the ordinary budget through the shared replay
 controls. Fixed native fixtures retain the non-generated boundaries: lexical
@@ -499,7 +499,7 @@ thrown error identity. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled execution
 with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed0005`, ten successful cases, at most five
+The ordinary suite uses seed `0x60000500`, ten successful cases, at most five
 values per spread, and no filtering. The extended tier raises the reviewed
 size to nine values per spread and runs ten times the ordinary budget through
 the shared replay controls. Fixed native fixtures retain multiple spreads,
@@ -519,7 +519,7 @@ compares Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled native execution with collection forced at every
 safepoint.
 
-The ordinary suite uses seed `0x5eed0006`, ten successful cases, at most five
+The ordinary suite uses seed `0x60000900`, ten successful cases, at most five
 values per spread, and no filtering. The extended tier raises the reviewed size
 to nine values per spread and runs ten times the ordinary budget through the
 shared replay controls. Fixed native fixtures retain `Promise` construction,
@@ -548,7 +548,7 @@ retain variadic array rests, type-reference spreads, and object targets inside
 an array rest as unhinted. They also pin the ordinary unsupported-type
 diagnostic for a member exposed by fixed spread expansion.
 
-The ordinary suite uses seed `0x5eed0007`, ten successful cases, at most five
+The ordinary suite uses seed `0x60000400`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
 values and runs ten times the ordinary budget through the shared replay
 controls. Fixed native fixtures retain lexical temporal dead zones, `var`
@@ -574,13 +574,13 @@ and object properties also vary matching and scalar annotation members; a
 scalar mismatch leaves that subtree unhinted without changing the modeled
 execution.
 
-The ordinary suite uses seed `0x5eed0008`, ten successful cases, bounded integer
+The ordinary suite uses seed `0x60002000`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
 through the shared replay controls. Fixed native fixtures retain temporal dead
 zones, function-name inference, symbol keys, primitive property reads, nested
 patterns, nullish ordering, `var` hoisting, and awaited initialization.
 
-The object rest property uses seed `0x5eed0009` and generates `const`, `let`,
+The object rest property uses seed `0x60002200` and generates `const`, `let`,
 and `var` declarations with static, computed string, or computed symbol
 exclusions. Its independent oracle predicts the selected value, ordered string
 keys, retained and excluded symbols, omitted non-enumerable and inherited
@@ -602,7 +602,7 @@ rest value, or escaped nullish `TypeError`. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
 execution with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed000a`, ten successful cases, bounded
+The ordinary suite uses seed `0x60000a00`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain fresh
 catch cells, function-name inference, iterator cleanup after a default failure,
@@ -625,7 +625,7 @@ rejection. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
 execution with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed0011`, ten successful cases, bounded
+The ordinary suite uses seed `0x60002600`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. The asynchronous and hint dimensions
 use the same direct structured generation and shrinking. TypeScript cases use
@@ -647,7 +647,7 @@ Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled native execution with collection forced at every
 safepoint.
 
-The ordinary suite uses seed `0x5eed0012`, ten successful cases, bounded
+The ordinary suite uses seed `0x60000d00`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain
 explicit `undefined`, null, prior and later references, body-declaration
@@ -667,7 +667,7 @@ Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled native execution with collection forced at every
 safepoint.
 
-The ordinary suite uses seed `0x5eed0013`, ten successful cases, bounded
+The ordinary suite uses seed `0x60002900`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain empty
 and nonempty suffixes, heap-valued arguments under forced collection, fresh
@@ -687,7 +687,7 @@ captured parameter value. Each case compares Node.js, Deno,
 specialization-disabled native execution, and specialization-enabled native
 execution with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed0014`, ten successful cases, bounded
+The ordinary suite uses seed `0x60002700`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain
 default and binding-pattern captures, a plain sibling binding, an arrow, and a
@@ -706,7 +706,7 @@ one shared `var` cell, or the escaped nullish `TypeError`. Each case compares
 Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled execution with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed000b`, ten successful cases, two
+The ordinary suite uses seed `0x60001700`, ten successful cases, two
 iterations, bounded integer values, and no filtering. The extended tier runs
 ten times the ordinary budget through the shared replay controls. Fixed native
 fixtures retain lexical temporal dead zones, function-name inference, object
@@ -724,7 +724,7 @@ identity, or nullish `TypeError` without changing the previous target. Each
 case compares Node.js, Deno, specialization-disabled native execution, and
 specialization-enabled execution with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed000c`, ten successful cases, bounded integer
+The ordinary suite uses seed `0x60001000`, ten successful cases, bounded integer
 values, and no filtering. The extended tier runs ten times the ordinary budget
 through the shared replay controls. Fixed native fixtures retain function-name
 inference, member object, key, conversion, read, and default order,
@@ -748,7 +748,7 @@ constant observations, fresh per-iteration `let` closures, the one shared final
 specialization-disabled native execution, and specialization-enabled execution
 with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed0010`, ten successful cases, bounded
+The ordinary suite uses seed `0x60001300`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain array
 defaults and rest, object rest, temporal dead zones, nullish failure,
@@ -768,7 +768,7 @@ Each case compares the model with Node.js, Deno, specialization-disabled native
 execution, and specialization-enabled execution with collection forced at
 every safepoint.
 
-The ordinary suite uses seed `0x5eed000e`, ten successful cases, bounded
+The ordinary suite uses seed `0x60001600`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain
 identifier and member targets, defaults, object rest, immutable-target failure,
@@ -790,7 +790,7 @@ Deno,
 specialization-disabled native execution, and specialization-enabled execution
 with collection forced at every safepoint.
 
-The ordinary suite uses seed `0x5eed000d`, ten successful cases, bounded
+The ordinary suite uses seed `0x60000c00`, ten successful cases, bounded
 integer values, and no filtering. The extended tier runs ten times the
 ordinary budget through the shared replay controls. Fixed native fixtures
 retain every operator, expression results, logical short-circuiting, identifier
@@ -811,7 +811,7 @@ case compares the model with Node.js, Deno, specialization-disabled native
 execution, and specialization-enabled native execution with collection forced
 at every safepoint.
 
-The ordinary suite uses seed `0x5eed000f`, ten successful cases, one update per
+The ordinary suite uses seed `0x60002e00`, ten successful cases, one update per
 program, and no filtering. The extended tier runs ten times the ordinary
 budget through the shared replay controls. Fixed native fixtures retain all
 four forms, numeric-string coercion, negative zero, infinities, `NaN`, distinct
@@ -882,6 +882,16 @@ the same cases. The extended tier adds explicitly recorded seeds chosen by its
 invocation. Seeds that found a defect are added to the reviewed set unless the
 minimized regression fixture makes the seed redundant and the removal is
 explained.
+
+Every ordinary property family owns one source file and one aligned block of
+256 signed 32-bit seeds in *tests/property-seeds.yaml*. A new family reserves
+an unused block in that registry before choosing a seed. Multiple domains in
+one family take distinct slots from its block; the same domain may reuse its
+seed when two runner calls deliberately exercise the same generated cases.
+Blocks and assignments remain stable after review. A seed change still needs
+an exact compatibility-ratchet override and must preserve or deliberately
+replace shrinking and replay quality. `OSEO_PROPERTY_SEED` is a replay or
+extended-run selection and does not transfer ownership of the ordinary seed.
 
 
 Replay and failure records

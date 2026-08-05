@@ -139,7 +139,7 @@ its deliberate boundary and its evidence:
     `escape` stay excluded from the claim and remain ordinary
     unresolvable names. HIR and MIR structural
     tests, a fixed native differential fixture, a generated property
-    suite with seed `0x5eed002c`, and the reviewed test262
+    suite with seed `0x60002d00`, and the reviewed test262
     unresolvable-reference case cover the boundary.
  -  The `&&` and `||` logical operators and the conditional `?:` operator,
     lowered through explicit MIR branches and a parameterized join block.
@@ -192,7 +192,7 @@ its deliberate boundary and its evidence:
     patterns as standalone declarations. Each lexical leaf enters its temporal
     dead zone before initialization, every mutable `let` leaf receives a fresh
     per-iteration cell, and `var` leaves write their hoisted cells.
-    Generated Node, Deno, and native evidence uses seed `0x5eed0010` across
+    Generated Node, Deno, and native evidence uses seed `0x60001300` across
     both pattern families, all three declaration kinds, defaults, rest,
     nullish inputs, both specialization policies, and forced collection. Fixed
     fixtures retain temporal dead zones, conditional iterator close, lexical
@@ -269,7 +269,7 @@ its deliberate boundary and its evidence:
     differential fixtures cover the head forms, subjects, transfers, and
     every enumeration rule above, including a suspension inside a
     generator and an asynchronous function body, and a generated property
-    with seed `0x5eed002f` compares a generated prototype chain, subject,
+    with seed `0x60001500` compares a generated prototype chain, subject,
     head form, and mid-enumeration mutation against an independent
     transcription of the specified rules. One hundred twenty-four newly
     reviewed test262 cases contribute 33 passes, 63 expected negatives,
@@ -330,7 +330,7 @@ its deliberate boundary and its evidence:
     transfers, a `return` through `finally`, a `with`-resolved leaf, the
     head temporal dead zone, a read-only strict target, and suspensions
     in a generator and an asynchronous function, and a generated property
-    with seed `0x5eed0030` compares generated head shapes against an
+    with seed `0x60001400` compares generated head shapes against an
     independent transcription of ForIn/OfBodyEvaluation's destructuring.
     The applicable-test inventory holds no executing case for this head;
     its fifteen applicable cases are early errors that stay expected
@@ -354,7 +354,7 @@ its deliberate boundary and its evidence:
     The private `#name in object` form resolves the name lexically and checks
     for its field, method, or accessor without reading or invoking the element.
     A fixed *class-private-in* native differential fixture and a generated
-    property with seed `0x5eed001d` cover per-evaluation identity, instance and
+    property with seed `0x60000b02` cover per-evaluation identity, instance and
     static placement, every private element kind, unbranded objects,
     non-object `TypeError`, evaluation order, both specialization policies,
     and forced collection on the enabled path against Node.js and Deno.
@@ -383,7 +383,7 @@ its deliberate boundary and its evidence:
     tags, cooked and raw text, multiple substitutions, custom return
     values, errors from tags and substitutions, receiver preservation,
     invalid escapes, frozen descriptors, and site identity. Generated
-    Node.js, Deno, and native evidence uses seed `0x5eed001a` for empty,
+    Node.js, Deno, and native evidence uses seed `0x60002b00` for empty,
     simple, multiple, nested, and raw-versus-cooked forms under both
     specialization policies and forced collection. Fourteen of the 25
     reviewed cases under *test/language/expressions/tagged-template/* pass
@@ -420,7 +420,7 @@ its deliberate boundary and its evidence:
     covers evaluation order, nested and loop positions, abrupt completion,
     awaited cleanup, heap locals across suspension, both specialization
     policies, false hints, a deliberate guard miss, and forced collection. A
-    generated property with seed `0x5eed001d` compares an independent model,
+    generated property with seed `0x60000600` compares an independent model,
     Node.js, Deno, and both native specialization policies across six position
     families, fulfillment and rejection, ordinary functions and arrows, and
     truthful and false hints. Fourteen existing reviewed test262 cases move
@@ -487,7 +487,7 @@ its deliberate boundary and its evidence:
     optional property, computed access, calls, multi-step chains, receiver
     preservation, abrupt non-callable values, evaluation order, one base
     evaluation, and skipped keys and arguments. A generated property with seed
-    `0x5eed0019` covers the same forms across both specialization policies and
+    `0x60002400` covers the same forms across both specialization policies and
     forced collection. Sixteen reviewed test262 cases pass and twelve
     expected negatives retain the tagged-template, assignment-target, update,
     and invalid `super()` grammar errors. Five unsupported cases record
@@ -522,7 +522,7 @@ its deliberate boundary and its evidence:
     name resolution. Fixed Node.js, Deno, and native fixtures cover both Script
     modes, effects, abrupt completion, live and nullish paths, a false hint, a
     deliberate property-guard miss, both specialization policies, and forced
-    collection. A directly generated property uses ordinary seed `0x5eed0023`
+    collection. A directly generated property uses ordinary seed `0x60000f00`
     and 16 cases across the same domain; the extended gate uses seed
     `0x5eed0003` and runs 160. Twenty-six applicable reviewed test262 cases pass
     and two strict identifier cases are expected parse negatives.
@@ -548,7 +548,7 @@ its deliberate boundary and its evidence:
     evaluate the key before the receiver in a derived constructor, which
     test262 rejects; frontend structural tests and the reviewed subset pin
     the specified order, while the fixed *class-super-delete* native
-    differential fixture and the generated property with seed `0x5eed002d`
+    differential fixture and the generated property with seed `0x60000e00`
     keep the derived-constructor case to keys with no observable evaluation
     so their Node.js and Deno comparisons stay exact. The fixture and the
     property cover every element form carrying a home object, static, pure
@@ -615,7 +615,7 @@ its deliberate boundary and its evidence:
     `AsyncIteratorClose` the specified order performs, from an abrupt direct
     head, an abrupt head pattern, and an abrupt leaf, over tracked synchronous
     and asynchronous iterables, across both specialization policies and forced
-    collection. A generated property with seed `0x5eed002e` draws one of ten
+    collection. A generated property with seed `0x60002a00` draws one of ten
     element forms and one of ten target positions against static, pure
     computed, side-effecting, abrupt, and poisoned keys and a parent setter,
     parent data property, or absent property, and checks the key-evaluation
@@ -654,7 +654,7 @@ its deliberate boundary and its evidence:
     converts it only after the right operand, as `PutValue` specifies, so
     a key whose `toString` is observable runs after that operand. Immutable
     and imported targets retain their catchable write errors. Native
-    differential fixtures and a generated property with seed `0x5eed000d`
+    differential fixtures and a generated property with seed `0x60000c00`
     cover all 15 operators, both target forms, short-circuiting, reference and
     conversion counts, both specialization policies, and forced collection.
     An ordinary asynchronous function retains the reference and current value
@@ -669,7 +669,7 @@ its deliberate boundary and its evidence:
     once, then converts the retained raw key separately for the read and write,
     so the conversions may select different properties. Immutable targets keep
     their catchable write errors after coercion. Native differential fixtures
-    and a generated property with seed `0x5eed000f` cover both operators,
+    and a generated property with seed `0x60002e00` cover both operators,
     both result forms, both target forms, numbers, numeric strings, booleans,
     null, reference and conversion counts, both specialization policies, and
     forced collection, including suppression of key conversion for a nullish
@@ -801,12 +801,12 @@ its deliberate boundary and its evidence:
     the iterator open. Close-time completion follows `IteratorClose`: a close
     failure replaces `break` or `return`, while an in-flight throw stays
     authoritative. Native differential fixtures and a generated property with
-    seed `0x5eed000b` cover all three declaration kinds, array and object
+    seed `0x60001700` cover all three declaration kinds, array and object
     values, defaults, rest, nullish failure, fresh cells, both specialization
     policies, and forced collection. Assignment patterns preserve the same
     defaults, rest, member-reference evaluation, and inner-before-outer cleanup
     as standalone destructuring assignment. Native differential fixtures and a
-    generated property with seed `0x5eed000e` cover array and object patterns,
+    generated property with seed `0x60001600` cover array and object patterns,
     identifier and member targets, nullish failure, both specialization
     policies, and forced collection. A nullish member base fails before
     property-key conversion, then nested pattern cleanup completes before the
@@ -888,7 +888,7 @@ its deliberate boundary and its evidence:
     per-iteration loop cells, switch clauses, class static blocks, awaited
     declarators, a false hint reaching the compiled generic fallback, both
     specialization policies, and forced collection. A generated property with
-    seed `0x5eed0029` compares an independent model, Node.js, Deno, and both
+    seed `0x60001d00` compares an independent model, Node.js, Deno, and both
     native specialization policies across one list of two to four declarators
     per case in five statement-list positions. Seventy-eight reviewed test262
     cases pass, twenty nine record the parse negatives that keep a lexical
@@ -941,14 +941,14 @@ its deliberate boundary and its evidence:
     produce `undefined` for absent properties. Direct awaited initialization or
     writing is supported in asynchronous functions and modules, and lexical
     module exports expose every bound name. Native differential fixtures and a
-    generated property with seed `0x5eed0008` cover values, temporal dead zones,
+    generated property with seed `0x60002000` cover values, temporal dead zones,
     function-name inference, computed and default order, symbol keys, primitive
     inputs, nullish failure, both specialization policies, and forced
     collection. A final identifier rest target snapshots own keys in ECMAScript
     order, excludes each evaluated static, computed string, or computed symbol
     key, skips non-enumerable and inherited properties, and creates writable,
     enumerable, and configurable data properties on a fresh object. A second
-    generated property with seed `0x5eed0009` covers `const`, `let`, and `var`,
+    generated property with seed `0x60002200` covers `const`, `let`, and `var`,
     both specialization policies, and forced collection. Twenty-four reviewed
     test262 cases cover all three declaration kinds, nullish coercibility,
     trailing shorthand properties, function-name inference for function, arrow,
@@ -995,7 +995,7 @@ its deliberate boundary and its evidence:
     constructors initialize their receiver before parameter work. JavaScript
     function length is retained independently from the ABI parameter count.
     Native differential fixtures and generated properties with seeds
-    `0x5eed0011`, `0x5eed0012`, `0x5eed0013`, and `0x5eed0014` cover both
+    `0x60002600`, `0x60000d00`, `0x60002900`, and `0x60002700` cover both
     pattern families, supplied, missing, explicit `undefined`, and nullish
     inputs, abrupt initializers, bounded and heap-valued rest suffixes, absent,
     truthful, and false pattern-bound JSDoc and TypeScript hints, both
@@ -1089,17 +1089,17 @@ its deliberate boundary and its evidence:
     error for `arguments` as an assignment target, binding identifier, or
     declared name is unchanged. That unit left the runtime
     ABI at `oseo-runtime-m5-41`. A generated property with seed
-    `0x5eed001b`
+    `0x60000300`
     covers zero to six bounded arguments, in-range and absent indexed
     reads, writes, `length`, `callee`, fresh identity, both specialization
     policies, and forced collection; a second generated property with seed
-    `0x5eed002b` covers one to three simple parameters, an optional
+    `0x60000301` covers one to three simple parameters, an optional
     rightmost-name duplicate, zero to five supplied arguments, a
     write/sever index, and every sever mode (none, deletion, an explicit
     non-writable redefinition, and conversion to an accessor), checked
     against an independent hand oracle alongside Node.js and Deno
     references, both specialization policies, and forced collection; a
-    third generated property with seed `0x5eed003b` covers one owning form
+    third generated property with seed `0x60000302` covers one owning form
     of seven, an optional enclosing strict scope, one to three simple
     leading parameters with an optional non-simple trailing formal, zero to
     five supplied arguments, a bounded write index, and optional reads
@@ -1162,7 +1162,7 @@ its deliberate boundary and its evidence:
     computed-key and default order, symbol exclusions, and
     `CopyDataProperties`. A pattern failure skips the catch body and propagates
     through an enclosing `finally`. Native differential fixtures and a
-    generated property with seed `0x5eed000a` cover array and object values,
+    generated property with seed `0x60000a00` cover array and object values,
     defaults, rest, nullish failure, both specialization policies, and forced
     collection. Sixteen reviewed test262 cases cover array values, defaults,
     function-name inference, nested rest, object nullish failure, trailing
@@ -1190,8 +1190,8 @@ its deliberate boundary and its evidence:
     `break` and `continue`, a rethrow reaching an outer handler, generator
     yields inside the clause, and an awaited recovery, under both
     specialization policies with forced collection. The pre-existing
-    `0x5eed000a` generated domain of array and object catch bindings is
-    unchanged; a distinct `0x5eed002a` generated domain covers absent and
+    `0x60000a00` generated domain of array and object catch bindings is
+    unchanged; a distinct `0x60002300` generated domain covers absent and
     destructured catch handlers with rethrown completions, optional
     finalizers, and present, missing, and nullish thrown inputs. Seven
     reviewed cases enter:
@@ -1245,7 +1245,7 @@ its deliberate boundary and its evidence:
     that nested suspension position; M5a Unit 8.3 supplies it and admits the
     position in asynchronous bodies, as recorded below.
     Native differential fixtures cover identifier and member targets.
-    A generated property with seed `0x5eed000c` also covers parenthesized member
+    A generated property with seed `0x60001000` also covers parenthesized member
     targets, array and object inputs, defaults, rest, nullish failure, result
     identity, both specialization policies, and forced collection. Fourteen
     reviewed test262 cases add strict and non-strict evidence for identifier and
@@ -1315,7 +1315,7 @@ its deliberate boundary and its evidence:
     primitive, array, function, prototype-chain, non-enumerable, and
     symbol-keyed spread sources plus an abrupt spread source and a
     spread-driven growth loop. A generated property with seed
-    `0x5eed0015` covers zero to four data, shorthand, method, getter,
+    `0x60002100` covers zero to four data, shorthand, method, getter,
     setter, object spread, and nullish spread properties over a shared
     five-name key pool and bounded integer values across Node.js, Deno,
     both specialization policies, and forced collection on the enabled
@@ -1429,7 +1429,7 @@ its deliberate boundary and its evidence:
     path: an implicit close from `for-of` and array destructuring, an
     explicit close before the first resumption and after completion, a
     `finally` that yields, returns, or throws, and a nested close that closes
-    an inner generator as well. A generated property with seed `0x5eed0016`
+    an inner generator as well. A generated property with seed `0x60001c00`
     covers zero to four suspension steps placed at statement level, inside a
     conditional, inside a loop, inside nested loops, and inside a `for-of`
     over a nested generator, wrapped in a cleanup-observing `try`/`finally`,
@@ -1440,7 +1440,7 @@ its deliberate boundary and its evidence:
     nested defaults, recursive array and object patterns, rest bindings,
     explicit `undefined` and `null`, call-time abrupt completion,
     later-parameter temporal dead zones, and false hints. A generated property
-    with seed `0x5eed001d` uses an independent call-time initialization oracle
+    with seed `0x60001a00` uses an independent call-time initialization oracle
     over both generator kinds, both recursive pattern kinds, missing, present,
     `undefined`, and `null` inputs, both specialization policies, truthful and
     false JSDoc and TypeScript hints, deliberate guard misses, and forced
@@ -1448,8 +1448,8 @@ its deliberate boundary and its evidence:
     cases move from unsupported to passing while the other reviewed
     generator-parameter cases retain their independently observed
     classifications.
-    A generated property with seed `0x5eed0017` covers caught and uncaught
-    throw resumptions, and one with seed `0x5eed0018` covers generator methods
+    A generated property with seed `0x60001b00` covers caught and uncaught
+    throw resumptions, and one with seed `0x60001900` covers generator methods
     in object literals and prototype, static, and private class elements
     against Node.js, Deno, and native execution.
     Fifty-nine reviewed test262 cases newly pass and forty-nine new expected
@@ -1552,7 +1552,7 @@ its deliberate boundary and its evidence:
     strict-mode rejection inside a class method in a non-strict script, and
     a computed key in a non-strict script that assigns to a non-writable
     property or deletes a non-configurable one. A
-    generated property with seed `0x5eed0017` covers class declarations,
+    generated property with seed `0x60000b00` covers class declarations,
     named class expressions, and anonymous class expressions with zero to
     two constructor-assigned fields and zero to three prototype methods over
     static and computed keys, across Node.js, Deno, both specialization
@@ -1950,7 +1950,7 @@ its deliberate boundary and its evidence:
     that receiver as `this`. Fixed native differential fixtures cover valid
     and invalid brands, nullish short circuit, receiver preservation, truthful
     and false hints, both specialization policies, and forced collection. A
-    generated property with seed `0x5eed003c` adds twelve ordinary cases with
+    generated property with seed `0x60002500` adds twelve ordinary cases with
     an independent oracle over field, accessor, and method operations and
     valid, invalid, `null`, and `undefined` receivers.
     `delete this.#name` remains the early error it is. Native differential
@@ -2122,7 +2122,7 @@ its deliberate boundary and its evidence:
     transfers, `return`, body throws, absent, promised, and throwing `return`
     methods, nested and `finally`-wrapped loops, and every catchable
     `TypeError` the protocol defines. A generated property with seed
-    `0x5eed0011` draws asynchronous and synchronous iterator kinds, head
+    `0x60001200` draws asynchronous and synchronous iterator kinds, head
     forms, transfer positions, and close modes under both specialization
     policies and forced collection. Two hundred eighty-one reviewed test262
     cases newly pass, ninety new expected negatives record the head's early
@@ -2154,7 +2154,7 @@ its deliberate boundary and its evidence:
     external dependency waits for the cycle root. Canonical identity, one
     evaluation, live cells, independent sibling progress, FIFO promise jobs,
     and deterministic no-progress shutdown remain unchanged. The generated
-    property suite uses seed `0x5eed0021` over structured asynchronous SCC,
+    property suite uses seed `0x60001f00` over structured asynchronous SCC,
     non-root observer, and sibling schedules with an independent oracle, eight
     ordinary cases, replay metadata, and forced collection under both
     specialization policies. Fixed native fixtures cover spread-prefix
@@ -2242,12 +2242,12 @@ its deliberate boundary and its evidence:
     caught and uncaught, body throws, timer-driven awaits, queued requests
     resolved in order, a misapplied method that rejects rather than throws,
     and the exact microtask interleaving of two generators against five
-    chained reactions. A generated property with seed `0x5eed0018` draws
+    chained reactions. A generated property with seed `0x60000700` draws
     bounded bodies, awaited and promised operands, three delegation kinds,
     `try`/`catch` and `try`/`finally` guards, and every resumption position
     under both specialization policies and forced collection.
     Unit 7.5 adds fixed reaction- and timer-ordered delegation fixtures plus a
-    generated property with seed `0x5eed001e`. The property draws `for await`
+    generated property with seed `0x60001201`. The property draws `for await`
     in ordinary asynchronous functions and asynchronous generators, plus
     `yield*`, native asynchronous and wrapped synchronous iterators, reaction,
     timer, and never-settling results, and truthful and false hints. Its
@@ -2266,7 +2266,7 @@ its deliberate boundary and its evidence:
     original rejection. Wrapped synchronous missing-`throw` delegation closes
     the underlying iterator synchronously without reading or awaiting the
     close result's fields.
-    Generated properties with seeds `0x5eed001f` and `0x5eed0020` draw
+    Generated properties with seeds `0x60001202` and `0x60001203` draw
     structured close-frame and AsyncFromSync rejection domains against
     independent completion models, Node.js, Deno, both specialization
     policies, false hints, deliberate generic fallback, and forced
@@ -2374,7 +2374,7 @@ M5a Unit 8.1a advances the runtime ABI to `m5-35`. It adds
 construction, `ToNumeric`, and numeric-one entry points. Fixed
 native evidence compares Node.js, Deno, both specialization policies, forced
 collection, Linux AMD64 execution, and the AArch64 Linux cross-link. The
-generated property suite uses ordinary seed `0x5eed0022`, a 10-case ordinary
+generated property suite uses ordinary seed `0x60000800`, a 10-case ordinary
 budget, directly generated admitted operator domains, and a bounded independent
 integer oracle. The repository extended gate uses fixed seed `0x5eed0003` and a
 ten-times scale for a 100-case budget. Both native policies force collection.
@@ -2410,7 +2410,7 @@ names, temporal-dead-zone independence, `with` selection, operand, key,
 conversion, and call order, abrupt completion, nullish short-circuiting, later
 chain suppression, live static and computed deletion, non-configurable
 properties, a false number hint, and a deliberate intermediate property-guard
-miss. The directly generated property uses seed `0x5eed0023`, a 16-case
+miss. The directly generated property uses seed `0x60000f00`, a 16-case
 ordinary budget, a directly generated structured domain, and an independent
 reference-and-effect oracle. The extended gate uses seed `0x5eed0003` and
 scales it to 160 cases. Initial and intermediate nullish bases prove key
@@ -2466,13 +2466,13 @@ parse-time `SyntaxError`, including an identifier spelling paired with a
 quoted spelling. Permitted ordinary forms do not participate in that early
 error.
 
-The generated property uses fixed seed `0x5eed0024` and a 16-case ordinary
+The generated property uses fixed seed `0x60002101` and a 16-case ordinary
 budget. Its independent oracle directly generates null, object, and primitive
 prototype values, all four definition positions, each permitted ordinary
 `__proto__` form, inherited reads and writes versus own descriptors, effects,
 abrupt completion, a false number hint and deliberate guard miss, both
 specialization policies, and forced collection. The duplicate early-error
-property uses seed `0x5eed0025` under both policies. Fixed Node.js, Deno, and
+property uses seed `0x60002102` under both policies. Fixed Node.js, Deno, and
 native fixtures cover the same boundary, including forced collection and the
 AArch64 Linux cross-link.
 
@@ -2597,7 +2597,7 @@ while an unadmitted construct beside it is only outside this profile, and
 the reader has to be told the answer that holds. A property key spelled
 `this` names an ordinary property and is unaffected.
 
-The generated property uses fixed seed `0x5eed0026` and a 32-case ordinary
+The generated property uses fixed seed `0x60002c0c` and a 32-case ordinary
 budget. Its independent oracle names the binding each position observes rather
 than the value the compiler produces, and it directly generates fifteen
 positions across both source kinds: Script top level with and without a
@@ -2688,8 +2688,8 @@ it attempts to rebind the derived constructor's `this`. A private element on
 the parent is installed on that fresh receiver and does not cause an earlier
 duplicate-brand `TypeError`.
 
-The existing lexical-super property retains seed `0x5eed001d`. A separate
-optional-call property uses seed `0x5eed0027` across one to three nested arrows,
+The existing lexical-super property uses seed `0x60001e00`. A separate
+optional-call property uses seed `0x60001e01` across one to three nested arrows,
 literal and side-effecting computed keys, and present and absent methods. Both
 run under both
 specialization policies with forced collection and compare independent
@@ -2743,7 +2743,7 @@ write the pattern performs after it.
 Module top level is not part of this admission and keeps a source-located
 diagnostic for the same three positions, as recorded below.
 
-The generated property suite uses seed `0x5eed0028` across the four pattern
+The generated property suite uses seed `0x60002800` across the four pattern
 positions, asynchronous functions, arrows, and asynchronous generators,
 supplied and missing selections, fulfilled and rejected operands, and truthful
 or false hints. Its independent oracle predicts the printed order and

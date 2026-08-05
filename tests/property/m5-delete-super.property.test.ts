@@ -348,7 +348,7 @@ test(
           "keys naming a present or absent parent property",
         numRuns: 16,
         profile: "M5 super property deletion",
-        seed: 0x5eed_002d,
+        seed: 0x6000_0e00,
         sizeLimit: "one observed delete expression per generated program",
         timeLimitMilliseconds: 240_000,
       },

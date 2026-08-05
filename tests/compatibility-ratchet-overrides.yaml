@@ -1,9 +1,528 @@
 overrides:
   - invariant: subset-path
     path: test/language/statements/class/elements/syntax/valid/grammar-field-named-set-followed-by-generator-asi.js
-    reason: >-
-      Removes test calling Object.prototype.hasOwnProperty which is
+    reason: Removes test calling Object.prototype.hasOwnProperty which is
       unmaterialized in M5a
     transition:
       from: present
+      to: absent
+  - invariant: property-seed
+    domain:
+      a super property target written in an array element, object property,
+      nested array, element default, array rest, object rest, for-of head,
+      for-of head pattern, for-await-of head, and for-await-of head pattern,
+      inside an instance method, static method, getter, arrow, derived
+      constructor before and after super(), field initializer, static block,
+      generator, and asynchronous method, over static, pure computed,
+      side-effecting, abrupt, and poisoned-conversion keys naming a parent
+      setter, a parent data property, or an absent property
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590382
+      to: absent
+  - invariant: property-seed
+    domain: absent and destructured catch handlers with rethrown completions,
+      optional finalizers, and present, missing, and nullish thrown inputs
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590378
+      to: absent
+  - invariant: property-seed
+    domain:
+      all compound operators over identifier and computed member targets with
+      observable property-key conversion, bounded integers, and direct nullish
+      cases
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590349
+      to: absent
+  - invariant: property-seed
+    domain:
+      array and object catch bindings with defaults, rest, present, missing,
+      and nullish inputs
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590346
+      to: absent
+  - invariant: property-seed
+    domain:
+      async-function and async-generator for-await close frames, native async
+      and wrapped sync missing-throw yield-star, completion precedence,
+      reaction, timer, rejection, non-object, never settlement, and false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590367
+      to: absent
+  - invariant: property-seed
+    domain:
+      bounded asynchronous generator bodies, awaited and promised operands,
+      delegation kinds, guards, and resumption positions
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590360
+      to: absent
+  - invariant: property-seed
+    domain:
+      bounded integer async iterables, iterator kinds, head forms, transfers,
+      and close modes
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590353
+      to: absent
+  - invariant: property-seed
+    domain: bounded integer iterables, head forms, transfers, and close modes
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590340
+      to: absent
+  - invariant: property-seed
+    domain:
+      bounded multi-spread arrays, custom iterables, captured next, and abrupt
+      steps
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590341
+      to: absent
+  - invariant: property-seed
+    domain: bounded promise commands and deterministic timer schedules
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590339
+      to: absent
+  - invariant: property-seed
+    domain: class declarations, named class expressions, and anonymous class
+      expressions with zero to two constructor-assigned fields and zero to three
+      elements over literal, computed, and private `#` names, each element a
+      method, a getter, a setter, a getter and setter pair placed on the
+      prototype or on the constructor with `static`, or an instance field
+      declared with an initializer, without one, or with an anonymous function
+      the key names, or a `static { ... }` initialization block that assigns
+      through its constructor receiver, whose reading body returns a constant,
+      an instance field, the class-scope name binding, or a base member reached
+      through `super`, and whose setter clause stores through `this` or through
+      `super`, each private element read and written only through generated
+      bridge methods and brand-checked against a plain object, each class
+      standing alone, extending a base class through a declared `super()` call,
+      or extending it through the implicit derived constructor, comparing an
+      independent name, own-property descriptor, accessor round-trip,
+      inherited-member, private-element value, brand-check, instance own-key
+      order, and definition and initialization order model with Node.js, Deno,
+      and both native specialization policies with forced collection on the
+      enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590359
+      to: absent
+  - invariant: property-seed
+    domain: closed reachable module graphs with arbitrary cycles
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590338
+      to: absent
+  - invariant: property-seed
+    domain:
+      computed assignment-target members, computed binding property names, and
+      array and object binding defaults in asynchronous functions, arrows, and
+      asynchronous generators, with supplied and missing selections, fulfilled
+      and rejected operands, and truthful or false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590376
+      to: absent
+  - invariant: property-seed
+    domain:
+      const, let, and var array or object for-of bindings with defaults, rest,
+      present, missing, and nullish inputs
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590347
+      to: absent
+  - invariant: property-seed
+    domain: const, let, and var array patterns with defaults, elision, nesting,
+      rest, arrays, custom iterators, abrupt steps, and absent, truthful, or
+      false homogeneous array, fixed tuple-spread, and tuple-rest TypeScript
+      hints, including nested shape mismatches that remain unhinted
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590343
+      to: absent
+  - invariant: property-seed
+    domain:
+      const, let, and var classic for array or object bindings with defaults,
+      rest, present, missing, and nullish inputs plus absent, truthful, or false
+      TypeScript hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590352
+      to: absent
+  - invariant: property-seed
+    domain: const, let, and var object patterns with static, computed literal,
+      computed dynamic, defaulted, nested, primitive, and nullish inputs plus
+      absent, truthful, or false TypeScript hints; computed keys and nested
+      shape mismatches remain unhinted
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590344
+      to: absent
+  - invariant: property-seed
+    domain:
+      const, let, and var object rest bindings with static, computed string,
+      and computed symbol exclusions
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590345
+      to: absent
+  - invariant: property-seed
+    domain:
+      default and binding-pattern parameters with one captured parameter cell
+      and a same-name body var or function binding
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590356
+      to: absent
+  - invariant: property-seed
+    domain: delete of a super property reference written in an instance method,
+      static method, getter, arrow, derived constructor before and after
+      super(), field initializer, static block, generator, and asynchronous
+      method, over static, pure computed, side-effecting, abrupt, and
+      poisoned-conversion keys naming a present or absent parent property
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590381
+      to: absent
+  - invariant: property-seed
+    domain: direct typeof over unresolvable, var-declared, initialized number,
+      string, object, and function bindings and a temporal dead zone, in strict
+      and non-strict scripts, and typeof through a with object environment with
+      supplied function, number, and undefined values against missing, lexical,
+      and dead-zone fallbacks
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590380
+      to: absent
+  - invariant: property-seed
+    domain: directly generated radix 2, 8, 10, and 16 BigInt operands for
+      arithmetic, bitwise, shift, comparison, compound assignment, update, mixed
+      numeric error, false number hint, and bigint hint
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590370
+      to: absent
+  - invariant: property-seed
+    domain:
+      fifteen this positions across Script and module source kinds, a Script
+      strict directive, ordinary, own-strict, arrow, generator, asynchronous,
+      parameter-default, method, detached, class instance, static, and field
+      receivers, a module continuation resumed after top-level await, an absent,
+      `var`, function, or lexical top-level declaration observed through the
+      captured receiver, and an optional false number hint whose guarded
+      addition misses
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590374
+      to: absent
+  - invariant: property-seed
+    domain: finite integer lists
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590337
+      to: absent
+  - invariant: property-seed
+    domain: for-await and async yield-star over wrapped sync steps, done states,
+      rejecting promised values, close result failures, and false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590368
+      to: absent
+  - invariant: property-seed
+    domain:
+      for-await in async functions and generators, async yield-star frames,
+      async and wrapped sync iterators, reaction, timer, and never settlements,
+      and false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590366
+      to: absent
+  - invariant: property-seed
+    domain:
+      for-in object pattern heads of one to three properties with static and
+      computed present, absent, and index names, optional defaults, identifier,
+      member, and nested pattern leaves, and an optional rest property, through
+      const, let, var, and assignment heads, over object, empty object, string,
+      number, null, and undefined subjects
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590384
+      to: absent
+  - invariant: property-seed
+    domain: for-in over a one- to three-level prototype chain of enumerable and
+      non-enumerable index and string keys, over a string, a number, a symbol,
+      null, and undefined subject, through const, let, var, identifier
+      assignment, and member head targets, with a key added to or deleted from
+      the own or the parent level after the first reported key
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590383
+      to: absent
+  - invariant: property-seed
+    domain:
+      generator functions with try/catch and try/finally yield points, resumed
+      with g.throw(val), comparing Node.js, Deno, and native
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590359
+      to: absent
+  - invariant: property-seed
+    domain: generator method definitions in object literals and class bodies
+      (prototype, static, private), comparing Node.js, Deno, and native
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590360
+      to: absent
+  - invariant: property-seed
+    domain:
+      identifier and member array or object for-of assignment patterns with
+      defaults, rest, present, missing, and nullish inputs
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590350
+      to: absent
+  - invariant: property-seed
+    domain: identifier, member, and parenthesized-member array and object
+      assignments with defaults, rest, present, missing, and nullish inputs
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590348
+      to: absent
+  - invariant: property-seed
+    domain: mixed arguments for intrinsic, method, dynamic, and constructor
+      consumers with custom iterables, captured next, and abrupt steps
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590342
+      to: absent
+  - invariant: property-seed
+    domain: named and anonymous default class declarations with optional static
+      `name` replacement, a local named-class reference, bounded constructor
+      input, a prototype method, and a heap-valued static field imported through
+      the default export
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590366
+      to: absent
+  - invariant: property-seed
+    domain:
+      no-substitution, simple, multiple, nested, and escaped templates over
+      bounded integer substitutions
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590362
+      to: absent
+  - invariant: property-seed
+    domain: object literals with one colon-form prototype setter at any of four
+      positions, null, object, and primitive prototype values, computed,
+      shorthand, method, accessor, and spread __proto__ properties, inherited
+      reads and writes, effects and abrupt completion, a false number hint and
+      deliberate guard miss, both specialization policies, and forced collection
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590372
+      to: absent
+  - invariant: property-seed
+    domain: object literals with zero to four data, shorthand, method, getter,
+      setter, object spread, and nullish spread properties over a shared
+      five-name key pool and bounded integer values, comparing an independent
+      key-order, last-definition, and evaluation-order model with Node.js, Deno,
+      and both native specialization policies with forced collection on the
+      enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590357
+      to: absent
+  - invariant: property-seed
+    domain:
+      one const or let list of two to four declarators per case, mixing plain,
+      bare, array-pattern, object-pattern, and back-reading declarators, written
+      in try-block, block, loop-body, arrow-body, and class static-block
+      statement lists, with normal completion, an abrupt declarator, a read of a
+      later name, and truthful or false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590377
+      to: absent
+  - invariant: property-seed
+    domain: one instance or static private field, method, getter, setter, or
+      accessor pair checked against its branded object, an unbranded object, and
+      a bounded primitive, comparing an independent presence, no-invocation, and
+      TypeError model with Node.js, Deno, and both native specialization
+      policies with forced collection on the enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590365
+      to: absent
+  - invariant: property-seed
+    domain: one instance or static private field, method, getter, setter, or
+      accessor pair reached through another instance or the declaring
+      constructor, plus an unbranded ordinary object or derived constructor,
+      comparing an independent value and TypeError model with Node.js, Deno, and
+      both native specialization policies with forced collection on the enabled
+      path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590364
+      to: absent
+  - invariant: property-seed
+    domain: one owning function form of seven (ordinary, object method, class
+      method, class constructor, generator, asynchronous function, asynchronous
+      generator), an optional enclosing strict scope, one to three simple
+      leading parameters with an optional non-simple trailing formal (default,
+      rest, or binding pattern), zero to five supplied integer arguments, a
+      write index from zero through four, and optional reads through a nested
+      arrow function
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590395
+      to: absent
+  - invariant: property-seed
+    domain:
+      one to three nested arrows capturing a derived constructor's super call
+      and new.target plus instance, static, and asynchronous class method super
+      property reads through literal or computed keys, compared with an
+      independent bounded-integer model under Node.js, Deno, and both native
+      specialization policies with forced collection on the enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590365
+      to: absent
+  - invariant: property-seed
+    domain: one to three nested arrows making a present or absent optional super
+      property call through a literal or side-effecting computed key in
+      synchronous and asynchronous methods, compared with an independent
+      bounded-integer and argument-count model under Node.js, Deno, and both
+      native specialization policies with forced collection on the enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590375
+      to: absent
+  - invariant: property-seed
+    domain:
+      one to three simple parameters, an optional rightmost-name duplicate,
+      zero to five supplied integer arguments, a write/sever index from zero
+      through four, and every sever mode (none, delete, non-writable
+      redefinition, accessor)
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590379
+      to: absent
+  - invariant: property-seed
+    domain:
+      optional member, computed, call, method call, and multi-step chains over
+      null, undefined, and objects with guarded key and argument effects
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590361
+      to: absent
+  - invariant: property-seed
+    domain: optional private field, accessor, and method access over null,
+      undefined, valid-brand, and invalid-brand receivers with bounded values,
+      argument effects, and truthful or false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590396
+      to: absent
+  - invariant: property-seed
+    domain:
+      ordinary async functions and arrows with six await positions, fulfilled
+      and rejected operands, and truthful or false hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590365
+      to: absent
+  - invariant: property-seed
+    domain: prefix and postfix increment or decrement of identifier and member
+      targets, including a nullish base, with number, numeric string, boolean,
+      and null input
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590351
+      to: absent
+  - invariant: property-seed
+    domain:
+      resolved and unresolved identifiers, non-references, ordinary static and
+      computed members, and optional static, computed, and tail members across
+      strictness, nullishness, attributes, and initial and intermediate nullish
+      bases, operand, key, conversion, and abrupt effects
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590371
+      to: absent
+  - invariant: property-seed
+    domain: structured 2-4 node async SCCs, canonical aliases, ordered siblings,
+      non-root observers, sync members, and 0-3 FIFO await checkpoints per node
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590369
+      to: absent
+  - invariant: property-seed
+    domain:
+      synchronous and asynchronous array and object function parameters with
+      defaults, rest, present, missing, and nullish inputs plus absent,
+      truthful, and false JSDoc or TypeScript hints, including nested TypeScript
+      shape mismatches that remain unhinted
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590353
+      to: absent
+  - invariant: property-seed
+    domain:
+      synchronous and asynchronous generators with recursive array or object
+      parameters, top-level and nested defaults, present, missing, undefined,
+      and null inputs, and absent, truthful, or false JSDoc and TypeScript hints
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590365
+      to: absent
+  - invariant: property-seed
+    domain:
+      synchronous generator bodies with zero to four suspension steps placed
+      at statement level, inside a conditional, inside a loop, inside nested
+      loops, inside a for-of over a nested generator, and delegated through
+      `yield*` both for its values alone and for its result, wrapped in a
+      cleanup-observing try/finally, driven by a bounded cycle of sent values
+      and either drained or closed with `return` after a bounded number of
+      yields, comparing an independent suspension-order, sent-value, cleanup,
+      and completion model with Node.js, Deno, and both native specialization
+      policies with forced collection on the enabled path
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590358
+      to: absent
+  - invariant: property-seed
+    domain:
+      synchronous identifier defaults with supplied or missing bounded integer
+      values
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590354
+      to: absent
+  - invariant: property-seed
+    domain: two noncomputed colon-form __proto__ definitions separated by one
+      computed, shorthand, method, accessor, or spread ordinary property
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590373
+      to: absent
+  - invariant: property-seed
+    domain: zero to six bounded integer arguments, a bounded read index, and a
+      bounded replacement value
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590363
+      to: absent
+  - invariant: property-seed
+    domain: zero to three fixed parameters and zero to six bounded integer
+      arguments
+    reason: Moves the reviewed seed into its registered family block.
+    transition:
+      from: 1592590355
       to: absent

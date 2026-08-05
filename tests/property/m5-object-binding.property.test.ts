@@ -334,7 +334,7 @@ test(
           "computed keys and nested shape mismatches remain unhinted",
         numRuns: 10,
         profile: "M5 object binding declarations",
-        seed: 0x5eed_0008,
+        seed: 0x6000_2000,
         sizeLimit: "one nested property and bounded integer values",
         timeLimitMilliseconds: 180_000,
       },

@@ -142,7 +142,7 @@ specified catchable errors after the specified conversions.
 30 value bits per `uint32_t` limb, and `uint64_t` intermediates. The runtime ABI
 is `m5-35`; tag 7 remains unassigned.
 
-The generated native property uses ordinary seed `0x5eed0022`, directly
+The generated native property uses ordinary seed `0x60000800`, directly
 generated admitted radix and operator domains, a bounded independent integer
 oracle, and a 10-case ordinary budget. The repository extended gate uses its
 fixed `0x5eed0003` seed and a ten-times scale for a 100-case budget. The suite

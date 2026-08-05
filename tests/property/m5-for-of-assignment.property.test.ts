@@ -265,7 +265,7 @@ test(
           "with defaults, rest, present, missing, and nullish inputs",
         numRuns: 10,
         profile: "M5 for-of assignment patterns",
-        seed: 0x5eed_000e,
+        seed: 0x6000_1600,
         sizeLimit: "two iterations with bounded integers",
         timeLimitMilliseconds: 180_000,
       },

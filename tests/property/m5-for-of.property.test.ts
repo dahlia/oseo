@@ -262,7 +262,7 @@ test(
           "bounded integer iterables, head forms, transfers, and close modes",
         numRuns: 10,
         profile: "M5 synchronous for-of and IteratorClose",
-        seed: 0x5eed_0004,
+        seed: 0x6000_1800,
         sizeLimit: large ? "9 values and 9 transfer positions" : "5 values",
         timeLimitMilliseconds: 180_000,
       },

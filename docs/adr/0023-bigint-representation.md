@@ -58,11 +58,11 @@ signed-shift behavior, mixed numeric failures, assignment and update order,
 false number hints, deliberate guard misses, and collector survival. Selected
 fixtures collect at every safepoint.
 
-The generated property suite uses seed `0x5eed0022`, directly generates the
+The generated property suite uses seed `0x60000800`, directly generates the
 admitted radix, operator, assignment, update, mixed-type, and hint domains, and
 compares a bounded independent integer model with both reference hosts and both
 native specialization policies. The ordinary budget is 10 cases under seed
-`0x5eed0022`; the repository extended gate uses fixed seed `0x5eed0003` and a
+`0x60000800`; the repository extended gate uses fixed seed `0x5eed0003` and a
 ten-times scale for a 100-case budget. Both native policies force collection.
 
 The native gate executes the shared C sources under the matching Linux AMD64

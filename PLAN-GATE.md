@@ -5,9 +5,9 @@ Status
 ------
 
 Implementation status: in progress. The runtime archive reuse, concurrent
-reviewed execution, compatibility ratchet, infrastructure failure
-classification, and manifest record partitioning checkpoints are complete.
-The seed allocation registry and per-family evidence lanes remain planned.
+reviewed execution, compatibility ratchet, seed allocation registry,
+infrastructure failure classification, and manifest record partitioning
+checkpoints are complete. The per-family evidence lanes remain planned.
 This plan defines the cost contract for the reviewed evidence gates and the
 checkpoints that keep that cost usable as the reviewed corpus grows. It does
 not change any language semantic or the amount of evidence a semantic unit
@@ -306,13 +306,41 @@ rule; this plan only carries the gate that enforces it.
 
 ### Seed allocation registry
 
-Property seeds are allocated sequentially without a registry, so two
-concurrently developed units can select the same seed. An identical seed does
-not fail; it silently removes generated diversity.
+Checkpoint status: complete.
 
-A checked-in registry allocates a reserved block for each family. Changing a
-generator must still preserve or deliberately replace its shrinking and replay
-quality.
+*tests/property-seeds.yaml* assigns every reviewed property source one stable
+kebab-case family ID, exact owner path, and aligned block of 256 signed 32-bit
+seeds. A source file is the ownership boundary: domains in that file take
+distinct slots from its block, while two calls for the same domain may reuse a
+seed deliberately to exercise the same cases through different runner paths.
+New families reserve any unused aligned block. This lets concurrent units pick
+independent ranges, and an overlap fails mechanically when their changes meet.
+
+The compatibility-ratchet scanner validates the registry and ordinary property
+calls before comparing the current snapshot with Git. It rejects unknown
+fields, versions, family IDs, owner paths, range values, non-aligned or
+wrong-sized blocks, overlapping blocks, repeated families or owners,
+unregistered property sources, out-of-block seeds, seed reuse across distinct
+family-domain allocations, and registry entries with no reviewed property
+call. Seeds must fit the signed 32-bit range accepted deterministically by
+`fast-check`. The check reads sources and the registry directly, so it retains
+the clean-checkout test that forbids compiler build artifacts.
+
+The migration assigned 47 family blocks to 57 generated domains. It moved each
+ordinary reviewed seed into its owning block and removed the seven duplicate
+allocations by which unrelated domains had shared seed values. The scan reports
+57 distinct seeds instead of 50 while retaining the aggregate ordinary case
+budget of 2,686. The compatibility snapshot remains 2,934 passes across 4,861
+reviewed paths. Each of the 57 old seed removals is recorded through the
+existing exact-transition override path; future comparisons retain the same
+monotonic property-seed and case-budget rules.
+
+Focused regressions accept a valid allocation and deliberately reject an
+unregistered family, an out-of-block seed, reuse across distinct domains,
+overlapping blocks, a malformed range, and a stale entry. This checkpoint has
+no timing target; its count measurement records the diversity correction and
+the unchanged evidence budget without claiming a semantic or compatibility
+change.
 
 Owner: [*PLAN-PT.md*](./PLAN-PT.md).
 

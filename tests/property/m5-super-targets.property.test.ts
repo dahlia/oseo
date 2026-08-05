@@ -502,7 +502,7 @@ test(
           "property, or an absent property",
         numRuns: 16,
         profile: "M5 super property assignment targets",
-        seed: 0x5eed_002e,
+        seed: 0x6000_2a00,
         sizeLimit: "one observed super target per generated program",
         timeLimitMilliseconds: 240_000,
       },

@@ -1152,7 +1152,7 @@ landed with the M5 intrinsics units. The remaining queue is:
     invalid-brand `TypeError`, nullish short circuit, optional private method
     receiver preservation and argument suppression, both specialization
     policies, truthful and false hints, and forced collection. A generated
-    property with seed `0x5eed003c` adds one domain, one seed, and twelve
+    property with seed `0x60002500` adds one domain, one seed, and twelve
     ordinary cases with an independent Node.js oracle over field, accessor,
     and method operations and valid, invalid, `null`, and `undefined`
     receivers. Four test262 cases are reviewed: two optional-private grammar

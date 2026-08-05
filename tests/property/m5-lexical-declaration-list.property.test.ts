@@ -472,7 +472,7 @@ test(
           "later name, and truthful or false hints",
         numRuns: 16,
         profile: "M5a lexical declaration lists",
-        seed: 0x5eed_0029,
+        seed: 0x6000_1d00,
         sizeLimit: large
           ? "16 generated cases at the extended run scale"
           : "16 generated cases",

@@ -492,7 +492,7 @@ test(
           "path",
         numRuns: 15,
         profile: "M5 synchronous generator functions",
-        seed: 0x5eed_0016,
+        seed: 0x6000_1c00,
         sizeLimit:
           "zero to four steps, loops of at most three outer and two inner " +
           "iterations, one to three bounded sent values, and a stop count " +
