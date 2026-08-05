@@ -37,6 +37,7 @@ interface AwaitCase {
   readonly falseHint: boolean;
   readonly form: "arrow" | "function";
   readonly left: number;
+  readonly logicalOperator: "&&" | "||";
   readonly position: AwaitPosition;
   readonly reject: boolean;
   readonly right: number;
@@ -60,6 +61,7 @@ const awaitCaseArbitrary = fc.record({
   falseHint: fc.boolean(),
   form: fc.constantFrom("arrow" as const, "function" as const),
   left: fc.integer({ max: 20, min: -20 }),
+  logicalOperator: fc.constantFrom("&&" as const, "||" as const),
   position: fc.constantFrom(
     "binary" as const,
     "call" as const,
@@ -124,11 +126,12 @@ function modeledBody(testCase: AwaitCase): ModeledBody {
     };
   }
   if (testCase.position === "logical") {
-    const taken = left !== 0;
+    const and = testCase.logicalOperator === "&&";
+    const taken = and ? left !== 0 : left === 0;
     return {
       lines: taken ? ["left", "operand"] : ["left"],
       source: [
-        `const result = mark("left", ${left}) &&`,
+        `const result = mark("left", ${left}) ${testCase.logicalOperator}`,
         `  await settle(mark("operand", ${right}), ${reject});`,
       ],
       value: taken ? right : left,
@@ -199,9 +202,11 @@ function printSource(testCase: AwaitCase): string {
 
 function expectedOutput(testCase: AwaitCase): string {
   const body = modeledBody(testCase);
-  const rejects =
-    testCase.reject &&
-    !(testCase.position === "logical" && testCase.left === 0);
+  const skipsAwait =
+    testCase.position === "logical" &&
+    ((testCase.logicalOperator === "&&" && testCase.left === 0) ||
+      (testCase.logicalOperator === "||" && testCase.left !== 0));
+  const rejects = testCase.reject && !skipsAwait;
   const lines = ["start", ...body.lines];
   if (rejects) {
     lines.push("caught await rejection");
