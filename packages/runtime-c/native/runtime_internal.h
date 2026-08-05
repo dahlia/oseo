@@ -787,6 +787,28 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/*
+ * String and property-key helpers owned by runtime_string.c. A string
+ * property key names a property by content rather than by identity, so
+ * key equality, ASCII name matching, canonical array-index recognition,
+ * and the own properties a String exotic object exposes all resolve
+ * here rather than in each component that asks about a key.
+ */
+OseoResult oseo_internal_ascii_string(OseoContext *context, const char *text);
+bool oseo_internal_string_equal(OseoValue left, OseoValue right);
+bool oseo_internal_property_key_equal(OseoValue left, OseoValue right);
+bool oseo_internal_array_index(OseoValue key, uint32_t *result);
+/*
+ * True when key names an own property of the String exotic object
+ * string_value stands for, which is `length` or an in-range code unit
+ * index. *index receives the index when the key is one, and is left
+ * alone otherwise.
+ */
+bool oseo_internal_string_own_property(
+    OseoValue string_value,
+    OseoValue key,
+    uint32_t *index
+);
 
 typedef enum {
     OSEO_BIGINT_ADD,
@@ -843,6 +865,60 @@ bool oseo_internal_own_descriptor(
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
     OseoValue *setter
+);
+/*
+ * Ordinary object layout helpers owned by runtime_object.c. The
+ * property vector is the one storage location for an object's own
+ * properties, so every component that finds, adds, or removes one goes
+ * through these instead of walking the vector itself.
+ */
+size_t oseo_internal_own_property_index(
+    const OseoOrdinaryObject *object,
+    OseoValue key
+);
+bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index);
+/*
+ * Reserves room for one more own property. The call is a safepoint and
+ * moves the property vector, so a caller reacquires both the object and
+ * any property pointer afterward.
+ */
+OseoResult oseo_internal_grow_properties(
+    OseoContext *context,
+    OseoValue object_value
+);
+/*
+ * True when one own property of object_value keeps its value in the
+ * binding cell `stored` instead of the property slot, which a module
+ * namespace, the realm's global this value, and a mapped arguments
+ * object each do.
+ */
+bool oseo_internal_cell_backed_property(
+    OseoValue object_value,
+    OseoValue stored
+);
+/*
+ * Rejects a key that is neither a string nor a symbol as a host
+ * diagnostic. Every property operation applies it before it looks at
+ * the object.
+ */
+OseoResult oseo_internal_require_property_key(
+    OseoContext *context,
+    OseoValue key
+);
+/*
+ * The array `length` property's shared [[Set]] and [[DefineOwnProperty]]
+ * body, including the descending truncation that stops at the first
+ * non-configurable element. `allow_same_value` admits a redefinition
+ * that leaves a non-writable length unchanged, and *valid_length reports
+ * whether the requested value was a valid array length at all.
+ */
+OseoResult oseo_internal_set_array_length(
+    OseoContext *context,
+    OseoOrdinaryObject *array,
+    OseoValue value,
+    bool strict,
+    bool allow_same_value,
+    bool *valid_length
 );
 OseoResult oseo_internal_promise_aggregate_settle(
     OseoContext *context,

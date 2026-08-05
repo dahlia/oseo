@@ -17,21 +17,28 @@ explainable.
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists thirteen reviewed assets in this order:
+The runtime input now lists twenty-three reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*, *runtime\_core.c*,
-*runtime\_memory.c*, *runtime\_binding.c*, *runtime\_object.c*,
-*runtime\_function.c*, *runtime\_error.c*, *runtime\_symbol.c*,
-*runtime\_iterator.c*, *runtime\_primitive.c*,
-*runtime\_promise.c*, and
+*runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
+*runtime\_object.c*, *runtime\_property.c*, *runtime\_descriptor.c*,
+*runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_arguments.c*,
+*runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
+*runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
+*runtime\_async\_generator.c*, *runtime\_bigint.c*,
+*runtime\_primitive.c*, *runtime\_promise.c*, and
 *runtime\_event\_loop.c*. The M5 named-error-intrinsics unit added
-*runtime\_error.c* as the first post-componentization component, the
-symbols unit added *runtime\_symbol.c*, and the iterator-protocol unit
-added *runtime\_iterator.c*, each
-following the same ownership, include, and one-definition rules. No
-catch-all *runtime.c* remains, and no
-temporary forwarding helper was needed at any point in the migration.
-Each source compiles as its own translation unit and is archived in
-exactly this order. The symbols test in
+*runtime\_error.c* as the first post-componentization component, and the
+symbol, iterator-protocol, generator, asynchronous-generator, and BigInt
+units each added one component the same way. The M5b preparation unit
+then split the original *runtime\_object.c* into the eight object-family
+components listed above, so the standard built-in objects can be
+authored in parallel lanes instead of competing for one translation
+unit; that split moved code and promoted eleven file-local helpers to
+the internal header without changing behavior. Every addition follows
+the same ownership, include, and one-definition rules. No catch-all
+*runtime.c* remains, and no temporary forwarding helper was needed at
+any point in the migration. Each source compiles as its own translation
+unit and is archived in exactly this order. The symbols test in
 *packages/runtime-c/tests/symbols.test.ts* enforces the reviewed list,
 the include boundaries, and the one-definition rule on every change.
 
@@ -46,9 +53,41 @@ Ownership follows the plan's target layout:
     evolution boundaries;
  -  *runtime\_binding.c*: environments, binding cells, module
     namespaces, and the realm's global this value;
- -  *runtime\_object.c*: strings used as property keys, arrays, ordinary
-    objects, descriptors, prototypes, property caches, and the `Object`
-    built-ins;
+ -  *runtime\_string.c*: string values and the string half of a property
+    key, meaning allocation, content equality, ASCII name matching,
+    canonical array-index recognition, and the own properties a String
+    exotic object exposes;
+ -  *runtime\_object.c*: ordinary object creation and layout, the
+    property vector and its growth, own-property lookup and removal,
+    cell-backed property recognition, shape identifiers and the
+    generated-code property caches, object coercibility checks, and
+    `[[SetPrototypeOf]]`;
+ -  *runtime\_property.c*: the generic property access paths, meaning
+    `[[Get]]` and `[[Set]]` with their `super` forms, `HasOwnProperty`,
+    and the classification of the virtualized intrinsic methods this
+    runtime serves without materializing the prototype objects that own
+    them;
+ -  *runtime\_descriptor.c*: `[[GetOwnProperty]]`,
+    `[[DefineOwnProperty]]` for data and accessor descriptors,
+    `[[Delete]]`, and the `SameValue` comparison
+    `ValidateAndApplyPropertyDescriptor` performs;
+ -  *runtime\_array.c*: array exotic behavior, meaning array creation,
+    the `length` own property and its truncation rules, canonical index
+    keys, monotonic literal and spread accumulation, frozen template
+    objects, and the virtualized `Array.prototype.push`;
+ -  *runtime\_object\_builtin.c*: the `Object` built-ins and the own-key
+    operations they share with object rest and spread, meaning
+    `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key
+    ordering, and the `Object.create`, `Object.defineProperty`,
+    `Object.getOwnPropertyDescriptor`, `Object.keys`, and
+    `Object.setPrototypeOf` entry points;
+ -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
+    the mapped object 10.4.4 creates from a simple parameter list, the
+    `@@iterator` both shapes define, and the realm's single
+    `%ThrowTypeError%` intrinsic their `callee` accessor reports;
+ -  *runtime\_enumeration.c*: `EnumerateObjectProperties`, meaning the
+    for-in key collection over one prototype chain and the reachability
+    rule each step applies;
  -  *runtime\_function.c*: function creation, callable metadata,
     construction, and generic dispatch;
  -  *runtime\_error.c*: the named error intrinsics, their lazily created
@@ -59,6 +98,16 @@ Ownership follows the plan's target layout:
  -  *runtime\_iterator.c*: the synchronous iterator protocol
     (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
     first-class array iterator, and its cached virtualized methods;
+ -  *runtime\_generator.c*: the suspended body frame both generator kinds
+    share, its collector-traced root slots and saved completion records,
+    and the `%GeneratorPrototype%` resumptions that drive a synchronous
+    generator;
+ -  *runtime\_async\_generator.c*: the `AsyncGeneratorRequest` queue, the
+    driver that runs one request at a time, and the two reactions that
+    resume a body parked on an awaited operand;
+ -  *runtime\_bigint.c*: exact BigInt primitives, their limb
+    representation, arithmetic and bitwise operators, comparison, and
+    string conversion in both directions;
  -  *runtime\_primitive.c*: coercions including the generic
     `ToPrimitive`, arithmetic, comparison, string
     conversion, and console output;
@@ -73,7 +122,7 @@ and `oseo_iterator_close` are generated-code ABI entry points declared in
 *oseo\_runtime.h*. Promise combinators share those public operations.
 Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
-owned by *runtime\_object.c*. The append operations preserve monotonic own
+owned by *runtime\_array.c*. The append operations preserve monotonic own
 indexed-property accumulation and keep allocation policy outside the backend.
 Call and constructor argument spread share iterator get and next without
 iterator close, then use the `oseo_argument_list_create`,
@@ -125,55 +174,97 @@ its read and write.
 
 ### Internal helpers
 
-Twenty-seven helpers cross a translation-unit boundary. Each uses the
+Sixty-four helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
-| Internal helper                                     | Defined in             |
-| --------------------------------------------------- | ---------------------- |
-| `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*    |
-| `oseo_internal_error_construct`                     | *runtime\_error.c*     |
-| `oseo_internal_error_prototype`                     | *runtime\_error.c*     |
-| `oseo_internal_error_to_string`                     | *runtime\_error.c*     |
-| `oseo_internal_throw_error`                         | *runtime\_error.c*     |
-| `oseo_internal_publish_heap`                        | *runtime\_memory.c*    |
-| `oseo_internal_allocate_string`                     | *runtime\_object.c*    |
-| `oseo_internal_string_is_ascii`                     | *runtime\_object.c*    |
-| `oseo_internal_own_descriptor`                      | *runtime\_object.c*    |
-| `oseo_internal_symbol_create`                       | *runtime\_symbol.c*    |
-| `oseo_internal_symbol_text`                         | *runtime\_symbol.c*    |
-| `oseo_internal_symbol_name`                         | *runtime\_symbol.c*    |
-| `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*    |
-| `oseo_internal_array_values`                        | *runtime\_iterator.c*  |
-| `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*  |
-| `oseo_internal_iterator_method`                     | *runtime\_iterator.c*  |
-| `oseo_internal_iterator_key_matches`                | *runtime\_iterator.c*  |
-| `oseo_internal_to_number`                           | *runtime\_primitive.c* |
-| `oseo_internal_to_primitive`                        | *runtime\_primitive.c* |
-| `oseo_internal_value_string`                        | *runtime\_primitive.c* |
-| `oseo_internal_promise_method_function`             | *runtime\_promise.c*   |
-| `oseo_internal_promise_invoke_then`                 | *runtime\_promise.c*   |
-| `oseo_internal_promise_aggregate_settle`            | *runtime\_promise.c*   |
-| `oseo_internal_promise_finally_continuation_create` | *runtime\_promise.c*   |
-| `oseo_internal_promise_finally_invoke`              | *runtime\_promise.c*   |
-| `oseo_internal_jobs_drain_until`                    | *runtime\_promise.c*   |
-| `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*   |
+| Internal helper                                     | Defined in                    |
+| --------------------------------------------------- | ----------------------------- |
+| `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
+| `oseo_internal_error_construct`                     | *runtime\_error.c*            |
+| `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
+| `oseo_internal_error_to_string`                     | *runtime\_error.c*            |
+| `oseo_internal_throw_error`                         | *runtime\_error.c*            |
+| `oseo_internal_publish_heap`                        | *runtime\_memory.c*           |
+| `oseo_internal_allocate_string`                     | *runtime\_string.c*           |
+| `oseo_internal_ascii_string`                        | *runtime\_string.c*           |
+| `oseo_internal_string_equal`                        | *runtime\_string.c*           |
+| `oseo_internal_property_key_equal`                  | *runtime\_string.c*           |
+| `oseo_internal_array_index`                         | *runtime\_string.c*           |
+| `oseo_internal_string_own_property`                 | *runtime\_string.c*           |
+| `oseo_internal_bigint_binary`                       | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_negate`                       | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_not`                          | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_string`                       | *runtime\_bigint.c*           |
+| `oseo_internal_string_to_bigint`                    | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_compare`                      | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_compare_number`               | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_equal`                        | *runtime\_bigint.c*           |
+| `oseo_internal_bigint_is_zero`                      | *runtime\_bigint.c*           |
+| `oseo_internal_own_descriptor`                      | *runtime\_descriptor.c*       |
+| `oseo_internal_own_property_index`                  | *runtime\_object.c*           |
+| `oseo_internal_remove_property`                     | *runtime\_object.c*           |
+| `oseo_internal_grow_properties`                     | *runtime\_object.c*           |
+| `oseo_internal_cell_backed_property`                | *runtime\_object.c*           |
+| `oseo_internal_require_property_key`                | *runtime\_property.c*         |
+| `oseo_internal_set_array_length`                    | *runtime\_array.c*            |
+| `oseo_internal_promise_aggregate_settle`            | *runtime\_promise.c*          |
+| `oseo_internal_promise_finally_continuation_create` | *runtime\_promise.c*          |
+| `oseo_internal_promise_finally_invoke`              | *runtime\_promise.c*          |
+| `oseo_internal_promise_invoke_then`                 | *runtime\_promise.c*          |
+| `oseo_internal_promise_create`                      | *runtime\_promise.c*          |
+| `oseo_internal_async_generator_method`              | *runtime\_async\_generator.c* |
+| `oseo_internal_generator_complete`                  | *runtime\_generator.c*        |
+| `oseo_internal_promise_method_function`             | *runtime\_promise.c*          |
+| `oseo_internal_string_is_ascii`                     | *runtime\_string.c*           |
+| `oseo_internal_classify_virtual_property`           | *runtime\_property.c*         |
+| `oseo_internal_virtual_property`                    | *runtime\_property.c*         |
+| `oseo_internal_to_number`                           | *runtime\_primitive.c*        |
+| `oseo_internal_to_primitive`                        | *runtime\_primitive.c*        |
+| `oseo_internal_symbol_create`                       | *runtime\_symbol.c*           |
+| `oseo_internal_symbol_text`                         | *runtime\_symbol.c*           |
+| `oseo_internal_symbol_name`                         | *runtime\_symbol.c*           |
+| `oseo_internal_well_known_symbol`                   | *runtime\_symbol.c*           |
+| `oseo_internal_generator_prototype`                 | *runtime\_generator.c*        |
+| `oseo_internal_async_generator_prototype`           | *runtime\_generator.c*        |
+| `oseo_internal_async_generator_intrinsic`           | *runtime\_generator.c*        |
+| `oseo_internal_async_generator_awaited`             | *runtime\_async\_generator.c* |
+| `oseo_internal_iterator_result`                     | *runtime\_iterator.c*         |
+| `oseo_internal_array_values`                        | *runtime\_iterator.c*         |
+| `oseo_internal_array_iterator_next`                 | *runtime\_iterator.c*         |
+| `oseo_internal_iterator_key_matches`                | *runtime\_iterator.c*         |
+| `oseo_internal_iterator_method`                     | *runtime\_iterator.c*         |
+| `oseo_internal_async_from_sync_fulfilled`           | *runtime\_iterator.c*         |
+| `oseo_internal_async_from_sync_rejected`            | *runtime\_iterator.c*         |
+| `oseo_internal_throw_type_error_function`           | *runtime\_arguments.c*        |
+| `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
+| `oseo_internal_array_push`                          | *runtime\_array.c*            |
+| `oseo_internal_value_string`                        | *runtime\_primitive.c*        |
+| `oseo_internal_jobs_drain_until`                    | *runtime\_promise.c*          |
+| `oseo_internal_jobs_reached_promise`                | *runtime\_promise.c*          |
+| `oseo_internal_await_step`                          | *runtime\_event\_loop.c*      |
+| `oseo_internal_async_iterator_key_matches`          | *runtime\_iterator.c*         |
 
 ### Documented component cycles
 
 The extraction confirmed these irreducible cycles. Each is accepted as a
 pair of named interfaces rather than removed, because both directions
-express observable language semantics:
+express observable language semantics. Where a cycle names the object
+side, it means the object family as a whole: *runtime\_string.c*,
+*runtime\_object.c*, *runtime\_property.c*, *runtime\_descriptor.c*,
+*runtime\_array.c*, *runtime\_object\_builtin.c*, *runtime\_arguments.c*,
+and *runtime\_enumeration.c*.
 
- -  object to promise: `oseo_object_get` materializes `then`, `catch`,
-    and `finally` through `oseo_internal_promise_method_function`, while
-    promise code builds ordinary objects through public object
-    operations;
+ -  property access to promise: `oseo_object_get`, owned by
+    *runtime\_property.c*, materializes `then`, `catch`, and `finally`
+    through `oseo_internal_promise_method_function`, while promise code
+    builds ordinary objects through public object operations;
  -  function to promise: generic dispatch executes the internal promise
     built-in code IDs through the promoted `oseo_internal_promise_*`
     helpers, while promise code re-enters callables through
     `oseo_call_function`;
- -  object and primitive: array-length and descriptor semantics call
+ -  object and primitive: array-length semantics in *runtime\_array.c*
+    and descriptor semantics in *runtime\_descriptor.c* call
     `oseo_internal_to_number`, while coercions and operators use public
     object reads and `oseo_internal_own_descriptor`;
  -  binding and object: module-namespace creation builds its backing
@@ -193,8 +284,8 @@ express observable language semantics:
     to a symbol key through `oseo_internal_symbol_name`, while the
     `Symbol` intrinsic and its well-known symbols are built through the
     public function and object operations;
- -  object and iterator: `oseo_object_get` materializes an array's
-    `Symbol.iterator` and an array iterator's `next` through
+ -  property access and iterator: `oseo_object_get` materializes an
+    array's `Symbol.iterator` and an array iterator's `next` through
     `oseo_internal_iterator_method`, while the iterator component reads
     elements, reads and calls `next` and `return`, and reads the
     well-known iterator symbol through public object, symbol, and
@@ -205,6 +296,52 @@ through `oseo_internal_jobs_drain_until` and
 `oseo_internal_jobs_reached_promise`, and `await` and timers construct
 promises through promise-owned entry points, while no promise code calls
 into the event loop.
+
+### Object-family split evidence
+
+The M5b preparation unit divided the 3,168-line *runtime\_object.c* into
+eight translation units totaling 3,263 lines. The 95-line growth is the
+per-unit include lines, the ownership comment each file now carries, and
+the statements re-wrapped to stay at or below 80 columns after eleven
+helpers took the longer `oseo_internal_` names:
+
+| Component                    | Lines |
+| ---------------------------- | ----- |
+| *runtime\_string.c*          | 114   |
+| *runtime\_object.c*          | 285   |
+| *runtime\_property.c*        | 549   |
+| *runtime\_descriptor.c*      | 405   |
+| *runtime\_array.c*           | 472   |
+| *runtime\_object\_builtin.c* | 728   |
+| *runtime\_arguments.c*       | 311   |
+| *runtime\_enumeration.c*     | 399   |
+
+The split moved function bodies without editing them. Comparing the
+token streams of every function before and after, the only differences
+are inserted line breaks and braces around single-statement `if` bodies
+that the 80-column rule required. External text symbols across the
+family grew from 42 to 53, which is exactly the eleven promoted helpers
+(`oseo_internal_ascii_string`, `oseo_internal_string_equal`,
+`oseo_internal_property_key_equal`, `oseo_internal_array_index`,
+`oseo_internal_string_own_property`,
+`oseo_internal_own_property_index`, `oseo_internal_remove_property`,
+`oseo_internal_grow_properties`,
+`oseo_internal_cell_backed_property`,
+`oseo_internal_require_property_key`, and
+`oseo_internal_set_array_length`); no public declaration in
+*oseo\_runtime.h* was added, removed, or changed.
+
+`abiVersion` stays `m5-43`. It names the generated-code ABI contract
+*oseo\_runtime.h* declares, and that contract is untouched. The archive
+reuse key already hashes every asset's name, kind, and contents, so a
+source reorganization invalidates a cached archive without a version
+bump.
+
+On `linux-x86_64-gnu`, `mise run check`, `mise run test`,
+`mise run test:native`, `mise run test:test262`, and
+`mise run test:property:native` all passed, with the pinned test262
+subset reporting `tests=4861/4861 pass=2934`, unchanged from the
+ratchet baseline.
 
 ### Evidence compared with the baseline
 

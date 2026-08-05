@@ -30,8 +30,43 @@ const runtimeInput: RuntimeInput = {
     },
     {
       kind: "source",
+      name: "runtime_string.c",
+      url: new URL("../native/runtime_string.c", import.meta.url),
+    },
+    {
+      kind: "source",
       name: "runtime_object.c",
       url: new URL("../native/runtime_object.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_property.c",
+      url: new URL("../native/runtime_property.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_descriptor.c",
+      url: new URL("../native/runtime_descriptor.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_array.c",
+      url: new URL("../native/runtime_array.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_object_builtin.c",
+      url: new URL("../native/runtime_object_builtin.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_arguments.c",
+      url: new URL("../native/runtime_arguments.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_enumeration.c",
+      url: new URL("../native/runtime_enumeration.c", import.meta.url),
     },
     {
       kind: "source",
