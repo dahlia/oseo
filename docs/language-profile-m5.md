@@ -15,7 +15,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 62
+M5a is complete. The normative family records described below inventory 63
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 4,876 reviewed cases: 2,949 passes, 1,355
-expected negatives, and 572 unsupported profile features. It records no
+The current manifest contains 4,899 reviewed cases: 2,958 passes, 1,355
+expected negatives, and 586 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -797,16 +797,24 @@ current evidence assessment. Those live only in the indexed records above.
     everything else to a string. Converting a symbol to a number or
     string throws a catchable `TypeError`, and `console.log` renders a
     symbol as `Symbol(description)` the way the host console does. The
-    well-known `Symbol.iterator`, `Symbol.toPrimitive`,
-    `Symbol.toStringTag`, and `Symbol.asyncIterator` are fixed
-    non-writable properties of the
-    intrinsic, and `Symbol.toPrimitive` methods participate in generic
-    `ToPrimitive`. Deliberate boundaries: `Symbol.for`, `Symbol.keyFor`,
-    `Symbol.prototype` methods including `toString` and the
-    `description` accessor, `Symbol.hasInstance` dispatch in
-    `instanceof`, and `Symbol.toStringTag` observation in
+    complete edition set of thirteen well-known symbols is present:
+    `Symbol.asyncIterator`, `Symbol.hasInstance`,
+    `Symbol.isConcatSpreadable`, `Symbol.iterator`, `Symbol.match`,
+    `Symbol.matchAll`, `Symbol.replace`, `Symbol.search`, `Symbol.species`,
+    `Symbol.split`, `Symbol.toPrimitive`, `Symbol.toStringTag`, and
+    `Symbol.unscopables`. Each property has a stable identity, is distinct
+    from every other entry, has the description `Symbol.<name>`, and is
+    non-writable, non-enumerable, and non-configurable. The generated property
+    suite uses seed `0x60003000`, an independent table oracle, both
+    specialization policies, and forced collection. `Symbol.toPrimitive`
+    methods participate in generic `ToPrimitive`. Deliberate boundaries:
+    adding an identity does not admit the corresponding consuming algorithm.
+    `Symbol.for`, `Symbol.keyFor`, `Symbol.prototype` methods including
+    `toString` and the `description` accessor, `Symbol.hasInstance` dispatch
+    in `instanceof`, and `Symbol.toStringTag` observation in
     `Object.prototype.toString` remain outside the profile until their
-    prerequisites land.
+    prerequisites land. Multiple realms are unavailable, so cross-realm
+    well-known-symbol identity remains an owned unsupported dependency.
  -  The synchronous iterator protocol. `GetIterator` reads a value's
     `Symbol.iterator` method and calls it, throwing a catchable
     `TypeError` for a non-iterable, a non-callable method, or a
@@ -2950,6 +2958,21 @@ infrastructure failures. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, and zero-override policy are unchanged. The public
 error-kind and context layouts move the runtime ABI to
 `oseo-runtime-m5-44`.
+
+M5b node `well-known-symbols` extends the realm-owned table from four entries
+to all thirteen well-known symbols in the candidate edition. Fixed native
+differential evidence covers every entry under both specialization policies
+and forced collection. The directly generated suite uses stable seed
+`0x60003000` and an independent identity, description, and descriptor oracle.
+All 28 cases under the node's thirteen inventory roots are reviewed: thirteen
+pass, while thirteen cross-realm cases and two `Symbol.species` prerequisite
+cases remain unsupported. The node adds nine passes and fourteen honest
+unsupported classifications, moving the manifest to 4,899 cases: 2,958
+passes, 1,355 expected negatives, and 586 unsupported profile features with
+no semantic, harness, or infrastructure failures. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, and zero-override
+policy are unchanged. The public realm context layout moves the runtime ABI to
+`oseo-runtime-m5-45`.
 
 
 Known gaps inside the claim

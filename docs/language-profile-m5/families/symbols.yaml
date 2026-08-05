@@ -2,7 +2,7 @@ version: 1
 id: symbols
 title: "Symbol values and intrinsic"
 scope:
-  - "Symbol primitives, the Symbol intrinsic, and well-known symbols."
+  - "Symbol primitives, the Symbol intrinsic, and symbol property keys."
 owners:
   - PLAN-M5.md
 evidence:
