@@ -124,7 +124,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/new-sc-line-me\
         thod-rs-static-privatename-identifier-initializer-alt-by-classn\
-        ame.js:211:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        ame.js:215:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

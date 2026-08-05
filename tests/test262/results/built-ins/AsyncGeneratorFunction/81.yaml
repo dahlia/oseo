@@ -22,7 +22,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorFunction/prototype/prototype.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorFunction/prototype/protot\
-        ype.js:139:39: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        ype.js:143:39: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

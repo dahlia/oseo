@@ -263,6 +263,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "closures-and-methods" ||
     fixture.name === "catchable-type-errors" ||
+    fixture.name === "aggregate-error-and-options" ||
     fixture.name === "async-continuations" ||
     fixture.name === "async-await-positions" ||
     fixture.name === "async-pattern-await-positions" ||
@@ -420,6 +421,9 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "delete-strict") {
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "aggregate-error-and-options") {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "class-super-targets") {

@@ -53,7 +53,7 @@ results:
         s-static-privatename-identifier-alt-by-classname.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/multiple-defin\
-        itions-rs-static-privatename-identifier-alt-by-classname.js:219\
+        itions-rs-static-privatename-identifier-alt-by-classname.js:223\
         :4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

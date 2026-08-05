@@ -745,6 +745,7 @@ export const emittedC = {
     newTarget: [["new_target"]],
   },
   errorIntrinsic: {
+    oseoErrorAggregate: [["OSEO_ERROR_AGGREGATE"]],
     oseoErrorError: [["OSEO_ERROR_ERROR"]],
     oseoErrorEval: [["OSEO_ERROR_EVAL"]],
     oseoErrorRange: [["OSEO_ERROR_RANGE"]],

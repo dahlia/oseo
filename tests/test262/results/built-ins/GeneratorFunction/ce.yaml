@@ -23,7 +23,7 @@ results:
       detail: "test/built-ins/GeneratorFunction/prototype/Symbol.toStringTag.\
         js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/GeneratorFunction/prototype/Symbol.toSt\
-        ringTag.js:142:34: error[OSEO1001]: Unknown binding
+        ringTag.js:146:34: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

@@ -168,7 +168,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/multiple-stac\
         ked-definitions-rs-static-privatename-identifier-by-classname.j\
-        s:217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        s:221:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

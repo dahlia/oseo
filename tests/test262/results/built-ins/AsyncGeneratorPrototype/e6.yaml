@@ -20,8 +20,8 @@ results:
     observation:
       detail: "test/built-ins/AsyncGeneratorPrototype/next/name.js non-strict
         disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/AsyncGeneratorPrototype/next/name.js:14\
-        8:31: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        stderr=\"test/built-ins/AsyncGeneratorPrototype/next/name.js:15\
+        2:31: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

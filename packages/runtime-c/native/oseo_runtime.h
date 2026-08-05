@@ -99,6 +99,7 @@ typedef enum {
     OSEO_ERROR_SYNTAX = 4,
     OSEO_ERROR_TYPE = 5,
     OSEO_ERROR_URI = 6,
+    OSEO_ERROR_AGGREGATE = 7,
 } OseoErrorKind;
 
 typedef struct {
@@ -156,8 +157,8 @@ struct OseoContext {
     OseoValue promise_finally_function;
     OseoValue promise_then_function;
     /* Lazily created error intrinsics indexed by OseoErrorKind. */
-    OseoValue error_constructors[7];
-    OseoValue error_prototypes[7];
+    OseoValue error_constructors[8];
+    OseoValue error_prototypes[8];
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
     OseoValue well_known_symbols[4];

@@ -99,7 +99,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/multiple-stack\
         ed-definitions-rs-static-privatename-identifier-by-classname.js\
-        :217:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        :221:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
@@ -127,7 +127,7 @@ results:
       detail: "test/language/statements/class/elements/redeclaration-symbol.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/redeclaration-\
-        symbol.js:178:4: error[OSEO1001]: Unknown binding
+        symbol.js:182:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

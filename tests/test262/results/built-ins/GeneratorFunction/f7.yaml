@@ -22,7 +22,7 @@ results:
       detail: "test/built-ins/GeneratorFunction/prototype/prototype.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/GeneratorFunction/prototype/prototype.j\
-        s:139:34: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        s:143:34: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

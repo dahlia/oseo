@@ -214,6 +214,7 @@ export type HirForInTarget =
  * runtime-owned constructor instead of an unknown-binding diagnostic.
  */
 export type ErrorIntrinsicName =
+  | "AggregateError"
   | "Error"
   | "EvalError"
   | "RangeError"
@@ -223,6 +224,7 @@ export type ErrorIntrinsicName =
   | "URIError";
 
 const errorIntrinsicNames: readonly ErrorIntrinsicName[] = [
+  "AggregateError",
   "Error",
   "EvalError",
   "RangeError",

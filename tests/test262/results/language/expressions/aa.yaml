@@ -202,7 +202,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/same-line-met\
         hod-rs-static-privatename-identifier-initializer-alt-by-classna\
-        me.js:210:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        me.js:214:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

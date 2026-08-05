@@ -62,7 +62,7 @@ results:
         .js non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/after-same-lin\
         e-static-async-method-rs-static-privatename-identifier-alt-by-c\
-        lassname.js:228:4: error[OSEO1001]: Unknown binding
+        lassname.js:232:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false

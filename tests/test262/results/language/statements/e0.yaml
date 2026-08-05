@@ -61,7 +61,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/new-no-sc-line\
         -method-rs-static-privatename-identifier-initializer-alt-by-cla\
-        ssname.js:211:4: error[OSEO1001]: Unknown binding
+        ssname.js:215:4: error[OSEO1001]: Unknown binding
         'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
@@ -94,7 +94,7 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/same-line-asyn\
         c-method-rs-static-privatename-identifier-alt-by-classname.js:2\
-        28:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        32:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

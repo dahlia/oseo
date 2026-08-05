@@ -80,7 +80,7 @@ results:
       detail: "test/language/expressions/class/elements/field-declaration.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/class/elements/field-declara\
-        tion.js:191:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        tion.js:195:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

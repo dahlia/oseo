@@ -74,8 +74,8 @@ results:
         rs-static-privatename-identifier-alt-by-classname.js non-strict
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/class/elements/new-no-sc-line\
-        -method-rs-static-privatename-identifier-alt-by-classname.js:21\
-        7:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        -method-rs-static-privatename-identifier-alt-by-classname.js:22\
+        1:4: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

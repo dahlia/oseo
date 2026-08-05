@@ -22,7 +22,7 @@ results:
       detail: "test/built-ins/AsyncGeneratorPrototype/Symbol.toStringTag.js
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/AsyncGeneratorPrototype/Symbol.toString\
-        Tag.js:144:3: error[OSEO1001]: Unknown binding 'Object'.\\n\""
+        Tag.js:148:3: error[OSEO1001]: Unknown binding 'Object'.\\n\""
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []
