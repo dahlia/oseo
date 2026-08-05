@@ -97,11 +97,20 @@
 #define OSEO_THROW_TYPE_ERROR_CODE_ID \
     (SIZE_MAX - 28u - OSEO_ERROR_KIND_COUNT)
 /* Well-known symbol table indexes shared with the public context. */
-#define OSEO_WELL_KNOWN_ITERATOR ((size_t)0u)
-#define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)1u)
-#define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)2u)
-#define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)3u)
-#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)4u)
+#define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
+#define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
+#define OSEO_WELL_KNOWN_IS_CONCAT_SPREADABLE ((size_t)2u)
+#define OSEO_WELL_KNOWN_ITERATOR ((size_t)3u)
+#define OSEO_WELL_KNOWN_MATCH ((size_t)4u)
+#define OSEO_WELL_KNOWN_MATCH_ALL ((size_t)5u)
+#define OSEO_WELL_KNOWN_REPLACE ((size_t)6u)
+#define OSEO_WELL_KNOWN_SEARCH ((size_t)7u)
+#define OSEO_WELL_KNOWN_SPECIES ((size_t)8u)
+#define OSEO_WELL_KNOWN_SPLIT ((size_t)9u)
+#define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)10u)
+#define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)11u)
+#define OSEO_WELL_KNOWN_UNSCOPABLES ((size_t)12u)
+#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)13u)
 
 /*
  * The preferred-type hint passed to the generic ToPrimitive. The

@@ -735,14 +735,59 @@ partitions:
     key: "01"
     path: results/built-ins/Symbol/01.yaml
   - group: built-ins/Symbol
+    key: "12"
+    path: results/built-ins/Symbol/12.yaml
+  - group: built-ins/Symbol
+    key: 1c
+    path: results/built-ins/Symbol/1c.yaml
+  - group: built-ins/Symbol
+    key: 2d
+    path: results/built-ins/Symbol/2d.yaml
+  - group: built-ins/Symbol
+    key: "35"
+    path: results/built-ins/Symbol/35.yaml
+  - group: built-ins/Symbol
+    key: 3a
+    path: results/built-ins/Symbol/3a.yaml
+  - group: built-ins/Symbol
+    key: 3c
+    path: results/built-ins/Symbol/3c.yaml
+  - group: built-ins/Symbol
+    key: 3f
+    path: results/built-ins/Symbol/3f.yaml
+  - group: built-ins/Symbol
+    key: "40"
+    path: results/built-ins/Symbol/40.yaml
+  - group: built-ins/Symbol
     key: "43"
     path: results/built-ins/Symbol/43.yaml
+  - group: built-ins/Symbol
+    key: "48"
+    path: results/built-ins/Symbol/48.yaml
   - group: built-ins/Symbol
     key: 5b
     path: results/built-ins/Symbol/5b.yaml
   - group: built-ins/Symbol
+    key: "70"
+    path: results/built-ins/Symbol/70.yaml
+  - group: built-ins/Symbol
+    key: "74"
+    path: results/built-ins/Symbol/74.yaml
+  - group: built-ins/Symbol
     key: "75"
     path: results/built-ins/Symbol/75.yaml
+  - group: built-ins/Symbol
+    key: 7a
+    path: results/built-ins/Symbol/7a.yaml
+  - group: built-ins/Symbol
+    key: 7c
+    path: results/built-ins/Symbol/7c.yaml
+  - group: built-ins/Symbol
+    key: "88"
+    path: results/built-ins/Symbol/88.yaml
+  - group: built-ins/Symbol
+    key: 8b
+    path: results/built-ins/Symbol/8b.yaml
   - group: built-ins/Symbol
     key: "98"
     path: results/built-ins/Symbol/98.yaml
@@ -750,8 +795,17 @@ partitions:
     key: 9a
     path: results/built-ins/Symbol/9a.yaml
   - group: built-ins/Symbol
+    key: ae
+    path: results/built-ins/Symbol/ae.yaml
+  - group: built-ins/Symbol
+    key: af
+    path: results/built-ins/Symbol/af.yaml
+  - group: built-ins/Symbol
     key: c9
     path: results/built-ins/Symbol/c9.yaml
+  - group: built-ins/Symbol
+    key: cc
+    path: results/built-ins/Symbol/cc.yaml
   - group: built-ins/Symbol
     key: cf
     path: results/built-ins/Symbol/cf.yaml
@@ -762,11 +816,23 @@ partitions:
     key: da
     path: results/built-ins/Symbol/da.yaml
   - group: built-ins/Symbol
+    key: ec
+    path: results/built-ins/Symbol/ec.yaml
+  - group: built-ins/Symbol
+    key: f0
+    path: results/built-ins/Symbol/f0.yaml
+  - group: built-ins/Symbol
+    key: f5
+    path: results/built-ins/Symbol/f5.yaml
+  - group: built-ins/Symbol
     key: f6
     path: results/built-ins/Symbol/f6.yaml
   - group: built-ins/Symbol
     key: fc
     path: results/built-ins/Symbol/fc.yaml
+  - group: built-ins/Symbol
+    key: fe
+    path: results/built-ins/Symbol/fe.yaml
   - group: language/arguments-object
     key: "03"
     path: results/language/arguments-object/03.yaml
@@ -3532,9 +3598,9 @@ summary:
   expectedNegatives: 1355
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 2949
+  passes: 2958
   semanticFailures: 0
-  unsupportedProfileFeatures: 572
+  unsupportedProfileFeatures: 586
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -3570,7 +3636,7 @@ summary:
       infrastructureFailures: 0
       passes: 773
       semanticFailures: 0
-      unsupportedProfileFeatures: 149
+      unsupportedProfileFeatures: 150
     - dependency: control-flow
       expectedNegatives: 224
       harnessFailures: 0
@@ -3661,7 +3727,7 @@ summary:
       infrastructureFailures: 0
       passes: 1006
       semanticFailures: 0
-      unsupportedProfileFeatures: 131
+      unsupportedProfileFeatures: 132
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -3687,9 +3753,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 41
+      passes: 50
       semanticFailures: 0
-      unsupportedProfileFeatures: 25
+      unsupportedProfileFeatures: 39
     - dependency: top-level-await
       expectedNegatives: 5
       harnessFailures: 0
@@ -3786,9 +3852,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11
+      passes: 20
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 15
     - group: language/arguments-object
       expectedNegatives: 1
       harnessFailures: 0

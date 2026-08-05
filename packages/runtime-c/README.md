@@ -296,6 +296,11 @@ installation path with `Error` and every NativeError constructor. These public
 enum and context layout changes shift the generated error code identifiers and
 require the ABI bump.
 
+The `m5-45` ABI expands the realm-owned well-known symbol table from four
+entries to the complete thirteen-entry edition set. The public context layout
+changes with the table, so embedding code must use runtime inputs with the
+matching ABI.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

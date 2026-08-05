@@ -346,6 +346,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "script-this-strict" ||
     fixture.name === "script-this-hints" ||
     fixture.name === "script-global-bindings" ||
+    fixture.name === "symbols" ||
     fixture.name === "delete-strict" ||
     fixture.name === "function-rest-parameters" ||
     fixture.name === "for-of" ||
@@ -424,6 +425,9 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "aggregate-error-and-options") {
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "symbols") {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "class-super-targets") {

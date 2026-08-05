@@ -1,0 +1,51 @@
+version: 1
+id: well-known-symbols
+title: "Well-known symbols"
+scope:
+  - "The 13 edition well-known symbols and their stable identities."
+  - "Their descriptions and Symbol constructor descriptors."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-well-known-symbols.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-well-known-symbols.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The fixed table adds no specialized path or family-specific guard."
+    replacements:
+      - tests/property/m5-well-known-symbols.property.test.ts
+      - tests/native/fixtures/objects.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-well-known-symbols.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: omitted
+    reason: "The runtime-owned table adds no MIR or backend operation."
+    replacements:
+      - packages/runtime-c/native/runtime_internal.h
+      - packages/runtime-c/native/runtime_symbol.c
+      - tests/native/fixtures/objects.ts

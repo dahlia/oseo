@@ -121,7 +121,10 @@ static OseoResult define_symbol_property(
     OseoValue value
 ) {
     size_t name_length = strlen(name);
-    uint16_t units[16];
+    uint16_t units[20];
+    if (name_length > sizeof(units) / sizeof(*units)) {
+        return failure(context, "OSEO2001", "Symbol property name is long.");
+    }
     for (size_t index = 0u; index < name_length; index += 1u) {
         units[index] = (uint16_t)(unsigned char)name[index];
     }
@@ -146,18 +149,36 @@ static OseoResult define_symbol_property(
 
 static OseoResult symbol_intrinsic_create(OseoContext *context) {
     static const char *const well_known_names[OSEO_WELL_KNOWN_SYMBOL_COUNT] = {
+        "asyncIterator",
+        "hasInstance",
+        "isConcatSpreadable",
         "iterator",
+        "match",
+        "matchAll",
+        "replace",
+        "search",
+        "species",
+        "split",
         "toPrimitive",
         "toStringTag",
-        "asyncIterator",
+        "unscopables",
     };
     static const char *const well_known_descriptions[
         OSEO_WELL_KNOWN_SYMBOL_COUNT
     ] = {
+        "Symbol.asyncIterator",
+        "Symbol.hasInstance",
+        "Symbol.isConcatSpreadable",
         "Symbol.iterator",
+        "Symbol.match",
+        "Symbol.matchAll",
+        "Symbol.replace",
+        "Symbol.search",
+        "Symbol.species",
+        "Symbol.split",
         "Symbol.toPrimitive",
         "Symbol.toStringTag",
-        "Symbol.asyncIterator",
+        "Symbol.unscopables",
     };
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -190,6 +211,14 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         const char *description = well_known_descriptions[index];
         size_t description_length = strlen(description);
         uint16_t units[32];
+        if (description_length > sizeof(units) / sizeof(*units)) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "Well-known symbol description is long."
+            );
+            break;
+        }
         for (size_t unit = 0u; unit < description_length; unit += 1u) {
             units[unit] = (uint16_t)(unsigned char)description[unit];
         }

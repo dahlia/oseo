@@ -866,6 +866,69 @@ console.log(typeof first, first === second, first === first);
 console.log(first, Symbol(), Symbol(42));
 console.log(typeof Symbol, typeof Symbol.iterator, typeof Symbol.toPrimitive);
 console.log(typeof Symbol.toStringTag, Symbol.iterator === Symbol.iterator);
+const wellKnownNames = [
+  "asyncIterator",
+  "hasInstance",
+  "isConcatSpreadable",
+  "iterator",
+  "match",
+  "matchAll",
+  "replace",
+  "search",
+  "species",
+  "split",
+  "toPrimitive",
+  "toStringTag",
+  "unscopables",
+];
+const wellKnownValues = [];
+for (let index = 0; index < wellKnownNames.length; index = index + 1) {
+  const name = wellKnownNames[index];
+  const value = Symbol[name];
+  const descriptor = Object.getOwnPropertyDescriptor(Symbol, name);
+  wellKnownValues[index] = value;
+  console.log(
+    "well-known",
+    name,
+    typeof value,
+    value,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+    value === Symbol[name],
+  );
+}
+let wellKnownDistinct = true;
+for (let left = 0; left < wellKnownValues.length; left = left + 1) {
+  for (
+    let right = left + 1;
+    right < wellKnownValues.length;
+    right = right + 1
+  ) {
+    if (wellKnownValues[left] === wellKnownValues[right]) {
+      wellKnownDistinct = false;
+    }
+  }
+}
+console.log("well-known-distinct", wellKnownDistinct);
+function rejectWellKnownMutation() {
+  "use strict";
+  let assignmentRejected = false;
+  let deletionRejected = false;
+  try { Symbol.match = Symbol.iterator; } catch (error) {
+    assignmentRejected = error instanceof TypeError;
+  }
+  try { delete Symbol.match; } catch (error) {
+    deletionRejected = error instanceof TypeError;
+  }
+  console.log("well-known-fixed", assignmentRejected, deletionRejected);
+}
+rejectWellKnownMutation();
+const retainedWellKnown = Symbol.hasInstance;
+for (let index = 0; index < 32; index = index + 1) {
+  Symbol("collection-" + index);
+}
+console.log("well-known-retained", retainedWellKnown === Symbol.hasInstance);
 console.log(typeof Symbol.prototype, Symbol.prototype === Symbol.prototype);
 const protoDesc = Object.getOwnPropertyDescriptor(Symbol, "prototype");
 console.log(protoDesc.writable, protoDesc.enumerable, protoDesc.configurable);

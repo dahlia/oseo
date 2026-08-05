@@ -1,0 +1,25 @@
+group: built-ins/Symbol
+key: ec
+results:
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Symbol.matchAll
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Symbol/matchAll/cross-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - symbols
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

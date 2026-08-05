@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,876
-reviewed cases: 2,949 passes, 1,355 expected negatives, and 572 unsupported
+honest unsupported classifications. The current reviewed manifest records 4,899
+reviewed cases: 2,958 passes, 1,355 expected negatives, and 586 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 62 indexed records in the normative
+M5a is complete. The 63 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 2,949
-passes across 4,876 paths, and the property inventory records 58 domains,
-58 seeds, and an ordinary case budget of 2,698.
+the M5b and M5c dependency order below. The reviewed manifest now records 2,958
+passes across 4,899 paths, and the property inventory records 59 domains,
+59 seeds, and an ordinary case budget of 2,714.
 
 
 M5a implementation history
@@ -3589,6 +3589,15 @@ The graph admits no language semantics of its own. Implemented M5b node
 `error-aggregate-and-options` admits `AggregateError`, its iterable `errors`
 list, and error constructor `cause` options through the external node workflow.
 Its fifteen reviewed promotions move the manifest to 2,949 passes across 4,876
+paths without changing the graph's orchestration state.
+
+Implemented M5b node `well-known-symbols` extends the realm-owned table from
+four entries to the complete thirteen-symbol edition set. Directly generated
+and fixed native differential evidence covers stable identities, descriptions,
+and fixed constructor descriptors under both specialization policies and
+forced collection. The reviewed node inventory contains thirteen passes and
+fifteen unsupported prerequisite cases. Its nine new passes and fourteen new
+unsupported classifications move the manifest to 2,958 passes across 4,899
 paths without changing the graph's orchestration state.
 
 

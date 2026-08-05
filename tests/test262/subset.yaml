@@ -36,9 +36,18 @@ supportedFeatures:
   - rest-parameters
   - Symbol
   - Symbol.asyncIterator
+  - Symbol.hasInstance
+  - Symbol.isConcatSpreadable
   - Symbol.iterator
+  - Symbol.match
+  - Symbol.matchAll
+  - Symbol.replace
+  - Symbol.search
+  - Symbol.species
+  - Symbol.split
   - Symbol.toPrimitive
   - Symbol.toStringTag
+  - Symbol.unscopables
   - template
   - top-level-await
   - well-known-symbols
@@ -820,8 +829,23 @@ tests:
   - path: test/built-ins/Symbol/desc-to-string-symbol.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/Symbol/hasInstance/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/hasInstance/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
   - path: test/built-ins/Symbol/invoked-with-new.js
     expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/isConcatSpreadable/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/isConcatSpreadable/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/iterator/cross-realm.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [symbols]
   - path: test/built-ins/Symbol/iterator/prop-desc.js
     expectedClassification: pass
@@ -829,16 +853,70 @@ tests:
   - path: test/built-ins/Symbol/length.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/Symbol/match/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/match/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/matchAll/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/matchAll/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
   - path: test/built-ins/Symbol/name.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/Symbol/replace/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/replace/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/search/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/search/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/species/basic.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/species/builtin-getter-name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-properties, symbols]
+  - path: test/built-ins/Symbol/species/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/species/subclassing.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [classes, symbols]
+  - path: test/built-ins/Symbol/split/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/split/prop-desc.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/toPrimitive/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
   - path: test/built-ins/Symbol/toPrimitive/prop-desc.js
     expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/toStringTag/cross-realm.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toStringTag/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/uniqueness.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/unscopables/cross-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/unscopables/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/language/arguments-object/10.5-1gs.js

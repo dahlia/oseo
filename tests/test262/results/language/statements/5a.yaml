@@ -25,7 +25,6 @@ results:
       passed: false
     unsupportedFeatures:
       - globalThis
-      - Symbol.unscopables
   - case:
       async: false
       expectedErrorType: SyntaxError

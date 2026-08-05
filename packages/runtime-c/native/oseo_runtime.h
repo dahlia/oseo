@@ -161,7 +161,7 @@ struct OseoContext {
     OseoValue error_prototypes[8];
     /* The lazily created Symbol intrinsic and well-known symbols. */
     OseoValue symbol_constructor;
-    OseoValue well_known_symbols[4];
+    OseoValue well_known_symbols[13];
     /*
      * The realm's global this value, which is the [[GlobalThisValue]] a
      * Global Environment Record binds. It is created on first use and

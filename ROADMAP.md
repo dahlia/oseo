@@ -966,7 +966,12 @@ named error family as runtime-owned constructor values with typed catchable
 runtime errors. M5b node `error-aggregate-and-options` adds the runtime-owned
 `AggregateError`, its iterable-to-list `errors` property, and `cause` handling
 to every error constructor;
-[*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. The C
+[*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list. M5b node
+`well-known-symbols` adds the complete thirteen-entry well-known symbol table,
+fixing every entry's identity, description, and constructor descriptor with
+generated, differential, forced-collection, and reviewed standards evidence.
+The corresponding consuming algorithms remain separate dependency-ordered
+nodes. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is
 complete: the runtime ships eleven component translation units behind a

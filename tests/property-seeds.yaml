@@ -192,3 +192,7 @@ families:
     owner: tests/property/m5-update-expression.property.test.ts
     start: 0x60002e00
     end: 0x60002eff
+  - family: m5-well-known-symbols
+    owner: tests/property/m5-well-known-symbols.property.test.ts
+    start: 0x60003000
+    end: 0x600030ff
