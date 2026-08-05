@@ -298,7 +298,7 @@ test(
         numRuns: 12,
         profile:
           "M5 lexical super calls, super properties, and new.target in arrows",
-        seed: 0x5eed_001d,
+        seed: 0x6000_1e00,
         sizeLimit:
           "one class pair, one to three nested arrows, and one bounded integer",
         timeLimitMilliseconds: 180_000,
@@ -341,7 +341,7 @@ test(
           "forced collection on the enabled path",
         numRuns: 12,
         profile: "M5 optional calls through lexical super properties",
-        seed: 0x5eed_0027,
+        seed: 0x6000_1e01,
         sizeLimit:
           "one class pair, one to three nested arrows, two calls, one key " +
           "mode, one property-presence mode, and one bounded integer",

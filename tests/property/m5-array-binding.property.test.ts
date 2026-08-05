@@ -492,7 +492,7 @@ test(
           "shape mismatches that remain unhinted",
         numRuns: 10,
         profile: "M5 array binding declarations",
-        seed: 0x5eed_0007,
+        seed: 0x6000_0400,
         sizeLimit: large ? "9 outer and nested values" : "5 values",
         timeLimitMilliseconds: 180_000,
       },

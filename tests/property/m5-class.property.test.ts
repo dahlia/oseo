@@ -1474,7 +1474,7 @@ test(
           "M5 class declarations, expressions, accessors, statics, " +
           "inheritance, instance fields, private names, and static " +
           "initialization blocks",
-        seed: 0x5eed_0017,
+        seed: 0x6000_0b00,
         sizeLimit:
           "zero to two constructor parameters, zero to three class " +
           "elements, " +
@@ -1721,7 +1721,7 @@ test(
           "forced collection on the enabled path",
         numRuns: 10,
         profile: "M5 cross-instance and declaring-constructor private access",
-        seed: 0x5eed_001c,
+        seed: 0x6000_0b01,
         sizeLimit:
           "one private element, one valid reference, one invalid brand, and " +
           "bounded integer values",
@@ -1848,7 +1848,7 @@ test(
           "on the enabled path",
         numRuns: 10,
         profile: "M5 private-in brand checks",
-        seed: 0x5eed_001d,
+        seed: 0x6000_0b02,
         sizeLimit:
           "one private element, one branded object, one unbranded object, " +
           "and one bounded primitive",

@@ -17,7 +17,7 @@ const ordinarySuite = {
   domain: "finite integer lists",
   numRuns: 1_000,
   profile: "M2 and M3 primitive values",
-  seed: 0x5eed_0001,
+  seed: 0x6000_0100,
   sizeLimit: `${maximumLength} integers`,
   timeLimitMilliseconds: 5_000,
 } as const;

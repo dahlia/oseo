@@ -286,7 +286,7 @@ test(
           "fallbacks",
         numRuns: 16,
         profile: "M5 typeof unresolved references",
-        seed: 0x5eed_002c,
+        seed: 0x6000_2d00,
         sizeLimit: "one observed typeof expression per generated program",
         timeLimitMilliseconds: 240_000,
       },

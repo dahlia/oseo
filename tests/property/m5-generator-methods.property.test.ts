@@ -172,7 +172,7 @@ test(
           "(prototype, static, private), comparing Node.js, Deno, and native",
         numRuns: 15,
         profile: "M5 generator method definitions",
-        seed: 0x5eed_0018,
+        seed: 0x6000_1900,
         sizeLimit: "small generator methods with yield sequences",
         timeLimitMilliseconds: 180_000,
       },

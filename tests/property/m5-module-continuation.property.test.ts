@@ -202,7 +202,7 @@ test(
           "checkpoints per node",
         numRuns: 8,
         profile: "M5a Unit 7.7 module continuation and cycle schedules",
-        seed: 0x5eed_0021,
+        seed: 0x6000_1f00,
         sizeLimit: large
           ? "4 cycle nodes, 3 siblings, and 3 awaits per node"
           : "3 cycle nodes, 2 siblings, and 3 awaits per node",

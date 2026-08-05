@@ -199,7 +199,7 @@ test(
           "parameter cell and a same-name body var or function binding",
         numRuns: 10,
         profile: "M5 parameter and body var environments",
-        seed: 0x5eed_0014,
+        seed: 0x6000_2700,
         sizeLimit: "two parameter bindings and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

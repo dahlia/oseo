@@ -368,7 +368,7 @@ test(
           "path",
         numRuns: 15,
         profile: "M5 basic object literal expressions",
-        seed: 0x5eed_0015,
+        seed: 0x6000_2100,
         sizeLimit:
           "zero to four properties, zero to three spread source keys, and " +
           "bounded integer values",
@@ -689,7 +689,7 @@ test(
           "specialization policies, and forced collection",
         numRuns: 16,
         profile: "M5 object literal prototype setters",
-        seed: 0x5eed_0024,
+        seed: 0x6000_2101,
         sizeLimit:
           "four definitions, one prototype setter, one ordinary __proto__ " +
           "form, and bounded scalar observations",
@@ -737,7 +737,7 @@ const __proto__ = 21;
         "computed, shorthand, method, accessor, or spread ordinary property",
       numRuns: 12,
       profile: "M5 object literal prototype setter early errors",
-      seed: 0x5eed_0025,
+      seed: 0x6000_2102,
       sizeLimit: "three definitions and six permitted intervening forms",
       timeLimitMilliseconds: 30_000,
     },

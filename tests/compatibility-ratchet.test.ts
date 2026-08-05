@@ -16,6 +16,7 @@ import {
   selectBaselineIntent,
   selectCurrentPropertyPaths,
   selectGitResultPartitionPaths,
+  validatePropertySeedRegistry,
 } from "../tools/compatibility-ratchet.ts";
 import type {
   CompatibilitySnapshot,
@@ -112,6 +113,25 @@ const suite = {
 assertAsyncProperty("example", property, suite);
 `,
   };
+}
+
+interface RegistryFamilyInput {
+  readonly end: number;
+  readonly family: string;
+  readonly owner: string;
+  readonly start: number;
+}
+
+function seedRegistry(families: readonly RegistryFamilyInput[]): string {
+  return JSON.stringify({ families, version: 1 });
+}
+
+function locatedPropertySource(
+  path: string,
+  domain: string,
+  seed: number,
+): PropertySource {
+  return { ...propertySource(domain, seed, 10), path };
 }
 
 function snapshot(
@@ -377,6 +397,162 @@ test("rejects a generated domain case-budget reduction", () => {
       to: 9,
     },
   ]);
+});
+
+test("accepts registered property family seed allocations", () => {
+  const firstPath = "tests/property/first.property.test.ts";
+  const secondPath = "tests/property/second.property.test.ts";
+  const summary = validatePropertySeedRegistry(
+    seedRegistry([
+      {
+        end: 0x1ff,
+        family: "first",
+        owner: firstPath,
+        start: 0x100,
+      },
+      {
+        end: 0x2ff,
+        family: "second",
+        owner: secondPath,
+        start: 0x200,
+      },
+    ]),
+    [
+      locatedPropertySource(firstPath, "first", 0x100),
+      locatedPropertySource(secondPath, "second", 0x200),
+    ],
+  );
+  assert.deepEqual(summary, { allocations: 2, families: 2, seeds: 2 });
+});
+
+test("accepts same-domain property seed reuse", () => {
+  const path = "tests/property/example.property.test.ts";
+  const summary = validatePropertySeedRegistry(
+    seedRegistry([
+      { end: 0x1ff, family: "example", owner: path, start: 0x100 },
+    ]),
+    [
+      locatedPropertySource(path, "example", 0x100),
+      locatedPropertySource(path, "example", 0x100),
+    ],
+  );
+  assert.deepEqual(summary, { allocations: 2, families: 1, seeds: 1 });
+});
+
+test("rejects an unregistered property family", () => {
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(seedRegistry([]), [
+        locatedPropertySource(
+          "tests/property/unregistered.property.test.ts",
+          "unregistered",
+          0x100,
+        ),
+      ]),
+    /property family is unregistered/u,
+  );
+});
+
+test("rejects an unregistered property file with no recognized call", () => {
+  const path = "tests/property/unscanned.property.test.ts";
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(seedRegistry([]), [
+        { path, text: "const property = assertProperty;\n" },
+      ]),
+    /property family is unregistered/u,
+  );
+});
+
+test("rejects a property seed outside its family block", () => {
+  const path = "tests/property/example.property.test.ts";
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(
+        seedRegistry([
+          { end: 0x1ff, family: "example", owner: path, start: 0x100 },
+        ]),
+        [locatedPropertySource(path, "example", 0x200)],
+      ),
+    /uses seed 512 outside family example block 256\.\.511/u,
+  );
+});
+
+test("rejects a seed allocated to distinct property domains", () => {
+  const path = "tests/property/example.property.test.ts";
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(
+        seedRegistry([
+          { end: 0x1ff, family: "example", owner: path, start: 0x100 },
+        ]),
+        [
+          locatedPropertySource(path, "first", 0x100),
+          locatedPropertySource(path, "second", 0x100),
+        ],
+      ),
+    /property seed 256 is allocated to both/u,
+  );
+});
+
+test("rejects overlapping property family blocks", () => {
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(
+        seedRegistry([
+          {
+            end: 0x1ff,
+            family: "first",
+            owner: "tests/property/first.property.test.ts",
+            start: 0x100,
+          },
+          {
+            end: 0x1ff,
+            family: "second",
+            owner: "tests/property/second.property.test.ts",
+            start: 0x100,
+          },
+        ]),
+        [],
+      ),
+    /property seed blocks overlap for first and second/u,
+  );
+});
+
+test("rejects malformed property seed registry data", () => {
+  const path = "tests/property/example.property.test.ts";
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(
+        JSON.stringify({
+          families: [
+            {
+              end: 0x200,
+              family: "example",
+              owner: path,
+              start: 0x100,
+            },
+          ],
+          version: 1,
+        }),
+        [],
+      ),
+    /must reserve one aligned 256-seed block/u,
+  );
+});
+
+test("rejects a stale property seed family", () => {
+  const path = "tests/property/stale.property.test.ts";
+  assert.throws(
+    () =>
+      validatePropertySeedRegistry(
+        seedRegistry([
+          { end: 0x1ff, family: "stale", owner: path, start: 0x100 },
+        ]),
+        [],
+      ),
+    /property seed family stale has no reviewed property call/u,
+  );
 });
 
 test("an override permits only its exact named transition", () => {

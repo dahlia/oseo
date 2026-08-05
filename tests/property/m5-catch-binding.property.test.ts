@@ -218,7 +218,7 @@ test(
           "missing, and nullish inputs",
         numRuns: 10,
         profile: "M5 catch binding patterns",
-        seed: 0x5eed_000a,
+        seed: 0x6000_0a00,
         sizeLimit: "one binding, one rest value, and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

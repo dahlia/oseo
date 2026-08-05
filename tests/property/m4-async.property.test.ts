@@ -289,7 +289,7 @@ test(
         domain: "bounded promise commands and deterministic timer schedules",
         numRuns: 10,
         profile: "M4 promises, jobs, timers, and shutdown",
-        seed: 0x5eed_0003,
+        seed: 0x6000_0200,
         sizeLimit: large
           ? "6 async calls, 12 promises, and 10 timers"
           : "3 async calls, 6 promises, and 5 timers",

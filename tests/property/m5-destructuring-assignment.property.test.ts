@@ -243,7 +243,7 @@ test(
           "inputs",
         numRuns: 10,
         profile: "M5 destructuring assignment",
-        seed: 0x5eed_000c,
+        seed: 0x6000_1000,
         sizeLimit: "one target, one rest value, and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

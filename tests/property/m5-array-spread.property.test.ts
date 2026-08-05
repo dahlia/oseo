@@ -268,7 +268,7 @@ test(
           "and abrupt steps",
         numRuns: 10,
         profile: "M5 array literal spread and dynamic accumulation",
-        seed: 0x5eed_0005,
+        seed: 0x6000_0500,
         sizeLimit: large
           ? "9 values in each spread"
           : "5 values in each spread",

@@ -295,7 +295,7 @@ test(
           "bounded values, argument effects, and truthful or false hints",
         numRuns: 12,
         profile: "M5 optional private access",
-        seed: 0x5eed_003c,
+        seed: 0x6000_2500,
         sizeLimit:
           "one optional private access with bounded values and effects",
         timeLimitMilliseconds: 180_000,

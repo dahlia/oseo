@@ -163,7 +163,7 @@ test(
           "integer values",
         numRuns: 10,
         profile: "M5 default parameters",
-        seed: 0x5eed_0012,
+        seed: 0x6000_0d00,
         sizeLimit: "two parameters and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

@@ -370,7 +370,7 @@ test(
           "false JSDoc and TypeScript hints",
         numRuns: 10,
         profile: "M5 generator parameters",
-        seed: 0x5eed_001d,
+        seed: 0x6000_1a00,
         sizeLimit:
           "two recursive binding leaves, one rest observation, and bounded " +
           "integer values",

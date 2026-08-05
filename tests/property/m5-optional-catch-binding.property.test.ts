@@ -275,7 +275,7 @@ test(
           "nullish thrown inputs",
         numRuns: 10,
         profile: "M5 optional catch binding",
-        seed: 0x5eed_002a,
+        seed: 0x6000_2300,
         sizeLimit: "one handler, one finalizer, and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

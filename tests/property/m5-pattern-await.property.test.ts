@@ -342,7 +342,7 @@ test(
           "truthful or false hints",
         numRuns: 16,
         profile: "M5a pattern-position await suspension",
-        seed: 0x5eed_0028,
+        seed: 0x6000_2800,
         sizeLimit: large
           ? "16 generated pattern cases at the extended run scale"
           : "16 generated pattern cases",

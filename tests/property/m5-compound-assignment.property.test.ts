@@ -305,7 +305,7 @@ test(
           "integers, and direct nullish cases",
         numRuns: 10,
         profile: "M5 compound assignment",
-        seed: 0x5eed_000d,
+        seed: 0x6000_0c00,
         sizeLimit: "one target, one right operand, and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

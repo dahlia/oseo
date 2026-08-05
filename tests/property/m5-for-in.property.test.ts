@@ -468,7 +468,7 @@ test(
           "first reported key",
         numRuns: 24,
         profile: "M5 for-in enumeration",
-        seed: 0x5eed_002f,
+        seed: 0x6000_1500,
         sizeLimit: "three prototype levels of at most four own keys each",
         timeLimitMilliseconds: 300_000,
       },

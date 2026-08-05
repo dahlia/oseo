@@ -1,0 +1,190 @@
+version: 1
+families:
+  - family: testkit-module-graph
+    owner: packages/testkit/tests/module-graph.property.test.ts
+    start: 0x60000000
+    end: 0x600000ff
+  - family: testkit-property-runner
+    owner: packages/testkit/tests/property-runner.property.test.ts
+    start: 0x60000100
+    end: 0x600001ff
+  - family: m4-async
+    owner: tests/property/m4-async.property.test.ts
+    start: 0x60000200
+    end: 0x600002ff
+  - family: m5-arguments-object
+    owner: tests/property/m5-arguments-object.property.test.ts
+    start: 0x60000300
+    end: 0x600003ff
+  - family: m5-array-binding
+    owner: tests/property/m5-array-binding.property.test.ts
+    start: 0x60000400
+    end: 0x600004ff
+  - family: m5-array-spread
+    owner: tests/property/m5-array-spread.property.test.ts
+    start: 0x60000500
+    end: 0x600005ff
+  - family: m5-async-await
+    owner: tests/property/m5-async-await.property.test.ts
+    start: 0x60000600
+    end: 0x600006ff
+  - family: m5-async-generator
+    owner: tests/property/m5-async-generator.property.test.ts
+    start: 0x60000700
+    end: 0x600007ff
+  - family: m5-bigint
+    owner: tests/property/m5-bigint.property.test.ts
+    start: 0x60000800
+    end: 0x600008ff
+  - family: m5-call-spread
+    owner: tests/property/m5-call-spread.property.test.ts
+    start: 0x60000900
+    end: 0x600009ff
+  - family: m5-catch-binding
+    owner: tests/property/m5-catch-binding.property.test.ts
+    start: 0x60000a00
+    end: 0x60000aff
+  - family: m5-class
+    owner: tests/property/m5-class.property.test.ts
+    start: 0x60000b00
+    end: 0x60000bff
+  - family: m5-compound-assignment
+    owner: tests/property/m5-compound-assignment.property.test.ts
+    start: 0x60000c00
+    end: 0x60000cff
+  - family: m5-default-parameter
+    owner: tests/property/m5-default-parameter.property.test.ts
+    start: 0x60000d00
+    end: 0x60000dff
+  - family: m5-delete-super
+    owner: tests/property/m5-delete-super.property.test.ts
+    start: 0x60000e00
+    end: 0x60000eff
+  - family: m5-delete
+    owner: tests/property/m5-delete.property.test.ts
+    start: 0x60000f00
+    end: 0x60000fff
+  - family: m5-destructuring-assignment
+    owner: tests/property/m5-destructuring-assignment.property.test.ts
+    start: 0x60001000
+    end: 0x600010ff
+  - family: m5-export-default-class
+    owner: tests/property/m5-export-default-class.property.test.ts
+    start: 0x60001100
+    end: 0x600011ff
+  - family: m5-for-await-of
+    owner: tests/property/m5-for-await-of.property.test.ts
+    start: 0x60001200
+    end: 0x600012ff
+  - family: m5-for-binding
+    owner: tests/property/m5-for-binding.property.test.ts
+    start: 0x60001300
+    end: 0x600013ff
+  - family: m5-for-in-object-pattern
+    owner: tests/property/m5-for-in-object-pattern.property.test.ts
+    start: 0x60001400
+    end: 0x600014ff
+  - family: m5-for-in
+    owner: tests/property/m5-for-in.property.test.ts
+    start: 0x60001500
+    end: 0x600015ff
+  - family: m5-for-of-assignment
+    owner: tests/property/m5-for-of-assignment.property.test.ts
+    start: 0x60001600
+    end: 0x600016ff
+  - family: m5-for-of-binding
+    owner: tests/property/m5-for-of-binding.property.test.ts
+    start: 0x60001700
+    end: 0x600017ff
+  - family: m5-for-of
+    owner: tests/property/m5-for-of.property.test.ts
+    start: 0x60001800
+    end: 0x600018ff
+  - family: m5-generator-methods
+    owner: tests/property/m5-generator-methods.property.test.ts
+    start: 0x60001900
+    end: 0x600019ff
+  - family: m5-generator-parameter
+    owner: tests/property/m5-generator-parameter.property.test.ts
+    start: 0x60001a00
+    end: 0x60001aff
+  - family: m5-generator-throw
+    owner: tests/property/m5-generator-throw.property.test.ts
+    start: 0x60001b00
+    end: 0x60001bff
+  - family: m5-generator
+    owner: tests/property/m5-generator.property.test.ts
+    start: 0x60001c00
+    end: 0x60001cff
+  - family: m5-lexical-declaration-list
+    owner: tests/property/m5-lexical-declaration-list.property.test.ts
+    start: 0x60001d00
+    end: 0x60001dff
+  - family: m5-lexical-super
+    owner: tests/property/m5-lexical-super.property.test.ts
+    start: 0x60001e00
+    end: 0x60001eff
+  - family: m5-module-continuation
+    owner: tests/property/m5-module-continuation.property.test.ts
+    start: 0x60001f00
+    end: 0x60001fff
+  - family: m5-object-binding
+    owner: tests/property/m5-object-binding.property.test.ts
+    start: 0x60002000
+    end: 0x600020ff
+  - family: m5-object-literal
+    owner: tests/property/m5-object-literal.property.test.ts
+    start: 0x60002100
+    end: 0x600021ff
+  - family: m5-object-rest
+    owner: tests/property/m5-object-rest.property.test.ts
+    start: 0x60002200
+    end: 0x600022ff
+  - family: m5-optional-catch-binding
+    owner: tests/property/m5-optional-catch-binding.property.test.ts
+    start: 0x60002300
+    end: 0x600023ff
+  - family: m5-optional-chaining
+    owner: tests/property/m5-optional-chaining.property.test.ts
+    start: 0x60002400
+    end: 0x600024ff
+  - family: m5-optional-private
+    owner: tests/property/m5-optional-private.property.test.ts
+    start: 0x60002500
+    end: 0x600025ff
+  - family: m5-parameter-binding
+    owner: tests/property/m5-parameter-binding.property.test.ts
+    start: 0x60002600
+    end: 0x600026ff
+  - family: m5-parameter-var
+    owner: tests/property/m5-parameter-var.property.test.ts
+    start: 0x60002700
+    end: 0x600027ff
+  - family: m5-pattern-await
+    owner: tests/property/m5-pattern-await.property.test.ts
+    start: 0x60002800
+    end: 0x600028ff
+  - family: m5-rest-parameter
+    owner: tests/property/m5-rest-parameter.property.test.ts
+    start: 0x60002900
+    end: 0x600029ff
+  - family: m5-super-targets
+    owner: tests/property/m5-super-targets.property.test.ts
+    start: 0x60002a00
+    end: 0x60002aff
+  - family: m5-tagged-template
+    owner: tests/property/m5-tagged-template.property.test.ts
+    start: 0x60002b00
+    end: 0x60002bff
+  - family: m5-top-level-this
+    owner: tests/property/m5-top-level-this.property.test.ts
+    start: 0x60002c00
+    end: 0x60002cff
+  - family: m5-typeof-unresolved
+    owner: tests/property/m5-typeof-unresolved.property.test.ts
+    start: 0x60002d00
+    end: 0x60002dff
+  - family: m5-update-expression
+    owner: tests/property/m5-update-expression.property.test.ts
+    start: 0x60002e00
+    end: 0x60002eff

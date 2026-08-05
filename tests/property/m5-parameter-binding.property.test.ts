@@ -306,7 +306,7 @@ test(
           "unhinted",
         numRuns: 10,
         profile: "M5 function binding patterns",
-        seed: 0x5eed_0011,
+        seed: 0x6000_2600,
         sizeLimit: "one binding, one rest value, and bounded integers",
         timeLimitMilliseconds: 180_000,
       },

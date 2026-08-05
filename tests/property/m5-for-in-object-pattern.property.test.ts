@@ -441,7 +441,7 @@ test(
           "undefined subjects",
         numRuns: 24,
         profile: "M5 for-in object pattern head",
-        seed: 0x5eed_0030,
+        seed: 0x6000_1400,
         sizeLimit: "three properties over at most two enumerated keys",
         timeLimitMilliseconds: 300_000,
       },

@@ -258,6 +258,15 @@ admitted structured inputs directly instead of filtering arbitrary source. Keep
 that structure until the predicate prints source so shrinking can preserve
 scope, graph, and schedule invariants.
 
+Each *.property.test.ts* file is one seed family. Before adding its first
+property, reserve an unused aligned 256-seed block in
+*tests/property-seeds.yaml*. Assign a distinct slot to each domain in that
+family and keep the assignment stable. The compatibility-ratchet check rejects
+unregistered families, malformed or overlapping blocks, out-of-block seeds,
+reuse across distinct domains, and stale registry entries. A deliberate seed
+change also needs the exact property-seed override and replay rationale that
+the ratchet requires.
+
 New syntax, operators, values, runtime states, and module behavior extend their
 applicable valid and invalid generators. A specialization adds generated hits,
 every distinct miss or invalidation, false hints, and disabled-policy cases.

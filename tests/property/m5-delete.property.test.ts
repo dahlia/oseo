@@ -426,7 +426,7 @@ test(
           "conversion, and abrupt effects",
         numRuns: 16,
         profile: "M5 delete expressions",
-        seed: 0x5eed_0023,
+        seed: 0x6000_0f00,
         sizeLimit: "one delete expression with bounded values and effects",
         timeLimitMilliseconds: 240_000,
       },

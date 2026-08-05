@@ -264,7 +264,7 @@ test(
           "string, boolean, and null input",
         numRuns: 10,
         profile: "M5 update expressions",
-        seed: 0x5eed_000f,
+        seed: 0x6000_2e00,
         sizeLimit: "one update with bounded numeric input",
         timeLimitMilliseconds: 180_000,
       },

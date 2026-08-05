@@ -248,7 +248,7 @@ test(
           "string, and computed symbol exclusions",
         numRuns: 10,
         profile: "M5 object binding rest properties",
-        seed: 0x5eed_0009,
+        seed: 0x6000_2200,
         sizeLimit: "five own properties with bounded integer values",
         timeLimitMilliseconds: 180_000,
       },
