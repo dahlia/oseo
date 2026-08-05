@@ -26,16 +26,16 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
-found for optional private field and accessor reads and optional private method
-calls. Fixed native fixtures and a generated differential property now cover
-nullish short circuit, valid-brand access, invalid-brand `TypeError`, and
-method receiver preservation under both specialization policies and forced
-collection. The remaining gaps keep their M5b intrinsic and
-global-object, module and asynchronous execution, standards harness, host, or
-accepted dynamic-source owners. The audit changes no semantics, compatibility
-classification, revision pin, generated domain, property seed, or case budget;
-Unit 8.5o adds one generated domain, one seed, and twelve ordinary cases.
+M5a is complete. The 61 indexed records in the normative
+[*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
+for admitted families and their evidence assessments. The remaining work is
+the M5b and M5c dependency order below. The reviewed manifest remains at 2,934
+passes across 4,861 paths, and the property inventory remains at 57 domains,
+57 seeds, and an ordinary case budget of 2,686.
+
+
+M5a implementation history
+--------------------------
 
 Delivery item 8 is resolved for dynamic source:
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps `eval`, the

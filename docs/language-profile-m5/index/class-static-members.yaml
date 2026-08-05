@@ -1,0 +1,3 @@
+version: 1
+id: class-static-members
+record: docs/language-profile-m5/families/class-static-members.yaml

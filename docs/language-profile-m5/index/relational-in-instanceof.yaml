@@ -1,0 +1,3 @@
+version: 1
+id: relational-in-instanceof
+record: docs/language-profile-m5/families/relational-in-instanceof.yaml

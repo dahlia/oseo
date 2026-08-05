@@ -1,0 +1,3 @@
+version: 1
+id: numeric-bitwise-exponentiation
+record: docs/language-profile-m5/families/numeric-bitwise-exponentiation.yaml

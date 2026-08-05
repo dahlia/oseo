@@ -1,0 +1,42 @@
+version: 1
+id: bigint-primitive
+title: "BigInt primitive and operators"
+scope:
+  - "Exact BigInt literals, conversion, comparison, and operators."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bigint.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bigint.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-bigint.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-bigint.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-bigint.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bigint.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

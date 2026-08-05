@@ -1,0 +1,45 @@
+version: 1
+id: error-intrinsics
+title: "Error intrinsics"
+scope:
+  - "Error and NativeError constructors and typed runtime errors."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: omitted
+    reason: "The family adds identity, not a distinct suspended root."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  generated:
+    status: omitted
+    reason: "Fixed and standards cases enumerate the constructors."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

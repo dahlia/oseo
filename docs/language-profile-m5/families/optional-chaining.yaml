@@ -1,0 +1,43 @@
+version: 1
+id: optional-chaining
+title: "Optional chaining"
+scope:
+  - "Optional property, computed, and call chains."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-optional-chaining.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-optional-chaining.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family has no deliberate family-specific guard-miss evidence."
+    replacements:
+      - tests/property/m5-optional-chaining.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/expressions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

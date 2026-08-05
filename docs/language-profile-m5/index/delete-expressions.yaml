@@ -1,0 +1,3 @@
+version: 1
+id: delete-expressions
+record: docs/language-profile-m5/families/delete-expressions.yaml

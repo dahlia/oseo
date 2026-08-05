@@ -1,0 +1,3 @@
+version: 1
+id: object-binding
+record: docs/language-profile-m5/families/object-binding.yaml

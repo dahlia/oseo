@@ -1,0 +1,3 @@
+version: 1
+id: catch-var-coexistence
+record: docs/language-profile-m5/families/catch-var-coexistence.yaml

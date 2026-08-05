@@ -1,0 +1,43 @@
+version: 1
+id: destructuring-assignment
+title: "Destructuring assignment"
+scope:
+  - "Recursive array and object assignment patterns."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-destructuring-assignment.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-destructuring-assignment.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/bindings.test.ts

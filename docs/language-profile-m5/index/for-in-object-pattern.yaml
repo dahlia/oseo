@@ -1,0 +1,3 @@
+version: 1
+id: for-in-object-pattern
+record: docs/language-profile-m5/families/for-in-object-pattern.yaml

@@ -1,0 +1,3 @@
+version: 1
+id: switch-statements
+record: docs/language-profile-m5/families/switch-statements.yaml

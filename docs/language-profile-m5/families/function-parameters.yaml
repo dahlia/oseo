@@ -1,0 +1,43 @@
+version: 1
+id: function-parameters
+title: "Function parameter patterns"
+scope:
+  - "Binding patterns, defaults, and rest in synchronous functions."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/functions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-parameter-binding.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-parameter-binding.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "Parameter-pattern binding has no specialized path or guard."
+    replacements:
+      - tests/property/m5-parameter-binding.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/functions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

@@ -1,0 +1,45 @@
+version: 1
+id: do-while
+title: "Do-while statements"
+scope:
+  - "Body-first do-while control flow."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  forced-collection:
+    status: omitted
+    reason: "The loop adds no allocation or state that crosses a safepoint."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  generated:
+    status: omitted
+    reason: "Fixed fixtures enumerate its finite body-first transfer matrix."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/expressions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

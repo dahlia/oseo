@@ -1,0 +1,45 @@
+version: 1
+id: to-primitive
+title: "ToPrimitive conversion"
+scope:
+  - "OrdinaryToPrimitive and admitted symbol conversion hooks."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: omitted
+    reason: "Roots are inherited from ordinary invocation."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  generated:
+    status: omitted
+    reason: "Fixed fixtures enumerate hint order, results, and abrupt cases."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/objects.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

@@ -1,0 +1,43 @@
+version: 1
+id: call-spread
+title: "Call and constructor spread"
+scope:
+  - "Dynamic argument spread for calls and construction."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/functions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-call-spread.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-call-spread.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/property/m5-call-spread.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/functions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts

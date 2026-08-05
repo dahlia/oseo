@@ -139,18 +139,14 @@ been written down yet.
 Consequences
 ------------
 
-The profile template gains an evidence field, which the per-family evidence
-lanes checkpoint in [*PLAN-GATE.md*](../../PLAN-GATE.md) defines alongside the
-rest of that template. *CONTRIBUTING.md* gains a sentence requiring the record;
-its list of classes does not change.
+The per-family evidence lanes checkpoint in
+[*PLAN-GATE.md*](../../PLAN-GATE.md) defines the fixed profile template and
+makes this decision effective. *CONTRIBUTING.md* requires the record; its
+applicability rule does not change.
 
-Accepting this record changes no unit's obligations today. Until that
-checkpoint defines the field, there is nowhere to write the judgment, so units
-in flight are unaffected and no existing family is retroactively annotated.
-Every family admitted before the checkpoint therefore enters `unassessed`, and
-the restructuring annotates them. The conformance claim cannot be audited
-through this record while any family inside the inventory remains
-`unassessed`.
+The checkpoint assessed every existing family. New family records cannot use
+`unassessed`, so the current-tree check blocks an admission until every class
+is either covered or deliberately omitted with replacement evidence.
 
 Review gains a question: whether a recorded omission is the one the family
 actually justifies. That question is the point of the record.

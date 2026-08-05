@@ -39,6 +39,7 @@ depends = [
   "check:actions",
   "check:boundaries",
   "check:compatibility-ratchet",
+  "check:evidence-lanes",
   "check:fmt",
   "check:test262-inventory",
   "check:lines",
@@ -58,6 +59,10 @@ run = "node tools/check-boundaries.ts"
 [tasks."check:compatibility-ratchet"]
 description = "Reject measured compatibility reversals"
 run = "node tools/compatibility-ratchet.ts"
+
+[tasks."check:evidence-lanes"]
+description = "Validate normative per-family evidence records"
+run = "node tools/evidence-lanes.ts"
 
 [tasks."check:fmt"]
 depends = ["check:fmt:md", "check:fmt:mise", "check:fmt:oxfmt"]

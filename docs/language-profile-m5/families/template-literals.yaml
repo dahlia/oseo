@@ -1,0 +1,44 @@
+version: 1
+id: template-literals
+title: "Template literals"
+scope:
+  - "Untagged template literals and substitution conversion."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  generated:
+    status: omitted
+    reason: "Fixed and standards cases enumerate substitutions and escapes."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

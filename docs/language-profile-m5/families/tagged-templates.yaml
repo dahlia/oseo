@@ -1,0 +1,43 @@
+version: 1
+id: tagged-templates
+title: "Tagged templates"
+scope:
+  - "Tagged calls, cached template objects, and raw strings."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-tagged-template.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-tagged-template.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/property/m5-tagged-template.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

@@ -124,14 +124,45 @@ function modeledBody(testCase: AwaitCase): ModeledBody {
     };
   }
   if (testCase.position === "logical") {
-    const taken = left !== 0;
     return {
-      lines: taken ? ["left", "operand"] : ["left"],
-      source: [
-        `const result = mark("left", ${left}) &&`,
-        `  await settle(mark("operand", ${right}), ${reject});`,
+      lines: [
+        "and skip left",
+        "and take left",
+        "and take operand",
+        "or skip left",
+        "or take left",
+        "or take operand",
+        "and reject left",
+        "and reject operand",
+        ...(reject ? ["and reject caught"] : []),
+        "or reject left",
+        "or reject operand",
+        ...(reject ? ["or reject caught"] : []),
       ],
-      value: taken ? right : left,
+      source: [
+        'const andSkip = mark("and skip left", 0) &&',
+        '  await settle(mark("and skip operand", 1), true);',
+        'const andTake = mark("and take left", 1) &&',
+        `  await settle(mark("and take operand", ${right}), false);`,
+        'const orSkip = mark("or skip left", 1) ||',
+        '  await settle(mark("or skip operand", 1), true);',
+        'const orTake = mark("or take left", 0) ||',
+        `  await settle(mark("or take operand", ${right}), false);`,
+        "try {",
+        '  const andReject = mark("and reject left", 1) &&',
+        `    await settle(mark("and reject operand", ${right}), ${reject});`,
+        "} catch {",
+        '  mark("and reject caught", 0);',
+        "}",
+        "try {",
+        '  const orReject = mark("or reject left", 0) ||',
+        `    await settle(mark("or reject operand", ${right}), ${reject});`,
+        "} catch {",
+        '  mark("or reject caught", 0);',
+        "}",
+        "const result = andSkip + andTake + orSkip + orTake;",
+      ],
+      value: right * 2 + 1,
     };
   }
   return {
@@ -199,9 +230,7 @@ function printSource(testCase: AwaitCase): string {
 
 function expectedOutput(testCase: AwaitCase): string {
   const body = modeledBody(testCase);
-  const rejects =
-    testCase.reject &&
-    !(testCase.position === "logical" && testCase.left === 0);
+  const rejects = testCase.reject && testCase.position !== "logical";
   const lines = ["start", ...body.lines];
   if (rejects) {
     lines.push("caught await rejection");

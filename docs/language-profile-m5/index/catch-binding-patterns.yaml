@@ -1,0 +1,3 @@
+version: 1
+id: catch-binding-patterns
+record: docs/language-profile-m5/families/catch-binding-patterns.yaml

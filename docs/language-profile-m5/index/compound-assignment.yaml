@@ -1,0 +1,3 @@
+version: 1
+id: compound-assignment
+record: docs/language-profile-m5/families/compound-assignment.yaml

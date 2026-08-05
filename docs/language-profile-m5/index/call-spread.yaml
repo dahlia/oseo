@@ -1,0 +1,3 @@
+version: 1
+id: call-spread
+record: docs/language-profile-m5/families/call-spread.yaml

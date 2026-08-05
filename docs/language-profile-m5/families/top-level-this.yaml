@@ -1,0 +1,42 @@
+version: 1
+id: top-level-this
+title: "Top-level this"
+scope:
+  - "Script and module top-level this and Script global bindings."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/receivers.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/receivers.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-top-level-this.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-top-level-this.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-top-level-this.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/receivers.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/hir.test.ts

@@ -15,12 +15,9 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. Unit 8.5o closes the execution-evidence gap that Unit 8.5n
-found for optional private field and accessor reads and optional private method
-calls. Native differential fixtures and a generated property cover nullish
-short circuit, valid-brand access, invalid-brand `TypeError`, and method
-receiver preservation under both specialization policies and forced
-collection. M5 remains active through its M5b and M5c checkpoints.
+M5a is complete. The normative family records described below inventory 61
+admitted M5 families and assess every evidence class. M5 remains active through
+its M5b and M5c checkpoints.
 
 
 Claim boundary
@@ -55,6 +52,40 @@ expected negatives, and 572 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
+Normative family records
+------------------------
+
+The complete language profile is the union of the frozen
+[M3](./language-profile-m3.md) and [M4](./language-profile-m4.md) profiles and
+every indexed M5 family record. M3 and M4 remain the normative owners of their
+admitted behavior; M5 does not duplicate those families or claim new ownership
+of them.
+
+The files under *language-profile-m5/index/* are the normative index. Each
+index file names one record under *language-profile-m5/families/* with the same
+stable kebab-case ID and filename. A family addition creates its own index and
+record files, so two family lanes do not edit one shared inventory file.
+
+Every record uses version 1 of this fixed template:
+
+ -  stable family ID, title, scope, and owning contract references;
+ -  exactly one assessment for each evidence class; and
+ -  either `covered` with existing references, or `omitted` with a reason and
+    existing replacement references.
+
+The exact evidence-class vocabulary is `differential`, `generated`,
+`specialization`, `guard-fallback`, `forced-collection`, `structural`, `fixed`,
+and `standards`. These names represent generated or property evidence,
+execution under both specialization policies, deliberate guard miss through a
+compiled generic fallback, forced collection, structural IR or generated-code
+checks, fixed or unit evidence, and applicable standards evidence. The records
+may not use `unassessed`.
+
+`mise run check:evidence-lanes` validates the complete current-tree index and
+record set. The compatibility ratchet snapshots the stable IDs, so removing an
+admitted family is a monotonicity violation without an override path.
+
+
 Capability groups
 -----------------
 
@@ -79,11 +110,12 @@ first reviewed test262 cases land.
 every other form rejected by a source-located diagnostic.
 
 
-Admitted M5 syntax
-------------------
+M5a implementation history
+--------------------------
 
-M5 admits these forms beyond the frozen M3 and M4 profiles. Each entry names
-its deliberate boundary and its evidence:
+The following narrative preserves the implementation and measurement history
+that produced the records. It is not the normative family inventory or the
+current evidence assessment. Those live only in the indexed records above.
 
  -  The `typeof` and `void` unary operators and the `%` remainder operator.
     `typeof` distinguishes `undefined`, `null`, booleans, numbers, strings,

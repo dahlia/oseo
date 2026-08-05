@@ -11,6 +11,10 @@ import {
   parseReviewedManifest,
   validateReviewedManifestFileSet,
 } from "./test262-manifest.ts";
+import {
+  currentEvidenceFamilyIds,
+  validatedEvidenceFamilyIdsFromTree,
+} from "./evidence-lanes.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const subsetPath = "tests/test262/subset.yaml";
@@ -32,6 +36,7 @@ type Classification =
   | "unsupported-profile-feature";
 
 export type RatchetInvariant =
+  | "admitted-family"
   | "manifest-path-set"
   | "pass-classification"
   | "pass-count"
@@ -65,6 +70,7 @@ export interface GeneratedDomain {
 }
 
 export interface CompatibilitySnapshot {
+  readonly admittedFamilies: ReadonlySet<string>;
   readonly classifications: ReadonlyMap<string, Classification>;
   readonly domains: ReadonlyMap<string, GeneratedDomain>;
   readonly resultPaths: ReadonlySet<string>;
@@ -72,6 +78,7 @@ export interface CompatibilitySnapshot {
 }
 
 export interface RatchetCounts {
+  readonly admittedFamilies: number;
   readonly distinctPropertySeeds: number;
   readonly pass: number;
   readonly propertyCaseBudget: number;
@@ -89,7 +96,10 @@ export interface RatchetViolation {
 
 export interface RatchetOverride {
   readonly from: number | string;
-  readonly invariant: Exclude<RatchetInvariant, "manifest-path-set">;
+  readonly invariant: Exclude<
+    RatchetInvariant,
+    "admitted-family" | "manifest-path-set"
+  >;
   readonly reason: string;
   readonly scope: string;
   readonly to: number | string;
@@ -698,9 +708,11 @@ function createCompatibilitySnapshotFromSource(
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
   allowLegacyGitBaseline: boolean,
+  admittedFamilies: readonly string[],
 ): CompatibilitySnapshot {
   const classifications = parseResults(resultManifest, allowLegacyGitBaseline);
   return {
+    admittedFamilies: new Set(admittedFamilies),
     classifications,
     domains: parseGeneratedDomains(propertySources),
     resultPaths: new Set(classifications.keys()),
@@ -712,12 +724,14 @@ export function createCompatibilitySnapshot(
   subsetText: string,
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
+  admittedFamilies: readonly string[] = [],
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshotFromSource(
     subsetText,
     resultManifest,
     propertySources,
     false,
+    admittedFamilies,
   );
 }
 
@@ -726,12 +740,14 @@ export function createGitCompatibilitySnapshot(
   subsetText: string,
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
+  admittedFamilies: readonly string[] = [],
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshotFromSource(
     subsetText,
     resultManifest,
     propertySources,
     true,
+    admittedFamilies,
   );
 }
 
@@ -743,6 +759,7 @@ function counts(snapshot: CompatibilitySnapshot): RatchetCounts {
     for (const seed of domain.seeds) seeds.add(seed);
   }
   return {
+    admittedFamilies: snapshot.admittedFamilies.size,
     distinctPropertySeeds: seeds.size,
     pass: [...snapshot.classifications.values()].filter(
       (value) => value === "pass",
@@ -768,6 +785,16 @@ function detectViolations(
       scope: resultsPath,
       to: currentCounts.pass,
     });
+  }
+  for (const family of baseline.admittedFamilies) {
+    if (!current.admittedFamilies.has(family)) {
+      violations.push({
+        from: present,
+        invariant: "admitted-family",
+        scope: family,
+        to: absent,
+      });
+    }
   }
   for (const [path, value] of baseline.classifications) {
     if (value !== "pass") continue;
@@ -1115,6 +1142,11 @@ export function compatibilitySnapshotAtRevision(
   revision: string,
 ): CompatibilitySnapshot {
   const commit = resolveCommit(revision);
+  const listedPaths = git(["ls-tree", "-r", "--name-only", commit]).split("\n");
+  const admittedFamilies = validatedEvidenceFamilyIdsFromTree(
+    listedPaths,
+    (path) => gitText(commit, path),
+  );
   return createGitCompatibilitySnapshot(
     gitText(commit, subsetPath),
     {
@@ -1134,6 +1166,7 @@ export function compatibilitySnapshotAtRevision(
       },
     },
     baselinePropertySources(commit),
+    admittedFamilies,
   );
 }
 
@@ -1180,7 +1213,8 @@ function currentResultPartitionPaths(): readonly string[] {
 
 function formatCounts(label: string, value: RatchetCounts): string {
   return (
-    `${label} pass=${value.pass} subset=${value.subset} ` +
+    `${label} families=${value.admittedFamilies} pass=${value.pass} ` +
+    `subset=${value.subset} ` +
     `results=${value.results} property-domains=${value.propertyDomains} ` +
     `property-seeds=${value.distinctPropertySeeds} ` +
     `property-case-budget=${value.propertyCaseBudget}`
@@ -1231,6 +1265,7 @@ async function main(): Promise<void> {
       },
     },
     propertySources,
+    currentEvidenceFamilyIds(),
   );
   const report = compareCompatibility(
     baseline,

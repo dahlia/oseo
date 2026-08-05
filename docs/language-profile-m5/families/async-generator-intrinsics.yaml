@@ -1,0 +1,44 @@
+version: 1
+id: async-generator-intrinsics
+title: "Async generator intrinsics"
+scope:
+  - "The admitted async generator and async iterator intrinsic chain."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/async-generators.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/async-generators.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/fixtures/async-generators.ts
+  generated:
+    status: omitted
+    reason: "The contract is a fixed intrinsic identity and descriptor graph."
+    replacements:
+      - tests/native/fixtures/async-generators.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/async-generators.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/async-generators.ts
+  standards:
+    status: omitted
+    reason: "Standards cases require omitted Object.getPrototypeOf."
+    replacements:
+      - tests/native/fixtures/async-generators.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/async-generators.test.ts

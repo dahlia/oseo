@@ -1,0 +1,44 @@
+version: 1
+id: block-function-var-coexistence
+title: "Block function and var coexistence"
+scope:
+  - "A block function distinct from a same-name outer var binding."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/fixtures/bindings.ts
+  generated:
+    status: omitted
+    reason: "The contract is the identity of two distinct binding cells."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+  standards:
+    status: omitted
+    reason: "Upstream positives require eval, Annex B, or unresolved globals."
+    replacements:
+      - tests/native/fixtures/bindings.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

@@ -1,0 +1,45 @@
+version: 1
+id: loose-equality
+title: "Loose equality"
+scope:
+  - "Admitted IsLooselyEqual behavior for current value types."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/expressions.ts
+  forced-collection:
+    status: omitted
+    reason: "The admitted primitive matrix owns no suspended state."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  generated:
+    status: omitted
+    reason: "Fixed and standards cases enumerate the admitted coercion matrix."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - tests/native/fixtures/expressions.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/expressions.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/mir.test.ts

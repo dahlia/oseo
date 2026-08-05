@@ -1,0 +1,3 @@
+version: 1
+id: with-statement
+record: docs/language-profile-m5/families/with-statement.yaml

@@ -4,10 +4,10 @@ Evidence gate throughput plan
 Status
 ------
 
-Implementation status: in progress. The runtime archive reuse, concurrent
+Implementation status: complete. The runtime archive reuse, concurrent
 reviewed execution, compatibility ratchet, seed allocation registry,
 infrastructure failure classification, and manifest record partitioning
-checkpoints are complete. The per-family evidence lanes remain planned.
+checkpoints and per-family evidence lanes are complete.
 This plan defines the cost contract for the reviewed evidence gates and the
 checkpoints that keep that cost usable as the reviewed corpus grows. It does
 not change any language semantic or the amount of evidence a semantic unit
@@ -432,19 +432,64 @@ classification vocabulary.
 
 ### Per-family evidence lanes
 
-The seed registry and the record partitioning remove the two mechanical reasons
-concurrent semantic units conflict. The remaining contention is editorial: the
-reviewed status prose in [*PLAN-M5.md*](./PLAN-M5.md),
-[*ROADMAP.md*](./ROADMAP.md), and
-[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) grows by append,
-and the profile is the only one of the three with a normative record.
+Checkpoint status: complete.
 
-The profile becomes the single per-family record under a fixed template. That
-template carries the evidence field
-[ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md) requires, so this
-checkpoint is where that accepted record takes effect. The plan and roadmap
-status sections reference the profile instead of paraphrasing it. Only then do
-concurrent family lanes stop serializing on documentation.
+The M5 profile now indexes one YAML record per family through matching index and
+record files under *docs/language-profile-m5/*. A new family adds its own two
+files and edits no shared inventory. The stable filename and kebab-case ID are
+the same in both files. The fixed record template carries the title, scope,
+owning contracts, and all eight evidence classes required by
+[ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md): `differential`,
+`generated`, `specialization`, `guard-fallback`, `forced-collection`,
+`structural`, `fixed`, and `standards`.
+
+The inventory has 61 owners. The first 54 correspond to the former top-level
+admission entries. Seven further owners record BigInt, object-literal prototype
+setters, top-level `this`, lexical and constructed `super`, pattern-position
+`await`, block-function and outer-`var` coexistence, and `debugger`. The later
+delete work and Units 8.5a through 8.5c, 8.5e, and 8.5o remain folded into the
+families whose contracts they extend. Async-from-sync delegated throw remains
+repair evidence for asynchronous generators, not a new language family. The
+frozen M3 and M4 profiles remain normative for inherited behavior, so M5 does
+not invent duplicate owners for them.
+
+All 488 class judgments were reviewed. There are 403 covered assessments and
+85 deliberate omissions. A covered class names existing evidence. An omission
+states why the class does not isolate a useful additional contract and names
+the fixed, generated, differential, structural, or standards evidence that
+replaces it. No record remains `unassessed`.
+
+*tools/evidence-lanes.ts* uses the existing `yaml` dependency and reads the
+source tree directly. It rejects malformed records, unknown or missing fields
+and classes, duplicate IDs, filename and ID disagreement, missing references,
+stale indexes, unindexed records, and `unassessed`. The new
+`check:evidence-lanes` task is part of the default check. Focused regressions
+deliberately reverse each validation rule.
+
+The compatibility snapshot now includes the indexed family IDs. Removing an
+admitted family produces an `admitted-family` monotonicity violation. That
+invariant is deliberately absent from the override vocabulary. A focused
+regression removes one of two baseline families and proves both the violation
+and the rejected override attempt. [*PLAN-M5.md*](./PLAN-M5.md) and
+[*ROADMAP.md*](./ROADMAP.md) now reference the normative records for current
+family status while retaining their unit-level evidence narratives as history.
+
+The final checks ran on Linux 7.1.5-201.fc44.x86\_64 with an AMD Ryzen 7 7700X,
+8 cores and 16 threads. The host had 42 GiB of memory available, 1.4 GiB of
+swap free, */tmp* at 94 percent use, and a load average of 0.56/0.35/0.33 after
+the samples. Mise reported read-only cache warnings during the isolated task
+measurements. This checkpoint has no timing target, so the measurements retain
+that environment cost rather than adjusting it away.
+
+| Task                                   | Wall    | User    | System | CPU / wall |
+| -------------------------------------- | ------- | ------- | ------ | ---------- |
+| `mise run check:evidence-lanes`        | 10.14 s | 0.14 s  | 0.06 s | 0.02       |
+| `mise run check:compatibility-ratchet` | 16.17 s | 4.62 s  | 2.81 s | 0.46       |
+| `mise run check`                       | 34.17 s | 23.35 s | 8.21 s | 0.92       |
+
+The compatibility snapshot remains exactly 2,934 passes across 4,861 paths.
+The property snapshot remains 57 domains, 57 distinct seeds, and an aggregate
+ordinary case budget of 2,686. No semantic output or manifest was regenerated.
 
 Owner: [*PLAN-M5.md*](./PLAN-M5.md) and the M5 language profile.
 
