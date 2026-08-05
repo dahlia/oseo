@@ -227,11 +227,32 @@ export function validateEvidenceInventory(
   return { classes: evidenceClasses.length, families: records.size, omitted };
 }
 
-/** Validate and return family IDs from one complete repository tree. */
-export function validatedEvidenceFamilyIdsFromTree(
+/** Validate a required current-tree inventory rather than a historical tree. */
+export function validateRequiredEvidenceInventory(
+  indexSources: readonly EvidenceSource[],
+  recordSources: readonly EvidenceSource[],
+  knownReferences: ReadonlySet<string>,
+): EvidenceInventorySummary {
+  if (indexSources.length === 0 && recordSources.length === 0) {
+    throw new Error("current evidence inventory must not be empty.");
+  }
+  return validateEvidenceInventory(
+    indexSources,
+    recordSources,
+    knownReferences,
+  );
+}
+
+interface ValidatedEvidenceTree {
+  readonly familyIds: readonly string[];
+  readonly summary: EvidenceInventorySummary;
+}
+
+function validateEvidenceTree(
   listedPaths: readonly string[],
   readSource: EvidenceSourceReader,
-): readonly string[] {
+  required: boolean,
+): ValidatedEvidenceTree {
   const evidenceSources = (directory: string): readonly EvidenceSource[] =>
     listedPaths
       .filter(
@@ -240,9 +261,36 @@ export function validatedEvidenceFamilyIdsFromTree(
       .map((path) => ({ path, text: readSource(path) }));
   const indexSources = evidenceSources(evidenceIndexDirectory);
   const recordSources = evidenceSources(evidenceRecordDirectory);
-  if (indexSources.length === 0 && recordSources.length === 0) return [];
-  validateEvidenceInventory(indexSources, recordSources, new Set(listedPaths));
-  return recordSources.map((source) => basename(source.path, ".yaml"));
+  if (indexSources.length === 0 && recordSources.length === 0 && !required) {
+    return {
+      familyIds: [],
+      summary: { classes: evidenceClasses.length, families: 0, omitted: 0 },
+    };
+  }
+  const validate = required
+    ? validateRequiredEvidenceInventory
+    : validateEvidenceInventory;
+  const summary = validate(indexSources, recordSources, new Set(listedPaths));
+  return {
+    familyIds: recordSources.map((source) => basename(source.path, ".yaml")),
+    summary,
+  };
+}
+
+/** Validate and return family IDs from one complete repository tree. */
+export function validatedEvidenceFamilyIdsFromTree(
+  listedPaths: readonly string[],
+  readSource: EvidenceSourceReader,
+): readonly string[] {
+  return validateEvidenceTree(listedPaths, readSource, false).familyIds;
+}
+
+/** Validate a required inventory read from one complete repository tree. */
+export function validateRequiredEvidenceInventoryFromTree(
+  listedPaths: readonly string[],
+  readSource: EvidenceSourceReader,
+): EvidenceInventorySummary {
+  return validateEvidenceTree(listedPaths, readSource, true).summary;
 }
 
 function directorySources(directory: string): readonly EvidenceSource[] {
@@ -259,31 +307,63 @@ function directorySources(directory: string): readonly EvidenceSource[] {
     .toSorted((left, right) => left.path.localeCompare(right.path));
 }
 
-function repositoryFiles(): ReadonlySet<string> {
-  const git = (args: readonly string[]): readonly string[] =>
-    execFileSync("git", ["-c", "core.fsmonitor=false", ...args], {
-      cwd: repositoryRoot,
-      encoding: "utf8",
-      maxBuffer: 128 * 1024 * 1024,
-      stdio: ["ignore", "pipe", "pipe"],
-    })
-      .split("\n")
-      .filter((path) => path.length > 0);
-  return new Set(git(["ls-files", "--cached"]));
+function git(args: readonly string[]): readonly string[] {
+  return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+    maxBuffer: 128 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  })
+    .split("\n")
+    .filter((path) => path.length > 0);
 }
 
-/** Validate and summarize the current worktree's normative evidence lanes. */
-export function validateCurrentEvidenceInventory(): EvidenceInventorySummary {
-  return validateEvidenceInventory(
-    directorySources(evidenceIndexDirectory),
-    directorySources(evidenceRecordDirectory),
-    repositoryFiles(),
+function repositoryFiles(): ReadonlySet<string> {
+  const cached = git(["ls-files", "--cached"]);
+  const deleted = new Set(git(["ls-files", "--deleted"]));
+  return new Set(
+    [...cached, ...git(["ls-files", "--others", "--exclude-standard"])].filter(
+      (path) => !deleted.has(path),
+    ),
   );
 }
 
+function validateStagedEvidenceInventory(): ValidatedEvidenceTree {
+  const listedPaths = git(["ls-files", "--cached"]);
+  return validateEvidenceTree(
+    listedPaths,
+    (path) =>
+      execFileSync("git", ["-c", "core.fsmonitor=false", "show", `:${path}`], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+        maxBuffer: 128 * 1024 * 1024,
+        stdio: ["ignore", "pipe", "pipe"],
+      }),
+    true,
+  );
+}
+
+/** Validate and summarize the current worktree's normative evidence lanes. */
+export function validateCurrentEvidenceInventory(
+  preCommit: boolean = process.env.MISE_PRE_COMMIT === "1",
+): EvidenceInventorySummary {
+  if (preCommit) return validateStagedEvidenceInventory().summary;
+  const indexSources = directorySources(evidenceIndexDirectory);
+  const recordSources = directorySources(evidenceRecordDirectory);
+  const summary = validateRequiredEvidenceInventory(
+    indexSources,
+    recordSources,
+    repositoryFiles(),
+  );
+  return summary;
+}
+
 /** Return validated current-tree family IDs for compatibility snapshots. */
-export function currentEvidenceFamilyIds(): readonly string[] {
-  validateCurrentEvidenceInventory();
+export function currentEvidenceFamilyIds(
+  preCommit: boolean = process.env.MISE_PRE_COMMIT === "1",
+): readonly string[] {
+  if (preCommit) return validateStagedEvidenceInventory().familyIds;
+  validateCurrentEvidenceInventory(false);
   return directorySources(evidenceRecordDirectory).map((source) =>
     basename(source.path, ".yaml"),
   );

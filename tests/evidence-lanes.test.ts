@@ -6,6 +6,8 @@ import {
   evidenceIndexDirectory,
   evidenceRecordDirectory,
   validateEvidenceInventory,
+  validateRequiredEvidenceInventory,
+  validateRequiredEvidenceInventoryFromTree,
   validatedEvidenceFamilyIdsFromTree,
 } from "../tools/evidence-lanes.ts";
 import type { EvidenceSource } from "../tools/evidence-lanes.ts";
@@ -209,6 +211,13 @@ test("rejects stale indexes and unindexed records", () => {
   assert.throws(() => validate([], [recordSource()]), /is not indexed/u);
 });
 
+test("rejects an absent required current-tree inventory", () => {
+  assert.throws(
+    () => validateRequiredEvidenceInventory([], [], references),
+    /must not be empty/u,
+  );
+});
+
 test("extracts validated family IDs from old and current trees", () => {
   assert.deepEqual(
     validatedEvidenceFamilyIdsFromTree(["PLAN-M5.md"], () => {
@@ -227,5 +236,17 @@ test("extracts validated family IDs from old and current trees", () => {
       return text;
     }),
     [id],
+  );
+  assert.deepEqual(
+    validateRequiredEvidenceInventoryFromTree(paths, (path) => {
+      const text = sources.get(path);
+      if (text == null) throw new Error(`unexpected evidence source ${path}`);
+      return text;
+    }),
+    { classes: 8, families: 1, omitted: 0 },
+  );
+  assert.throws(
+    () => validateRequiredEvidenceInventoryFromTree(["PLAN-M5.md"], () => ""),
+    /must not be empty/u,
   );
 });
