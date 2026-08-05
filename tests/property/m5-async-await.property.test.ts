@@ -37,7 +37,6 @@ interface AwaitCase {
   readonly falseHint: boolean;
   readonly form: "arrow" | "function";
   readonly left: number;
-  readonly logicalOperator: "&&" | "||";
   readonly position: AwaitPosition;
   readonly reject: boolean;
   readonly right: number;
@@ -61,7 +60,6 @@ const awaitCaseArbitrary = fc.record({
   falseHint: fc.boolean(),
   form: fc.constantFrom("arrow" as const, "function" as const),
   left: fc.integer({ max: 20, min: -20 }),
-  logicalOperator: fc.constantFrom("&&" as const, "||" as const),
   position: fc.constantFrom(
     "binary" as const,
     "call" as const,
@@ -126,15 +124,27 @@ function modeledBody(testCase: AwaitCase): ModeledBody {
     };
   }
   if (testCase.position === "logical") {
-    const and = testCase.logicalOperator === "&&";
-    const taken = and ? left !== 0 : left === 0;
     return {
-      lines: taken ? ["left", "operand"] : ["left"],
-      source: [
-        `const result = mark("left", ${left}) ${testCase.logicalOperator}`,
-        `  await settle(mark("operand", ${right}), ${reject});`,
+      lines: [
+        "and skip left",
+        "and take left",
+        "and take operand",
+        "or skip left",
+        "or take left",
+        "or take operand",
       ],
-      value: taken ? right : left,
+      source: [
+        'const andSkip = mark("and skip left", 0) &&',
+        '  await settle(mark("and skip operand", 1), true);',
+        'const andTake = mark("and take left", 1) &&',
+        `  await settle(mark("and take operand", ${right}), false);`,
+        'const orSkip = mark("or skip left", 1) ||',
+        '  await settle(mark("or skip operand", 1), true);',
+        'const orTake = mark("or take left", 0) ||',
+        `  await settle(mark("or take operand", ${right}), false);`,
+        "const result = andSkip + andTake + orSkip + orTake;",
+      ],
+      value: right * 2 + 1,
     };
   }
   return {
@@ -202,11 +212,7 @@ function printSource(testCase: AwaitCase): string {
 
 function expectedOutput(testCase: AwaitCase): string {
   const body = modeledBody(testCase);
-  const skipsAwait =
-    testCase.position === "logical" &&
-    ((testCase.logicalOperator === "&&" && testCase.left === 0) ||
-      (testCase.logicalOperator === "||" && testCase.left !== 0));
-  const rejects = testCase.reject && !skipsAwait;
+  const rejects = testCase.reject && testCase.position !== "logical";
   const lines = ["start", ...body.lines];
   if (rejects) {
     lines.push("caught await rejection");
