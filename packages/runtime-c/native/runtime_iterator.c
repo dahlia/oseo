@@ -4,6 +4,43 @@
 #include <stdlib.h>
 #include <string.h>
 
+OseoResult oseo_internal_iterator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)new_target;
+    if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
+        return oseo_internal_array_values(context, receiver);
+    }
+    if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
+        return oseo_internal_array_iterator_next(context, receiver);
+    }
+    if (code_id == OSEO_ITERATOR_SELF_CODE_ID) return normal(receiver);
+    OseoValue argument = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (code_id == OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID) {
+        return oseo_internal_async_from_sync_fulfilled(
+            context,
+            callee,
+            argument
+        );
+    }
+    if (code_id == OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID) {
+        return oseo_internal_async_from_sync_rejected(
+            context,
+            callee,
+            argument
+        );
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
 /*
  * The generic synchronous iterator protocol: GetIterator over
  * Symbol.iterator, IteratorStep and IteratorValue, IteratorClose, and

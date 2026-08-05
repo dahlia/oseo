@@ -3,6 +3,28 @@
 #include <math.h>
 #include <stdlib.h>
 
+OseoResult oseo_internal_array_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)new_target;
+    if (code_id != OSEO_ARRAY_PUSH_CODE_ID) {
+        return oseo_unknown_function(context, code_id);
+    }
+    return oseo_internal_array_push(
+        context,
+        receiver,
+        argument_count,
+        arguments
+    );
+}
+
 /*
  * Array exotic behavior: array creation, the `length` own property and
  * its truncation rules, canonical index keys, monotonic literal and

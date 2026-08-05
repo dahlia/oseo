@@ -26,53 +26,94 @@
 #define OSEO_SMI_MIN INT64_C(-140737488355328)
 #define OSEO_SMI_MAX INT64_C(140737488355327)
 #define OSEO_UNHANDLED_THROW_MESSAGE "Unhandled JavaScript throw."
-#define OSEO_PROMISE_RESOLVE_CODE_ID SIZE_MAX
-#define OSEO_PROMISE_REJECT_CODE_ID (SIZE_MAX - 1u)
-#define OSEO_PROMISE_THEN_CODE_ID (SIZE_MAX - 2u)
-#define OSEO_PROMISE_CATCH_CODE_ID (SIZE_MAX - 3u)
-#define OSEO_PROMISE_FINALLY_CODE_ID (SIZE_MAX - 4u)
-#define OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID (SIZE_MAX - 5u)
-#define OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID (SIZE_MAX - 6u)
-#define OSEO_PROMISE_FINALLY_FULFILL_CODE_ID (SIZE_MAX - 7u)
-#define OSEO_PROMISE_FINALLY_REJECT_CODE_ID (SIZE_MAX - 8u)
-#define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID (SIZE_MAX - 9u)
+
+/*
+ * Runtime-owned functions use disjoint, fixed-width code ranges. A
+ * component may add entries inside its range without renumbering any
+ * other component or extending one shared sequence.
+ */
+#define OSEO_BUILTIN_CODE_RANGE_SIZE ((size_t)256u)
+#define OSEO_BUILTIN_CODE_RANGE_LAST(index) \
+    (SIZE_MAX - (index) * OSEO_BUILTIN_CODE_RANGE_SIZE)
+#define OSEO_BUILTIN_CODE_RANGE_FIRST(index) \
+    (OSEO_BUILTIN_CODE_RANGE_LAST(index) - \
+     (OSEO_BUILTIN_CODE_RANGE_SIZE - 1u))
+
+#define OSEO_PROMISE_CODE_ID_RANGE_INDEX ((size_t)0u)
+#define OSEO_PROMISE_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_PROMISE_CODE_ID_RANGE_INDEX)
+#define OSEO_PROMISE_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_PROMISE_CODE_ID_RANGE_INDEX)
+#define OSEO_PROMISE_RESOLVE_CODE_ID OSEO_PROMISE_CODE_ID_RANGE_LAST
+#define OSEO_PROMISE_REJECT_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_PROMISE_THEN_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_PROMISE_CATCH_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_PROMISE_FINALLY_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_PROMISE_FINALLY_FULFILL_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_PROMISE_FINALLY_REJECT_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID \
+    (OSEO_PROMISE_CODE_ID_RANGE_LAST - 9u)
+
+#define OSEO_ERROR_CODE_ID_RANGE_INDEX ((size_t)1u)
+#define OSEO_ERROR_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ERROR_CODE_ID_RANGE_INDEX)
+#define OSEO_ERROR_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ERROR_CODE_ID_RANGE_INDEX)
 /*
  * Error constructor code IDs occupy one contiguous block indexed by
- * OseoErrorKind: SIZE_MAX - 10u - kind.
+ * OseoErrorKind from the top of the error component's range.
  */
 #define OSEO_ERROR_KIND_COUNT ((size_t)8u)
-#define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID (SIZE_MAX - 10u)
+#define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID OSEO_ERROR_CODE_ID_RANGE_LAST
 #define OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID \
-    (SIZE_MAX - 9u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_ERROR_CODE_ID_RANGE_LAST - (OSEO_ERROR_KIND_COUNT - 1u))
 #define OSEO_ERROR_TO_STRING_CODE_ID \
-    (SIZE_MAX - 10u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_SYMBOL_CONSTRUCT_CODE_ID \
-    (SIZE_MAX - 11u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ARRAY_VALUES_CODE_ID \
-    (SIZE_MAX - 12u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_ERROR_CODE_ID_RANGE_LAST - OSEO_ERROR_KIND_COUNT)
+
+#define OSEO_SYMBOL_CODE_ID_RANGE_INDEX ((size_t)2u)
+#define OSEO_SYMBOL_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_SYMBOL_CODE_ID_RANGE_INDEX)
+#define OSEO_SYMBOL_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_SYMBOL_CODE_ID_RANGE_INDEX)
+#define OSEO_SYMBOL_CONSTRUCT_CODE_ID OSEO_SYMBOL_CODE_ID_RANGE_LAST
+
+#define OSEO_ITERATOR_CODE_ID_RANGE_INDEX ((size_t)3u)
+#define OSEO_ITERATOR_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ITERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_ITERATOR_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ITERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_ARRAY_VALUES_CODE_ID OSEO_ITERATOR_CODE_ID_RANGE_LAST
 #define OSEO_ARRAY_ITERATOR_NEXT_CODE_ID \
-    (SIZE_MAX - 13u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 1u)
 #define OSEO_ITERATOR_SELF_CODE_ID \
-    (SIZE_MAX - 14u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_GENERATOR_NEXT_CODE_ID \
-    (SIZE_MAX - 15u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 4u)
+
+#define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
+#define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_GENERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_GENERATOR_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_GENERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_GENERATOR_NEXT_CODE_ID OSEO_GENERATOR_CODE_ID_RANGE_LAST
 #define OSEO_GENERATOR_RETURN_CODE_ID \
-    (SIZE_MAX - 16u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_GENERATOR_NEXT_CODE_ID \
-    (SIZE_MAX - 17u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_GENERATOR_RETURN_CODE_ID \
-    (SIZE_MAX - 18u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_GENERATOR_THROW_CODE_ID \
-    (SIZE_MAX - 19u - OSEO_ERROR_KIND_COUNT)
-/* The two reactions one asynchronous generator await installs on the
- * operand it suspended with. Each carries the generator in slot 0 of its
- * own environment and resumes the body with the settled value. */
-#define OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID \
-    (SIZE_MAX - 20u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_GENERATOR_REJECT_CODE_ID \
-    (SIZE_MAX - 21u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_GENERATOR_THROW_CODE_ID \
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 2u)
 #define OSEO_ASYNC_ITERATOR_SELF_CODE_ID \
-    (SIZE_MAX - 22u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 3u)
 /* %AsyncGeneratorFunction%. The intrinsic exists so the asynchronous
  * generator prototype chain and its `constructor` links are complete,
  * but reaching its [[Call]] or [[Construct]] means source text became
@@ -81,21 +122,45 @@
  * point reports the same boundary for the one reference a property chain
  * can still reach. */
 #define OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID \
-    (SIZE_MAX - 23u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_GENERATOR_THROW_CODE_ID \
-    (SIZE_MAX - 24u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ARRAY_PUSH_CODE_ID \
-    (SIZE_MAX - 25u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID \
-    (SIZE_MAX - 26u - OSEO_ERROR_KIND_COUNT)
-#define OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID \
-    (SIZE_MAX - 27u - OSEO_ERROR_KIND_COUNT)
+    (OSEO_GENERATOR_CODE_ID_RANGE_LAST - 4u)
+
+#define OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)5u)
+#define OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_INDEX)
+#define OSEO_ASYNC_GENERATOR_NEXT_CODE_ID \
+    OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST
+#define OSEO_ASYNC_GENERATOR_RETURN_CODE_ID \
+    (OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_ASYNC_GENERATOR_THROW_CODE_ID \
+    (OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST - 2u)
+/* The two reactions one asynchronous generator await installs on the
+ * operand it suspended with. Each carries the generator in slot 0 of its
+ * own environment and resumes the body with the settled value. */
+#define OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID \
+    (OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_ASYNC_GENERATOR_REJECT_CODE_ID \
+    (OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST - 4u)
+
+#define OSEO_ARRAY_CODE_ID_RANGE_INDEX ((size_t)6u)
+#define OSEO_ARRAY_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ARRAY_CODE_ID_RANGE_INDEX)
+#define OSEO_ARRAY_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ARRAY_CODE_ID_RANGE_INDEX)
+#define OSEO_ARRAY_PUSH_CODE_ID OSEO_ARRAY_CODE_ID_RANGE_LAST
+
+#define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
+#define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX)
+#define OSEO_ARGUMENTS_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX)
 /* %ThrowTypeError%. CreateUnmappedArgumentsObject installs it as both
  * the [[Get]] and the [[Set]] of the arguments object's non-configurable
  * `callee`, so every read or write of that property throws a TypeError
  * instead of exposing the running function. */
 #define OSEO_THROW_TYPE_ERROR_CODE_ID \
-    (SIZE_MAX - 28u - OSEO_ERROR_KIND_COUNT)
+    OSEO_ARGUMENTS_CODE_ID_RANGE_LAST
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -764,6 +829,87 @@ static inline bool is_nullish(OseoValue value) {
  * Cross-component helpers. Each is defined in exactly one
  * runtime translation unit.
  */
+typedef OseoResult (*OseoBuiltinDispatcher)(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_promise_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_error_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_symbol_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_iterator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_generator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_async_generator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_array_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+OseoResult oseo_internal_arguments_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,

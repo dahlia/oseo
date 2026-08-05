@@ -10,6 +10,53 @@
  * generic dispatch.
  */
 
+typedef struct {
+    size_t first_code_id;
+    size_t last_code_id;
+    OseoBuiltinDispatcher dispatch;
+} OseoBuiltinDispatchRange;
+
+static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
+    {OSEO_PROMISE_CODE_ID_RANGE_FIRST,
+     OSEO_PROMISE_CODE_ID_RANGE_LAST,
+     oseo_internal_promise_builtin_dispatch},
+    {OSEO_ERROR_CODE_ID_RANGE_FIRST,
+     OSEO_ERROR_CODE_ID_RANGE_LAST,
+     oseo_internal_error_builtin_dispatch},
+    {OSEO_SYMBOL_CODE_ID_RANGE_FIRST,
+     OSEO_SYMBOL_CODE_ID_RANGE_LAST,
+     oseo_internal_symbol_builtin_dispatch},
+    {OSEO_ITERATOR_CODE_ID_RANGE_FIRST,
+     OSEO_ITERATOR_CODE_ID_RANGE_LAST,
+     oseo_internal_iterator_builtin_dispatch},
+    {OSEO_GENERATOR_CODE_ID_RANGE_FIRST,
+     OSEO_GENERATOR_CODE_ID_RANGE_LAST,
+     oseo_internal_generator_builtin_dispatch},
+    {OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_FIRST,
+     OSEO_ASYNC_GENERATOR_CODE_ID_RANGE_LAST,
+     oseo_internal_async_generator_builtin_dispatch},
+    {OSEO_ARRAY_CODE_ID_RANGE_FIRST,
+     OSEO_ARRAY_CODE_ID_RANGE_LAST,
+     oseo_internal_array_builtin_dispatch},
+    {OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST,
+     OSEO_ARGUMENTS_CODE_ID_RANGE_LAST,
+     oseo_internal_arguments_builtin_dispatch},
+};
+
+static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
+    size_t count =
+        sizeof(builtin_dispatch_ranges) / sizeof(builtin_dispatch_ranges[0]);
+    for (size_t index = 0u; index < count; index += 1u) {
+        const OseoBuiltinDispatchRange *range =
+            &builtin_dispatch_ranges[index];
+        if (code_id >= range->first_code_id &&
+            code_id <= range->last_code_id) {
+            return range->dispatch;
+        }
+    }
+    return NULL;
+}
+
 static bool is_argument_list(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_ARGUMENT_LIST;
@@ -1343,288 +1390,17 @@ OseoResult oseo_call_function(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    if (code_id >= OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID &&
-        code_id <= OSEO_ERROR_CONSTRUCT_LAST_CODE_ID) {
-        result = oseo_internal_error_construct(
+    OseoBuiltinDispatcher dispatch = builtin_dispatcher(code_id);
+    if (dispatch != NULL) {
+        result = dispatch(
             context,
-            callee,
-            new_target,
             code_id,
-            argument_count,
-            arguments
-        );
-    } else if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
-        result = oseo_internal_error_to_string(context, receiver);
-    } else if (code_id == OSEO_THROW_TYPE_ERROR_CODE_ID) {
-        /* %ThrowTypeError%. Only an unmapped arguments object's `callee`
-         * accessor reaches it, and both its [[Get]] and its [[Set]]
-         * throw regardless of receiver or argument. */
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "'callee' is not available on an unmapped arguments object."
-        );
-    } else if (code_id == OSEO_ARRAY_PUSH_CODE_ID) {
-        result = oseo_internal_array_push(
-            context,
+            callee,
             receiver,
             argument_count,
-            arguments
+            arguments,
+            new_target
         );
-    } else if (code_id == OSEO_ARRAY_VALUES_CODE_ID) {
-        result = oseo_internal_array_values(context, receiver);
-    } else if (code_id == OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
-        result = oseo_internal_array_iterator_next(context, receiver);
-    } else if (code_id == OSEO_ITERATOR_SELF_CODE_ID) {
-        result = normal(receiver);
-    } else if (code_id == OSEO_GENERATOR_NEXT_CODE_ID) {
-        result = oseo_generator_next(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_GENERATOR_RETURN_CODE_ID) {
-        result = oseo_generator_return(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_GENERATOR_THROW_CODE_ID) {
-        result = oseo_generator_throw(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_ASYNC_ITERATOR_SELF_CODE_ID) {
-        result = normal(receiver);
-    } else if (code_id == OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID) {
-        /* ADR 0016 keeps every form that compiles source text at run time
-         * outside the profile. The frontend rejects the ones it can see;
-         * a call reaching the intrinsic through the prototype chain
-         * reports the same boundary here instead of approximating it. */
-        result = failure(
-            context,
-            "OSEO1001",
-            "AsyncGeneratorFunction compiles source text at run time, "
-            "which is outside the admitted profile."
-        );
-    } else if (code_id == OSEO_ASYNC_GENERATOR_NEXT_CODE_ID) {
-        result = oseo_async_generator_next(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_ASYNC_GENERATOR_RETURN_CODE_ID) {
-        result = oseo_async_generator_return(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_ASYNC_GENERATOR_THROW_CODE_ID) {
-        result = oseo_async_generator_throw(
-            context,
-            receiver,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID ||
-               code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID) {
-        /* One await reaction: the generator it resumes is the only value
-         * its environment carries. */
-        result = oseo_function_environment(context, callee);
-        OseoValue environment = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, environment, 0u);
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_async_generator_awaited(
-                context,
-                result.value,
-                argument_count > 0u ? arguments[0] : oseo_undefined(),
-                code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID
-            );
-        }
-    } else if (code_id == OSEO_ASYNC_FROM_SYNC_FULFILL_CODE_ID) {
-        result = oseo_internal_async_from_sync_fulfilled(
-            context,
-            callee,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_ASYNC_FROM_SYNC_REJECT_CLOSE_CODE_ID) {
-        result = oseo_internal_async_from_sync_rejected(
-            context,
-            callee,
-            argument_count > 0u ? arguments[0] : oseo_undefined()
-        );
-    } else if (code_id == OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
-        OseoValue description_input = argument_count > 0u
-            ? arguments[0]
-            : oseo_undefined();
-        if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
-            result = oseo_internal_symbol_create(context, oseo_undefined());
-        } else {
-            result = oseo_internal_value_string(context, description_input);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                result = oseo_internal_symbol_create(context, result.value);
-            }
-        }
-    } else if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
-        code_id == OSEO_PROMISE_REJECT_CODE_ID) {
-        result = oseo_function_environment(context, callee);
-        OseoValue environment = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, environment, 1u);
-        }
-        OseoValue latch = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_cell_get(context, latch);
-        }
-        bool already_resolved = result.status == OSEO_STATUS_NORMAL &&
-            oseo_to_boolean(result.value);
-        if (already_resolved) {
-            result = normal(oseo_undefined());
-        } else if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_cell_set(
-                context,
-                latch,
-                oseo_boolean(true)
-            );
-        }
-        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
-            result = oseo_environment_get(context, environment, 0u);
-        }
-        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
-            OseoValue argument = argument_count > 0u
-                ? arguments[0]
-                : oseo_undefined();
-            result = code_id == OSEO_PROMISE_RESOLVE_CODE_ID
-                ? oseo_promise_resolve_into(context, result.value, argument)
-                : oseo_promise_reject_into(context, result.value, argument);
-        }
-    } else if (code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID ||
-               code_id == OSEO_PROMISE_FINALLY_REJECT_CODE_ID) {
-        OseoRootFrame frame = {NULL, NULL, 0u};
-        result = oseo_roots_allocate(context, &frame, 7u);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            frame.slots[0] = callee;
-            frame.slots[3] = argument_count > 0u
-                ? arguments[0]
-                : oseo_undefined();
-            result = oseo_function_environment(context, frame.slots[0]);
-            frame.slots[1] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, frame.slots[1], 0u);
-            frame.slots[2] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_call_function(
-                context,
-                frame.slots[2],
-                oseo_undefined(),
-                0u,
-                NULL,
-                oseo_undefined()
-            );
-            frame.slots[4] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_promise_resolve(context, frame.slots[4]);
-            frame.slots[5] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            bool fulfilled =
-                code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID;
-            result = oseo_internal_promise_finally_continuation_create(
-                context,
-                frame.slots[3],
-                fulfilled
-            );
-            frame.slots[6] = result.value;
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_promise_invoke_then(
-                context,
-                frame.slots[5],
-                frame.slots[6],
-                oseo_undefined()
-            );
-        }
-        oseo_roots_release(context, &frame);
-    } else if (code_id == OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID) {
-        result = oseo_function_environment(context, callee);
-        OseoValue environment = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, environment, 0u);
-        }
-        OseoValue preserved = result.value;
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_environment_get(context, environment, 1u);
-        }
-        if (result.status == OSEO_STATUS_NORMAL &&
-            oseo_to_boolean(result.value)) {
-            result = normal(preserved);
-        } else if (result.status == OSEO_STATUS_NORMAL) {
-            oseo_context_clear_language_error(context);
-            result = (OseoResult){OSEO_STATUS_THROW, preserved};
-        }
-    } else if (code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID ||
-               code_id == OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID) {
-        result = oseo_function_environment(context, callee);
-        OseoValue environment = result.value;
-        bool fulfilling =
-            code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID;
-        if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
-            result = oseo_environment_get(context, environment, 1u);
-        }
-        bool already_fulfilled = result.status == OSEO_STATUS_NORMAL &&
-            fulfilling &&
-            oseo_to_boolean(result.value);
-        if (already_fulfilled) {
-            result = normal(oseo_undefined());
-        } else if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
-            result = oseo_environment_set(
-                context,
-                environment,
-                1u,
-                oseo_boolean(true)
-            );
-        }
-        if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
-            result = oseo_environment_get(context, environment, 0u);
-        }
-        if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
-            OseoValue argument = argument_count > 0u
-                ? arguments[0]
-                : oseo_undefined();
-            result = oseo_internal_promise_aggregate_settle(
-                context,
-                result.value,
-                argument,
-                fulfilling
-            );
-        }
-    } else if (code_id == OSEO_PROMISE_THEN_CODE_ID ||
-               code_id == OSEO_PROMISE_CATCH_CODE_ID ||
-               code_id == OSEO_PROMISE_FINALLY_CODE_ID) {
-        OseoValue first = argument_count > 0u
-            ? arguments[0]
-            : oseo_undefined();
-        OseoValue second = argument_count > 1u
-            ? arguments[1]
-            : oseo_undefined();
-        if (code_id == OSEO_PROMISE_THEN_CODE_ID) {
-            result = oseo_promise_then(context, receiver, first, second);
-        } else if (code_id == OSEO_PROMISE_CATCH_CODE_ID) {
-            result = oseo_internal_promise_invoke_then(
-                context,
-                receiver,
-                oseo_undefined(),
-                first
-            );
-        } else {
-            result =
-                oseo_internal_promise_finally_invoke(context, receiver, first);
-        }
     } else if (context->function_dispatcher == NULL) {
         result = failure(
             context,

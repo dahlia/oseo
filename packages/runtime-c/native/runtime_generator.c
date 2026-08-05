@@ -3,6 +3,45 @@
 #include <stdlib.h>
 #include <string.h>
 
+OseoResult oseo_internal_generator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)new_target;
+    OseoValue argument = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (code_id == OSEO_GENERATOR_NEXT_CODE_ID) {
+        return oseo_generator_next(context, receiver, argument);
+    }
+    if (code_id == OSEO_GENERATOR_RETURN_CODE_ID) {
+        return oseo_generator_return(context, receiver, argument);
+    }
+    if (code_id == OSEO_GENERATOR_THROW_CODE_ID) {
+        return oseo_generator_throw(context, receiver, argument);
+    }
+    if (code_id == OSEO_ASYNC_ITERATOR_SELF_CODE_ID) {
+        return normal(receiver);
+    }
+    if (code_id == OSEO_ASYNC_GENERATOR_FUNCTION_CODE_ID) {
+        /* ADR 0016 keeps every form that compiles source text at run time
+         * outside the profile. */
+        return failure(
+            context,
+            "OSEO1001",
+            "AsyncGeneratorFunction compiles source text at run time, "
+            "which is outside the admitted profile."
+        );
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
 /*
  * Generator objects: the suspended body frame shared by both generator
  * kinds, its collector-traced root slots and saved completion records,

@@ -3586,6 +3586,15 @@ encodes are recorded here with their reasons.
     instead: agent clusters and shared memory have no `$262` harness support.
 
 The graph admits no language semantics of its own. Implemented M5b node
+`builtin-code-registry` reserves one stable 256-ID range for each runtime
+component that owns built-in functions and delegates those ranges through a
+table to component-owned dispatchers. Adding an entry within one component no
+longer renumbers other components or extends the generic dispatch chain. The
+node claims no test262 inventory roots and admits no semantic family, so it
+adds structural registry evidence without a language-profile record, property
+seed, native semantic fixture, or standards promotion.
+
+Implemented M5b node
 `error-aggregate-and-options` admits `AggregateError`, its iterable `errors`
 list, and error constructor `cause` options through the external node workflow.
 Its fifteen reviewed promotions move the manifest to 2,949 passes across 4,876

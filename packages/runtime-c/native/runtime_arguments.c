@@ -1,5 +1,31 @@
 #include "runtime_internal.h"
 
+OseoResult oseo_internal_arguments_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    if (code_id != OSEO_THROW_TYPE_ERROR_CODE_ID) {
+        return oseo_unknown_function(context, code_id);
+    }
+    /* %ThrowTypeError%. Both accessor halves throw regardless of their
+     * receiver or argument. */
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "'callee' is not available on an unmapped arguments object."
+    );
+}
+
 /*
  * The arguments exotic objects: the unmapped object 10.2.4 creates, the
  * mapped object 10.4.4 creates from a simple parameter list, the
