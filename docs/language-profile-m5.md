@@ -2994,39 +2994,44 @@ complete. The remaining gaps retain their existing owners.
     observes it surfaces as a semantic failure at manifest review rather
     than entering silently. Admitting the global object
     requires the intrinsic graph to expose standard constructors as real
-    values first, Annex B block-level function hoisting so that a
-    function declared in a block reaches the same binding model, the
-    restricted-global and non-extensible cases a complete Global
-    Environment Record answers, indirect `eval` var bindings, and an owned
-    architecture decision on how a mutable global object meets
-    closed-world name resolution before any dynamically created global
-    binding is admitted. The reviewed *test/language/global-code/*
-    directory is directly applicable to that model and is not yet in the
-    reviewed subset. The reviewed
+    values first, the restricted-global and non-extensible cases a
+    complete Global Environment Record answers, and an owned architecture
+    decision on how a mutable global object meets closed-world name
+    resolution before any dynamically created global binding is admitted.
+    Two interactions a complete model would also cover sit outside this
+    unit for different reasons. Annex B block-level function hoisting is
+    outside the candidate claim under
+    [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Indirect `eval` var
+    bindings stay inside that claim and outside this profile, because
+    [ADR 0016](./adr/0016-dynamic-source-boundary.md) keeps the dynamic
+    source family unsupported and
+    [ADR 0019](./adr/0019-m5-claim-closure.md) authorizes that exclusion
+    for M5 completion while leaving the conformance label to its own later
+    gate. A case that depends on either classifies unsupported under the
+    record that owns it instead of blocking this unit. The reviewed
+    *test/language/global-code/* directory is directly applicable to that model
+    and is not yet in the reviewed subset. The reviewed
     *test/language/statements/with/12.10-2-4.js* and
     *test/language/statements/with/12.10-2-5.js* cases each contain a
     failure-only read of the unresolved global `x` outside the `with`
     environment. Their intended nullish `TypeError` path has fixed native
     evidence, but the complete upstream source remains
-    `unsupported-profile-feature` until this global binding model lands.
-    The reviewed
-    *test/language/statements/try/optional-catch-binding-lexical.js* case
-    stays `unsupported-profile-feature` for the same reason: its final
+    `unsupported-profile-feature` until this global binding model lands. The
+    reviewed *test/language/statements/try/optional-catch-binding-lexical.js*
+    case stays `unsupported-profile-feature` for the same reason: its final
     assertion reads the unresolved global `y` through
-    `assert.throws(ReferenceError, ...)`, while the optional catch clauses
-    it contains are admitted by M5a Unit 8.5b.
-    Strict writes to an unresolved name also stop at the source-located
-    boundary recorded above instead of producing the runtime
-    `ReferenceError` that a complete global environment would produce. The
-    reviewed *function-code/block-decl-onlystrict.js* and
+    `assert.throws(ReferenceError, ...)`, while the optional catch clauses it
+    contains are admitted by M5a Unit 8.5b. Strict writes to an unresolved name
+    also stop at the source-located boundary recorded above instead of
+    producing the runtime `ReferenceError` that a complete global environment
+    would produce. The reviewed *function-code/block-decl-onlystrict.js* and
     *global-code/block-decl-strict.js* cases and four of the reviewed
     _statements/switch/scope-lex-\*.js_ cases expose the same boundary. Their
     block or switch binding is correctly absent outside its lexical scope, but
-    the remaining read receives the compile-stage `Unknown binding`
-    diagnostic instead of the runtime `ReferenceError` a complete global name
-    resolution path produces.
-    Owner: the intrinsics and built-in objects stream; the surface audit in
-    [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
+    the remaining read receives the compile-stage `Unknown binding` diagnostic
+    instead of the runtime `ReferenceError` a complete global name resolution
+    path produces. Owner: the intrinsics and built-in objects stream; the
+    surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
  -  Await inside a computed member of an assignment target, a computed binding
     property name, or an array or object binding default is admitted by M5a
     Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as

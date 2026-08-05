@@ -81,8 +81,13 @@ Regular expression work starts from these implemented contracts:
     processing;
  -  generic strings, arrays, objects, properties, functions, constructors,
     symbols, errors, abrupt completion, and collection have native semantics;
- -  the well-known symbol family and generic `ToPrimitive` behavior are
-    implemented;
+ -  symbol values, symbol-keyed properties, well-known symbol dispatch, and
+    generic `ToPrimitive` behavior are implemented, but the realm defines only
+    `@@iterator`, `@@toPrimitive`, `@@toStringTag`, and `@@asyncIterator`. The
+    `@@match`, `@@matchAll`, `@@replace`, `@@search`, `@@split`, and
+    `@@species` symbols do not exist yet. They are prerequisites of the
+    prototype and dispatch step below rather than entry evidence, and that
+    step cannot start until the intrinsics stream supplies them;
  -  the synchronous iterator protocol supplies the basis for future
     `String.prototype.matchAll` iterator behavior;
  -  generated C and the runtime are separate backend inputs, and the runtime is
