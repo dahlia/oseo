@@ -1,0 +1,19 @@
+version: 1
+id: iterator-helpers-eager
+title: "Eager iterator helpers"
+delivers: "Adds reduce, toArray, forEach, some, every, and find, which drain
+  the iterator and close it on an abrupt callback completion."
+inventory:
+  included: 173
+  roots:
+    - test/built-ins/Iterator/prototype/every/
+    - test/built-ins/Iterator/prototype/find/
+    - test/built-ins/Iterator/prototype/forEach/
+    - test/built-ins/Iterator/prototype/reduce/
+    - test/built-ins/Iterator/prototype/some/
+    - test/built-ins/Iterator/prototype/toArray/
+dependencies:
+  - array-constructor
+  - iterator-intrinsic
+landed: false
+status: blocked

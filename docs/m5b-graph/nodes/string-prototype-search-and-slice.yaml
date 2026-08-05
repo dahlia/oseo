@@ -1,0 +1,20 @@
+version: 1
+id: string-prototype-search-and-slice
+title: "String.prototype search and slice"
+delivers: "Adds concat, indexOf, lastIndexOf, includes, startsWith, endsWith,
+  slice, and substring with their conversion order and index clamping."
+inventory:
+  included: 253
+  roots:
+    - test/built-ins/String/prototype/concat/
+    - test/built-ins/String/prototype/endsWith/
+    - test/built-ins/String/prototype/includes/
+    - test/built-ins/String/prototype/indexOf/
+    - test/built-ins/String/prototype/lastIndexOf/
+    - test/built-ins/String/prototype/slice/
+    - test/built-ins/String/prototype/startsWith/
+    - test/built-ins/String/prototype/substring/
+dependencies:
+  - string-prototype-access
+landed: false
+status: blocked

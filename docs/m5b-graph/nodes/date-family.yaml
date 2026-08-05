@@ -1,0 +1,18 @@
+version: 1
+id: date-family
+title: "Date family"
+delivers: "Would add the Date constructor, statics, prototype, and time-value
+  arithmetic."
+inventory:
+  included: 586
+  roots:
+    - test/built-ins/Date/
+dependencies:
+  - number-prototype
+  - object-prototype
+  - string-prototype-search-and-slice
+landed: false
+status: parked
+reason: "The family depends on the PLAN-NIO.md clock and wakeup integration
+  checkpoint, whose probe work has not started and whose real-time and
+  monotonic-domain choices need maintainer judgment."

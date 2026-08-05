@@ -1,0 +1,16 @@
+version: 1
+id: string-iterator
+title: "String iterator"
+delivers: "Adds String.prototype[@@iterator] and %StringIteratorPrototype%
+  with code-point traversal, which also unblocks array destructuring of a
+  for-in key."
+inventory:
+  included: 13
+  roots:
+    - test/built-ins/String/prototype/Symbol.iterator/
+    - test/built-ins/StringIteratorPrototype/
+dependencies:
+  - string-intrinsic
+  - well-known-symbols
+landed: false
+status: blocked

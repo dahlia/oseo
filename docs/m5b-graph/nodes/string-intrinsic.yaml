@@ -1,0 +1,16 @@
+version: 1
+id: string-intrinsic
+title: "String constructor and statics"
+delivers: "Adds the String constructor, the String exotic wrapper object, and
+  the fromCharCode, fromCodePoint, and raw statics."
+inventory:
+  included: 150
+  roots:
+    - test/built-ins/String/*.js
+    - test/built-ins/String/fromCharCode/
+    - test/built-ins/String/fromCodePoint/
+    - test/built-ins/String/raw/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

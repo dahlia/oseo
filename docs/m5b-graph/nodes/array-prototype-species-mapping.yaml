@@ -1,0 +1,15 @@
+version: 1
+id: array-prototype-species-mapping
+title: "Array.prototype species-allocating iteration"
+delivers: "Adds map and filter over ArraySpeciesCreate, including the
+  constructor and @@species reads the specification performs."
+inventory:
+  included: 458
+  roots:
+    - test/built-ins/Array/prototype/filter/
+    - test/built-ins/Array/prototype/map/
+dependencies:
+  - array-prototype-iterative
+  - well-known-symbols
+landed: false
+status: blocked

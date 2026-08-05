@@ -1,0 +1,17 @@
+version: 1
+id: string-prototype-pad
+title: "String.prototype padding and well-formedness"
+delivers: "Adds repeat, padStart, padEnd, isWellFormed, and toWellFormed with
+  their length limits and lone-surrogate handling."
+inventory:
+  included: 58
+  roots:
+    - test/built-ins/String/prototype/isWellFormed/
+    - test/built-ins/String/prototype/padEnd/
+    - test/built-ins/String/prototype/padStart/
+    - test/built-ins/String/prototype/repeat/
+    - test/built-ins/String/prototype/toWellFormed/
+dependencies:
+  - string-prototype-search-and-slice
+landed: false
+status: blocked

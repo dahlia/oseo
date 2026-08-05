@@ -1,0 +1,15 @@
+version: 1
+id: typed-array-sort
+title: "TypedArray sorting"
+delivers: "Adds sort and toSorted with the numeric default comparator and
+  comparator validation."
+inventory:
+  included: 47
+  roots:
+    - test/built-ins/TypedArray/prototype/sort/
+    - test/built-ins/TypedArray/prototype/toSorted/
+dependencies:
+  - array-prototype-sort
+  - typed-array-core
+landed: false
+status: blocked

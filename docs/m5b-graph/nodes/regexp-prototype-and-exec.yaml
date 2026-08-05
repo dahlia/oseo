@@ -1,0 +1,28 @@
+version: 1
+id: regexp-prototype-and-exec
+title: "RegExp.prototype and built-in execution"
+delivers: "Adds RegExp.prototype.exec, test, toString, and the source, flags,
+  and individual flag accessors with the match result object."
+inventory:
+  included: 271
+  roots:
+    - test/built-ins/RegExp/prototype/*.js
+    - test/built-ins/RegExp/prototype/dotAll/
+    - test/built-ins/RegExp/prototype/exec/
+    - test/built-ins/RegExp/prototype/flags/
+    - test/built-ins/RegExp/prototype/global/
+    - test/built-ins/RegExp/prototype/hasIndices/
+    - test/built-ins/RegExp/prototype/ignoreCase/
+    - test/built-ins/RegExp/prototype/multiline/
+    - test/built-ins/RegExp/prototype/source/
+    - test/built-ins/RegExp/prototype/sticky/
+    - test/built-ins/RegExp/prototype/test/
+    - test/built-ins/RegExp/prototype/toString/
+    - test/built-ins/RegExp/prototype/unicode/
+    - test/built-ins/RegExp/prototype/unicodeSets/
+dependencies:
+  - array-constructor
+  - object-define-property
+  - regexp-intrinsic
+landed: false
+status: blocked

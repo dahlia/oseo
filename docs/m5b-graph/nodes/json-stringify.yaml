@@ -1,0 +1,17 @@
+version: 1
+id: json-stringify
+title: "JSON.stringify"
+delivers: "Adds SerializeJSONProperty with toJSON, replacer functions and
+  arrays, gap handling, and cycle detection."
+inventory:
+  included: 72
+  roots:
+    - test/built-ins/JSON/*.js
+    - test/built-ins/JSON/stringify/
+dependencies:
+  - array-constructor
+  - number-intrinsic
+  - object-own-keys
+  - string-prototype-access
+landed: false
+status: blocked

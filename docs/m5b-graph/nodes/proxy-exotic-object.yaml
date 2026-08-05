@@ -1,0 +1,14 @@
+version: 1
+id: proxy-exotic-object
+title: "Proxy exotic object"
+delivers: "Adds Proxy with every trap, its invariant checks, revocation, and
+  Proxy.revocable."
+inventory:
+  included: 311
+  roots:
+    - test/built-ins/Proxy/
+dependencies:
+  - object-integrity-levels
+  - reflect-namespace
+landed: false
+status: blocked

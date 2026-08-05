@@ -1,0 +1,23 @@
+version: 1
+id: object-own-keys
+title: "Object key and entry statics"
+delivers: "Adds Object.keys, values, entries, getOwnPropertyNames,
+  getOwnPropertySymbols, assign, fromEntries, hasOwn, and groupBy over the
+  existing own-key ordering."
+inventory:
+  included: 296
+  roots:
+    - test/built-ins/Object/assign/
+    - test/built-ins/Object/entries/
+    - test/built-ins/Object/fromEntries/
+    - test/built-ins/Object/getOwnPropertyNames/
+    - test/built-ins/Object/getOwnPropertySymbols/
+    - test/built-ins/Object/groupBy/
+    - test/built-ins/Object/hasOwn/
+    - test/built-ins/Object/keys/
+    - test/built-ins/Object/values/
+dependencies:
+  - array-constructor
+  - object-constructor
+landed: false
+status: blocked

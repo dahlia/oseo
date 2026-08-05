@@ -1,0 +1,9 @@
+version: 1
+id: intrinsic-graph-root
+title: "Realm intrinsic graph root"
+delivers: "Replaces the name-compared virtual intrinsics with one realm-owned
+  intrinsic table that materializes %Object.prototype%, %Function.prototype%,
+  and the standard constructors as reachable values."
+dependencies: []
+landed: false
+status: ready

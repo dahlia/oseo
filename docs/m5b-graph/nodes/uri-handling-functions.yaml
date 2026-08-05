@@ -1,0 +1,18 @@
+version: 1
+id: uri-handling-functions
+title: "URI handling functions"
+delivers: "Adds encodeURI, encodeURIComponent, decodeURI, and
+  decodeURIComponent with UTF-8 encoding and the URIError cases."
+inventory:
+  included: 173
+  roots:
+    - test/built-ins/decodeURI/
+    - test/built-ins/decodeURIComponent/
+    - test/built-ins/encodeURI/
+    - test/built-ins/encodeURIComponent/
+dependencies:
+  - error-aggregate-and-options
+  - intrinsic-graph-root
+  - string-intrinsic
+landed: false
+status: blocked

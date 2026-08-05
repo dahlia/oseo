@@ -1,0 +1,13 @@
+version: 1
+id: object-create
+title: "Object.create"
+delivers: "Adds Object.create over ObjectDefineProperties, including null and
+  object prototypes and the properties argument."
+inventory:
+  included: 320
+  roots:
+    - test/built-ins/Object/create/
+dependencies:
+  - object-define-properties
+landed: false
+status: blocked

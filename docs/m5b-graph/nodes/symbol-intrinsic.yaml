@@ -1,0 +1,18 @@
+version: 1
+id: symbol-intrinsic
+title: "Symbol prototype and registry"
+delivers: "Completes the Symbol intrinsic with its prototype methods,
+  description accessor, and the cross-realm registry behind Symbol.for and
+  Symbol.keyFor."
+inventory:
+  included: 64
+  roots:
+    - test/built-ins/Symbol/*.js
+    - test/built-ins/Symbol/for/
+    - test/built-ins/Symbol/keyFor/
+    - test/built-ins/Symbol/prototype/
+dependencies:
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

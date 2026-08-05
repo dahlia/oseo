@@ -1,0 +1,10 @@
+version: 1
+id: super-without-extends
+title: "super in a null-extends home object"
+delivers: "Admits a super property reference in a class body without extends
+  and in an object literal method, whose lookup now reaches
+  %Object.prototype%."
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

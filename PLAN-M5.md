@@ -3504,6 +3504,91 @@ land. That checkpoint does not change the M5 test262 denominator or claim
 boundary.
 
 
+M5b work graph
+--------------
+
+The M5b queue is checked in as a machine-readable graph rather than a
+hand-drawn phase scheme, so an implementation session can take any work item
+whose dependencies are already merged instead of asking which phase it is in.
+[*docs/m5b-graph/graph.yaml*](./docs/m5b-graph/graph.yaml) holds the node
+counts, the advisory collision list, the repository-wide serialization points,
+and the ordered fallback backlog. One record per node lives under
+*docs/m5b-graph/nodes/*, naming what the node delivers, the included inventory
+paths it claims, its dependencies by ID, and whether it is ready, blocked, or
+parked.
+
+`mise run check:m5b-graph` rejects an unknown ID, a dependency cycle, an
+unparked node depending on a parked one, a status that disagrees with the
+landed state of its dependencies, a recorded path count that does not match
+*tests/test262/inventory.tsv*, a selector naming a root the graph does not
+cover, two nodes claiming the same upstream path, and any included path under
+*test/built-ins/* that no node claims. That last rule is what keeps the graph
+a partition of the built-in denominator rather than a selection from it. A
+parked node may depend on another parked node, because neither is work the
+graph hands out. A session takes a node whose status is `ready` and whose
+`landed` field is still `false`; the change that lands it sets that field and
+updates the dependents whose status the landing changes.
+
+Read the graph directly rather than a prose copy of it. The decisions it
+encodes are recorded here with their reasons.
+
+ -  The primitive families at the root of M5b are implemented in the C
+    runtime. Nothing else about M5b is decided here. The root families have no
+    alternative: the realm has no `%Object.prototype%`, no global object, and
+    no `String` or `Array` prototype methods, so the compiled profile cannot
+    yet express what they need. Later families land after those prerequisites
+    exist, so the choice reopens for each of them.
+    [*ROADMAP.md*](./ROADMAP.md) asks every family to weigh a self-hosted
+    implementation against a C one and to record the choice and its evidence
+    when the family lands. That weighing belongs to each family's own change,
+    not to this plan.
+ -  `object-prototype` precedes the `Object` statics.
+    `oseo_object_literal_create` passes `oseo_null()` as the prototype, so an
+    object literal has a null `[[Prototype]]`, and the methods a lookup on it
+    would find are virtualized behind the per-object `default_intrinsics` flag
+    and fabricated by name comparison in *runtime\_property.c*. Materializing
+    `%Object.prototype%` first means the statics are written against real
+    property lookup instead of extending the mechanism they replace.
+ -  `builtin-code-registry` is a root beside `intrinsic-graph-root` rather than
+    a dependent of it. Built-in function code IDs are one dense hand-numbered
+    block in *runtime\_internal.h* and dispatch is one else-if chain in
+    *runtime\_function.c*, so every family that adds a built-in function edits
+    both. Neither refactor needs the other, so the graph records no edge
+    between them. It records no edge to the later families either, because a
+    dependency would claim they need the registry to be correct when what they
+    need is not to be rewriting the same chain at the same time. Nothing in
+    the schema expresses that, so it is an operational rule instead: land
+    `builtin-code-registry` early, and before running built-in-function nodes
+    concurrently.
+ -  `weak-collections` and `date-family` are parked, not blocked. Weak
+    collections need the ephemeron tracing and finalization that
+    [*PLAN-GC.md*](./PLAN-GC.md) leaves out; that plan assigns their language
+    semantics to M5, and no M5 document owns the collector contract behind
+    them. `Date` depends on the clock and wakeup integration checkpoint in
+    [*PLAN-NIO.md*](./PLAN-NIO.md), whose probe work has not started and whose
+    real-time and monotonic-domain choices need maintainer judgment. Neither
+    becomes ready by landing anything else in this graph.
+ -  Annex B block-level function hoisting and indirect `eval` var bindings are
+    not prerequisites of `global-object-record`.
+    [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) already
+    records why: the first is outside the candidate claim under
+    [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), and the second is
+    an authorized exclusion under
+    [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) and
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md).
+ -  A node whose next step is an architecture decision is parked rather than
+    made ready, because recording a costly-to-reverse choice is maintainer
+    judgment. That covers `globalthis-binding`, which needs the decision
+    reconciling a mutable global object with closed-world name resolution, and
+    `regexp-matcher-backend-probes`, which ends in the backend selection
+    [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) defers until its probes compare the
+    candidates. `atomics-and-shared-memory` is parked for a missing capability
+    instead: agent clusters and shared memory have no `$262` harness support.
+
+The graph admits no language semantics of its own. The reviewed manifest stays
+at 2,934 passes across 4,861 paths.
+
+
 Ahead-of-time challenge boundary
 --------------------------------
 

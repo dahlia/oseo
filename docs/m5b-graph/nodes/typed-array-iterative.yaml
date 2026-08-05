@@ -1,0 +1,20 @@
+version: 1
+id: typed-array-iterative
+title: "TypedArray iteration methods"
+delivers: "Adds every, some, forEach, map, filter, reduce, and reduceRight
+  with typed-array species allocation and detach checks."
+inventory:
+  included: 398
+  roots:
+    - test/built-ins/TypedArray/prototype/every/
+    - test/built-ins/TypedArray/prototype/filter/
+    - test/built-ins/TypedArray/prototype/forEach/
+    - test/built-ins/TypedArray/prototype/map/
+    - test/built-ins/TypedArray/prototype/reduce/
+    - test/built-ins/TypedArray/prototype/reduceRight/
+    - test/built-ins/TypedArray/prototype/some/
+dependencies:
+  - array-prototype-species-mapping
+  - typed-array-core
+landed: false
+status: blocked

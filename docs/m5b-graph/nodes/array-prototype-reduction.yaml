@@ -1,0 +1,14 @@
+version: 1
+id: array-prototype-reduction
+title: "Array.prototype reduction"
+delivers: "Adds reduce and reduceRight with initial-value handling,
+  empty-array TypeError, and index traversal order."
+inventory:
+  included: 520
+  roots:
+    - test/built-ins/Array/prototype/reduce/
+    - test/built-ins/Array/prototype/reduceRight/
+dependencies:
+  - array-prototype-iterative
+landed: false
+status: blocked

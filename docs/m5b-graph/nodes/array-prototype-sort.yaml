@@ -1,0 +1,14 @@
+version: 1
+id: array-prototype-sort
+title: "Array.prototype sorting"
+delivers: "Adds sort and toSorted with SortCompare, comparator validation,
+  hole and undefined ordering, and stability."
+inventory:
+  included: 75
+  roots:
+    - test/built-ins/Array/prototype/sort/
+    - test/built-ins/Array/prototype/toSorted/
+dependencies:
+  - array-prototype-copying
+landed: false
+status: blocked

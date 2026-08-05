@@ -1,0 +1,15 @@
+version: 1
+id: bigint-intrinsic
+title: "BigInt intrinsic and prototype"
+delivers: "Adds the callable BigInt intrinsic, BigInt.prototype, the wrapper
+  object, and the asIntN and asUintN fixed-width conversions over the admitted
+  primitive."
+inventory:
+  included: 77
+  roots:
+    - test/built-ins/BigInt/
+dependencies:
+  - number-intrinsic
+  - object-prototype
+landed: false
+status: blocked

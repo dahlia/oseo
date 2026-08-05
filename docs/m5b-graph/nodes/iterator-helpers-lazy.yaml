@@ -1,0 +1,17 @@
+version: 1
+id: iterator-helpers-lazy
+title: "Lazy iterator helpers"
+delivers: "Adds map, filter, take, drop, and flatMap as iterator helper
+  objects with underlying-iterator close semantics."
+inventory:
+  included: 184
+  roots:
+    - test/built-ins/Iterator/prototype/drop/
+    - test/built-ins/Iterator/prototype/filter/
+    - test/built-ins/Iterator/prototype/flatMap/
+    - test/built-ins/Iterator/prototype/map/
+    - test/built-ins/Iterator/prototype/take/
+dependencies:
+  - iterator-intrinsic
+landed: false
+status: blocked

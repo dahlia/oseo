@@ -1,0 +1,24 @@
+version: 1
+id: number-intrinsic
+title: "Number constructor and statics"
+delivers: "Adds the Number constructor, its wrapper object, the numeric
+  constants, and the isFinite, isInteger, isNaN, isSafeInteger, parseFloat,
+  and parseInt statics."
+inventory:
+  included: 172
+  roots:
+    - test/built-ins/Number/*.js
+    - test/built-ins/Number/MAX_VALUE/
+    - test/built-ins/Number/MIN_VALUE/
+    - test/built-ins/Number/NEGATIVE_INFINITY/
+    - test/built-ins/Number/POSITIVE_INFINITY/
+    - test/built-ins/Number/isFinite/
+    - test/built-ins/Number/isInteger/
+    - test/built-ins/Number/isNaN/
+    - test/built-ins/Number/isSafeInteger/
+    - test/built-ins/Number/parseFloat/
+    - test/built-ins/Number/parseInt/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

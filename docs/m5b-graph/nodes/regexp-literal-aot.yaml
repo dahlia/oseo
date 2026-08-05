@@ -1,0 +1,10 @@
+version: 1
+id: regexp-literal-aot
+title: "Ahead-of-time literal compilation"
+delivers: "Compiles literal patterns during the build into immutable
+  descriptors while each evaluation still allocates a fresh object with
+  independent lastIndex."
+dependencies:
+  - regexp-prototype-and-exec
+landed: false
+status: blocked

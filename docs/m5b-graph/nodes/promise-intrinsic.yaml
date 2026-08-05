@@ -1,0 +1,21 @@
+version: 1
+id: promise-intrinsic
+title: "%Promise% as a value"
+delivers: "Makes Promise a real intrinsic value with its constructor,
+  prototype methods, species accessor, resolve, reject, withResolvers, and
+  try."
+inventory:
+  included: 250
+  roots:
+    - test/built-ins/Promise/*.js
+    - test/built-ins/Promise/Symbol.species/
+    - test/built-ins/Promise/prototype/
+    - test/built-ins/Promise/reject/
+    - test/built-ins/Promise/resolve/
+    - test/built-ins/Promise/try/
+    - test/built-ins/Promise/withResolvers/
+dependencies:
+  - function-prototype
+  - object-prototype
+landed: false
+status: blocked

@@ -1,0 +1,18 @@
+version: 1
+id: object-constructor
+title: "Object constructor and prototype operations"
+delivers: "Makes Object a real intrinsic value with call and construct
+  behavior, ToObject wrapping, Object.is, Object.getPrototypeOf, and
+  Object.setPrototypeOf."
+inventory:
+  included: 139
+  roots:
+    - test/built-ins/Object/*.js
+    - test/built-ins/Object/getPrototypeOf/
+    - test/built-ins/Object/internals/
+    - test/built-ins/Object/is/
+    - test/built-ins/Object/setPrototypeOf/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

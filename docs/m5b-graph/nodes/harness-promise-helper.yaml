@@ -1,0 +1,10 @@
+version: 1
+id: harness-promise-helper
+title: "promiseHelper.js harness include"
+delivers: "Implements the reviewed promiseHelper.js include so its sequence
+  and settlement assertions can enter the reviewed subset."
+dependencies:
+  - array-prototype-iterative
+  - promise-intrinsic
+landed: false
+status: blocked

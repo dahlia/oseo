@@ -1,0 +1,18 @@
+version: 1
+id: regexp-pattern-extensions
+title: "Unicode sets, modifiers, and assertions"
+delivers: "Adds class set notation, inline modifiers, named groups,
+  lookbehind, match indices, and dotAll matching."
+inventory:
+  included: 255
+  roots:
+    - test/built-ins/RegExp/dotall/
+    - test/built-ins/RegExp/lookBehind/
+    - test/built-ins/RegExp/match-indices/
+    - test/built-ins/RegExp/named-groups/
+    - test/built-ins/RegExp/regexp-modifiers/
+    - test/built-ins/RegExp/unicodeSets/
+dependencies:
+  - regexp-unicode-property-escapes
+landed: false
+status: blocked

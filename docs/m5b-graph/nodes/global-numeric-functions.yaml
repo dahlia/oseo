@@ -1,0 +1,18 @@
+version: 1
+id: global-numeric-functions
+title: "Global numeric functions"
+delivers: "Adds parseInt, parseFloat, isNaN, and isFinite as global function
+  properties with their string grammars."
+inventory:
+  included: 139
+  roots:
+    - test/built-ins/isFinite/
+    - test/built-ins/isNaN/
+    - test/built-ins/parseFloat/
+    - test/built-ins/parseInt/
+dependencies:
+  - intrinsic-graph-root
+  - number-intrinsic
+  - string-prototype-access
+landed: false
+status: blocked

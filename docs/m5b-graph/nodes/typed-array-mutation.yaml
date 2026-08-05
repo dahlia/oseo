@@ -1,0 +1,18 @@
+version: 1
+id: typed-array-mutation
+title: "TypedArray mutation and copying"
+delivers: "Adds copyWithin, fill, reverse, slice, with, and toReversed with
+  their bounds and detach behavior."
+inventory:
+  included: 258
+  roots:
+    - test/built-ins/TypedArray/prototype/copyWithin/
+    - test/built-ins/TypedArray/prototype/fill/
+    - test/built-ins/TypedArray/prototype/reverse/
+    - test/built-ins/TypedArray/prototype/slice/
+    - test/built-ins/TypedArray/prototype/toReversed/
+    - test/built-ins/TypedArray/prototype/with/
+dependencies:
+  - typed-array-core
+landed: false
+status: blocked

@@ -1,0 +1,16 @@
+version: 1
+id: promise-allsettled-and-any
+title: "Promise.allSettled and Promise.any"
+delivers: "Reimplements allSettled with its result records and any with the
+  AggregateError it rejects with."
+inventory:
+  included: 198
+  roots:
+    - test/built-ins/Promise/allSettled/
+    - test/built-ins/Promise/any/
+dependencies:
+  - error-aggregate-and-options
+  - object-constructor
+  - promise-all-and-race
+landed: false
+status: blocked

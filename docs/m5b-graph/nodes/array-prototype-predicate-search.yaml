@@ -1,0 +1,16 @@
+version: 1
+id: array-prototype-predicate-search
+title: "Array.prototype predicate search"
+delivers: "Adds find, findIndex, findLast, and findLastIndex over the shared
+  callback protocol."
+inventory:
+  included: 94
+  roots:
+    - test/built-ins/Array/prototype/find/
+    - test/built-ins/Array/prototype/findIndex/
+    - test/built-ins/Array/prototype/findLast/
+    - test/built-ins/Array/prototype/findLastIndex/
+dependencies:
+  - array-prototype-iterative
+landed: false
+status: blocked

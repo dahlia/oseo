@@ -1,0 +1,14 @@
+version: 1
+id: string-prototype-replace
+title: "String.prototype replacement"
+delivers: "Adds replace and replaceAll with functional replacers, substitution
+  text, named capture references, and coercion order."
+inventory:
+  included: 100
+  roots:
+    - test/built-ins/String/prototype/replace/
+    - test/built-ins/String/prototype/replaceAll/
+dependencies:
+  - string-prototype-match-and-split
+landed: false
+status: blocked

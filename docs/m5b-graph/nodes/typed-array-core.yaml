@@ -1,0 +1,25 @@
+version: 1
+id: typed-array-core
+title: "TypedArray core prototype"
+delivers: "Adds the integer-indexed exotic behavior with buffer, byteLength,
+  byteOffset, length, at, set, subarray, and the iterator methods."
+inventory:
+  included: 337
+  roots:
+    - test/built-ins/TypedArray/prototype/*.js
+    - test/built-ins/TypedArray/prototype/Symbol.iterator/
+    - test/built-ins/TypedArray/prototype/Symbol.toStringTag/
+    - test/built-ins/TypedArray/prototype/at/
+    - test/built-ins/TypedArray/prototype/buffer/
+    - test/built-ins/TypedArray/prototype/byteLength/
+    - test/built-ins/TypedArray/prototype/byteOffset/
+    - test/built-ins/TypedArray/prototype/entries/
+    - test/built-ins/TypedArray/prototype/keys/
+    - test/built-ins/TypedArray/prototype/length/
+    - test/built-ins/TypedArray/prototype/set/
+    - test/built-ins/TypedArray/prototype/subarray/
+    - test/built-ins/TypedArray/prototype/values/
+dependencies:
+  - typed-array-constructors
+landed: false
+status: blocked

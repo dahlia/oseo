@@ -1,0 +1,16 @@
+version: 1
+id: reflect-namespace
+title: "Reflect namespace object"
+delivers: "Adds the Reflect namespace exposing every essential internal method
+  as a function property."
+inventory:
+  included: 153
+  roots:
+    - test/built-ins/Reflect/
+dependencies:
+  - function-prototype
+  - object-define-property
+  - object-descriptor-queries
+  - object-own-keys
+landed: false
+status: blocked

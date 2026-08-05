@@ -1,0 +1,15 @@
+version: 1
+id: function-constructor-dynamic-source
+title: "Function constructor"
+delivers: "Would compile source text supplied after linking."
+inventory:
+  included: 179
+  roots:
+    - test/built-ins/Function/*.js
+dependencies:
+  - function-prototype
+landed: false
+status: parked
+reason: "ADR 0016 keeps the dynamic source family unsupported and ADR 0019
+  authorizes the exclusion for M5 completion. The paths stay accounted for
+  here rather than looking unclaimed."

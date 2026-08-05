@@ -1,0 +1,14 @@
+version: 1
+id: error-aggregate-and-options
+title: "AggregateError and error options"
+delivers: "Adds AggregateError with its errors list and the cause option
+  accepted by Error and every NativeError constructor."
+inventory:
+  included: 165
+  roots:
+    - test/built-ins/AggregateError/
+    - test/built-ins/Error/
+    - test/built-ins/NativeErrors/
+dependencies: []
+landed: false
+status: ready

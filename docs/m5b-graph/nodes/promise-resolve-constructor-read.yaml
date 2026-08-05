@@ -1,0 +1,9 @@
+version: 1
+id: promise-resolve-constructor-read
+title: "PromiseResolve constructor read"
+delivers: "Makes PromiseResolve read the value's constructor and compare it
+  with %Promise%, so a throwing constructor getter makes the operation abrupt."
+dependencies:
+  - promise-intrinsic
+landed: false
+status: blocked

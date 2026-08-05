@@ -1,0 +1,15 @@
+version: 1
+id: regexp-unicode-property-escapes
+title: "Unicode property escapes"
+delivers: "Adds the Unicode property escapes and the character class escapes
+  over the pinned Unicode property tables."
+inventory:
+  included: 625
+  roots:
+    - test/built-ins/RegExp/CharacterClassEscapes/
+    - test/built-ins/RegExp/property-escapes/
+dependencies:
+  - regexp-generic-matcher
+  - unicode-tables
+landed: false
+status: blocked

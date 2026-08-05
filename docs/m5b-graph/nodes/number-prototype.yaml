@@ -1,0 +1,14 @@
+version: 1
+id: number-prototype
+title: "Number.prototype formatting"
+delivers: "Adds Number.prototype toString with radix, toFixed, toExponential,
+  toPrecision, toLocaleString, and valueOf with their branded receiver checks."
+inventory:
+  included: 168
+  roots:
+    - test/built-ins/Number/prototype/
+dependencies:
+  - number-intrinsic
+  - string-intrinsic
+landed: false
+status: blocked

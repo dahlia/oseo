@@ -1,0 +1,15 @@
+version: 1
+id: array-prototype-change-by-copy
+title: "Array.prototype change by copy"
+delivers: "Adds with, toSpliced, and toReversed, which allocate a plain array
+  rather than consulting @@species."
+inventory:
+  included: 68
+  roots:
+    - test/built-ins/Array/prototype/toReversed/
+    - test/built-ins/Array/prototype/toSpliced/
+    - test/built-ins/Array/prototype/with/
+dependencies:
+  - array-prototype-copying
+landed: false
+status: blocked

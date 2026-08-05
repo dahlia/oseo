@@ -1,0 +1,20 @@
+version: 1
+id: array-prototype-mutation
+title: "Array.prototype in-place mutation"
+delivers: "Adds push, pop, shift, unshift, splice, fill, copyWithin, and
+  reverse with their length updates and hole preservation."
+inventory:
+  included: 249
+  roots:
+    - test/built-ins/Array/prototype/copyWithin/
+    - test/built-ins/Array/prototype/fill/
+    - test/built-ins/Array/prototype/pop/
+    - test/built-ins/Array/prototype/push/
+    - test/built-ins/Array/prototype/reverse/
+    - test/built-ins/Array/prototype/shift/
+    - test/built-ins/Array/prototype/splice/
+    - test/built-ins/Array/prototype/unshift/
+dependencies:
+  - array-constructor
+landed: false
+status: blocked

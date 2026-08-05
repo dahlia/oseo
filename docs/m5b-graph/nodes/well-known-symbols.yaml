@@ -1,0 +1,24 @@
+version: 1
+id: well-known-symbols
+title: "Remaining well-known symbols"
+delivers: "Extends the realm well-known symbol table from four entries to the
+  complete edition set with their identities, descriptions, and descriptors."
+inventory:
+  included: 28
+  roots:
+    - test/built-ins/Symbol/asyncIterator/
+    - test/built-ins/Symbol/hasInstance/
+    - test/built-ins/Symbol/isConcatSpreadable/
+    - test/built-ins/Symbol/iterator/
+    - test/built-ins/Symbol/match/
+    - test/built-ins/Symbol/matchAll/
+    - test/built-ins/Symbol/replace/
+    - test/built-ins/Symbol/search/
+    - test/built-ins/Symbol/species/
+    - test/built-ins/Symbol/split/
+    - test/built-ins/Symbol/toPrimitive/
+    - test/built-ins/Symbol/toStringTag/
+    - test/built-ins/Symbol/unscopables/
+dependencies: []
+landed: false
+status: ready

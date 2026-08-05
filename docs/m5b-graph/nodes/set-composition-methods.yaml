@@ -1,0 +1,20 @@
+version: 1
+id: set-composition-methods
+title: "Set composition methods"
+delivers: "Adds union, intersection, difference, symmetricDifference,
+  isSubsetOf, isSupersetOf, and isDisjointFrom over GetSetRecord."
+inventory:
+  included: 186
+  roots:
+    - test/built-ins/Set/prototype/difference/
+    - test/built-ins/Set/prototype/intersection/
+    - test/built-ins/Set/prototype/isDisjointFrom/
+    - test/built-ins/Set/prototype/isSubsetOf/
+    - test/built-ins/Set/prototype/isSupersetOf/
+    - test/built-ins/Set/prototype/symmetricDifference/
+    - test/built-ins/Set/prototype/union/
+dependencies:
+  - number-intrinsic
+  - set-intrinsic
+landed: false
+status: blocked

@@ -1,0 +1,18 @@
+version: 1
+id: array-constructor
+title: "Array constructor and statics"
+delivers: "Makes Array a real intrinsic value with its length-argument
+  construction, species accessor, and the from, of, and isArray statics."
+inventory:
+  included: 176
+  roots:
+    - test/built-ins/Array/*.js
+    - test/built-ins/Array/Symbol.species/
+    - test/built-ins/Array/from/
+    - test/built-ins/Array/isArray/
+    - test/built-ins/Array/length/
+    - test/built-ins/Array/of/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

@@ -1,0 +1,23 @@
+version: 1
+id: regexp-symbol-methods
+title: "RegExp symbol methods and String dispatch"
+delivers: "Adds @@match, @@matchAll, @@replace, @@search, @@split,
+  RegExp.escape, and %RegExpStringIteratorPrototype%, and routes the String
+  methods through them."
+inventory:
+  included: 253
+  roots:
+    - test/built-ins/RegExp/escape/
+    - test/built-ins/RegExp/prototype/Symbol.match/
+    - test/built-ins/RegExp/prototype/Symbol.matchAll/
+    - test/built-ins/RegExp/prototype/Symbol.replace/
+    - test/built-ins/RegExp/prototype/Symbol.search/
+    - test/built-ins/RegExp/prototype/Symbol.split/
+    - test/built-ins/RegExpStringIteratorPrototype/
+dependencies:
+  - iterator-intrinsic
+  - regexp-prototype-and-exec
+  - string-prototype-match-and-split
+  - string-prototype-replace
+landed: false
+status: blocked

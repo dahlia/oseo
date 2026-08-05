@@ -1,0 +1,30 @@
+version: 1
+id: set-intrinsic
+title: "Set and its iterators"
+delivers: "Adds Set with its element storage, insertion order, core prototype
+  methods, and %SetIteratorPrototype%."
+inventory:
+  included: 208
+  roots:
+    - test/built-ins/Set/*.js
+    - test/built-ins/Set/Symbol.species/
+    - test/built-ins/Set/prototype/*.js
+    - test/built-ins/Set/prototype/Symbol.iterator/
+    - test/built-ins/Set/prototype/Symbol.toStringTag/
+    - test/built-ins/Set/prototype/add/
+    - test/built-ins/Set/prototype/clear/
+    - test/built-ins/Set/prototype/constructor/
+    - test/built-ins/Set/prototype/delete/
+    - test/built-ins/Set/prototype/entries/
+    - test/built-ins/Set/prototype/forEach/
+    - test/built-ins/Set/prototype/has/
+    - test/built-ins/Set/prototype/keys/
+    - test/built-ins/Set/prototype/size/
+    - test/built-ins/Set/prototype/values/
+    - test/built-ins/SetIteratorPrototype/
+dependencies:
+  - iterator-intrinsic
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

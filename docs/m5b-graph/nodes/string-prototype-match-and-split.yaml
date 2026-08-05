@@ -1,0 +1,17 @@
+version: 1
+id: string-prototype-match-and-split
+title: "String.prototype symbol-dispatching search"
+delivers: "Adds match, matchAll, search, and split dispatching through the
+  well-known symbol protocol with string fallbacks."
+inventory:
+  included: 239
+  roots:
+    - test/built-ins/String/prototype/match/
+    - test/built-ins/String/prototype/matchAll/
+    - test/built-ins/String/prototype/search/
+    - test/built-ins/String/prototype/split/
+dependencies:
+  - string-prototype-search-and-slice
+  - well-known-symbols
+landed: false
+status: blocked

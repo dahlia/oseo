@@ -1,0 +1,28 @@
+version: 1
+id: function-intrinsic-chains
+title: "Generator and async prototype chains"
+delivers: "Materializes %GeneratorFunction%, %AsyncGeneratorFunction%,
+  %AsyncFunction%, and the generator, async generator, and async-from-sync
+  prototype chains reachable through Object.getPrototypeOf. The three
+  constructors become real intrinsic values with their own descriptors; a case
+  that calls one to compile a source string stays unsupported under ADR 0016
+  and is recorded as an unsupported profile feature rather than admitted here,
+  the same boundary function-constructor-dynamic-source carries for
+  %Function%."
+inventory:
+  included: 215
+  roots:
+    - test/built-ins/AsyncFromSyncIteratorPrototype/
+    - test/built-ins/AsyncFunction/
+    - test/built-ins/AsyncGeneratorFunction/
+    - test/built-ins/AsyncGeneratorPrototype/
+    - test/built-ins/AsyncIteratorPrototype/
+    - test/built-ins/GeneratorFunction/
+    - test/built-ins/GeneratorPrototype/
+dependencies:
+  - function-prototype
+  - iterator-intrinsic
+  - object-constructor
+  - promise-intrinsic
+landed: false
+status: blocked

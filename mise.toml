@@ -44,6 +44,7 @@ depends = [
   "check:test262-inventory",
   "check:lines",
   "check:lint",
+  "check:m5b-graph",
   "check:packages",
   "check:types",
   "check:versions",
@@ -81,6 +82,10 @@ run = "node tools/check-lines.ts"
 
 [tasks."check:lint"]
 run = "oxlint --deny-warnings ."
+
+[tasks."check:m5b-graph"]
+description = "Validate the checked-in M5b work graph"
+run = "node tools/m5b-graph.ts"
 
 [tasks."check:packages"]
 depends = ["build"]

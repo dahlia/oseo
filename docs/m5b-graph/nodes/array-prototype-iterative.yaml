@@ -1,0 +1,16 @@
+version: 1
+id: array-prototype-iterative
+title: "Array.prototype non-allocating iteration"
+delivers: "Adds every, some, and forEach with their callable checks, callback
+  argument order, and mutation-during-iteration behavior."
+inventory:
+  included: 627
+  roots:
+    - test/built-ins/Array/prototype/every/
+    - test/built-ins/Array/prototype/forEach/
+    - test/built-ins/Array/prototype/some/
+dependencies:
+  - array-constructor
+  - function-prototype
+landed: false
+status: blocked

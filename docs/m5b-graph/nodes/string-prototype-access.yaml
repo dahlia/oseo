@@ -1,0 +1,20 @@
+version: 1
+id: string-prototype-access
+title: "String.prototype element access"
+delivers: "Adds charAt, charCodeAt, codePointAt, at, toString, valueOf, and
+  the constructor link with their branded receiver checks."
+inventory:
+  included: 105
+  roots:
+    - test/built-ins/String/prototype/*.js
+    - test/built-ins/String/prototype/at/
+    - test/built-ins/String/prototype/charAt/
+    - test/built-ins/String/prototype/charCodeAt/
+    - test/built-ins/String/prototype/codePointAt/
+    - test/built-ins/String/prototype/constructor/
+    - test/built-ins/String/prototype/toString/
+    - test/built-ins/String/prototype/valueOf/
+dependencies:
+  - string-intrinsic
+landed: false
+status: blocked

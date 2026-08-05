@@ -1,0 +1,20 @@
+version: 1
+id: iterator-intrinsic
+title: "%Iterator% and %IteratorPrototype%"
+delivers: "Materializes %Iterator%, %IteratorPrototype%, and Iterator.from
+  with the wrap object the helper methods extend."
+inventory:
+  included: 37
+  roots:
+    - test/built-ins/Iterator/*.js
+    - test/built-ins/Iterator/from/
+    - test/built-ins/Iterator/prototype/*.js
+    - test/built-ins/Iterator/prototype/Symbol.iterator/
+    - test/built-ins/Iterator/prototype/Symbol.toStringTag/
+    - test/built-ins/Iterator/prototype/constructor/
+dependencies:
+  - function-prototype
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

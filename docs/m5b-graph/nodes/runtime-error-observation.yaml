@@ -1,0 +1,11 @@
+version: 1
+id: runtime-error-observation
+title: "Runtime negative error observation"
+delivers: "Renders a thrown value's identity and message so a runtime negative
+  whose thrown value is not a native error, such as Test262Error, is
+  observable."
+dependencies:
+  - error-aggregate-and-options
+  - generic-string-coercion
+landed: false
+status: blocked

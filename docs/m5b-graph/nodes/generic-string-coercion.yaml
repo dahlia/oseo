@@ -1,0 +1,11 @@
+version: 1
+id: generic-string-coercion
+title: "Generic string coercion"
+delivers: "Routes ToString for arbitrary objects through
+  %Object.prototype.toString%, @@toPrimitive, and @@toStringTag so arbitrary
+  values render without a private fallback."
+dependencies:
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

@@ -1,0 +1,20 @@
+version: 1
+id: object-integrity-levels
+title: "Object integrity levels"
+delivers: "Adds the extensible flag and the SetIntegrityLevel and
+  TestIntegrityLevel operations behind seal, freeze, preventExtensions,
+  isSealed, isFrozen, and isExtensible."
+inventory:
+  included: 317
+  roots:
+    - test/built-ins/Object/freeze/
+    - test/built-ins/Object/isExtensible/
+    - test/built-ins/Object/isFrozen/
+    - test/built-ins/Object/isSealed/
+    - test/built-ins/Object/preventExtensions/
+    - test/built-ins/Object/seal/
+dependencies:
+  - object-define-property
+  - object-descriptor-queries
+landed: false
+status: blocked

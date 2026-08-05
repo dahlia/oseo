@@ -1,0 +1,14 @@
+version: 1
+id: typed-array-constructors
+title: "TypedArray constructors"
+delivers: "Adds %TypedArray% and the concrete element-type constructors with
+  buffer, length, iterable, and typed-array construction paths."
+inventory:
+  included: 736
+  roots:
+    - test/built-ins/TypedArrayConstructors/
+dependencies:
+  - array-buffer
+  - iterator-intrinsic
+landed: false
+status: blocked

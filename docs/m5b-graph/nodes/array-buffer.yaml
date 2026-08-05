@@ -1,0 +1,15 @@
+version: 1
+id: array-buffer
+title: "ArrayBuffer"
+delivers: "Adds ArrayBuffer with its backing store, byteLength, resizable and
+  transfer behavior, slice, and species accessor."
+inventory:
+  included: 192
+  roots:
+    - test/built-ins/ArrayBuffer/
+dependencies:
+  - number-intrinsic
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

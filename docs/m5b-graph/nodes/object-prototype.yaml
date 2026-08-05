@@ -1,0 +1,15 @@
+version: 1
+id: object-prototype
+title: "%Object.prototype%"
+delivers: "Materializes %Object.prototype% as the default ordinary-object
+  prototype with hasOwnProperty, isPrototypeOf, propertyIsEnumerable,
+  toString, toLocaleString, valueOf, and constructor."
+inventory:
+  included: 179
+  roots:
+    - test/built-ins/Object/prototype/
+dependencies:
+  - intrinsic-graph-root
+  - well-known-symbols
+landed: false
+status: blocked

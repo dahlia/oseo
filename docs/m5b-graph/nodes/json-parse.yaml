@@ -1,0 +1,16 @@
+version: 1
+id: json-parse
+title: "JSON.parse"
+delivers: "Adds the JSON grammar parser, the reviver walk, and source-text
+  ordering for JSON.parse."
+inventory:
+  included: 72
+  roots:
+    - test/built-ins/JSON/parse/
+dependencies:
+  - array-constructor
+  - number-intrinsic
+  - object-define-property
+  - string-prototype-access
+landed: false
+status: blocked

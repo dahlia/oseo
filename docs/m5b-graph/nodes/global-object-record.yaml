@@ -1,0 +1,27 @@
+version: 1
+id: global-object-record
+title: "Standard global properties and restricted-global cases"
+delivers: "Completes the partial Global Environment Record M5a left behind.
+  oseo_global_object_create already installs the Script top-level var and
+  function bindings a compilation knows statically; this node adds the
+  standard value properties Infinity, NaN, and undefined with their
+  non-writable, non-enumerable, non-configurable attributes, and answers the
+  restricted-global and non-extensible cases that redeclaring or shadowing
+  them reaches. It does not expose the global object as a value;
+  globalthis-binding owns that, and it is parked for the architecture
+  decision reconciling a mutable global object with closed-world name
+  resolution."
+inventory:
+  included: 62
+  roots:
+    - test/built-ins/Infinity/
+    - test/built-ins/NaN/
+    - test/built-ins/undefined/
+    - test/language/global-code/
+dependencies:
+  - intrinsic-graph-root
+  - object-define-property
+  - object-descriptor-queries
+  - object-integrity-levels
+landed: false
+status: blocked

@@ -1,0 +1,12 @@
+version: 1
+id: regexp-matcher-backend-probes
+title: "Matcher backend probes and selection"
+delivers: "Would run the matcher-strategy, external-component, Unicode-table,
+  resource, and code-size probes and select a backend."
+dependencies:
+  - regexp-literal-aot
+landed: false
+status: parked
+reason: "PLAN-REGEXP.md delivery item 7 ends in an architecture decision
+  selecting an owned implementation, an external component, or a composed
+  design. Recording that selection is maintainer judgment."

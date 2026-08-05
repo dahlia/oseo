@@ -1,0 +1,14 @@
+version: 1
+id: data-view
+title: "DataView"
+delivers: "Adds DataView with its buffer view, endianness, bounds checks, and
+  the numeric and BigInt get and set methods."
+inventory:
+  included: 550
+  roots:
+    - test/built-ins/DataView/
+dependencies:
+  - array-buffer
+  - bigint-intrinsic
+landed: false
+status: blocked

@@ -1,0 +1,24 @@
+version: 1
+id: atomics-and-shared-memory
+title: "Atomics and shared memory"
+delivers: "Would add SharedArrayBuffer and the Atomics namespace."
+inventory:
+  included: 479
+  roots:
+    - test/built-ins/Atomics/
+    - test/built-ins/SharedArrayBuffer/
+dependencies:
+  - array-buffer
+  - typed-array-core
+landed: false
+status: parked
+reason: "Agent clusters and shared memory need runtime and $262 harness
+  capabilities that do not exist, as docs/language-profile-m5.md records.
+  This is an unowned gap, not an authorized exclusion: ADR 0013 keeps agents
+  and shared memory inside the candidate claim, and ADR 0019 records that no
+  accepted record authorizes excluding them, so they remain M5 work and still
+  block the conformance label. Some included paths here read descriptors or
+  exercise single-agent operations and would not need the missing
+  capabilities, so the gap is narrower than the family. Separating that
+  subset, and building the capabilities the rest needs, is work no other node
+  in this graph makes ready."

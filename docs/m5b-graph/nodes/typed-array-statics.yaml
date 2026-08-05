@@ -1,0 +1,16 @@
+version: 1
+id: typed-array-statics
+title: "TypedArray statics"
+delivers: "Adds %TypedArray%.from, %TypedArray%.of, and the @@species
+  accessor."
+inventory:
+  included: 42
+  roots:
+    - test/built-ins/TypedArray/*.js
+    - test/built-ins/TypedArray/Symbol.species/
+    - test/built-ins/TypedArray/from/
+    - test/built-ins/TypedArray/of/
+dependencies:
+  - typed-array-constructors
+landed: false
+status: blocked

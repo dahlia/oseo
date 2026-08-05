@@ -1,0 +1,14 @@
+version: 1
+id: math-namespace
+title: "Math namespace object"
+delivers: "Adds the Math namespace object with its constants and every
+  function property at the precision and edge-case behavior the edition
+  requires."
+inventory:
+  included: 317
+  roots:
+    - test/built-ins/Math/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

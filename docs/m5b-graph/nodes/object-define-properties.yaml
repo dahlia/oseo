@@ -1,0 +1,13 @@
+version: 1
+id: object-define-properties
+title: "Object.defineProperties"
+delivers: "Adds ObjectDefineProperties with its descriptor collection pass,
+  own enumerable key ordering, and failure ordering."
+inventory:
+  included: 632
+  roots:
+    - test/built-ins/Object/defineProperties/
+dependencies:
+  - object-define-property
+landed: false
+status: blocked

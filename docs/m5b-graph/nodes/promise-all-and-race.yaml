@@ -1,0 +1,16 @@
+version: 1
+id: promise-all-and-race
+title: "Promise.all and Promise.race"
+delivers: "Reimplements all and race over the materialized intrinsic,
+  including constructor and resolve reads and iterator close on an abrupt
+  element."
+inventory:
+  included: 192
+  roots:
+    - test/built-ins/Promise/all/
+    - test/built-ins/Promise/race/
+dependencies:
+  - array-constructor
+  - promise-intrinsic
+landed: false
+status: blocked

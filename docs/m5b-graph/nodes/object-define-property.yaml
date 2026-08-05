@@ -1,0 +1,14 @@
+version: 1
+id: object-define-property
+title: "Object.defineProperty"
+delivers: "Adds Object.defineProperty over the existing descriptor validation,
+  including its conversion order, attribute defaults, and abrupt completion
+  points."
+inventory:
+  included: 1131
+  roots:
+    - test/built-ins/Object/defineProperty/
+dependencies:
+  - object-constructor
+landed: false
+status: blocked

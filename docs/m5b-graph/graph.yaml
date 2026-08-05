@@ -1,0 +1,236 @@
+version: 1
+checkpoint: M5b
+usage: "One record per node lives in docs/m5b-graph/nodes. Take a node whose
+  status is ready and whose landed field is still false. The change that lands
+  a node sets its landed field to true and updates the status of every direct
+  dependent the landing unblocks; mise run check:m5b-graph fails when those
+  states disagree. A parked node is not work: its reason names what would have
+  to be decided or built elsewhere first, and nothing in this graph can make it
+  ready. Collisions are advisory, not edges: two nodes in one collision group
+  have no dependency between them, so either may land first, but they edit the
+  same file and should not run in parallel lanes. The backlog is what a lane
+  takes when no node is ready, in the order listed."
+summary:
+  nodes: 86
+  ready: 6
+  blocked: 73
+  parked: 7
+serializationPoints:
+  - path: packages/runtime-c/src/index.ts
+    note: "Carries abiVersion, which every admitted checkpoint bumps. One
+      line, every lane, so a landing rebases onto whatever value is on main
+      rather than merging the field."
+  - path: docs/runtime-components.md
+    note: "Records translation-unit ownership, the internal-helper table, and
+      the documented component cycles. A node that adds a component or an
+      oseo_internal_ helper edits it."
+  - path: docs/language-profile-m5.md
+    note: "The normative profile. A node that admits behavior edits its
+      admitted-family section and removes or narrows the matching entry under
+      Known gaps inside the claim."
+  - path: docs/language-profile-m5/families
+    note: "One evidence record and one index entry per admitted family, both
+      validated by tools/evidence-lanes.ts."
+  - path: tests/test262/results.yaml
+    note: "The result manifest index and its sorted partitions, regenerated
+      by mise run test262:update. Two lanes cannot regenerate concurrently."
+  - path: tests/test262/subset.yaml
+    note: "The reviewed subset. It must describe the same path set as the
+      manifest, so it moves in the same change."
+  - path: tests/native.ts
+    note: "The reviewed differential fixture corpus registry."
+collisions:
+  - path: packages/runtime-c/native/runtime_internal.h
+    nodes:
+      - builtin-code-registry
+      - error-aggregate-and-options
+      - intrinsic-graph-root
+      - well-known-symbols
+    note: "The dense hand-numbered built-in code-ID block and the well-known
+      symbol index block both live here. builtin-code-registry rewrites the
+      first of them, so let it land before the other three add entries."
+  - path: packages/runtime-c/native/runtime_function.c
+    nodes:
+      - builtin-code-registry
+      - error-aggregate-and-options
+    note: "Dispatch is one else-if chain over code IDs, so every node that
+      adds a built-in function appends to it. That makes this group a rule,
+      not the closed list below, and the schema cannot express it: no node
+      declares a dependency on builtin-code-registry, so nothing orders a
+      later built-in-function node against it. Land builtin-code-registry
+      early and before running built-in-function nodes concurrently. The two
+      named here are the pair that can already run unordered today."
+  - path: packages/runtime-c/native/oseo_runtime.h
+    nodes:
+      - builtin-code-registry
+      - intrinsic-graph-root
+    note: "The generated-code ABI declarations. A new entry point here also
+      moves abiVersion."
+  - path: packages/runtime-c/native/runtime_property.c
+    nodes:
+      - intrinsic-graph-root
+      - well-known-symbols
+    note: "Owns the virtualized intrinsic-method classification that
+      intrinsic-graph-root retires and the symbol-keyed property paths."
+  - path: packages/runtime-c/native/runtime_symbol.c
+    nodes:
+      - intrinsic-graph-root
+      - well-known-symbols
+    note: "The lazily created Symbol intrinsic and the four-entry well-known
+      symbol table."
+  - path: packages/runtime-c/native/runtime_error.c
+    nodes:
+      - error-aggregate-and-options
+      - intrinsic-graph-root
+    note: "The lazily created error constructor and prototype pairs move into
+      the realm intrinsic table while a new error kind is being added."
+  - path: packages/runtime-c/native/runtime_object_builtin.c
+    nodes:
+      - object-define-property
+      - object-descriptor-queries
+      - object-own-keys
+    note: "The Object statics share one component. Their descendants
+      object-define-properties, object-create, and object-integrity-levels
+      land in the same file."
+  - path: packages/runtime-c/native/runtime_object_builtin.c
+    nodes:
+      - object-integrity-levels
+      - object-own-keys
+    note: "The same component again, for the pair that the descriptor and
+      define-property edges do not already order."
+  - path: packages/runtime-c/native/runtime_array.c
+    nodes:
+      - array-prototype-index-search
+      - array-prototype-iterative
+      - array-prototype-iterators
+      - array-prototype-mutation
+    note: "Array exotic behavior and every Array.prototype unit share one
+      component, so these four contend for it directly."
+  - path: packages/runtime-c/native/runtime_array.c
+    nodes:
+      - array-prototype-index-search
+      - array-prototype-iterators
+      - array-prototype-mutation
+      - array-prototype-predicate-search
+      - array-prototype-reduction
+    note: "The same component for the units that descend from
+      array-prototype-iterative but not from each other."
+  - path: packages/runtime-c/native/runtime_string.c
+    nodes:
+      - string-iterator
+      - string-prototype-case
+      - string-prototype-match-and-split
+      - string-prototype-pad
+    note: "String values and String exotic own properties are one component.
+      Splitting it is worth considering before these four run in parallel."
+  - path: packages/runtime-c/native/runtime_iterator.c
+    nodes:
+      - iterator-intrinsic
+      - string-iterator
+    note: "The synchronous iterator protocol and its cached virtualized
+      methods."
+  - path: packages/runtime-c/native/runtime_promise.c
+    nodes:
+      - promise-all-and-race
+      - promise-resolve-constructor-read
+    note: "Combinators and PromiseResolve are the same component."
+  - path: packages/runtime-c/tests/symbols.test.ts
+    nodes:
+      - map-intrinsic
+      - regexp-intrinsic
+      - set-intrinsic
+      - typed-array-constructors
+    note: "The reviewed asset list, include boundaries, and one-definition
+      rule. Any node that adds a translation unit edits this list."
+  - path: packages/compiler/src/hir.ts
+    nodes:
+      - array-constructor
+      - boolean-intrinsic
+      - math-namespace
+      - number-intrinsic
+      - object-constructor
+      - promise-intrinsic
+      - string-intrinsic
+      - symbol-intrinsic
+    note: "The known standard global names the frontend resolves. Every
+      constructor node adds a name here and in hir-build.ts until
+      global-object-record replaces the mechanism."
+  - path: packages/runtime-c/native/runtime_typed_array.c
+    nodes:
+      - typed-array-core
+      - typed-array-statics
+    note: "A component that does not exist yet. Whichever node lands first
+      creates it, and both add to docs/runtime-components.md."
+  - path: packages/runtime-c/native/runtime_typed_array.c
+    nodes:
+      - typed-array-iterative
+      - typed-array-mutation
+      - typed-array-search-and-join
+      - typed-array-sort
+    note: "The same component for the four prototype units that descend from
+      typed-array-core but not from each other."
+  - path: packages/runtime-c/native/runtime_regexp.c
+    nodes:
+      - regexp-pattern-extensions
+      - regexp-symbol-methods
+    note: "A component that does not exist yet. Pattern grammar extensions
+      and the symbol-dispatching methods land in the same runtime component
+      even though neither needs the other."
+backlog:
+  - id: reviewed-subset-growth
+    title: "Grow the reviewed test262 subset inside admitted families"
+    delivers: "Adds already-applicable upstream paths in families the profile
+      already admits, with their observed classifications, and regenerates the
+      manifest partitions in the same change."
+    independent: "It adds no semantics and touches no runtime component, so it
+      cannot conflict with a graph node outside the manifest serialization
+      point."
+  - id: omitted-evidence-conversion
+    title: "Convert omitted evidence classes that now have coverage"
+    delivers: "Replaces an omitted evidence class in an M5a family record with
+      a covered status when a later unit supplied the missing generated,
+      forced-collection, or guard-fallback observation."
+    independent: "Each family record is one file with one owner and no runtime
+      code changes."
+  - id: property-generator-gaps
+    title: "Extend valid and invalid generators for admitted M5a families"
+    delivers: "Adds generated domains for admitted families whose records
+      still record generated evidence as omitted, with seeds, replay paths,
+      and independent oracles."
+    independent: "It adds no runtime or compiler behavior. It is not free of
+      collisions, though: the M5 property corpus lives in tests/property/
+      rather than beside each package, and every new domain also claims a slot
+      in tests/property-seeds.yaml, so two lanes doing this at once contend
+      for the seed registry."
+  - id: forced-collection-fixtures
+    title: "Add forced-collection differential fixtures"
+    delivers: "Extends existing native fixtures so admitted families that
+      allocate across a safepoint execute under collection forced at every
+      safepoint under both specialization policies."
+    independent: "It changes fixtures rather than semantics. Fixtures are
+      grouped by category under tests/native/fixtures/ rather than stored one
+      file per family, so two lanes extending the same category contend for
+      that one file. tests/native.ts only imports the categories, so it moves
+      when a lane adds a category, not when one grows."
+  - id: size-and-compile-time-report
+    title: "Publish the reproducible size and compile-time report"
+    delivers: "Adds the documented task that records compile time, generated C
+      size, executable size, and peak runtime allocation that PLAN-M5.md
+      requires and no current task produces."
+    independent: "It is a new tool and mise task that reads artifacts rather
+      than changing them."
+  - id: runtime-components-validator
+    title: "Validate the runtime component and helper tables"
+    delivers: "Extends the symbols test so the component list and the
+      internal-helper ownership table in docs/runtime-components.md are
+      checked against the sources rather than maintained by hand."
+    independent: "It reads the existing native sources and adds no runtime
+      behavior, though it makes every later component addition update the
+      document."
+  - id: diagnostic-location-audit
+    title: "Audit source-located diagnostics for unadmitted built-ins"
+    delivers: "Confirms that every free reference to an unadmitted standard
+      global produces one owned compile-stage diagnostic with an exact source
+      location, and adds the missing parser and compiler cases."
+    independent: "It touches diagnostics and their tests only, and it shrinks
+      as constructor nodes land."

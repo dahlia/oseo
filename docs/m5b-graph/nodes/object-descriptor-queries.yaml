@@ -1,0 +1,14 @@
+version: 1
+id: object-descriptor-queries
+title: "Object descriptor queries"
+delivers: "Adds Object.getOwnPropertyDescriptor and
+  Object.getOwnPropertyDescriptors with FromPropertyDescriptor object shapes."
+inventory:
+  included: 328
+  roots:
+    - test/built-ins/Object/getOwnPropertyDescriptor/
+    - test/built-ins/Object/getOwnPropertyDescriptors/
+dependencies:
+  - object-constructor
+landed: false
+status: blocked

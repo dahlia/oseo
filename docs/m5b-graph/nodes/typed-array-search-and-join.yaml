@@ -1,0 +1,23 @@
+version: 1
+id: typed-array-search-and-join
+title: "TypedArray search and joining"
+delivers: "Adds find, findIndex, findLast, findLastIndex, indexOf,
+  lastIndexOf, includes, join, toString, and toLocaleString."
+inventory:
+  included: 356
+  roots:
+    - test/built-ins/TypedArray/prototype/find/
+    - test/built-ins/TypedArray/prototype/findIndex/
+    - test/built-ins/TypedArray/prototype/findLast/
+    - test/built-ins/TypedArray/prototype/findLastIndex/
+    - test/built-ins/TypedArray/prototype/includes/
+    - test/built-ins/TypedArray/prototype/indexOf/
+    - test/built-ins/TypedArray/prototype/join/
+    - test/built-ins/TypedArray/prototype/lastIndexOf/
+    - test/built-ins/TypedArray/prototype/toLocaleString/
+    - test/built-ins/TypedArray/prototype/toString/
+dependencies:
+  - string-prototype-access
+  - typed-array-core
+landed: false
+status: blocked

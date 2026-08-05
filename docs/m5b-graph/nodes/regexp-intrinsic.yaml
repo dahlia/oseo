@@ -1,0 +1,17 @@
+version: 1
+id: regexp-intrinsic
+title: "RegExp intrinsic and initialization"
+delivers: "Adds the RegExp intrinsic, allocation, initialization, lastIndex
+  state, and catchable dynamic-pattern SyntaxError over the generic matcher."
+inventory:
+  included: 492
+  roots:
+    - test/built-ins/RegExp/*.js
+    - test/built-ins/RegExp/Symbol.species/
+dependencies:
+  - error-aggregate-and-options
+  - object-prototype
+  - regexp-generic-matcher
+  - well-known-symbols
+landed: false
+status: blocked

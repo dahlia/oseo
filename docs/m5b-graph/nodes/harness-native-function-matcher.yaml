@@ -1,0 +1,10 @@
+version: 1
+id: harness-native-function-matcher
+title: "nativeFunctionMatcher.js harness include"
+delivers: "Implements the reviewed nativeFunctionMatcher.js include so cases
+  asserting the NativeFunction source grammar can enter the reviewed subset."
+dependencies:
+  - function-prototype
+  - string-prototype-search-and-slice
+landed: false
+status: blocked

@@ -1,0 +1,17 @@
+version: 1
+id: function-prototype
+title: "%Function.prototype% methods"
+delivers: "Materializes %Function.prototype% with call, apply, bind, toString,
+  hasInstance dispatch, and the length and name descriptors, alongside the
+  existing %ThrowTypeError%."
+inventory:
+  included: 344
+  roots:
+    - test/built-ins/Function/internals/
+    - test/built-ins/Function/length/
+    - test/built-ins/Function/prototype/
+    - test/built-ins/ThrowTypeError/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked

@@ -1,0 +1,22 @@
+version: 1
+id: string-prototype-case
+title: "String.prototype case and trimming"
+delivers: "Adds toLowerCase, toUpperCase, their locale forms, trim, trimStart,
+  trimEnd, normalize, and localeCompare over the pinned Unicode tables."
+inventory:
+  included: 312
+  roots:
+    - test/built-ins/String/prototype/localeCompare/
+    - test/built-ins/String/prototype/normalize/
+    - test/built-ins/String/prototype/toLocaleLowerCase/
+    - test/built-ins/String/prototype/toLocaleUpperCase/
+    - test/built-ins/String/prototype/toLowerCase/
+    - test/built-ins/String/prototype/toUpperCase/
+    - test/built-ins/String/prototype/trim/
+    - test/built-ins/String/prototype/trimEnd/
+    - test/built-ins/String/prototype/trimStart/
+dependencies:
+  - string-prototype-access
+  - unicode-tables
+landed: false
+status: blocked

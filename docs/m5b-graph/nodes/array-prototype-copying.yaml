@@ -1,0 +1,20 @@
+version: 1
+id: array-prototype-copying
+title: "Array.prototype copying and flattening"
+delivers: "Adds slice, concat, join, toString, toLocaleString, flat, and
+  flatMap with @@isConcatSpreadable and species allocation."
+inventory:
+  included: 229
+  roots:
+    - test/built-ins/Array/prototype/concat/
+    - test/built-ins/Array/prototype/flat/
+    - test/built-ins/Array/prototype/flatMap/
+    - test/built-ins/Array/prototype/join/
+    - test/built-ins/Array/prototype/slice/
+    - test/built-ins/Array/prototype/toLocaleString/
+    - test/built-ins/Array/prototype/toString/
+dependencies:
+  - array-prototype-species-mapping
+  - string-prototype-access
+landed: false
+status: blocked

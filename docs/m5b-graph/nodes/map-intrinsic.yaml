@@ -1,0 +1,16 @@
+version: 1
+id: map-intrinsic
+title: "Map and its iterators"
+delivers: "Adds Map with its keyed collection storage, SameValueZero keying,
+  insertion order, prototype methods, and %MapIteratorPrototype%."
+inventory:
+  included: 182
+  roots:
+    - test/built-ins/Map/
+    - test/built-ins/MapIteratorPrototype/
+dependencies:
+  - iterator-intrinsic
+  - object-prototype
+  - well-known-symbols
+landed: false
+status: blocked

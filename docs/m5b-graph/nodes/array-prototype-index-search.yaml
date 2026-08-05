@@ -1,0 +1,16 @@
+version: 1
+id: array-prototype-index-search
+title: "Array.prototype index search"
+delivers: "Adds indexOf, lastIndexOf, includes, and at with their
+  strict-equality and SameValueZero comparisons and relative index handling."
+inventory:
+  included: 442
+  roots:
+    - test/built-ins/Array/prototype/at/
+    - test/built-ins/Array/prototype/includes/
+    - test/built-ins/Array/prototype/indexOf/
+    - test/built-ins/Array/prototype/lastIndexOf/
+dependencies:
+  - array-constructor
+landed: false
+status: blocked

@@ -1,0 +1,20 @@
+version: 1
+id: array-prototype-iterators
+title: "Array iterator methods"
+delivers: "Adds values, keys, entries, @@iterator, and @@unscopables over the
+  materialized %ArrayIteratorPrototype%."
+inventory:
+  included: 75
+  roots:
+    - test/built-ins/Array/prototype/*.js
+    - test/built-ins/Array/prototype/Symbol.iterator/
+    - test/built-ins/Array/prototype/Symbol.unscopables/
+    - test/built-ins/Array/prototype/entries/
+    - test/built-ins/Array/prototype/keys/
+    - test/built-ins/Array/prototype/values/
+    - test/built-ins/ArrayIteratorPrototype/
+dependencies:
+  - array-constructor
+  - iterator-intrinsic
+landed: false
+status: blocked

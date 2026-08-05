@@ -1,0 +1,11 @@
+version: 1
+id: regexp-generic-matcher
+title: "Generic matcher artifact and executor"
+delivers: "Implements the semantic-authority matcher artifact and executor for
+  the admitted pattern grammar, freezing choice, capture, Unicode, and
+  resource behavior."
+dependencies:
+  - regexp-pattern-ast
+  - unicode-tables
+landed: false
+status: blocked

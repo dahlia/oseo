@@ -1,0 +1,13 @@
+version: 1
+id: boolean-intrinsic
+title: "Boolean intrinsic and wrapper"
+delivers: "Adds the Boolean constructor, its prototype, and the wrapper object
+  with branded toString and valueOf."
+inventory:
+  included: 51
+  roots:
+    - test/built-ins/Boolean/
+dependencies:
+  - object-prototype
+landed: false
+status: blocked
