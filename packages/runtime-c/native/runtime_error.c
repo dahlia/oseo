@@ -4,6 +4,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+OseoResult oseo_internal_error_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    if (code_id >= OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID &&
+        code_id <= OSEO_ERROR_CONSTRUCT_LAST_CODE_ID) {
+        return oseo_internal_error_construct(
+            context,
+            callee,
+            new_target,
+            code_id,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
+        return oseo_internal_error_to_string(context, receiver);
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
 /*
  * Named error intrinsics: lazily created constructor and prototype
  * pairs, typed runtime error creation, the Error.prototype.toString

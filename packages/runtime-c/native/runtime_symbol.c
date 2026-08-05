@@ -3,6 +3,35 @@
 #include <stdlib.h>
 #include <string.h>
 
+OseoResult oseo_internal_symbol_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)receiver;
+    (void)new_target;
+    if (code_id != OSEO_SYMBOL_CONSTRUCT_CODE_ID) {
+        return oseo_unknown_function(context, code_id);
+    }
+    OseoValue description_input = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (tag_of(description_input) == OSEO_TAG_UNDEFINED) {
+        return oseo_internal_symbol_create(context, oseo_undefined());
+    }
+    OseoResult result =
+        oseo_internal_value_string(context, description_input);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_symbol_create(context, result.value);
+    }
+    return result;
+}
+
 /*
  * Symbol values: unique heap primitives with an optional description,
  * the lazily created Symbol intrinsic, and the well-known symbols

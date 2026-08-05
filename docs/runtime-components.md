@@ -174,12 +174,20 @@ its read and write.
 
 ### Internal helpers
 
-Sixty-four helpers cross a translation-unit boundary. Each uses the
+Seventy-two helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
 | Internal helper                                     | Defined in                    |
 | --------------------------------------------------- | ----------------------------- |
+| `oseo_internal_promise_builtin_dispatch`            | *runtime\_promise.c*          |
+| `oseo_internal_error_builtin_dispatch`              | *runtime\_error.c*            |
+| `oseo_internal_symbol_builtin_dispatch`             | *runtime\_symbol.c*           |
+| `oseo_internal_iterator_builtin_dispatch`           | *runtime\_iterator.c*         |
+| `oseo_internal_generator_builtin_dispatch`          | *runtime\_generator.c*        |
+| `oseo_internal_async_generator_builtin_dispatch`    | *runtime\_async\_generator.c* |
+| `oseo_internal_array_builtin_dispatch`              | *runtime\_array.c*            |
+| `oseo_internal_arguments_builtin_dispatch`          | *runtime\_arguments.c*        |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
@@ -259,10 +267,9 @@ and *runtime\_enumeration.c*.
     *runtime\_property.c*, materializes `then`, `catch`, and `finally`
     through `oseo_internal_promise_method_function`, while promise code
     builds ordinary objects through public object operations;
- -  function to promise: generic dispatch executes the internal promise
-    built-in code IDs through the promoted `oseo_internal_promise_*`
-    helpers, while promise code re-enters callables through
-    `oseo_call_function`;
+ -  function to promise: the built-in code-range table delegates the
+    promise range to `oseo_internal_promise_builtin_dispatch`, while promise
+    code re-enters callables through `oseo_call_function`;
  -  object and primitive: array-length semantics in *runtime\_array.c*
     and descriptor semantics in *runtime\_descriptor.c* call
     `oseo_internal_to_number`, while coercions and operators use public

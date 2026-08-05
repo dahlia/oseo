@@ -5,6 +5,184 @@
 #include <stdlib.h>
 #include <string.h>
 
+OseoResult oseo_internal_promise_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)new_target;
+    if (code_id == OSEO_PROMISE_RESOLVE_CODE_ID ||
+        code_id == OSEO_PROMISE_REJECT_CODE_ID) {
+        OseoResult result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 1u);
+        }
+        OseoValue latch = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_cell_get(context, latch);
+        }
+        bool already_resolved = result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value);
+        if (already_resolved) {
+            result = normal(oseo_undefined());
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_cell_set(context, latch, oseo_boolean(true));
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_resolved) {
+            OseoValue argument = argument_count > 0u
+                ? arguments[0]
+                : oseo_undefined();
+            result = code_id == OSEO_PROMISE_RESOLVE_CODE_ID
+                ? oseo_promise_resolve_into(context, result.value, argument)
+                : oseo_promise_reject_into(context, result.value, argument);
+        }
+        return result;
+    }
+    if (code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID ||
+        code_id == OSEO_PROMISE_FINALLY_REJECT_CODE_ID) {
+        OseoRootFrame frame = {NULL, NULL, 0u};
+        OseoResult result = oseo_roots_allocate(context, &frame, 7u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            frame.slots[0] = callee;
+            frame.slots[3] = argument_count > 0u
+                ? arguments[0]
+                : oseo_undefined();
+            result = oseo_function_environment(context, frame.slots[0]);
+            frame.slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, frame.slots[1], 0u);
+            frame.slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_call_function(
+                context,
+                frame.slots[2],
+                oseo_undefined(),
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_promise_resolve(context, frame.slots[4]);
+            frame.slots[5] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            bool fulfilled =
+                code_id == OSEO_PROMISE_FINALLY_FULFILL_CODE_ID;
+            result = oseo_internal_promise_finally_continuation_create(
+                context,
+                frame.slots[3],
+                fulfilled
+            );
+            frame.slots[6] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_promise_invoke_then(
+                context,
+                frame.slots[5],
+                frame.slots[6],
+                oseo_undefined()
+            );
+        }
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    if (code_id == OSEO_PROMISE_FINALLY_CONTINUE_CODE_ID) {
+        OseoResult result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        OseoValue preserved = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_environment_get(context, environment, 1u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            oseo_to_boolean(result.value)) {
+            result = normal(preserved);
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            oseo_context_clear_language_error(context);
+            result = (OseoResult){OSEO_STATUS_THROW, preserved};
+        }
+        return result;
+    }
+    if (code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID ||
+        code_id == OSEO_PROMISE_AGGREGATE_REJECT_CODE_ID) {
+        OseoResult result = oseo_function_environment(context, callee);
+        OseoValue environment = result.value;
+        bool fulfilling =
+            code_id == OSEO_PROMISE_AGGREGATE_FULFILL_CODE_ID;
+        if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
+            result = oseo_environment_get(context, environment, 1u);
+        }
+        bool already_fulfilled = result.status == OSEO_STATUS_NORMAL &&
+            fulfilling && oseo_to_boolean(result.value);
+        if (already_fulfilled) {
+            result = normal(oseo_undefined());
+        } else if (result.status == OSEO_STATUS_NORMAL && fulfilling) {
+            result = oseo_environment_set(
+                context,
+                environment,
+                1u,
+                oseo_boolean(true)
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
+            result = oseo_environment_get(context, environment, 0u);
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !already_fulfilled) {
+            OseoValue argument = argument_count > 0u
+                ? arguments[0]
+                : oseo_undefined();
+            result = oseo_internal_promise_aggregate_settle(
+                context,
+                result.value,
+                argument,
+                fulfilling
+            );
+        }
+        return result;
+    }
+    if (code_id == OSEO_PROMISE_THEN_CODE_ID ||
+        code_id == OSEO_PROMISE_CATCH_CODE_ID ||
+        code_id == OSEO_PROMISE_FINALLY_CODE_ID) {
+        OseoValue first = argument_count > 0u
+            ? arguments[0]
+            : oseo_undefined();
+        OseoValue second = argument_count > 1u
+            ? arguments[1]
+            : oseo_undefined();
+        if (code_id == OSEO_PROMISE_THEN_CODE_ID) {
+            return oseo_promise_then(context, receiver, first, second);
+        }
+        if (code_id == OSEO_PROMISE_CATCH_CODE_ID) {
+            return oseo_internal_promise_invoke_then(
+                context,
+                receiver,
+                oseo_undefined(),
+                first
+            );
+        }
+        return oseo_internal_promise_finally_invoke(
+            context,
+            receiver,
+            first
+        );
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
 /*
  * Promises, capabilities, reactions, thenable jobs, combinators,
  * and rejection tracking.

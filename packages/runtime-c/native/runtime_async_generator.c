@@ -1,5 +1,48 @@
 #include "runtime_internal.h"
 
+OseoResult oseo_internal_async_generator_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)new_target;
+    OseoValue argument = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (code_id == OSEO_ASYNC_GENERATOR_NEXT_CODE_ID) {
+        return oseo_async_generator_next(context, receiver, argument);
+    }
+    if (code_id == OSEO_ASYNC_GENERATOR_RETURN_CODE_ID) {
+        return oseo_async_generator_return(context, receiver, argument);
+    }
+    if (code_id == OSEO_ASYNC_GENERATOR_THROW_CODE_ID) {
+        return oseo_async_generator_throw(context, receiver, argument);
+    }
+    if (code_id != OSEO_ASYNC_GENERATOR_FULFILL_CODE_ID &&
+        code_id != OSEO_ASYNC_GENERATOR_REJECT_CODE_ID) {
+        return oseo_unknown_function(context, code_id);
+    }
+    /* One await reaction carries the resumed generator in slot zero. */
+    OseoResult result = oseo_function_environment(context, callee);
+    OseoValue environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_get(context, environment, 0u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_async_generator_awaited(
+            context,
+            result.value,
+            argument,
+            code_id == OSEO_ASYNC_GENERATOR_REJECT_CODE_ID
+        );
+    }
+    return result;
+}
+
 /*
  * Asynchronous generator objects: the AsyncGeneratorRequest queue, the
  * driver that runs one request at a time, and the two reactions that
