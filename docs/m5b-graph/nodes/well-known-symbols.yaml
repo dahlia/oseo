@@ -20,5 +20,5 @@ inventory:
     - test/built-ins/Symbol/toStringTag/
     - test/built-ins/Symbol/unscopables/
 dependencies: []
-landed: false
+landed: true
 status: ready
