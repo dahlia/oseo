@@ -5,5 +5,5 @@ delivers: "Replaces the hand-numbered SIZE_MAX code-ID block and the single
   else-if dispatch chain with per-component ID ranges and table-driven
   dispatch so later families stop editing one shared block."
 dependencies: []
-landed: false
+landed: true
 status: ready
