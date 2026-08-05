@@ -14,6 +14,8 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
+
 interface PackedFile {
   readonly path: string;
 }
@@ -77,6 +79,54 @@ function requireFile(
   name: string,
 ): void {
   if (!files.has(path)) throw new Error(`${name} archive is missing ${path}.`);
+}
+
+const runtimeNativePrefix = "native/";
+
+/**
+ * Archive paths of the reviewed C runtime assets, derived from the
+ * `@oseo/runtime-c` public entry point instead of a copy maintained here.
+ * That provider is the list the compiler consumes and the build ships, and
+ * a package test pins it to a reviewed order, so a new runtime unit reaches
+ * this check as soon as it is added there.
+ */
+const runtimeNativeFiles: ReadonlySet<string> = new Set(
+  cRuntimeProvider
+    .getRuntimeInput()
+    .assets.map((asset) => `${runtimeNativePrefix}${asset.name}`),
+);
+
+if (runtimeNativeFiles.size === 0) {
+  throw new Error(
+    "The @oseo/runtime-c asset list is empty, so the packaging check " +
+      "would verify nothing.",
+  );
+}
+
+/**
+ * Require the packed `@oseo/runtime-c` archive to hold exactly the reviewed
+ * native assets. A missing asset fails, and so does a packed native file
+ * that no reviewed asset names, so neither the archive nor the asset list
+ * can drift away from the other unnoticed.
+ */
+function requireRuntimeNativeFiles(
+  files: ReadonlySet<string>,
+  name: string,
+): void {
+  for (const path of runtimeNativeFiles) requireFile(files, path, name);
+  const unexpected = [...files]
+    .filter(
+      (path) =>
+        path.startsWith(runtimeNativePrefix) && !runtimeNativeFiles.has(path),
+    )
+    .toSorted();
+  if (unexpected.length > 0) {
+    throw new Error(
+      `${name} archive packs unreviewed native files: ` +
+        `${unexpected.join(", ")}. List each file in the runtime asset ` +
+        "list of packages/runtime-c/src/index.ts or stop packing it.",
+    );
+  }
 }
 
 function requireReleaseDependencies(
@@ -212,20 +262,7 @@ async function main(): Promise<void> {
         throw new Error(`${packed.name} npm archive contains private source.`);
       }
       if (packed.name === "@oseo/runtime-c") {
-        requireFile(files, "native/oseo_runtime.h", packed.name);
-        requireFile(files, "native/runtime_internal.h", packed.name);
-        requireFile(files, "native/runtime_core.c", packed.name);
-        requireFile(files, "native/runtime_memory.c", packed.name);
-        requireFile(files, "native/runtime_binding.c", packed.name);
-        requireFile(files, "native/runtime_object.c", packed.name);
-        requireFile(files, "native/runtime_function.c", packed.name);
-        requireFile(files, "native/runtime_error.c", packed.name);
-        requireFile(files, "native/runtime_symbol.c", packed.name);
-        requireFile(files, "native/runtime_iterator.c", packed.name);
-        requireFile(files, "native/runtime_generator.c", packed.name);
-        requireFile(files, "native/runtime_primitive.c", packed.name);
-        requireFile(files, "native/runtime_promise.c", packed.name);
-        requireFile(files, "native/runtime_event_loop.c", packed.name);
+        requireRuntimeNativeFiles(files, packed.name);
       }
       const manifestBytes = await run(
         "tar",
