@@ -4,7 +4,7 @@ min_version = "2026.6.1"
 experimental = true
 
 [hooks]
-postinstall = "mise generate git-pre-commit --write --task=check"
+postinstall = "mise run install-hooks"
 
 [tools]
 "aqua:dahlia/hongdown" = "0.5.3"
@@ -56,6 +56,11 @@ run = "actionlint"
 
 [tasks."check:boundaries"]
 run = "node tools/check-boundaries.ts"
+
+[tasks."check:commit-message"]
+description = "Reject a malformed commit message given its file"
+raw_args = true
+run = "node tools/check-commit-message.ts"
 
 [tasks."check:compatibility-ratchet"]
 description = "Reject measured compatibility reversals"
@@ -126,6 +131,27 @@ run = "mise fmt"
 
 [tasks."fmt:oxfmt"]
 run = "oxfmt ."
+
+[tasks.install-hooks]
+description = "Install the local pre-commit and commit-msg hooks"
+run = """
+# git rev-parse --git-path resolves core.hooksPath and a linked worktree's
+# shared hook directory. Neither hook may go to $GIT_DIR/hooks, which git
+# never reads in either case, so --write is not used for the generated one
+# either: it hard-codes that path.
+hooks=$(git rev-parse --git-path hooks)
+mkdir -p "$hooks"
+
+mise generate git-pre-commit --task=check > "$hooks/pre-commit"
+chmod +x "$hooks/pre-commit"
+
+# mise generate cannot produce the commit-msg hook: its body never forwards
+# the hook's arguments, and git passes the message file as $1, which is
+# .git/MERGE_MSG for a merge rather than .git/COMMIT_EDITMSG.
+printf '%s\\n' '#!/bin/sh' 'exec mise run check:commit-message "$1"' \\
+  > "$hooks/commit-msg"
+chmod +x "$hooks/commit-msg"
+"""
 
 [tasks.test]
 depends = ["test:deno", "test:native", "test:node", "test:test262"]

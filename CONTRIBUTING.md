@@ -42,8 +42,24 @@ mise run check
 mise run test
 ~~~~
 
-`mise install` also installs a local pre-commit hook that runs
-`mise run check`. Repeating the install refreshes the generated hook.
+`mise install` also installs two local Git hooks through
+`mise run install-hooks`. The pre-commit hook runs `mise run check`. The
+commit-msg hook runs `mise run check:commit-message` on the message file Git
+passes it. Repeating the install refreshes both.
+
+A commit message uses a subject of 50 columns or fewer, a blank second line,
+and a body wrapped at 72. The commit-msg hook does not enforce that. It
+rejects only a message whose subject reaches 80 columns, whose second line is
+not blank, or whose body has a line past 100 columns that wrapping could have
+shortened. It also rejects an escaped paragraph break, a doubled `\n` or `\t`
+on a line already past its limit, which is what a message looks like when
+shell quoting turned its line breaks into literal characters. Writing about an
+escape sequence is fine; only that combination is refused.
+
+The looser thresholds are deliberate. The hook catches a message that went
+wrong mechanically and leaves style to review, so a message written to the
+convention never reaches them. A rejection names the line at fault and how to
+fix it, and keeps what you wrote for editing rather than discarding it.
 
 `mise tasks` is the source of truth for commands available in the current
 checkout. A command described in a design or plan document may not exist until
