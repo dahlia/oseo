@@ -13,5 +13,5 @@ inventory:
     - test/built-ins/ThrowTypeError/
 dependencies:
   - object-prototype
-landed: false
+landed: true
 status: ready
