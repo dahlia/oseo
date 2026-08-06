@@ -163,6 +163,22 @@ function rejectStrictWithFallbackWrite(
   );
 }
 
+/** Reject an `Array` write whose `with` chain may miss every object. */
+function rejectArrayWithFallbackWrite(
+  located: LocatedSyntax,
+  state: ResolveState,
+): void {
+  state.diagnostics.push(
+    sourceDiagnostic(
+      state.sourceId,
+      located,
+      "Assigning with fallback binding 'Array' is outside the admitted " +
+        "global-object profile; the intrinsic fallback cannot preserve " +
+        "a sloppy global write.",
+    ),
+  );
+}
+
 function bindingExpression(
   binding: Binding,
   range: SourceRange,
@@ -197,6 +213,7 @@ function identifierFallback(
   }
   const errorName = errorIntrinsicName(name);
   if (errorName != null) return { errorName, kind: "error-intrinsic", range };
+  if (name === "Array") return { kind: "array-intrinsic", range };
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
   if (name === "Function") return { kind: "function-intrinsic", range };
   return bindingExpression(withFallbackBinding(name, state, false), range);
@@ -352,6 +369,7 @@ function resolveOptionalChain(
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
+    name === "Array" ||
     name === "Function" ||
     name === "Object" ||
     name === "Promise" ||
@@ -448,6 +466,7 @@ function resolveTypeofIdentifier(
     argument.name === "undefined" ||
     argument.name === "NaN" ||
     argument.name === "Infinity" ||
+    argument.name === "Array" ||
     argument.name === "Function" ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
@@ -555,6 +574,14 @@ function resolveExpression(
     if (value == null) return undefined;
     if (
       resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      expression.name === "Array"
+    ) {
+      rejectArrayWithFallbackWrite(expression, state);
+      return undefined;
+    }
+    if (
+      resolution.binding == null &&
       state.strict &&
       expression.kind === "binding-set"
     ) {
@@ -638,6 +665,14 @@ function resolveExpression(
     // An update expression performs GetValue before its write, so an
     // all-miss chain throws ReferenceError on the uninitialized
     // fallback cell and can never initialize it.
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      expression.name === "Array"
+    ) {
+      rejectArrayWithFallbackWrite(expression, state);
+      return undefined;
+    }
     const binding =
       resolution.binding ?? withFallbackBinding(expression.name, state, false);
     if (resolution.objectBindingIds.length > 0) {
@@ -796,6 +831,9 @@ function resolveExpression(
           kind: "error-intrinsic",
           range: expression.range,
         };
+      }
+      if (expression.name === "Array") {
+        return { kind: "array-intrinsic", range: expression.range };
       }
       if (expression.name === "Symbol") {
         return { kind: "symbol-intrinsic", range: expression.range };
@@ -2406,6 +2444,14 @@ function resolveBindingPattern(
       rejectStrictWithFallbackWrite(pattern.name, pattern, state);
       return undefined;
     }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      pattern.name === "Array"
+    ) {
+      rejectArrayWithFallbackWrite(pattern, state);
+      return undefined;
+    }
     const binding =
       resolution.binding ??
       (resolution.objectBindingIds.length === 0
@@ -2681,6 +2727,14 @@ function resolveForInTarget(
       state.strict
     ) {
       rejectStrictWithFallbackWrite(target.name, target, state);
+      return undefined;
+    }
+    if (
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0 &&
+      target.name === "Array"
+    ) {
+      rejectArrayWithFallbackWrite(target, state);
       return undefined;
     }
     const binding =
@@ -3287,6 +3341,14 @@ function resolveStatement(
           statement.target,
           state,
         );
+        return undefined;
+      }
+      if (
+        resolution.binding == null &&
+        resolution.objectBindingIds.length > 0 &&
+        statement.target.name === "Array"
+      ) {
+        rejectArrayWithFallbackWrite(statement.target, state);
         return undefined;
       }
       const binding =

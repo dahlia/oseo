@@ -316,6 +316,11 @@ apply, bind, source-text, and has-instance behavior. The intrinsic table gains
 stable slots for the `Function` identity and those methods, and function heap
 objects gain traced initial-name, source, and bound-call state.
 
+The `m5-49` ABI makes `Array` a realm-owned intrinsic value and adds stable
+slots for `from`, `of`, `isArray`, and the `Symbol.species` getter. The array
+component owns length-argument construction and the generic constructor paths
+used by the collection statics.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

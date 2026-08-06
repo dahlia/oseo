@@ -192,6 +192,7 @@ OseoResult oseo_object_set(
             value,
             strict,
             false,
+            false,
             NULL
         );
     }

@@ -124,6 +124,17 @@ OseoResult oseo_object_define(
     OseoOrdinaryObject *object = ordinary_object(object_value);
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
+        bool valid_length = false;
+        OseoResult converted = oseo_internal_set_array_length(
+            context,
+            object,
+            value,
+            true,
+            true,
+            true,
+            &valid_length
+        );
+        if (converted.status != OSEO_STATUS_NORMAL) return converted;
         if (attributes.configurable || attributes.enumerable) {
             return type_error(
                 context,
@@ -136,13 +147,13 @@ OseoResult oseo_object_define(
                 "Cannot redefine the array length property."
             );
         }
-        bool valid_length = false;
         OseoResult changed = oseo_internal_set_array_length(
             context,
             object,
-            value,
+            converted.value,
             true,
             true,
+            false,
             &valid_length
         );
         if (changed.status != OSEO_STATUS_NORMAL) {

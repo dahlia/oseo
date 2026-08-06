@@ -105,3 +105,23 @@ test("populates the realm-owned Function prototype", () => {
   assert.match(functionSource, /OSEO_WELL_KNOWN_HAS_INSTANCE/u);
   assert.match(functionSource, /oseo_internal_throw_type_error_function/u);
 });
+
+test("populates the realm-owned Array constructor", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const arraySource = sources.get("runtime_array.c") ?? "";
+
+  for (const intrinsic of [
+    "ARRAY",
+    "ARRAY_FROM",
+    "ARRAY_IS_ARRAY",
+    "ARRAY_OF",
+    "ARRAY_SPECIES_GETTER",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of ["constructor", "from", "isArray", "of", "push"]) {
+    assert.match(arraySource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(arraySource, /OSEO_WELL_KNOWN_SPECIES/u);
+  assert.match(arraySource, /array_create_with_prototype\(context, 0u,/u);
+});
