@@ -24,37 +24,15 @@ void oseo_context_init(
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
-    context->promise_catch_function = oseo_undefined();
-    context->promise_finally_function = oseo_undefined();
-    context->promise_then_function = oseo_undefined();
-    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-        context->error_constructors[kind] = oseo_undefined();
-        context->error_prototypes[kind] = oseo_undefined();
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        context->intrinsics[index] = oseo_undefined();
     }
-    context->symbol_constructor = oseo_undefined();
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
-    context->throw_type_error_function = oseo_undefined();
-    context->array_push_function = oseo_undefined();
-    context->iterator_values_function = oseo_undefined();
-    context->iterator_next_function = oseo_undefined();
-    context->iterator_self_function = oseo_undefined();
-    context->generator_next_function = oseo_undefined();
-    context->generator_return_function = oseo_undefined();
-    context->generator_throw_function = oseo_undefined();
-    context->generator_prototype = oseo_undefined();
-    context->async_generator_next_function = oseo_undefined();
-    context->async_generator_return_function = oseo_undefined();
-    context->async_generator_throw_function = oseo_undefined();
-    context->async_generator_prototype = oseo_undefined();
-    context->async_iterator_prototype = oseo_undefined();
-    context->async_generator_intrinsic = oseo_undefined();
-    context->async_generator_function = oseo_undefined();
-    context->async_iterator_self_function = oseo_undefined();
     context->template_cache = NULL;
     context->template_cache_count = 0u;
     context->template_cache_capacity = 0u;
@@ -117,37 +95,15 @@ void oseo_context_destroy(OseoContext *context) {
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
-    context->promise_catch_function = oseo_undefined();
-    context->promise_finally_function = oseo_undefined();
-    context->promise_then_function = oseo_undefined();
-    for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-        context->error_constructors[kind] = oseo_undefined();
-        context->error_prototypes[kind] = oseo_undefined();
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        context->intrinsics[index] = oseo_undefined();
     }
-    context->symbol_constructor = oseo_undefined();
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
     context->global_this = oseo_undefined();
-    context->throw_type_error_function = oseo_undefined();
-    context->array_push_function = oseo_undefined();
-    context->iterator_values_function = oseo_undefined();
-    context->iterator_next_function = oseo_undefined();
-    context->iterator_self_function = oseo_undefined();
-    context->generator_next_function = oseo_undefined();
-    context->generator_return_function = oseo_undefined();
-    context->generator_throw_function = oseo_undefined();
-    context->generator_prototype = oseo_undefined();
-    context->async_generator_next_function = oseo_undefined();
-    context->async_generator_return_function = oseo_undefined();
-    context->async_generator_throw_function = oseo_undefined();
-    context->async_generator_prototype = oseo_undefined();
-    context->async_iterator_prototype = oseo_undefined();
-    context->async_generator_intrinsic = oseo_undefined();
-    context->async_generator_function = oseo_undefined();
-    context->async_iterator_self_function = oseo_undefined();
     free(context->template_cache);
     context->template_cache = NULL;
     context->template_cache_count = 0u;

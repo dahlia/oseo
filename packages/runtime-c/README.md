@@ -76,7 +76,7 @@ The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive`
 behind the numeric, string, addition, relational, loose-equality,
 property-key, console, error-message, and timer-delay conversions.
 `OrdinaryToPrimitive` runs user-reachable `valueOf` and `toString` in
-hint order; objects on a default-intrinsics chain use the virtualized
+hint order; objects on the realm intrinsic chain use deferred
 `Object.prototype` and `Array.prototype` conversions with cycle-safe,
 call-depth-bounded array joins, and an object with no convertible
 method throws a catchable `TypeError`. Function and promise text
@@ -93,10 +93,10 @@ dispatched by the generic `ToPrimitive`.
 The `m5-8` ABI adds the *runtime\_iterator.c* component and the
 synchronous iterator protocol: `oseo_internal_iterator_get`, `_next`, `_close`,
 over `Symbol.iterator`, `next`, and `return`, plus a first-class array iterator
-exposed through a default array's virtualized `Symbol.iterator`. The array
+exposed through the realm's `%Array.prototype%`. The array
 iterator is an ordinary object that steps by re-reading the array length, and
-its virtualized `next` and `Symbol.iterator` methods are cached on the context
-so they stay rooted. The next method is captured once by `GetIterator` and
+its `next` and `Symbol.iterator` methods live on realm-owned prototypes. The
+next method is captured once by `GetIterator` and
 reused each step, and `IteratorClose` invokes a present `return` method when a
 combinator rejects after a step. `Promise.all` and `Promise.race` consume any
 object iterable through this protocol. String and other primitive iteration and
@@ -139,10 +139,10 @@ alive. Generated code reacquires `oseo_generator_slots` and
 `oseo_generator_completions` on every entry, leaves through
 `oseo_generator_suspend`, and is reentered by the generator dispatcher that
 `oseo_context_set_generator_dispatcher` installs. `oseo_generator_next` is the
-virtualized `%GeneratorPrototype%.next`, served from a generator function's
+materialized `%GeneratorPrototype%.next`, reached from a generator function's
 `prototype` object alongside `Symbol.iterator`.
 The `m5-15` ABI adds `oseo_generator_return` and `oseo_generator_resume_kind`.
-`oseo_generator_return` is the virtualized `%GeneratorPrototype%.return`,
+`oseo_generator_return` is the materialized `%GeneratorPrototype%.return`,
 served from the same `prototype` object, so `IteratorClose` reaches it whenever
 a consumer abandons a generator. It resumes the body with a return completion,
 which `oseo_generator_resume_kind` reports at the resume point as
@@ -296,7 +296,10 @@ installation path with `Error` and every NativeError constructor. These public
 enum and context layout changes shift the generated error code identifiers and
 require the ABI bump.
 
-The `m5-45` ABI expands the realm-owned well-known symbol table from four
+The `m5-46` ABI replaces component-local intrinsic caches with one realm-owned
+intrinsic table and materializes `%Object.prototype%`,
+`%Function.prototype%`, and the admitted standard constructors as reachable
+values. The preceding `m5-45` ABI expanded the well-known symbol table from four
 entries to the complete thirteen-entry edition set. The public context layout
 changes with the table, so embedding code must use runtime inputs with the
 matching ABI.

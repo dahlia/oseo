@@ -971,7 +971,13 @@ to every error constructor;
 fixing every entry's identity, description, and constructor descriptor with
 generated, differential, forced-collection, and reviewed standards evidence.
 The corresponding consuming algorithms remain separate dependency-ordered
-nodes. The C
+nodes. M5b node `intrinsic-graph-root` replaces name-compared virtual intrinsic
+properties with one realm-owned, collector-traced table. It materializes the
+object and callable function prototype roots and links the already admitted
+constructors without claiming a later built-in family. Stable-seed generated,
+fixed differential, both-policy, forced-collection, and structural evidence
+cover the refactor. Its empty test262 inventory leaves all compatibility counts
+unchanged and moves the public runtime ABI to `oseo-runtime-m5-46`. The C
 runtime componentization recorded in
 [*docs/runtime-components.md*](./docs/runtime-components.md) is
 complete: the runtime ships eleven component translation units behind a

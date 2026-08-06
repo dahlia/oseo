@@ -1,0 +1,3 @@
+version: 1
+id: intrinsic-graph-root
+record: docs/language-profile-m5/families/intrinsic-graph-root.yaml

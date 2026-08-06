@@ -3609,6 +3609,18 @@ fifteen unsupported prerequisite cases. Its nine new passes and fourteen new
 unsupported classifications move the manifest to 2,958 passes across 4,899
 paths without changing the graph's orchestration state.
 
+Implemented M5b node `intrinsic-graph-root` replaces the component-local
+intrinsic caches and name-compared virtual properties with one realm-owned,
+collector-traced table. `%Object.prototype%`, callable
+`%Function.prototype%`, and the already admitted constructors become reachable
+through ordinary prototype links without admitting the later prototype-method,
+constructor, global-object, or `super-without-extends` nodes. Fixed native
+differential evidence and the generated domain at seed `0x60003100` cover both
+specialization policies, forced collection, shared method identity, and
+explicit prototype replacement. The node owns no test262 inventory roots, so
+the 4,899 reviewed paths and 2,958 passes do not move. The public runtime ABI
+moves to `oseo-runtime-m5-46` without changing the graph's orchestration state.
+
 
 Ahead-of-time challenge boundary
 --------------------------------

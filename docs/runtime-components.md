@@ -63,10 +63,7 @@ Ownership follows the plan's target layout:
     generated-code property caches, object coercibility checks, and
     `[[SetPrototypeOf]]`;
  -  *runtime\_property.c*: the generic property access paths, meaning
-    `[[Get]]` and `[[Set]]` with their `super` forms, `HasOwnProperty`,
-    and the classification of the virtualized intrinsic methods this
-    runtime serves without materializing the prototype objects that own
-    them;
+    `[[Get]]` and `[[Set]]` with their `super` forms and `HasOwnProperty`;
  -  *runtime\_descriptor.c*: `[[GetOwnProperty]]`,
     `[[DefineOwnProperty]]` for data and accessor descriptors,
     `[[Delete]]`, and the `SameValue` comparison
@@ -74,7 +71,7 @@ Ownership follows the plan's target layout:
  -  *runtime\_array.c*: array exotic behavior, meaning array creation,
     the `length` own property and its truncation rules, canonical index
     keys, monotonic literal and spread accumulation, frozen template
-    objects, and the virtualized `Array.prototype.push`;
+    objects, and the realm-owned `%Array.prototype%` methods;
  -  *runtime\_object\_builtin.c*: the `Object` built-ins and the own-key
     operations they share with object rest and spread, meaning
     `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key
@@ -97,7 +94,7 @@ Ownership follows the plan's target layout:
     intrinsic, the well-known symbols, and descriptive symbol text;
  -  *runtime\_iterator.c*: the synchronous iterator protocol
     (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
-    first-class array iterator, and its cached virtualized methods;
+    first-class array iterator, and its realm-owned prototype methods;
  -  *runtime\_generator.c*: the suspended body frame both generator kinds
     share, its collector-traced root slots and saved completion records,
     and the `%GeneratorPrototype%` resumptions that drive a synchronous
@@ -303,6 +300,25 @@ through `oseo_internal_jobs_drain_until` and
 `oseo_internal_jobs_reached_promise`, and `await` and timers construct
 promises through promise-owned entry points, while no promise code calls
 into the event loop.
+
+### Intrinsic graph root evidence
+
+M5b node `intrinsic-graph-root` gives `OseoContext` one
+`intrinsics[OSEO_INTRINSIC_COUNT]` table. *runtime\_function.c* owns root
+materialization and dispatches component slots to their existing builders;
+*runtime\_memory.c* traces the table as one permanent realm root. Ordinary
+objects and functions now inherit from the materialized `%Object.prototype%`
+and callable `%Function.prototype%`. Arrays, promises, iterators, generators,
+errors, symbols, and asynchronous generators expose their existing methods and
+constructors through ordinary prototype objects instead of name comparison in
+*runtime\_property.c*.
+
+The public context layout and intrinsic accessor move `abiVersion` to `m5-46`.
+The structural runtime tests reject a return of `default_intrinsics` or
+`OseoVirtualProperty`; fixed and generated native evidence covers method
+identity, prototype replacement, both specialization policies, and forced
+collection. The node owns no test262 inventory roots and changes no reviewed
+compatibility count.
 
 ### Object-family split evidence
 

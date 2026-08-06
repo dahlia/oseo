@@ -47,6 +47,32 @@ static const char *const error_names[OSEO_ERROR_KIND_COUNT] = {
     "AggregateError",
 };
 
+static const OseoIntrinsic error_prototype_intrinsics[
+    OSEO_ERROR_KIND_COUNT
+] = {
+    OSEO_INTRINSIC_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_EVAL_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_RANGE_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_REFERENCE_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_SYNTAX_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_TYPE_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_URI_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_AGGREGATE_ERROR_PROTOTYPE,
+};
+
+static const OseoIntrinsic error_constructor_intrinsics[
+    OSEO_ERROR_KIND_COUNT
+] = {
+    OSEO_INTRINSIC_ERROR,
+    OSEO_INTRINSIC_EVAL_ERROR,
+    OSEO_INTRINSIC_RANGE_ERROR,
+    OSEO_INTRINSIC_REFERENCE_ERROR,
+    OSEO_INTRINSIC_SYNTAX_ERROR,
+    OSEO_INTRINSIC_TYPE_ERROR,
+    OSEO_INTRINSIC_URI_ERROR,
+    OSEO_INTRINSIC_AGGREGATE_ERROR,
+};
+
 static OseoResult ascii_runtime_string(
     OseoContext *context,
     const char *text
@@ -101,8 +127,12 @@ static OseoResult error_intrinsic_pair(
     OseoContext *context,
     OseoErrorKind kind
 ) {
-    if (tag_of(context->error_constructors[kind]) != OSEO_TAG_UNDEFINED) {
-        return normal(context->error_constructors[kind]);
+    OseoValue *constructor_cache =
+        &context->intrinsics[error_constructor_intrinsics[kind]];
+    OseoValue *prototype_cache =
+        &context->intrinsics[error_prototype_intrinsics[kind]];
+    if (tag_of(*constructor_cache) != OSEO_TAG_UNDEFINED) {
+        return normal(*constructor_cache);
     }
     size_t entry_allocations = context->allocations;
     if (kind != OSEO_ERROR_ERROR) {
@@ -113,15 +143,21 @@ static OseoResult error_intrinsic_pair(
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    result = oseo_object_create(
-        context,
-        kind == OSEO_ERROR_ERROR
-            ? oseo_null()
-            : context->error_prototypes[OSEO_ERROR_ERROR]
-    );
+    OseoValue parent = kind == OSEO_ERROR_ERROR
+        ? context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]
+        : context->intrinsics[OSEO_INTRINSIC_ERROR_PROTOTYPE];
+    if (kind == OSEO_ERROR_ERROR) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
+        parent = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, parent);
+    }
     frame.slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[0])->default_intrinsics = true;
         result = ascii_runtime_string(context, error_names[kind]);
         frame.slots[1] = result.value;
     }
@@ -207,10 +243,10 @@ static OseoResult error_intrinsic_pair(
         OseoFunction *constructor = function_object(frame.slots[3]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
-        constructor->ordinary.prototype = kind == OSEO_ERROR_ERROR
-            ? oseo_null()
-            : context->error_constructors[OSEO_ERROR_ERROR];
-        constructor->ordinary.default_intrinsics = true;
+        if (kind != OSEO_ERROR_ERROR) {
+            constructor->ordinary.prototype =
+                context->intrinsics[OSEO_INTRINSIC_ERROR];
+        }
         result = define_ascii_property(
             context,
             frame.slots[0],
@@ -220,8 +256,8 @@ static OseoResult error_intrinsic_pair(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->error_prototypes[kind] = frame.slots[0];
-        context->error_constructors[kind] = frame.slots[3];
+        *prototype_cache = frame.slots[0];
+        *constructor_cache = frame.slots[3];
         result.value = frame.slots[3];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
@@ -244,7 +280,7 @@ OseoResult oseo_internal_error_prototype(
 ) {
     OseoResult result = error_intrinsic_pair(context, kind);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->error_prototypes[kind]);
+    return normal(context->intrinsics[error_prototype_intrinsics[kind]]);
 }
 
 OseoResult oseo_internal_throw_error(
@@ -260,7 +296,6 @@ OseoResult oseo_internal_throw_error(
     result = oseo_object_create(context, slots[0]);
     if (result.status == OSEO_STATUS_NORMAL) {
         slots[1] = result.value;
-        ordinary_object(slots[1])->default_intrinsics = true;
         ordinary_object(slots[1])->error_data = true;
         result = ascii_runtime_string(context, message);
     }
@@ -360,7 +395,6 @@ OseoResult oseo_internal_error_construct(
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        ordinary_object(frame.slots[3])->default_intrinsics = true;
         ordinary_object(frame.slots[3])->error_data = true;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
@@ -582,7 +616,10 @@ static size_t error_instance_kind(OseoContext *context, OseoValue thrown) {
     OseoValue current = thrown;
     while (is_object(current)) {
         for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-            if (context->error_prototypes[kind] == current) return kind;
+            OseoValue prototype = context->intrinsics[
+                error_prototype_intrinsics[kind]
+            ];
+            if (prototype == current) return kind;
         }
         current = ordinary_object(current)->prototype;
     }

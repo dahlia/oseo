@@ -2,6 +2,73 @@ import type { Fixture } from "../fixture.ts";
 
 export const objectFixtures: readonly Fixture[] = [
   {
+    name: "intrinsic-graph-root",
+    source: `
+// Admitted built-ins now meet through ordinary, realm-owned prototype
+// objects. Their methods retain one identity until an explicit prototype
+// replacement cuts that chain.
+const first = [1];
+const second = [2];
+console.log(
+  "array",
+  first.push === second.push,
+  first[Symbol.iterator] === second[Symbol.iterator],
+  "push" in first,
+);
+const firstIterator = first[Symbol.iterator]();
+const secondIterator = second[Symbol.iterator]();
+console.log(
+  "iterator",
+  firstIterator.next === secondIterator.next,
+  firstIterator[Symbol.iterator]() === firstIterator,
+);
+Object.setPrototypeOf(first, { push: "shadowed" });
+console.log("replaced", first.push, first[Symbol.iterator]);
+
+const promiseA = Promise.resolve(1);
+const promiseB = Promise.resolve(2);
+console.log(
+  "promise",
+  promiseA.then === promiseB.then,
+  promiseA.catch === promiseB.catch,
+  promiseA.finally === promiseB.finally,
+);
+
+function* generate(value) { yield value; }
+const generatorA = generate(1);
+const generatorB = generate(2);
+console.log(
+  "generator",
+  generatorA.next === generatorB.next,
+  generatorA.return === generatorB.return,
+  generatorA.throw === generatorB.throw,
+  generatorA[Symbol.iterator]() === generatorA,
+);
+
+console.log(
+  "constructors",
+  Error.prototype.constructor === Error,
+  TypeError.prototype.constructor === TypeError,
+  AggregateError.prototype.constructor === AggregateError,
+  Symbol.prototype.constructor === Symbol,
+);
+
+// A class with null heritage must retain that null on its prototype object
+// after ordinary objects begin at %Object.prototype%.
+class NullHeritage extends null {
+  probe() {
+    return super.missing;
+  }
+}
+try {
+  NullHeritage.prototype.probe();
+  console.log("null heritage reached");
+} catch (error) {
+  console.log("null heritage", error instanceof TypeError);
+}
+`,
+  },
+  {
     name: "object-reflection",
     source: `
 const firstPrototype = { inherited: 9 };

@@ -48,8 +48,10 @@ OseoResult oseo_internal_arguments_builtin_dispatch(
  * carries is a separate boundary the intrinsics stream owns.
  */
 OseoResult oseo_internal_throw_type_error_function(OseoContext *context) {
-    if (tag_of(context->throw_type_error_function) != OSEO_TAG_UNDEFINED) {
-        return normal(context->throw_type_error_function);
+    OseoValue *cache =
+        &context->intrinsics[OSEO_INTRINSIC_THROW_TYPE_ERROR];
+    if (tag_of(*cache) != OSEO_TAG_UNDEFINED) {
+        return normal(*cache);
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 2u);
@@ -96,7 +98,7 @@ OseoResult oseo_internal_throw_type_error_function(OseoContext *context) {
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         ordinary_object(frame.slots[0])->extensible = false;
-        context->throw_type_error_function = frame.slots[0];
+        *cache = frame.slots[0];
         result = normal(frame.slots[0]);
     }
     oseo_roots_release(context, &frame);

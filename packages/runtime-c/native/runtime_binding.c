@@ -196,10 +196,9 @@ OseoResult oseo_module_namespace_create(
 
 /*
  * The realm's global this value, created on first use. It is an
- * ordinary extensible object with a null [[Prototype]], created the way
- * this profile creates an object literal so that it answers the same
- * virtualized %Object.prototype% methods every other ordinary object
- * answers. Storing it before returning keeps one identity for the whole
+ * ordinary extensible object created the way this profile creates an object
+ * literal, so it reaches the realm-owned %Object.prototype%. Storing it
+ * before returning keeps one identity for the whole
  * realm and permanently roots it, so a collection between two `this`
  * reads cannot replace it.
  *
