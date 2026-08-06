@@ -218,6 +218,7 @@ OseoResult oseo_internal_promise_create(OseoContext *context) {
     promise->ordinary.async_from_sync = false;
     promise->ordinary.async_sync_iterator = oseo_undefined();
     promise->ordinary.generator = NULL;
+    promise->ordinary.arguments_object = false;
     promise->ordinary.mapped_arguments = false;
     promise->result = oseo_undefined();
     promise->reaction_head = oseo_undefined();

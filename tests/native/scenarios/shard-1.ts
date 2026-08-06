@@ -551,6 +551,49 @@ throw boom;
     /error\[OSEO2001\].*Root frame allocation failed/u,
   );
 
+  const objectPrototypeRootFailureHost = {
+    ...host,
+    async readTextFile(path: string | URL): Promise<string> {
+      const source = await host.readTextFile(path);
+      if (
+        !(path instanceof URL) ||
+        !path.pathname.endsWith("/runtime_object_builtin.c")
+      ) {
+        return source;
+      }
+      const injected = source.replace(
+        "result = oseo_roots_allocate(context, &frame, 2u);\n" +
+          "        if (result.status == OSEO_STATUS_NORMAL) {\n" +
+          "            frame.slots[0] = prototype;",
+        'result = failure(context, "OSEO2001", ' +
+          '"Injected Object prototype root allocation failure.");\n' +
+          "        if (result.status == OSEO_STATUS_NORMAL) {\n" +
+          "            frame.slots[0] = prototype;",
+      );
+      assert.notEqual(
+        injected,
+        source,
+        "Object prototype root allocation failure injected",
+      );
+      return injected;
+    },
+  };
+  const objectPrototypeRootFailure = await runNativeCli(
+    {
+      args: ["object-prototype-root-allocation-runtime.ts"],
+      source: "console.log({}.toString());",
+      sourceId: "object-prototype-root-allocation-runtime.ts",
+      version: "0.1.0",
+    },
+    objectPrototypeRootFailureHost,
+  );
+  assert.equal(objectPrototypeRootFailure.exitStatus, 1);
+  assert.equal(objectPrototypeRootFailure.stdout, "");
+  assert.match(
+    objectPrototypeRootFailure.stderr,
+    /error\[OSEO2001\].*Object prototype root allocation failure/u,
+  );
+
   const concatenationOverflowHost = {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {

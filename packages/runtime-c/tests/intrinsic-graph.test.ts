@@ -45,3 +45,34 @@ test("materializes ordinary roots instead of name-compared properties", () => {
   assert.doesNotMatch(propertySource, /string_is_ascii\(key, "push"\)/u);
   assert.doesNotMatch(propertySource, /string_is_ascii\(key, "then"\)/u);
 });
+
+test("populates the realm-owned Object prototype", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const objectBuiltins = sources.get("runtime_object_builtin.c") ?? "";
+
+  for (const intrinsic of [
+    "OBJECT_HAS_OWN_PROPERTY",
+    "OBJECT_IS_PROTOTYPE_OF",
+    "OBJECT_PROPERTY_IS_ENUMERABLE",
+    "OBJECT_TO_STRING",
+    "OBJECT_TO_LOCALE_STRING",
+    "OBJECT_VALUE_OF",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "constructor",
+    "hasOwnProperty",
+    "isPrototypeOf",
+    "propertyIsEnumerable",
+    "toLocaleString",
+    "toString",
+    "valueOf",
+  ]) {
+    assert.match(objectBuiltins, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(
+    objectBuiltins,
+    /const OseoPropertyAttributes attributes = \{true, false, true, false\}/u,
+  );
+});

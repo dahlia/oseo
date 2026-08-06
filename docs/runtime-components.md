@@ -171,7 +171,7 @@ its read and write.
 
 ### Internal helpers
 
-Seventy-two helpers cross a translation-unit boundary. Each uses the
+Seventy-four helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -185,6 +185,7 @@ Seventy-two helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_async_generator_builtin_dispatch`    | *runtime\_async\_generator.c* |
 | `oseo_internal_array_builtin_dispatch`              | *runtime\_array.c*            |
 | `oseo_internal_arguments_builtin_dispatch`          | *runtime\_arguments.c*        |
+| `oseo_internal_object_builtin_dispatch`             | *runtime\_object\_builtin.c*  |
 | `oseo_internal_allocate_heap_bytes`                 | *runtime\_memory.c*           |
 | `oseo_internal_error_construct`                     | *runtime\_error.c*            |
 | `oseo_internal_error_prototype`                     | *runtime\_error.c*            |
@@ -242,6 +243,7 @@ Seventy-two helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_async_from_sync_fulfilled`           | *runtime\_iterator.c*         |
 | `oseo_internal_async_from_sync_rejected`            | *runtime\_iterator.c*         |
 | `oseo_internal_throw_type_error_function`           | *runtime\_arguments.c*        |
+| `oseo_internal_object_prototype`                    | *runtime\_object\_builtin.c*  |
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c*        |
@@ -319,6 +321,22 @@ The structural runtime tests reject a return of `default_intrinsics` or
 identity, prototype replacement, both specialization policies, and forced
 collection. The node owns no test262 inventory roots and changes no reviewed
 compatibility count.
+
+### Object prototype evidence
+
+M5b node `object-prototype` populates the existing realm-owned
+`%Object.prototype%` with `hasOwnProperty`, `isPrototypeOf`,
+`propertyIsEnumerable`, `toString`, `toLocaleString`, `valueOf`, and its
+`constructor` link. *runtime\_object\_builtin.c* owns the methods and its
+reserved built-in code range; ordinary lookup continues to use the shared
+object and property components. The later `object-constructor-and-wrappers`
+node still owns callable constructor behavior and primitive wrapper objects.
+
+The public intrinsic table expands for the constructor and methods, moving
+`abiVersion` to `m5-47`. Fixed and generated native differential evidence
+covers descriptors, prototype identity, both specialization policies,
+deliberate shape-guard misses, and forced collection. The node reviews only
+its declared `%Object.prototype%` test262 inventory root.
 
 ### Object-family split evidence
 

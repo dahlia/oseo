@@ -208,6 +208,14 @@ for (const fixture of selectedFixtures) {
     assert.match(enabledText, /property-get generic/u);
   }
 
+  if (fixture.name === "object-prototype") {
+    const enabledText = printMir(enabledMir);
+    assert.match(enabledText, /guard-object/u);
+    assert.match(enabledText, /guard-shape/u);
+    assert.match(enabledText, /property-get generic/u);
+    assert.doesNotMatch(printMir(disabledMir), /guard-(?:object|shape)/u);
+  }
+
   if (fixture.name === "object-literal-prototype-setter") {
     assert.match(printMir(enabledMir), /guard-smi/u);
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
@@ -262,6 +270,7 @@ for (const fixture of selectedFixtures) {
 
   if (
     fixture.name === "closures-and-methods" ||
+    fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
     fixture.name === "async-continuations" ||
@@ -416,6 +425,12 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "delete-non-strict") {
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
+          if (fixture.name === "object-prototype") {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
               assert.ok(native.counters.guardMisses > 0);

@@ -2,6 +2,113 @@ import type { Fixture } from "../fixture.ts";
 
 export const objectFixtures: readonly Fixture[] = [
   {
+    name: "object-prototype",
+    source: `
+const parent = { inherited: 3 };
+const value = { visible: 1 };
+Object.defineProperty(value, "hidden", { value: 2 });
+Object.setPrototypeOf(value, parent);
+const ownSymbol = Symbol("own");
+value[ownSymbol] = 4;
+
+console.log(
+  "own",
+  value.hasOwnProperty("visible"),
+  value.hasOwnProperty("inherited"),
+  value.hasOwnProperty(ownSymbol),
+);
+console.log(
+  "enumerable",
+  value.propertyIsEnumerable("visible"),
+  value.propertyIsEnumerable("hidden"),
+  value.propertyIsEnumerable("inherited"),
+  value.propertyIsEnumerable(ownSymbol),
+);
+console.log(
+  "prototype",
+  parent.isPrototypeOf(value),
+  value.isPrototypeOf(parent),
+  parent.isPrototypeOf(1),
+  value.constructor.prototype.isPrototypeOf(value),
+);
+console.log("tag", value.toString());
+const tagged = { [Symbol.toStringTag]: "Fixture" };
+console.log("tagged", tagged.toString());
+function mappedArgumentsTag() {
+  return arguments.toString();
+}
+function unmappedArgumentsTag() {
+  "use strict";
+  return arguments.toString();
+}
+console.log(
+  "arguments",
+  mappedArgumentsTag(1),
+  unmappedArgumentsTag(1),
+);
+const localized = {
+  toString: function () { return "localized"; },
+};
+console.log("locale", localized.toLocaleString());
+console.log(
+  "value",
+  value.valueOf() === value,
+  value.constructor === parent.constructor,
+  value.constructor.prototype === parent.constructor.prototype,
+);
+console.log(
+  "metadata",
+  value.constructor.name,
+  value.constructor.length,
+  value.hasOwnProperty.name,
+  value.hasOwnProperty.length,
+  value.isPrototypeOf.name,
+  value.isPrototypeOf.length,
+  value.propertyIsEnumerable.name,
+  value.propertyIsEnumerable.length,
+  value.toString.name,
+  value.toString.length,
+  value.toLocaleString.name,
+  value.toLocaleString.length,
+  value.valueOf.name,
+  value.valueOf.length,
+);
+function printDescriptor(name) {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    value.constructor.prototype,
+    name,
+  );
+  console.log(
+    "descriptor",
+    name,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+}
+printDescriptor("constructor");
+printDescriptor("hasOwnProperty");
+printDescriptor("isPrototypeOf");
+printDescriptor("propertyIsEnumerable");
+printDescriptor("toString");
+printDescriptor("toLocaleString");
+printDescriptor("valueOf");
+try {
+  new value.hasOwnProperty();
+} catch (error) {
+  console.log("not constructor", error instanceof TypeError);
+}
+
+const guarded = { probe: 1 };
+let turn = 0;
+while (turn < 2) {
+  console.log("guarded", guarded.hasOwnProperty("probe"));
+  if (turn === 0) delete guarded.probe;
+  turn = turn + 1;
+}
+`,
+  },
+  {
     name: "intrinsic-graph-root",
     source: `
 // Admitted built-ins now meet through ordinary, realm-owned prototype

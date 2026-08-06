@@ -168,6 +168,25 @@
 #define OSEO_FUNCTION_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_FUNCTION_CODE_ID_RANGE_INDEX)
 #define OSEO_FUNCTION_PROTOTYPE_CODE_ID OSEO_FUNCTION_CODE_ID_RANGE_LAST
+
+#define OSEO_OBJECT_CODE_ID_RANGE_INDEX ((size_t)9u)
+#define OSEO_OBJECT_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_OBJECT_CODE_ID_RANGE_INDEX)
+#define OSEO_OBJECT_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_OBJECT_CODE_ID_RANGE_INDEX)
+#define OSEO_OBJECT_CONSTRUCTOR_CODE_ID OSEO_OBJECT_CODE_ID_RANGE_LAST
+#define OSEO_OBJECT_HAS_OWN_PROPERTY_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_OBJECT_IS_PROTOTYPE_OF_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_OBJECT_PROPERTY_IS_ENUMERABLE_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_OBJECT_TO_STRING_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_OBJECT_TO_LOCALE_STRING_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_OBJECT_VALUE_OF_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 6u)
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -483,6 +502,8 @@ typedef struct {
      */
     bool async_from_sync;
     OseoValue async_sync_iterator;
+    /* Both mapped and unmapped arguments objects carry the Arguments tag. */
+    bool arguments_object;
     /*
      * A mapped arguments exotic object (10.4.4). Each own index property
      * this unit maps stores its parameter's own binding cell as the
@@ -921,6 +942,15 @@ OseoResult oseo_internal_arguments_builtin_dispatch(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_object_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
 void *oseo_internal_allocate_heap_bytes(OseoContext *context, size_t size);
 OseoResult oseo_internal_error_construct(
     OseoContext *context,
@@ -1132,6 +1162,8 @@ OseoResult oseo_internal_intrinsic(
     OseoContext *context,
     OseoIntrinsic intrinsic
 );
+/* Completes the realm root object with the Object.prototype methods. */
+OseoResult oseo_internal_object_prototype(OseoContext *context);
 OseoResult oseo_internal_to_number(OseoContext *context, OseoValue value);
 OseoResult oseo_internal_to_primitive(
     OseoContext *context,

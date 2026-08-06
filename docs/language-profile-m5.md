@@ -47,8 +47,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 4,899 reviewed cases: 2,958 passes, 1,355
-expected negatives, and 586 unsupported profile features. It records no
+The current manifest contains 5,078 reviewed cases: 3,016 passes, 1,355
+expected negatives, and 707 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -751,10 +751,10 @@ current evidence assessment. Those live only in the indexed records above.
     `valueOf` and `toString` run in hint order with the receiver, an
     object result falls through to the next method, and an object with
     neither convertible method throws a catchable `TypeError`. Objects
-    on the realm-owned intrinsic prototype chain use deferred
-    `Object.prototype` and `Array.prototype` conversions selected by
-    the first applicable intrinsic identity on the chain: the
-    receiver-sensitive `Object.prototype.toString` tags
+    on the realm-owned intrinsic prototype chain reach the materialized
+    `Object.prototype` methods through ordinary lookup. Arrays retain a
+    deferred conversion selected by intrinsic identity until their own method
+    node lands: the receiver-sensitive `Object.prototype.toString` tags
     (`"[object Array]"`, `"[object Function]"`, `"[object Error]"`
     through the internal error brand, and `"[object Object]"`,
     including promises whose well-known-symbol tag is unreachable) and
@@ -783,6 +783,24 @@ current evidence assessment. Those live only in the indexed records above.
     `@@toPrimitive` dispatch is implemented by the symbols unit. Native
     differential fixtures,
     runtime C fixtures, and reviewed test262 cases cover the conversion.
+ -  `%Object.prototype%` is the realm-owned default prototype of ordinary
+    objects. Its own `hasOwnProperty`, `isPrototypeOf`,
+    `propertyIsEnumerable`, `toString`, `toLocaleString`, `valueOf`, and
+    `constructor` properties have the standard writable, non-enumerable, and
+    configurable descriptors. The six methods have stable identities,
+    standard names and lengths, and are non-constructible. Own-property and
+    enumerability queries perform `ToPropertyKey`; prototype tests traverse
+    ordinary prototype chains; `toString` honors a string
+    `Symbol.toStringTag`; `toLocaleString` invokes an object's current
+    `toString`; and `valueOf` returns its object receiver. The constructor
+    identity links back to this prototype, while its callable behavior and
+    primitive wrapper objects remain owned by the later
+    `object-constructor-and-wrappers` node. Fixed and generated Node.js, Deno,
+    and native differential evidence covers both specialization policies,
+    forced collection, descriptors, symbol keys, prototype identity, and a
+    deliberate shape-guard miss. The generated domain uses stable seed
+    `0x60003200`. All 179 paths under the node's sole reviewed test262 root are
+    classified: 58 pass and 121 retain explicit prerequisite boundaries.
  -  Symbol values and the `Symbol` intrinsic. `Symbol([description])`
     creates a unique, GC-traced symbol primitive whose description
     converts through the shared `ToString`; `typeof` reports
@@ -809,10 +827,10 @@ current evidence assessment. Those live only in the indexed records above.
     methods participate in generic `ToPrimitive`. Deliberate boundaries:
     adding an identity does not admit the corresponding consuming algorithm.
     `Symbol.for`, `Symbol.keyFor`, `Symbol.prototype` methods including
-    `toString` and the `description` accessor, `Symbol.hasInstance` dispatch
-    in `instanceof`, and `Symbol.toStringTag` observation in
-    `Object.prototype.toString` remain outside the profile until their
-    prerequisites land. Multiple realms are unavailable, so cross-realm
+    `toString` and the `description` accessor, and `Symbol.hasInstance`
+    dispatch in `instanceof` remain outside the profile until their
+    prerequisites land. `Object.prototype.toString` now observes a string
+    `Symbol.toStringTag`. Multiple realms are unavailable, so cross-realm
     well-known-symbol identity remains an owned unsupported dependency.
  -  The synchronous iterator protocol. `GetIterator` reads a value's
     `Symbol.iterator` method and calls it, throwing a catchable
@@ -1613,10 +1631,9 @@ current evidence assessment. Those live only in the indexed records above.
     errors. Ten deliberately unsupported cases record the static,
     generator-method, `extends`, and `super` boundaries in the manifest. The
     ten `forbidden-ext` cases that assert a class method has no own `caller`
-    or `arguments` property stay out of the reviewed subset until
-    `Object.prototype.hasOwnProperty` exists; the property they check already
-    holds, but the assertion itself needs an intrinsic this profile does not
-    provide.
+    or `arguments` property remain outside this node's reviewed promotion
+    root. Their owning class family must review them separately now that
+    `Object.prototype.hasOwnProperty` exists.
  -  Class getter and setter accessors on the prototype. A `get` or `set`
     class element reuses the `property-define-accessor` MIR operation that
     object literal accessor clauses already use, so a class getter and
@@ -1663,9 +1680,8 @@ current evidence assessment. Those live only in the indexed records above.
     unresolvable computed key that this profile rejects before execution;
     the static unit below promotes the static accessor cases and keeps the
     unresolvable computed key unsupported. The
-    two `grammar-special-prototype-accessor-meth`
-    cases stay out of the reviewed subset until
-    `Object.prototype.hasOwnProperty` exists.
+    two `grammar-special-prototype-accessor-meth` cases remain outside this
+    node's reviewed promotion root and await their owning class-family review.
  -  Class static methods and accessors on the constructor. A `static` element
     carries a placement flag through the owned syntax tree and HIR, and MIR
     lowering targets the constructor value instead of the prototype object
@@ -1851,8 +1867,9 @@ current evidence assessment. Those live only in the indexed records above.
     optional call such as `super.m?.()` guards the looked-up value and calls a
     present method with the same derived receiver. Deliberate boundaries: a
     `super` property reference is rejected with a source-located diagnostic in
-    a class body without `extends` and in an object literal method, because
-    this runtime has no `Object.prototype` object for such a lookup to reach.
+    a class body without `extends` and in an object literal method. The
+    materialized `%Object.prototype%` now supplies the lookup root, but the
+    separate `super-without-extends` graph node still owns this syntax.
     M5a Unit 8.5j
     later admits the `delete` operand position, recorded above, which carries
     no receiver anywhere because ECMA-262 rejects the evaluated reference
@@ -1953,8 +1970,8 @@ current evidence assessment. Those live only in the indexed records above.
     boundaries and the `eval`, `Object`, `Proxy`, unresolvable computed key,
     and generator-method observations the remaining cases need. The three
     `init-value-defined-after-class` and
-    `fields-computed-name-propname-constructor` cases stay out of the reviewed
-    subset until `Object.prototype.hasOwnProperty` exists. The reviewed
+    `fields-computed-name-propname-constructor` cases remain outside this
+    node's promotion root and await their owning class-family review. The
     manifest moves to 1077 passes, 460 expected negatives, and 227 unsupported
     profile features with no semantic or harness failures.
  -  Private instance class elements. A `#name` field, a `#name()` method, and
@@ -2978,14 +2995,27 @@ realm table. It materializes `%Object.prototype%` and the callable
 `%Function.prototype%`, makes ordinary objects and functions reach those roots,
 and links the admitted array, promise, iterator, generator, error, symbol, and
 asynchronous-generator prototypes and constructors through ordinary property
-lookup. Deferred `Object.prototype` and `Array.prototype` coercions remain
-behavior-preserving fallbacks selected by intrinsic identity until their method
-nodes land. Fixed native differential evidence and the generated array domain
-with seed `0x60003100` cover shared identity, explicit prototype replacement,
-both specialization policies, and forced collection. The node owns no test262
-inventory roots and admits no new semantics, so all 4,899 reviewed results and
-their 2,958 passes remain unchanged. The public context and intrinsic-access
-ABI moves to `oseo-runtime-m5-46`.
+lookup. At that node boundary, deferred `Object.prototype` and
+`Array.prototype` coercions stayed as behavior-preserving fallbacks selected
+by intrinsic identity. Fixed native differential evidence and the generated
+array domain with seed `0x60003100` cover shared identity, explicit prototype
+replacement, both specialization policies, and forced collection. The node owns
+no test262 inventory roots and admits no new semantics, so all 4,899 reviewed
+results and their 2,958 passes remain unchanged. The public context and
+intrinsic-access ABI moves to `oseo-runtime-m5-46`.
+
+M5b node `object-prototype` populates the existing realm root with its six
+standard methods and `constructor` link. Fixed native differential evidence
+and the generated domain at seed `0x60003200` cover descriptors, symbol keys,
+prototype identity, both specialization policies, forced collection, and a
+deliberate shape-guard miss that reaches generic lookup. All 179 cases under
+the sole reviewed promotion root are classified: 58 pass and 121 remain honest
+prerequisite boundaries. The manifest reaches 5,078 cases: 3,016 passes, 1,355
+expected negatives, and 707 unsupported profile features with no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The expanded intrinsic table moves the runtime ABI to
+`oseo-runtime-m5-47` without changing the graph's orchestration state.
 
 
 Known gaps inside the claim
@@ -3021,15 +3051,15 @@ complete. The remaining gaps retain their existing owners.
     array pattern must consume. Owner: the intrinsics and built-in objects
     stream.
  -  A `super` property reference in a class body without `extends` and in an
-    object literal method stays rejected until the `object-prototype` and
-    `super-without-extends` graph nodes land. The empty intrinsic root alone
-    does not admit that separate language surface. Owner: the intrinsics and
+    object literal method stays rejected until the `super-without-extends`
+    graph node lands. The object prototype root is now populated, but that
+    does not admit the separate language surface. Owner: the intrinsics and
     built-in objects stream.
- -  The realm root now owns one collector-traced intrinsic graph, but standard
-    constructors other than the already admitted error and symbol families
-    remain assigned to their dependency-ordered M5b nodes. No built-in
-    dispatches through
-    `Symbol.hasInstance` or `Symbol.toStringTag` yet. test262 runtime
+ -  The realm root now owns one collector-traced intrinsic graph and the
+    `Object` constructor identity, but that constructor's callable behavior
+    and primitive wrappers and the remaining standard constructors stay
+    assigned to their dependency-ordered M5b nodes. No built-in dispatches
+    through `Symbol.hasInstance` yet. test262 runtime
     negatives whose
     thrown value has no error identity, such as a thrown
     `Test262Error`, classify as unsupported with the
@@ -3149,7 +3179,7 @@ complete. The remaining gaps retain their existing owners.
     `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and its
     `assert.throwsAsync` reports a constructor mismatch without composing a
     message from the observed value, because this profile admits neither
-    `globalThis` nor generic string coercion. Owner: the standards harness
+    `globalThis` nor `Function.prototype.call`. Owner: the standards harness
     expansion in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host

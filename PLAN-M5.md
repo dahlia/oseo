@@ -17,8 +17,8 @@ M5 profile. The test262 harness executes module and asynchronous cases under
 the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
-honest unsupported classifications. The current reviewed manifest records 4,899
-reviewed cases: 2,958 passes, 1,355 expected negatives, and 586 unsupported
+honest unsupported classifications. The current reviewed manifest records 5,078
+reviewed cases: 3,016 passes, 1,355 expected negatives, and 707 unsupported
 profile features with no semantic, harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
 M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
@@ -26,12 +26,12 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a is complete. The 63 indexed records in the normative
+M5a is complete. The 65 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. The remaining work is
-the M5b and M5c dependency order below. The reviewed manifest now records 2,958
-passes across 4,899 paths, and the property inventory records 59 domains,
-59 seeds, and an ordinary case budget of 2,714.
+the M5b and M5c dependency order below. The reviewed manifest now records 3,016
+passes across 5,078 paths, and the property inventory records 61 domains,
+61 seeds, and an ordinary case budget of 2,738.
 
 
 M5a implementation history
@@ -3620,6 +3620,18 @@ specialization policies, forced collection, shared method identity, and
 explicit prototype replacement. The node owns no test262 inventory roots, so
 the 4,899 reviewed paths and 2,958 passes do not move. The public runtime ABI
 moves to `oseo-runtime-m5-46` without changing the graph's orchestration state.
+
+Implemented M5b node `object-prototype` populates the realm-owned
+`%Object.prototype%` with `hasOwnProperty`, `isPrototypeOf`,
+`propertyIsEnumerable`, `toString`, `toLocaleString`, `valueOf`, and its
+`constructor` link. Callable `Object` behavior and primitive wrappers remain
+owned by their later node. Fixed native and generated differential evidence at
+seed `0x60003200` covers both specialization policies, forced collection, and
+deliberate shape-guard misses that reach generic lookup. All 179 paths under
+the node's sole promotion root are reviewed: 58 pass and 121 retain explicit
+prerequisite boundaries. The manifest moves to 3,016 passes across 5,078 paths,
+and the runtime ABI moves to `oseo-runtime-m5-47`, without changing the graph's
+orchestration state.
 
 
 Ahead-of-time challenge boundary

@@ -156,6 +156,9 @@ OseoResult oseo_arguments_create(
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_object_literal_create(context);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[0])->arguments_object = true;
+    }
     const OseoPropertyAttributes indexed =
         (OseoPropertyAttributes){true, true, true, false};
     for (size_t index = 0u;
@@ -267,6 +270,7 @@ OseoResult oseo_mapped_arguments_create(
     result = oseo_object_literal_create(context);
     frame.slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[0])->arguments_object = true;
         ordinary_object(frame.slots[0])->mapped_arguments = true;
     }
     const OseoPropertyAttributes indexed =
