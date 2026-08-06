@@ -908,6 +908,50 @@ static OseoResult to_primitive_value(
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         if (!is_function(frame.slots[2])) continue;
+        /* A later prototype node still owns each nearer default method.
+         * Reaching Object.prototype.toString through that empty prototype
+         * must not bypass the existing behavior-preserving fallback. */
+        if (trying_to_string &&
+            frame.slots[2] ==
+                context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING]) {
+            DefaultConversionKind kind =
+                default_conversion_kind(context, frame.slots[0]);
+            if (kind == OSEO_CONVERSION_ARRAY) {
+                result = default_array_text(
+                    context,
+                    frame.slots[0],
+                    previous
+                );
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                converted = !is_object(result.value);
+                if (converted) break;
+                continue;
+            }
+            if (kind == OSEO_CONVERSION_FUNCTION &&
+                !is_function(frame.slots[0])) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Function.prototype.toString requires a function "
+                    "receiver."
+                );
+                break;
+            }
+            if (kind == OSEO_CONVERSION_FUNCTION ||
+                kind == OSEO_CONVERSION_PROMISE) {
+                if (hint == OSEO_TO_PRIMITIVE_NUMERIC) {
+                    result = normal(oseo_number(NAN));
+                    converted = true;
+                } else {
+                    result = failure(
+                        context,
+                        "OSEO2001",
+                        "Function and promise text conversion is unsupported."
+                    );
+                }
+                break;
+            }
+        }
         result = oseo_call_function(
             context,
             frame.slots[2],

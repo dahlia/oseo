@@ -155,6 +155,7 @@ OseoResult oseo_array_create(OseoContext *context, size_t length) {
     array->async_from_sync = false;
     array->async_sync_iterator = oseo_undefined();
     array->generator = NULL;
+    array->arguments_object = false;
     array->mapped_arguments = false;
     return oseo_internal_publish_heap(context, &array->header, OSEO_HEAP_ARRAY);
 }

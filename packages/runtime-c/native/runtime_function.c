@@ -64,6 +64,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_FUNCTION_CODE_ID_RANGE_FIRST,
      OSEO_FUNCTION_CODE_ID_RANGE_LAST,
      oseo_internal_function_builtin_dispatch},
+    {OSEO_OBJECT_CODE_ID_RANGE_FIRST,
+     OSEO_OBJECT_CODE_ID_RANGE_LAST,
+     oseo_internal_object_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -284,7 +287,13 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     }
     OseoResult materialized = normal(oseo_undefined());
     if (intrinsic == OSEO_INTRINSIC_OBJECT_PROTOTYPE ||
-        intrinsic == OSEO_INTRINSIC_FUNCTION_PROTOTYPE) {
+        (intrinsic >= OSEO_INTRINSIC_OBJECT &&
+         intrinsic <= OSEO_INTRINSIC_OBJECT_VALUE_OF)) {
+        materialized = intrinsic_graph_root(context);
+        if (materialized.status == OSEO_STATUS_NORMAL) {
+            materialized = oseo_internal_object_prototype(context);
+        }
+    } else if (intrinsic == OSEO_INTRINSIC_FUNCTION_PROTOTYPE) {
         materialized = intrinsic_graph_root(context);
     } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
         materialized = oseo_internal_array_prototype(context);
@@ -511,6 +520,7 @@ OseoResult oseo_function_create(
     function->ordinary.async_from_sync = false;
     function->ordinary.async_sync_iterator = oseo_undefined();
     function->ordinary.generator = NULL;
+    function->ordinary.arguments_object = false;
     function->ordinary.mapped_arguments = false;
     function->environment = frame.slots[0];
     function->lexical_this = frame.slots[7];

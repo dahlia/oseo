@@ -983,7 +983,17 @@ runtime componentization recorded in
 complete: the runtime ships eleven component translation units behind a
 package-private internal header, an M5-enabling refactor that changes
 no compatibility counts; the error, symbol, and iterator components
-landed with the M5 intrinsics units. The remaining queue is:
+landed with the M5 intrinsics units.
+
+M5b node `object-prototype` populates the realm-owned ordinary-object root with
+its six standard methods and `constructor` link. Fixed and stable-seed
+generated differential evidence covers both specialization policies, forced
+collection, and generic fallback after a deliberate shape-guard miss. Its 179
+reviewed paths add 58 passes and 121 explicit prerequisite boundaries, moving
+the manifest to 3,016 passes across 5,078 paths and the runtime ABI to
+`oseo-runtime-m5-47`.
+
+The remaining queue is:
 
 1.  The behavior-preserving compiler, Babel frontend, and native fixture
     decomposition is complete. [*DESIGN.md*](./DESIGN.md) and the applicable
@@ -1001,7 +1011,7 @@ landed with the M5 intrinsics units. The remaining queue is:
     retain `super` property context, each `super()` call performs a fresh
     `Construct`, and optional calls through `super` properties are admitted.
     Class bodies without `extends` and object-literal methods still wait for
-    the M5b `Object.prototype` intrinsic. Unit 8.3 admits `await` inside an
+    the M5b `super-without-extends` node. Unit 8.3 admits `await` inside an
     assignment target's computed member, a computed binding property name, and
     an array or object binding default in every body that owns a traced
     suspension frame; module top level keeps that rejection under the modules

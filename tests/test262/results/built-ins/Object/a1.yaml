@@ -1,0 +1,29 @@
+group: built-ins/Object
+key: a1
+results:
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Symbol.toStringTag
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/prototype/toString/symbol-tag-override-bigint.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "test/built-ins/Object/prototype/toString/symbol-tag-override-b\
+        igint.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Object/prototype/toString/symbol-tag-ov\
+        erride-bigint.js:83:15: error[OSEO1001]: Unknown binding
+        'BigInt'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

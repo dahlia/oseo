@@ -1,0 +1,54 @@
+version: 1
+id: object-prototype
+title: "Object prototype"
+scope:
+  - "The realm-owned %Object.prototype% as the default ordinary-object
+    prototype."
+  - "hasOwnProperty, isPrototypeOf, propertyIsEnumerable, toString,
+    toLocaleString, valueOf, and constructor."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-prototype.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/objects.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-prototype.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-object-prototype.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-prototype.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/objects.ts
+      - tests/property/m5-object-prototype.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: omitted
+    reason: "The runtime-owned methods add no MIR or backend operation."
+    replacements:
+      - packages/runtime-c/native/runtime_object_builtin.c
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
+      - tests/native/fixtures/objects.ts

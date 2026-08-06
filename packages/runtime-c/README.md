@@ -304,6 +304,12 @@ entries to the complete thirteen-entry edition set. The public context layout
 changes with the table, so embedding code must use runtime inputs with the
 matching ABI.
 
+The `m5-47` ABI populates the realm-owned `%Object.prototype%` with its six
+standard methods and `constructor` link. The intrinsic table gains stable
+slots for those functions and the `Object` constructor identity. Callable
+constructor behavior and primitive wrappers remain owned by their later M5b
+node.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

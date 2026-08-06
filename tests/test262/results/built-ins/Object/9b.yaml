@@ -1,0 +1,25 @@
+group: built-ins/Object
+key: 9b
+results:
+  - case:
+      async: false
+      features:
+        - Symbol.toStringTag
+        - Promise
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - object-properties
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Promise
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

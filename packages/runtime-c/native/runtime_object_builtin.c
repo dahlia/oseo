@@ -1,10 +1,12 @@
 #include "runtime_internal.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
- * The `Object` built-ins and the own-key operations they share with
- * object rest and spread: ToPropertyDescriptor field reads,
+ * The `Object` built-ins, the `Object.prototype` methods, and the own-key
+ * operations they share with object rest and spread: ToPropertyDescriptor,
  * CopyDataProperties, own-key ordering, and the `Object.create`,
  * `Object.defineProperty`, `Object.getOwnPropertyDescriptor`,
  * `Object.keys`, and `Object.setPrototypeOf` entry points.
@@ -20,6 +22,492 @@ static OseoValue builtin_argument(
     size_t index
 ) {
     return index < argument_count ? arguments[index] : oseo_undefined();
+}
+
+static OseoResult object_prototype_has_own_property(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult key = oseo_property_key(
+        context,
+        builtin_argument(argument_count, arguments, 0u)
+    );
+    if (key.status != OSEO_STATUS_NORMAL) return key;
+    return oseo_object_has_own(context, receiver, key.value);
+}
+
+static OseoResult object_prototype_property_is_enumerable(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult key = oseo_property_key(
+        context,
+        builtin_argument(argument_count, arguments, 0u)
+    );
+    if (key.status != OSEO_STATUS_NORMAL) return key;
+    if (is_nullish(receiver)) {
+        return type_error(context, "Cannot convert a nullish value to object.");
+    }
+    if (is_string(receiver)) {
+        bool own = oseo_internal_string_own_property(
+            receiver,
+            key.value,
+            NULL
+        );
+        bool enumerable = own &&
+            !oseo_internal_string_is_ascii(key.value, "length");
+        return normal(oseo_boolean(enumerable));
+    }
+    if (!is_object(receiver)) return normal(oseo_boolean(false));
+    if (function_has_prototype_property(receiver) &&
+        oseo_internal_string_is_ascii(key.value, "prototype")) {
+        return normal(oseo_boolean(false));
+    }
+    if (is_array(receiver) &&
+        oseo_internal_string_is_ascii(key.value, "length")) {
+        return normal(oseo_boolean(false));
+    }
+    OseoValue ignored = oseo_undefined();
+    OseoValue ignored_getter = oseo_undefined();
+    OseoValue ignored_setter = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false, false};
+    bool own = oseo_internal_own_descriptor(
+        receiver,
+        key.value,
+        &ignored,
+        &attributes,
+        &ignored_getter,
+        &ignored_setter
+    );
+    return normal(oseo_boolean(own && attributes.enumerable));
+}
+
+static OseoResult object_prototype_is_prototype_of(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue value = builtin_argument(argument_count, arguments, 0u);
+    if (!is_object(value)) return normal(oseo_boolean(false));
+    if (is_nullish(receiver)) {
+        return type_error(context, "Cannot convert a nullish value to object.");
+    }
+    if (!is_object(receiver)) return normal(oseo_boolean(false));
+    OseoValue current = ordinary_object(value)->prototype;
+    while (is_object(current)) {
+        if (current == receiver) return normal(oseo_boolean(true));
+        current = ordinary_object(current)->prototype;
+    }
+    return normal(oseo_boolean(false));
+}
+
+static const char *object_builtin_tag(OseoValue receiver) {
+    if (is_array(receiver)) return "Array";
+    if (is_function(receiver)) return "Function";
+    if (is_object(receiver) && ordinary_object(receiver)->arguments_object) {
+        return "Arguments";
+    }
+    if (is_object(receiver) && ordinary_object(receiver)->error_data) {
+        return "Error";
+    }
+    if (is_string(receiver)) return "String";
+    if (is_symbol(receiver)) return "Symbol";
+    if (is_bigint(receiver)) return "BigInt";
+    if (is_number(receiver)) return "Number";
+    if (tag_of(receiver) == OSEO_TAG_BOOLEAN) return "Boolean";
+    return "Object";
+}
+
+static OseoResult object_tag_text(
+    OseoContext *context,
+    OseoValue tag_value,
+    const char *fallback
+) {
+    static const uint16_t prefix[] = {
+        '[', 'o', 'b', 'j', 'e', 'c', 't', ' '
+    };
+    size_t tag_length = is_string(tag_value)
+        ? string_object(tag_value)->length
+        : strlen(fallback);
+    if (tag_length > SIZE_MAX - 9u ||
+        tag_length + 9u > SIZE_MAX / sizeof(uint16_t)) {
+        return failure(context, "OSEO2001", "Object tag is too long.");
+    }
+    size_t length = tag_length + 9u;
+    uint16_t *units = malloc(length * sizeof(*units));
+    if (units == NULL) {
+        return failure(context, "OSEO2001", "Object tag allocation failed.");
+    }
+    memcpy(units, prefix, sizeof(prefix));
+    if (is_string(tag_value)) {
+        memcpy(
+            units + 8u,
+            string_object(tag_value)->units,
+            tag_length * sizeof(*units)
+        );
+    } else {
+        for (size_t index = 0u; index < tag_length; index += 1u) {
+            units[index + 8u] = (uint16_t)(unsigned char)fallback[index];
+        }
+    }
+    units[length - 1u] = ']';
+    OseoValue slot = tag_value;
+    OseoRootFrame frame = {NULL, &slot, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_allocate_string(context, units, length);
+    oseo_roots_pop(context, &frame);
+    free(units);
+    return result;
+}
+
+static OseoResult object_prototype_to_string(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (tag_of(receiver) == OSEO_TAG_UNDEFINED) {
+        return object_tag_text(context, oseo_undefined(), "Undefined");
+    }
+    if (tag_of(receiver) == OSEO_TAG_NULL) {
+        return object_tag_text(context, oseo_undefined(), "Null");
+    }
+    const char *fallback = object_builtin_tag(receiver);
+    if (!is_object(receiver)) {
+        return object_tag_text(context, oseo_undefined(), fallback);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_TO_STRING_TAG
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = object_tag_text(context, frame.slots[2], fallback);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult object_prototype_to_locale_string(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_nullish(receiver)) {
+        return type_error(context, "Cannot convert a nullish value to object.");
+    }
+    if (!is_object(receiver)) {
+        return is_symbol(receiver)
+            ? oseo_internal_symbol_text(context, receiver)
+            : oseo_internal_value_string(context, receiver);
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 2u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    result = oseo_internal_ascii_string(context, "toString");
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_function(frame.slots[1])) {
+        result = type_error(context, "The toString property is not callable.");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            frame.slots[1],
+            frame.slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult object_prototype_value_of(
+    OseoContext *context,
+    OseoValue receiver
+) {
+    if (is_nullish(receiver)) {
+        return type_error(context, "Cannot convert a nullish value to object.");
+    }
+    if (!is_object(receiver)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Primitive wrapper objects are not admitted yet."
+        );
+    }
+    return normal(receiver);
+}
+
+OseoResult oseo_internal_object_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    (void)callee;
+    (void)new_target;
+    if (code_id == OSEO_OBJECT_CONSTRUCTOR_CODE_ID) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Object constructor behavior is not admitted yet."
+        );
+    }
+    if (code_id == OSEO_OBJECT_HAS_OWN_PROPERTY_CODE_ID) {
+        return object_prototype_has_own_property(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_OBJECT_IS_PROTOTYPE_OF_CODE_ID) {
+        return object_prototype_is_prototype_of(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_OBJECT_PROPERTY_IS_ENUMERABLE_CODE_ID) {
+        return object_prototype_property_is_enumerable(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_OBJECT_TO_STRING_CODE_ID) {
+        return object_prototype_to_string(context, receiver);
+    }
+    if (code_id == OSEO_OBJECT_TO_LOCALE_STRING_CODE_ID) {
+        return object_prototype_to_locale_string(context, receiver);
+    }
+    if (code_id == OSEO_OBJECT_VALUE_OF_CODE_ID) {
+        return object_prototype_value_of(context, receiver);
+    }
+    return oseo_unknown_function(context, code_id);
+}
+
+static OseoResult create_object_prototype_function(
+    OseoContext *context,
+    size_t code_id,
+    const char *name,
+    size_t length
+) {
+    size_t name_length = strlen(name);
+    if (name_length > 31u) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
+    uint16_t units[31];
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            environment,
+            units,
+            name_length,
+            length,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult object_prototype_function(
+    OseoContext *context,
+    OseoIntrinsic intrinsic,
+    size_t code_id,
+    const char *name,
+    size_t length
+) {
+    OseoValue *cache = &context->intrinsics[intrinsic];
+    if (is_function(*cache)) return normal(*cache);
+    OseoResult result = create_object_prototype_function(
+        context,
+        code_id,
+        name,
+        length
+    );
+    if (result.status == OSEO_STATUS_NORMAL) *cache = result.value;
+    return result;
+}
+
+static OseoResult object_constructor_function(OseoContext *context) {
+    static const uint16_t name[] = {'O', 'b', 'j', 'e', 'c', 't'};
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            OSEO_OBJECT_CONSTRUCTOR_CODE_ID,
+            environment,
+            name,
+            sizeof(name) / sizeof(*name),
+            1u,
+            OSEO_FUNCTION_ORDINARY,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_object_prototype(OseoContext *context) {
+    OseoValue prototype =
+        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+    OseoValue *marker =
+        &context->intrinsics[OSEO_INTRINSIC_OBJECT_VALUE_OF];
+    if (is_function(*marker)) return normal(prototype);
+    if (is_object(*marker)) return normal(prototype);
+    if (!is_object(prototype)) {
+        return failure(context, "OSEO2001", "Object prototype is unavailable.");
+    }
+    size_t entry_allocations = context->allocations;
+    *marker = prototype;
+    OseoResult result = object_constructor_function(context);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_OBJECT] = result.value;
+        OseoFunction *constructor = function_object(result.value);
+        constructor->prototype_object = prototype;
+        constructor->prototype_writable = false;
+    }
+    static const OseoIntrinsic intrinsics[] = {
+        OSEO_INTRINSIC_OBJECT_HAS_OWN_PROPERTY,
+        OSEO_INTRINSIC_OBJECT_IS_PROTOTYPE_OF,
+        OSEO_INTRINSIC_OBJECT_PROPERTY_IS_ENUMERABLE,
+        OSEO_INTRINSIC_OBJECT_TO_LOCALE_STRING,
+        OSEO_INTRINSIC_OBJECT_TO_STRING,
+    };
+    static const size_t codes[] = {
+        OSEO_OBJECT_HAS_OWN_PROPERTY_CODE_ID,
+        OSEO_OBJECT_IS_PROTOTYPE_OF_CODE_ID,
+        OSEO_OBJECT_PROPERTY_IS_ENUMERABLE_CODE_ID,
+        OSEO_OBJECT_TO_LOCALE_STRING_CODE_ID,
+        OSEO_OBJECT_TO_STRING_CODE_ID,
+    };
+    static const char *const names[] = {
+        "hasOwnProperty",
+        "isPrototypeOf",
+        "propertyIsEnumerable",
+        "toLocaleString",
+        "toString",
+    };
+    static const size_t lengths[] = {1u, 1u, 1u, 0u, 0u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < sizeof(intrinsics) / sizeof(*intrinsics);
+         index += 1u) {
+        result = object_prototype_function(
+            context,
+            intrinsics[index],
+            codes[index],
+            names[index],
+            lengths[index]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_object_prototype_function(
+            context,
+            OSEO_OBJECT_VALUE_OF_CODE_ID,
+            "valueOf",
+            0u
+        );
+        if (result.status == OSEO_STATUS_NORMAL) *marker = result.value;
+    }
+    static const OseoIntrinsic properties[] = {
+        OSEO_INTRINSIC_OBJECT,
+        OSEO_INTRINSIC_OBJECT_HAS_OWN_PROPERTY,
+        OSEO_INTRINSIC_OBJECT_IS_PROTOTYPE_OF,
+        OSEO_INTRINSIC_OBJECT_PROPERTY_IS_ENUMERABLE,
+        OSEO_INTRINSIC_OBJECT_TO_LOCALE_STRING,
+        OSEO_INTRINSIC_OBJECT_TO_STRING,
+        OSEO_INTRINSIC_OBJECT_VALUE_OF,
+    };
+    static const char *const property_names[] = {
+        "constructor",
+        "hasOwnProperty",
+        "isPrototypeOf",
+        "propertyIsEnumerable",
+        "toLocaleString",
+        "toString",
+        "valueOf",
+    };
+    const OseoPropertyAttributes attributes = {true, false, true, false};
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_roots_allocate(context, &frame, 2u);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            frame.slots[0] = prototype;
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL &&
+             index < sizeof(properties) / sizeof(*properties);
+         index += 1u) {
+        result = oseo_internal_ascii_string(context, property_names[index]);
+        frame.slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[1],
+                context->intrinsics[properties[index]],
+                attributes
+            );
+        }
+    }
+    if (frame.slots != NULL) oseo_roots_release(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        *marker = oseo_undefined();
+        context->intrinsics[OSEO_INTRINSIC_OBJECT] = oseo_undefined();
+        return result;
+    }
+    if (context->observe_specialization) {
+        context->allocations = entry_allocations;
+    }
+    return normal(prototype);
 }
 
 static size_t own_ascii_property_index(

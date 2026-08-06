@@ -94,6 +94,7 @@ static OseoResult object_create(
     object->async_from_sync = false;
     object->async_sync_iterator = oseo_undefined();
     object->generator = NULL;
+    object->arguments_object = false;
     object->mapped_arguments = false;
     return oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_OBJECT);
