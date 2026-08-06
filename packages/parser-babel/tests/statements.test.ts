@@ -820,7 +820,6 @@ test("rejects typeof of an unimplemented standard global name", () => {
   for (const source of [
     "console.log(typeof Math);",
     "console.log(typeof Array);",
-    "console.log(typeof Function);",
     "console.log(typeof JSON);",
     "console.log(typeof RegExp);",
     "console.log(typeof BigInt);",

@@ -781,6 +781,29 @@ null.item;
   assert.equal(primitiveWrapper.classification, "unsupported-profile-feature");
 });
 
+test("keeps user-thrown runtime-boundary text as a failure", async () => {
+  const source = `/*---
+---*/
+throw new Error("Primitive wrapper objects are not admitted yet.");
+`;
+  const parsed = parseTest262Case(source, "test/user-throw.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    respondStderr(
+      "test/user-throw.js:3:1: error[OSEO2001]: Error: " +
+        "Primitive wrapper objects are not admitted yet.\n" +
+        "OSEO_THROWN Error\n",
+    ),
+    ["error-intrinsics"],
+  );
+  assert.equal(result.classification, "semantic-failure");
+  assert.equal(result.observation.failedPhase, "runtime");
+  assert.equal(result.observation.unsupportedCapability, undefined);
+});
+
 test("classifies unsupported features without native execution", async () => {
   const parsed = parseTest262Case(
     "/*---\nfeatures: [default-parameters]\n---*/\n",

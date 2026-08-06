@@ -477,7 +477,16 @@ function detail(
 
 /** A runtime value can reach a reviewed, explicit profile boundary. */
 function unsupportedRuntimeCapability(stderr: string): string | undefined {
-  return stderr.includes("Primitive wrapper objects are not admitted yet.")
+  if (
+    unhandledErrorType(stderr) != null ||
+    stderr.includes(untypedThrowMessage)
+  ) {
+    return undefined;
+  }
+  const diagnostic = /^.+?:\d+:\d+: error\[OSEO2001\]: (.+)$/mu.exec(
+    stderr,
+  )?.[1];
+  return diagnostic === "Primitive wrapper objects are not admitted yet."
     ? "primitive-wrapper"
     : undefined;
 }

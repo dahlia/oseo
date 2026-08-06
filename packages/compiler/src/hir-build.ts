@@ -297,6 +297,7 @@ function resolveCallArgument(
 function callsDynamicFunctionConstructor(
   target: SyntaxCallTarget,
   scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
 ): boolean {
   const name =
     target.kind === "name"
@@ -304,7 +305,9 @@ function callsDynamicFunctionConstructor(
       : target.kind === "dynamic" && target.callee.kind === "identifier"
         ? target.callee.name
         : undefined;
-  return name === "Function" && findBinding(scopes, name) == null;
+  if (name !== "Function") return false;
+  const resolution = resolveName(scopes, state, name);
+  return resolution.binding == null && resolution.objectBindingIds.length === 0;
 }
 
 /** Resolves one optional chain without inflating the recursive dispatcher. */
@@ -349,6 +352,7 @@ function resolveOptionalChain(
 function isRuntimeOwnedIntrinsicName(name: string): boolean {
   return (
     name === "console" ||
+    name === "Function" ||
     name === "Object" ||
     name === "Promise" ||
     name === "Symbol" ||
@@ -444,6 +448,7 @@ function resolveTypeofIdentifier(
     argument.name === "undefined" ||
     argument.name === "NaN" ||
     argument.name === "Infinity" ||
+    argument.name === "Function" ||
     argument.name === "Symbol" ||
     errorIntrinsicName(argument.name) != null;
   if (resolvesValue) {
@@ -993,10 +998,15 @@ function resolveExpression(
         };
   }
   if (expression.kind === "new") {
-    if (
+    const functionResolution =
       expression.callee.kind === "identifier" &&
-      expression.callee.name === "Function" &&
-      findBinding(scopes, "Function") == null
+      expression.callee.name === "Function"
+        ? resolveName(scopes, state, "Function")
+        : undefined;
+    if (
+      functionResolution != null &&
+      functionResolution.binding == null &&
+      functionResolution.objectBindingIds.length === 0
     ) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -1043,7 +1053,7 @@ function resolveExpression(
       range: expression.range,
     };
   }
-  if (callsDynamicFunctionConstructor(expression.target, scopes)) {
+  if (callsDynamicFunctionConstructor(expression.target, scopes, state)) {
     state.diagnostics.push(
       sourceDiagnostic(
         state.sourceId,
