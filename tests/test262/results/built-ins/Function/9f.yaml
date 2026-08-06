@@ -1,0 +1,48 @@
+group: built-ins/Function
+key: 9f
+results:
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Function/prototype/bind/proto-from-ctor-realm.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - cross-realm
+      - Reflect
+  - case:
+      async: false
+      features:
+        - generators
+        - Proxy
+      flags: []
+      includes:
+        - nativeFunctionMatcher.js
+      mode: script
+      path: test/built-ins/Function/prototype/toString/proxy-generator-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - Proxy
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

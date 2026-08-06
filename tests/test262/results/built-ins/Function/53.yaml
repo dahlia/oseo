@@ -1,0 +1,50 @@
+group: built-ins/Function
+key: "53"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Function/length/S15.3.5.1_A3_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: 'test/built-ins/Function/length/S15.3.5.1_A3_T1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/length/S15.3.5.1_A3_T1.js:141:9:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/prototype/bind/15.3.4.5.2-4-9.\
+        js:81:14: error[OSEO1001]: Unknown binding 'Boolean'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -728,12 +728,19 @@ export const emittedC = {
     oseoFunctionMethod: [["OSEO_FUNCTION_METHOD"]],
     oseoFunctionOrdinary: [["OSEO_FUNCTION_ORDINARY"]],
     functionNameUnits: [["function_name_units_"], [""]],
+    functionSourceUnits: [["function_source_units_"], [""]],
     oseoFunctionNamePrefixGet: [["OSEO_FUNCTION_NAME_PREFIX_GET"]],
     oseoFunctionNamePrefixSet: [["OSEO_FUNCTION_NAME_PREFIX_SET"]],
     oseoFunctionNamePrefixNone: [["OSEO_FUNCTION_NAME_PREFIX_NONE"]],
     resultAssignOseoFunctionCreateContextU: [
       ["result = oseo_function_create(context, "],
       ["u, "],
+    ],
+    resultAssignOseoFunctionSetSource: [
+      ["result = oseo_function_set_source(context, roots["],
+      ["], "],
+      [", "],
+      ["u);"],
     ],
     rootsU: [["roots["], ["], "], [", "], ["u, "]],
     receiver: [[""], [", receiver, "], [", "]],
@@ -755,6 +762,11 @@ export const emittedC = {
     oseoErrorUri: [["OSEO_ERROR_URI"]],
     resultAssignOseoErrorIntrinsicContext: [
       ["result = oseo_error_intrinsic(context, "],
+    ],
+  },
+  functionIntrinsic: {
+    resultAssign: [
+      ["result = oseo_intrinsic(context, OSEO_INTRINSIC_FUNCTION);"],
     ],
   },
   constructReceiver: {

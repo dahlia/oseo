@@ -3472,6 +3472,9 @@ function lowerExpression(
       functionKind: expression.functionKind,
       functionLength: expression.functionLength,
       functionName: expression.name,
+      ...(expression.sourceText == null
+        ? {}
+        : { functionSource: expression.sourceText }),
       id,
       kind: "function-create",
       range: expression.range,
@@ -3731,6 +3734,32 @@ function lowerExpression(
       detail: "intrinsic Symbol",
       id,
       kind: "symbol-intrinsic",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "function-intrinsic") {
+    appendMirMetadata(
+      builder,
+      "safepoint",
+      "function intrinsic allocation",
+      [],
+      expression.range,
+    );
+    const id = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      detail: "intrinsic Function",
+      id,
+      kind: "function-intrinsic",
       range: expression.range,
     });
     appendMirMetadata(
@@ -6140,6 +6169,9 @@ function lowerStatements(
           kind: "function",
           name: statement.functionName,
           range: statement.range,
+          ...(statement.sourceText == null
+            ? {}
+            : { sourceText: statement.sourceText }),
         },
         builder,
       );

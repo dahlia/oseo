@@ -1059,6 +1059,10 @@ export interface SyntaxFunction extends LocatedSyntax {
   readonly parameters: readonly SyntaxParameter[];
   readonly returnHints: readonly Hint[];
   /**
+   * Original source text returned by `Function.prototype.toString`.
+   */
+  readonly sourceText?: string;
+  /**
    * ECMA-262's IsSimpleParameterList: every parameter is a single
    * `BindingIdentifier` with no initializer, and no parameter is a rest
    * parameter. A mapped arguments object is admitted only when this is

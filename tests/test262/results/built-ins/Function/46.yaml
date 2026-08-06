@@ -1,0 +1,50 @@
+group: built-ins/Function
+key: "46"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Function/prototype/apply/15.3.4.3-2-s.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "test/built-ins/Function/prototype/apply/15.3.4.3-2-s.js strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/prototype/apply/15.3.4.3-2-s.j\
+        s:84:27: error[OSEO1001]: Unknown binding 'Number'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/built-ins/Function/prototype/toString/S15.3.4.2_A10.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "test/built-ins/Function/prototype/toString/S15.3.4.2_A10.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/prototype/toString/S15.3.4.2_A\
+        10.js:147:1: error[OSEO1001]: Unknown binding
+        'verifyNotWritable'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

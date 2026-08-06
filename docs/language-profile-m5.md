@@ -775,11 +775,12 @@ current evidence assessment. Those live only in the indexed records above.
     message and `Error.prototype.toString` conversion, and `setTimeout` delays
     through one shared implementation, replacing both the former unsupported
     object-coercion boundary and the timer-only ad-hoc conversion. Deliberate
-    boundary: converting a function or promise without a user-supplied method
-    to text stays an owned unsupported diagnostic, because faithful text needs
-    `Function.prototype.toString` or well-known symbols; a purely numeric
-    conversion of such a value produces `NaN` without materializing the text,
-    because every function source and promise tag string is non-numeric.
+    Function text uses the frontend-retained source for user code and the
+    native-function form for built-ins and bound functions. Deliberate
+    boundary: converting a promise without a user-supplied method to text stays
+    an owned unsupported diagnostic until its well-known-symbol tag is
+    reachable; purely numeric function and promise conversion produces `NaN`
+    without materializing text, because each applicable string is non-numeric.
     `@@toPrimitive` dispatch is implemented by the symbols unit. Native
     differential fixtures,
     runtime C fixtures, and reviewed test262 cases cover the conversion.
@@ -3017,6 +3018,25 @@ inventory, manifest schema and vocabulary, and zero-override policy are
 unchanged. The expanded intrinsic table moves the runtime ABI to
 `oseo-runtime-m5-47` without changing the graph's orchestration state.
 
+M5b node `function-prototype` completes the callable realm root with
+`call`, `apply`, `bind`, `toString`, `Symbol.hasInstance`, the `Function`
+constructor identity, and the restricted `caller` and `arguments` accessors
+backed by the realm's existing `%ThrowTypeError%`. Source known to the AOT
+frontend is retained for user functions, while built-ins and bound functions
+use the native-function form. The dynamic-source constructor and primitive
+wrapper coercion remain explicit later-node boundaries. Fixed native and
+generated differential evidence at seed `0x60003300` covers both
+specialization policies, forced collection, bound construction, custom
+has-instance dispatch, and deliberate shape-guard misses. All 344 paths under
+the node's four inventory roots are reviewed: 123 pass and 221 retain explicit
+prerequisite boundaries. Two existing global-binding cases also become passes,
+moving the manifest to 5,422 cases: 3,141 passes, 1,355 expected negatives,
+and 926 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. The public
+function-kind and intrinsic tables move the runtime ABI to
+`oseo-runtime-m5-48` without changing the graph's orchestration state.
+
 
 Known gaps inside the claim
 ---------------------------
@@ -3161,7 +3181,8 @@ complete. The remaining gaps retain their existing owners.
     materializes promotes none of them and they keep the
     `unsupported-profile-feature` classification their compile-stage
     `OSEO1001` produces. Owner: the intrinsics and built-in objects stream.
- -  `eval`, the `Function` constructor, and dynamic import stay explicitly
+ -  `eval`, dynamic `Function` construction, and dynamic import stay
+    explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
     Reviewed cases that need them carry the `dynamic-source` dependency
     tag, and no release uses an unqualified conformance label while this
@@ -3171,15 +3192,16 @@ complete. The remaining gaps retain their existing owners.
     affected tests name the missing `$262` capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, and *propertyHelper.js* only. Cases
-    that include *promiseHelper.js* or *nativeFunctionMatcher.js* stay out of
-    the reviewed subset until those includes have reviewed implementations;
-    the eight *test/built-ins/Function/prototype/toString/* cases the
-    `async-iteration` tag reaches need the second of them. The reviewed
+    that include *promiseHelper.js* stay outside the reviewed subset until the
+    include has a reviewed implementation. Cases in the reviewed function
+    inventory that need *nativeFunctionMatcher.js* or
+    *wellKnownIntrinsicObjects.js* classify as unsupported until those
+    includes have reviewed implementations. The reviewed
     *asyncHelpers.js* probes `$DONE` with `typeof` rather than through
     `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, and its
     `assert.throwsAsync` reports a constructor mismatch without composing a
-    message from the observed value, because this profile admits neither
-    `globalThis` nor `Function.prototype.call`. Owner: the standards harness
+    message from the observed value, because this profile does not admit
+    `globalThis`. Owner: the standards harness
     expansion in [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host

@@ -171,7 +171,7 @@ its read and write.
 
 ### Internal helpers
 
-Seventy-four helpers cross a translation-unit boundary. Each uses the
+Seventy-five helpers cross a translation-unit boundary. Each uses the
 `oseo_internal_` prefix, has exactly one declaration in
 *runtime\_internal.h*, and is defined in its owning unit:
 
@@ -244,6 +244,7 @@ Seventy-four helpers cross a translation-unit boundary. Each uses the
 | `oseo_internal_async_from_sync_rejected`            | *runtime\_iterator.c*         |
 | `oseo_internal_throw_type_error_function`           | *runtime\_arguments.c*        |
 | `oseo_internal_object_prototype`                    | *runtime\_object\_builtin.c*  |
+| `oseo_internal_ordinary_has_instance`               | *runtime\_function.c*         |
 | `oseo_internal_array_push_function`                 | *runtime\_array.c*            |
 | `oseo_internal_array_push`                          | *runtime\_array.c*            |
 | `oseo_internal_value_string`                        | *runtime\_primitive.c*        |
@@ -337,6 +338,21 @@ The public intrinsic table expands for the constructor and methods, moving
 covers descriptors, prototype identity, both specialization policies,
 deliberate shape-guard misses, and forced collection. The node reviews only
 its declared `%Object.prototype%` test262 inventory root.
+
+### Function prototype evidence
+
+M5b node `function-prototype` completes the callable realm root in
+*runtime\_function.c*. The component owns `call`, `apply`, `bind`, `toString`,
+`Symbol.hasInstance`, bound-function state, source-text state, and the circular
+`Function` constructor link. The shared primitive component delegates
+`instanceof` to the callable right operand's `Symbol.hasInstance` method and
+uses `oseo_internal_ordinary_has_instance` for the standard fallback.
+
+The public function-kind and intrinsic tables expand, moving `abiVersion` to
+`m5-48`. Fixed and generated native differential evidence covers descriptors,
+bound calls and construction, source forms, custom has-instance dispatch, both
+specialization policies, deliberate shape-guard misses, and forced collection.
+The node reviews all four of its declared test262 inventory roots.
 
 ### Object-family split evidence
 

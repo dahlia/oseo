@@ -1979,6 +1979,33 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
       renderC(emittedC.common.callSuffix, namePrefix),
   );
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+  if (operation.functionSource != null) {
+    const sourceUnits = utf16Units(operation.functionSource);
+    const sourceName = renderC(
+      emittedC.functionCreate.functionSourceUnits,
+      operation.id,
+    );
+    line(
+      state,
+      renderC(
+        emittedC.common.staticConstUint16TAssignStatement,
+        sourceName,
+        sourceUnits.join(renderC(emittedC.common.commaSpace)),
+      ),
+    );
+    line(state, renderC(emittedC.common.statusNormalOpen));
+    line(
+      state,
+      renderC(
+        emittedC.functionCreate.resultAssignOseoFunctionSetSource,
+        operation.id,
+        sourceName,
+        sourceUnits.length,
+      ),
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+    line(state, renderC(emittedC.common.closeBlock));
+  }
   if (
     operation.functionKind === "arrow" ||
     operation.functionKind === "async-arrow"
@@ -2581,6 +2608,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state,
       renderC(emittedC.operation.resultAssignOseoSymbolIntrinsicContext),
     );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+  } else if (operation.kind === "function-intrinsic") {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(state, renderC(emittedC.functionIntrinsic.resultAssign));
     line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "module-namespace-create") {
     emitModuleNamespace(state, operation);

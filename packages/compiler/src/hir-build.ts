@@ -43,6 +43,7 @@ import type {
   LocatedSyntax,
   SyntaxAssignmentPattern,
   SyntaxCallArgument,
+  SyntaxCallTarget,
   SyntaxClassField,
   SyntaxExpression,
   SyntaxForInTarget,
@@ -197,6 +198,7 @@ function identifierFallback(
   const errorName = errorIntrinsicName(name);
   if (errorName != null) return { errorName, kind: "error-intrinsic", range };
   if (name === "Symbol") return { kind: "symbol-intrinsic", range };
+  if (name === "Function") return { kind: "function-intrinsic", range };
   return bindingExpression(withFallbackBinding(name, state, false), range);
 }
 
@@ -287,6 +289,22 @@ function resolveCallArgument(
     return resolved == null ? undefined : { ...argument, argument: resolved };
   }
   return resolveExpression(argument, scopes, state);
+}
+
+/**
+ * Whether this call target reaches the unshadowed dynamic Function boundary.
+ */
+function callsDynamicFunctionConstructor(
+  target: SyntaxCallTarget,
+  scopes: readonly Map<string, Binding>[],
+): boolean {
+  const name =
+    target.kind === "name"
+      ? target.name
+      : target.kind === "dynamic" && target.callee.kind === "identifier"
+        ? target.callee.name
+        : undefined;
+  return name === "Function" && findBinding(scopes, name) == null;
 }
 
 /** Resolves one optional chain without inflating the recursive dispatcher. */
@@ -777,6 +795,9 @@ function resolveExpression(
       if (expression.name === "Symbol") {
         return { kind: "symbol-intrinsic", range: expression.range };
       }
+      if (expression.name === "Function") {
+        return { kind: "function-intrinsic", range: expression.range };
+      }
       state.diagnostics.push(
         sourceDiagnostic(
           state.sourceId,
@@ -972,6 +993,21 @@ function resolveExpression(
         };
   }
   if (expression.kind === "new") {
+    if (
+      expression.callee.kind === "identifier" &&
+      expression.callee.name === "Function" &&
+      findBinding(scopes, "Function") == null
+    ) {
+      state.diagnostics.push(
+        sourceDiagnostic(
+          state.sourceId,
+          expression,
+          "The Function constructor requires dynamic source and is " +
+            "unsupported in M5.",
+        ),
+      );
+      return undefined;
+    }
     const argumentsValue: HirCallArgument[] = [];
     for (const argument of expression.arguments) {
       const resolved = resolveCallArgument(argument, scopes, state);
@@ -1006,6 +1042,17 @@ function resolveExpression(
       kind: "promise-construct",
       range: expression.range,
     };
+  }
+  if (callsDynamicFunctionConstructor(expression.target, scopes)) {
+    state.diagnostics.push(
+      sourceDiagnostic(
+        state.sourceId,
+        expression,
+        "The Function constructor requires dynamic source and is " +
+          "unsupported in M5.",
+      ),
+    );
+    return undefined;
   }
   const argumentValues: HirCallArgument[] = [];
   for (const argument of expression.arguments) {
@@ -1389,6 +1436,9 @@ function buildFunctionInits(
       functionKind: functionValue.functionKind,
       functionName: functionValue.name,
       functionLength: functionValue.functionLength,
+      ...(functionValue.sourceText == null
+        ? {}
+        : { sourceText: functionValue.sourceText }),
       kind: "function-init",
       name: bindingName,
       range: statement.range,
@@ -2001,6 +2051,7 @@ function resolveFunctionExpression(
     kind: "function",
     name: expression.inferredName ?? functionValue.name ?? "",
     range: expression.range,
+    ...(resolved.sourceText == null ? {} : { sourceText: resolved.sourceText }),
   };
 }
 
@@ -2195,6 +2246,9 @@ function resolveClassExpression(
     kind: "function",
     name: expression.inferredName ?? expression.constructorFunction.name ?? "",
     range: expression.range,
+    ...(resolvedConstructor.sourceText == null
+      ? {}
+      : { sourceText: resolvedConstructor.sourceText }),
   };
   const elements: HirClassElement[] = [];
   for (const element of expression.elements) {
@@ -2226,6 +2280,9 @@ function resolveClassExpression(
           kind: "function",
           name: "",
           range: element.range,
+          ...(resolvedBlock.sourceText == null
+            ? {}
+            : { sourceText: resolvedBlock.sourceText }),
         },
       });
       continue;
@@ -2248,6 +2305,9 @@ function resolveClassExpression(
       kind: "function",
       name: element.value.name ?? "",
       range: element.range,
+      ...(resolvedMethod.sourceText == null
+        ? {}
+        : { sourceText: resolvedMethod.sourceText }),
     };
     const staticName = classElementStaticName(key);
     elements.push({

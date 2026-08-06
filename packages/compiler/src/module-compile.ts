@@ -1071,6 +1071,9 @@ function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
     kind: "function",
     name: functionValue.name,
     range: functionValue.range,
+    ...(functionValue.sourceText == null
+      ? {}
+      : { sourceText: functionValue.sourceText }),
   };
 }
 

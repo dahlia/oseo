@@ -204,3 +204,7 @@ families:
     owner: tests/property/m5-object-prototype.property.test.ts
     start: 0x60003200
     end: 0x600032ff
+  - family: m5-function-prototype
+    owner: tests/property/m5-function-prototype.property.test.ts
+    start: 0x60003300
+    end: 0x600033ff

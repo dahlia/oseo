@@ -2,6 +2,146 @@ import type { Fixture } from "../fixture.ts";
 
 export const functionFixtures: readonly Fixture[] = [
   {
+    name: "function-prototype",
+    source: `
+function add(left, right) {
+  return this.base + left + right;
+}
+console.log("call", add.call({ base: 10 }, 2, 3));
+console.log("apply", add.apply({ base: 20 }, { 0: 4, 1: 5, length: 2 }));
+function readMarker(value) { return value.marker; }
+console.log(
+  "apply accessor",
+  readMarker.apply(null, {
+    get 0() { return { marker: 31 }; },
+    length: 1,
+  }),
+);
+console.log("apply null", add.apply({ base: 30 }, null));
+const boundAdd = add.bind({ base: 40 }, 6);
+console.log("bind", boundAdd(7), boundAdd.name, boundAdd.length);
+
+function Box(first, second) {
+  this.total = first + second;
+}
+const BoundBox = Box.bind({ total: -1 }, 8);
+const box = new BoundBox(9);
+console.log(
+  "bound construct",
+  box.total,
+  box instanceof Box,
+  box instanceof BoundBox,
+  BoundBox.hasOwnProperty("prototype"),
+);
+class ParentBox {
+  static marker() { return 32; }
+}
+class ChildBox extends ParentBox {}
+const BoundChildBox = ChildBox.bind(null);
+console.log(
+  "bound prototype",
+  BoundChildBox.marker(),
+  BoundChildBox instanceof ParentBox,
+);
+
+const matcher = {
+  [Symbol.hasInstance]: function (candidate) {
+    return candidate.marker === 11;
+  },
+};
+console.log(
+  "hasInstance",
+  { marker: 11 } instanceof matcher,
+  { marker: 12 } instanceof matcher,
+  Function.prototype[Symbol.hasInstance].call(Box, box),
+);
+
+console.log(
+  "function metadata",
+  Function.prototype.constructor === Function,
+  Function.name,
+  Function.length,
+  Function.prototype.name === "",
+  Function.prototype.length,
+);
+for (const name of ["call", "apply", "bind", "toString"]) {
+  const value = Function.prototype[name];
+  const descriptor = Object.getOwnPropertyDescriptor(
+    Function.prototype,
+    name,
+  );
+  console.log(
+    "method",
+    name,
+    value.name,
+    value.length,
+    descriptor.writable,
+    descriptor.enumerable,
+    descriptor.configurable,
+  );
+}
+const hasInstanceDescriptor = Object.getOwnPropertyDescriptor(
+  Function.prototype,
+  Symbol.hasInstance,
+);
+console.log(
+  "hasInstance descriptor",
+  Function.prototype[Symbol.hasInstance].name,
+  Function.prototype[Symbol.hasInstance].length,
+  hasInstanceDescriptor.writable,
+  hasInstanceDescriptor.enumerable,
+  hasInstanceDescriptor.configurable,
+);
+
+const callerDescriptor = Object.getOwnPropertyDescriptor(
+  Function.prototype,
+  "caller",
+);
+const argumentsDescriptor = Object.getOwnPropertyDescriptor(
+  Function.prototype,
+  "arguments",
+);
+console.log(
+  "restricted",
+  typeof callerDescriptor.get,
+  typeof callerDescriptor.set,
+  typeof argumentsDescriptor.get,
+  typeof argumentsDescriptor.set,
+  callerDescriptor.enumerable,
+  callerDescriptor.configurable,
+);
+try { Function.prototype.caller; } catch (error) {
+  console.log("restricted throws", error instanceof TypeError);
+}
+
+console.log(
+  "source",
+  add.toString() ===
+    "function add(left, right) {\\n" +
+      "  return this.base + left + right;\\n" +
+      "}",
+  boundAdd.toString(),
+  Function.prototype.call.toString(),
+  Function.prototype.toString(),
+);
+Object.defineProperty(Function.prototype.call, "name", {
+  get: function () { throw new Error("name getter must not run"); },
+});
+console.log(
+  "native source stable",
+  Function.prototype.toString.call(Function.prototype.call),
+);
+console.log("root call", Function.prototype(1, 2));
+
+let turn = 0;
+while (turn < 2) {
+  console.log("guarded", add.call({ base: turn }, 1, 2));
+  if (turn === 0) add.marker = true;
+  turn = turn + 1;
+}
+`,
+  },
+  {
     name: "closures-and-methods",
     source: `
 function makeCounter(start) {

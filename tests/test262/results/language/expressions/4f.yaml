@@ -178,11 +178,11 @@ results:
       - dynamic-source
       - expression-operators
     observation:
-      detail: "test/language/expressions/tagged-template/cache-identical-sour\
-        ce-new-function.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/tagged-template/cache-identi\
-        cal-source-new-function.js:92:6: error[OSEO1001]: Unknown
-        binding 'Function'.\\n\""
+      detail: 'test/language/expressions/tagged-template/cache-identical-source-new-function.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/tagged-template/cache-identical-source-new-function.js:92:2:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

@@ -382,12 +382,11 @@ results:
       - dynamic-source
       - expression-operators
     observation:
-      detail: "test/language/expressions/tagged-template/cache-differing-expr\
-        essions-new-function.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/expressions/tagged-template/cache-differ\
-        ing-expressions-new-function.js:93:6: error[OSEO1001]: Unknown
-        binding 'Function'.\\n\""
+      detail: 'test/language/expressions/tagged-template/cache-differing-expressions-new-function.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/tagged-template/cache-differing-expressions-new-function.js:93:2:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       unsupportedCapability: profile-syntax
       passed: false
     unsupportedFeatures: []

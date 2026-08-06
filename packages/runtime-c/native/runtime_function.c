@@ -16,6 +16,34 @@ typedef struct {
     OseoBuiltinDispatcher dispatch;
 } OseoBuiltinDispatchRange;
 
+static OseoResult function_prototype_apply(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult function_prototype_bind(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult function_prototype_call(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult function_prototype_to_string(
+    OseoContext *context,
+    OseoValue target
+);
+OseoResult oseo_internal_ordinary_has_instance(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue value
+);
+
 OseoResult oseo_internal_function_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -26,12 +54,56 @@ OseoResult oseo_internal_function_builtin_dispatch(
     OseoValue new_target
 ) {
     (void)callee;
-    (void)receiver;
-    (void)argument_count;
-    (void)arguments;
-    (void)new_target;
     if (code_id == OSEO_FUNCTION_PROTOTYPE_CODE_ID) {
         return normal(oseo_undefined());
+    }
+    if (code_id == OSEO_FUNCTION_CONSTRUCTOR_CODE_ID) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Function compiles source text at run time, which is outside "
+            "the admitted profile."
+        );
+    }
+    if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Function prototype method is not a constructor."
+        );
+    }
+    if (code_id == OSEO_FUNCTION_APPLY_CODE_ID) {
+        return function_prototype_apply(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_FUNCTION_BIND_CODE_ID) {
+        return function_prototype_bind(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_FUNCTION_CALL_CODE_ID) {
+        return function_prototype_call(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_FUNCTION_TO_STRING_CODE_ID) {
+        return function_prototype_to_string(context, receiver);
+    }
+    if (code_id == OSEO_FUNCTION_HAS_INSTANCE_CODE_ID) {
+        OseoValue value = argument_count == 0u
+            ? oseo_undefined()
+            : arguments[0];
+        return oseo_internal_ordinary_has_instance(context, receiver, value);
     }
     return oseo_unknown_function(context, code_id);
 }
@@ -190,6 +262,385 @@ OseoResult oseo_argument_list_view(
     return normal(list_value);
 }
 
+static OseoResult require_callable(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_function(value)) return normal(value);
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "Function prototype method requires a callable receiver."
+    );
+}
+
+static OseoResult array_like_length(
+    OseoContext *context,
+    OseoValue value,
+    double *length
+) {
+    *length = 0.0;
+    if (!is_object(value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Function.prototype.apply requires an object argument list."
+        );
+    }
+    if (is_array(value)) {
+        *length = (double)ordinary_object(value)->array_length;
+        return normal(value);
+    }
+    OseoValue slots[2] = {value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "length");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_to_number(context, result.value);
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    double number = number_value(result.value);
+    if (!(number > 0.0)) return normal(value);
+    number = floor(number);
+    *length = number > 9007199254740991.0
+        ? 9007199254740991.0
+        : number;
+    return normal(value);
+}
+
+static OseoResult function_prototype_call(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult callable = require_callable(context, target);
+    if (callable.status != OSEO_STATUS_NORMAL) return callable;
+    OseoValue receiver = argument_count == 0u
+        ? oseo_undefined()
+        : arguments[0];
+    size_t forwarded_count = argument_count == 0u
+        ? 0u
+        : argument_count - 1u;
+    const OseoValue *forwarded = forwarded_count == 0u
+        ? NULL
+        : arguments + 1u;
+    return oseo_call_function(
+        context,
+        target,
+        receiver,
+        forwarded_count,
+        forwarded,
+        oseo_undefined()
+    );
+}
+
+static OseoResult function_prototype_apply(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult callable = require_callable(context, target);
+    if (callable.status != OSEO_STATUS_NORMAL) return callable;
+    OseoValue receiver = argument_count == 0u
+        ? oseo_undefined()
+        : arguments[0];
+    OseoValue source = argument_count < 2u
+        ? oseo_undefined()
+        : arguments[1];
+    if (is_nullish(source)) {
+        return oseo_call_function(
+            context,
+            target,
+            receiver,
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+    }
+    OseoValue slots[5] = {
+        target,
+        receiver,
+        source,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    double length = 0.0;
+    OseoResult result = array_like_length(context, slots[2], &length);
+    if (result.status == OSEO_STATUS_NORMAL && length > (double)SIZE_MAX) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Function.prototype.apply argument list is too large."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_create(context);
+        slots[3] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && (double)index < length;
+         index += 1u) {
+        result = oseo_property_key(context, oseo_number((double)index));
+        slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[2], slots[4]);
+            slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_argument_list_append(
+                context,
+                slots[3],
+                slots[4]
+            );
+        }
+    }
+    size_t forwarded_count = 0u;
+    const OseoValue *forwarded = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_view(
+            context,
+            slots[3],
+            &forwarded_count,
+            &forwarded
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[0],
+            slots[1],
+            forwarded_count,
+            forwarded,
+            oseo_undefined()
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult bound_function_name(
+    OseoContext *context,
+    OseoValue name
+) {
+    size_t base_length = is_string(name) ? string_object(name)->length : 0u;
+    if (base_length > SIZE_MAX / sizeof(uint16_t) - 6u) {
+        return failure(context, "OSEO2001", "Bound name is too large.");
+    }
+    size_t length = base_length + 6u;
+    uint16_t *units = malloc(length * sizeof(*units));
+    if (units == NULL) {
+        return failure(context, "OSEO2001", "Bound name allocation failed.");
+    }
+    static const char prefix[] = "bound ";
+    for (size_t index = 0u; index < 6u; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)prefix[index];
+    }
+    if (base_length > 0u) {
+        memcpy(
+            units + 6u,
+            string_object(name)->units,
+            base_length * sizeof(*units)
+        );
+    }
+    OseoValue rooted = name;
+    OseoRootFrame frame = {NULL, &rooted, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_allocate_string(context, units, length);
+    oseo_roots_pop(context, &frame);
+    free(units);
+    return result;
+}
+
+static OseoResult function_prototype_bind(
+    OseoContext *context,
+    OseoValue target,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoResult result = require_callable(context, target);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 7u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = target;
+    frame.slots[1] = argument_count == 0u
+        ? oseo_undefined()
+        : arguments[0];
+    result = oseo_argument_list_create(context);
+    frame.slots[2] = result.value;
+    for (size_t index = 1u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = oseo_argument_list_append(
+            context,
+            frame.slots[2],
+            arguments[index]
+        );
+    }
+    OseoValue length_value = oseo_number(0.0);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "length");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_has_own(context, frame.slots[0], frame.slots[3]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && oseo_to_boolean(result.value)) {
+        result = oseo_object_get(context, frame.slots[0], frame.slots[3]);
+        if (result.status == OSEO_STATUS_NORMAL && is_number(result.value)) {
+            double target_length = number_value(result.value);
+            double bound_count = argument_count == 0u
+                ? 0.0
+                : (double)(argument_count - 1u);
+            double bound_length;
+            if (isinf(target_length) && target_length > 0.0) {
+                bound_length = INFINITY;
+            } else if (!isfinite(target_length)) {
+                bound_length = 0.0;
+            } else {
+                double integer = trunc(target_length);
+                bound_length = integer > bound_count
+                    ? integer - bound_count
+                    : 0.0;
+            }
+            length_value = oseo_number(bound_length);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "name");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, frame.slots[0], frame.slots[3]);
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = bound_function_name(context, frame.slots[4]);
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_create(context, 0u);
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoString *name = string_object(frame.slots[4]);
+        result = oseo_function_create(
+            context,
+            OSEO_FUNCTION_BIND_CODE_ID,
+            frame.slots[5],
+            name->units,
+            name->length,
+            0u,
+            OSEO_FUNCTION_BOUND,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[6] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "length");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoPropertyAttributes attributes = {
+            true,
+            false,
+            false,
+            false,
+        };
+        result = oseo_object_define(
+            context,
+            frame.slots[6],
+            frame.slots[3],
+            length_value,
+            attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoFunction *bound = function_object(frame.slots[6]);
+        bound->ordinary.prototype =
+            ordinary_object(frame.slots[0])->prototype;
+        bound->bound_target = frame.slots[0];
+        bound->bound_this = frame.slots[1];
+        bound->bound_arguments = frame.slots[2];
+        result = normal(frame.slots[6]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+static OseoResult native_function_text(
+    OseoContext *context,
+    OseoValue target
+) {
+    OseoValue slots[2] = {target, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    slots[1] = function_object(slots[0])->initial_name;
+    OseoResult result = normal(slots[1]);
+    size_t name_length = is_string(slots[1])
+        ? string_object(slots[1])->length
+        : 0u;
+    if (function_object(slots[0])->function_kind == OSEO_FUNCTION_BOUND) {
+        name_length = 0u;
+    }
+    static const char prefix[] = "function ";
+    static const char suffix[] = "() { [native code] }";
+    size_t length = 9u + name_length + 20u;
+    uint16_t *units = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        units = malloc(length * sizeof(*units));
+        if (units == NULL) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "Native function text allocation failed."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        for (size_t index = 0u; index < 9u; index += 1u) {
+            units[index] = (uint16_t)(unsigned char)prefix[index];
+        }
+        if (name_length > 0u) {
+            memcpy(
+                units + 9u,
+                string_object(slots[1])->units,
+                name_length * sizeof(*units)
+            );
+        }
+        for (size_t index = 0u; index < 20u; index += 1u) {
+            units[9u + name_length + index] =
+                (uint16_t)(unsigned char)suffix[index];
+        }
+        result = oseo_internal_allocate_string(context, units, length);
+    }
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult function_prototype_to_string(
+    OseoContext *context,
+    OseoValue target
+) {
+    OseoResult callable = require_callable(context, target);
+    if (callable.status != OSEO_STATUS_NORMAL) return callable;
+    OseoValue source = function_object(target)->source_text;
+    if (is_string(source)) return normal(source);
+    return native_function_text(context, target);
+}
+
 /*
  * SetFunctionName's "get "/"set " prefix, applied to whatever base
  * name the static or computed key path already resolved, mirroring
@@ -281,6 +732,218 @@ static OseoResult intrinsic_graph_root(OseoContext *context) {
     return result;
 }
 
+static OseoResult create_function_builtin(
+    OseoContext *context,
+    size_t code_id,
+    const char *name,
+    size_t length,
+    OseoFunctionKind kind
+) {
+    size_t name_length = strlen(name);
+    if (name_length > 31u) {
+        return failure(context, "OSEO2001", "Built-in name is too long.");
+    }
+    uint16_t units[31];
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue environment = oseo_undefined();
+    OseoRootFrame frame = {NULL, &environment, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    environment = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            environment,
+            units,
+            name_length,
+            length,
+            kind,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoResult function_prototype_intrinsic(OseoContext *context) {
+    OseoValue prototype =
+        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
+    OseoValue *marker =
+        &context->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE];
+    if (is_function(*marker)) return normal(prototype);
+    if (is_object(*marker)) return normal(prototype);
+    if (!is_function(prototype)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Function prototype is unavailable."
+        );
+    }
+    size_t entry_allocations = context->allocations;
+    *marker = prototype;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) {
+        *marker = oseo_undefined();
+        return result;
+    }
+    frame.slots[0] = prototype;
+    result = create_function_builtin(
+        context,
+        OSEO_FUNCTION_CONSTRUCTOR_CODE_ID,
+        "Function",
+        1u,
+        OSEO_FUNCTION_ORDINARY
+    );
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        context->intrinsics[OSEO_INTRINSIC_FUNCTION] = frame.slots[1];
+        OseoFunction *constructor = function_object(frame.slots[1]);
+        constructor->prototype_object = frame.slots[0];
+        constructor->prototype_writable = false;
+    }
+    static const OseoIntrinsic intrinsics[] = {
+        OSEO_INTRINSIC_FUNCTION_APPLY,
+        OSEO_INTRINSIC_FUNCTION_BIND,
+        OSEO_INTRINSIC_FUNCTION_CALL,
+        OSEO_INTRINSIC_FUNCTION_TO_STRING,
+        OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE,
+    };
+    static const size_t codes[] = {
+        OSEO_FUNCTION_APPLY_CODE_ID,
+        OSEO_FUNCTION_BIND_CODE_ID,
+        OSEO_FUNCTION_CALL_CODE_ID,
+        OSEO_FUNCTION_TO_STRING_CODE_ID,
+        OSEO_FUNCTION_HAS_INSTANCE_CODE_ID,
+    };
+    static const char *const names[] = {
+        "apply",
+        "bind",
+        "call",
+        "toString",
+        "[Symbol.hasInstance]",
+    };
+    static const size_t lengths[] = {2u, 1u, 1u, 0u, 1u};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 5u;
+         index += 1u) {
+        result = create_function_builtin(
+            context,
+            codes[index],
+            names[index],
+            lengths[index],
+            OSEO_FUNCTION_INTERNAL
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->intrinsics[intrinsics[index]] = result.value;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_throw_type_error_function(context);
+        frame.slots[2] = result.value;
+    }
+    static const char *const restricted_names[] = {"arguments", "caller"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = oseo_internal_ascii_string(
+            context,
+            restricted_names[index]
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            const OseoPropertyAttributes attributes = {
+                true,
+                false,
+                false,
+                true,
+            };
+            result = oseo_object_define_accessor(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                frame.slots[2],
+                frame.slots[2],
+                true,
+                true,
+                attributes
+            );
+        }
+    }
+    static const OseoIntrinsic properties[] = {
+        OSEO_INTRINSIC_FUNCTION,
+        OSEO_INTRINSIC_FUNCTION_APPLY,
+        OSEO_INTRINSIC_FUNCTION_BIND,
+        OSEO_INTRINSIC_FUNCTION_CALL,
+        OSEO_INTRINSIC_FUNCTION_TO_STRING,
+    };
+    static const char *const property_names[] = {
+        "constructor",
+        "apply",
+        "bind",
+        "call",
+        "toString",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 5u;
+         index += 1u) {
+        result = oseo_internal_ascii_string(context, property_names[index]);
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            const OseoPropertyAttributes attributes = {
+                true,
+                false,
+                true,
+                false,
+            };
+            result = oseo_object_define(
+                context,
+                frame.slots[0],
+                frame.slots[3],
+                context->intrinsics[properties[index]],
+                attributes
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_HAS_INSTANCE
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoPropertyAttributes attributes = {
+            false,
+            false,
+            false,
+            false,
+        };
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[3],
+            context->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE],
+            attributes
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = normal(frame.slots[0]);
+        if (context->observe_specialization) {
+            context->allocations = entry_allocations;
+        }
+    } else {
+        *marker = oseo_undefined();
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     if ((size_t)intrinsic >= OSEO_INTRINSIC_COUNT) {
         return failure(context, "OSEO2001", "Unknown realm intrinsic.");
@@ -293,8 +956,15 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         if (materialized.status == OSEO_STATUS_NORMAL) {
             materialized = oseo_internal_object_prototype(context);
         }
-    } else if (intrinsic == OSEO_INTRINSIC_FUNCTION_PROTOTYPE) {
+    } else if (
+        intrinsic == OSEO_INTRINSIC_FUNCTION_PROTOTYPE ||
+        (intrinsic >= OSEO_INTRINSIC_FUNCTION &&
+         intrinsic <= OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE)
+    ) {
         materialized = intrinsic_graph_root(context);
+        if (materialized.status == OSEO_STATUS_NORMAL) {
+            materialized = function_prototype_intrinsic(context);
+        }
     } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PROTOTYPE) {
         materialized = oseo_internal_array_prototype(context);
     } else if (intrinsic == OSEO_INTRINSIC_PROMISE_PROTOTYPE) {
@@ -406,6 +1076,7 @@ OseoResult oseo_function_create(
         case OSEO_FUNCTION_GENERATOR:
         case OSEO_FUNCTION_ASYNC_GENERATOR:
         case OSEO_FUNCTION_CLASS:
+        case OSEO_FUNCTION_BOUND:
             break;
         default:
             return failure(context, "OSEO2001", "Invalid function kind.");
@@ -528,6 +1199,11 @@ OseoResult oseo_function_create(
     function->lexical_super = oseo_undefined();
     function->prototype_object = frame.slots[1];
     function->home_object = oseo_undefined();
+    function->initial_name = oseo_undefined();
+    function->source_text = oseo_undefined();
+    function->bound_target = oseo_undefined();
+    function->bound_this = oseo_undefined();
+    function->bound_arguments = oseo_undefined();
     function->elements = NULL;
     function->element_count = 0u;
     function->element_capacity = 0u;
@@ -626,6 +1302,9 @@ OseoResult oseo_function_create(
             frame.slots[5],
             attributes
         );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            function_object(frame.slots[2])->initial_name = frame.slots[5];
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         !bootstrapping_function_prototype &&
@@ -662,6 +1341,35 @@ OseoResult oseo_function_create(
         result.value = frame.slots[2];
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_function_set_source(
+    OseoContext *context,
+    OseoValue function_value,
+    const uint16_t *source_units,
+    size_t source_length
+) {
+    if (!is_function(function_value)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Function source requires a callable value."
+        );
+    }
+    OseoValue rooted = function_value;
+    OseoRootFrame frame = {NULL, &rooted, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_allocate_string(
+        context,
+        source_units,
+        source_length
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        function_object(rooted)->source_text = result.value;
+        result = normal(rooted);
+    }
+    oseo_roots_pop(context, &frame);
     return result;
 }
 
@@ -711,7 +1419,58 @@ OseoResult oseo_function_prototype(
             "Constructed value is not a constructor."
         );
     }
+    while (
+        function_object(function_value)->function_kind == OSEO_FUNCTION_BOUND
+    ) {
+        function_value = function_object(function_value)->bound_target;
+    }
     return normal(function_object(function_value)->prototype_object);
+}
+
+OseoResult oseo_internal_ordinary_has_instance(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue value
+) {
+    if (!is_function(target)) return normal(oseo_boolean(false));
+    if (function_object(target)->function_kind == OSEO_FUNCTION_BOUND) {
+        return oseo_instanceof(
+            context,
+            value,
+            function_object(target)->bound_target
+        );
+    }
+    if (!is_object(value)) return normal(oseo_boolean(false));
+    OseoValue slots[3] = {target, value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, "prototype");
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[2]);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The instanceof prototype must be an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue current = ordinary_object(slots[1])->prototype;
+        bool found = false;
+        while (is_object(current)) {
+            if (current == slots[2]) {
+                found = true;
+                break;
+            }
+            current = ordinary_object(current)->prototype;
+        }
+        result = normal(oseo_boolean(found));
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }
 
 OseoResult oseo_constructor_receiver(
@@ -1574,6 +2333,84 @@ OseoResult oseo_derived_constructor_result(
     return oseo_cell_get(context, cell);
 }
 
+static OseoResult call_bound_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = callee;
+    frame.slots[1] = receiver;
+    frame.slots[2] = new_target;
+    frame.slots[3] = function_object(frame.slots[0])->bound_target;
+    frame.slots[4] = function_object(frame.slots[0])->bound_this;
+    OseoValue combined = oseo_undefined();
+    OseoRootFrame combined_frame = {NULL, &combined, 1u};
+    oseo_roots_push(context, &combined_frame);
+    result = oseo_argument_list_create(context);
+    combined = result.value;
+    size_t bound_count = 0u;
+    const OseoValue *bound_values = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_view(
+            context,
+            function_object(frame.slots[0])->bound_arguments,
+            &bound_count,
+            &bound_values
+        );
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < bound_count;
+         index += 1u) {
+        result = oseo_argument_list_append(
+            context,
+            combined,
+            bound_values[index]
+        );
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        result = oseo_argument_list_append(
+            context,
+            combined,
+            arguments[index]
+        );
+    }
+    size_t combined_count = 0u;
+    const OseoValue *combined_values = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_argument_list_view(
+            context,
+            combined,
+            &combined_count,
+            &combined_values
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        bool constructing = tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED;
+        OseoValue forwarded_target = frame.slots[2] == frame.slots[0]
+            ? frame.slots[3]
+            : frame.slots[2];
+        result = oseo_call_function(
+            context,
+            frame.slots[3],
+            constructing ? frame.slots[1] : frame.slots[4],
+            combined_count,
+            combined_values,
+            forwarded_target
+        );
+    }
+    oseo_roots_pop(context, &combined_frame);
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_call_function(
     OseoContext *context,
     OseoValue callee,
@@ -1598,6 +2435,21 @@ OseoResult oseo_call_function(
         OseoFunction *function = function_object(callee);
         receiver = function->lexical_this;
         new_target = function->lexical_new_target;
+    }
+    if (is_function(callee) &&
+        function_object(callee)->function_kind == OSEO_FUNCTION_BOUND) {
+        OseoResult entered = oseo_call_enter(context);
+        if (entered.status != OSEO_STATUS_NORMAL) return entered;
+        OseoResult result = call_bound_function(
+            context,
+            callee,
+            receiver,
+            argument_count,
+            arguments,
+            new_target
+        );
+        oseo_call_leave(context);
+        return result;
     }
     size_t code_id = 0u;
     OseoResult result = oseo_function_code_id(context, callee, &code_id);

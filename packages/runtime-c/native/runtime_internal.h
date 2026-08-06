@@ -168,6 +168,18 @@
 #define OSEO_FUNCTION_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_FUNCTION_CODE_ID_RANGE_INDEX)
 #define OSEO_FUNCTION_PROTOTYPE_CODE_ID OSEO_FUNCTION_CODE_ID_RANGE_LAST
+#define OSEO_FUNCTION_CONSTRUCTOR_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_FUNCTION_APPLY_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_FUNCTION_BIND_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_FUNCTION_CALL_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_FUNCTION_TO_STRING_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_FUNCTION_HAS_INSTANCE_CODE_ID \
+    (OSEO_FUNCTION_CODE_ID_RANGE_LAST - 6u)
 
 #define OSEO_OBJECT_CODE_ID_RANGE_INDEX ((size_t)9u)
 #define OSEO_OBJECT_CODE_ID_RANGE_FIRST \
@@ -570,6 +582,14 @@ typedef struct {
      * definition sets it before it defines the element's property.
      */
     OseoValue home_object;
+    /* Initial SetFunctionName result, independent of later property changes. */
+    OseoValue initial_name;
+    /* Original source, or undefined for built-in and bound functions. */
+    OseoValue source_text;
+    /* BoundFunction exotic state, undefined outside OSEO_FUNCTION_BOUND. */
+    OseoValue bound_target;
+    OseoValue bound_this;
+    OseoValue bound_arguments;
     /*
      * [[Fields]] and [[PrivateMethods]], in class-body order and
      * non-NULL only on a class constructor whose body declared instance
@@ -775,7 +795,13 @@ static inline bool is_function(OseoValue value) {
 }
 static inline bool function_is_constructible(OseoValue value) {
     if (!is_function(value)) return false;
-    OseoFunctionKind kind = function_object(value)->function_kind;
+    OseoFunctionKind kind;
+    while (true) {
+        kind = function_object(value)->function_kind;
+        if (kind != OSEO_FUNCTION_BOUND) break;
+        value = function_object(value)->bound_target;
+        if (!is_function(value)) return false;
+    }
     return kind == OSEO_FUNCTION_ORDINARY || kind == OSEO_FUNCTION_CLASS;
 }
 /*
@@ -869,6 +895,12 @@ OseoResult oseo_internal_function_builtin_dispatch(
     size_t argument_count,
     const OseoValue *arguments,
     OseoValue new_target
+);
+/* OrdinaryHasInstance, shared by instanceof and @@hasInstance dispatch. */
+OseoResult oseo_internal_ordinary_has_instance(
+    OseoContext *context,
+    OseoValue target,
+    OseoValue value
 );
 OseoResult oseo_internal_promise_builtin_dispatch(
     OseoContext *context,

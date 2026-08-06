@@ -76,3 +76,32 @@ test("populates the realm-owned Object prototype", () => {
     /const OseoPropertyAttributes attributes = \{true, false, true, false\}/u,
   );
 });
+
+test("populates the realm-owned Function prototype", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+
+  for (const intrinsic of [
+    "FUNCTION",
+    "FUNCTION_APPLY",
+    "FUNCTION_BIND",
+    "FUNCTION_CALL",
+    "FUNCTION_TO_STRING",
+    "FUNCTION_HAS_INSTANCE",
+  ]) {
+    assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
+  }
+  for (const property of [
+    "arguments",
+    "caller",
+    "constructor",
+    "apply",
+    "bind",
+    "call",
+    "toString",
+  ]) {
+    assert.match(functionSource, new RegExp(`"${property}"`, "u"));
+  }
+  assert.match(functionSource, /OSEO_WELL_KNOWN_HAS_INSTANCE/u);
+  assert.match(functionSource, /oseo_internal_throw_type_error_function/u);
+});

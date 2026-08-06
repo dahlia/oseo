@@ -1,0 +1,26 @@
+group: built-ins/Function
+key: 7d
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T10.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - functions
+    observation:
+      detail: "test/built-ins/Function/prototype/call/S15.3.4.4_A3_T10.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/prototype/call/S15.3.4.4_A3_T1\
+        0.js:82:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      unsupportedCapability: profile-syntax
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

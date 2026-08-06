@@ -15,6 +15,54 @@ test("normalizes Babel parse failures", () => {
   assert.equal(result.diagnostics[0]?.sourceId, "invalid.ts");
 });
 
+test("preserves function source and lowers the Function intrinsic", () => {
+  const source = `console.log(Function);
+function sample(value) { return value; }
+`;
+  const parsed = babelFrontend.parse({ source, sourceId: "function.ts" });
+  assert.ok(parsed.parsed);
+  const declaration = parsed.program?.body[1];
+  assert.equal(declaration?.kind, "function");
+  if (declaration?.kind !== "function") return;
+  assert.equal(
+    declaration.sourceText,
+    "function sample(value) { return value; }",
+  );
+
+  const compiled = compileSource(babelFrontend, {
+    source,
+    sourceId: "function.ts",
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  assert.ok(compiled.mir != null);
+  assert.match(printHir(compiled.hir), /intrinsic Function/u);
+  assert.match(
+    printMir(compiled.mir),
+    /function-intrinsic intrinsic Function/u,
+  );
+  const sample = compiled.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .find(
+      (operation) =>
+        operation.kind === "function-create" &&
+        operation.functionName === "sample",
+    );
+  assert.equal(sample?.functionSource, declaration.sourceText);
+
+  for (const dynamicSource of ["Function('return 1')", "new Function()"]) {
+    const rejected = compileSource(babelFrontend, {
+      source: dynamicSource,
+      sourceId: "dynamic-function.ts",
+    });
+    assert.equal(rejected.mir, undefined);
+    assert.match(
+      rejected.diagnostics[0]?.message ?? "",
+      /Function constructor requires dynamic source/u,
+    );
+  }
+});
+
 test("converts the M1 profile to owned syntax and retains hints", () => {
   const result = babelFrontend.parse({
     source:

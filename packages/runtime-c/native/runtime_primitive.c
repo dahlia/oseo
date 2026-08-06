@@ -1670,44 +1670,60 @@ OseoResult oseo_instanceof(
     OseoValue left,
     OseoValue right
 ) {
-    if (!is_function(right)) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The instanceof right operand must be callable."
-        );
-    }
-    if (!is_object(left)) return normal(oseo_boolean(false));
-    OseoValue slots[3] = {left, right, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 3u};
+    OseoValue slots[4] = {
+        left,
+        right,
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
     oseo_roots_push(context, &frame);
-    const char *name = "prototype";
-    uint16_t units[9];
-    for (size_t index = 0u; index < 9u; index += 1u) {
-        units[index] = (uint16_t)(unsigned char)name[index];
+    OseoResult result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_HAS_INSTANCE
+    );
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[1], slots[2]);
+        slots[3] = result.value;
     }
-    OseoResult key = oseo_internal_allocate_string(context, units, 9u);
-    if (key.status != OSEO_STATUS_NORMAL) {
-        oseo_roots_pop(context, &frame);
-        return key;
+    if (result.status == OSEO_STATUS_NORMAL && !is_nullish(slots[3])) {
+        if (!is_function(slots[3])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Symbol.hasInstance is not callable."
+            );
+        } else {
+            result = oseo_call_function(
+                context,
+                slots[3],
+                slots[1],
+                1u,
+                &slots[0],
+                oseo_undefined()
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = normal(oseo_boolean(oseo_to_boolean(result.value)));
+            }
+        }
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        if (!is_function(slots[1])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The instanceof right operand must be callable."
+            );
+        } else {
+            result = oseo_internal_ordinary_has_instance(
+                context,
+                slots[1],
+                slots[0]
+            );
+        }
     }
-    slots[2] = key.value;
-    OseoResult prototype = oseo_object_get(context, slots[1], slots[2]);
     oseo_roots_pop(context, &frame);
-    if (prototype.status != OSEO_STATUS_NORMAL) return prototype;
-    if (!is_object(prototype.value)) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The instanceof prototype must be an object."
-        );
-    }
-    OseoValue current = ordinary_object(slots[0])->prototype;
-    while (is_object(current)) {
-        if (current == prototype.value) return normal(oseo_boolean(true));
-        current = ordinary_object(current)->prototype;
-    }
-    return normal(oseo_boolean(false));
+    return result;
 }
 
 OseoResult oseo_not_strict_equal(

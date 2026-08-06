@@ -3608,6 +3608,9 @@ export function functionDeclaration(
     name,
     parameters,
     returnHints,
+    ...(value.start == null || value.end == null
+      ? {}
+      : { sourceText: context.input.source.slice(value.start, value.end) }),
     ...(simpleParameterList ? { simpleParameterList: true } : {}),
     strict,
   };
@@ -3928,7 +3931,15 @@ export function classExpression(
       element.staticPlacement !== true &&
       (element.kind === "field" || element.key.kind === "private-name"),
   );
-  const classConstructor = constructorFunction ?? implicitConstructor;
+  const classSource =
+    value.start == null || value.end == null
+      ? undefined
+      : context.input.source.slice(value.start, value.end);
+  const selectedConstructor = constructorFunction ?? implicitConstructor;
+  const classConstructor =
+    classSource == null
+      ? selectedConstructor
+      : { ...selectedConstructor, sourceText: classSource };
   return {
     ...located,
     constructorFunction: instanceElements

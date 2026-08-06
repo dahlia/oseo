@@ -38,6 +38,10 @@ typedef enum {
      * well as to yield. Its `prototype` object reaches the realm-owned
      * %AsyncGeneratorPrototype% methods. */
     OSEO_FUNCTION_ASYNC_GENERATOR = 8,
+    /* BoundFunction exotic object. Calls prepend the captured arguments and
+     * use the captured receiver; construction forwards to a constructible
+     * target and substitutes that target for the bound new target. */
+    OSEO_FUNCTION_BOUND = 9,
 } OseoFunctionKind;
 
 /*
@@ -159,7 +163,13 @@ typedef enum {
     OSEO_INTRINSIC_OBJECT_TO_STRING = 48,
     OSEO_INTRINSIC_OBJECT_TO_LOCALE_STRING = 49,
     OSEO_INTRINSIC_OBJECT_VALUE_OF = 50,
-    OSEO_INTRINSIC_COUNT = 51,
+    OSEO_INTRINSIC_FUNCTION = 51,
+    OSEO_INTRINSIC_FUNCTION_APPLY = 52,
+    OSEO_INTRINSIC_FUNCTION_BIND = 53,
+    OSEO_INTRINSIC_FUNCTION_CALL = 54,
+    OSEO_INTRINSIC_FUNCTION_TO_STRING = 55,
+    OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE = 56,
+    OSEO_INTRINSIC_COUNT = 57,
 } OseoIntrinsic;
 
 typedef struct {
@@ -441,6 +451,13 @@ OseoResult oseo_function_create(
     OseoValue lexical_this,
     OseoValue inferred_name,
     OseoFunctionNamePrefix name_prefix
+);
+/** Retains the original ECMAScript source text for callable reflection. */
+OseoResult oseo_function_set_source(
+    OseoContext *context,
+    OseoValue function_value,
+    const uint16_t *source_units,
+    size_t source_length
 );
 OseoResult oseo_function_environment(
     OseoContext *context,
