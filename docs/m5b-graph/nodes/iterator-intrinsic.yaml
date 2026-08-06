@@ -16,5 +16,5 @@ dependencies:
   - function-prototype
   - object-prototype
   - well-known-symbols
-landed: false
+landed: true
 status: ready

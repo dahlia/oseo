@@ -13,4 +13,4 @@ dependencies:
   - object-prototype
   - well-known-symbols
 landed: false
-status: blocked
+status: ready
