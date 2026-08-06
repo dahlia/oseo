@@ -156,7 +156,9 @@ current evidence assessment. Those live only in the indexed records above.
     all-miss PutValue ECMA-262 makes throw instead of creating a
     global, is itself a source-located rejection until that strict
     throw is lowered, so it neither runs with sloppy semantics nor
-    poisons the fold.
+    poisons the fold. A write to an `Array` fallback is also a
+    source-located rejection because the profile cannot preserve that
+    sloppy global write across separate or repeated `with` statements.
     `typeof` of an unshadowed admitted intrinsic value, including `Array`,
     `Function`, `Symbol`, and the error constructors, resolves that value and
     reports `"function"`. A runtime-owned name such as `Object` or `Promise`

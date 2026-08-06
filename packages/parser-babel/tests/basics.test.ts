@@ -126,6 +126,39 @@ test("lowers the Array intrinsic and preserves ordinary shadowing", () => {
   );
 });
 
+test("rejects an Array write through a with fallback", () => {
+  const sources = [
+    {
+      source:
+        "const replacement = function () {};\n" +
+        "with ({}) {\n" +
+        "  Array = replacement;\n" +
+        "  console.log(Array === replacement);\n" +
+        "}",
+      start: { column: 3, line: 3 },
+    },
+    { source: "with ({}) { Array++; }" },
+    { source: "with ({}) { [Array] = [1]; }" },
+    { source: "with ({}) { for (Array in {}) {} }" },
+    { source: "with ({}) { for (Array of []) {} }" },
+  ];
+  for (const { source, start } of sources) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "with-array-write.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      /Assigning with fallback binding 'Array'/u,
+      source,
+    );
+    if (start != null) {
+      assert.deepEqual(result.diagnostics[0]?.range.start, start);
+    }
+  }
+});
+
 test("starts static class method source at the method definition", () => {
   const source = `class C {
   static /* omitted */ plain() {}
