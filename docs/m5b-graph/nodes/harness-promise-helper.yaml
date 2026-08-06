@@ -7,4 +7,6 @@ dependencies:
   - array-prototype-iterative
   - promise-intrinsic
 landed: false
-status: blocked
+status: parked
+reason: "Its array-constructor prerequisite is parked after repeated CI
+  aggregation failures; resume it when that prerequisite returns to ready."

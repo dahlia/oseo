@@ -20,4 +20,6 @@ dependencies:
   - string-prototype-match-and-split
   - string-prototype-replace
 landed: false
-status: blocked
+status: parked
+reason: "Its array-constructor prerequisite is parked after repeated CI
+  aggregation failures; resume it when that prerequisite returns to ready."
