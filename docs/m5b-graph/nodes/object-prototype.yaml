@@ -12,4 +12,4 @@ dependencies:
   - intrinsic-graph-root
   - well-known-symbols
 landed: false
-status: blocked
+status: ready
